@@ -245,20 +245,6 @@
           "sortable": true
         }
       },
-      "blurhash": {
-        "edit": {
-          "label": "blurhash",
-          "description": "",
-          "placeholder": "",
-          "visible": true,
-          "editable": true
-        },
-        "list": {
-          "label": "blurhash",
-          "searchable": true,
-          "sortable": true
-        }
-      },
       "createdAt": {
         "edit": {
           "label": "createdAt",
@@ -313,6 +299,14 @@
         },
         "list": {
           "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
           "searchable": true,
           "sortable": true
         }
@@ -407,12 +401,6 @@
           },
           {
             "name": "folderPath",
-            "size": 6
-          }
-        ],
-        [
-          {
-            "name": "blurhash",
             "size": 6
           }
         ]

@@ -148,9 +148,23 @@
           "searchable": true,
           "sortable": true
         }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
       }
     },
     "layouts": {
+      "list": [
+        "name",
+        "events",
+        "slug",
+        "country"
+      ],
       "edit": [
         [
           {
@@ -180,12 +194,6 @@
             "size": 6
           }
         ]
-      ],
-      "list": [
-        "name",
-        "events",
-        "slug",
-        "country"
       ]
     }
   },

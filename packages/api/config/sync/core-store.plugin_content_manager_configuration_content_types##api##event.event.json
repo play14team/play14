@@ -54,8 +54,7 @@
           "description": "When does it starts?",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "step": 30
+          "editable": true
         },
         "list": {
           "label": "start",
@@ -69,8 +68,7 @@
           "description": "When does it ends?",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "step": 30
+          "editable": true
         },
         "list": {
           "label": "end",
@@ -81,8 +79,8 @@
       "eventStatus": {
         "edit": {
           "label": "Status",
-          "description": "Event status workflow: Announced → Open → Over → Cancelled",
-          "placeholder": "Select event status",
+          "description": "",
+          "placeholder": "",
           "visible": true,
           "editable": true
         },
@@ -140,7 +138,8 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "day"
         },
         "list": {
           "label": "timetable",
@@ -154,7 +153,8 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "link"
         },
         "list": {
           "label": "registration",
@@ -242,7 +242,8 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "category"
         },
         "list": {
           "label": "sponsorships",
@@ -256,7 +257,8 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "type"
         },
         "list": {
           "label": "media",
@@ -295,7 +297,7 @@
       },
       "tagline": {
         "edit": {
-          "label": "Tagline",
+          "label": "tagline",
           "description": "",
           "placeholder": "",
           "visible": true,
@@ -309,11 +311,12 @@
       },
       "finance": {
         "edit": {
-          "label": "Finance",
+          "label": "finance",
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "destination"
         },
         "list": {
           "label": "finance",
@@ -378,18 +381,17 @@
           "searchable": true,
           "sortable": true
         }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "start",
-        "end",
-        "eventStatus",
-        "location",
-        "venue",
-        "defaultImage"
-      ],
       "edit": [
         [
           {
@@ -415,15 +417,15 @@
           {
             "name": "timezone",
             "size": 6
+          },
+          {
+            "name": "contactEmail",
+            "size": 6
           }
         ],
         [
           {
             "name": "eventStatus",
-            "size": 6
-          },
-          {
-            "name": "contactEmail",
             "size": 6
           }
         ],
@@ -503,6 +505,14 @@
             "size": 12
           }
         ]
+      ],
+      "list": [
+        "name",
+        "start",
+        "end",
+        "location",
+        "venue",
+        "defaultImage"
       ]
     }
   },

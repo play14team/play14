@@ -1,0 +1,275 @@
+{
+  "name": "Game contributor",
+  "code": "game-contributor-m2eznsqv",
+  "description": "Created October 18th, 2024",
+  "documentId": "dxpf4uotqjqa1pl8sok7gjif",
+  "locale": null,
+  "permissions": [
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::event.event",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "start",
+          "end",
+          "defaultImage",
+          "images",
+          "contactEmail",
+          "timetable.day",
+          "timetable.description",
+          "timetable.timeslots.time",
+          "timetable.timeslots.description",
+          "registration.link",
+          "registration.widgetCode",
+          "description",
+          "location",
+          "venue",
+          "hosts",
+          "mentors",
+          "sponsorships.category",
+          "sponsorships.sponsors",
+          "media.url",
+          "media.type",
+          "players",
+          "timezone",
+          "tagline",
+          "finance.revenue",
+          "finance.expenses",
+          "finance.destination",
+          "finance.result",
+          "finance.resultAmount"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "hh232anlwe3c4ni1yep0e61y",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::game.game",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "category",
+          "documentedBy",
+          "proposedBy",
+          "firstPlayedAt",
+          "scale",
+          "timebox",
+          "summary",
+          "materials.value",
+          "preparationSteps.value",
+          "safety.key",
+          "safety.value",
+          "defaultImage",
+          "images",
+          "resources",
+          "description",
+          "tags.value",
+          "credits",
+          "ratings.energy",
+          "ratings.connection",
+          "ratings.silliness"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "eboefnjr41fzkhgv2d0tagx6",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::game.game",
+      "properties": {
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [
+        "admin::is-creator"
+      ],
+      "actionParameters": {},
+      "documentId": "szgcei2ysxyal6bwa62wkdk5",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::game.game",
+      "properties": {
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "cr7ewj1w63zodzixr9nj3k2z",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::game.game",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "category",
+          "documentedBy",
+          "proposedBy",
+          "firstPlayedAt",
+          "scale",
+          "timebox",
+          "summary",
+          "materials.value",
+          "preparationSteps.value",
+          "safety.key",
+          "safety.value",
+          "defaultImage",
+          "images",
+          "resources",
+          "description",
+          "tags.value",
+          "credits",
+          "ratings.energy",
+          "ratings.connection",
+          "ratings.silliness"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "kjenjqkj1njqsg96un5db9tt",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::game.game",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "category",
+          "documentedBy",
+          "proposedBy",
+          "firstPlayedAt",
+          "scale",
+          "timebox",
+          "summary",
+          "materials.value",
+          "preparationSteps.value",
+          "safety.key",
+          "safety.value",
+          "defaultImage",
+          "images",
+          "resources",
+          "description",
+          "tags.value",
+          "credits",
+          "ratings.energy",
+          "ratings.connection",
+          "ratings.silliness"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "itepaor5zi2vbxrerb8ii693",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::player.player",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "position",
+          "company",
+          "tagline",
+          "bio",
+          "website",
+          "avatar",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "attended",
+          "hosted",
+          "mentored",
+          "user",
+          "documented",
+          "proposed",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "u6z8n9vb448csydy6u1bq06e",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.copy-link",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "v141h8qzs9s6w8pc8l9y149o",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.create",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "wgiqyvi6b2p1dssyndk5o774",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.download",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "rjacq2txw1fahqvsbzz1t8sz",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.update",
+      "subject": null,
+      "properties": {},
+      "conditions": [
+        "admin::is-creator"
+      ],
+      "actionParameters": {},
+      "documentId": "ltutoeb58sldoj0j329z2ese",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.read",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "dpsx10a282b2mubsv8vi6ajm",
+      "locale": null
+    }
+  ]
+}

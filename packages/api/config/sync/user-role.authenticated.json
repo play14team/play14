@@ -2,18 +2,28 @@
   "name": "Authenticated",
   "description": "Default role given to authenticated user.",
   "type": "authenticated",
+  "documentId": "yaeix1o2aeqzard87ca4x6ga",
+  "locale": null,
   "permissions": [
     {
-      "action": "api::event.event.find"
+      "action": "api::event.event.find",
+      "documentId": "rvqpugp16183whu7t1f4993m",
+      "locale": null
     },
     {
-      "action": "api::event.event.findOne"
+      "action": "api::event.event.findOne",
+      "documentId": "iwzhufr3dwhnkameeqz1fvro",
+      "locale": null
     },
     {
-      "action": "plugin::users-permissions.auth.connect"
+      "action": "plugin::users-permissions.auth.connect",
+      "documentId": "ni418oykm5u6q4ouqdfc5b4x",
+      "locale": null
     },
     {
-      "action": "plugin::users-permissions.user.me"
+      "action": "plugin::users-permissions.user.me",
+      "documentId": "pbzg8nwi0cff0u736srs6yvw",
+      "locale": null
     }
   ]
 }

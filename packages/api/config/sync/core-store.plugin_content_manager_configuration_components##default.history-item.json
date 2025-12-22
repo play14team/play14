@@ -34,6 +34,20 @@
           "sortable": true
         }
       },
+      "dateFormat": {
+        "edit": {
+          "label": "dateFormat",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "dateFormat",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "additionalText": {
         "edit": {
           "label": "additionalText",
@@ -90,16 +104,10 @@
           "sortable": false
         }
       },
-      "dateFormat": {
-        "edit": {
-          "label": "dateFormat",
-          "description": "",
-          "placeholder": "",
-          "visible": true,
-          "editable": true
-        },
+      "documentId": {
+        "edit": {},
         "list": {
-          "label": "dateFormat",
+          "label": "documentId",
           "searchable": true,
           "sortable": true
         }

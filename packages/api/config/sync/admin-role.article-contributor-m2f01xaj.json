@@ -1,0 +1,184 @@
+{
+  "name": "Article contributor",
+  "code": "article-contributor-m2f01xaj",
+  "description": "Created October 18th, 2024",
+  "documentId": "vcyspboipmpf86avpy0kvuku",
+  "locale": null,
+  "permissions": [
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::article.article",
+      "properties": {
+        "fields": [
+          "title",
+          "slug",
+          "author",
+          "cannonical",
+          "summary",
+          "defaultImage",
+          "images",
+          "content",
+          "category",
+          "tags"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "jxicen0f0af44fdua9mgbzc2",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::article.article",
+      "properties": {},
+      "conditions": [
+        "admin::is-creator"
+      ],
+      "actionParameters": {},
+      "documentId": "w9q0pjnt26hw40bkfafsbedd",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::article.article",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "xd9st77o7mb7d7o6z7ygywjf",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::article.article",
+      "properties": {
+        "fields": [
+          "title",
+          "slug",
+          "author",
+          "cannonical",
+          "summary",
+          "defaultImage",
+          "images",
+          "content",
+          "category",
+          "tags"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "ysph187q5lbofz049fpo4rqc",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::article.article",
+      "properties": {
+        "fields": [
+          "title",
+          "slug",
+          "author",
+          "cannonical",
+          "summary",
+          "defaultImage",
+          "images",
+          "content",
+          "category",
+          "tags"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "y8gzypyemqic1v07841iwtg2",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::tag.tag",
+      "properties": {
+        "fields": [
+          "value",
+          "articles"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "qmx14dqt08r2knb7cbicuypv",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::tag.tag",
+      "properties": {
+        "fields": [
+          "value",
+          "articles"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "mzrhdy20mvc8q9z1wwj1sdnu",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::tag.tag",
+      "properties": {
+        "fields": [
+          "value",
+          "articles"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "m1uxhyywe4n56zzr1geuqd2y",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.copy-link",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "f1g82rjv4hoqtgijy00bki46",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.create",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "i8jjvild5mn8as1y7rhlti81",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.download",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "f32j9vedx1v30a5eflhx9926",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.assets.update",
+      "subject": null,
+      "properties": {},
+      "conditions": [
+        "admin::is-creator"
+      ],
+      "actionParameters": {},
+      "documentId": "t3v92y4ehwl5v4zngcec14ac",
+      "locale": null
+    },
+    {
+      "action": "plugin::upload.read",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "vsb7u3rvwy058323cgtaxhru",
+      "locale": null
+    }
+  ]
+}

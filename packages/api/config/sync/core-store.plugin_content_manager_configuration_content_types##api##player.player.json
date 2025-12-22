@@ -307,9 +307,24 @@
           "searchable": true,
           "sortable": true
         }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
       }
     },
     "layouts": {
+      "list": [
+        "name",
+        "slug",
+        "position",
+        "avatar",
+        "company"
+      ],
       "edit": [
         [
           {
@@ -397,13 +412,6 @@
             "size": 6
           }
         ]
-      ],
-      "list": [
-        "name",
-        "slug",
-        "position",
-        "avatar",
-        "company"
       ]
     }
   },

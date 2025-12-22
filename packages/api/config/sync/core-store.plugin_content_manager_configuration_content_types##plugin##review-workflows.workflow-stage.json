@@ -1,14 +1,13 @@
 {
-  "key": "plugin_content_manager_configuration_content_types::api::expectation.expectation",
+  "key": "plugin_content_manager_configuration_content_types::plugin::review-workflows.workflow-stage",
   "value": {
-    "uid": "api::expectation.expectation",
     "settings": {
       "bulkable": true,
       "filterable": true,
       "searchable": true,
       "pageSize": 10,
-      "mainField": "title",
-      "defaultSortBy": "title",
+      "mainField": "name",
+      "defaultSortBy": "name",
       "defaultSortOrder": "ASC"
     },
     "metadatas": {
@@ -20,58 +19,60 @@
           "sortable": true
         }
       },
-      "title": {
+      "name": {
         "edit": {
-          "label": "title",
+          "label": "name",
           "description": "",
           "placeholder": "",
           "visible": true,
           "editable": true
         },
         "list": {
-          "label": "title",
+          "label": "name",
           "searchable": true,
           "sortable": true
         }
       },
-      "type": {
+      "color": {
         "edit": {
-          "label": "type",
+          "label": "color",
           "description": "",
           "placeholder": "",
           "visible": true,
           "editable": true
         },
         "list": {
-          "label": "type",
+          "label": "color",
           "searchable": true,
           "sortable": true
         }
       },
-      "icon": {
+      "workflow": {
         "edit": {
-          "label": "icon",
+          "label": "workflow",
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "name"
         },
         "list": {
-          "label": "icon",
+          "label": "workflow",
           "searchable": true,
           "sortable": true
         }
       },
-      "content": {
+      "permissions": {
         "edit": {
-          "label": "content",
+          "label": "permissions",
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true
+          "editable": true,
+          "mainField": "action"
         },
         "list": {
-          "label": "content",
+          "label": "permissions",
           "searchable": false,
           "sortable": false
         }
@@ -145,36 +146,35 @@
     },
     "layouts": {
       "list": [
-        "title",
-        "type",
-        "icon",
-        "createdBy"
+        "id",
+        "name",
+        "color",
+        "workflow"
       ],
       "edit": [
         [
           {
-            "name": "title",
+            "name": "name",
             "size": 6
           },
           {
-            "name": "type",
+            "name": "color",
             "size": 6
           }
         ],
         [
           {
-            "name": "icon",
+            "name": "workflow",
             "size": 6
-          }
-        ],
-        [
+          },
           {
-            "name": "content",
-            "size": 12
+            "name": "permissions",
+            "size": 6
           }
         ]
       ]
-    }
+    },
+    "uid": "plugin::review-workflows.workflow-stage"
   },
   "type": "object",
   "environment": null,

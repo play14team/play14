@@ -26,8 +26,7 @@
           "description": "What time does the activity starts?",
           "placeholder": "Pick a time for the activity",
           "visible": true,
-          "editable": true,
-          "step": 30
+          "editable": true
         },
         "list": {
           "label": "time",
@@ -48,14 +47,18 @@
           "searchable": true,
           "sortable": true
         }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "time",
-        "description"
-      ],
+      "list": ["id", "time", "description", "documentId"],
       "edit": [
         [
           {
