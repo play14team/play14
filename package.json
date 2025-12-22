@@ -1,12 +1,23 @@
 {
   "name": "play14",
   "version": "1.0.0",
+  "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "db": "podman-compose up -d play14-db",
-    "api": "cd packages/api && bun run dev",
-    "web": "cd packages/web && bun run dev"
-  }
+    "api": "bun --filter play14-api dev",
+    "web": "bun --filter play14-web dev",
+    "build": "bun --filter play14-api build && bun --filter play14-web build",
+    "build:api": "bun --filter play14-api build",
+    "build:web": "bun --filter play14-web build",
+    "lint": "bun --filter play14-web lint",
+    "lint:fix": "bun --filter play14-web lint:fix",
+    "typecheck": "bun --filter play14-web typecheck",
+    "format": "bun --filter play14-web format",
+    "test": "bun --filter play14-web test",
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/.next packages/*/build packages/*/dist"
+  },
+  "packageManager": "bun@1.3.5"
 }

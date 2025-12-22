@@ -102,8 +102,9 @@ node_modules
 testApp
 coverage
 
-node_modules
-.env
+**/node_modules
+**/.env
+**/.env.local
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md

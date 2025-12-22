@@ -1,0 +1,21 @@
+# CODEOWNERS file for play14 monorepo
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @cpontet
+
+# API package
+/packages/api/ @cpontet
+
+# Web package
+/packages/web/ @cpontet
+
+# Design package
+/packages/design/ @cpontet
+
+# Infrastructure and CI/CD
+/.github/ @cpontet
+/compose.yaml @cpontet
+
+# Documentation
+*.md @cpontet

@@ -1,57 +1,98 @@
-# 🚀 Getting started with #play14 api
+# #play14 API
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/developer-docs/latest/developer-resources/cli/CLI.html) (CLI) which lets you scaffold and manage your project in seconds.
+Strapi 5 headless CMS API for the #play14 global community platform.
 
-### `develop`
+> This package is part of the [play14 monorepo](../../README.md).
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/developer-docs/latest/developer-resources/cli/CLI.html#strapi-develop)
+## Tech Stack
+
+- **Framework**: Strapi 5.33.0
+- **Runtime**: Node.js 22, Bun
+- **Database**: PostgreSQL 17.6
+- **APIs**: GraphQL + REST
+- **Hosting**: Azure Container Apps
+- **Storage**: Azure Blob Storage
+
+## Getting Started
+
+### From Monorepo Root
 
 ```bash
+# Install all dependencies
+bun install
+
+# Start database
+bun run db
+
+# Start API in development mode
+bun run api
+```
+
+### From This Directory
+
+```bash
+# Development mode with auto-reload
 bun run develop
-```
 
-### `start`
-
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/developer-docs/latest/developer-resources/cli/CLI.html#strapi-start)
-
-```bash
+# Production mode (no auto-reload)
 bun run start
-```
 
-### `build`
-
-Build your admin panel. [Learn more](https://docs.strapi.io/developer-docs/latest/developer-resources/cli/CLI.html#strapi-build)
-
-```bash
+# Build admin panel
 bun run build
 ```
 
-### Build container image
+## Container Development
 
-**Note**: This project uses Podman instead of Docker.
+### Using Podman Compose (Recommended)
+
+From the monorepo root:
+
+```bash
+# Start API and database
+podman-compose up play14-api play14-db
+
+# Start all services
+podman-compose up
+```
+
+### Manual Container Build
 
 ```bash
 podman build --build-arg STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=<token> -t play14-api .
 ```
 
-Pay attention to the `.` at the end of the line
-
-### Run container
+### Run Container
 
 ```bash
 podman run -p 1337:1337 -it --env-file=./.env --name play14-api play14-api
 ```
 
-This command uses the `.env` file content to provide environement variables to the container. This is mostly useful for database configuration. Alternatively, you can use the `-e` option.
+Uses the `.env` file for environment variables (database configuration, etc.).
 
-For more information, refer to the [podman run](https://docs.podman.io/en/latest/markdown/podman-run.1.html) documentation
+## Configuration
 
-### Configure upload provider
+### Upload Provider
 
-Use [Strapi Provider Upload Azure Storage](https://github.com/jakeFeldman/strapi-provider-upload-azure-storage)
+Uses [Strapi Provider Upload Azure Storage](https://github.com/jakeFeldman/strapi-provider-upload-azure-storage) for file uploads.
 
-## Do not update dependencies
+### Plugins
+
+- **CKEditor 5**: Rich text editing
+- **GraphQL**: GraphQL API endpoint
+- **Fuzzy Search**: Search across events, players, games, articles
+- **Map Field**: Location selection with Mapbox
+- **WebP Converter**: Automatic image optimization
+- **Strapi Cache**: API response caching
+
+## Dependency Notes
+
+Do not update these dependencies without testing:
 
 - react-router-dom
 - strapi-blurhash
 - styled-components
+
+## Learn More
+
+- [Strapi Documentation](https://docs.strapi.io)
+- [Strapi CLI Reference](https://docs.strapi.io/developer-docs/latest/developer-resources/cli/CLI.html)

@@ -1,30 +1,98 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# #play14 Web
+
+Next.js 16 frontend for the #play14 global community platform.
+
+> This package is part of the [play14 monorepo](../../README.md).
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Runtime**: React 19, TypeScript 5.9
+- **Styling**: SCSS
+- **Maps**: Mapbox GL
+- **Hosting**: Azure Container Apps
 
 ## Getting Started
 
-First, run the development server:
+### From Monorepo Root
 
 ```bash
-bun run dev
+# Install all dependencies
+bun install
+
+# Start the web frontend
+bun run web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### From This Directory
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Development mode with Turbopack
+bun run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+# Production build
+bun run build
+
+# Run production server
+bun run start
+```
+
+## Development
+
+### Code Quality
+
+```bash
+# Run ESLint
+bun run lint
+
+# Format code with Prettier
+bun run format
+```
+
+### Environment Variables
+
+Create a `.env.local` file with required environment variables:
+
+```env
+NEXT_PUBLIC_STRAPI_URL=http://localhost:1337
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=<your-mapbox-token>
+```
+
+## Container Development
+
+From the monorepo root:
+
+```bash
+# Start web frontend with all services
+podman-compose up play14-web
+
+# Start all services
+podman-compose up
+```
+
+## Features
+
+- Server-side rendering (SSR)
+- Event calendar and scheduling
+- Player profiles
+- Interactive maps with Mapbox
+- Server actions for form handling
+- Responsive design
+
+## Project Structure
+
+```
+src/
+├── app/              # Next.js App Router pages
+├── components/       # React components
+├── lib/              # Utility functions and API clients
+├── styles/           # Global SCSS styles
+└── types/            # TypeScript type definitions
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+- [Next.js Documentation](https://nextjs.org/docs)
+- [React 19 Documentation](https://react.dev)
+- [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
