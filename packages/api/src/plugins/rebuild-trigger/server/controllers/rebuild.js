@@ -3,7 +3,7 @@
 const config = {
   githubToken: process.env.GITHUB_TOKEN,
   owner: process.env.GITHUB_OWNER || "play14team",
-  repo: process.env.GITHUB_REPO || "play14-ui",
+  repo: process.env.GITHUB_REPO || "play14-web",
   workflowId: process.env.GITHUB_WORKFLOW_ID || "217740349",
 };
 

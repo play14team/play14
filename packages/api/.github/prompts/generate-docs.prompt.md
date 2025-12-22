@@ -241,7 +241,7 @@ Triggers rebuild of the frontend static site when content changes.
   config: {
     githubToken: env('GITHUB_TOKEN'),
     repositoryOwner: 'play14team',
-    repositoryName: 'play14-ui',
+    repositoryName: 'play14-web',
     workflowId: 52506304,
   },
 },

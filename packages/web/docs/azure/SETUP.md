@@ -1,6 +1,6 @@
 # Azure Container Apps Setup Guide
 
-This guide walks you through setting up Azure Container Apps for the play14-ui application.
+This guide walks you through setting up Azure Container Apps for the play14-web application.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ The following resources already exist and will be used:
 
 ```bash
 az containerapp create \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --environment play14-container-env \
   --image mcr.microsoft.com/k8se/quickstart:latest \
@@ -98,9 +98,9 @@ APP_OBJECT_ID=$(az ad app list --display-name "play14-github-actions" --query "[
 az ad app federated-credential create \
   --id $APP_OBJECT_ID \
   --parameters '{
-    "name": "play14-ui-pr",
+    "name": "play14-web-pr",
     "issuer": "https://token.actions.githubusercontent.com",
-    "subject": "repo:play14team/play14-ui:pull_request",
+    "subject": "repo:play14team/play14-web:pull_request",
     "audiences": ["api://AzureADTokenExchange"]
   }'
 
@@ -108,9 +108,9 @@ az ad app federated-credential create \
 az ad app federated-credential create \
   --id $APP_OBJECT_ID \
   --parameters '{
-    "name": "play14-ui-main",
+    "name": "play14-web-main",
     "issuer": "https://token.actions.githubusercontent.com",
-    "subject": "repo:play14team/play14-ui:ref:refs/heads/main",
+    "subject": "repo:play14team/play14-web:ref:refs/heads/main",
     "audiences": ["api://AzureADTokenExchange"]
   }'
 ```
@@ -122,13 +122,13 @@ To update secrets after initial creation:
 ```bash
 # Update Strapi API secret
 az containerapp secret set \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --secrets strapi-api-secret={new-value}
 
 # Update Mapbox token
 az containerapp secret set \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --secrets mapbox-token={new-value}
 ```
@@ -140,7 +140,7 @@ After the workflow runs, verify the deployment:
 ```bash
 # Get the Container App URL
 az containerapp show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --query properties.configuration.ingress.fqdn \
   --output tsv
@@ -154,7 +154,7 @@ When ready for production, create a separate container app:
 
 ```bash
 az containerapp create \
-  --name play14-ui-prod \
+  --name play14-web-prod \
   --resource-group play14-community \
   --environment play14-container-env \
   --image mcr.microsoft.com/k8se/quickstart:latest \
@@ -179,7 +179,7 @@ az containerapp create \
 
 ```bash
 az containerapp logs show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --follow
 ```
@@ -188,7 +188,7 @@ az containerapp logs show \
 
 ```bash
 az containerapp show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --query properties.template
 ```
@@ -219,7 +219,7 @@ az role assignment list \
 
 ```bash
 az containerapp logs show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --tail 50
 ```
@@ -230,7 +230,7 @@ az containerapp logs show \
 
 ```bash
 az containerapp ingress show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community
 ```
 
@@ -245,3 +245,4 @@ az containerapp ingress show \
 - [Azure Container Apps Documentation](https://learn.microsoft.com/azure/container-apps/)
 - [GitHub Actions Azure Login](https://github.com/marketplace/actions/azure-login)
 - [Next.js Deployment Documentation](https://nextjs.org/docs/deployment)
+

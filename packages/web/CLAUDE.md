@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**play14-ui** is a Next.js 16 App Router application for the #play14 global community platform. It fetches content from a **Strapi 5 CMS REST API** and displays events, games, articles, and player profiles with server-side rendering and client-side interactivity.
+**play14-web** is a Next.js 16 App Router application for the #play14 global community platform. It fetches content from a **Strapi 5 CMS REST API** and displays events, games, articles, and player profiles with server-side rendering and client-side interactivity.
 
 **Tech Stack:** Next.js 16.0.8 (App Router) • React 19 • TypeScript 5.9 • Strapi 5 REST API • SCSS • Mapbox • Azure Static Web Apps
 
@@ -156,7 +156,7 @@ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=<token>        # Mapbox key
 - **Separate compose files**: Each repository manages its own services
 - **Shared network**: Next.js connects to the external `Play14-api` network
 - **Service discovery**: Next.js reaches Strapi via `http://play14-api:1337`
-- **Start order**: Start play14-api services first, then play14-ui
+- **Start order**: Start play14-api services first, then play14-web
 - **Scripts**:
   - `pnpm up` - Start containerized Next.js
   - `pnpm down` - Stop containerized Next.js
@@ -246,10 +246,10 @@ The application is deployed to **Azure Container Apps** which supports all Next.
 
 **Environments:**
 
-- **Acceptance (play14-ui-acc):** Deployed automatically on PR creation/updates
+- **Acceptance (play14-web-acc):** Deployed automatically on PR creation/updates
   - Backend: `https://community-acc.play14.org/`
   - Workflow: `.github/workflows/azure-container-apps-acceptance.yml`
-- **Production (play14-ui-prod):** Deployed from main branch
+- **Production (play14-web-prod):** Deployed from main branch
   - Backend: `https://community.play14.org`
   - Workflow: TBD
 
@@ -303,7 +303,7 @@ docker compose -f compose.prod.yaml up --build
 
 ```bash
 # Build production image
-podman build -t play14-ui:latest \
+podman build -t play14-web:latest \
   --build-arg STRAPI_API_URL=https://community.play14.org \
   --build-arg STRAPI_API_SECRET=your-secret \
   --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token \
@@ -311,10 +311,10 @@ podman build -t play14-ui:latest \
 
 # Run production container
 podman run -d \
-  --name play14-ui \
+  --name play14-web \
   -p 3000:3000 \
   --restart unless-stopped \
-  play14-ui:latest
+  play14-web:latest
 ```
 
 **Deployment Targets:**
@@ -342,6 +342,7 @@ When using Codacy MCP Server:
 
 - Provider: `gh`
 - Organization: `play14team`
-- Repository: `play14-ui`
+- Repository: `play14-web`
 
 **CRITICAL:** After editing files or installing dependencies, run Codacy CLI analysis immediately.
+

@@ -1,12 +1,12 @@
 services:
   app:
-    container_name: play14-ui
+    container_name: play14-web
     build:
       context: .
       dockerfile: Dockerfile.dev
       target: development
       cache_from:
-        - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-ui:dev-cache
+        - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-web:dev-cache
       cache_to:
         - type=inline
     env_file:

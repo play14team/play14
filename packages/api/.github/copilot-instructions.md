@@ -8,7 +8,7 @@ This is a **Strapi v5** headless CMS API serving the #play14 community platform 
 - **Infrastructure**: Azure Bicep templates for repeatable deployments
 - **Deployment**: Azure Container Apps via Docker (multi-stage builds)
 - **Storage**: Azure Blob Storage for media uploads
-- **Frontend Integration**: Triggers `play14-ui` repo rebuilds via GitHub Actions (see `update-static-content` plugin config)
+- **Frontend Integration**: Triggers `play14-web` repo rebuilds via GitHub Actions (see `update-static-content` plugin config)
 
 ### Infrastructure Components
 
@@ -87,7 +87,7 @@ module.exports = {
   beforeCreate(event) {
     event.params.data.slug = eventToSlug(
       event.params.data.name,
-      event.params.data.start,
+      event.params.data.start
     );
   },
 };
@@ -105,7 +105,7 @@ Standard Strapi routes in `src/api/*/routes/*.js`, plus custom routes like:
 
 - **Azure Storage Upload**: Custom provider with CDN support
 - **Fuzzy Search**: Configured for events (threshold: -200) and players with weighted fields
-- **Update Static Content**: Triggers GitHub workflow 52506304 in `play14-ui` repo
+- **Update Static Content**: Triggers GitHub workflow 52506304 in `play14-web` repo
 - **GraphQL**: Enabled with introspection for development
 
 ### Cron Jobs (`config/cron-tasks.js`)

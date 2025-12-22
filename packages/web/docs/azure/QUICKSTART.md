@@ -7,7 +7,7 @@ Run these commands to set up the acceptance environment:
 ```bash
 # 1. Create the container app (replace placeholders with actual values)
 az containerapp create \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --environment play14-container-env \
   --image mcr.microsoft.com/k8se/quickstart:latest \
@@ -47,9 +47,9 @@ APP_OBJECT_ID=$(az ad app list --display-name "play14-github-actions" --query "[
 az ad app federated-credential create \
   --id $APP_OBJECT_ID \
   --parameters '{
-    "name": "play14-ui-pr",
+    "name": "play14-web-pr",
     "issuer": "https://token.actions.githubusercontent.com",
-    "subject": "repo:play14team/play14-ui:pull_request",
+    "subject": "repo:play14team/play14-web:pull_request",
     "audiences": ["api://AzureADTokenExchange"]
   }'
 
@@ -57,16 +57,16 @@ az ad app federated-credential create \
 az ad app federated-credential create \
   --id $APP_OBJECT_ID \
   --parameters '{
-    "name": "play14-ui-main",
+    "name": "play14-web-main",
     "issuer": "https://token.actions.githubusercontent.com",
-    "subject": "repo:play14team/play14-ui:ref:refs/heads/main",
+    "subject": "repo:play14team/play14-web:ref:refs/heads/main",
     "audiences": ["api://AzureADTokenExchange"]
   }'
 ```
 
 ## GitHub Secrets to Add
 
-Go to: `https://github.com/play14team/play14-ui/settings/secrets/actions`
+Go to: `https://github.com/play14team/play14-web/settings/secrets/actions`
 
 Add these secrets:
 
@@ -83,19 +83,19 @@ Add these secrets:
 ```bash
 # Get the container app URL
 az containerapp show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --query properties.configuration.ingress.fqdn \
   --output tsv
 
 # Test the health endpoint
-curl https://$(az containerapp show --name play14-ui-acc --resource-group play14-community --query properties.configuration.ingress.fqdn -o tsv)/api/health
+curl https://$(az containerapp show --name play14-web-acc --resource-group play14-community --query properties.configuration.ingress.fqdn -o tsv)/api/health
 ```
 
 ## Test the Workflow
 
 1. Create a test PR
-2. Watch GitHub Actions: `https://github.com/play14team/play14-ui/actions`
+2. Watch GitHub Actions: `https://github.com/play14team/play14-web/actions`
 3. Check the PR for a comment with the deployment URL
 
 ## Common Issues
@@ -116,7 +116,7 @@ Run step 3 to grant ACR push permission to the service principal.
 ### "Deployment succeeds but app doesn't work"
 
 - Check secrets are set correctly in the container app
-- View logs: `az containerapp logs show --name play14-ui-acc --resource-group play14-community --follow`
+- View logs: `az containerapp logs show --name play14-web-acc --resource-group play14-community --follow`
 
 ## Existing Azure Resources
 
@@ -137,3 +137,4 @@ Run step 3 to grant ACR push permission to the service principal.
 
 - [SETUP.md](./SETUP.md) - Complete setup guide with explanations
 - [README.md](./README.md) - Architecture and monitoring guide
+

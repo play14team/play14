@@ -76,14 +76,14 @@ services:
     depends_on:
       - play14-db
 
-  play14-ui:
-    container_name: play14-ui
+  play14-web:
+    container_name: play14-web
     build:
       context: ./packages/ui
       dockerfile: Dockerfile.dev
       target: development
       cache_from:
-        - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-ui:dev-cache
+        - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-web:dev-cache
       cache_to:
         - type=inline
     env_file:

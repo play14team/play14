@@ -1,5 +1,12 @@
 {
   "name": "play14",
   "version": "1.0.0",
-  "workspaces": ["packages/*"]
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "db": "podman-compose up -d play14-db",
+    "api": "cd packages/api && bun run dev",
+    "web": "cd packages/web && bun run dev"
+  }
 }

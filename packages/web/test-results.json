@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\playwright.config.ts",
-    "rootDir": "c:/Users/CedricPONTET/repos/play14/play14-ui/tests",
+    "configFile": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\playwright.config.ts",
+    "rootDir": "c:/Users/CedricPONTET/repos/play14/play14-web/tests",
     "forbidOnly": false,
     "fullyParallel": true,
     "globalSetup": null,
@@ -22,7 +22,7 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "c:/Users/CedricPONTET/repos/play14/play14-ui/test-results",
+        "outputDir": "c:/Users/CedricPONTET/repos/play14/play14-web/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
@@ -30,7 +30,7 @@
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "c:/Users/CedricPONTET/repos/play14/play14-ui/tests",
+        "testDir": "c:/Users/CedricPONTET/repos/play14/play14-web/tests",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 30000
@@ -582,9 +582,9 @@
                       "duration": 9258,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.dropdown-menu').first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dropdown-menu').first()\u001b[22m\n\u001b[2m    9 × locator resolved to <ul class=\"dropdown-menu\">…</ul>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.dropdown-menu').first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dropdown-menu').first()\u001b[22m\n\u001b[2m    9 × locator resolved to <ul class=\"dropdown-menu\">…</ul>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\about.spec.ts:130:32",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.dropdown-menu').first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dropdown-menu').first()\u001b[22m\n\u001b[2m    9 × locator resolved to <ul class=\"dropdown-menu\">…</ul>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\about.spec.ts:130:32",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\about.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\about.spec.ts",
                           "column": 32,
                           "line": 130
                         },
@@ -593,11 +593,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\about.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\about.spec.ts",
                             "column": 32,
                             "line": 130
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.dropdown-menu').first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dropdown-menu').first()\u001b[22m\n\u001b[2m    9 × locator resolved to <ul class=\"dropdown-menu\">…</ul>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  128 |     // Check dropdown menu items exist\n  129 |     const dropdownMenu = page.locator(\".dropdown-menu\").first()\n> 130 |     await expect(dropdownMenu).toBeVisible({ timeout: 5000 })\n      |                                ^\n  131 |   })\n  132 | })\n  133 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\about.spec.ts:130:32"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('.dropdown-menu').first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('.dropdown-menu').first()\u001b[22m\n\u001b[2m    9 × locator resolved to <ul class=\"dropdown-menu\">…</ul>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  128 |     // Check dropdown menu items exist\n  129 |     const dropdownMenu = page.locator(\".dropdown-menu\").first()\n> 130 |     await expect(dropdownMenu).toBeVisible({ timeout: 5000 })\n      |                                ^\n  131 |   })\n  132 | })\n  133 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\about.spec.ts:130:32"
                         }
                       ],
                       "stdout": [],
@@ -609,16 +609,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\about-About-Navigation-sho-f2c0f--pages-from-navbar-dropdown-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\about-About-Navigation-sho-f2c0f--pages-from-navbar-dropdown-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\about-About-Navigation-sho-f2c0f--pages-from-navbar-dropdown-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\about-About-Navigation-sho-f2c0f--pages-from-navbar-dropdown-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\about.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\about.spec.ts",
                         "column": 32,
                         "line": 130
                       }
@@ -838,9 +838,9 @@
                       "duration": 8027,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:41:42",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:41:42",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                           "column": 42,
                           "line": 41
                         },
@@ -849,11 +849,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 42,
                             "line": 41
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  39 |     })\n  40 |     if ((await articleLinks.count()) > 0) {\n> 41 |       await expect(articleLinks.first()).toBeVisible()\n     |                                          ^\n  42 |       const href = await articleLinks.first().getAttribute(\"href\")\n  43 |       expect(href).toMatch(/\\/articles\\//)\n  44 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:41:42"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  39 |     })\n  40 |     if ((await articleLinks.count()) > 0) {\n> 41 |       await expect(articleLinks.first()).toBeVisible()\n     |                                          ^\n  42 |       const href = await articleLinks.first().getAttribute(\"href\")\n  43 |       expect(href).toMatch(/\\/articles\\//)\n  44 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:41:42"
                         }
                       ],
                       "stdout": [],
@@ -865,16 +865,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-List-Pag-c90cc-ave-clickable-article-cards-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-List-Pag-c90cc-ave-clickable-article-cards-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-List-Pag-c90cc-ave-clickable-article-cards-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-List-Pag-c90cc-ave-clickable-article-cards-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                         "column": 42,
                         "line": 41
                       }
@@ -915,11 +915,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 34,
                             "line": 52
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    50 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n\n  50 |     })\n  51 |     if ((await articleLinks.count()) > 0) {\n> 52 |       await articleLinks.first().click()\n     |                                  ^\n  53 |       await waitForPageLoad(page)\n  54 |       expect(page.url()).toMatch(/\\/articles/)\n  55 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:52:34"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    50 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n\n  50 |     })\n  51 |     if ((await articleLinks.count()) > 0) {\n> 52 |       await articleLinks.first().click()\n     |                                  ^\n  53 |       await waitForPageLoad(page)\n  54 |       expect(page.url()).toMatch(/\\/articles/)\n  55 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:52:34"
                         }
                       ],
                       "stdout": [],
@@ -931,12 +931,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-List-Pag-c0785-ticle-details-on-card-click-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-List-Pag-c0785-ticle-details-on-card-click-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-List-Pag-c0785-ticle-details-on-card-click-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-List-Pag-c0785-ticle-details-on-card-click-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -1146,9 +1146,9 @@
                       "duration": 1723,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:97:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:97:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                           "column": 26,
                           "line": 97
                         },
@@ -1157,11 +1157,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 26,
                             "line": 97
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n\n   95 |       await categoryLinks.first().click()\n   96 |       await waitForPageLoad(page)\n>  97 |       expect(page.url()).toMatch(/\\/articles\\/categories\\//)\n      |                          ^\n   98 |     }\n   99 |   })\n  100 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:97:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n\n   95 |       await categoryLinks.first().click()\n   96 |       await waitForPageLoad(page)\n>  97 |       expect(page.url()).toMatch(/\\/articles\\/categories\\//)\n      |                          ^\n   98 |     }\n   99 |   })\n  100 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:97:26"
                         }
                       ],
                       "stdout": [],
@@ -1173,16 +1173,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-Categori-c41d5-e-to-specific-category-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-Categori-c41d5-e-to-specific-category-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-Categori-c41d5-e-to-specific-category-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-Categori-c41d5-e-to-specific-category-page-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                         "column": 26,
                         "line": 97
                       }
@@ -1223,9 +1223,9 @@
                       "duration": 1737,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:113:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:113:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                           "column": 26,
                           "line": 113
                         },
@@ -1234,11 +1234,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 26,
                             "line": 113
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n\n  111 |       await categoryLinks.first().click()\n  112 |       await waitForPageLoad(page)\n> 113 |       expect(page.url()).toMatch(/\\/articles\\/categories\\//)\n      |                          ^\n  114 |       await verifyPageLayout(page)\n  115 |     }\n  116 |   })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:113:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/categories\"\u001b[39m\n\n  111 |       await categoryLinks.first().click()\n  112 |       await waitForPageLoad(page)\n> 113 |       expect(page.url()).toMatch(/\\/articles\\/categories\\//)\n      |                          ^\n  114 |       await verifyPageLayout(page)\n  115 |     }\n  116 |   })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:113:26"
                         }
                       ],
                       "stdout": [],
@@ -1250,16 +1250,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-Category-9cb6a-ticles-from-categories-list-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-Category-9cb6a-ticles-from-categories-list-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-Category-9cb6a-ticles-from-categories-list-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-Category-9cb6a-ticles-from-categories-list-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                         "column": 26,
                         "line": 113
                       }
@@ -1436,9 +1436,9 @@
                       "duration": 2392,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/tags\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/tags\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:156:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/tags\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:156:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                           "column": 26,
                           "line": 156
                         },
@@ -1447,11 +1447,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 26,
                             "line": 156
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/tags\"\u001b[39m\n\n  154 |       await tagLinks.first().click()\n  155 |       await waitForPageLoad(page)\n> 156 |       expect(page.url()).toMatch(/\\/articles\\/tags\\//)\n      |                          ^\n  157 |     }\n  158 |   })\n  159 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:156:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/articles\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/articles/tags\"\u001b[39m\n\n  154 |       await tagLinks.first().click()\n  155 |       await waitForPageLoad(page)\n> 156 |       expect(page.url()).toMatch(/\\/articles\\/tags\\//)\n      |                          ^\n  157 |     }\n  158 |   })\n  159 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:156:26"
                         }
                       ],
                       "stdout": [],
@@ -1463,16 +1463,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-Tags-Pag-e3e51-vigate-to-specific-tag-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-Tags-Pag-e3e51-vigate-to-specific-tag-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Articles-Tags-Pag-e3e51-vigate-to-specific-tag-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Articles-Tags-Pag-e3e51-vigate-to-specific-tag-page-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                         "column": 26,
                         "line": 156
                       }
@@ -1555,11 +1555,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 34,
                             "line": 187
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  185 |\n  186 |     if ((await articleLinks.count()) > 0) {\n> 187 |       await articleLinks.first().click()\n      |                                  ^\n  188 |       await waitForPageLoad(page)\n  189 |       const main = page.locator(\"main\")\n  190 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:187:34"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  185 |\n  186 |     if ((await articleLinks.count()) > 0) {\n> 187 |       await articleLinks.first().click()\n      |                                  ^\n  188 |       await waitForPageLoad(page)\n  189 |       const main = page.locator(\"main\")\n  190 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:187:34"
                         }
                       ],
                       "stdout": [],
@@ -1571,12 +1571,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-P-fc677-display-article-information-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-P-fc677-display-article-information-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-P-fc677-display-article-information-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-P-fc677-display-article-information-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -1616,11 +1616,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 34,
                             "line": 203
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  201 |\n  202 |     if ((await articleLinks.count()) > 0) {\n> 203 |       await articleLinks.first().click()\n      |                                  ^\n  204 |       await waitForPageLoad(page)\n  205 |       await verifyPageLayout(page)\n  206 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:203:34"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  201 |\n  202 |     if ((await articleLinks.count()) > 0) {\n> 203 |       await articleLinks.first().click()\n      |                                  ^\n  204 |       await waitForPageLoad(page)\n  205 |       await verifyPageLayout(page)\n  206 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:203:34"
                         }
                       ],
                       "stdout": [],
@@ -1632,12 +1632,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-P-3d196-page-layout-on-details-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-P-3d196-page-layout-on-details-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-P-3d196-page-layout-on-details-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-P-3d196-page-layout-on-details-page-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -1677,11 +1677,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 34,
                             "line": 218
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  216 |\n  217 |     if ((await articleLinks.count()) > 0) {\n> 218 |       await articleLinks.first().click()\n      |                                  ^\n  219 |       await waitForPageLoad(page)\n  220 |       const main = page.locator(\"main\")\n  221 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:218:34"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  216 |\n  217 |     if ((await articleLinks.count()) > 0) {\n> 218 |       await articleLinks.first().click()\n      |                                  ^\n  219 |       await waitForPageLoad(page)\n  220 |       const main = page.locator(\"main\")\n  221 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:218:34"
                         }
                       ],
                       "stdout": [],
@@ -1693,12 +1693,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-Page-should-display-article-content-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-Page-should-display-article-content-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-Page-should-display-article-content-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-Page-should-display-article-content-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -1738,11 +1738,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts",
                             "column": 34,
                             "line": 234
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    53 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  232 |\n  233 |     if ((await articleLinks.count()) > 0) {\n> 234 |       await articleLinks.first().click()\n      |                                  ^\n  235 |       await waitForPageLoad(page)\n  236 |       const main = page.locator(\"main\")\n  237 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\articles.spec.ts:234:34"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/articles/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/articles/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    53 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  232 |\n  233 |     if ((await articleLinks.count()) > 0) {\n> 234 |       await articleLinks.first().click()\n      |                                  ^\n  235 |       await waitForPageLoad(page)\n  236 |       const main = page.locator(\"main\")\n  237 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\articles.spec.ts:234:34"
                         }
                       ],
                       "stdout": [],
@@ -1754,12 +1754,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-P-aebfa-ticle-sidebar-with-metadata-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-P-aebfa-ticle-sidebar-with-metadata-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\articles-Article-Details-P-aebfa-ticle-sidebar-with-metadata-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\articles-Article-Details-P-aebfa-ticle-sidebar-with-metadata-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -2020,9 +2020,9 @@
                       "duration": 16990,
                       "error": {
                         "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:44:16",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:44:16",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                           "column": 16,
                           "line": 44
                         },
@@ -2031,11 +2031,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                             "column": 16,
                             "line": 44
                           },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n\n  42 |\n  43 |   test(\"should have clickable event cards\", async ({ page }) => {\n> 44 |     await page.waitForSelector(\"a[href^='/events/']\", { timeout: 15000 })\n     |                ^\n  45 |     // Filter out navigation links\n  46 |     const eventLinks = page.locator(\"a[href^='/events/']\").filter({\n  47 |       hasNot: page.locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]'),\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:44:16"
+                          "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n\n  42 |\n  43 |   test(\"should have clickable event cards\", async ({ page }) => {\n> 44 |     await page.waitForSelector(\"a[href^='/events/']\", { timeout: 15000 })\n     |                ^\n  45 |     // Filter out navigation links\n  46 |     const eventLinks = page.locator(\"a[href^='/events/']\").filter({\n  47 |       hasNot: page.locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]'),\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:44:16"
                         }
                       ],
                       "stdout": [],
@@ -2047,16 +2047,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Events-List-Page-should-have-clickable-event-cards-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Events-List-Page-should-have-clickable-event-cards-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Events-List-Page-should-have-clickable-event-cards-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Events-List-Page-should-have-clickable-event-cards-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                         "column": 16,
                         "line": 44
                       }
@@ -2089,9 +2089,9 @@
                       "duration": 17275,
                       "error": {
                         "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    33 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    33 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:57:16",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    33 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:57:16",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                           "column": 16,
                           "line": 57
                         },
@@ -2100,11 +2100,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                             "column": 16,
                             "line": 57
                           },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    33 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n\n  55 |\n  56 |   test(\"should navigate to event details on card click\", async ({ page }) => {\n> 57 |     await page.waitForSelector(\"a[href^='/events/']\", { timeout: 15000 })\n     |                ^\n  58 |     // Filter out navigation links\n  59 |     const eventLinks = page.locator(\"a[href^='/events/']\").filter({\n  60 |       hasNot: page.locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]'),\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:57:16"
+                          "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    33 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n\n  55 |\n  56 |   test(\"should navigate to event details on card click\", async ({ page }) => {\n> 57 |     await page.waitForSelector(\"a[href^='/events/']\", { timeout: 15000 })\n     |                ^\n  58 |     // Filter out navigation links\n  59 |     const eventLinks = page.locator(\"a[href^='/events/']\").filter({\n  60 |       hasNot: page.locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]'),\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:57:16"
                         }
                       ],
                       "stdout": [],
@@ -2116,16 +2116,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Events-List-Page-sh-1b8c9-event-details-on-card-click-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Events-List-Page-sh-1b8c9-event-details-on-card-click-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Events-List-Page-sh-1b8c9-event-details-on-card-click-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Events-List-Page-sh-1b8c9-event-details-on-card-click-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                         "column": 16,
                         "line": 57
                       }
@@ -2726,9 +2726,9 @@
                       "duration": 2024,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/events\\/countries\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/events/countries\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/events\\/countries\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/events/countries\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:204:24",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/events\\/countries\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/events/countries\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:204:24",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                           "column": 24,
                           "line": 204
                         },
@@ -2737,11 +2737,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                             "column": 24,
                             "line": 204
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/events\\/countries\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/events/countries\"\u001b[39m\n\n  202 |     await countryLink.click()\n  203 |     await waitForPageLoad(page)\n> 204 |     expect(page.url()).toMatch(/\\/events\\/countries\\//)\n      |                        ^\n  205 |   })\n  206 | })\n  207 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:204:24"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/events\\/countries\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/events/countries\"\u001b[39m\n\n  202 |     await countryLink.click()\n  203 |     await waitForPageLoad(page)\n> 204 |     expect(page.url()).toMatch(/\\/events\\/countries\\//)\n      |                        ^\n  205 |   })\n  206 | })\n  207 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:204:24"
                         }
                       ],
                       "stdout": [],
@@ -2753,16 +2753,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Events-Countries-Pa-1b29c-te-to-specific-country-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Events-Countries-Pa-1b29c-te-to-specific-country-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Events-Countries-Pa-1b29c-te-to-specific-country-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Events-Countries-Pa-1b29c-te-to-specific-country-page-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                         "column": 24,
                         "line": 204
                       }
@@ -3285,11 +3285,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                             "column": 32,
                             "line": 329
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']').filter({ hasNot: locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    49 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  327 |\n  328 |     if ((await eventLinks.count()) > 0) {\n> 329 |       await eventLinks.first().click()\n      |                                ^\n  330 |       await waitForPageLoad(page)\n  331 |       const main = page.locator(\"main\")\n  332 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:329:32"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']').filter({ hasNot: locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    49 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  327 |\n  328 |     if ((await eventLinks.count()) > 0) {\n> 329 |       await eventLinks.first().click()\n      |                                ^\n  330 |       await waitForPageLoad(page)\n  331 |       const main = page.locator(\"main\")\n  332 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:329:32"
                         }
                       ],
                       "stdout": [],
@@ -3301,12 +3301,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Event-Details-Page-should-display-event-information-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Event-Details-Page-should-display-event-information-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Event-Details-Page-should-display-event-information-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Event-Details-Page-should-display-event-information-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -3346,11 +3346,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts",
                             "column": 32,
                             "line": 345
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']').filter({ hasNot: locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    49 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  343 |\n  344 |     if ((await eventLinks.count()) > 0) {\n> 345 |       await eventLinks.first().click()\n      |                                ^\n  346 |       await waitForPageLoad(page)\n  347 |       await verifyPageLayout(page)\n  348 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\events.spec.ts:345:32"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/events/\\']').filter({ hasNot: locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    49 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  343 |\n  344 |     if ((await eventLinks.count()) > 0) {\n> 345 |       await eventLinks.first().click()\n      |                                ^\n  346 |       await waitForPageLoad(page)\n  347 |       await verifyPageLayout(page)\n  348 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\events.spec.ts:345:32"
                         }
                       ],
                       "stdout": [],
@@ -3362,12 +3362,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Event-Details-Page--f9606-page-layout-on-details-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Event-Details-Page--f9606-page-layout-on-details-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\events-Event-Details-Page--f9606-page-layout-on-details-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\events-Event-Details-Page--f9606-page-layout-on-details-page-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -3586,9 +3586,9 @@
                       "duration": 7433,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:43:39",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:43:39",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                           "column": 39,
                           "line": 43
                         },
@@ -3597,11 +3597,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 39,
                             "line": 43
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  41 |     })\n  42 |     if ((await gameLinks.count()) > 0) {\n> 43 |       await expect(gameLinks.first()).toBeVisible()\n     |                                       ^\n  44 |       const href = await gameLinks.first().getAttribute(\"href\")\n  45 |       expect(href).toMatch(/\\/games\\//)\n  46 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:43:39"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  41 |     })\n  42 |     if ((await gameLinks.count()) > 0) {\n> 43 |       await expect(gameLinks.first()).toBeVisible()\n     |                                       ^\n  44 |       const href = await gameLinks.first().getAttribute(\"href\")\n  45 |       expect(href).toMatch(/\\/games\\//)\n  46 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:43:39"
                         }
                       ],
                       "stdout": [],
@@ -3613,16 +3613,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-List-Page-should-have-clickable-game-cards-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-List-Page-should-have-clickable-game-cards-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-List-Page-should-have-clickable-game-cards-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-List-Page-should-have-clickable-game-cards-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                         "column": 39,
                         "line": 43
                       }
@@ -3663,11 +3663,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 31,
                             "line": 54
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  52 |     })\n  53 |     if ((await gameLinks.count()) > 0) {\n> 54 |       await gameLinks.first().click()\n     |                               ^\n  55 |       await waitForPageLoad(page)\n  56 |       expect(page.url()).toMatch(/\\/games/)\n  57 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:54:31"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  52 |     })\n  53 |     if ((await gameLinks.count()) > 0) {\n> 54 |       await gameLinks.first().click()\n     |                               ^\n  55 |       await waitForPageLoad(page)\n  56 |       expect(page.url()).toMatch(/\\/games/)\n  57 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:54:31"
                         }
                       ],
                       "stdout": [],
@@ -3679,12 +3679,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-List-Page-shou-02ef2--game-details-on-card-click-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-List-Page-shou-02ef2--game-details-on-card-click-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-List-Page-shou-02ef2--game-details-on-card-click-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-List-Page-shou-02ef2--game-details-on-card-click-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -3894,9 +3894,9 @@
                       "duration": 1648,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:99:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:99:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                           "column": 26,
                           "line": 99
                         },
@@ -3905,11 +3905,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 26,
                             "line": 99
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n\n   97 |       await categoryLinks.first().click()\n   98 |       await waitForPageLoad(page)\n>  99 |       expect(page.url()).toMatch(/\\/games\\/categories\\//)\n      |                          ^\n  100 |     }\n  101 |   })\n  102 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:99:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n\n   97 |       await categoryLinks.first().click()\n   98 |       await waitForPageLoad(page)\n>  99 |       expect(page.url()).toMatch(/\\/games\\/categories\\//)\n      |                          ^\n  100 |     }\n  101 |   })\n  102 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:99:26"
                         }
                       ],
                       "stdout": [],
@@ -3921,16 +3921,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-Categories-Pag-b0919-e-to-specific-category-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-Categories-Pag-b0919-e-to-specific-category-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-Categories-Pag-b0919-e-to-specific-category-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-Categories-Pag-b0919-e-to-specific-category-page-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                         "column": 26,
                         "line": 99
                       }
@@ -3971,9 +3971,9 @@
                       "duration": 1619,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:113:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:113:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                           "column": 26,
                           "line": 113
                         },
@@ -3982,11 +3982,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 26,
                             "line": 113
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n\n  111 |       await categoryLinks.first().click()\n  112 |       await waitForPageLoad(page)\n> 113 |       expect(page.url()).toMatch(/\\/games\\/categories\\//)\n      |                          ^\n  114 |       await verifyPageLayout(page)\n  115 |     }\n  116 |   })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:113:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/categories\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/categories\"\u001b[39m\n\n  111 |       await categoryLinks.first().click()\n  112 |       await waitForPageLoad(page)\n> 113 |       expect(page.url()).toMatch(/\\/games\\/categories\\//)\n      |                          ^\n  114 |       await verifyPageLayout(page)\n  115 |     }\n  116 |   })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:113:26"
                         }
                       ],
                       "stdout": [],
@@ -3998,16 +3998,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-Category-Detai-0b386--games-from-categories-list-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-Category-Detai-0b386--games-from-categories-list-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-Category-Detai-0b386--games-from-categories-list-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-Category-Detai-0b386--games-from-categories-list-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                         "column": 26,
                         "line": 113
                       }
@@ -4184,9 +4184,9 @@
                       "duration": 2519,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/tags\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/tags\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:156:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/tags\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:156:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                           "column": 26,
                           "line": 156
                         },
@@ -4195,11 +4195,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 26,
                             "line": 156
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/tags\"\u001b[39m\n\n  154 |       await tagLinks.first().click()\n  155 |       await waitForPageLoad(page)\n> 156 |       expect(page.url()).toMatch(/\\/games\\/tags\\//)\n      |                          ^\n  157 |     }\n  158 |   })\n  159 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:156:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/games\\/tags\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/games/tags\"\u001b[39m\n\n  154 |       await tagLinks.first().click()\n  155 |       await waitForPageLoad(page)\n> 156 |       expect(page.url()).toMatch(/\\/games\\/tags\\//)\n      |                          ^\n  157 |     }\n  158 |   })\n  159 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:156:26"
                         }
                       ],
                       "stdout": [],
@@ -4211,16 +4211,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-Tags-Page-should-navigate-to-specific-tag-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-Tags-Page-should-navigate-to-specific-tag-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Games-Tags-Page-should-navigate-to-specific-tag-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Games-Tags-Page-should-navigate-to-specific-tag-page-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                         "column": 26,
                         "line": 156
                       }
@@ -4303,11 +4303,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 31,
                             "line": 187
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  185 |\n  186 |     if ((await gameLinks.count()) > 0) {\n> 187 |       await gameLinks.first().click()\n      |                               ^\n  188 |       await waitForPageLoad(page)\n  189 |       const main = page.locator(\"main\")\n  190 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:187:31"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  185 |\n  186 |     if ((await gameLinks.count()) > 0) {\n> 187 |       await gameLinks.first().click()\n      |                               ^\n  188 |       await waitForPageLoad(page)\n  189 |       const main = page.locator(\"main\")\n  190 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:187:31"
                         }
                       ],
                       "stdout": [],
@@ -4319,12 +4319,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Game-Details-Page-should-display-game-information-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Game-Details-Page-should-display-game-information-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Game-Details-Page-should-display-game-information-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Game-Details-Page-should-display-game-information-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -4364,11 +4364,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 31,
                             "line": 203
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  201 |\n  202 |     if ((await gameLinks.count()) > 0) {\n> 203 |       await gameLinks.first().click()\n      |                               ^\n  204 |       await waitForPageLoad(page)\n  205 |       await verifyPageLayout(page)\n  206 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:203:31"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  201 |\n  202 |     if ((await gameLinks.count()) > 0) {\n> 203 |       await gameLinks.first().click()\n      |                               ^\n  204 |       await waitForPageLoad(page)\n  205 |       await verifyPageLayout(page)\n  206 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:203:31"
                         }
                       ],
                       "stdout": [],
@@ -4380,12 +4380,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Game-Details-Page-sh-6b701-page-layout-on-details-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Game-Details-Page-sh-6b701-page-layout-on-details-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Game-Details-Page-sh-6b701-page-layout-on-details-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Game-Details-Page-sh-6b701-page-layout-on-details-page-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -4425,11 +4425,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts",
                             "column": 31,
                             "line": 218
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    53 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  216 |\n  217 |     if ((await gameLinks.count()) > 0) {\n> 218 |       await gameLinks.first().click()\n      |                               ^\n  219 |       await waitForPageLoad(page)\n  220 |       const main = page.locator(\"main\")\n  221 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\games.spec.ts:218:31"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/games/\\']').filter({ hasNot: locator('[href*=\"categories\"], [href*=\"tags\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/games/categories\">Category</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    53 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  216 |\n  217 |     if ((await gameLinks.count()) > 0) {\n> 218 |       await gameLinks.first().click()\n      |                               ^\n  219 |       await waitForPageLoad(page)\n  220 |       const main = page.locator(\"main\")\n  221 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\games.spec.ts:218:31"
                         }
                       ],
                       "stdout": [],
@@ -4441,12 +4441,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Game-Details-Page-sh-0313d-y-game-sidebar-with-details-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Game-Details-Page-sh-0313d-y-game-sidebar-with-details-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\games-Game-Details-Page-sh-0313d-y-game-sidebar-with-details-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\games-Game-Details-Page-sh-0313d-y-game-sidebar-with-details-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -4809,9 +4809,9 @@
                       "duration": 2729,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Our values')\nExpected: visible\nError: strict mode violation: getByText('Our values') resolved to 2 elements:\n    1) <a class=\"nav-link\" href=\"/about/values\">Our values</a> aka locator('#navbarSupportedContent').getByText('Our values')\n    2) <h3 class=\"pt-100 pb-3\">Our values</h3> aka getByRole('heading', { name: 'Our values' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Our values')\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Our values')\nExpected: visible\nError: strict mode violation: getByText('Our values') resolved to 2 elements:\n    1) <a class=\"nav-link\" href=\"/about/values\">Our values</a> aka locator('#navbarSupportedContent').getByText('Our values')\n    2) <h3 class=\"pt-100 pb-3\">Our values</h3> aka getByRole('heading', { name: 'Our values' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Our values')\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts:55:48",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Our values')\nExpected: visible\nError: strict mode violation: getByText('Our values') resolved to 2 elements:\n    1) <a class=\"nav-link\" href=\"/about/values\">Our values</a> aka locator('#navbarSupportedContent').getByText('Our values')\n    2) <h3 class=\"pt-100 pb-3\">Our values</h3> aka getByRole('heading', { name: 'Our values' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Our values')\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts:55:48",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts",
                           "column": 48,
                           "line": 55
                         },
@@ -4820,11 +4820,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts",
                             "column": 48,
                             "line": 55
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Our values')\nExpected: visible\nError: strict mode violation: getByText('Our values') resolved to 2 elements:\n    1) <a class=\"nav-link\" href=\"/about/values\">Our values</a> aka locator('#navbarSupportedContent').getByText('Our values')\n    2) <h3 class=\"pt-100 pb-3\">Our values</h3> aka getByRole('heading', { name: 'Our values' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Our values')\u001b[22m\n\n\n  53 |\n  54 |   test(\"should display manifesto and code of conduct\", async ({ page }) => {\n> 55 |     await expect(page.getByText(\"Our values\")).toBeVisible()\n     |                                                ^\n  56 |     // Look for manifesto content - use first() to avoid strict mode violation\n  57 |     const manifestoText = page.getByText(\"Manifesto\").first()\n  58 |     await expect(manifestoText).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts:55:48"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Our values')\nExpected: visible\nError: strict mode violation: getByText('Our values') resolved to 2 elements:\n    1) <a class=\"nav-link\" href=\"/about/values\">Our values</a> aka locator('#navbarSupportedContent').getByText('Our values')\n    2) <h3 class=\"pt-100 pb-3\">Our values</h3> aka getByRole('heading', { name: 'Our values' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Our values')\u001b[22m\n\n\n  53 |\n  54 |   test(\"should display manifesto and code of conduct\", async ({ page }) => {\n> 55 |     await expect(page.getByText(\"Our values\")).toBeVisible()\n     |                                                ^\n  56 |     // Look for manifesto content - use first() to avoid strict mode violation\n  57 |     const manifestoText = page.getByText(\"Manifesto\").first()\n  58 |     await expect(manifestoText).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts:55:48"
                         }
                       ],
                       "stdout": [],
@@ -4836,16 +4836,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\home-Home-Page-should-display-manifesto-and-code-of-conduct-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\home-Home-Page-should-display-manifesto-and-code-of-conduct-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\home-Home-Page-should-display-manifesto-and-code-of-conduct-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\home-Home-Page-should-display-manifesto-and-code-of-conduct-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts",
                         "column": 48,
                         "line": 55
                       }
@@ -5056,11 +5056,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts",
                             "column": 77,
                             "line": 101
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#navbar').getByRole('link', { name: 'Events', exact: true }).first()\u001b[22m\n\n\n   99 |   test(\"should navigate to events page from navbar\", async ({ page }) => {\n  100 |     const navbar = page.locator(\"#navbar\")\n> 101 |     await navbar.getByRole(\"link\", { name: \"Events\", exact: true }).first().click()\n      |                                                                             ^\n  102 |     await expect(page).toHaveURL(/\\/events/)\n  103 |   })\n  104 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\home.spec.ts:101:77"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#navbar').getByRole('link', { name: 'Events', exact: true }).first()\u001b[22m\n\n\n   99 |   test(\"should navigate to events page from navbar\", async ({ page }) => {\n  100 |     const navbar = page.locator(\"#navbar\")\n> 101 |     await navbar.getByRole(\"link\", { name: \"Events\", exact: true }).first().click()\n      |                                                                             ^\n  102 |     await expect(page).toHaveURL(/\\/events/)\n  103 |   })\n  104 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\home.spec.ts:101:77"
                         }
                       ],
                       "stdout": [],
@@ -5072,12 +5072,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\home-Home-Page-should-navigate-to-events-page-from-navbar-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\home-Home-Page-should-navigate-to-events-page-from-navbar-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\home-Home-Page-should-navigate-to-events-page-from-navbar-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\home-Home-Page-should-navigate-to-events-page-from-navbar-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -5838,9 +5838,9 @@
                       "duration": 17847,
                       "error": {
                         "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n",
-                        "stack": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts:240:16",
+                        "stack": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts:240:16",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts",
                           "column": 16,
                           "line": 240
                         },
@@ -5849,11 +5849,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts",
                             "column": 16,
                             "line": 240
                           },
-                          "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n\n  238 |\n  239 |     // Find event links that are not filter links\n> 240 |     await page.waitForSelector(\"a[href*='/events/']\", { timeout: 15000 })\n      |                ^\n  241 |     const eventLinks = page.locator(\"a[href^='/events/']\").filter({\n  242 |       hasNot: page.locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]'),\n  243 |     })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts:240:16"
+                          "message": "TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href*=\\'/events/\\']') to be visible\u001b[22m\n\u001b[2m    34 × locator resolved to 43 elements. Proceeding with the first one: <a class=\"nav-link\" href=\"/events/calendar\">Calendar</a>\u001b[22m\n\n\n  238 |\n  239 |     // Find event links that are not filter links\n> 240 |     await page.waitForSelector(\"a[href*='/events/']\", { timeout: 15000 })\n      |                ^\n  241 |     const eventLinks = page.locator(\"a[href^='/events/']\").filter({\n  242 |       hasNot: page.locator('[href*=\"countries\"], [href*=\"locations\"], [href*=\"statuses\"], [href*=\"calendar\"], [href*=\"map\"], [href*=\"hosting\"], [href*=\"testimonials\"]'),\n  243 |     })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts:240:16"
                         }
                       ],
                       "stdout": [],
@@ -5865,16 +5865,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\navigation-Breadcrumb-Navi-b86f7-breadcrumbs-on-detail-pages-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\navigation-Breadcrumb-Navi-b86f7-breadcrumbs-on-detail-pages-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\navigation-Breadcrumb-Navi-b86f7-breadcrumbs-on-detail-pages-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\navigation-Breadcrumb-Navi-b86f7-breadcrumbs-on-detail-pages-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts",
                         "column": 16,
                         "line": 240
                       }
@@ -6033,9 +6033,9 @@
                       "duration": 2723,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m425\u001b[39m\nReceived:    \u001b[31m488\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m425\u001b[39m\nReceived:    \u001b[31m488\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts:320:25",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m425\u001b[39m\nReceived:    \u001b[31m488\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts:320:25",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts",
                           "column": 25,
                           "line": 320
                         },
@@ -6044,11 +6044,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts",
                             "column": 25,
                             "line": 320
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m425\u001b[39m\nReceived:    \u001b[31m488\u001b[39m\n\n  318 |       // Page should not have major layout issues (allow some overflow for scrollbars)\n  319 |       const bodyWidth = await page.evaluate(() => document.body.scrollWidth)\n> 320 |       expect(bodyWidth).toBeLessThanOrEqual(viewport.width + 50) // Allow margin for scrollbars\n      |                         ^\n  321 |     })\n  322 |   }\n  323 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts:320:25"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m425\u001b[39m\nReceived:    \u001b[31m488\u001b[39m\n\n  318 |       // Page should not have major layout issues (allow some overflow for scrollbars)\n  319 |       const bodyWidth = await page.evaluate(() => document.body.scrollWidth)\n> 320 |       expect(bodyWidth).toBeLessThanOrEqual(viewport.width + 50) // Allow margin for scrollbars\n      |                         ^\n  321 |     })\n  322 |   }\n  323 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts:320:25"
                         }
                       ],
                       "stdout": [],
@@ -6060,16 +6060,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\navigation-Responsive-Layo-8c5b6--render-correctly-on-mobile-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\navigation-Responsive-Layo-8c5b6--render-correctly-on-mobile-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\navigation-Responsive-Layo-8c5b6--render-correctly-on-mobile-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\navigation-Responsive-Layo-8c5b6--render-correctly-on-mobile-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\navigation.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\navigation.spec.ts",
                         "column": 25,
                         "line": 320
                       }
@@ -6535,9 +6535,9 @@
                       "duration": 7062,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:41:41",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:41:41",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                           "column": 41,
                           "line": 41
                         },
@@ -6546,11 +6546,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 41,
                             "line": 41
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  39 |     })\n  40 |     if ((await playerLinks.count()) > 0) {\n> 41 |       await expect(playerLinks.first()).toBeVisible()\n     |                                         ^\n  42 |       const href = await playerLinks.first().getAttribute(\"href\")\n  43 |       expect(href).toMatch(/\\/players\\//)\n  44 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:41:41"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\nExpected: visible\nReceived: hidden\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    9 × locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m      - unexpected value \"hidden\"\u001b[22m\n\n\n  39 |     })\n  40 |     if ((await playerLinks.count()) > 0) {\n> 41 |       await expect(playerLinks.first()).toBeVisible()\n     |                                         ^\n  42 |       const href = await playerLinks.first().getAttribute(\"href\")\n  43 |       expect(href).toMatch(/\\/players\\//)\n  44 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:41:41"
                         }
                       ],
                       "stdout": [],
@@ -6562,16 +6562,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-List-Page-should-have-clickable-player-cards-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-List-Page-should-have-clickable-player-cards-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-List-Page-should-have-clickable-player-cards-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-List-Page-should-have-clickable-player-cards-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                         "column": 41,
                         "line": 41
                       }
@@ -6612,11 +6612,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 33,
                             "line": 52
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  50 |     })\n  51 |     if ((await playerLinks.count()) > 0) {\n> 52 |       await playerLinks.first().click()\n     |                                 ^\n  53 |       await waitForPageLoad(page)\n  54 |       expect(page.url()).toMatch(/\\/players/)\n  55 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:52:33"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  50 |     })\n  51 |     if ((await playerLinks.count()) > 0) {\n> 52 |       await playerLinks.first().click()\n     |                                 ^\n  53 |       await waitForPageLoad(page)\n  54 |       expect(page.url()).toMatch(/\\/players/)\n  55 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:52:33"
                         }
                       ],
                       "stdout": [],
@@ -6628,12 +6628,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-List-Page--f724a-layer-details-on-card-click-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-List-Page--f724a-layer-details-on-card-click-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-List-Page--f724a-layer-details-on-card-click-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-List-Page--f724a-layer-details-on-card-click-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -6809,9 +6809,9 @@
                       "duration": 3473,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:90:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:90:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                           "column": 26,
                           "line": 90
                         },
@@ -6820,11 +6820,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 26,
                             "line": 90
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n\n  88 |       await positionLinks.first().click()\n  89 |       await waitForPageLoad(page)\n> 90 |       expect(page.url()).toMatch(/\\/players\\/positions\\//)\n     |                          ^\n  91 |     }\n  92 |   })\n  93 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:90:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n\n  88 |       await positionLinks.first().click()\n  89 |       await waitForPageLoad(page)\n> 90 |       expect(page.url()).toMatch(/\\/players\\/positions\\//)\n     |                          ^\n  91 |     }\n  92 |   })\n  93 | })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:90:26"
                         }
                       ],
                       "stdout": [],
@@ -6836,16 +6836,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-Positions--c708c-e-to-specific-position-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-Positions--c708c-e-to-specific-position-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-Positions--c708c-e-to-specific-position-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-Positions--c708c-e-to-specific-position-page-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                         "column": 26,
                         "line": 90
                       }
@@ -6886,9 +6886,9 @@
                       "duration": 2807,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:104:26",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:104:26",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                           "column": 26,
                           "line": 104
                         },
@@ -6897,11 +6897,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 26,
                             "line": 104
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n\n  102 |       await positionLinks.first().click()\n  103 |       await waitForPageLoad(page)\n> 104 |       expect(page.url()).toMatch(/\\/players\\/positions\\//)\n      |                          ^\n  105 |       await verifyPageLayout(page)\n  106 |     }\n  107 |   })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:104:26"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoMatch\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected pattern: \u001b[32m/\\/players\\/positions\\//\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/players/positions\"\u001b[39m\n\n  102 |       await positionLinks.first().click()\n  103 |       await waitForPageLoad(page)\n> 104 |       expect(page.url()).toMatch(/\\/players\\/positions\\//)\n      |                          ^\n  105 |       await verifyPageLayout(page)\n  106 |     }\n  107 |   })\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:104:26"
                         }
                       ],
                       "stdout": [],
@@ -6913,16 +6913,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-Position-D-7ccb5-players-from-positions-list-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-Position-D-7ccb5-players-from-positions-list-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Players-Position-D-7ccb5-players-from-positions-list-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Players-Position-D-7ccb5-players-from-positions-list-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                         "column": 26,
                         "line": 104
                       }
@@ -7039,11 +7039,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 33,
                             "line": 149
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    49 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n\n  147 |\n  148 |     if ((await playerLinks.count()) > 0) {\n> 149 |       await playerLinks.first().click()\n      |                                 ^\n  150 |       await waitForPageLoad(page)\n  151 |       const main = page.locator(\"main\")\n  152 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:149:33"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    49 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\n\n  147 |\n  148 |     if ((await playerLinks.count()) > 0) {\n> 149 |       await playerLinks.first().click()\n      |                                 ^\n  150 |       await waitForPageLoad(page)\n  151 |       const main = page.locator(\"main\")\n  152 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:149:33"
                         }
                       ],
                       "stdout": [],
@@ -7055,12 +7055,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-d04a8--display-player-information-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-d04a8--display-player-information-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-d04a8--display-player-information-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-d04a8--display-player-information-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -7100,11 +7100,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 33,
                             "line": 165
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    51 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  163 |\n  164 |     if ((await playerLinks.count()) > 0) {\n> 165 |       await playerLinks.first().click()\n      |                                 ^\n  166 |       await waitForPageLoad(page)\n  167 |       await verifyPageLayout(page)\n  168 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:165:33"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    51 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  163 |\n  164 |     if ((await playerLinks.count()) > 0) {\n> 165 |       await playerLinks.first().click()\n      |                                 ^\n  166 |       await waitForPageLoad(page)\n  167 |       await verifyPageLayout(page)\n  168 |     }\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:165:33"
                         }
                       ],
                       "stdout": [],
@@ -7116,12 +7116,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-e8a1a-page-layout-on-details-page-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-e8a1a-page-layout-on-details-page-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-e8a1a-page-layout-on-details-page-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-e8a1a-page-layout-on-details-page-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -7161,11 +7161,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 33,
                             "line": 180
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    51 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  178 |\n  179 |     if ((await playerLinks.count()) > 0) {\n> 180 |       await playerLinks.first().click()\n      |                                 ^\n  181 |       await waitForPageLoad(page)\n  182 |       const main = page.locator(\"main\")\n  183 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:180:33"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    51 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  178 |\n  179 |     if ((await playerLinks.count()) > 0) {\n> 180 |       await playerLinks.first().click()\n      |                                 ^\n  181 |       await waitForPageLoad(page)\n  182 |       const main = page.locator(\"main\")\n  183 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:180:33"
                         }
                       ],
                       "stdout": [],
@@ -7177,12 +7177,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-7fa4c-player-sidebar-with-details-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-7fa4c-player-sidebar-with-details-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-7fa4c-player-sidebar-with-details-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-7fa4c-player-sidebar-with-details-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -7222,11 +7222,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 33,
                             "line": 196
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    50 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  194 |\n  195 |     if ((await playerLinks.count()) > 0) {\n> 196 |       await playerLinks.first().click()\n      |                                 ^\n  197 |       await waitForPageLoad(page)\n  198 |       const main = page.locator(\"main\")\n  199 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:196:33"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    50 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  194 |\n  195 |     if ((await playerLinks.count()) > 0) {\n> 196 |       await playerLinks.first().click()\n      |                                 ^\n  197 |       await waitForPageLoad(page)\n  198 |       const main = page.locator(\"main\")\n  199 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:196:33"
                         }
                       ],
                       "stdout": [],
@@ -7238,12 +7238,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-1f61f-ay-player-tabs-if-available-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-1f61f-ay-player-tabs-if-available-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-1f61f-ay-player-tabs-if-available-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-1f61f-ay-player-tabs-if-available-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -7283,11 +7283,11 @@
                         },
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts",
                             "column": 33,
                             "line": 212
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  210 |\n  211 |     if ((await playerLinks.count()) > 0) {\n> 212 |       await playerLinks.first().click()\n      |                                 ^\n  213 |       await waitForPageLoad(page)\n  214 |       const main = page.locator(\"main\")\n  215 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\players.spec.ts:212:33"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('a[href^=\\'/players/\\']').filter({ hasNot: locator('[href*=\"positions\"]') }).first()\u001b[22m\n\u001b[2m    - locator resolved to <a href=\"/players/positions\">Position</a>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    52 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n  210 |\n  211 |     if ((await playerLinks.count()) > 0) {\n> 212 |       await playerLinks.first().click()\n      |                                 ^\n  213 |       await waitForPageLoad(page)\n  214 |       const main = page.locator(\"main\")\n  215 |       await expect(main).toBeVisible()\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\players.spec.ts:212:33"
                         }
                       ],
                       "stdout": [],
@@ -7299,12 +7299,12 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-a536d--player-events-if-available-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-a536d--player-events-if-available-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\players-Player-Details-Pag-a536d--player-events-if-available-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\players-Player-Details-Pag-a536d--player-events-if-available-chromium\\error-context.md"
                         }
                       ]
                     }
@@ -7531,9 +7531,9 @@
                       "duration": 4291,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/contact\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/\"\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/contact\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\static-pages.spec.ts:49:24",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/contact\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/\"\u001b[39m\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\static-pages.spec.ts:49:24",
                         "location": {
-                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\static-pages.spec.ts",
+                          "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\static-pages.spec.ts",
                           "column": 24,
                           "line": 49
                         },
@@ -7542,11 +7542,11 @@
                       "errors": [
                         {
                           "location": {
-                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\static-pages.spec.ts",
+                            "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\static-pages.spec.ts",
                             "column": 24,
                             "line": 49
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/contact\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/\"\u001b[39m\n\n  47 |     await waitForPageLoad(page)\n  48 |\n> 49 |     expect(page.url()).toContain(\"/contact\")\n     |                        ^\n  50 |   })\n  51 | })\n  52 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\static-pages.spec.ts:49:24"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected substring: \u001b[32m\"/contact\"\u001b[39m\nReceived string:    \u001b[31m\"http://localhost:3000/\"\u001b[39m\n\n  47 |     await waitForPageLoad(page)\n  48 |\n> 49 |     expect(page.url()).toContain(\"/contact\")\n     |                        ^\n  50 |   })\n  51 | })\n  52 |\n    at c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\static-pages.spec.ts:49:24"
                         }
                       ],
                       "stdout": [],
@@ -7558,16 +7558,16 @@
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\static-pages-Contact-Page-should-be-accessible-from-navbar-chromium\\test-failed-1.png"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\static-pages-Contact-Page-should-be-accessible-from-navbar-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\test-results\\static-pages-Contact-Page-should-be-accessible-from-navbar-chromium\\error-context.md"
+                          "path": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\test-results\\static-pages-Contact-Page-should-be-accessible-from-navbar-chromium\\error-context.md"
                         }
                       ],
                       "errorLocation": {
-                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-ui\\tests\\static-pages.spec.ts",
+                        "file": "c:\\Users\\CedricPONTET\\repos\\play14\\play14-web\\tests\\static-pages.spec.ts",
                         "column": 24,
                         "line": 49
                       }
@@ -8206,3 +8206,4 @@
     "flaky": 0
   }
 }
+

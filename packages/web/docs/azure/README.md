@@ -36,8 +36,8 @@ Once Azure resources are configured, the deployment is fully automated:
 ┌─────────────────────────────────────────────────────────────┐
 │            Azure Container Registry                         │
 │                                                             │
-│  play14containerregistry.azurecr.io/play14-ui:pr-X-{sha}  │
-│  play14containerregistry.azurecr.io/play14-ui:prod-{sha}  │
+│  play14containerregistry.azurecr.io/play14-web:pr-X-{sha}  │
+│  play14containerregistry.azurecr.io/play14-web:prod-{sha}  │
 └─────────────────────────────────────────────────────────────┘
          │                    │
          ▼                    ▼
@@ -45,7 +45,7 @@ Once Azure resources are configured, the deployment is fully automated:
 │  Container App   │  │  Container App   │
 │  (Acceptance)    │  │  (Production)    │
 │                  │  │                  │
-│  play14-ui-acc   │  │  play14-ui-prod  │
+│  play14-web-acc   │  │  play14-web-prod  │
 │  Min: 1          │  │  Min: 2          │
 │  Max: 3          │  │  Max: 10         │
 │  CPU: 0.5        │  │  CPU: 1.0        │
@@ -79,7 +79,7 @@ Once Azure resources are configured, the deployment is fully automated:
    - `STRAPI_API_SECRET` (from secret)
    - `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` (from secret)
 4. 📦 Push to Azure Container Registry
-5. 🚀 Deploy to `play14-ui-acc` container app
+5. 🚀 Deploy to `play14-web-acc` container app
 6. 🏥 Health check on `/api/health`
 7. 💬 Comment PR with deployment URL
 
@@ -115,13 +115,13 @@ Stored securely in Azure Container Apps:
 ```bash
 # Acceptance
 az containerapp logs show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --follow
 
 # Production
 az containerapp logs show \
-  --name play14-ui-prod \
+  --name play14-web-prod \
   --resource-group play14-community \
   --follow
 ```
@@ -131,7 +131,7 @@ az containerapp logs show \
 ```bash
 # Get URL
 URL=$(az containerapp show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --query properties.configuration.ingress.fqdn \
   --output tsv)
@@ -144,7 +144,7 @@ curl https://${URL}/api/health
 
 ```bash
 az containerapp revision list \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --output table
 ```
@@ -157,7 +157,7 @@ Check GitHub Actions logs and Container App logs:
 
 ```bash
 az containerapp logs show \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --tail 100
 ```
@@ -168,7 +168,7 @@ az containerapp logs show \
 
    ```bash
    az containerapp revision list \
-     --name play14-ui-acc \
+     --name play14-web-acc \
      --resource-group play14-community
    ```
 
@@ -176,7 +176,7 @@ az containerapp logs show \
 
    ```bash
    az containerapp replica list \
-     --name play14-ui-acc \
+     --name play14-web-acc \
      --resource-group play14-community \
      --revision {revision-name}
    ```
@@ -184,7 +184,7 @@ az containerapp logs show \
 3. Restart the app:
    ```bash
    az containerapp restart \
-     --name play14-ui-acc \
+     --name play14-web-acc \
      --resource-group play14-community
    ```
 
@@ -192,7 +192,7 @@ az containerapp logs show \
 
 ```bash
 az containerapp secret set \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community \
   --secrets \
     strapi-api-secret={new-value} \
@@ -200,7 +200,7 @@ az containerapp secret set \
 
 # Restart to pick up new secrets
 az containerapp restart \
-  --name play14-ui-acc \
+  --name play14-web-acc \
   --resource-group play14-community
 ```
 
@@ -251,3 +251,4 @@ az containerapp restart \
 - [Azure Container Apps Docs](https://learn.microsoft.com/azure/container-apps/)
 - [Next.js Deployment Docs](https://nextjs.org/docs/deployment)
 - [GitHub Actions Azure Login](https://github.com/marketplace/actions/azure-login)
+

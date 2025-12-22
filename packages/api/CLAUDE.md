@@ -112,14 +112,14 @@ module.exports = {
     // Events use "name-MM" format (name + start month)
     event.params.data.slug = eventToSlug(
       event.params.data.name,
-      event.params.data.start,
+      event.params.data.start
     );
   },
   beforeUpdate(event) {
     if (event.params.data.name || event.params.data.start) {
       event.params.data.slug = eventToSlug(
         event.params.data.name,
-        event.params.data.start,
+        event.params.data.start
       );
     }
   },
@@ -147,12 +147,12 @@ Located in `config/cron-tasks.js`, using Document Service API:
 
 ### GitHub Actions Integration
 
-Custom service in `src/api/github-trigger/services/github-trigger.js` triggers frontend (`play14-ui`) rebuilds on content changes:
+Custom service in `src/api/github-trigger/services/github-trigger.js` triggers frontend (`play14-web`) rebuilds on content changes:
 
 - Listens for publish/unpublish/delete events on: Events, Players, Games, Articles, Home, Venues, Hostings
 - Debounces triggers (5-second window)
 - Calls GitHub Actions API via `GITHUB_TOKEN`
-- Workflow: `play14team/play14-ui` workflow ID `52506304`
+- Workflow: `play14team/play14-web` workflow ID `52506304`
 - Hooks registered in `src/extensions/github-trigger-lifecycles.js` (uses DB lifecycle API, not Document Service)
 
 ### Plugin Configuration
@@ -318,7 +318,7 @@ Critical variables (see `.env.example`):
 
 **Integrations**:
 
-- `GITHUB_TOKEN` (for triggering play14-ui rebuilds)
+- `GITHUB_TOKEN` (for triggering play14-web rebuilds)
 - `STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN` (required for admin panel maps)
 
 **Cron**:

@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packages/ui/**'
-      - '!packages/ui/.github/**'  # Exclude workflow changes unless they affect build/deploy
+      - "packages/ui/**"
+      - "!packages/ui/.github/**" # Exclude workflow changes unless they affect build/deploy
   workflow_dispatch:
 
 concurrency:
@@ -16,8 +16,8 @@ env:
   NODE_VERSION: "20"
   STRAPI_API_URL: "https://community.play14.org"
   REGISTRY: play14containerregistry.azurecr.io
-  IMAGE_NAME: play14/play14-ui
-  CONTAINER_APP_NAME: play14-ui
+  IMAGE_NAME: play14/play14-web
+  CONTAINER_APP_NAME: play14-web
   RESOURCE_GROUP: play14-community
 
 jobs:
@@ -405,3 +405,4 @@ jobs:
           elif [ "${{ needs.build-production.result }}" == "success" ]; then
             echo "**Source:** Newly built image" >> $GITHUB_STEP_SUMMARY
           fi
+

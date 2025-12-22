@@ -1,6 +1,6 @@
 # Container Deployment Guide
 
-This guide covers deploying the play14-ui application using containers with Podman or Docker.
+This guide covers deploying the play14-web application using containers with Podman or Docker.
 
 ## Table of Contents
 
@@ -128,7 +128,7 @@ podman compose -f compose.prod.yaml down
 
 ```bash
 # Build image with build args
-podman build -t play14-ui:latest \
+podman build -t play14-web:latest \
   --build-arg STRAPI_API_URL=https://community.play14.org \
   --build-arg STRAPI_API_SECRET=your-secret \
   --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token \
@@ -136,15 +136,15 @@ podman build -t play14-ui:latest \
 
 # Run container
 podman run -d \
-  --name play14-ui \
+  --name play14-web \
   -p 3000:3000 \
   --restart unless-stopped \
   --env-file .env.production \
-  play14-ui:latest
+  play14-web:latest
 
 # Check status
 podman ps
-podman logs play14-ui
+podman logs play14-web
 ```
 
 #### Option 3: With Custom Port
@@ -152,11 +152,11 @@ podman logs play14-ui
 ```bash
 # Run on port 8080 instead of 3000
 podman run -d \
-  --name play14-ui \
+  --name play14-web \
   -p 8080:3000 \
   --restart unless-stopped \
   --env-file .env.production \
-  play14-ui:latest
+  play14-web:latest
 ```
 
 ### Production Features
@@ -240,14 +240,14 @@ Health checks run every 30 seconds with 3 retries and 10s timeout.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: play14-ui
+  name: play14-web
 spec:
   replicas: 3
   template:
     spec:
       containers:
-        - name: play14-ui
-          image: play14-ui:latest
+        - name: play14-web
+          image: play14-web:latest
           ports:
             - containerPort: 3000
           env:
@@ -269,9 +269,9 @@ spec:
 ```bash
 az container create \
   --resource-group play14-rg \
-  --name play14-ui \
-  --image play14-ui:latest \
-  --dns-name-label play14-ui \
+  --name play14-web \
+  --image play14-web:latest \
+  --dns-name-label play14-web \
   --ports 3000 \
   --environment-variables \
     STRAPI_API_URL=https://community.play14.org \
@@ -284,10 +284,10 @@ az container create \
 
 ```bash
 az containerapp create \
-  --name play14-ui \
+  --name play14-web \
   --resource-group play14-rg \
   --environment play14-env \
-  --image play14-ui:latest \
+  --image play14-web:latest \
   --target-port 3000 \
   --ingress external \
   --env-vars \
@@ -303,23 +303,23 @@ az containerapp create \
 
 ```bash
 # Check logs
-podman logs play14-ui
+podman logs play14-web
 
 # Check health
-podman inspect play14-ui --format='{{.State.Health.Status}}'
+podman inspect play14-web --format='{{.State.Health.Status}}'
 
 # Run interactively for debugging
-podman run -it --rm play14-ui:latest sh
+podman run -it --rm play14-web:latest sh
 ```
 
 ### Build fails
 
 ```bash
 # Clean build (no cache)
-podman build --no-cache -t play14-ui:latest .
+podman build --no-cache -t play14-web:latest .
 
 # Check build args
-podman build --build-arg STRAPI_API_URL=https://example.com -t play14-ui:latest .
+podman build --build-arg STRAPI_API_URL=https://example.com -t play14-web:latest .
 
 # Verify .dockerignore
 cat .dockerignore
@@ -332,10 +332,10 @@ cat .dockerignore
 curl http://localhost:3000/api/health
 
 # Check if app is listening
-podman exec play14-ui netstat -tuln | grep 3000
+podman exec play14-web netstat -tuln | grep 3000
 
 # View full health check logs
-podman inspect play14-ui | grep -A 10 Health
+podman inspect play14-web | grep -A 10 Health
 ```
 
 ### Permission issues
@@ -352,7 +352,7 @@ podman unshare chown -R 1001:1001 /path/to/volume
 
 ```bash
 # Check resource usage
-podman stats play14-ui
+podman stats play14-web
 
 # Adjust limits in compose.prod.yaml
 deploy:
@@ -366,7 +366,7 @@ deploy:
 
 ```bash
 # Verify env vars in container
-podman exec play14-ui env | grep STRAPI
+podman exec play14-web env | grep STRAPI
 
 # Check .env file
 cat .env.production
@@ -381,12 +381,12 @@ podman run --env STRAPI_API_URL=https://example.com ...
 2. **Use secrets management** for production credentials
 3. **Scan images** for vulnerabilities:
    ```bash
-   podman scan play14-ui:latest
+   podman scan play14-web:latest
    ```
 4. **Keep base images updated:**
    ```bash
    podman pull node:20-alpine
-   podman build --pull -t play14-ui:latest .
+   podman build --pull -t play14-web:latest .
    ```
 5. **Use TLS termination** at reverse proxy/load balancer level
 
@@ -408,3 +408,4 @@ podman run --env STRAPI_API_URL=https://example.com ...
 - [Podman Documentation](https://docs.podman.io/)
 - [Docker Documentation](https://docs.docker.com/)
 - [Next.js Standalone Output](https://nextjs.org/docs/advanced-features/output-file-tracing)
+

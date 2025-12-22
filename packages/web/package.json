@@ -1,5 +1,5 @@
 {
-  "name": "play14-ui",
+  "name": "play14-web",
   "version": "3.0.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "format": "prettier src --write",
     "dev": "bun develop",
     "dev:pods": "podman-compose up --build",
-    "up": "podman-compose up -d && podman logs -f play14-ui",
+    "up": "podman-compose up -d && podman logs -f play14-web",
     "down": "podman-compose down",
     "test": "playwright test",
     "test:ui": "playwright test --ui",

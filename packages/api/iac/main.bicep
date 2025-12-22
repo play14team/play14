@@ -229,7 +229,7 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             }
             {
               name: 'GITHUB_REPO'
-              value: 'play14-ui'
+              value: 'play14-web'
             }
             {
               name: 'GITHUB_WORKFLOW_ID'

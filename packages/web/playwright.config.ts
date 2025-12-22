@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test"
 
 /**
- * Playwright configuration for play14-ui
+ * Playwright configuration for play14-web
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
@@ -44,3 +44,4 @@ export default defineConfig({
     timeout: 120 * 1000,
   },
 })
+

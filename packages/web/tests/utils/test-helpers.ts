@@ -1,7 +1,7 @@
 import { expect, Page } from "@playwright/test"
 
 /**
- * Common test helper functions for play14-ui tests
+ * Common test helper functions for play14-web tests
  */
 
 /**
@@ -256,3 +256,4 @@ export async function navigateViaDropdown(
   }
   return false
 }
+

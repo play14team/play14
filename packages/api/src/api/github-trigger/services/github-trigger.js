@@ -1,7 +1,7 @@
 /**
  * GitHub Trigger Service
  * Replaces strapi-plugin-update-static-content for Strapi 5
- * Triggers play14-ui repository build via GitHub Actions API
+ * Triggers play14-web repository build via GitHub Actions API
  */
 
 module.exports = ({ strapi }) => ({
@@ -14,14 +14,14 @@ module.exports = ({ strapi }) => ({
     const config = {
       githubToken: process.env.GITHUB_TOKEN,
       owner: process.env.GITHUB_OWNER || "play14team",
-      repo: process.env.GITHUB_REPO || "play14-ui",
+      repo: process.env.GITHUB_REPO || "play14-web",
       workflowId: process.env.GITHUB_WORKFLOW_ID || "217740349",
       branch: process.env.GITHUB_BRANCH || "main",
     };
 
     if (!config.githubToken) {
       strapi.log.warn(
-        "[GitHub Trigger] GITHUB_TOKEN not configured, skipping workflow trigger",
+        "[GitHub Trigger] GITHUB_TOKEN not configured, skipping workflow trigger"
       );
       return false;
     }
@@ -44,21 +44,21 @@ module.exports = ({ strapi }) => ({
 
       if (response.ok) {
         strapi.log.info(
-          `[GitHub Trigger] ✅ Successfully triggered ${config.repo} build: ${reason}`,
+          `[GitHub Trigger] ✅ Successfully triggered ${config.repo} build: ${reason}`
         );
         return true;
       } else {
         const errorText = await response.text();
         strapi.log.error(
           `[GitHub Trigger] ❌ Failed to trigger workflow: ${response.status} ${response.statusText}`,
-          errorText,
+          errorText
         );
         return false;
       }
     } catch (error) {
       strapi.log.error(
         `[GitHub Trigger] ❌ Error triggering workflow:`,
-        error.message,
+        error.message
       );
       return false;
     }

@@ -17,8 +17,8 @@ env:
   NODE_VERSION: "20"
   STRAPI_API_URL: "https://community-acc.play14.org/"
   REGISTRY: play14containerregistry.azurecr.io
-  IMAGE_NAME: play14/play14-ui
-  CONTAINER_APP_ACC: play14-ui-acc
+  IMAGE_NAME: play14/play14-web
+  CONTAINER_APP_ACC: play14-web-acc
   RESOURCE_GROUP: play14-community
 
 jobs:

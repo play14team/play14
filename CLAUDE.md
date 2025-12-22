@@ -27,12 +27,14 @@ All packages use TypeScript with ES modules (`"type": "module"`).
 ## Common Commands
 
 ### Workspace Management
+
 ```bash
 # Install all workspace dependencies
 bun install
 ```
 
 ### Development
+
 ```bash
 # Run individual package in dev mode (with watch)
 bun --filter api dev          # Start API with database (Strapi develop mode)
@@ -59,6 +61,7 @@ bun --filter design build-storybook    # Build Storybook
 ```
 
 ### Container Development
+
 ```bash
 # Start all services (API, database, pgAdmin, design)
 podman-compose up
@@ -72,10 +75,11 @@ podman-compose down
 ```
 
 **Available Services**:
+
 - `play14-api`: Strapi API (port 1337)
 - `play14-db`: PostgreSQL database (port 5432)
 - `pgadmin`: Database admin UI (port 5050)
-- `play14-ui`: Next.js frontend (port 3000)
+- `play14-web`: Next.js frontend (port 3000)
 - `design`: Storybook (port 8080)
 
 ## Codacy Integration
@@ -83,6 +87,7 @@ podman-compose down
 This repository uses Codacy's MCP Server for code quality analysis. The following rules MUST be followed:
 
 ### After File Edits
+
 - **CRITICAL**: After ANY successful `edit_file` or `reapply` operation, IMMEDIATELY run `codacy_cli_analyze` tool for each edited file with:
   - `rootPath`: workspace path
   - `file`: path of the edited file
@@ -91,6 +96,7 @@ This repository uses Codacy's MCP Server for code quality analysis. The followin
 - Failure to follow this is considered a critical error
 
 ### After Dependency Changes
+
 - **CRITICAL**: After ANY dependency operations (npm/yarn/pnpm/bun install, adding dependencies to package.json), IMMEDIATELY run `codacy_cli_analyze` with:
   - `rootPath`: workspace path
   - `tool`: "trivy"
@@ -98,12 +104,14 @@ This repository uses Codacy's MCP Server for code quality analysis. The followin
 - If vulnerabilities are found, stop all operations and fix security issues before continuing
 
 ### Codacy CLI Installation
+
 - If Codacy CLI is not installed, ask the user if they want to install it
 - If yes, run `codacy_cli_install` tool
 - If no, instruct user to disable automatic analysis in extension settings
 - Do NOT manually install Codacy CLI using brew, npm, npx, or other package managers
 
 ### General Codacy Rules
+
 - Do NOT run `codacy_cli_analyze` for duplicated code or code complexity metrics
 - Do NOT run `codacy_cli_analyze` for code coverage
 - Always use standard, non-URL-encoded file system paths for `rootPath`
