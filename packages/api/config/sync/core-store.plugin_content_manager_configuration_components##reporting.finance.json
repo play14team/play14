@@ -1,0 +1,135 @@
+{
+  "key": "plugin_content_manager_configuration_components::reporting.finance",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "destination",
+      "defaultSortBy": "id",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "revenue": {
+        "edit": {
+          "label": "Revenue",
+          "description": "Total amout of tickets sales and sponsoring",
+          "placeholder": "Total revenue",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "revenue",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "expenses": {
+        "edit": {
+          "label": "Expenses",
+          "description": "Total amount of costs and expenses",
+          "placeholder": "Total expenses",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "expenses",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "destination": {
+        "edit": {
+          "label": "Destination",
+          "description": "Where are the funds at the moment? What is intended to do with them?",
+          "placeholder": "Destination of the funds",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "destination",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "result": {
+        "edit": {
+          "label": "Type of result",
+          "description": "Profit or loss",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "result",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "resultAmount": {
+        "edit": {
+          "label": "Result amount",
+          "description": "Difference between revenue and expenses",
+          "placeholder": "Profit or loss amount",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "resultAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "revenue",
+        "expenses",
+        "destination"
+      ],
+      "edit": [
+        [
+          {
+            "name": "revenue",
+            "size": 4
+          },
+          {
+            "name": "expenses",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "result",
+            "size": 4
+          },
+          {
+            "name": "resultAmount",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "destination",
+            "size": 8
+          }
+        ]
+      ]
+    },
+    "uid": "reporting.finance",
+    "isComponent": true
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

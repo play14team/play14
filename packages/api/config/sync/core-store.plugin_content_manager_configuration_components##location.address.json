@@ -1,0 +1,115 @@
+{
+  "key": "plugin_content_manager_configuration_components::location.address",
+  "value": {
+    "uid": "location.address",
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "street",
+      "defaultSortBy": "street",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "street": {
+        "edit": {
+          "label": "Street and number",
+          "description": "What are the street and number?",
+          "placeholder": "Type street and number",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "street",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "postalCode": {
+        "edit": {
+          "label": "Postal Code",
+          "description": "What is the postal code?",
+          "placeholder": "Type the postal code",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "postalCode",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "city": {
+        "edit": {
+          "label": "City",
+          "description": "What city?",
+          "placeholder": "Type the name of the city",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "city",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "area": {
+        "edit": {
+          "label": "Area",
+          "description": "What area of neighborhood?",
+          "placeholder": "Type the name of the area or neighborhood",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "area",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "street",
+        "postalCode",
+        "city"
+      ],
+      "edit": [
+        [
+          {
+            "name": "street",
+            "size": 6
+          },
+          {
+            "name": "area",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "postalCode",
+            "size": 6
+          },
+          {
+            "name": "city",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "isComponent": true
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

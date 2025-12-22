@@ -1,0 +1,24 @@
+{
+  "key": "plugin_calendar_settings",
+  "value": {
+    "collection": "api::event.event",
+    "startField": "start",
+    "endField": "end",
+    "titleField": "name",
+    "defaultDuration": 120,
+    "drafts": true,
+    "startHour": "17:30",
+    "endHour": "17:00",
+    "defaultView": "Month",
+    "monthView": true,
+    "weekView": false,
+    "dayView": false,
+    "todayButton": true,
+    "createButton": true,
+    "primaryColor": "#4945ff",
+    "eventColor": "#4945ff"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

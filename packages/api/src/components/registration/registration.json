@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_registration_registrations",
+  "info": {
+    "displayName": "Registration",
+    "icon": "info-circle",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "link": {
+      "type": "string"
+    },
+    "widgetCode": {
+      "type": "text"
+    }
+  }
+}

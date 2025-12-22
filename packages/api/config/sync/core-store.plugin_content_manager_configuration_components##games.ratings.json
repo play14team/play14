@@ -1,0 +1,95 @@
+{
+  "key": "plugin_content_manager_configuration_components::games.ratings",
+  "value": {
+    "uid": "games.ratings",
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "id",
+      "defaultSortBy": "id",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "energy": {
+        "edit": {
+          "label": "energy",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "energy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "connection": {
+        "edit": {
+          "label": "connection",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "connection",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "silliness": {
+        "edit": {
+          "label": "silliness",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "silliness",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "energy",
+        "connection",
+        "silliness"
+      ],
+      "edit": [
+        [
+          {
+            "name": "energy",
+            "size": 4
+          },
+          {
+            "name": "connection",
+            "size": 4
+          },
+          {
+            "name": "silliness",
+            "size": 4
+          }
+        ]
+      ]
+    },
+    "isComponent": true
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

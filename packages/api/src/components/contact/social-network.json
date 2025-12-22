@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_contact_social_networks",
+  "info": {
+    "displayName": "SocialNetwork",
+    "icon": "address-card",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "Twitter",
+        "LinkedIn",
+        "Facebook",
+        "Youtube",
+        "Instagram",
+        "Xing",
+        "Email",
+        "Website",
+        "Wikipedia",
+        "Vimeo",
+        "Other"
+      ]
+    }
+  }
+}

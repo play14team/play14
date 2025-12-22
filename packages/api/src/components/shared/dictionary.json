@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shared_dictionaries",
+  "info": {
+    "displayName": "Dictionary",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true
+    },
+    "value": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

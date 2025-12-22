@@ -1,0 +1,21 @@
+{
+  "name": "rebuild-trigger",
+  "version": "1.0.0",
+  "description": "A Strapi plugin to manually trigger website rebuilds via GitHub Actions",
+  "strapi": {
+    "kind": "plugin",
+    "name": "rebuild-trigger",
+    "displayName": "Rebuild Trigger"
+  },
+  "dependencies": {
+    "@strapi/design-system": "^2.0.0",
+    "@strapi/icons": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@strapi/strapi": "^5.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.0.0",
+    "styled-components": "^6.0.0"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "event_locations",
+  "info": {
+    "singularName": "event-location",
+    "pluralName": "event-locations",
+    "displayName": "EventLocation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": false
+    },
+    "country": {
+      "type": "customField",
+      "customField": "plugin::country-select.country"
+    },
+    "events": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::event.event",
+      "mappedBy": "location"
+    },
+    "location": {
+      "type": "customField",
+      "customField": "global::map-field"
+    }
+  }
+}

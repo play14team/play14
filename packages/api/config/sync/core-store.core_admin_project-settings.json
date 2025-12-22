@@ -1,0 +1,28 @@
+{
+  "key": "core_admin_project-settings",
+  "value": {
+    "menuLogo": {
+      "name": "play14_500x500_black_bg.png",
+      "hash": "play14_500x500_black_bg_ef46e7adbc",
+      "url": "https://play14-cdn.azureedge.net/strapi-uploads/assets/play14_500x500_black_bg_ef46e7adbc.png",
+      "width": 500,
+      "height": 500,
+      "ext": ".png",
+      "size": 29.1,
+      "provider": "strapi-provider-upload-azure-storage"
+    },
+    "authLogo": {
+      "name": "play14_500x500_black_bg.png",
+      "hash": "play14_500x500_black_bg_4c0b54ef09",
+      "url": "https://play14-cdn.azureedge.net/strapi-uploads/assets/play14_500x500_black_bg_4c0b54ef09.png",
+      "width": 500,
+      "height": 500,
+      "ext": ".png",
+      "size": 29.1,
+      "provider": "strapi-provider-upload-azure-storage"
+    }
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

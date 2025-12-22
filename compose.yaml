@@ -1,0 +1,132 @@
+services:
+  design:
+    container_name: play14-design
+    build:
+      context: ./packages/design
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+
+  play14-api:
+    container_name: play14-api
+    build:
+      context: ./packages/api
+      dockerfile: Dockerfile.dev
+    image: play14-api:dev
+    restart: unless-stopped
+    env_file: ./packages/api/.env
+    environment:
+      HOST: 0.0.0.0
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: play14-db
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PORT: ${DATABASE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./packages/api/config:/opt/app/config
+      - ./packages/api/src:/opt/app/src
+      - ./packages/api/package.json:/opt/package.json
+      - ./packages/api/bun.lock:/opt/bun.lock
+      - ./packages/api/.env:/opt/app/.env
+      - ./packages/api/public/uploads:/opt/app/public/uploads
+    ports:
+      - "1337:1337"
+    networks:
+      - play14-api
+    depends_on:
+      - play14-db
+
+  play14-db:
+    container_name: play14-db
+    platform: linux/arm64
+    restart: unless-stopped
+    env_file: ./packages/api/.env
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - play14-api-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    networks:
+      - play14-api
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@play14.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - play14-api
+    depends_on:
+      - play14-db
+
+  play14-ui:
+    container_name: play14-ui
+    build:
+      context: ./packages/ui
+      dockerfile: Dockerfile.dev
+      target: development
+      cache_from:
+        - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-ui:dev-cache
+      cache_to:
+        - type=inline
+    env_file:
+      - ./packages/ui/.env.local
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./packages/ui/src:/app/src:z
+      - ./packages/ui/public:/app/public:z
+      - ./packages/ui/next.config.js:/app/next.config.js:z
+      - ./packages/ui/tsconfig.json:/app/tsconfig.json:z
+      - ./packages/ui/.prettierrc:/app/.prettierrc:z
+      - ./packages/ui/eslint.config.mjs:/app/eslint.config.mjs:z
+      - ui-node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - STRAPI_API_URL=http://play14-api:1337
+    command: bun run develop
+    networks:
+      - play14-api
+    depends_on:
+      - play14-api
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  play14-api-data:
+  pgadmin-data:
+  ui-node_modules:
+
+networks:
+  play14-api:
+    name: Play14-api
+    driver: bridge

@@ -1,0 +1,9 @@
+{
+  "key": "plugin_tinymce_settings",
+  "value": {
+    "apiKey": ""
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

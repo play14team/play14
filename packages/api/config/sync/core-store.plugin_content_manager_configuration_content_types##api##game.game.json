@@ -1,0 +1,470 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::game.game",
+  "value": {
+    "uid": "api::game.game",
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 50,
+      "mainField": "name",
+      "defaultSortBy": "name",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "name": {
+        "edit": {
+          "label": "name",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "name",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "slug": {
+        "edit": {
+          "label": "slug",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": false
+        },
+        "list": {
+          "label": "slug",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "category": {
+        "edit": {
+          "label": "category",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "category",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentedBy": {
+        "edit": {
+          "label": "documentedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "documentedBy",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "proposedBy": {
+        "edit": {
+          "label": "proposedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "proposedBy",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "firstPlayedAt": {
+        "edit": {
+          "label": "firstPlayedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "firstPlayedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "scale": {
+        "edit": {
+          "label": "scale",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "scale",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "timebox": {
+        "edit": {
+          "label": "timebox",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "timebox",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "summary": {
+        "edit": {
+          "label": "summary",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "summary",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "materials": {
+        "edit": {
+          "label": "materials",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "materials",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "preparationSteps": {
+        "edit": {
+          "label": "preparationSteps",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "preparationSteps",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "safety": {
+        "edit": {
+          "label": "safety",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "safety",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "defaultImage": {
+        "edit": {
+          "label": "defaultImage",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "defaultImage",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "images": {
+        "edit": {
+          "label": "images",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "images",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "resources": {
+        "edit": {
+          "label": "resources",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "resources",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "description": {
+        "edit": {
+          "label": "description",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "description",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "tags": {
+        "edit": {
+          "label": "tags",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "tags",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "credits": {
+        "edit": {
+          "label": "credits",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "credits",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "ratings": {
+        "edit": {
+          "label": "ratings",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "ratings",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "edit": [
+        [
+          {
+            "name": "name",
+            "size": 6
+          },
+          {
+            "name": "slug",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "scale",
+            "size": 6
+          },
+          {
+            "name": "category",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "firstPlayedAt",
+            "size": 6
+          },
+          {
+            "name": "timebox",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "documentedBy",
+            "size": 6
+          },
+          {
+            "name": "proposedBy",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "credits",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "summary",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "materials",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "preparationSteps",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "safety",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "defaultImage",
+            "size": 6
+          },
+          {
+            "name": "images",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "description",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "tags",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "resources",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "ratings",
+            "size": 12
+          }
+        ]
+      ],
+      "list": [
+        "name",
+        "category",
+        "defaultImage",
+        "scale",
+        "timebox"
+      ]
+    }
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

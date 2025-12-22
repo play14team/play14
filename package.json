@@ -1,0 +1,5 @@
+{
+  "name": "play14",
+  "version": "1.0.0",
+  "workspaces": ["packages/*"]
+}

@@ -1,0 +1,7 @@
+.ratingColor {
+  color: var(--color-yellow) !important;
+}
+
+.smallRatings i {
+  color: var(--color-border);
+}

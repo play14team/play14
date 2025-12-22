@@ -1,0 +1,51 @@
+$red: #d80000;
+$orange: #ff5200;
+$yellow: #ffc900;
+$green: #92c900;
+$blue: #0098dd;
+$grey: #393939;
+
+// Override calendar event backgroung color
+$event-bg: #92c900;
+
+$theme-colors: (
+  "primary": #ff5200,
+  "secondary": #0098dd,
+  "success": #92c900,
+  "info": #ff5200,
+  "warning": #ffc900,
+  "danger": #d80000,
+  "light": #c0ccda,
+  "dark": #393939,
+);
+
+.red {
+  color: $red;
+}
+.orange {
+  color: $orange;
+}
+.yellow {
+  color: $yellow;
+}
+.green {
+  color: $green;
+}
+.blue {
+  color: $blue;
+}
+.grey {
+  color: $grey;
+}
+.isDisabled {
+  color: currentColor;
+  cursor: not-allowed;
+  opacity: 0.5;
+  text-decoration: none;
+}
+.centered {
+  text-align: center;
+}
+.rating-color {
+  color: $yellow;
+}

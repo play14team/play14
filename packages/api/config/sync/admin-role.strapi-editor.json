@@ -1,0 +1,565 @@
+{
+  "name": "Editor",
+  "code": "strapi-editor",
+  "description": "Editors can manage and publish contents including those of other users.",
+  "permissions": [
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::event-location.event-location",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "country",
+          "events",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::event-location.event-location",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "country",
+          "events",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::event-location.event-location",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "country",
+          "events",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::event.event",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "start",
+          "end",
+          "status",
+          "defaultImage",
+          "images",
+          "contactEmail",
+          "timetable.day",
+          "timetable.description",
+          "timetable.timeslots.time",
+          "timetable.timeslots.description",
+          "registration.link",
+          "registration.widgetCode",
+          "description",
+          "location",
+          "venue",
+          "hosts",
+          "mentors",
+          "sponsorships.category",
+          "sponsorships.sponsors",
+          "media.url",
+          "media.type",
+          "players",
+          "timezone"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::event.event",
+      "properties": {
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::event.event",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "start",
+          "end",
+          "status",
+          "defaultImage",
+          "images",
+          "contactEmail",
+          "timetable.day",
+          "timetable.description",
+          "timetable.timeslots.time",
+          "timetable.timeslots.description",
+          "registration.link",
+          "registration.widgetCode",
+          "description",
+          "location",
+          "venue",
+          "hosts",
+          "mentors",
+          "sponsorships.category",
+          "sponsorships.sponsors",
+          "media.url",
+          "media.type",
+          "players",
+          "timezone"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::event.event",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "start",
+          "end",
+          "status",
+          "defaultImage",
+          "images",
+          "contactEmail",
+          "timetable.day",
+          "timetable.description",
+          "timetable.timeslots.time",
+          "timetable.timeslots.description",
+          "registration.link",
+          "registration.widgetCode",
+          "description",
+          "location",
+          "venue",
+          "hosts",
+          "mentors",
+          "sponsorships.category",
+          "sponsorships.sponsors",
+          "media.url",
+          "media.type",
+          "players",
+          "timezone"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::game.game",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "category",
+          "documentedBy",
+          "proposedBy",
+          "firstPlayedAt",
+          "scale",
+          "timebox",
+          "summary",
+          "materials.value",
+          "preparationSteps.value",
+          "safety.key",
+          "safety.value",
+          "defaultImage",
+          "images",
+          "resources",
+          "description",
+          "tags.value",
+          "credits",
+          "ratings.energy",
+          "ratings.connection",
+          "ratings.silliness"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::game.game",
+      "properties": {
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::game.game",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "category",
+          "documentedBy",
+          "proposedBy",
+          "firstPlayedAt",
+          "scale",
+          "timebox",
+          "summary",
+          "materials.value",
+          "preparationSteps.value",
+          "safety.key",
+          "safety.value",
+          "defaultImage",
+          "images",
+          "resources",
+          "description",
+          "tags.value",
+          "credits",
+          "ratings.energy",
+          "ratings.connection",
+          "ratings.silliness"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::game.game",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "category",
+          "documentedBy",
+          "proposedBy",
+          "firstPlayedAt",
+          "scale",
+          "timebox",
+          "summary",
+          "materials.value",
+          "preparationSteps.value",
+          "safety.key",
+          "safety.value",
+          "defaultImage",
+          "images",
+          "resources",
+          "description",
+          "tags.value",
+          "credits",
+          "ratings.energy",
+          "ratings.connection",
+          "ratings.silliness"
+        ],
+        "locales": [
+          "en",
+          "fr"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::player.player",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "position",
+          "company",
+          "tagline",
+          "bio",
+          "website",
+          "avatar",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "attended",
+          "hosted",
+          "mentored",
+          "user",
+          "documented",
+          "proposed",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::player.player",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "position",
+          "company",
+          "tagline",
+          "bio",
+          "website",
+          "avatar",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "attended",
+          "hosted",
+          "mentored",
+          "user",
+          "documented",
+          "proposed",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::player.player",
+      "properties": {
+        "fields": [
+          "name",
+          "slug",
+          "position",
+          "company",
+          "tagline",
+          "bio",
+          "website",
+          "avatar",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "attended",
+          "hosted",
+          "mentored",
+          "user",
+          "documented",
+          "proposed",
+          "location"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::sponsor.sponsor",
+      "properties": {
+        "fields": [
+          "name",
+          "url",
+          "logo",
+          "socialNetworks.url",
+          "socialNetworks.type"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::sponsor.sponsor",
+      "properties": {
+        "fields": [
+          "name",
+          "url",
+          "logo",
+          "socialNetworks.url",
+          "socialNetworks.type"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::sponsor.sponsor",
+      "properties": {
+        "fields": [
+          "name",
+          "url",
+          "logo",
+          "socialNetworks.url",
+          "socialNetworks.type"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::tag.tag",
+      "properties": {
+        "fields": [
+          "value",
+          "articles"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::tag.tag",
+      "properties": {
+        "fields": [
+          "value",
+          "articles"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::tag.tag",
+      "properties": {
+        "fields": [
+          "value",
+          "articles"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::venue.venue",
+      "properties": {
+        "fields": [
+          "name",
+          "shortName",
+          "logo",
+          "website",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "events",
+          "location",
+          "addressDetails"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::venue.venue",
+      "properties": {
+        "fields": [
+          "name",
+          "shortName",
+          "logo",
+          "website",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "events",
+          "location",
+          "addressDetails"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::venue.venue",
+      "properties": {
+        "fields": [
+          "name",
+          "shortName",
+          "logo",
+          "website",
+          "socialNetworks.url",
+          "socialNetworks.type",
+          "events",
+          "location",
+          "addressDetails"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::update-static-content.trigger",
+      "subject": null,
+      "properties": {},
+      "conditions": [
+        "admin::has-same-role-as-creator",
+        "admin::is-creator"
+      ],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::upload.assets.copy-link",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::upload.assets.create",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::upload.assets.download",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::upload.assets.update",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {}
+    },
+    {
+      "action": "plugin::upload.read",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {}
+    }
+  ]
+}

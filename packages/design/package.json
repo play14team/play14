@@ -1,0 +1,11 @@
+{
+  "name": "design",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Graphic design assets and storybook for #play14",
+  "scripts": {
+    "storybook": "cd storybook && bun run storybook",
+    "build-storybook": "cd storybook && bun run build-storybook",
+    "dev": "cd storybook && bun run dev"
+  }
+}

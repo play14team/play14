@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_reporting_finances",
+  "info": {
+    "displayName": "Finance",
+    "icon": "briefcase",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "revenue": {
+      "type": "decimal",
+      "required": true
+    },
+    "expenses": {
+      "type": "decimal",
+      "required": true
+    },
+    "destination": {
+      "type": "string",
+      "required": true
+    },
+    "result": {
+      "type": "enumeration",
+      "enum": [
+        "Profit",
+        "Loss"
+      ],
+      "required": true
+    },
+    "resultAmount": {
+      "type": "decimal",
+      "required": true
+    }
+  }
+}

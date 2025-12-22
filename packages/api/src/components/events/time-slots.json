@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_events_time_slots",
+  "info": {
+    "displayName": "Timeslots",
+    "icon": "stopwatch",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "time": {
+      "type": "time",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

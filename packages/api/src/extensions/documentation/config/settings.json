@@ -1,0 +1,17 @@
+{
+  "info": {
+    "version": "1.0.0",
+    "title": "#play14 api documentation",
+    "description": "",
+    "termsOfService": "",
+    "contact": {
+      "name": "#play14",
+      "email": "team@play14.org",
+      "url": "https://play14.org"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://choosealicense.com/licenses/mit/"
+    }
+  }
+}

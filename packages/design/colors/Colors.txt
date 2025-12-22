@@ -1,0 +1,6 @@
+#D80000 #	Red
+#FF5200 p	Orange
+#FFC900 l	Yellow
+#92C900 a	Green
+#0098DD y	Blue
+#393939 14	Gray

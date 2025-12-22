@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_events_sponsorships",
+  "info": {
+    "displayName": "Sponsorship",
+    "icon": "address-book",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "category": {
+      "type": "string",
+      "required": true
+    },
+    "sponsors": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::sponsor.sponsor"
+    }
+  }
+}

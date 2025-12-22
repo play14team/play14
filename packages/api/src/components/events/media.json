@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_events_media",
+  "info": {
+    "displayName": "Media",
+    "icon": "photo-video"
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "Photos",
+        "Videos"
+      ],
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,317 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.39.26.7824",
+      "templateHash": "16813619730004454119"
+    }
+  },
+  "parameters": {
+    "environmentType": {
+      "type": "string",
+      "metadata": {
+        "description": "Environment type (dev, acc, prod)"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for resources"
+      }
+    },
+    "appName": {
+      "type": "string",
+      "metadata": {
+        "description": "Container app name"
+      }
+    },
+    "containerImage": {
+      "type": "string",
+      "metadata": {
+        "description": "Container image to deploy"
+      }
+    },
+    "databaseConfig": {
+      "type": "object",
+      "metadata": {
+        "description": "Database configuration"
+      }
+    },
+    "storageConfig": {
+      "type": "object",
+      "metadata": {
+        "description": "Storage configuration"
+      }
+    },
+    "registryConfig": {
+      "type": "object",
+      "metadata": {
+        "description": "Registry configuration"
+      }
+    },
+    "appSecrets": {
+      "type": "secureObject",
+      "metadata": {
+        "description": "Application secrets"
+      }
+    },
+    "customDomain": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Custom domain name"
+      }
+    },
+    "certificateName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Certificate name for custom domain"
+      }
+    },
+    "containerEnvironmentName": {
+      "type": "string",
+      "defaultValue": "play14-container-env",
+      "metadata": {
+        "description": "Container environment name"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('appName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "environment": "[parameters('environmentType')]",
+        "app": "play14-api"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', parameters('containerEnvironmentName'))]",
+        "configuration": {
+          "activeRevisionsMode": "Single",
+          "ingress": {
+            "external": true,
+            "targetPort": 1337,
+            "allowInsecure": false,
+            "traffic": [
+              {
+                "latestRevision": true,
+                "weight": 100
+              }
+            ],
+            "customDomains": "[if(not(empty(parameters('customDomain'))), createArray(createObject('name', parameters('customDomain'), 'certificateId', resourceId('Microsoft.App/managedEnvironments/certificates', parameters('containerEnvironmentName'), parameters('certificateName')), 'bindingType', 'SniEnabled')), createArray())]"
+          },
+          "registries": "[if(startsWith(parameters('containerImage'), parameters('registryConfig').loginServer), createArray(createObject('server', parameters('registryConfig').loginServer, 'identity', 'system')), createArray())]",
+          "secrets": [
+            {
+              "name": "database-password",
+              "value": "[parameters('appSecrets').databasePassword]"
+            },
+            {
+              "name": "app-keys",
+              "value": "[parameters('appSecrets').appKeys]"
+            },
+            {
+              "name": "api-token-salt",
+              "value": "[parameters('appSecrets').apiTokenSalt]"
+            },
+            {
+              "name": "admin-jwt-secret",
+              "value": "[parameters('appSecrets').adminJwtSecret]"
+            },
+            {
+              "name": "jwt-secret",
+              "value": "[parameters('appSecrets').jwtSecret]"
+            },
+            {
+              "name": "storage-account-key",
+              "value": "[parameters('appSecrets').storageAccountKey]"
+            },
+            {
+              "name": "mapbox-access-token",
+              "value": "[parameters('appSecrets').mapboxAccessToken]"
+            },
+            {
+              "name": "transfer-token-salt",
+              "value": "[parameters('appSecrets').transferTokenSalt]"
+            },
+            {
+              "name": "github-token",
+              "value": "[parameters('appSecrets').githubToken]"
+            }
+          ]
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "play14-api",
+              "image": "[parameters('containerImage')]",
+              "resources": {
+                "cpu": "[json('0.25')]",
+                "memory": "0.5Gi"
+              },
+              "env": [
+                {
+                  "name": "NODE_ENV",
+                  "value": "production"
+                },
+                {
+                  "name": "HOST",
+                  "value": "0.0.0.0"
+                },
+                {
+                  "name": "PORT",
+                  "value": "1337"
+                },
+                {
+                  "name": "DATABASE_CLIENT",
+                  "value": "postgres"
+                },
+                {
+                  "name": "DATABASE_HOST",
+                  "value": "[parameters('databaseConfig').host]"
+                },
+                {
+                  "name": "DATABASE_PORT",
+                  "value": "5432"
+                },
+                {
+                  "name": "DATABASE_NAME",
+                  "value": "[parameters('databaseConfig').name]"
+                },
+                {
+                  "name": "DATABASE_USERNAME",
+                  "value": "[parameters('databaseConfig').username]"
+                },
+                {
+                  "name": "DATABASE_PASSWORD",
+                  "secretRef": "database-password"
+                },
+                {
+                  "name": "DATABASE_SSL",
+                  "value": "true"
+                },
+                {
+                  "name": "DATABASE_SSL_SELF",
+                  "value": "false"
+                },
+                {
+                  "name": "APP_KEYS",
+                  "secretRef": "app-keys"
+                },
+                {
+                  "name": "API_TOKEN_SALT",
+                  "secretRef": "api-token-salt"
+                },
+                {
+                  "name": "ADMIN_JWT_SECRET",
+                  "secretRef": "admin-jwt-secret"
+                },
+                {
+                  "name": "JWT_SECRET",
+                  "secretRef": "jwt-secret"
+                },
+                {
+                  "name": "TRANSFER_TOKEN_SALT",
+                  "secretRef": "transfer-token-salt"
+                },
+                {
+                  "name": "STORAGE_ACCOUNT",
+                  "value": "[parameters('storageConfig').accountName]"
+                },
+                {
+                  "name": "STORAGE_ACCOUNT_KEY",
+                  "secretRef": "storage-account-key"
+                },
+                {
+                  "name": "STORAGE_CONTAINER_NAME",
+                  "value": "[parameters('storageConfig').containerName]"
+                },
+                {
+                  "name": "STORAGE_URL",
+                  "value": "[format('https://{0}.blob.{1}', parameters('storageConfig').accountName, environment().suffixes.storage)]"
+                },
+                {
+                  "name": "STORAGE_CDN_URL",
+                  "value": "[parameters('storageConfig').cdnUrl]"
+                },
+                {
+                  "name": "STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN",
+                  "secretRef": "mapbox-access-token"
+                },
+                {
+                  "name": "GITHUB_TOKEN",
+                  "secretRef": "github-token"
+                },
+                {
+                  "name": "GITHUB_OWNER",
+                  "value": "play14team"
+                },
+                {
+                  "name": "GITHUB_REPO",
+                  "value": "play14-ui"
+                },
+                {
+                  "name": "GITHUB_WORKFLOW_ID",
+                  "value": "217740349"
+                },
+                {
+                  "name": "GITHUB_BRANCH",
+                  "value": "main"
+                },
+                {
+                  "name": "CRON_ENABLED",
+                  "value": "false"
+                }
+              ]
+            }
+          ],
+          "scale": {
+            "minReplicas": 1,
+            "maxReplicas": 1
+          }
+        }
+      }
+    },
+    {
+      "condition": "[startsWith(parameters('containerImage'), parameters('registryConfig').loginServer)]",
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.App/containerApps', parameters('appName')), 'AcrPull')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
+        "principalId": "[reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/containerApps', parameters('appName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "containerAppName": {
+      "type": "string",
+      "value": "[parameters('appName')]"
+    },
+    "containerAppFQDN": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01').configuration.ingress.fqdn]"
+    },
+    "containerAppUrl": {
+      "type": "string",
+      "value": "[format('https://{0}', reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01').configuration.ingress.fqdn)]"
+    },
+    "customDomainUrl": {
+      "type": "string",
+      "value": "[if(not(empty(parameters('customDomain'))), format('https://{0}', parameters('customDomain')), '')]"
+    }
+  }
+}

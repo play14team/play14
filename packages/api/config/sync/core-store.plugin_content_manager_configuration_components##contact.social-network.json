@@ -1,0 +1,76 @@
+{
+  "key": "plugin_content_manager_configuration_components::contact.social-network",
+  "value": {
+    "uid": "contact.social-network",
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "type",
+      "defaultSortBy": "url",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "url": {
+        "edit": {
+          "label": "URL",
+          "description": "URL of the social network account",
+          "placeholder": "Type a valid URL",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "url",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "type": {
+        "edit": {
+          "label": "Social Network",
+          "description": "Which social network?",
+          "placeholder": "Pick a social network",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "type",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "url",
+        "type"
+      ],
+      "edit": [
+        [
+          {
+            "name": "url",
+            "size": 6
+          },
+          {
+            "name": "type",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "isComponent": true
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}
