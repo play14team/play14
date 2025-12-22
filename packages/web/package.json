@@ -69,7 +69,7 @@
     "@types/react-html-parser": "^2.0.7",
     "@types/react-map-gl": "^6.1.7",
     "eslint": "^9.39.2",
-    "eslint-config-next": "16.0.8",
+    "eslint-config-next": "16.1.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "husky": "^9.1.7",
