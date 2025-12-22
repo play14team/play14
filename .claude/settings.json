@@ -1,11 +1,8 @@
 {
-  "enabledPlugins": {
-    "typescript-lsp@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true
-  },
-  "includeCoAuthoredBy": false,
   "attribution": {
     "commit": "",
     "pr": ""
-  }
+  },
+  "includeCoAuthoredBy": false,
+  "enabledPlugins": {}
 }

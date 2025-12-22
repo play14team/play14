@@ -32,6 +32,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "slugify": "^1.6.6",
+    "strapi-cache": "^1.7.0",
     "strapi-plugin-config-sync": "^3.1.2",
     "strapi-plugin-country-select": "^2.1.0",
     "strapi-plugin-fuzzy-search": "4.0.0-beta.1",

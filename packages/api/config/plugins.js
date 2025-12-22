@@ -3,6 +3,33 @@ module.exports = ({ env }) => ({
     enabled: true,
     resolve: "./src/plugins/rebuild-trigger",
   },
+  "strapi-cache": {
+    enabled: env.bool("CACHE_ENABLED", true),
+    config: {
+      debug: env.bool("CACHE_DEBUG", false),
+      provider: env("CACHE_PROVIDER", "memory"),
+      // Memory cache settings
+      max: env.int("CACHE_MAX_ITEMS", 1000),
+      maxSize: env.int("CACHE_MAX_SIZE", 1024 * 1024 * 1024), // 1GB default
+      ttl: env.int("CACHE_TTL", 1000 * 60 * 60), // 1 hour default
+      allowStale: false,
+      // Redis configuration (used when provider is 'redis')
+      redisConfig: env("REDIS_URL", "redis://localhost:6379"),
+      // Cache settings
+      cacheHeaders: true,
+      cacheAuthorizedRequests: false,
+      autoPurgeCache: true,
+      cacheGetTimeoutInMs: 1000,
+      // Routes to cache (empty array = cache all /api routes)
+      cacheableRoutes: [],
+      // Routes to exclude from caching
+      excludeRoutes: [
+        "/api/fuzzy-search/**",
+        "/api/rebuild-trigger/**",
+        "/api/strapi-cache/**",
+      ],
+    },
+  },
   graphql: {
     config: {
       apolloServer: {

@@ -4,6 +4,7 @@
  */
 import ckeditor5 from "@_sh/strapi-plugin-ckeditor/strapi-admin";
 import usersPermissions from "@strapi/plugin-users-permissions/strapi-admin";
+import strapiCache from "strapi-cache/strapi-admin";
 import configSync from "strapi-plugin-config-sync/strapi-admin";
 import countrySelect from "strapi-plugin-country-select/strapi-admin";
 import mapField from "strapi-plugin-map-field/strapi-admin";
@@ -20,6 +21,7 @@ renderAdmin(document.getElementById("strapi"), {
   plugins: {
     ckeditor5: ckeditor5,
     "users-permissions": usersPermissions,
+    "strapi-cache": strapiCache,
     "config-sync": configSync,
     "country-select": countrySelect,
     "map-field": mapField,

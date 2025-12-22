@@ -1,7 +1,8 @@
 ---
-mode: "agent"
-description: "Perform thorough code review with actionable feedback"
-tools: ["edit/editFiles", "search", "codebase", "problems"]
+name: 'Code Review Assistant for Strapi 5 Projects'
+agent: agent
+description: 'Perform thorough code review with actionable feedback'
+tools: ['edit/editFiles', 'search', 'codebase', 'problems']
 ---
 
 # Code Review Assistant
