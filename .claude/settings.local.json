@@ -40,7 +40,9 @@
       "Bash(bun --version:*)",
       "Bash(curl:*)",
       "Bash(gh pr list:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(bun:*)",
+      "Bash(ls:*)"
     ]
   }
 }

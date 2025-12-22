@@ -55,6 +55,23 @@ interface Player {
 }
 
 /**
+ * Build filter object for player queries
+ */
+function buildPlayerFilters(
+  position?: string,
+  letter?: string,
+): Record<string, unknown> {
+  const filters: Record<string, unknown> = {}
+  if (position) {
+    filters.position = { $eqi: position }
+  }
+  if (letter) {
+    filters.name = { $startsWithi: letter }
+  }
+  return filters
+}
+
+/**
  * Get paginated players list
  * REST equivalent of: players/grid.graphql
  */
@@ -62,11 +79,9 @@ export async function getPlayers(
   page: number,
   pageSize: number,
   position?: string,
+  letter?: string,
 ) {
-  const filters: Record<string, unknown> = {}
-  if (position) {
-    filters.position = { $eqi: position }
-  }
+  const filters = buildPlayerFilters(position, letter)
 
   const response = await restQuery<Player[]>("players", {
     sort: ["name:asc"],
@@ -85,15 +100,12 @@ export async function getPlayers(
  * Get all players with optional position filter
  * Fetches all pages since Strapi limits pageSize to 100
  */
-export async function getAllPlayers(position?: string) {
+export async function getAllPlayers(position?: string, letter?: string) {
   const allPlayers: Player[] = []
   let page = 1
   const pageSize = 100
 
-  const filters: Record<string, unknown> = {}
-  if (position) {
-    filters.position = { $eqi: position }
-  }
+  const filters = buildPlayerFilters(position, letter)
 
   while (true) {
     const response = await restQuery<Player[]>("players", {
@@ -113,6 +125,52 @@ export async function getAllPlayers(position?: string) {
   }
 
   return allPlayers
+}
+
+/**
+ * Get count of players per first letter of name
+ * Used for alphabet navigation to show which letters have players
+ * NOTE: Fetches all player names - performance is acceptable for <10k players.
+ * TODO: Consider Strapi aggregation endpoint for larger datasets.
+ */
+export async function getPlayerLetterCounts(): Promise<Record<string, number>> {
+  try {
+    // Fetch all players with minimal data (just names)
+    const allPlayers: Array<{ name: string }> = []
+    let page = 1
+    const pageSize = 100
+
+    while (true) {
+      const response = await restQuery<Array<{ name: string }>>("players", {
+        fields: ["name"],
+        pagination: { page, pageSize },
+        sort: ["name:asc"],
+      })
+
+      const players = response.data || []
+      allPlayers.push(...players)
+
+      if (players.length < pageSize) {
+        break
+      }
+      page++
+    }
+
+    // Count players by first letter
+    const counts: Record<string, number> = {}
+
+    allPlayers.forEach((player) => {
+      const firstLetter = player.name.charAt(0).toUpperCase()
+      if (/[A-Z]/.test(firstLetter)) {
+        counts[firstLetter] = (counts[firstLetter] || 0) + 1
+      }
+    })
+
+    return counts
+  } catch (error) {
+    console.error("Failed to fetch player letter counts:", error)
+    return {} // Return empty counts on error - all letters will be disabled
+  }
 }
 
 /**

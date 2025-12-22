@@ -12,11 +12,11 @@ This is a Bun workspace monorepo with the following structure:
   - **Purpose**: Serves the #play14 global community platform for agile game players and facilitators
   - **Key Features**: Content management, event scheduling, player profiles, automated cron jobs
   - See `packages/api/CLAUDE.md` for detailed API documentation
-- **packages/ui**: Next.js 16 frontend application
+- **packages/web**: Next.js 16 frontend application
   - **Tech Stack**: Next.js 16 App Router, React 19, TypeScript 5.9, SCSS, Mapbox, Azure Container Apps
   - **Purpose**: Frontend for the #play14 community platform, consuming Strapi 5 REST API
   - **Key Features**: SSR, event calendar, player profiles, interactive maps, server actions
-  - See `packages/ui/CLAUDE.md` for detailed UI documentation
+  - See `packages/web/CLAUDE.md` for detailed web documentation
 - **packages/design**: Design assets and Storybook
   - Contains graphic design resources (logos, colors, fonts, QR codes)
   - Includes a SvelteKit/Storybook application in `storybook/` subdirectory
@@ -38,7 +38,7 @@ bun install
 ```bash
 # Run individual package in dev mode (with watch)
 bun --filter api dev          # Start API with database (Strapi develop mode)
-bun --filter ui dev           # Start Next.js UI with Turbopack
+bun --filter web dev           # Start Next.js web with Turbopack
 bun --filter design dev
 
 # API-specific commands
@@ -48,12 +48,12 @@ bun --filter api start        # Production mode without reload
 bun --filter api db           # Start database only
 bun --filter api down         # Stop containers
 
-# UI-specific commands
-bun --filter ui develop       # Next.js dev with Turbopack
-bun --filter ui build         # Production build
-bun --filter ui start         # Run production server
-bun --filter ui lint          # ESLint check
-bun --filter ui format        # Prettier format
+# Web-specific commands
+bun --filter web develop       # Next.js dev with Turbopack
+bun --filter web build         # Production build
+bun --filter web start         # Run production server
+bun --filter web lint          # ESLint check
+bun --filter web format        # Prettier format
 
 # Work with Storybook
 bun --filter design storybook          # Start Storybook dev server
