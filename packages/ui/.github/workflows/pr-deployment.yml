@@ -1,9 +1,12 @@
-name: PR Deployment to Acceptance
+name: Acceptance Deployment (PR)
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches: [main]
+    paths:
+      - "packages/ui/**"
+      - "!packages/ui/.github/**" # Exclude workflow changes unless they affect build/deploy
   workflow_dispatch:
 
 concurrency:
@@ -243,3 +246,4 @@ jobs:
               repo: context.repo.repo,
               body: `🛑 **Acceptance Environment Stopped**\n\nThe container app has been stopped to save resources.\nPR was ${prStatus}.`
             })
+

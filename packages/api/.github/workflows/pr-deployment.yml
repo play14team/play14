@@ -1,9 +1,12 @@
-name: PR Deployment to Acceptance
+name: Acceptance Deployment (PR)
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches: [main]
+    paths:
+      - "packages/api/**"
+      - "!packages/api/.github/**" # Exclude workflow changes unless they affect build/deploy
 
 env:
   REGISTRY: play14containerregistry.azurecr.io

@@ -3,6 +3,9 @@ name: Production Deployment
 on:
   push:
     branches: [main]
+    paths:
+      - 'packages/api/**'
+      - '!packages/api/.github/**'  # Exclude workflow changes unless they affect build/deploy
   workflow_dispatch:
 
 env:
