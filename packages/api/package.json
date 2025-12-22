@@ -25,6 +25,7 @@
   "dependencies": {
     "@_sh/strapi-plugin-ckeditor": "^6.0.2",
     "@mapbox/mapbox-sdk": "^0.16.1",
+    "@strapi/plugin-documentation": "^5.33.0",
     "@strapi/plugin-users-permissions": "5.33.0",
     "@strapi/strapi": "5.33.0",
     "pg": "^8.11.5",
@@ -39,6 +40,7 @@
     "strapi-plugin-map-field": "^2.0.0",
     "strapi-plugin-multi-select": "2.1.1",
     "strapi-plugin-timezone-select": "^2.0.0",
+    "strapi-plugin-webp-converter": "^1.0.4",
     "strapi-provider-upload-azure-storage": "^3.5.0",
     "styled-components": "^6.1.13"
   },

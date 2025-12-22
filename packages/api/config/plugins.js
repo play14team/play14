@@ -76,6 +76,13 @@ module.exports = ({ env }) => ({
   "multi-select": {
     enabled: true,
   },
+  "webp-converter": {
+    enabled: true,
+    config: {
+      mimeTypes: undefined, // Defaults to image/png, image/jpeg, image/jpg
+      options: {},
+    },
+  },
   "fuzzy-search": {
     enabled: true,
     config: {
