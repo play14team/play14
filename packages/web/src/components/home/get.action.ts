@@ -116,3 +116,88 @@ export async function getRandomTestimonials(
     return []
   }
 }
+
+interface StatisticsEvent {
+  eventStatus: string
+  location?: {
+    country: string
+  }
+}
+
+export interface Play14Statistics {
+  countries: number
+  events: number
+  players: number
+  games: number
+  yearsSince2014: number
+}
+
+/**
+ * Get #play14 statistics for the home page
+ * Fetches counts for countries, events (excluding cancelled), players, and games
+ */
+export async function getStatistics(): Promise<Play14Statistics> {
+  const currentYear = new Date().getFullYear()
+  const yearsSince2014 = currentYear - 2014
+
+  try {
+    // Fetch all data in parallel for performance
+    const [eventsResponse, playersResponse, gamesResponse] = await Promise.all([
+      // Get all events to count unique countries and non-cancelled events
+      restQuery<StatisticsEvent[]>("events", {
+        fields: ["eventStatus"],
+        populate: {
+          location: {
+            fields: ["country"],
+          },
+        },
+        pagination: { page: 1, pageSize: 5000 },
+      }),
+      // Get player count
+      restQuery<Array<{ documentId: string }>>("players", {
+        fields: ["documentId"],
+        pagination: { page: 1, pageSize: 5000 },
+      }),
+      // Get games count
+      restQuery<Array<{ documentId: string }>>("games", {
+        fields: ["documentId"],
+        pagination: { page: 1, pageSize: 5000 },
+      }),
+    ])
+
+    const allEvents = eventsResponse.data || []
+    const allPlayers = playersResponse.data || []
+    const allGames = gamesResponse.data || []
+
+    // Filter out cancelled events
+    const nonCancelledEvents = allEvents.filter(
+      (event) => event.eventStatus !== "Cancelled",
+    )
+
+    // Get unique countries from non-cancelled events
+    const uniqueCountries = new Set<string>()
+    nonCancelledEvents.forEach((event) => {
+      if (event.location?.country) {
+        uniqueCountries.add(event.location.country)
+      }
+    })
+
+    return {
+      countries: uniqueCountries.size,
+      events: nonCancelledEvents.length,
+      players: allPlayers.length,
+      games: allGames.length,
+      yearsSince2014,
+    }
+  } catch (error) {
+    console.error("Failed to fetch statistics:", error)
+    // Return fallback values on error
+    return {
+      countries: 0,
+      events: 0,
+      players: 0,
+      games: 0,
+      yearsSince2014,
+    }
+  }
+}
