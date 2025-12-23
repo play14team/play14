@@ -1,0 +1,47 @@
+@use "../../styles/scss/play14.scss" as *;
+
+// Shared navigation button styles for alphabet-nav and year-nav
+@mixin nav-button-styles {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 6px 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: $grey;
+  background-color: #f5f5f5;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover:not(.disabled) {
+    background-color: lighten($orange, 35%);
+    border-color: $orange;
+    color: $orange;
+    transform: translateY(-2px);
+  }
+
+  &.active {
+    background-color: $orange;
+    color: white;
+    border-color: $orange;
+  }
+
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+// Responsive adjustments
+@mixin nav-button-styles-mobile {
+  min-width: 35px;
+  padding: 6px 10px;
+  font-size: 13px;
+}

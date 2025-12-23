@@ -1,7 +1,9 @@
 import Filters from "@/components/events/filters"
-import { getEvents } from "@/components/events/get.action"
+import { getEvents, getEventYearCounts } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import LoadMore from "@/components/events/load-more"
+import YearNav from "@/components/events/year-nav"
+import ScrollToTop from "@/components/layout/scroll-to-top"
 import { Event } from "@/models/strapi"
 import { Metadata } from "next"
 
@@ -12,6 +14,9 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function Events() {
+  // Fetch year counts for navigation
+  const yearCounts = await getEventYearCounts()
+
   const response = await getEvents(1, 18)
   // In Strapi 5, events_connection returns nodes and pageInfo
   const events = (response?.events_connection?.nodes || []) as Event[]
@@ -27,9 +32,11 @@ export default async function Events() {
       <div className="centered pt-5 pb-5">
         <Filters name="Events" />
         <p>Total: {pagination.total}</p>
+        <YearNav currentYear={undefined} yearCounts={yearCounts} />
       </div>
       <EventGrid events={events} />
       <LoadMore pagination={pagination} />
+      <ScrollToTop />
     </>
   )
 }

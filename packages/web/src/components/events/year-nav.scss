@@ -1,11 +1,11 @@
 @use "../../styles/scss/play14.scss" as *;
 @use "../shared/nav-button-mixin" as *;
 
-.alphabet-nav {
+.year-nav {
   margin: 20px 0;
   padding: 0 15px;
 
-  .alphabet-buttons {
+  .year-buttons {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -13,19 +13,21 @@
     max-width: 100%;
   }
 
-  .alphabet-btn {
+  .year-btn {
     @include nav-button-styles;
+    min-width: 60px; // Wider for 4-digit years
   }
 }
 
 // Responsive adjustments
 @media only screen and (max-width: 767px) {
-  .alphabet-nav {
-    .alphabet-btn {
+  .year-nav {
+    .year-btn {
       @include nav-button-styles-mobile;
+      min-width: 58px; // Slightly wider for years on mobile
     }
 
-    .alphabet-buttons {
+    .year-buttons {
       gap: 6px;
     }
   }

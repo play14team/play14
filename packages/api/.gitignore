@@ -118,6 +118,7 @@ exports
 *.cache
 build
 .strapi-updater.json
+types/generated
 
 appSettings.json
 **/bootstrap/json

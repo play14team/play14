@@ -30,6 +30,9 @@ const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
+  turbopack: {
+    root: path.join(__dirname, "../.."),
+  },
 }
 
 module.exports = nextConfig

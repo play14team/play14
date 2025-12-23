@@ -1,6 +1,6 @@
-# play14
+# #play14
 
-A global community platform for agile game players and facilitators.
+A global community platform for the worldwide gathering of like-minded people who believe that playing is the best way to learn, share and get creative!
 
 ## Tech Stack
 
@@ -65,13 +65,13 @@ podman-compose up
 
 Available services:
 
-| Service       | Port | Description              |
-| ------------- | ---- | ------------------------ |
-| `play14-api`  | 1337 | Strapi API               |
-| `play14-db`   | 5432 | PostgreSQL database      |
-| `pgadmin`     | 5050 | Database admin UI        |
-| `play14-web`  | 3000 | Next.js frontend         |
-| `design`      | 8080 | Storybook                |
+| Service      | Port | Description         |
+| ------------ | ---- | ------------------- |
+| `play14-api` | 1337 | Strapi API          |
+| `play14-db`  | 5432 | PostgreSQL database |
+| `pgadmin`    | 5050 | Database admin UI   |
+| `play14-web` | 3000 | Next.js frontend    |
+| `design`     | 8080 | Storybook           |
 
 ## Package Commands
 

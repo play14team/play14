@@ -12,7 +12,7 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   const triggerRef = useRef<HTMLDivElement>(null)
   const isVisible = useIntersection(
     triggerRef as RefObject<HTMLDivElement>,
-    "0px",
+    "800px",
   )
   const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
 

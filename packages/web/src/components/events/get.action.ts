@@ -346,3 +346,90 @@ export async function getHosting() {
 
   return response.data
 }
+
+/**
+ * Get count of events per start year
+ * Used for year navigation to show which years have events
+ * NOTE: Fetches all event start dates - performance is acceptable for <10k events.
+ */
+export async function getEventYearCounts(): Promise<Record<number, number>> {
+  try {
+    // Fetch all events with minimal data (just start dates)
+    const allEvents: Array<{ start: string }> = []
+    let page = 1
+    const pageSize = 100
+
+    while (true) {
+      const response = await restQuery<Array<{ start: string }>>("events", {
+        fields: ["start"],
+        pagination: { page, pageSize },
+        sort: ["start:desc"],
+      })
+
+      const events = response.data || []
+      allEvents.push(...events)
+
+      if (events.length < pageSize) {
+        break
+      }
+      page++
+    }
+
+    // Count events by start year (including future years)
+    const counts: Record<number, number> = {}
+
+    allEvents.forEach((event) => {
+      const year = moment(event.start).year()
+      counts[year] = (counts[year] || 0) + 1
+    })
+
+    return counts
+  } catch (error) {
+    console.error("Failed to fetch event year counts:", error)
+    return {} // Return empty counts on error - all years will be disabled
+  }
+}
+
+/**
+ * Get all events for a specific start year
+ * Filters events where start date year matches the specified year
+ */
+export async function getAllEventsByYear(year: number) {
+  try {
+    // Fetch all events (no pagination limit at API level)
+    const allEvents: Event[] = []
+    let page = 1
+    const pageSize = 100
+
+    // Calculate year boundaries in UTC
+    const yearStart = moment().year(year).startOf("year").format()
+    const yearEnd = moment().year(year).endOf("year").format()
+
+    while (true) {
+      const response = await restQuery<Event[]>("events", {
+        sort: ["start:desc"],
+        pagination: { page, pageSize },
+        filters: {
+          start: {
+            $gte: yearStart,
+            $lte: yearEnd,
+          },
+        },
+        populate: eventItemPopulate,
+      })
+
+      const events = response.data || []
+      allEvents.push(...events)
+
+      if (events.length < pageSize) {
+        break
+      }
+      page++
+    }
+
+    return allEvents
+  } catch (error) {
+    console.error(`Failed to fetch events for year ${year}:`, error)
+    return []
+  }
+}

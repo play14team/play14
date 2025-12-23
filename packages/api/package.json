@@ -23,15 +23,15 @@
     "down": "podman-compose down"
   },
   "dependencies": {
-    "@_sh/strapi-plugin-ckeditor": "^6.0.2",
-    "@mapbox/mapbox-sdk": "^0.16.1",
+    "@_sh/strapi-plugin-ckeditor": "^6.0.3",
+    "@mapbox/mapbox-sdk": "^0.16.2",
     "@strapi/plugin-documentation": "^5.33.0",
     "@strapi/plugin-users-permissions": "5.33.0",
     "@strapi/strapi": "5.33.0",
-    "pg": "^8.11.5",
+    "pg": "^8.16.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0",
+    "react-router-dom": "^6.30.2",
     "slugify": "^1.6.6",
     "strapi-cache": "^1.7.0",
     "strapi-plugin-config-sync": "^3.1.2",
@@ -42,7 +42,7 @@
     "strapi-plugin-timezone-select": "^2.0.0",
     "strapi-plugin-webp-converter": "^1.0.4",
     "strapi-provider-upload-azure-storage": "^3.5.0",
-    "styled-components": "^6.1.13"
+    "styled-components": "^6.1.19"
   },
   "strapi": {
     "uuid": "57f1478c-cf26-4149-8239-82091268fbc1"
