@@ -1,9 +1,14 @@
 import Filters from "@/components/players/filters"
 import PlayerGrid from "@/components/players/grid"
 import LoadMore from "@/components/players/load-more"
+import AlphabetNav from "@/components/players/alphabet-nav"
+import ScrollToTop from "@/components/layout/scroll-to-top"
 import { Player } from "@/models/strapi"
 import { Metadata } from "next"
-import { getPlayers } from "../../components/players/get.action"
+import {
+  getPlayers,
+  getPlayerLetterCounts,
+} from "../../components/players/get.action"
 
 export const metadata: Metadata = {
   title: "Players",
@@ -12,6 +17,10 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function Players() {
+  // Fetch letter counts for navigation
+  const letterCounts = await getPlayerLetterCounts()
+
+  // All mode: paginated infinite scroll
   const response = (await getPlayers(1, 24)) as {
     players_connection?: {
       nodes: Player[]
@@ -36,9 +45,11 @@ export default async function Players() {
       <div className="centered pt-5 pb-5">
         <Filters name="Players" />
         <p>Total: {pagination.total}</p>
+        <AlphabetNav currentLetter={undefined} letterCounts={letterCounts} />
       </div>
       <PlayerGrid players={players} />
       <LoadMore pagination={pagination} />
+      <ScrollToTop />
     </>
   )
 }
