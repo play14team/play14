@@ -7,13 +7,11 @@ interface StatItem {
   icon: string
   color: string
   href?: string
+  suffix?: string
 }
 
 function formatNumber(num: number): string {
-  if (num >= 1000) {
-    return num.toLocaleString()
-  }
-  return num.toString()
+  return num.toLocaleString()
 }
 
 function StatCard({ item }: { item: StatItem }) {
@@ -22,7 +20,10 @@ function StatCard({ item }: { item: StatItem }) {
       <div className="icon">
         <i className={`${item.icon} ${item.color}`}></i>
       </div>
-      <h3>{formatNumber(item.value)}+</h3>
+      <h3>
+        {formatNumber(item.value)}
+        {item.suffix ?? "+"}
+      </h3>
       <p>{item.label}</p>
     </div>
   )
@@ -43,6 +44,7 @@ export default async function Statistics() {
       label: "Years of Play",
       icon: "bx bx-calendar-heart",
       color: "orange",
+      suffix: "",
     },
     {
       value: stats.countries,
@@ -92,8 +94,8 @@ export default async function Statistics() {
           </p>
         </div>
         <div className="row justify-content-center">
-          {statItems.map((item, index) => (
-            <div key={index} className="col-lg-4 col-md-6 col-sm-6">
+          {statItems.map((item) => (
+            <div key={item.label} className="col-lg-4 col-md-6 col-sm-6">
               <StatCard item={item} />
             </div>
           ))}

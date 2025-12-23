@@ -154,7 +154,9 @@ async function fetchAllPaginated<T>(
     const items = response.data || []
     allItems.push(...items)
 
-    if (items.length < pageSize) {
+    // Use pagination metadata to determine if we've fetched all pages
+    const totalPages = response.meta?.pagination?.pageCount || 1
+    if (page >= totalPages || items.length === 0) {
       break
     }
     page++
