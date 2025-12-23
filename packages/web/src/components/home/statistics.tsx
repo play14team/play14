@@ -60,7 +60,7 @@ export default async function Statistics() {
     },
     {
       value: stats.players,
-      label: "Community Members",
+      label: "Players",
       icon: "bx bx-group",
       color: "orange",
       href: "/players",

@@ -133,6 +133,37 @@ export interface Play14Statistics {
 }
 
 /**
+ * Helper to fetch all items with pagination (Strapi limits pageSize to 100)
+ */
+async function fetchAllPaginated<T>(
+  endpoint: string,
+  fields: string[],
+  populate?: Record<string, unknown>,
+): Promise<T[]> {
+  const allItems: T[] = []
+  let page = 1
+  const pageSize = 100
+
+  while (true) {
+    const response = await restQuery<T[]>(endpoint, {
+      fields,
+      populate,
+      pagination: { page, pageSize },
+    })
+
+    const items = response.data || []
+    allItems.push(...items)
+
+    if (items.length < pageSize) {
+      break
+    }
+    page++
+  }
+
+  return allItems
+}
+
+/**
  * Get #play14 statistics for the home page
  * Fetches counts for countries, events (excluding cancelled), players, and games
  */
@@ -142,32 +173,16 @@ export async function getStatistics(): Promise<Play14Statistics> {
 
   try {
     // Fetch all data in parallel for performance
-    const [eventsResponse, playersResponse, gamesResponse] = await Promise.all([
+    const [allEvents, allPlayers, allGames] = await Promise.all([
       // Get all events to count unique countries and non-cancelled events
-      restQuery<StatisticsEvent[]>("events", {
-        fields: ["eventStatus"],
-        populate: {
-          location: {
-            fields: ["country"],
-          },
-        },
-        pagination: { page: 1, pageSize: 5000 },
+      fetchAllPaginated<StatisticsEvent>("events", ["eventStatus"], {
+        location: { fields: ["country"] },
       }),
-      // Get player count
-      restQuery<Array<{ documentId: string }>>("players", {
-        fields: ["documentId"],
-        pagination: { page: 1, pageSize: 5000 },
-      }),
-      // Get games count
-      restQuery<Array<{ documentId: string }>>("games", {
-        fields: ["documentId"],
-        pagination: { page: 1, pageSize: 5000 },
-      }),
+      // Get all players
+      fetchAllPaginated<{ documentId: string }>("players", ["documentId"]),
+      // Get all games
+      fetchAllPaginated<{ documentId: string }>("games", ["documentId"]),
     ])
-
-    const allEvents = eventsResponse.data || []
-    const allPlayers = playersResponse.data || []
-    const allGames = gamesResponse.data || []
 
     // Filter out cancelled events
     const nonCancelledEvents = allEvents.filter(
