@@ -1,0 +1,160 @@
+// Custom styles for the Statistics component
+// Extends the base funfacts styling with #play14 branding
+
+.funfacts-area {
+  .section-title {
+    text-align: center;
+    margin-bottom: 50px;
+
+    h2 {
+      margin-bottom: 15px;
+      font-size: 40px;
+      font-weight: 800;
+
+      span {
+        color: #ff5200;
+      }
+    }
+
+    p {
+      max-width: 650px;
+      margin: 0 auto;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .single-funfacts-box {
+    text-align: center;
+    padding: 35px 25px;
+    border-radius: 10px;
+    background: var(--color-bg);
+    border: 2px solid transparent;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s ease;
+
+    .icon {
+      position: static;
+      transform: none;
+      width: 80px;
+      height: 80px;
+      line-height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 82, 0, 0.1) 0%,
+        rgba(0, 152, 221, 0.1) 100%
+      );
+      margin: 0 auto 20px;
+      font-size: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        &.orange {
+          color: #ff5200;
+        }
+        &.blue {
+          color: #0098dd;
+        }
+        &.green {
+          color: #92c900;
+        }
+        &.yellow {
+          color: #ffc900;
+        }
+      }
+    }
+
+    h3 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    &:hover {
+      transform: translateY(-8px);
+      border-color: #ff5200;
+      box-shadow: 0 15px 35px rgba(255, 82, 0, 0.15);
+
+      .icon {
+        background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+
+        i {
+          color: #fff !important;
+        }
+      }
+    }
+  }
+
+  // Links should not have underlines on stat cards
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 991px) {
+  .funfacts-area {
+    .section-title {
+      h2 {
+        font-size: 32px;
+      }
+    }
+
+    .single-funfacts-box {
+      h3 {
+        font-size: 38px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .funfacts-area {
+    .section-title {
+      h2 {
+        font-size: 28px;
+      }
+    }
+
+    .single-funfacts-box {
+      padding: 25px 20px;
+
+      .icon {
+        width: 65px;
+        height: 65px;
+        font-size: 32px;
+      }
+
+      h3 {
+        font-size: 32px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+    }
+  }
+}

@@ -116,3 +116,105 @@ export async function getRandomTestimonials(
     return []
   }
 }
+
+interface StatisticsEvent {
+  eventStatus: string
+  location?: {
+    country: string
+  }
+}
+
+export interface Play14Statistics {
+  countries: number
+  events: number
+  players: number
+  games: number
+  yearsSince2014: number
+}
+
+/**
+ * Helper to fetch all items with pagination (Strapi limits pageSize to 100)
+ */
+async function fetchAllPaginated<T>(
+  endpoint: string,
+  fields: string[],
+  populate?: Record<string, unknown>,
+): Promise<T[]> {
+  const allItems: T[] = []
+  let page = 1
+  const pageSize = 100
+
+  while (true) {
+    const response = await restQuery<T[]>(endpoint, {
+      fields,
+      populate,
+      pagination: { page, pageSize },
+    })
+
+    const items = response.data || []
+    allItems.push(...items)
+
+    // Use pagination metadata to determine if we've fetched all pages
+    const totalPages = response.meta?.pagination?.pageCount || 1
+    if (page >= totalPages || items.length === 0) {
+      break
+    }
+    page++
+  }
+
+  return allItems
+}
+
+/**
+ * Get #play14 statistics for the home page
+ * Fetches counts for countries, events (excluding cancelled), players, and games
+ */
+export async function getStatistics(): Promise<Play14Statistics> {
+  const currentYear = new Date().getFullYear()
+  const yearsSince2014 = currentYear - 2014
+
+  try {
+    // Fetch all data in parallel for performance
+    const [allEvents, allPlayers, allGames] = await Promise.all([
+      // Get all events to count unique countries and non-cancelled events
+      fetchAllPaginated<StatisticsEvent>("events", ["eventStatus"], {
+        location: { fields: ["country"] },
+      }),
+      // Get all players
+      fetchAllPaginated<{ documentId: string }>("players", ["documentId"]),
+      // Get all games
+      fetchAllPaginated<{ documentId: string }>("games", ["documentId"]),
+    ])
+
+    // Filter out cancelled events
+    const nonCancelledEvents = allEvents.filter(
+      (event) => event.eventStatus !== "Cancelled",
+    )
+
+    // Get unique countries from non-cancelled events
+    const uniqueCountries = new Set<string>()
+    nonCancelledEvents.forEach((event) => {
+      if (event.location?.country) {
+        uniqueCountries.add(event.location.country)
+      }
+    })
+
+    return {
+      countries: uniqueCountries.size,
+      events: nonCancelledEvents.length,
+      players: allPlayers.length,
+      games: allGames.length,
+      yearsSince2014,
+    }
+  } catch (error) {
+    console.error("Failed to fetch statistics:", error)
+    // Return fallback values on error
+    return {
+      countries: 0,
+      events: 0,
+      players: 0,
+      games: 0,
+      yearsSince2014,
+    }
+  }
+}

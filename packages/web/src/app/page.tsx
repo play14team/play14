@@ -1,6 +1,7 @@
 import EventsWorldMap from "@/components/events/EventsWorldMap"
 import Expectations from "@/components/home/expectations"
 import HomeGallery from "@/components/home/gallery"
+import Statistics from "@/components/home/statistics"
 import HomeTestimonials from "@/components/home/testimonials"
 import UpcomingEvents from "@/components/home/upcoming"
 import CodeOfConduct from "@/components/layout/codeofconduct"
@@ -92,6 +93,10 @@ export default function Home() {
           games or dive into the games suggested by others. It&apos;s all about
           participation, creativity, and shared fun!
         </p>
+      </section>
+
+      <section id="statistics">
+        <Statistics />
       </section>
 
       <section id="upcoming events">
