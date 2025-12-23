@@ -17,7 +17,7 @@ env:
   STRAPI_API_URL: "https://community.play14.org"
   REGISTRY: play14containerregistry.azurecr.io
   IMAGE_NAME: play14/play14-web
-  CONTAINER_APP_NAME: play14-web
+  CONTAINER_APP_NAME: play14-ui
   RESOURCE_GROUP: play14-community
   WORKING_DIRECTORY: packages/web
 
