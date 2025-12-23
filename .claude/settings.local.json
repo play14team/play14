@@ -42,7 +42,9 @@
       "Bash(gh pr list:*)",
       "Bash(git checkout:*)",
       "Bash(bun:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git merge-base:*)"
     ]
   }
 }
