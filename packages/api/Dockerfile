@@ -33,8 +33,8 @@ COPY packages/api ./packages/api
 
 WORKDIR /app/packages/api
 
-# Install dependencies with npm (creates proper bin links)
-RUN npm install
+# Install node-addon-api for sharp native build, then install dependencies
+RUN npm install -g node-addon-api && npm install
 
 # Add node_modules/.bin to PATH for strapi CLI
 ENV PATH=/app/packages/api/node_modules/.bin:$PATH
