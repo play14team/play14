@@ -162,7 +162,7 @@ export default function EventDetails({ event }: { event: Event }) {
             <div className="col-12">
               <div className="events-registration-section">
                 <h3 className="mb-3">Registration</h3>
-                <HtmlContent>{event.registration.widgetCode}</HtmlContent>
+                <HtmlContent>{event.registration?.widgetCode || ""}</HtmlContent>
               </div>
             </div>
           </div>
