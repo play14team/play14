@@ -6,14 +6,15 @@ FROM oven/bun:1.3.5-alpine AS deps
 
 WORKDIR /app
 
-# Copy workspace root files for bun workspace resolution
+# Copy root package files
 COPY package.json bun.lock ./
 
-# Copy the web package.json for dependency resolution
+# Copy ALL workspace package.json files (bun workspaces require all to exist)
+COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
 
 # Install dependencies with frozen lockfile
-# This layer is cached and only rebuilds when package files change
 RUN bun install --frozen-lockfile
 
 # Stage 2: Development

@@ -8,13 +8,15 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Copy workspace root files for bun workspace resolution
+# Copy root package files
 COPY package.json bun.lock ./
 
-# Copy the web package.json for dependency resolution
+# Copy ALL workspace package.json files (bun workspaces require all to exist)
+COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
 
-# Install dependencies with frozen lockfile
+# Install dependencies
 RUN bun install --frozen-lockfile
 
 # Stage 2: Builder

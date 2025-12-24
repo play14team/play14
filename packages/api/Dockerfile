@@ -7,14 +7,15 @@ RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev l
 
 WORKDIR /app
 
-# Copy only package files first for optimal caching
+# Copy root package files
 COPY package.json bun.lock ./
 
-# Create the package directory structure and copy package.json
-RUN mkdir -p packages/api
+# Copy ALL workspace package.json files (bun workspaces require all to exist)
 COPY packages/api/package.json ./packages/api/
+COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
 
-# Install dependencies (bun workspaces require proper directory structure)
+# Install dependencies
 RUN bun install --frozen-lockfile
 
 # Stage 2: Builder

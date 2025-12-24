@@ -7,11 +7,13 @@ RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev l
 
 WORKDIR /app
 
-# Copy workspace root files for bun workspace resolution
+# Copy root package files
 COPY package.json bun.lock ./
 
-# Copy the api package.json for dependency resolution
+# Copy ALL workspace package.json files (bun workspaces require all to exist)
 COPY packages/api/package.json ./packages/api/
+COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
 
 # Install all dependencies (including dev)
 RUN bun install --frozen-lockfile
