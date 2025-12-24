@@ -19,7 +19,7 @@ export default function Home() {
         <Title />
       </section>
 
-      <section id="power-of-play" className="funfacts-area pt-70">
+      <section id="power-of-play" className="funfacts-area pt-100">
         <div className="container">
           <div className="section-title">
             <h2>
@@ -105,7 +105,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="upcoming-events">
+      <section id="upcoming-events" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              Upcoming <span>events</span>
+            </h2>
+            <p>
+              Ready to play? Join our upcoming events and be part of a vibrant
+              community of players and facilitators.
+            </p>
+          </div>
+        </div>
         <UpcomingEvents />
       </section>
 
@@ -273,8 +284,8 @@ export default function Home() {
         <HomeGallery />
       </section>
 
-      <section id="benefits" className="pt-70">
-        <h3 className="pb-3 pt-70">What&apos;s in it for you?</h3>
+      <section id="benefits" className="pt-100">
+        <h3 className="pb-3 pt-100">What&apos;s in it for you?</h3>
         <p>
           Here are some of the things that you can expect when attending a
           #play14 event. However, be ready to &quot;Expect the unexpected!&quot;

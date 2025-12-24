@@ -1,5 +1,10 @@
 // Manifesto and Code of Conduct card styles
 // Used on both home page and values page
+//
+// Note: Some !important declarations are necessary to override base
+// .single-funfacts-box styles which use absolute positioning and
+// specific padding. This is a pragmatic solution to avoid modifying
+// the base component styles that are used elsewhere.
 
 .values-card {
   // Override base single-funfacts-box styles
@@ -32,13 +37,13 @@
 
     i {
       &.orange {
-        color: #ff5200;
+        color: var(--color-orange);
       }
       &.blue {
-        color: #0098dd;
+        color: var(--color-blue);
       }
       &.green {
-        color: #92c900;
+        color: var(--color-green);
       }
     }
   }
@@ -85,41 +90,29 @@
         text-align: center;
 
         &.orange {
-          color: #ff5200;
+          color: var(--color-orange);
         }
         &.blue {
-          color: #0098dd;
+          color: var(--color-blue);
         }
         &.green {
-          color: #92c900;
+          color: var(--color-green);
         }
       }
     }
   }
 
-  // Dark mode support
+  // Dark mode support - uses theme variables which auto-switch
   [data-theme="dark"] & {
-    background: var(--color-bg-secondary, #1f2937);
-    border-color: #374151;
+    background: var(--color-surface);
+    border-color: var(--color-border);
 
     .icon {
       background: linear-gradient(
         135deg,
-        rgba(255, 82, 0, 0.2) 0%,
-        rgba(0, 152, 221, 0.2) 100%
+        rgba(255, 107, 44, 0.2) 0%,
+        rgba(62, 181, 237, 0.2) 100%
       );
-    }
-
-    h3 {
-      color: #f3f4f6;
-    }
-
-    p {
-      color: #d1d5db;
-    }
-
-    ul li {
-      color: #d1d5db;
     }
   }
 }
@@ -131,15 +124,15 @@
 
     &:hover {
       .icon {
-        background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+        background: linear-gradient(135deg, var(--color-orange) 0%, #ff8c00 100%);
 
         i {
-          color: #fff !important;
+          color: var(--color-text-inverse) !important;
         }
       }
 
       h3 {
-        background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+        background: linear-gradient(135deg, var(--color-orange) 0%, #ff8c00 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
