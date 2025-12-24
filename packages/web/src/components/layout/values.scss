@@ -5,6 +5,9 @@
   // Override base single-funfacts-box styles
   text-align: left;
   padding: 35px 30px !important; // Override the 98px left padding from base
+  max-width: 800px; // Constrain width for better readability
+  margin-left: auto;
+  margin-right: auto;
 
   // Fix icon positioning - override absolute positioning from base
   .icon {
@@ -121,22 +124,26 @@
   }
 }
 
-// Home page specific hover effect
+// Home page specific styles
 #manifesto-and-code-of-conduct {
-  .values-card:hover {
-    .icon {
-      background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+  .values-card {
+    max-width: 100%; // Full width within the column on home page
 
-      i {
-        color: #fff !important;
+    &:hover {
+      .icon {
+        background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+
+        i {
+          color: #fff !important;
+        }
       }
-    }
 
-    h3 {
-      background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      h3 {
+        background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
     }
   }
 }
