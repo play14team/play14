@@ -129,8 +129,13 @@ const EventSidebar = ({ event }: { event: Event }) => {
             href={`mailto:${event.contactEmail}`}
             className="default-btn"
             aria-label="Send email to event team"
+            style={{ backgroundColor: "#6b6b84" }}
           >
-            <i className="bx bx-envelope"></i> Contact Team
+            <i
+              className="bx bx-envelope"
+              style={{ fontSize: "16.5px", marginTop: "-1px" }}
+            ></i>{" "}
+            Contact Team
           </Link>
         </div>
       )}
