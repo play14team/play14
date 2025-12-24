@@ -44,7 +44,8 @@
       "Bash(bun:*)",
       "Bash(ls:*)",
       "Bash(git add:*)",
-      "Bash(git merge-base:*)"
+      "Bash(git merge-base:*)",
+      "Bash(git worktree:*)"
     ]
   }
 }
