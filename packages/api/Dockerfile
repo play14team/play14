@@ -28,6 +28,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
 
+# Add node_modules/.bin to PATH for strapi CLI
+ENV PATH=/app/node_modules/.bin:$PATH
+
 # Copy source code (only invalidates this layer on source changes)
 COPY packages/api ./packages/api
 
