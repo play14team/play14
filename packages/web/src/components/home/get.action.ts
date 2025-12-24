@@ -128,6 +128,7 @@ export interface Play14Statistics {
   countries: number
   events: number
   players: number
+  hosts: number
   games: number
   yearsSince2014: number
 }
@@ -180,8 +181,11 @@ export async function getStatistics(): Promise<Play14Statistics> {
       fetchAllPaginated<StatisticsEvent>("events", ["eventStatus"], {
         location: { fields: ["country"] },
       }),
-      // Get all players
-      fetchAllPaginated<{ documentId: string }>("players", ["documentId"]),
+      // Get all players with position to count hosts
+      fetchAllPaginated<{ documentId: string; position: string }>("players", [
+        "documentId",
+        "position",
+      ]),
       // Get all games
       fetchAllPaginated<{ documentId: string }>("games", ["documentId"]),
     ])
@@ -199,10 +203,19 @@ export async function getStatistics(): Promise<Play14Statistics> {
       }
     })
 
+    // Count hosts (players with position Host, Mentor, or Founder)
+    const hosts = allPlayers.filter(
+      (player) =>
+        player.position === "Host" ||
+        player.position === "Mentor" ||
+        player.position === "Founder",
+    )
+
     return {
       countries: uniqueCountries.size,
       events: nonCancelledEvents.length,
       players: allPlayers.length,
+      hosts: hosts.length,
       games: allGames.length,
       yearsSince2014,
     }
@@ -213,6 +226,7 @@ export async function getStatistics(): Promise<Play14Statistics> {
       countries: 0,
       events: 0,
       players: 0,
+      hosts: 0,
       games: 0,
       yearsSince2014,
     }
