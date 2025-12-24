@@ -9,11 +9,13 @@ WORKDIR /app
 
 # Copy only package files first for optimal caching
 COPY package.json bun.lock ./
+
+# Create the package directory structure and copy package.json
+RUN mkdir -p packages/api
 COPY packages/api/package.json ./packages/api/
 
-# Install production dependencies
-ENV NODE_ENV=production
-RUN bun install --production --frozen-lockfile
+# Install dependencies (bun workspaces require proper directory structure)
+RUN bun install --frozen-lockfile
 
 # Stage 2: Builder
 FROM oven/bun:1.3.5-alpine AS builder
