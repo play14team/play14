@@ -123,6 +123,14 @@ const EventSidebar = ({ event }: { event: Event }) => {
           </div>
         )}
 
+      {event.contactEmail && (
+        <div className="btn-box">
+          <Link href={`mailto:${event.contactEmail}`} className="default-btn">
+            <i className="bx bx-envelope"></i>Contact Team
+          </Link>
+        </div>
+      )}
+
       {(event.eventStatus == Enum_Event_Eventstatus.Open ||
         event.eventStatus == Enum_Event_Eventstatus.Announced) && (
         <div className="events-share">
