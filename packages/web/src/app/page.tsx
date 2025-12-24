@@ -115,7 +115,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="upcoming events">
+      <section id="upcoming-events">
         <UpcomingEvents />
       </section>
 
@@ -123,7 +123,7 @@ export default function Home() {
         <Statistics />
       </section>
 
-      <section id="interactive-world-map">
+      <section id="world-map">
         <EventsWorldMap interactive={true} />
       </section>
 
@@ -251,7 +251,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="manifesto and code of conduct" className="funfacts-area pt-100">
+      <section id="manifesto-and-code-of-conduct" className="funfacts-area pt-100">
         <div className="container">
           <div className="section-title">
             <h2>
