@@ -7,41 +7,56 @@ const CodeOfConduct = () => {
       <h3>Code of Conduct</h3>
       <ul>
         <li>
-          <i className="bx bx-brain orange" aria-hidden="true"></i> You shall
-          be <strong>open minded</strong> and ready to{" "}
-          <strong>listen and learn</strong> from others
+          <i className="bx bx-brain orange" aria-hidden="true"></i>
+          <span>
+            You shall be <strong>open minded</strong> and ready to{" "}
+            <strong>listen and learn</strong> from others
+          </span>
         </li>
         <li>
-          <i className="bx bx-bulb green" aria-hidden="true"></i> You shall feel
-          free to <strong>propose, experiment and explain</strong> what you have
-          in mind
+          <i className="bx bx-bulb green" aria-hidden="true"></i>
+          <span>
+            You shall feel free to{" "}
+            <strong>propose, experiment and explain</strong> what you have in
+            mind
+          </span>
         </li>
         <li>
-          <i className="bx bx-block blue" aria-hidden="true"></i> You shall{" "}
-          <strong>not high-jack, sabotage or ruin</strong> the learning
-          experience of others
+          <i className="bx bx-block blue" aria-hidden="true"></i>
+          <span>
+            You shall <strong>not high-jack, sabotage or ruin</strong> the
+            learning experience of others
+          </span>
         </li>
         <li>
-          <i className="bx bx-time orange" aria-hidden="true"></i> You shall{" "}
-          <strong>manage your own timebox</strong> when facilitating so that
-          other sessions can start on time
+          <i className="bx bx-time orange" aria-hidden="true"></i>
+          <span>
+            You shall <strong>manage your own timebox</strong> when facilitating
+            so that other sessions can start on time
+          </span>
         </li>
         <li>
-          <i className="bx bx-user-check green" aria-hidden="true"></i> You
-          shall <strong>behave appropriately</strong> and be a{" "}
-          <strong>decent human being</strong>
+          <i className="bx bx-user-check green" aria-hidden="true"></i>
+          <span>
+            You shall <strong>behave appropriately</strong> and be a{" "}
+            <strong>decent human being</strong>
+          </span>
         </li>
         <li>
-          <i className="bx bx-leaf blue" aria-hidden="true"></i> You shall
-          always <strong>leave the playground clean</strong> (boy scout rule),{" "}
-          <strong>avoid waste</strong> and try to reduce your{" "}
-          <strong>carbon footprint</strong>
+          <i className="bx bx-leaf blue" aria-hidden="true"></i>
+          <span>
+            You shall always <strong>leave the playground clean</strong> (boy
+            scout rule), <strong>avoid waste</strong> and try to reduce your{" "}
+            <strong>carbon footprint</strong>
+          </span>
         </li>
         <li>
-          <i className="bx bx-happy-heart-eyes orange" aria-hidden="true"></i>{" "}
-          You shall be ready to{" "}
-          <strong>get serious fun and good laughs</strong> and should try not be
-          shy about that
+          <i className="bx bx-happy-heart-eyes orange" aria-hidden="true"></i>
+          <span>
+            You shall be ready to{" "}
+            <strong>get serious fun and good laughs</strong> and should try not
+            be shy about that
+          </span>
         </li>
       </ul>
       <p className="pt-3">

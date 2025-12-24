@@ -18,27 +18,8 @@ export default function Home() {
       <section id="title">
         <Title />
       </section>
-      <section id="summary" className="pt-70">
-        <h2 className="sr-only">What is #play14?</h2>
-        <p>
-          Welcome to #play14, a global movement that believes in the{" "}
-          <strong>transformative power of play</strong>!
-        </p>
-        <p>
-          We are a worldwide gathering of like-minded people who believe that{" "}
-          <strong>
-            playing is the best way to learn, share and get creative!
-          </strong>{" "}
-          We are a movement started in 2014, we are a{" "}
-          <strong>global series of events</strong> organized in different cities
-          on <strong>all five continents</strong>, we are an unconference
-          following <strong>the principles of open-space technology</strong>,
-          but above all we are a family whose members{" "}
-          <strong>share common values and interests</strong>.
-        </p>
-      </section>
 
-      <section id="power-of-play" className="funfacts-area pt-100">
+      <section id="power-of-play" className="funfacts-area pt-70">
         <div className="container">
           <div className="section-title">
             <h2>
@@ -49,6 +30,14 @@ export default function Home() {
               immersive experience.
             </p>
           </div>
+          <p>
+            Welcome to #play14, a global movement that believes in the{" "}
+            <strong>transformative power of play</strong>! We are a worldwide
+            gathering of like-minded people who believe that{" "}
+            <strong>
+              playing is the best way to learn, share and get creative!
+            </strong>
+          </p>
           <p>
             Through play, individuals explore, experiment, and discover concepts
             in a hands-on way, which enhances understanding and retention. It
@@ -76,11 +65,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="why-attend" className="funfacts-area pt-100">
+      <section id="join-the-movement" className="funfacts-area pt-100">
         <div className="container">
           <div className="section-title">
             <h2>
-              Why <span>Attend</span>?
+              Join the <span>Movement</span>
             </h2>
             <p>
               Join us in cities worldwide to connect with like-minded

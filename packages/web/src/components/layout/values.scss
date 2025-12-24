@@ -2,11 +2,42 @@
 // Used on both home page and values page
 
 .values-card {
+  // Override base single-funfacts-box styles
   text-align: left;
-  padding: 35px 30px;
+  padding: 35px 30px !important; // Override the 98px left padding from base
 
+  // Fix icon positioning - override absolute positioning from base
   .icon {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
     margin: 0 auto 25px;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 82, 0, 0.1) 0%,
+      rgba(0, 152, 221, 0.1) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+
+    i {
+      &.orange {
+        color: #ff5200;
+      }
+      &.blue {
+        color: #0098dd;
+      }
+      &.green {
+        color: #92c900;
+      }
+    }
   }
 
   h3 {
@@ -42,10 +73,13 @@
       line-height: 1.6;
       color: var(--color-text);
 
-      i {
+      // Icon in list items
+      > i {
         flex-shrink: 0;
-        margin-top: 3px;
+        margin-top: 4px;
         font-size: 18px;
+        width: 18px;
+        text-align: center;
 
         &.orange {
           color: #ff5200;
@@ -65,6 +99,14 @@
     background: var(--color-bg-secondary, #1f2937);
     border-color: #374151;
 
+    .icon {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 82, 0, 0.2) 0%,
+        rgba(0, 152, 221, 0.2) 100%
+      );
+    }
+
     h3 {
       color: #f3f4f6;
     }
@@ -82,6 +124,14 @@
 // Home page specific hover effect
 #manifesto-and-code-of-conduct {
   .values-card:hover {
+    .icon {
+      background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+
+      i {
+        color: #fff !important;
+      }
+    }
+
     h3 {
       background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
       -webkit-background-clip: text;
