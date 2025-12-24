@@ -1,10 +1,23 @@
-const Manifesto = () => {
+interface ManifestoProps {
+  showCard?: boolean
+}
+
+const Manifesto = ({ showCard = true }: ManifestoProps) => {
+  const wrapperClass = showCard ? "single-funfacts-box values-card" : "values-content"
+
   return (
-    <div className="values-content">
-      <div className="values-header">
-        <i className="bx bx-book-heart orange" aria-hidden="true"></i>
-        <h3>Manifesto</h3>
-      </div>
+    <div className={wrapperClass}>
+      {showCard ? (
+        <div className="icon">
+          <i className="bx bx-book-heart orange" aria-hidden="true"></i>
+        </div>
+      ) : (
+        <div className="values-header">
+          <i className="bx bx-book-heart orange" aria-hidden="true"></i>
+          <h3>Manifesto</h3>
+        </div>
+      )}
+      {showCard && <h3>Manifesto</h3>}
       <p>
         <strong>#play14</strong> is and always will be
       </p>

@@ -266,10 +266,10 @@ export default function Home() {
             </p>
           </div>
           <div className="pt-4">
-            <Manifesto />
+            <Manifesto showCard={false} />
           </div>
           <div className="pt-5">
-            <CodeOfConduct />
+            <CodeOfConduct showCard={false} />
           </div>
         </div>
       </section>

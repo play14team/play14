@@ -1,10 +1,23 @@
-const CodeOfConduct = () => {
+interface CodeOfConductProps {
+  showCard?: boolean
+}
+
+const CodeOfConduct = ({ showCard = true }: CodeOfConductProps) => {
+  const wrapperClass = showCard ? "single-funfacts-box values-card" : "values-content"
+
   return (
-    <div className="values-content">
-      <div className="values-header">
-        <i className="bx bx-shield-quarter blue" aria-hidden="true"></i>
-        <h3>Code of Conduct</h3>
-      </div>
+    <div className={wrapperClass}>
+      {showCard ? (
+        <div className="icon">
+          <i className="bx bx-shield-quarter blue" aria-hidden="true"></i>
+        </div>
+      ) : (
+        <div className="values-header">
+          <i className="bx bx-shield-quarter blue" aria-hidden="true"></i>
+          <h3>Code of Conduct</h3>
+        </div>
+      )}
+      {showCard && <h3>Code of Conduct</h3>}
       <ul>
         <li>
           <i className="bx bx-brain orange" aria-hidden="true"></i>
@@ -59,7 +72,7 @@ const CodeOfConduct = () => {
           </span>
         </li>
       </ul>
-      <p className="values-summary">
+      <p className={showCard ? "pt-3" : "values-summary"}>
         To summarize: &ldquo;You shall not be an a**hole&rdquo;.
       </p>
     </div>
