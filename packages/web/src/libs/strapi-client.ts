@@ -109,12 +109,16 @@ async function tryFetch(
     }
 
     console.warn(
-      `[Strapi] ${url} returned ${response.status}: ${response.statusText}`,
+      "[Strapi] Request returned error:",
+      url,
+      response.status,
+      response.statusText,
     )
     return null
   } catch (error) {
     console.warn(
-      `[Strapi] ${url} failed:`,
+      "[Strapi] Request failed:",
+      url,
       error instanceof Error ? error.message : String(error),
     )
     return null
@@ -132,7 +136,8 @@ async function parseJsonResponse<T>(
     return (await response.json()) as StrapiResponse<T>
   } catch (error) {
     console.error(
-      `[Strapi] Failed to parse JSON from ${url}:`,
+      "[Strapi] Failed to parse JSON:",
+      url,
       error instanceof Error ? error.message : String(error),
     )
     throw new Error("Invalid JSON response from Strapi API")
