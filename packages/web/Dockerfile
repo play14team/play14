@@ -52,8 +52,8 @@ ENV STRAPI_API_SECRET=${STRAPI_API_SECRET}
 ENV NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
 ENV NEXT_PUBLIC_WEB_VITALS=${NEXT_PUBLIC_WEB_VITALS}
 
-# Build application using explicit path
-RUN /app/node_modules/.bin/next build
+# Build application using bunx
+RUN bunx --bun next build
 
 # Stage 3: Runner (bun-only)
 FROM oven/bun:1.3.5-alpine AS runner
