@@ -123,6 +123,19 @@ const EventSidebar = ({ event }: { event: Event }) => {
           </div>
         )}
 
+      {event.contactEmail && (
+        <div className="btn-box">
+          <Link
+            href={`mailto:${event.contactEmail}`}
+            className="default-btn"
+            aria-label="Send email to event team"
+            style={{ backgroundColor: "#6b6b84" }}
+          >
+            <i className="flaticon-team"></i>Contact Team
+          </Link>
+        </div>
+      )}
+
       {(event.eventStatus == Enum_Event_Eventstatus.Open ||
         event.eventStatus == Enum_Event_Eventstatus.Announced) && (
         <div className="events-share">

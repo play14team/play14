@@ -128,19 +128,6 @@ export default function EventDetails({ event }: { event: Event }) {
                 )}
               </ul>
             </div>
-            {event.contactEmail && (
-              <ul className="d-flex">
-                <li>
-                  <Link href={`mailto:${event.contactEmail}`}>
-                    <i
-                      className="bx bx-envelope"
-                      title="Send an email to the team"
-                      style={{ fontSize: "25px" }}
-                    ></i>
-                  </Link>
-                </li>
-              </ul>
-            )}
             <ul className="d-flex">
               <li>
                 <ICalendar event={event} />
