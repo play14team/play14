@@ -107,31 +107,39 @@ export default function Home() {
         <EventsWorldMap interactive={true} />
       </section>
 
-      <section id="activities">
-        <h3 className="pb-3">What to expect?</h3>
-        <p>
-          For two and a half days, people with{" "}
-          <Link href="/players">many different profiles and experiences</Link>{" "}
-          are invited to share{" "}
-          <Link href="/games">serious games and fun activities</Link>,
-          experiences and tips, knowledge and insights, laughs and smiles.{" "}
-          <strong>Everyone is welcome to join</strong>.
-        </p>
-        <div className="d-flex justify-content-center">
-          <blockquote>
-            You can discover more about a person in an hour of play than a year
-            of conversation
-            <br />
-            <strong>
-              <em className="d-flex justify-content-end pt-4">Plato</em>
-            </strong>
-          </blockquote>
-        </div>
-        <p>
-          If you feel like joining but wonder what is going to happen, here are
-          some examples of activites we engage in:
-        </p>
-        <p>
+      <section id="activities" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              The <span>Experience</span>
+            </h2>
+            <p>
+              Two and a half days of games, connections, and unforgettable
+              moments.
+            </p>
+          </div>
+          <p>
+            For two and a half days, people with{" "}
+            <Link href="/players">many different profiles and experiences</Link>{" "}
+            are invited to share{" "}
+            <Link href="/games">serious games and fun activities</Link>,
+            experiences and tips, knowledge and insights, laughs and smiles.{" "}
+            <strong>Everyone is welcome to join</strong>.
+          </p>
+          <div className="d-flex justify-content-center">
+            <blockquote>
+              You can discover more about a person in an hour of play than a
+              year of conversation
+              <br />
+              <strong>
+                <em className="d-flex justify-content-end pt-4">Plato</em>
+              </strong>
+            </blockquote>
+          </div>
+          <p>
+            If you feel like joining but wonder what is going to happen, here
+            are some examples of activites we engage in:
+          </p>
           <ul>
             <li>
               A{" "}
@@ -219,14 +227,15 @@ export default function Home() {
               aikido, ...
             </li>
           </ul>
-        </p>
 
-        <p>
-          Join us in order to develop your <strong>facilitation skills</strong>,
-          increase your <strong>ability to accompany change</strong> in your
-          organization, <strong>foster your creativity</strong> and improve your{" "}
-          <strong>capacity to innovate</strong>.
-        </p>
+          <p>
+            Join us in order to develop your{" "}
+            <strong>facilitation skills</strong>, increase your{" "}
+            <strong>ability to accompany change</strong> in your organization,{" "}
+            <strong>foster your creativity</strong> and improve your{" "}
+            <strong>capacity to innovate</strong>.
+          </p>
+        </div>
       </section>
 
       <section id="manifesto and code of conduct" className="pt-100">

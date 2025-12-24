@@ -8,17 +8,21 @@ const UpcomingEvents = async () => {
   const events = (await getUpcomingEvents(today)) as Event[]
 
   return (
-    <div className="pt-100">
-      <h3 className="pb-3">Our upcoming events</h3>
-      <p>
-        Ready to play? Join our <strong>upcoming events</strong> and be part of
-        a vibrant community that’s shaping the future through play. Your next
-        breakthrough might just be one game away!
-      </p>
-      <div className="pt-5 pb-70">
-        {events && <EventGrid events={events} />}
+    <section className="funfacts-area pt-100">
+      <div className="container">
+        <div className="section-title">
+          <h2>
+            Join the <span>Movement</span>
+          </h2>
+          <p>
+            Find your next #play14 experience and connect with players near you.
+          </p>
+        </div>
+        <div className="pt-5 pb-70">
+          {events && <EventGrid events={events} />}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
