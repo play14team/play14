@@ -34,13 +34,13 @@ ENV PATH=/app/node_modules/.bin:$PATH
 # Copy source code (only invalidates this layer on source changes)
 COPY packages/api ./packages/api
 
-# Build Strapi admin panel using workspace filter from root
+WORKDIR /app/packages/api
+
+# Build Strapi admin panel
 ENV NODE_ENV=production
 ARG STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN
 ENV STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN}
-RUN bun --filter play14-api build
-
-WORKDIR /app/packages/api
+RUN strapi build
 
 # Stage 3: Production runtime
 FROM oven/bun:1.3.5-alpine AS runner
