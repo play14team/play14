@@ -49,7 +49,7 @@ WORKDIR /app/packages/api
 ENV NODE_ENV=production
 ARG STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN
 ENV STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN}
-RUN bun run build
+RUN strapi build --debug
 
 # Stage 3: Production runtime
 FROM oven/bun:1.3.5-alpine AS runner
