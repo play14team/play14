@@ -271,6 +271,11 @@ export default function Home() {
             <h2>
               What our community <span>says</span>
             </h2>
+            <p>
+              Hear from members of the #play14 community about their experiences.
+              These testimonials capture the spirit, impact, and joy of our events
+              around the world.
+            </p>
           </div>
         </div>
         <HomeTestimonials />
@@ -282,6 +287,10 @@ export default function Home() {
             <h2>
               Photo <span>gallery</span>
             </h2>
+            <p>
+              #play14 is first and foremost a community of people, a family, and
+              an incredible human adventure.
+            </p>
           </div>
         </div>
         <HomeGallery />
