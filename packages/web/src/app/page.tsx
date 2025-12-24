@@ -134,18 +134,12 @@ export default function Home() {
               The <span>Experience</span>
             </h2>
             <p>
-              Two and a half days of games, connections, and unforgettable
-              moments.
+              For two and a half days,{" "}
+              <Link href="/players">people with many different profiles</Link>{" "}
+              share <Link href="/games">games and activities</Link>, knowledge,
+              and laughs. <strong>Everyone is welcome</strong>.
             </p>
           </div>
-          <p>
-            For two and a half days, people with{" "}
-            <Link href="/players">many different profiles and experiences</Link>{" "}
-            are invited to share{" "}
-            <Link href="/games">serious games and fun activities</Link>,
-            experiences and tips, knowledge and insights, laughs and smiles.{" "}
-            <strong>Everyone is welcome to join</strong>.
-          </p>
           <div className="d-flex justify-content-center">
             <blockquote>
               You can discover more about a person in an hour of play than a
@@ -157,8 +151,7 @@ export default function Home() {
             </blockquote>
           </div>
           <p>
-            If you feel like joining but wonder what is going to happen, here
-            are some examples of activites we engage in:
+            Here are some examples of activities we engage in:
           </p>
           <ul>
             <li>
