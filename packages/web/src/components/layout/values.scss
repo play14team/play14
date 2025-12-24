@@ -1,0 +1,196 @@
+// Manifesto and Code of Conduct styles
+// Card style for values page, simple content style for home page
+
+// Card style (values page) - extends .single-funfacts-box
+.values-card {
+  text-align: left;
+  padding: 35px 30px !important;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+
+  .icon {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    margin: 0 auto 25px;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 82, 0, 0.1) 0%,
+      rgba(0, 152, 221, 0.1) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+
+    i {
+      &.orange {
+        color: var(--color-orange);
+      }
+      &.blue {
+        color: var(--color-blue);
+      }
+      &.green {
+        color: var(--color-green);
+      }
+    }
+  }
+
+  h3 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 25px;
+    background: none;
+    -webkit-text-fill-color: inherit;
+    color: var(--color-text);
+  }
+
+  p {
+    text-align: left;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: var(--color-text);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 15px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-text);
+
+      > i {
+        flex-shrink: 0;
+        margin-top: 4px;
+        font-size: 18px;
+        width: 18px;
+        text-align: center;
+
+        &.orange {
+          color: var(--color-orange);
+        }
+        &.blue {
+          color: var(--color-blue);
+        }
+        &.green {
+          color: var(--color-green);
+        }
+      }
+    }
+  }
+
+  [data-theme="dark"] & {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+
+    .icon {
+      background: linear-gradient(
+        135deg,
+        rgba(255, 107, 44, 0.2) 0%,
+        rgba(62, 181, 237, 0.2) 100%
+      );
+    }
+  }
+
+  // Home page: allow full width within grid column
+  #manifesto-and-code-of-conduct & {
+    max-width: 100%;
+  }
+}
+
+// Simple content style - no card wrapper
+.values-content {
+  max-width: 800px;
+  margin: 0 auto;
+
+  .values-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+
+    i {
+      font-size: 36px;
+
+      &.orange {
+        color: var(--color-orange);
+      }
+      &.blue {
+        color: var(--color-blue);
+      }
+      &.green {
+        color: var(--color-green);
+      }
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 28px;
+      color: var(--color-text);
+    }
+  }
+
+  p {
+    color: var(--color-text);
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-text);
+
+      > i {
+        flex-shrink: 0;
+        margin-top: 4px;
+        font-size: 18px;
+        width: 18px;
+        text-align: center;
+
+        &.orange {
+          color: var(--color-orange);
+        }
+        &.blue {
+          color: var(--color-blue);
+        }
+        &.green {
+          color: var(--color-green);
+        }
+      }
+    }
+  }
+
+  .values-summary {
+    margin-top: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
