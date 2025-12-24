@@ -23,7 +23,7 @@ export default function Home() {
         <div className="container">
           <div className="section-title">
             <h2>
-              Discover the Power of <span>Play</span>
+              Discover the power of <span>play</span>
             </h2>
             <p>
               Play engages both mind and body, making learning an active,
@@ -69,7 +69,7 @@ export default function Home() {
         <div className="container">
           <div className="section-title">
             <h2>
-              Join the <span>Movement</span>
+              Join the <span>movement</span>
             </h2>
             <p>
               Join us in cities worldwide to connect with like-minded
@@ -122,7 +122,7 @@ export default function Home() {
         <div className="container">
           <div className="section-title">
             <h2>
-              The <span>Experience</span>
+              The <span>experience</span>
             </h2>
             <p>
               For two and a half days,{" "}
@@ -246,7 +246,7 @@ export default function Home() {
         <div className="container">
           <div className="section-title">
             <h2>
-              What We <span>Stand For</span>
+              What we <span>stand for</span>
             </h2>
             <p>
               A game or activity at #play14 could be pretty much anything as
