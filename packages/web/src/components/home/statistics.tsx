@@ -68,6 +68,13 @@ export default async function Statistics() {
       href: "/players",
     },
     {
+      value: stats.hosts,
+      label: "Hosts",
+      icon: "bx bx-star",
+      color: "green",
+      href: "/players",
+    },
+    {
       value: stats.games,
       label: "Games & Activities",
       icon: "bx bx-game",
