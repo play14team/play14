@@ -6,7 +6,6 @@ import {
   Player,
 } from "@/models/strapi"
 import Gallery from "../layout/gallery"
-import HtmlContent from "../layout/html-content"
 import PlayerGrid from "../players/grid"
 import EventDescription from "./description"
 import EventSchedule from "./schedule"
@@ -67,11 +66,6 @@ export default function EventTabs({
               }
             />
           )}
-        </div>
-
-        {/* Registration */}
-        <div id="registrationTab" className="tab-pane tabs_item">
-          <HtmlContent>{event.registration?.widgetCode || ""}</HtmlContent>
         </div>
       </div>
     </>

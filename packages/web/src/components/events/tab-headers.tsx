@@ -1,7 +1,7 @@
 "use client"
 
 import openTabSection from "@/libs/tabs"
-import { Enum_Event_Eventstatus, Event } from "@/models/strapi"
+import { Event } from "@/models/strapi"
 
 export default function TabHeaders({
   event,
@@ -20,18 +20,6 @@ export default function TabHeaders({
       >
         Overview
       </li>
-
-      {/* Registration */}
-      {event.eventStatus == Enum_Event_Eventstatus.Open &&
-        event.registration &&
-        event.registration.widgetCode && (
-          <li
-            onClick={(e) => openTabSection(e, "registrationTab")}
-            aria-hidden="true"
-          >
-            Registration
-          </li>
-        )}
 
       {/* Schedule */}
       <li onClick={(e) => openTabSection(e, "scheduleTab")} aria-hidden="true">
