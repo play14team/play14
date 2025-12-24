@@ -133,16 +133,16 @@ export default function Faq() {
               className={`accordion__button${openIndex === index ? " active" : ""}`}
               onClick={() => toggleItem(index)}
               aria-expanded={openIndex === index}
+              type="button"
             >
-              <i className="bx bx-chevron-down"></i>
-              {item.question}
+              <i className="bx bx-chevron-down" aria-hidden="true"></i>
+              <span>{item.question}</span>
             </button>
-            <div
-              className={`accordion__panel${openIndex === index ? " show" : ""}`}
-              style={{ display: openIndex === index ? "block" : "none" }}
-            >
-              {item.answer}
-            </div>
+            {openIndex === index && (
+              <div className="accordion__panel show">
+                {item.answer}
+              </div>
+            )}
           </li>
         ))}
       </ul>
