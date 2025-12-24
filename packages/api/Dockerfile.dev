@@ -52,4 +52,4 @@ USER bun
 
 EXPOSE 1337
 
-CMD ["strapi", "develop"]
+CMD ["bunx", "--bun", "strapi", "develop"]
