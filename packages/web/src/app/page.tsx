@@ -105,18 +105,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="upcoming-events" className="funfacts-area pt-100">
-        <div className="container">
-          <div className="section-title">
-            <h2>
-              Upcoming <span>events</span>
-            </h2>
-            <p>
-              Ready to play? Join our upcoming events and be part of a vibrant
-              community of players and facilitators.
-            </p>
-          </div>
-        </div>
+      <section id="upcoming-events">
         <UpcomingEvents />
       </section>
 
@@ -152,7 +141,7 @@ export default function Home() {
               </strong>
             </blockquote>
           </div>
-          <p>
+          <p className="pt-5">
             Here are some examples of activities we engage in:
           </p>
           <ul>
@@ -276,20 +265,41 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="testimonials" className="pt-100">
+      <section id="testimonials" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              What our community <span>says</span>
+            </h2>
+          </div>
+        </div>
         <HomeTestimonials />
       </section>
 
-      <section id="gallery">
+      <section id="gallery" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              Photo <span>gallery</span>
+            </h2>
+          </div>
+        </div>
         <HomeGallery />
       </section>
 
-      <section id="benefits" className="pt-100">
-        <h3 className="pb-3 pt-100">What&apos;s in it for you?</h3>
-        <p>
-          Here are some of the things that you can expect when attending a
-          #play14 event. However, be ready to &quot;Expect the unexpected!&quot;
-        </p>
+      <section id="benefits" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              What&apos;s in it <span>for you</span>
+            </h2>
+            <p>
+              Here are some of the things that you can expect when attending a
+              #play14 event. However, be ready to &quot;Expect the
+              unexpected!&quot;
+            </p>
+          </div>
+        </div>
         <Expectations type={Enum_Expectation_Type.Main} />
       </section>
     </>
