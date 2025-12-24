@@ -2550,22 +2550,26 @@ $value_nine: 1550px;
       .accordion__item {
         padding: 0;
         font-size: 15px;
-        i {
-          left: 10px;
-          top: 50%;
-          font-size: 20px;
-          transform: translateY(-50%);
-        }
       }
       .accordion__button {
-        padding: 15px 20px;
+        padding: 15px 20px 15px 45px;
         font-size: 15px;
+
+        i {
+          left: 15px;
+          font-size: 20px;
+        }
       }
       .accordion__panel {
         padding: {
-          bottom: 15px;
           right: 15px;
-          left: 20px;
+          left: 45px;
+        }
+        p {
+          padding-bottom: 0;
+        }
+        &.show p {
+          padding-bottom: 15px;
         }
       }
     }

@@ -1,5 +1,6 @@
 import EventsWorldMap from "@/components/events/EventsWorldMap"
 import Expectations from "@/components/home/expectations"
+import Faq from "@/components/home/faq"
 import HomeGallery from "@/components/home/gallery"
 import Statistics from "@/components/home/statistics"
 import HomeTestimonials from "@/components/home/testimonials"
@@ -310,6 +311,25 @@ export default function Home() {
           </div>
         </div>
         <Expectations type={Enum_Expectation_Type.Main} />
+      </section>
+
+      <section id="faq" className="funfacts-area pt-100 pb-70">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              Frequently asked <span>questions</span>
+            </h2>
+            <p>
+              Find answers to the most common questions about #play14 events,
+              how they work, and what to expect when you join us.
+            </p>
+          </div>
+          <div className="row justify-content-center">
+            <div className="col-lg-10 col-md-12">
+              <Faq />
+            </div>
+          </div>
+        </div>
       </section>
     </>
   )

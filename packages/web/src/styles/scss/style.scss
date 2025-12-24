@@ -6283,7 +6283,7 @@ FAQ Area CSS
       border-radius: 5px;
       display: block;
       box-shadow: 2px 8px 20px 0 rgba(25, 42, 70, 0.13) !important;
-      background: $white-color;
+      background: var(--color-surface, $white-color);
       margin-bottom: 20px;
       padding: 0;
       border: none;
@@ -6292,45 +6292,69 @@ FAQ Area CSS
         margin-bottom: 0;
       }
     }
+    .accordion__heading {
+      margin: 0;
+      font-size: inherit;
+      font-weight: inherit;
+    }
     .accordion__button {
-      background-color: #fff;
-      color: $black-color;
+      background-color: var(--color-surface, #fff);
+      color: var(--color-text, $black-color);
       position: relative;
       display: block;
-      padding: 20px 30px;
+      width: 100%;
+      text-align: left;
+      padding: 20px 30px 20px 60px;
       border-radius: 5px;
+      border: none;
+      cursor: pointer;
       font: {
         size: 18px;
         weight: 800;
       }
       i {
         position: absolute;
-        left: 25px;
-        top: 18px;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
         font-size: 25px;
         transition: $transition;
       }
       &.active {
         i {
-          transform: rotate(180deg);
+          transform: translateY(-50%) rotate(180deg);
         }
+      }
+      &:hover {
+        background-color: var(--color-surface-hover, #f9f9f9);
       }
     }
     .accordion__panel {
-      position: relative;
-      margin-top: -5px;
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s ease-out;
       padding: {
-        bottom: 20px;
-        right: 25px;
-        left: 50px;
-        top: 0;
+        right: 30px;
+        left: 60px;
+      }
+      > * {
+        overflow: hidden;
       }
       p {
         line-height: 1.8;
         font-size: 15px;
+        color: var(--color-text-secondary, inherit);
+        padding-bottom: 0;
+        transition: padding 0.3s ease-out;
       }
       &.show {
-        display: block;
+        grid-template-rows: 1fr;
+        p {
+          padding-bottom: 20px;
+        }
+      }
+      &[hidden] {
+        display: grid;
       }
     }
   }

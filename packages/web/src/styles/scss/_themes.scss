@@ -941,3 +941,32 @@ body,
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
+
+// ===========================================
+// FAQ Accordion Dark Mode
+// ===========================================
+[data-theme="dark"] {
+  .faq-accordion {
+    .accordion {
+      .accordion__item {
+        background-color: var(--color-surface);
+        box-shadow: 2px 8px 20px 0 rgba(0, 0, 0, 0.3) !important;
+      }
+
+      .accordion__button {
+        background-color: var(--color-surface);
+        color: var(--color-text);
+
+        &:hover {
+          background-color: var(--color-surface-hover);
+        }
+      }
+
+      .accordion__panel {
+        p {
+          color: var(--color-text-secondary);
+        }
+      }
+    }
+  }
+}
