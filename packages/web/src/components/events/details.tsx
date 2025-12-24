@@ -18,6 +18,7 @@ import EventsNavigator from "./nav"
 import EventSidebar from "./sidebar"
 import EventTabs from "./tabs"
 import UpcomingEventTimer from "./timer"
+import HtmlContent from "../layout/html-content"
 
 export default function EventDetails({ event }: { event: Event }) {
   const defaultImage = event.defaultImage as UploadFile
@@ -155,6 +156,17 @@ export default function EventDetails({ event }: { event: Event }) {
             <EventSidebar event={event} />
           </div>
         </div>
+
+        {isOpen() && event.registration?.widgetCode && (
+          <div className="row mt-4">
+            <div className="col-12">
+              <div className="events-registration-section">
+                <h3 className="mb-3">Registration</h3>
+                <HtmlContent>{event.registration.widgetCode}</HtmlContent>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="row">
           <div className="courses-details-desc">

@@ -49,3 +49,17 @@ $theme-colors: (
 .rating-color {
   color: $yellow;
 }
+
+// Event registration section
+.events-registration-section {
+  background-color: #f8f9fa;
+  border: 2px solid $orange;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-top: 1rem;
+
+  h3 {
+    color: $orange;
+    font-weight: bold;
+  }
+}
