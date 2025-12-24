@@ -98,19 +98,16 @@ jobs:
         id: retag
         continue-on-error: true
         uses: azure/CLI@v2
-        env:
-          PR_NUMBER: ${{ needs.check-pr-merge.outputs.pr_number }}
-          PR_HEAD_SHA: ${{ needs.check-pr-merge.outputs.pr_head_sha }}
         with:
           inlineScript: |
             set +e
 
-            PR_TAG="pr-${PR_NUMBER}-${PR_HEAD_SHA}"
-            SOURCE_IMAGE="$REGISTRY/$IMAGE_NAME:$PR_TAG"
+            PR_TAG="pr-${{ needs.check-pr-merge.outputs.pr_number }}-${{ needs.check-pr-merge.outputs.pr_head_sha }}"
+            SOURCE_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$PR_TAG"
 
             echo "Looking for PR image: $SOURCE_IMAGE"
 
-            if az acr repository show-tags --name play14containerregistry --repository "$IMAGE_NAME" --output json | grep -q "$PR_TAG"; then
+            if az acr repository show-tags --name play14containerregistry --repository "${{ env.IMAGE_NAME }}" --output json | grep -q "$PR_TAG"; then
               echo "✅ PR image found in registry"
               echo "Using ACR import for server-side retagging (no network transfer)..."
 
@@ -118,34 +115,37 @@ jobs:
 
               # Import with merge SHA tag
               echo "Creating tag: ${{ github.sha }}"
-              if ! az acr import \
+              if ! OUTPUT=$(az acr import \
                 --name play14containerregistry \
                 --source "$SOURCE_IMAGE" \
-                --image "$IMAGE_NAME:${{ github.sha }}" \
-                --force 2>&1; then
+                --image "${{ env.IMAGE_NAME }}:${{ github.sha }}" \
+                --force 2>&1); then
                 echo "⚠️ Failed to create merge SHA tag"
+                echo "Error details: $OUTPUT"
                 IMPORT_FAILED=true
               fi
 
               # Import with PR head SHA tag
-              echo "Creating tag: ${PR_HEAD_SHA}"
-              if ! az acr import \
+              echo "Creating tag: ${{ needs.check-pr-merge.outputs.pr_head_sha }}"
+              if ! OUTPUT=$(az acr import \
                 --name play14containerregistry \
                 --source "$SOURCE_IMAGE" \
-                --image "$IMAGE_NAME:${PR_HEAD_SHA}" \
-                --force 2>&1; then
+                --image "${{ env.IMAGE_NAME }}:${{ needs.check-pr-merge.outputs.pr_head_sha }}" \
+                --force 2>&1); then
                 echo "⚠️ Failed to create head SHA tag"
+                echo "Error details: $OUTPUT"
                 IMPORT_FAILED=true
               fi
 
               # Import with latest tag
               echo "Creating tag: latest"
-              if ! az acr import \
+              if ! OUTPUT=$(az acr import \
                 --name play14containerregistry \
                 --source "$SOURCE_IMAGE" \
-                --image "$IMAGE_NAME:latest" \
-                --force 2>&1; then
+                --image "${{ env.IMAGE_NAME }}:latest" \
+                --force 2>&1); then
                 echo "⚠️ Failed to create latest tag"
+                echo "Error details: $OUTPUT"
                 IMPORT_FAILED=true
               fi
 
@@ -200,11 +200,11 @@ jobs:
             echo "Building image directly in ACR..."
             az acr build \
               --registry play14containerregistry \
-              --image "$IMAGE_NAME:${{ github.sha }}" \
-              --image "$IMAGE_NAME:latest" \
+              --image "${{ env.IMAGE_NAME }}:${{ github.sha }}" \
+              --image "${{ env.IMAGE_NAME }}:latest" \
               --build-arg STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${{ secrets.STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN }} \
               --file Dockerfile \
-              "${{ github.workspace }}/$WORKING_DIRECTORY"
+              "${{ github.workspace }}/${{ env.WORKING_DIRECTORY }}"
 
   deploy:
     name: Deploy to Production

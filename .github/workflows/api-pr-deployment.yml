@@ -43,11 +43,11 @@ jobs:
             echo "Building image directly in ACR..."
             az acr build \
               --registry play14containerregistry \
-              --image "$IMAGE_NAME:pr-${{ github.event.pull_request.number }}" \
-              --image "$IMAGE_NAME:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" \
+              --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}" \
+              --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" \
               --build-arg STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${{ secrets.STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN }} \
               --file Dockerfile \
-              "${{ github.workspace }}/$WORKING_DIRECTORY"
+              "${{ github.workspace }}/${{ env.WORKING_DIRECTORY }}"
 
       - name: Comment PR with image tags
         uses: actions/github-script@v7
