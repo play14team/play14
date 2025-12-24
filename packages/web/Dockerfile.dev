@@ -25,10 +25,21 @@ WORKDIR /app
 # Copy installed dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/bun.lock ./bun.lock
+
+# Copy ALL workspace package.json files for workspace resolution
+COPY packages/api/package.json ./packages/api/
+COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
 
 # Copy web package source
 # Note: Source files can be mounted as volumes for hot reload
 COPY packages/web ./packages/web
+
+# Re-run bun install to properly link workspace packages and create binaries
+RUN bun install --frozen-lockfile
+
+ENV PATH=/app/node_modules/.bin:$PATH
 
 WORKDIR /app/packages/web
 
