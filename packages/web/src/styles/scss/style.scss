@@ -6292,6 +6292,11 @@ FAQ Area CSS
         margin-bottom: 0;
       }
     }
+    .accordion__heading {
+      margin: 0;
+      font-size: inherit;
+      font-weight: inherit;
+    }
     .accordion__button {
       background-color: var(--color-surface, #fff);
       color: var(--color-text, $black-color);
@@ -6325,21 +6330,31 @@ FAQ Area CSS
       }
     }
     .accordion__panel {
-      position: relative;
-      margin-top: -5px;
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.3s ease-out;
       padding: {
-        bottom: 20px;
         right: 30px;
         left: 60px;
-        top: 0;
+      }
+      > * {
+        overflow: hidden;
       }
       p {
         line-height: 1.8;
         font-size: 15px;
         color: var(--color-text-secondary, inherit);
+        padding-bottom: 0;
+        transition: padding 0.3s ease-out;
       }
       &.show {
-        display: block;
+        grid-template-rows: 1fr;
+        p {
+          padding-bottom: 20px;
+        }
+      }
+      &[hidden] {
+        display: grid;
       }
     }
   }

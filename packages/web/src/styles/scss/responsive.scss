@@ -2562,9 +2562,14 @@ $value_nine: 1550px;
       }
       .accordion__panel {
         padding: {
-          bottom: 15px;
           right: 15px;
           left: 45px;
+        }
+        p {
+          padding-bottom: 0;
+        }
+        &.show p {
+          padding-bottom: 15px;
         }
       }
     }
