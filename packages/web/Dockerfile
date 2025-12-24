@@ -28,6 +28,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
 
+# Add node_modules/.bin to PATH for next CLI
+ENV PATH=/app/node_modules/.bin:$PATH
+
 # Copy web package source
 COPY packages/web ./packages/web
 
@@ -49,8 +52,8 @@ ENV STRAPI_API_SECRET=${STRAPI_API_SECRET}
 ENV NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
 ENV NEXT_PUBLIC_WEB_VITALS=${NEXT_PUBLIC_WEB_VITALS}
 
-# Build application
-RUN bun run build
+# Build application using explicit path
+RUN /app/node_modules/.bin/next build
 
 # Stage 3: Runner (bun-only)
 FROM oven/bun:1.3.5-alpine AS runner
