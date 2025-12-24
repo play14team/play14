@@ -33,6 +33,9 @@ COPY packages/api ./packages/api
 
 WORKDIR /app/packages/api
 
+# Add node_modules/.bin to PATH for strapi CLI
+ENV PATH=/app/node_modules/.bin:$PATH
+
 # Build Strapi admin panel using node
 ENV NODE_ENV=production
 ARG STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN
@@ -58,6 +61,9 @@ COPY --from=builder /app/packages/api ./packages/api
 COPY --from=deps /app/package.json ./package.json
 
 WORKDIR /app/packages/api
+
+# Add node_modules/.bin to PATH for strapi CLI
+ENV PATH=/app/node_modules/.bin:$PATH
 
 RUN chown -R node:node /app
 USER node
