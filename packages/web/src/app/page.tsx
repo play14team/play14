@@ -19,6 +19,7 @@ export default function Home() {
         <Title />
       </section>
       <section id="summary" className="pt-70">
+        <h2 className="sr-only">What is #play14?</h2>
         <p>
           Welcome to #play14, a global movement that believes in the{" "}
           <strong>transformative power of play</strong>!
@@ -124,6 +125,7 @@ export default function Home() {
       </section>
 
       <section id="world-map">
+        <h2 className="sr-only">Events Around the World</h2>
         <EventsWorldMap interactive={true} />
       </section>
 
@@ -156,7 +158,7 @@ export default function Home() {
           <ul>
             <li>
               A{" "}
-              <Link href="/games/ball-pointLinkgame" target="_blank">
+              <Link href="/games/ball-point-game" target="_blank">
                 serious game
               </Link>{" "}
               that you use as a metaphor in order to understand a new concept
