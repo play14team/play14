@@ -108,7 +108,7 @@ export default function Home() {
           <p>
             #play14 is an <Link href="/about/schedule">unconference</Link>,
             where <strong>all attendees are also contributors</strong>. Just
-            show up with an open mind, and you'll have the chance to propose
+            show up with an open mind, and you&apos;ll have the chance to propose
             your own games or dive into the games suggested by others. It&apos;s
             all about participation, creativity, and shared fun!
           </p>
