@@ -95,15 +95,15 @@ export default function Home() {
         </p>
       </section>
 
-      <section id="statistics">
-        <Statistics />
-      </section>
-
       <section id="upcoming events">
         <UpcomingEvents />
       </section>
 
-      <section id="interactive-world-map" className="pt-70">
+      <section id="statistics">
+        <Statistics />
+      </section>
+
+      <section id="interactive-world-map">
         <EventsWorldMap interactive={true} />
       </section>
 
