@@ -70,19 +70,18 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Build and push PR container image (ACR Build)
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            echo "Building image directly in ACR..."
-            az acr build \
-              --registry play14containerregistry \
-              --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}" \
-              --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" \
-              --build-arg STRAPI_API_URL=${{ env.STRAPI_API_URL }} \
-              --build-arg STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }} \
-              --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }} \
-              --file Dockerfile \
-              "${{ github.workspace }}/${{ env.WORKING_DIRECTORY }}"
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: |
+          echo "Building image directly in ACR..."
+          az acr build \
+            --registry play14containerregistry \
+            --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}" \
+            --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" \
+            --build-arg STRAPI_API_URL=${{ env.STRAPI_API_URL }} \
+            --build-arg STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }} \
+            --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }} \
+            --file Dockerfile \
+            .
 
       - name: Comment PR with image tags
         uses: actions/github-script@v7

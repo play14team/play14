@@ -325,14 +325,9 @@ export default function EventsWorldMap({
 
   return (
     <section className="events-world-map-wrapper">
-      <h2 id="eventsWorldMapTitle" className="events-world-map-title">
-        Events all around the world
-      </h2>
-
       <div
         className="events-world-map"
         role="region"
-        aria-labelledby="eventsWorldMapTitle"
         aria-label="World map showing countries with #play14 events"
       >
         {error ? (

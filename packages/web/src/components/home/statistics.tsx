@@ -93,7 +93,7 @@ export default async function Statistics() {
       <div className="container">
         <div className="section-title">
           <h2>
-            Our Global <span>Impact</span>
+            Our global <span>impact</span>
           </h2>
           <p>
             Since 2014, #play14 has grown into a worldwide movement connecting

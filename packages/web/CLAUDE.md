@@ -184,6 +184,13 @@ Always use `@/*` imports:
 - Utilities: `camelCase.ts`
 - Route params: Use `SlugParamsProps` from `@/libs/slug-params` for `[slug]` routes
 
+## Writing Style Guidelines
+
+- **Titles and headings:** Use sentence case (only capitalize the first letter of the first word), not title case
+  - ✅ Correct: "Discover the power of play", "Our global impact"
+  - ❌ Incorrect: "Discover the Power of Play", "Our Global Impact"
+- Exception: Proper nouns, acronyms, and brand names remain capitalized (e.g., "#play14", "Strapi", "Next.js")
+
 ## Important Patterns
 
 ### Pagination & Infinite Scroll

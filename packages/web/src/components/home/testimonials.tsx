@@ -10,14 +10,7 @@ const HomeTestimonials = async () => {
   }
 
   return (
-    <div className="pt-100">
-      <h3 className="pb-3">What our community says</h3>
-      <p>
-        Hear from members of the #play14 community about their experiences.
-        These testimonials capture the spirit, impact, and joy of our events
-        around the world.
-      </p>
-
+    <div className="container">
       <TestimonialsRefresh initialTestimonials={testimonials} />
 
       <div className="d-flex justify-content-center pb-70 pt-70">
