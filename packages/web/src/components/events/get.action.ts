@@ -429,7 +429,7 @@ export async function getAllEventsByYear(year: number) {
 
     return allEvents
   } catch (error) {
-    console.error(`Failed to fetch events for year ${year}:`, error)
+    console.error("Failed to fetch events for year", year, ":", error)
     return []
   }
 }
