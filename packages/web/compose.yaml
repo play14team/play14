@@ -1,9 +1,13 @@
+# Local development compose file for Web package
+# Run from packages/web directory: podman-compose up
+# Note: Uses monorepo root as build context
+
 services:
   app:
     container_name: play14-web
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: packages/web/Dockerfile.dev
       target: development
       cache_from:
         - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-web:dev-cache
@@ -15,19 +19,16 @@ services:
       - "3000:3000"
     volumes:
       # Mount source code for hot reload
-      - ./src:/app/src:z
-      - ./public:/app/public:z
-      - ./next.config.js:/app/next.config.js:z
-      - ./tsconfig.json:/app/tsconfig.json:z
-      - ./.prettierrc:/app/.prettierrc:z
-      - ./eslint.config.mjs:/app/eslint.config.mjs:z
+      - ./src:/app/packages/web/src:z
+      - ./public:/app/packages/web/public:z
+      - ./next.config.js:/app/packages/web/next.config.js:z
+      - ./tsconfig.json:/app/packages/web/tsconfig.json:z
+      - ./.prettierrc:/app/packages/web/.prettierrc:z
+      - ./eslint.config.mjs:/app/packages/web/eslint.config.mjs:z
       # Preserve node_modules in container
       - node_modules:/app/node_modules
     environment:
-      # All environment variables are loaded from .env.local
-      # Override specific values here if needed
       - NODE_ENV=development
-      # Override STRAPI_API_URL to use the service name from play14-api network
       - STRAPI_API_URL=http://play14-api:1337
     command: bun run develop
     networks:
@@ -51,5 +52,5 @@ volumes:
   node_modules:
 
 networks:
-  play14-net:
+  Play14-api:
     external: true

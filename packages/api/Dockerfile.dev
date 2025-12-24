@@ -1,30 +1,44 @@
 # Multi-stage development Dockerfile with dependency caching
-# Stage 1: Dependencies - only rebuilds when package.json or bun.lock changes
-FROM oven/bun:1.3.5-alpine as dependencies
-RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git nodejs > /dev/null 2>&1
+# Build context: monorepo root (use -f packages/api/Dockerfile.dev .)
 
-WORKDIR /opt/
+# Stage 1: Dependencies - only rebuilds when package files change
+FROM oven/bun:1.3.5-alpine AS dependencies
+RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
+
+WORKDIR /app
+
+# Copy workspace root files for bun workspace resolution
 COPY package.json bun.lock ./
+
+# Copy the api package.json for dependency resolution
+COPY packages/api/package.json ./packages/api/
+
+# Install all dependencies (including dev)
 RUN bun install --frozen-lockfile
 
-# Stage 2: Development runtime - rebuilds when source code changes
-FROM oven/bun:1.3.5-alpine as development
-RUN apk update && apk add --no-cache vips-dev nodejs
+# Stage 2: Development runtime
+FROM oven/bun:1.3.5-alpine AS development
+RUN apk update && apk add --no-cache vips-dev
 
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /opt/
+WORKDIR /app
+
 # Copy dependencies from the dependencies stage (cached layer)
-COPY --from=dependencies /opt/node_modules ./node_modules
-ENV PATH /opt/node_modules/.bin:$PATH
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/package.json ./package.json
 
-WORKDIR /opt/app
 # Copy source code (invalidates cache on code changes, but dependencies layer is preserved)
-COPY . .
+COPY packages/api ./packages/api
 
-RUN chown -R bun:bun /opt/app
+WORKDIR /app/packages/api
+
+ENV PATH=/app/node_modules/.bin:$PATH
+
+RUN chown -R bun:bun /app
 USER bun
+
 EXPOSE 1337
-# Use strapi CLI directly which works better with Bun
+
 CMD ["strapi", "develop"]

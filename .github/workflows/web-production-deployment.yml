@@ -187,9 +187,6 @@ jobs:
         needs.check-pr-merge.outputs.is_pr_merge == 'false' ||
         (needs.check-pr-merge.outputs.is_pr_merge == 'true' && needs.retag-pr-image.outputs.image_retagged != 'true')
       )
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
 
     steps:
       - name: Checkout code
@@ -204,9 +201,11 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run linter
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: bun run lint
 
       - name: Type check
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: bun run typecheck
 
   build-production:
@@ -253,7 +252,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
-          context: ${{ env.WORKING_DIRECTORY }}
+          context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
