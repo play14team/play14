@@ -36,6 +36,9 @@ WORKDIR /app/packages/api
 # Add node_modules/.bin to PATH for strapi CLI
 ENV PATH=/app/node_modules/.bin:$PATH
 
+# Rebuild bin links for npm compatibility with bun-installed deps
+RUN npm rebuild
+
 # Build Strapi admin panel using node
 ENV NODE_ENV=production
 ARG STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN
