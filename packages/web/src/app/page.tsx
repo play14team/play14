@@ -265,13 +265,11 @@ export default function Home() {
               <Link href="/about/values">Manifesto and Code of Conduct</Link>.
             </p>
           </div>
-          <div className="row justify-content-center">
-            <div className="col-lg-8 col-md-10 pt-5">
-              <Manifesto />
-            </div>
-            <div className="col-lg-8 col-md-10 pt-5">
-              <CodeOfConduct />
-            </div>
+          <div className="pt-4">
+            <Manifesto />
+          </div>
+          <div className="pt-5">
+            <CodeOfConduct />
           </div>
         </div>
       </section>

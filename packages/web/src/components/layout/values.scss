@@ -1,41 +1,20 @@
-// Manifesto and Code of Conduct card styles
-// Used on both home page and values page
-//
-// Note: Some !important declarations are necessary to override base
-// .single-funfacts-box styles which use absolute positioning and
-// specific padding. This is a pragmatic solution to avoid modifying
-// the base component styles that are used elsewhere.
+// Manifesto and Code of Conduct styles
+// Simple, clean styling without card wrappers
 
-.values-card {
-  // Override base single-funfacts-box styles
-  text-align: left;
-  padding: 35px 30px !important; // Override the 98px left padding from base
-  max-width: 800px; // Constrain width for better readability
-  margin-left: auto;
-  margin-right: auto;
+.values-content {
+  max-width: 800px;
+  margin: 0 auto;
 
-  // Fix icon positioning - override absolute positioning from base
-  .icon {
-    position: static !important;
-    left: auto !important;
-    top: auto !important;
-    transform: none !important;
-    margin: 0 auto 25px;
-    width: 80px;
-    height: 80px;
-    line-height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 82, 0, 0.1) 0%,
-      rgba(0, 152, 221, 0.1) 100%
-    );
+  .values-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 40px;
+    gap: 15px;
+    margin-bottom: 20px;
 
     i {
+      font-size: 36px;
+
       &.orange {
         color: var(--color-orange);
       }
@@ -46,25 +25,18 @@
         color: var(--color-green);
       }
     }
-  }
 
-  h3 {
-    text-align: center;
-    font-size: 28px;
-    margin-bottom: 25px;
-    background: none;
-    -webkit-text-fill-color: inherit;
-    color: var(--color-text);
+    h3 {
+      margin: 0;
+      font-size: 28px;
+      color: var(--color-text);
+    }
   }
 
   p {
-    text-align: left;
-    text-transform: none;
-    letter-spacing: normal;
-    font-weight: 400;
-    font-size: 16px;
-    margin-bottom: 20px;
     color: var(--color-text);
+    font-size: 16px;
+    margin-bottom: 15px;
   }
 
   ul {
@@ -76,12 +48,11 @@
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       font-size: 15px;
       line-height: 1.6;
       color: var(--color-text);
 
-      // Icon in list items
       > i {
         flex-shrink: 0;
         margin-top: 4px;
@@ -102,41 +73,10 @@
     }
   }
 
-  // Dark mode support - uses theme variables which auto-switch
-  [data-theme="dark"] & {
-    background: var(--color-surface);
-    border-color: var(--color-border);
-
-    .icon {
-      background: linear-gradient(
-        135deg,
-        rgba(255, 107, 44, 0.2) 0%,
-        rgba(62, 181, 237, 0.2) 100%
-      );
-    }
-  }
-}
-
-// Home page specific styles
-#manifesto-and-code-of-conduct {
-  .values-card {
-    max-width: 100%; // Full width within the column on home page
-
-    &:hover {
-      .icon {
-        background: linear-gradient(135deg, var(--color-orange) 0%, #ff8c00 100%);
-
-        i {
-          color: var(--color-text-inverse) !important;
-        }
-      }
-
-      h3 {
-        background: linear-gradient(135deg, var(--color-orange) 0%, #ff8c00 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-    }
+  .values-summary {
+    margin-top: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 }

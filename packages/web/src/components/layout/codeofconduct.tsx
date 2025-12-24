@@ -1,10 +1,10 @@
 const CodeOfConduct = () => {
   return (
-    <div className="single-funfacts-box values-card">
-      <div className="icon">
+    <div className="values-content">
+      <div className="values-header">
         <i className="bx bx-shield-quarter blue" aria-hidden="true"></i>
+        <h3>Code of Conduct</h3>
       </div>
-      <h3>Code of Conduct</h3>
       <ul>
         <li>
           <i className="bx bx-brain orange" aria-hidden="true"></i>
@@ -59,7 +59,7 @@ const CodeOfConduct = () => {
           </span>
         </li>
       </ul>
-      <p className="pt-3">
+      <p className="values-summary">
         To summarize: &ldquo;You shall not be an a**hole&rdquo;.
       </p>
     </div>

@@ -1,10 +1,10 @@
 const Manifesto = () => {
   return (
-    <div className="single-funfacts-box values-card">
-      <div className="icon">
+    <div className="values-content">
+      <div className="values-header">
         <i className="bx bx-book-heart orange" aria-hidden="true"></i>
+        <h3>Manifesto</h3>
       </div>
-      <h3>Manifesto</h3>
       <p>
         <strong>#play14</strong> is and always will be
       </p>
