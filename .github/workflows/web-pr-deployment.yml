@@ -82,7 +82,7 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
           file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
           context: ${{ env.WORKING_DIRECTORY }}
           cache-from: type=gha
@@ -100,7 +100,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🐳 **Web Docker Image Built Successfully**\n\nPR Image Tags:\n- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}\`\n- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}\`\n\n⏳ Deploying to acceptance environment...`
+              body: `🐳 **Web Docker Image Built Successfully**\n\nPR Image Tags:\n- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}\`\n- \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}\`\n\n⏳ Deploying to acceptance environment...`
             })
 
   deploy-pr:
@@ -129,7 +129,7 @@ jobs:
             az containerapp update \
               -n "$CONTAINER_APP_ACC" \
               -g "$RESOURCE_GROUP" \
-              --image "$REGISTRY/$IMAGE_NAME:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" \
+              --image "$REGISTRY/$IMAGE_NAME:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}" \
               --set-env-vars \
                 STRAPI_API_URL="$STRAPI_API_URL" \
                 STRAPI_API_SECRET=secretref:strapi-api-secret \
@@ -209,7 +209,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `✅ **Web Deployed to Acceptance Environment**\n\n🌐 URL: ${{ steps.get-url.outputs.url }}\n📦 Image: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}\`\n🔗 Backend: ${{ env.STRAPI_API_URL }}\n\nYou can now test this PR in the acceptance environment.`
+              body: `✅ **Web Deployed to Acceptance Environment**\n\n🌐 URL: ${{ steps.get-url.outputs.url }}\n📦 Image: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}\`\n🔗 Backend: ${{ env.STRAPI_API_URL }}\n\nYou can now test this PR in the acceptance environment.`
             })
 
   stop-pr:
