@@ -3,7 +3,7 @@
 
 # Stage 1: Dependencies - only rebuilds when package files change
 FROM oven/bun:1.3.5-alpine AS deps
-RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
+RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3 make g++ > /dev/null 2>&1
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN bun install --frozen-lockfile
 
 # Stage 2: Builder
 FROM oven/bun:1.3.5-alpine AS builder
-RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
+RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3 make g++ > /dev/null 2>&1
 
 WORKDIR /app
 
