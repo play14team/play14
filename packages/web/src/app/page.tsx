@@ -19,7 +19,6 @@ export default function Home() {
         <Title />
       </section>
       <section id="summary" className="pt-70">
-        <h3 className="pt-4 pb-3">What is #play14?</h3>
         <p>
           Welcome to #play14, a global movement that believes in the{" "}
           <strong>transformative power of play</strong>!
@@ -36,41 +35,62 @@ export default function Home() {
           but above all we are a family whose members{" "}
           <strong>share common values and interests</strong>.
         </p>
-        <h3 className="pt-100 pb-3">Discover the power of play</h3>
-        <p>
-          Play is a better way to learn because it engages both mind and body,
-          making learning an active, immersive experience. Through play,
-          individuals explore, experiment, and discover concepts in a hands-on
-          way, which enhances understanding and retention. It encourages
-          creativity, problem-solving, and collaboration, helping learners
-          develop critical thinking skills.
-        </p>
-        <div className="d-flex justify-content-center">
-          <blockquote>
-            Tell me and I forget, teach me and I may remember, involve me and I
-            learn
-            <br />
-            <strong>
-              <em className="d-flex justify-content-end pt-4">
-                Benjamin Franklin
-              </em>
-            </strong>
-          </blockquote>
+      </section>
+
+      <section id="power-of-play" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              Discover the Power of <span>Play</span>
+            </h2>
+            <p>
+              Play engages both mind and body, making learning an active,
+              immersive experience.
+            </p>
+          </div>
+          <p>
+            Through play, individuals explore, experiment, and discover concepts
+            in a hands-on way, which enhances understanding and retention. It
+            encourages creativity, problem-solving, and collaboration, helping
+            learners develop critical thinking skills.
+          </p>
+          <div className="d-flex justify-content-center">
+            <blockquote>
+              Tell me and I forget, teach me and I may remember, involve me and
+              I learn
+              <br />
+              <strong>
+                <em className="d-flex justify-content-end pt-4">
+                  Benjamin Franklin
+                </em>
+              </strong>
+            </blockquote>
+          </div>
+          <p>
+            Play also reduces stress and increases motivation, making the
+            learning process enjoyable and effective. By creating a safe space
+            for trial and error, play fosters a deeper, more meaningful
+            connection to the material being learned.
+          </p>
         </div>
-        <p>
-          Play also reduces stress and increases motivation, making the learning
-          process enjoyable and effective. By creating a safe space for trial
-          and error, play fosters a deeper, more meaningful connection to the
-          material being learned.
-        </p>
-        <h3 className="pt-100 pb-3">Why attend?</h3>
-        <p>
-          Whether you are a facilitator, educator, or curious mind, our events
-          are designed to spark creativity, foster collaboration, and ignite new
-          ideas. Join us in cities worldwide to connect with like-minded
-          individuals and dive into a world of playful experimentation.
-        </p>
-        <p>
+      </section>
+
+      <section id="why-attend" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              Why <span>Attend</span>?
+            </h2>
+            <p>
+              Join us in cities worldwide to connect with like-minded
+              individuals.
+            </p>
+          </div>
+          <p>
+            Whether you are a facilitator, educator, or curious mind, our events
+            are designed to spark creativity, foster collaboration, and ignite
+            new ideas. Dive into a world of playful experimentation.
+          </p>
           <ul>
             <li>
               <strong>Global community:</strong> Connect with a diverse network
@@ -85,14 +105,14 @@ export default function Home() {
               games, tools, and techniques.
             </li>
           </ul>
-        </p>
-        <p>
-          #play14 is an <Link href="/about/schedule">unconference</Link>, where{" "}
-          <strong>all attendees are also contributors</strong>. Just show up
-          with an open mind, and you’ll have the chance to propose your own
-          games or dive into the games suggested by others. It&apos;s all about
-          participation, creativity, and shared fun!
-        </p>
+          <p>
+            #play14 is an <Link href="/about/schedule">unconference</Link>,
+            where <strong>all attendees are also contributors</strong>. Just
+            show up with an open mind, and you'll have the chance to propose
+            your own games or dive into the games suggested by others. It&apos;s
+            all about participation, creativity, and shared fun!
+          </p>
+        </div>
       </section>
 
       <section id="upcoming events">
@@ -238,19 +258,25 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="manifesto and code of conduct" className="pt-100">
-        <h3 className="pt-100 pb-3">What we stand for</h3>
-        <p>
-          A game/activity at #play14 could be pretty much anything as long as it
-          respects our{" "}
-          <Link href="/about/values">Manifesto and Code of Conduct</Link>.
-        </p>
-        <div className="row">
-          <div className="col-lg-6 col-md-12 pt-5">
-            <Manifesto />
+      <section id="manifesto and code of conduct" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              What We <span>Stand For</span>
+            </h2>
+            <p>
+              A game or activity at #play14 could be pretty much anything as
+              long as it respects our{" "}
+              <Link href="/about/values">Manifesto and Code of Conduct</Link>.
+            </p>
           </div>
-          <div className="col-lg-6 col-md-12 pt-5">
-            <CodeOfConduct />
+          <div className="row">
+            <div className="col-lg-6 col-md-12 pt-5">
+              <Manifesto />
+            </div>
+            <div className="col-lg-6 col-md-12 pt-5">
+              <CodeOfConduct />
+            </div>
           </div>
         </div>
       </section>

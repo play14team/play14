@@ -1,30 +1,37 @@
 const Manifesto = () => {
   return (
-    <div>
-      <h3 className=" d-flex justify-content-center pb-5">Manifesto</h3>
+    <div className="single-funfacts-box">
+      <div className="icon">
+        <i className="bx bx-book-heart orange"></i>
+      </div>
+      <h3>Manifesto</h3>
       <p>
         <strong>#play14</strong> is and always will be
       </p>
       <ul>
         <li>
-          a place to <strong>share knowledge &amp; practices</strong> more than
-          a place to sell services &amp; goods
+          <i className="bx bx-share-alt blue"></i> a place to{" "}
+          <strong>share knowledge &amp; practices</strong> more than a place to
+          sell services &amp; goods
         </li>
         <li>
+          <i className="bx bx-door-open green"></i>{" "}
           <strong>open to all people or communities</strong> with an interest on
           learning with fun
         </li>
         <li>
-          focused on
+          <i className="bx bx-world orange"></i> focused on{" "}
           <strong>games &amp; activities in the physical world</strong> more
           than in the virtual world
         </li>
         <li>
+          <i className="bx bx-conversation blue"></i>{" "}
           <strong>an unconference</strong> based on the Open Space Technology
         </li>
         <li>
-          <strong>non profit</strong>, which means that when we do make a profit
-          on a given event, we reinvest everything into the next
+          <i className="bx bx-heart green"></i> <strong>non profit</strong>,
+          which means that when we do make a profit on a given event, we
+          reinvest everything into the next
         </li>
       </ul>
     </div>
