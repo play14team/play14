@@ -1,0 +1,62 @@
+@use "./play14.scss" as *;
+
+@mixin nav-buttons-container {
+  margin: 20px 0;
+  padding: 0 15px;
+}
+
+@mixin nav-buttons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 100%;
+}
+
+@mixin nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  padding: 6px 10px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: $grey;
+  background-color: #f5f5f5;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover:not(.disabled) {
+    background-color: lighten($orange, 35%);
+    border-color: $orange;
+    color: $orange;
+    transform: translateY(-2px);
+  }
+
+  &.active {
+    background-color: $orange;
+    color: white;
+    border-color: $orange;
+  }
+
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+@mixin nav-btn-responsive {
+  min-width: 35px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+@mixin nav-buttons-grid-responsive {
+  gap: 6px;
+}

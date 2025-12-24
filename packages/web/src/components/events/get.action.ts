@@ -346,3 +346,91 @@ export async function getHosting() {
 
   return response.data
 }
+
+/**
+ * Get event counts by year
+ * Returns a record of year -> count for year navigation
+ */
+export async function getEventYearCounts(): Promise<Record<number, number>> {
+  const response = await restQuery<Array<{ start: string }>>("events", {
+    fields: ["start"],
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const events = response.data || []
+  const yearCounts: Record<number, number> = {}
+
+  events.forEach((event) => {
+    if (event.start) {
+      const year = new Date(event.start).getFullYear()
+      yearCounts[year] = (yearCounts[year] || 0) + 1
+    }
+  })
+
+  return yearCounts
+}
+
+/**
+ * Get paginated events for a specific year
+ */
+export async function getEventsByYear(
+  year: number,
+  page: number,
+  pageSize: number,
+) {
+  const startOfYear = `${year}-01-01T00:00:00.000Z`
+  const endOfYear = `${year}-12-31T23:59:59.999Z`
+
+  const response = await restQuery<Event[]>("events", {
+    sort: ["start:desc"],
+    pagination: { page, pageSize: Math.min(pageSize, 100) },
+    filters: {
+      start: {
+        $gte: startOfYear,
+        $lte: endOfYear,
+      },
+    },
+    populate: eventItemPopulate,
+  })
+
+  return {
+    events_connection: normalizeConnection(response),
+  }
+}
+
+/**
+ * Get all events for a specific year
+ * Fetches all pages since Strapi limits pageSize to 100
+ */
+export async function getAllEventsByYear(year: number) {
+  const allEvents: Event[] = []
+  let page = 1
+  const pageSize = 100
+
+  const startOfYear = `${year}-01-01T00:00:00.000Z`
+  const endOfYear = `${year}-12-31T23:59:59.999Z`
+
+  while (true) {
+    const response = await restQuery<Event[]>("events", {
+      sort: ["start:desc"],
+      pagination: { page, pageSize },
+      filters: {
+        start: {
+          $gte: startOfYear,
+          $lte: endOfYear,
+        },
+      },
+      populate: eventItemPopulate,
+    })
+
+    const events = response.data || []
+    allEvents.push(...events)
+
+    if (events.length < pageSize) {
+      break
+    }
+    page++
+  }
+
+  return allEvents
+}

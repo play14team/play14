@@ -4,17 +4,26 @@ import { useIntersection } from "@/hooks/useIntersection"
 import { Event, Pagination } from "@/models/strapi"
 import { RefObject, useCallback, useEffect, useRef, useState } from "react"
 import Loader from "../layout/loader"
-import { getEvents } from "./get.action"
+import { getEventsByYear } from "./get.action"
 import EventGrid from "./grid"
 
-export default function LoadMore({ pagination }: { pagination: Pagination }) {
+interface LoadMoreYearProps {
+  pagination: Pagination
+  year: number
+}
+
+export default function LoadMoreYear({ pagination, year }: LoadMoreYearProps) {
   const [events, setEvents] = useState<Event[]>([])
   const triggerRef = useRef<HTMLDivElement>(null)
   const isVisible = useIntersection(
     triggerRef as RefObject<HTMLDivElement>,
     "800px",
   )
-  const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
+  const callback = useCallback(loadMore, [
+    pagination.page,
+    pagination.pageSize,
+    year,
+  ])
 
   useEffect(() => {
     if (isVisible) {
@@ -23,12 +32,12 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   }, [callback, isVisible])
 
   function loadMore() {
-    getEvents(pagination.page + 1, pagination.pageSize).then((res) => {
-      // In Strapi 5, events_connection returns nodes
-      const events = (res.events_connection?.nodes || []) as Event[]
-      console.log(events)
-      setEvents(events)
-    })
+    getEventsByYear(year, pagination.page + 1, pagination.pageSize).then(
+      (res) => {
+        const events = (res.events_connection?.nodes || []) as Event[]
+        setEvents(events)
+      },
+    )
   }
 
   if (pagination.page === pagination.pageCount) return
@@ -46,7 +55,7 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   return (
     <>
       <EventGrid events={events} />
-      <LoadMore pagination={newPagination} />
+      <LoadMoreYear pagination={newPagination} year={year} />
     </>
   )
 }

@@ -1,24 +1,24 @@
 @use "../../styles/scss/nav-buttons" as *;
 
-.alphabet-nav {
+.year-nav {
   @include nav-buttons-container;
 
-  .alphabet-buttons {
+  .year-buttons {
     @include nav-buttons-grid;
   }
 
-  .alphabet-btn {
+  .year-btn {
     @include nav-btn;
   }
 }
 
 @media only screen and (max-width: 767px) {
-  .alphabet-nav {
-    .alphabet-btn {
+  .year-nav {
+    .year-btn {
       @include nav-btn-responsive;
     }
 
-    .alphabet-buttons {
+    .year-buttons {
       @include nav-buttons-grid-responsive;
     }
   }
