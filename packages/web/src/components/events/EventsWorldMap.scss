@@ -3,20 +3,9 @@
 .events-world-map-wrapper {
   position: relative;
   width: 100%;
-  margin-bottom: 10rem;
+  margin-bottom: 5rem;
   padding-bottom: 2rem;
-  padding-top: 6rem;
-}
-
-.events-world-map-title {
-  margin-bottom: 1.5rem;
-  font-size: 1.875rem;
-  font-weight: bold;
-  color: #111827;
-
-  [data-theme="dark"] & {
-    color: #f3f4f6;
-  }
+  padding-top: 2rem;
 }
 
 /* Country search styles */
@@ -542,7 +531,8 @@
 /* Responsive styles */
 @media (max-width: 640px) {
   .events-world-map-wrapper {
-    padding-top: 5rem;
+    padding-top: 1rem;
+    margin-bottom: 3rem;
   }
 
   .events-world-map {
