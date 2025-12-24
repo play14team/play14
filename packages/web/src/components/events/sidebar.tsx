@@ -131,11 +131,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
             aria-label="Send email to event team"
             style={{ backgroundColor: "#6b6b84" }}
           >
-            <i
-              className="bx bx-envelope"
-              style={{ fontSize: "16.5px", marginTop: "-1px" }}
-            ></i>{" "}
-            Contact Team
+            <i className="flaticon-team"></i>Contact Team
           </Link>
         </div>
       )}
