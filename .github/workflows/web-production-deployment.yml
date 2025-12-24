@@ -99,8 +99,10 @@ jobs:
         env:
           PR_NUMBER: ${{ needs.check-pr-merge.outputs.pr_number }}
           PR_HEAD_SHA: ${{ needs.check-pr-merge.outputs.pr_head_sha }}
+          COMMIT_SHA: ${{ github.sha }}
           REGISTRY: ${{ env.REGISTRY }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          ACR_NAME: play14containerregistry
         run: |
           set +e
 
@@ -110,7 +112,7 @@ jobs:
           echo "Looking for PR image: $SOURCE_IMAGE"
 
           # Check if PR image exists
-          if ! az acr repository show-tags --name play14containerregistry --repository "$IMAGE_NAME" --output json | grep -q "$PR_TAG"; then
+          if ! az acr repository show-tags --name "$ACR_NAME" --repository "$IMAGE_NAME" --output json | grep -q "$PR_TAG"; then
             echo "⚠️ PR image not found in registry: $SOURCE_IMAGE"
             echo "success=false" >> $GITHUB_OUTPUT
             exit 1
@@ -129,7 +131,7 @@ jobs:
               echo "Attempt $ATTEMPT/$MAX_RETRIES: Importing tag '$TARGET_TAG'..."
 
               if OUTPUT=$(az acr import \
-                --name play14containerregistry \
+                --name "$ACR_NAME" \
                 --source "$SOURCE_IMAGE" \
                 --image "${IMAGE_NAME}:${TARGET_TAG}" \
                 --force 2>&1); then
@@ -155,7 +157,7 @@ jobs:
           # Import all tags (server-side, no network transfer)
           FAILED=false
 
-          if ! import_with_retry "${{ github.sha }}"; then
+          if ! import_with_retry "${COMMIT_SHA}"; then
             FAILED=true
           fi
 
