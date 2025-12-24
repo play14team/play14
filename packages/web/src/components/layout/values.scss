@@ -107,9 +107,14 @@
       );
     }
   }
+
+  // Home page: allow full width within grid column
+  #manifesto-and-code-of-conduct & {
+    max-width: 100%;
+  }
 }
 
-// Simple content style (home page) - no card wrapper
+// Simple content style - no card wrapper
 .values-content {
   max-width: 800px;
   margin: 0 auto;
