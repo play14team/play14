@@ -1,6 +1,6 @@
 const Manifesto = () => {
   return (
-    <div className="single-funfacts-box">
+    <div className="single-funfacts-box values-card">
       <div className="icon">
         <i className="bx bx-book-heart orange" aria-hidden="true"></i>
       </div>

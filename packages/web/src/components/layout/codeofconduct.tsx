@@ -1,6 +1,6 @@
 const CodeOfConduct = () => {
   return (
-    <div className="single-funfacts-box">
+    <div className="single-funfacts-box values-card">
       <div className="icon">
         <i className="bx bx-shield-quarter blue" aria-hidden="true"></i>
       </div>

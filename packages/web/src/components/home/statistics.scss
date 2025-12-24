@@ -110,73 +110,93 @@
   }
 }
 
-// Manifesto and Code of Conduct card styles
-#manifesto-and-code-of-conduct {
-  .single-funfacts-box {
+// Manifesto and Code of Conduct card styles (shared)
+.values-card {
+  text-align: left;
+  padding: 35px 30px;
+
+  .icon {
+    margin: 0 auto 25px;
+  }
+
+  h3 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 25px;
+    background: none;
+    -webkit-text-fill-color: inherit;
+    color: var(--color-text);
+  }
+
+  p {
     text-align: left;
-    padding: 35px 30px;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: var(--color-text);
+  }
 
-    .icon {
-      margin: 0 auto 25px;
-    }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 
-    h3 {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 25px;
-      background: none;
-      -webkit-text-fill-color: inherit;
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 15px;
+      font-size: 15px;
+      line-height: 1.6;
       color: var(--color-text);
-    }
 
-    p {
-      text-align: left;
-      text-transform: none;
-      letter-spacing: normal;
-      font-weight: 400;
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
+      i {
+        flex-shrink: 0;
+        margin-top: 3px;
+        font-size: 18px;
 
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 15px;
-        font-size: 15px;
-        line-height: 1.6;
-        color: var(--color-text);
-
-        i {
-          flex-shrink: 0;
-          margin-top: 3px;
-          font-size: 18px;
-
-          &.orange {
-            color: #ff5200;
-          }
-          &.blue {
-            color: #0098dd;
-          }
-          &.green {
-            color: #92c900;
-          }
+        &.orange {
+          color: #ff5200;
+        }
+        &.blue {
+          color: #0098dd;
+        }
+        &.green {
+          color: #92c900;
         }
       }
     }
+  }
 
-    &:hover {
-      h3 {
-        background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
+  // Dark mode support
+  [data-theme="dark"] & {
+    background: var(--color-bg-secondary, #1f2937);
+    border-color: #374151;
+
+    h3 {
+      color: #f3f4f6;
+    }
+
+    p {
+      color: #d1d5db;
+    }
+
+    ul li {
+      color: #d1d5db;
+    }
+  }
+}
+
+// Home page specific hover effect
+#manifesto-and-code-of-conduct {
+  .values-card:hover {
+    h3 {
+      background: linear-gradient(135deg, #ff5200 0%, #ff8c00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
   }
 }
