@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "./play14.scss" as *;
 
 @mixin nav-buttons-container {
@@ -32,7 +33,7 @@
   cursor: pointer;
 
   &:hover:not(.disabled) {
-    background-color: lighten($orange, 35%);
+    background-color: color.adjust($orange, $lightness: 35%);
     border-color: $orange;
     color: $orange;
     transform: translateY(-2px);
