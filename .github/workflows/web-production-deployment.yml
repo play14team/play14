@@ -93,75 +93,90 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Retag PR image for production (ACR Import)
+      - name: Retag PR image for production (server-side)
         id: retag
         continue-on-error: true
-        uses: azure/CLI@v2
-        with:
-          inlineScript: |
-            set +e
+        env:
+          PR_NUMBER: ${{ needs.check-pr-merge.outputs.pr_number }}
+          PR_HEAD_SHA: ${{ needs.check-pr-merge.outputs.pr_head_sha }}
+          COMMIT_SHA: ${{ github.sha }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          ACR_NAME: play14containerregistry
+        run: |
+          set +e
 
-            PR_TAG="pr-${{ needs.check-pr-merge.outputs.pr_number }}-${{ needs.check-pr-merge.outputs.pr_head_sha }}"
-            SOURCE_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$PR_TAG"
+          PR_TAG="pr-${PR_NUMBER}-${PR_HEAD_SHA}"
+          SOURCE_IMAGE="${REGISTRY}/${IMAGE_NAME}:${PR_TAG}"
 
-            echo "Looking for PR image: $SOURCE_IMAGE"
+          echo "Looking for PR image: $SOURCE_IMAGE"
 
-            if az acr repository show-tags --name play14containerregistry --repository "${{ env.IMAGE_NAME }}" --output json | grep -q "$PR_TAG"; then
-              echo "✅ PR image found in registry"
-              echo "Using ACR import for server-side retagging (no network transfer)..."
+          # Check if PR image exists
+          if ! az acr repository show-tags --name "$ACR_NAME" --repository "$IMAGE_NAME" --output json | grep -q "$PR_TAG"; then
+            echo "⚠️ PR image not found in registry: $SOURCE_IMAGE"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
-              IMPORT_FAILED=false
+          echo "✅ PR image found in registry"
+          echo "Using server-side retagging with az acr import (no network transfer)..."
 
-              # Import with merge SHA tag
-              echo "Creating tag: ${{ github.sha }}"
-              if ! OUTPUT=$(az acr import \
-                --name play14containerregistry \
+          # Function to import with retry and exponential backoff
+          import_with_retry() {
+            local TARGET_TAG=$1
+            local MAX_RETRIES=3
+            local ATTEMPT=1
+
+            while [ $ATTEMPT -le $MAX_RETRIES ]; do
+              echo "Attempt $ATTEMPT/$MAX_RETRIES: Importing tag '$TARGET_TAG'..."
+
+              if OUTPUT=$(az acr import \
+                --name "$ACR_NAME" \
                 --source "$SOURCE_IMAGE" \
-                --image "${{ env.IMAGE_NAME }}:${{ github.sha }}" \
+                --image "${IMAGE_NAME}:${TARGET_TAG}" \
                 --force 2>&1); then
-                echo "⚠️ Failed to create merge SHA tag"
-                echo "Error details: $OUTPUT"
-                IMPORT_FAILED=true
+                echo "✅ Successfully imported tag: $TARGET_TAG"
+                return 0
               fi
 
-              # Import with PR head SHA tag
-              echo "Creating tag: ${{ needs.check-pr-merge.outputs.pr_head_sha }}"
-              if ! OUTPUT=$(az acr import \
-                --name play14containerregistry \
-                --source "$SOURCE_IMAGE" \
-                --image "${{ env.IMAGE_NAME }}:${{ needs.check-pr-merge.outputs.pr_head_sha }}" \
-                --force 2>&1); then
-                echo "⚠️ Failed to create head SHA tag"
-                echo "Error details: $OUTPUT"
-                IMPORT_FAILED=true
+              echo "⚠️ Import failed. Error: $OUTPUT"
+
+              if [ $ATTEMPT -lt $MAX_RETRIES ]; then
+                BACKOFF=$((5 * (2 ** (ATTEMPT - 1))))  # 5s, 10s, 20s
+                echo "Retrying in ${BACKOFF} seconds..."
+                sleep $BACKOFF
               fi
 
-              # Import with latest tag
-              echo "Creating tag: latest"
-              if ! OUTPUT=$(az acr import \
-                --name play14containerregistry \
-                --source "$SOURCE_IMAGE" \
-                --image "${{ env.IMAGE_NAME }}:latest" \
-                --force 2>&1); then
-                echo "⚠️ Failed to create latest tag"
-                echo "Error details: $OUTPUT"
-                IMPORT_FAILED=true
-              fi
+              ATTEMPT=$((ATTEMPT + 1))
+            done
 
-              if [ "$IMPORT_FAILED" = true ]; then
-                echo "❌ Some tags failed to import"
-                echo "success=false" >> $GITHUB_OUTPUT
-                exit 1
-              fi
+            echo "❌ Failed to import tag '$TARGET_TAG' after $MAX_RETRIES attempts"
+            return 1
+          }
 
-              echo "✅ Successfully retagged PR image for production (server-side)"
-              echo "success=true" >> $GITHUB_OUTPUT
-              exit 0
-            else
-              echo "⚠️ PR image not found in registry: $SOURCE_IMAGE"
-              echo "success=false" >> $GITHUB_OUTPUT
-              exit 1
-            fi
+          # Import all tags (server-side, no network transfer)
+          FAILED=false
+
+          if ! import_with_retry "${COMMIT_SHA}"; then
+            FAILED=true
+          fi
+
+          if ! import_with_retry "${PR_HEAD_SHA}"; then
+            FAILED=true
+          fi
+
+          if ! import_with_retry "latest"; then
+            FAILED=true
+          fi
+
+          if [ "$FAILED" = true ]; then
+            echo "❌ Some tags failed to import"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "✅ Successfully retagged PR image for production (server-side)"
+          echo "success=true" >> $GITHUB_OUTPUT
 
   quality:
     name: Code Quality
@@ -216,6 +231,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Azure
         uses: azure/login@v2
         with:
@@ -223,20 +241,25 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and push production container image (ACR Build)
-        uses: azure/CLI@v2
+      - name: Log in to container registry
+        run: |
+          az acr login --name play14containerregistry
+
+      - name: Build and push production container image
+        uses: docker/build-push-action@v6
         with:
-          inlineScript: |
-            echo "Building image directly in ACR..."
-            az acr build \
-              --registry play14containerregistry \
-              --image "${{ env.IMAGE_NAME }}:${{ github.sha }}" \
-              --image "${{ env.IMAGE_NAME }}:latest" \
-              --build-arg STRAPI_API_URL=${{ env.STRAPI_API_URL }} \
-              --build-arg STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }} \
-              --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }} \
-              --file Dockerfile \
-              "${{ github.workspace }}/${{ env.WORKING_DIRECTORY }}"
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          context: ${{ env.WORKING_DIRECTORY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            STRAPI_API_URL=${{ env.STRAPI_API_URL }}
+            STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }}
+            NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
 
   deploy:
     name: Deploy to Production

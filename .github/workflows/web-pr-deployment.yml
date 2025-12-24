@@ -62,6 +62,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Azure
         uses: azure/login@v2
         with:
@@ -69,19 +72,25 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build and push PR container image (ACR Build)
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+      - name: Log in to container registry
         run: |
-          echo "Building image directly in ACR..."
-          az acr build \
-            --registry play14containerregistry \
-            --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}" \
-            --image "${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}" \
-            --build-arg STRAPI_API_URL=${{ env.STRAPI_API_URL }} \
-            --build-arg STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }} \
-            --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }} \
-            --file Dockerfile \
-            .
+          az acr login --name play14containerregistry
+
+      - name: Build and push PR container image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.sha }}
+          file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          context: ${{ env.WORKING_DIRECTORY }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            STRAPI_API_URL=${{ env.STRAPI_API_URL }}
+            STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }}
+            NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
 
       - name: Comment PR with image tags
         uses: actions/github-script@v7
