@@ -125,8 +125,12 @@ const EventSidebar = ({ event }: { event: Event }) => {
 
       {event.contactEmail && (
         <div className="btn-box">
-          <Link href={`mailto:${event.contactEmail}`} className="default-btn">
-            <i className="bx bx-envelope"></i>Contact Team
+          <Link
+            href={`mailto:${event.contactEmail}`}
+            className="default-btn"
+            aria-label="Send email to event team"
+          >
+            <i className="bx bx-envelope"></i> Contact Team
           </Link>
         </div>
       )}
