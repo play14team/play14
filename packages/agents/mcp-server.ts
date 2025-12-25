@@ -55,15 +55,15 @@ const apifyClient = APIFY_API_TOKEN
   : null;
 
 // Sanitize error messages to prevent leaking sensitive data (tokens, full URLs with params, etc.)
-// Also truncates to prevent log flooding
+// IMPORTANT: Sanitize first, then truncate to ensure tokens are redacted before any truncation
 function sanitizeErrorMessage(message: string): string {
-  // Remove potential API tokens (common patterns)
+  // Remove potential API tokens (common patterns) - do this FIRST before truncation
   let sanitized = message.replace(/Bearer\s+[a-zA-Z0-9_-]+/gi, "Bearer [REDACTED]");
   sanitized = sanitized.replace(/api[_-]?token[=:]\s*[a-zA-Z0-9_-]+/gi, "api_token=[REDACTED]");
   sanitized = sanitized.replace(/apify_api_[a-zA-Z0-9]+/gi, "[REDACTED_APIFY_TOKEN]");
   // Remove long hex strings that might be tokens
   sanitized = sanitized.replace(/[a-f0-9]{64,}/gi, "[REDACTED_TOKEN]");
-  // Truncate to prevent log flooding
+  // Truncate AFTER sanitization to prevent log flooding (tokens already redacted)
   if (sanitized.length > MAX_ERROR_MESSAGE_LENGTH) {
     sanitized = sanitized.substring(0, MAX_ERROR_MESSAGE_LENGTH) + "... [truncated]";
   }
@@ -122,6 +122,9 @@ const BIO_PREVIEW_LENGTH = 100;
 
 // Strapi batch fetch size (max allowed by API)
 const STRAPI_BATCH_SIZE = 100;
+
+// Maximum page size for list results
+const STRAPI_MAX_PAGE_SIZE = 100;
 
 // Maximum image size for avatar uploads (10MB, configurable via env)
 const MAX_IMAGE_SIZE_BYTES = parseInt(
@@ -497,8 +500,8 @@ async function listPlayersWithLinkedIn(
   page: number = 1,
   pageSize: number = 20
 ): Promise<object> {
-  // Clamp pageSize to max 100
-  const effectivePageSize = Math.min(Math.max(1, pageSize), 100);
+  // Clamp pageSize to allowed range
+  const effectivePageSize = Math.min(Math.max(1, pageSize), STRAPI_MAX_PAGE_SIZE);
   const effectivePage = Math.max(1, page);
 
   // First, we need to fetch ALL players to find those with LinkedIn
