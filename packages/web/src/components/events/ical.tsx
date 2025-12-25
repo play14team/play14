@@ -108,6 +108,9 @@ const ICalendar = ({
       URL.revokeObjectURL(url)
     } catch (error) {
       console.error("Failed to download calendar event:", error)
+      alert(
+        "Failed to download calendar event. Please try again or contact support if the problem persists.",
+      )
     }
   }
 

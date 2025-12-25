@@ -31,6 +31,19 @@ export default function EventDetails({ event }: { event: Event }) {
   const mentors = (event.mentors || []) as Player[]
   const participants = deduplicate(players, hosts, mentors)
 
+  // Helper functions for event status checks
+  function isOpen() {
+    return event.eventStatus === Enum_Event_Eventstatus.Open
+  }
+
+  function isAnnounced() {
+    return event.eventStatus === Enum_Event_Eventstatus.Announced
+  }
+
+  function isAnnouncedOrOpen() {
+    return isAnnounced() || isOpen()
+  }
+
   return (
     <>
       <h1 className="pt-5">
@@ -178,16 +191,4 @@ export default function EventDetails({ event }: { event: Event }) {
       </div>
     </>
   )
-
-  function isAnnouncedOrOpen() {
-    return isAnnounced() || isOpen()
-  }
-
-  function isAnnounced() {
-    return event.eventStatus === Enum_Event_Eventstatus.Announced
-  }
-
-  function isOpen() {
-    return event.eventStatus === Enum_Event_Eventstatus.Open
-  }
 }
