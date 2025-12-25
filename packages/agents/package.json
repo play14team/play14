@@ -11,9 +11,5 @@
     "@modelcontextprotocol/sdk": "^1.0.0",
     "apify-client": "^2.11.3",
     "dotenv": "^16.4.7"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.5",
-    "typescript": "^5.7.2"
   }
 }
