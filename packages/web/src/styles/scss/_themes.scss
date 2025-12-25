@@ -1004,26 +1004,26 @@ body,
 
           .courses-meta {
             .questions {
-              background-color: var(--color-bg-muted);
-              color: var(--color-blue);
+              background-color: var(--color-bg-muted) !important;
+              color: var(--color-blue) !important;
             }
 
             .duration {
-              background-color: var(--color-bg-elevated);
-              color: var(--color-orange);
+              background-color: #2a2a2a !important;
+              color: var(--color-orange) !important;
             }
 
             .status {
-              background-color: var(--color-bg-elevated);
-              color: var(--color-text);
+              background-color: #2a2a2a !important;
+              color: var(--color-text) !important;
 
               i {
-                color: var(--color-orange);
+                color: var(--color-orange) !important;
               }
 
               &.locked {
-                background-color: transparent;
-                color: var(--color-text-muted);
+                background-color: transparent !important;
+                color: var(--color-text-muted) !important;
               }
             }
           }

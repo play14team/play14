@@ -46,7 +46,9 @@ export default function EventTabs({
 
         {/* Schedule */}
         <div id="scheduleTab" className="tab-pane tabs_item">
-          {timetable && <EventSchedule timetable={timetable} />}
+          {timetable && timetable.length > 0 && (
+            <EventSchedule timetable={timetable} />
+          )}
         </div>
 
         {/* Players */}

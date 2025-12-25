@@ -162,7 +162,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
             aria-label="View event photos album"
             style={{ backgroundColor: "#92c900" }}
           >
-            <i className="flaticon-gallery"></i>View Photos
+            <i className="flaticon-view"></i>View Photos
           </Link>
         </div>
       )}
@@ -175,9 +175,9 @@ const EventSidebar = ({ event }: { event: Event }) => {
             rel="noopener noreferrer"
             className="default-btn"
             aria-label="View event videos library"
-            style={{ backgroundColor: "#92c900" }}
+            style={{ backgroundColor: "#0098dd" }}
           >
-            <i className="flaticon-video-player"></i>View Videos
+            <i className="flaticon-google-play"></i>View Videos
           </Link>
         </div>
       )}
