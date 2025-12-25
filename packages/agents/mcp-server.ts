@@ -65,11 +65,23 @@ function sanitizeErrorMessage(message: string): string {
   return sanitized;
 }
 
-// Fetch with timeout helper
-const FETCH_TIMEOUT_MS = 30000;
+// Fetch with timeout helper (configurable via env)
+const FETCH_TIMEOUT_MS = parseInt(
+  process.env.FETCH_TIMEOUT_MS || "30000",
+  10
+);
 
-// Rate limiting: delay between consecutive Strapi requests (ms)
-const STRAPI_REQUEST_DELAY_MS = 100;
+// Rate limiting: delay between consecutive Strapi requests (ms, configurable via env)
+const STRAPI_REQUEST_DELAY_MS = parseInt(
+  process.env.STRAPI_REQUEST_DELAY_MS || "100",
+  10
+);
+
+// Maximum bio length in characters (configurable via env)
+const MAX_BIO_LENGTH = parseInt(
+  process.env.MAX_BIO_LENGTH || "10000",
+  10
+);
 
 // Rate limiting for Apify/LinkedIn scraping
 // Minimum delay between scrape requests (configurable via env)
@@ -177,6 +189,27 @@ function isSafeUrl(url: string): boolean {
     return ["http:", "https:"].includes(parsed.protocol);
   } catch {
     return false;
+  }
+}
+
+// Validate website URL for player profiles
+function isValidWebsiteUrl(url: string): { valid: boolean; error?: string } {
+  if (!url || url.trim() === "") {
+    return { valid: true }; // Empty is valid (optional field)
+  }
+
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return { valid: false, error: "Website URL must use http or https protocol" };
+    }
+    // Block private/internal URLs
+    if (isPrivateHostname(parsed.hostname)) {
+      return { valid: false, error: "Website URL cannot be a private/internal address" };
+    }
+    return { valid: true };
+  } catch {
+    return { valid: false, error: "Invalid website URL format" };
   }
 }
 
@@ -644,6 +677,25 @@ async function updatePlayer(
     avatarId?: number;
   }
 ): Promise<object> {
+  // Validate website URL if provided
+  if (data.website !== undefined && data.website !== "") {
+    const websiteValidation = isValidWebsiteUrl(data.website);
+    if (!websiteValidation.valid) {
+      return { success: false, error: websiteValidation.error };
+    }
+  }
+
+  // Validate bio length if provided
+  if (data.bio !== undefined) {
+    const plainTextBio = stripHtmlTags(data.bio);
+    if (plainTextBio.length > MAX_BIO_LENGTH) {
+      return {
+        success: false,
+        error: `Bio exceeds maximum length of ${MAX_BIO_LENGTH} characters (current: ${plainTextBio.length})`,
+      };
+    }
+  }
+
   const updateData: Record<string, unknown> = {};
 
   if (data.company !== undefined) updateData.company = data.company;
