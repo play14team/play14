@@ -87,12 +87,11 @@ $theme-colors: (
       // Ensure the map container fills the height
       > div {
         flex: 1;
-        min-height: 0; // Allow flexbox to shrink if needed
+        height: 0; // Force flex child to respect flex: 1
       }
     }
 
     .events-details-info {
-      flex: 1;
       display: flex;
       flex-direction: column;
     }
