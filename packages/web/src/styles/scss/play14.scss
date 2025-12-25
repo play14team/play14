@@ -93,6 +93,19 @@ $theme-colors: (
   }
 }
 
+// Empty state message styling
+.empty-state-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+}
+
+// Schedule description styling
+.schedule-description {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
 // Event map and sidebar responsive layout
 .event-map-sidebar-row {
   .events-details-location {

@@ -50,7 +50,7 @@ export default function EventTabs({
             <EventSchedule timetable={timetable} />
           ) : (
             <div className="container">
-              <p style={{ textAlign: "center", padding: "2rem" }}>
+              <p className="empty-state-message">
                 The schedule for this event has not been published yet.
               </p>
             </div>
@@ -75,7 +75,7 @@ export default function EventTabs({
             />
           ) : (
             <div className="container">
-              <p style={{ textAlign: "center", padding: "2rem" }}>
+              <p className="empty-state-message">
                 No photos have been uploaded for this event yet.
               </p>
             </div>
