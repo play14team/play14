@@ -12,6 +12,11 @@ const EventSidebar = ({ event }: { event: Event }) => {
   const eventName = encodeURI(event.name!)
   const text = encodeURI("Take a look at #play14 ") + eventName
 
+  // Find photos album URL from media
+  const photosAlbum = event.media?.find(
+    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos,
+  )
+
   return (
     <aside className="events-details-info">
       <h4 className="orange pb-3" style={{ textAlign: "center" }}>
@@ -48,16 +53,12 @@ const EventSidebar = ({ event }: { event: Event }) => {
         {event.media &&
           event.media.map(
             (medium) =>
-              medium && (
+              medium &&
+              medium.type !== Enum_Componenteventsmedia_Type.Photos && (
                 <li key={medium.id}>
                   <div className="d-flex justify-content-between align-items-center">
                     <span>{medium.type}</span>
                     <Link href={medium.url || "#"} target="_blank">
-                      {medium.type == Enum_Componenteventsmedia_Type.Photos && (
-                        <>
-                          <i className="bx bx-photo-album"></i> go to album
-                        </>
-                      )}
                       {medium.type == Enum_Componenteventsmedia_Type.Videos && (
                         <>
                           <i className="bx bx-video"></i> go to library
@@ -132,6 +133,20 @@ const EventSidebar = ({ event }: { event: Event }) => {
             style={{ backgroundColor: "#6b6b84" }}
           >
             <i className="flaticon-team"></i>Contact Team
+          </Link>
+        </div>
+      )}
+
+      {photosAlbum?.url && (
+        <div className="btn-box">
+          <Link
+            href={photosAlbum.url}
+            target="_blank"
+            className="default-btn"
+            aria-label="View event photos album"
+            style={{ backgroundColor: "#92c900" }}
+          >
+            <i className="flaticon-gallery"></i>View Photos
           </Link>
         </div>
       )}
