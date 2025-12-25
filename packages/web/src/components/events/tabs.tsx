@@ -64,7 +64,7 @@ export default function EventTabs({
 
         {/* Photos */}
         <div id="photosTab" className="tab-pane tabs_item">
-          {event.images && (
+          {event.images && event.images.length > 0 ? (
             <Gallery
               images={
                 event.images.filter(Boolean) as Array<{
@@ -73,6 +73,12 @@ export default function EventTabs({
                 }>
               }
             />
+          ) : (
+            <div className="container">
+              <p style={{ textAlign: "center", padding: "2rem" }}>
+                No photos have been uploaded for this event yet.
+              </p>
+            </div>
           )}
         </div>
       </div>

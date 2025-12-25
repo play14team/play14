@@ -5,6 +5,9 @@ $green: #92c900;
 $blue: #0098dd;
 $grey: #393939;
 
+// Map dimensions
+$map-height: 500px;
+
 // Override calendar event backgroung color
 $event-bg: #92c900;
 
@@ -94,7 +97,7 @@ $theme-colors: (
 .event-map-sidebar-row {
   .events-details-location {
     .shadow {
-      height: 450px;
+      height: $map-height;
     }
   }
 }

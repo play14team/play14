@@ -81,7 +81,7 @@ const MapView = ({ location, height, zoom, popup }: MapViewProps) => {
           longitude: longitude,
           zoom: zoomLevel,
         }}
-        style={{ width: "100%", height: height || "450px" }}
+        style={{ width: "100%", height: height || "500px" }}
         mapStyle={mapStyle}
         mapboxAccessToken={token}
       >

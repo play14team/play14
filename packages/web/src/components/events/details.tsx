@@ -85,7 +85,11 @@ export default function EventDetails({ event }: { event: Event }) {
                   <li>
                     <b>
                       {venue.website && (
-                        <Link href={venue.website as string} target="_blank">
+                        <Link
+                          href={venue.website as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <i className="bx bx-home"></i>
                           {venue.name}
                         </Link>
@@ -160,7 +164,7 @@ export default function EventDetails({ event }: { event: Event }) {
                 <h3 id="registration-heading" className="mb-3">
                   Registration
                 </h3>
-                <HtmlContent>{event.registration?.widgetCode || ""}</HtmlContent>
+                <HtmlContent>{event.registration.widgetCode}</HtmlContent>
               </section>
             </div>
           </div>
