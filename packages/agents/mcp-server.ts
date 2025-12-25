@@ -55,6 +55,7 @@ const apifyClient = APIFY_API_TOKEN
   : null;
 
 // Sanitize error messages to prevent leaking sensitive data (tokens, full URLs with params, etc.)
+// Also truncates to prevent log flooding
 function sanitizeErrorMessage(message: string): string {
   // Remove potential API tokens (common patterns)
   let sanitized = message.replace(/Bearer\s+[a-zA-Z0-9_-]+/gi, "Bearer [REDACTED]");
@@ -62,6 +63,10 @@ function sanitizeErrorMessage(message: string): string {
   sanitized = sanitized.replace(/apify_api_[a-zA-Z0-9]+/gi, "[REDACTED_APIFY_TOKEN]");
   // Remove long hex strings that might be tokens
   sanitized = sanitized.replace(/[a-f0-9]{64,}/gi, "[REDACTED_TOKEN]");
+  // Truncate to prevent log flooding
+  if (sanitized.length > MAX_ERROR_MESSAGE_LENGTH) {
+    sanitized = sanitized.substring(0, MAX_ERROR_MESSAGE_LENGTH) + "... [truncated]";
+  }
   return sanitized;
 }
 
@@ -117,6 +122,15 @@ const BIO_PREVIEW_LENGTH = 100;
 
 // Strapi batch fetch size (max allowed by API)
 const STRAPI_BATCH_SIZE = 100;
+
+// Maximum image size for avatar uploads (10MB, configurable via env)
+const MAX_IMAGE_SIZE_BYTES = parseInt(
+  process.env.MAX_IMAGE_SIZE_BYTES || String(10 * 1024 * 1024),
+  10
+);
+
+// Maximum error message length to prevent log flooding
+const MAX_ERROR_MESSAGE_LENGTH = 500;
 
 // Track last scrape time for rate limiting
 // Note: This uses a global variable which is safe in MCP servers since they run
@@ -940,7 +954,23 @@ async function uploadAvatar(
     throw new Error(`Failed to download image: ${imageResponse.status}`);
   }
 
+  // Check content-length before downloading to prevent memory exhaustion
+  const contentLength = imageResponse.headers.get("content-length");
+  if (contentLength && parseInt(contentLength, 10) > MAX_IMAGE_SIZE_BYTES) {
+    throw new Error(
+      `Image too large: ${parseInt(contentLength, 10)} bytes exceeds limit of ${MAX_IMAGE_SIZE_BYTES} bytes`
+    );
+  }
+
   const imageBlob = await imageResponse.blob();
+
+  // Double-check actual size after download (content-length can be missing or wrong)
+  if (imageBlob.size > MAX_IMAGE_SIZE_BYTES) {
+    throw new Error(
+      `Image too large: ${imageBlob.size} bytes exceeds limit of ${MAX_IMAGE_SIZE_BYTES} bytes`
+    );
+  }
+
   const imageBuffer = await imageBlob.arrayBuffer();
 
   // Create form data (use sanitized filename)
