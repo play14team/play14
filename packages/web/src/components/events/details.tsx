@@ -135,12 +135,12 @@ export default function EventDetails({ event }: { event: Event }) {
           <div className="col-lg-8 col-md-12">
             <div className="events-details-location">
               {venue && venue.location && (
-                <Map location={venue.location} height={"100%"} popup />
+                <Map location={venue.location} fillContainer={true} popup />
               )}
               {!venue && eventLocation.location && (
                 <Map
                   location={eventLocation.location}
-                  height={"100%"}
+                  fillContainer={true}
                   zoom={12}
                 />
               )}

@@ -87,15 +87,16 @@ $theme-colors: (
       // Ensure the shadow wrapper fills the height
       .shadow {
         flex: 1;
-        display: flex;
-        flex-direction: column;
+        position: relative;
         min-height: 0;
-        height: 100%;
 
-        // Handle the inner map container
+        // Handle the inner map container (mapboxgl-map) - use absolute positioning
         > div {
-          flex: 1;
-          min-height: 0;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
         }
       }
 

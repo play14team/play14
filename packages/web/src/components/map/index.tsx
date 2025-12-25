@@ -30,13 +30,14 @@ interface MapViewProps {
   height?: string
   zoom?: number
   popup?: boolean
+  fillContainer?: boolean
 }
 
 function isMapboxLocation(loc: LocationType): loc is MapboxLocation {
   return "geometry" in loc && loc.geometry !== undefined
 }
 
-const MapView = ({ location, height, zoom, popup }: MapViewProps) => {
+const MapView = ({ location, height, zoom, popup, fillContainer }: MapViewProps) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
@@ -73,6 +74,10 @@ const MapView = ({ location, height, zoom, popup }: MapViewProps) => {
     : "mapbox://styles/mapbox/streets-v12"
   const markerColor = isDark ? "#ffd633" : "#ffc900"
 
+  const mapContainerStyle = fillContainer
+    ? { width: "100%", height: "100%" }
+    : { width: "100%", height: height || "500px" }
+
   return (
     <div className="shadow">
       <Map
@@ -81,7 +86,7 @@ const MapView = ({ location, height, zoom, popup }: MapViewProps) => {
           longitude: longitude,
           zoom: zoomLevel,
         }}
-        style={{ width: "100%", height: height || "500px" }}
+        style={mapContainerStyle}
         mapStyle={mapStyle}
         mapboxAccessToken={token}
       >
