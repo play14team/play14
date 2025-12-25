@@ -4,7 +4,13 @@ import { Enum_Event_Eventstatus, Event } from "@/models/strapi"
 import { EventAttributes, createEvent } from "ics"
 import Link from "next/link"
 
-const ICalendar = ({ event }: { event: Event }) => {
+const ICalendar = ({
+  event,
+  asButton = false,
+}: {
+  event: Event
+  asButton?: boolean
+}) => {
   const start = new Date(event.start)
   const end = new Date(event.end)
 
@@ -73,30 +79,52 @@ const ICalendar = ({ event }: { event: Event }) => {
         : "CONFIRMED"
   }
 
-  async function handleDownload() {
-    const filename = `${event.name}.ics`
-    const file: File = await new Promise((resolve, reject) => {
-      createEvent(evt, (error, value) => {
-        if (error) {
-          reject(error)
-        }
+  async function handleDownload(e: React.MouseEvent) {
+    e.preventDefault()
 
-        resolve(new File([value], filename, { type: "text/calendar" }))
+    try {
+      const filename = `${event.name}.ics`
+      const file: File = await new Promise((resolve, reject) => {
+        createEvent(evt, (error, value) => {
+          if (error) {
+            reject(error)
+          }
+
+          resolve(new File([value], filename, { type: "text/calendar" }))
+        })
       })
-    })
-    const url = URL.createObjectURL(file)
+      const url = URL.createObjectURL(file)
 
-    // trying to assign the file URL to a window could cause cross-site
-    // issues so this is a workaround using HTML5
-    const anchor = document.createElement("a")
-    anchor.href = url
-    anchor.download = filename
+      // trying to assign the file URL to a window could cause cross-site
+      // issues so this is a workaround using HTML5
+      const anchor = document.createElement("a")
+      anchor.href = url
+      anchor.download = filename
 
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
+      document.body.appendChild(anchor)
+      anchor.click()
+      document.body.removeChild(anchor)
 
-    URL.revokeObjectURL(url)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Failed to download calendar event:", error)
+      alert(
+        "Failed to download calendar event. Please try again or contact support if the problem persists.",
+      )
+    }
+  }
+
+  if (asButton) {
+    return (
+      <Link
+        href="#"
+        onClick={handleDownload}
+        className="default-btn btn-gray"
+        aria-label="Add event to your calendar"
+      >
+        <i className="flaticon-calendar"></i>Add to Calendar
+      </Link>
+    )
   }
 
   return (

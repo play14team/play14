@@ -6,7 +6,6 @@ import {
   Player,
 } from "@/models/strapi"
 import Gallery from "../layout/gallery"
-import HtmlContent from "../layout/html-content"
 import PlayerGrid from "../players/grid"
 import EventDescription from "./description"
 import EventSchedule from "./schedule"
@@ -47,7 +46,15 @@ export default function EventTabs({
 
         {/* Schedule */}
         <div id="scheduleTab" className="tab-pane tabs_item">
-          {timetable && <EventSchedule timetable={timetable} />}
+          {timetable && timetable.length > 0 ? (
+            <EventSchedule timetable={timetable} />
+          ) : (
+            <div className="container">
+              <p className="empty-state-message">
+                The schedule for this event has not been published yet.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Players */}
@@ -57,7 +64,7 @@ export default function EventTabs({
 
         {/* Photos */}
         <div id="photosTab" className="tab-pane tabs_item">
-          {event.images && (
+          {event.images && event.images.length > 0 ? (
             <Gallery
               images={
                 event.images.filter(Boolean) as Array<{
@@ -66,12 +73,13 @@ export default function EventTabs({
                 }>
               }
             />
+          ) : (
+            <div className="container">
+              <p className="empty-state-message">
+                No photos have been uploaded for this event yet.
+              </p>
+            </div>
           )}
-        </div>
-
-        {/* Registration */}
-        <div id="registrationTab" className="tab-pane tabs_item">
-          <HtmlContent>{event.registration?.widgetCode || ""}</HtmlContent>
         </div>
       </div>
     </>

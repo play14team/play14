@@ -17,20 +17,14 @@ const EventSponsorships = (props: {
           sponsorships.map((item) => {
             const sponsors = item?.sponsors
             const category = item?.category
-            return (
-              <div key={item.id}>
-                {sponsors?.map((sponsor, index) => {
-                  return (
-                    sponsor && (
-                      <EventSponsor
-                        key={`${item.id}-${index}`}
-                        sponsor={sponsor}
-                        category={category}
-                      />
-                    )
-                  )
-                })}
-              </div>
+            return sponsors?.map((sponsor, index) =>
+              sponsor ? (
+                <EventSponsor
+                  key={`${item.id}-${sponsor.name}-${index}`}
+                  sponsor={sponsor}
+                  category={category}
+                />
+              ) : null,
             )
           })}
       </div>

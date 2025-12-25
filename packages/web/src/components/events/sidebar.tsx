@@ -7,10 +7,21 @@ import {
 import SocialLinks from "../layout/social-links"
 import EventStatus from "./status"
 import EventTime from "./time"
+import ICalendar from "./ical"
 
 const EventSidebar = ({ event }: { event: Event }) => {
   const eventName = encodeURI(event.name!)
   const text = encodeURI("Take a look at #play14 ") + eventName
+
+  // Find photos album URL from media
+  const photosAlbum = event.media?.find(
+    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos,
+  )
+
+  // Find videos library URL from media
+  const videosLibrary = event.media?.find(
+    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Videos,
+  )
 
   return (
     <aside className="events-details-info">
@@ -48,21 +59,18 @@ const EventSidebar = ({ event }: { event: Event }) => {
         {event.media &&
           event.media.map(
             (medium) =>
-              medium && (
+              medium &&
+              medium.type !== Enum_Componenteventsmedia_Type.Photos &&
+              medium.type !== Enum_Componenteventsmedia_Type.Videos && (
                 <li key={medium.id}>
                   <div className="d-flex justify-content-between align-items-center">
                     <span>{medium.type}</span>
-                    <Link href={medium.url || "#"} target="_blank">
-                      {medium.type == Enum_Componenteventsmedia_Type.Photos && (
-                        <>
-                          <i className="bx bx-photo-album"></i> go to album
-                        </>
-                      )}
-                      {medium.type == Enum_Componenteventsmedia_Type.Videos && (
-                        <>
-                          <i className="bx bx-video"></i> go to library
-                        </>
-                      )}
+                    <Link
+                      href={medium.url || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {medium.url || "Link"}
                     </Link>
                   </div>
                 </li>
@@ -112,6 +120,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
             <Link
               href={event.registration.link}
               target="_blank"
+              rel="noopener noreferrer"
               className="default-btn"
             >
               <i className="flaticon-user"></i>Book Now
@@ -127,11 +136,45 @@ const EventSidebar = ({ event }: { event: Event }) => {
         <div className="btn-box">
           <Link
             href={`mailto:${event.contactEmail}`}
-            className="default-btn"
+            className="default-btn btn-gray"
             aria-label="Send email to event team"
-            style={{ backgroundColor: "#6b6b84" }}
           >
             <i className="flaticon-team"></i>Contact Team
+          </Link>
+        </div>
+      )}
+
+      {event.eventStatus !== Enum_Event_Eventstatus.Cancelled &&
+        event.eventStatus !== Enum_Event_Eventstatus.Over && (
+          <div className="btn-box">
+            <ICalendar event={event} asButton={true} />
+          </div>
+        )}
+
+      {photosAlbum?.url && (
+        <div className="btn-box">
+          <Link
+            href={photosAlbum.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="default-btn btn-green"
+            aria-label="View event photos album"
+          >
+            <i className="flaticon-view"></i>View Photos
+          </Link>
+        </div>
+      )}
+
+      {videosLibrary?.url && (
+        <div className="btn-box">
+          <Link
+            href={videosLibrary.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="default-btn btn-blue"
+            aria-label="View event videos library"
+          >
+            <i className="flaticon-google-play"></i>View Videos
           </Link>
         </div>
       )}

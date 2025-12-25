@@ -201,7 +201,8 @@ body,
 .single-events-box,
 .single-blog-post,
 .single-courses-box,
-.dropdown-menu {
+.dropdown-menu,
+.events-registration-section {
   transition:
     background-color 0.3s ease,
     color 0.3s ease,
@@ -965,6 +966,76 @@ body,
       .accordion__panel {
         p {
           color: var(--color-text-secondary);
+        }
+      }
+    }
+  }
+}
+
+// ===========================================
+// Event Schedule (Courses Curriculum) Dark Mode
+// ===========================================
+[data-theme="dark"] {
+  .courses-curriculum {
+    border-color: var(--color-border);
+    background-color: var(--color-surface);
+
+    .container {
+      color: var(--color-text);
+    }
+
+    h3 {
+      color: var(--color-text);
+    }
+
+    .schedule-description {
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      li {
+        a {
+          background-color: var(--color-bg-elevated) !important;
+          color: var(--color-text) !important;
+
+          &::before {
+            color: var(--color-orange) !important;
+          }
+
+          &:hover {
+            background-color: var(--color-surface-hover) !important;
+          }
+
+          .courses-name {
+            color: var(--color-text) !important;
+          }
+
+          .courses-meta {
+            .questions {
+              background-color: var(--color-bg-muted) !important;
+              color: var(--color-blue) !important;
+            }
+
+            .duration {
+              background-color: #2a2a2a !important;
+              color: var(--color-orange) !important;
+            }
+
+            .status {
+              background-color: #2a2a2a !important;
+              color: var(--color-text) !important;
+
+              i {
+                color: var(--color-orange) !important;
+              }
+
+              &.locked {
+                background-color: transparent !important;
+                color: var(--color-text-muted) !important;
+              }
+            }
+          }
         }
       }
     }

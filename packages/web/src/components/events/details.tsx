@@ -13,11 +13,11 @@ import {
 } from "@/models/strapi"
 import Map from "../map"
 import EventDate from "./date"
-import ICalendar from "./ical"
 import EventsNavigator from "./nav"
 import EventSidebar from "./sidebar"
 import EventTabs from "./tabs"
 import UpcomingEventTimer from "./timer"
+import HtmlContent from "../layout/html-content"
 
 export default function EventDetails({ event }: { event: Event }) {
   const defaultImage = event.defaultImage as UploadFile
@@ -30,6 +30,19 @@ export default function EventDetails({ event }: { event: Event }) {
   const hosts = (event.hosts || []) as Player[]
   const mentors = (event.mentors || []) as Player[]
   const participants = deduplicate(players, hosts, mentors)
+
+  // Helper functions for event status checks
+  function isOpen() {
+    return event.eventStatus === Enum_Event_Eventstatus.Open
+  }
+
+  function isAnnounced() {
+    return event.eventStatus === Enum_Event_Eventstatus.Announced
+  }
+
+  function isAnnouncedOrOpen() {
+    return isAnnounced() || isOpen()
+  }
 
   return (
     <>
@@ -85,7 +98,11 @@ export default function EventDetails({ event }: { event: Event }) {
                   <li>
                     <b>
                       {venue.website && (
-                        <Link href={venue.website as string} target="_blank">
+                        <Link
+                          href={venue.website as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
                           <i className="bx bx-home"></i>
                           {venue.name}
                         </Link>
@@ -128,24 +145,18 @@ export default function EventDetails({ event }: { event: Event }) {
                 )}
               </ul>
             </div>
-            <ul className="d-flex">
-              <li>
-                <ICalendar event={event} />
-              </li>
-            </ul>
           </div>
         </div>
 
-        <div className="row">
+        <div className="row event-map-sidebar-row">
           <div className="col-lg-8 col-md-12">
             <div className="events-details-location">
               {venue && venue.location && (
-                <Map location={venue.location} height={"450px"} popup />
+                <Map location={venue.location} popup />
               )}
               {!venue && eventLocation.location && (
                 <Map
                   location={eventLocation.location}
-                  height={"450px"}
                   zoom={12}
                 />
               )}
@@ -156,6 +167,22 @@ export default function EventDetails({ event }: { event: Event }) {
           </div>
         </div>
 
+        {isOpen() && event.registration?.widgetCode && (
+          <div className="row mt-4">
+            <div className="col-12">
+              <section
+                className="events-registration-section"
+                aria-labelledby="registration-heading"
+              >
+                <h3 id="registration-heading" className="mb-3">
+                  Registration
+                </h3>
+                <HtmlContent>{event.registration.widgetCode}</HtmlContent>
+              </section>
+            </div>
+          </div>
+        )}
+
         <div className="row">
           <div className="courses-details-desc">
             <EventTabs event={event} participants={participants} />
@@ -164,16 +191,4 @@ export default function EventDetails({ event }: { event: Event }) {
       </div>
     </>
   )
-
-  function isAnnouncedOrOpen() {
-    return isAnnounced() || isOpen()
-  }
-
-  function isAnnounced() {
-    return event.eventStatus === Enum_Event_Eventstatus.Announced
-  }
-
-  function isOpen() {
-    return event.eventStatus === Enum_Event_Eventstatus.Open
-  }
 }

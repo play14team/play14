@@ -5,6 +5,9 @@ $green: #92c900;
 $blue: #0098dd;
 $grey: #393939;
 
+// Map dimensions
+$map-height: 500px;
+
 // Override calendar event backgroung color
 $event-bg: #92c900;
 
@@ -48,4 +51,66 @@ $theme-colors: (
 }
 .rating-color {
   color: $yellow;
+}
+
+// Button color variations
+.btn-gray {
+  background-color: #6b6b84 !important;
+
+  &:hover {
+    background-color: darken(#6b6b84, 10%) !important;
+  }
+}
+
+.btn-green {
+  background-color: $green !important;
+
+  &:hover {
+    background-color: darken($green, 10%) !important;
+  }
+}
+
+.btn-blue {
+  background-color: $blue !important;
+
+  &:hover {
+    background-color: darken($blue, 10%) !important;
+  }
+}
+
+// Event registration section
+.events-registration-section {
+  background-color: var(--color-bg-elevated);
+  border: 2px solid var(--color-orange);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-top: 1rem;
+  box-shadow: var(--shadow-card);
+
+  h3 {
+    color: var(--color-orange);
+    font-weight: bold;
+  }
+}
+
+// Empty state message styling
+.empty-state-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary);
+}
+
+// Schedule description styling
+.schedule-description {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+// Event map and sidebar responsive layout
+.event-map-sidebar-row {
+  .events-details-location {
+    .shadow {
+      height: $map-height;
+    }
+  }
 }
