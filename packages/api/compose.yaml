@@ -1,9 +1,13 @@
+# Local development compose file for API package
+# Run from packages/api directory: podman-compose up
+# Note: Uses monorepo root as build context
+
 services:
   play14-api:
     container_name: play14-api
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: packages/api/Dockerfile.dev
     image: play14-api:dev
     restart: unless-stopped
     env_file: .env
@@ -19,13 +23,10 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       NODE_ENV: ${NODE_ENV}
     volumes:
-      - ./config:/opt/app/config
-      - ./src:/opt/app/src
-      - ./package.json:/opt/package.json
-      - ./bun.lock:/opt/bun.lock
-
-      - ./.env:/opt/app/.env
-      - ./public/uploads:/opt/app/public/uploads
+      - ./config:/app/packages/api/config
+      - ./src:/app/packages/api/src
+      - ./.env:/app/packages/api/.env
+      - ./public/uploads:/app/packages/api/public/uploads
     ports:
       - "1337:1337"
     networks:
@@ -44,9 +45,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - play14-api-data:/var/lib/postgresql/data/ #using a volume
-      #- ./data:/var/lib/postgresql/data/ # if you want to use a bind folder
-
+      - play14-api-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     networks:

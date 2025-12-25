@@ -27,9 +27,6 @@ jobs:
     name: Code Quality
     runs-on: ubuntu-latest
     if: github.event.action != 'closed'
-    defaults:
-      run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,9 +40,11 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run linter
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: bun run lint
 
       - name: Type check
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: bun run typecheck
 
   build-pr:
@@ -84,7 +83,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
           file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
-          context: ${{ env.WORKING_DIRECTORY }}
+          context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
