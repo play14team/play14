@@ -52,14 +52,15 @@ $theme-colors: (
 
 // Event registration section
 .events-registration-section {
-  background-color: #f8f9fa;
-  border: 2px solid $orange;
+  background-color: var(--color-bg-elevated);
+  border: 2px solid var(--color-orange);
   border-radius: 8px;
   padding: 2rem;
   margin-top: 1rem;
+  box-shadow: var(--shadow-card);
 
   h3 {
-    color: $orange;
+    color: var(--color-orange);
     font-weight: bold;
   }
 }
