@@ -971,3 +971,50 @@ body,
     }
   }
 }
+
+// ===========================================
+// Event Schedule (Courses Curriculum) Dark Mode
+// ===========================================
+[data-theme="dark"] {
+  .courses-curriculum {
+    border-color: var(--color-border);
+    background-color: var(--color-surface);
+
+    h3 {
+      color: var(--color-text);
+    }
+
+    ul {
+      li {
+        a {
+          background-color: var(--color-bg-elevated);
+          color: var(--color-text);
+
+          &::before {
+            color: var(--color-orange);
+          }
+
+          &:hover {
+            background-color: var(--color-surface-hover);
+          }
+
+          .courses-name {
+            color: var(--color-text);
+          }
+
+          .courses-meta {
+            .status {
+              i {
+                color: var(--color-orange);
+              }
+            }
+
+            .duration {
+              color: var(--color-text-secondary);
+            }
+          }
+        }
+      }
+    }
+  }
+}

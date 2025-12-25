@@ -7,6 +7,7 @@ import {
 import SocialLinks from "../layout/social-links"
 import EventStatus from "./status"
 import EventTime from "./time"
+import ICalendar from "./ical"
 
 const EventSidebar = ({ event }: { event: Event }) => {
   const eventName = encodeURI(event.name!)
@@ -58,7 +59,11 @@ const EventSidebar = ({ event }: { event: Event }) => {
                 <li key={medium.id}>
                   <div className="d-flex justify-content-between align-items-center">
                     <span>{medium.type}</span>
-                    <Link href={medium.url || "#"} target="_blank">
+                    <Link
+                      href={medium.url || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {medium.type == Enum_Componenteventsmedia_Type.Videos && (
                         <>
                           <i className="bx bx-video"></i> go to library
@@ -113,6 +118,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
             <Link
               href={event.registration.link}
               target="_blank"
+              rel="noopener noreferrer"
               className="default-btn"
             >
               <i className="flaticon-user"></i>Book Now
@@ -137,11 +143,18 @@ const EventSidebar = ({ event }: { event: Event }) => {
         </div>
       )}
 
+      {event.eventStatus !== Enum_Event_Eventstatus.Cancelled && (
+        <div className="btn-box">
+          <ICalendar event={event} asButton={true} />
+        </div>
+      )}
+
       {photosAlbum?.url && (
         <div className="btn-box">
           <Link
             href={photosAlbum.url}
             target="_blank"
+            rel="noopener noreferrer"
             className="default-btn"
             aria-label="View event photos album"
             style={{ backgroundColor: "#92c900" }}

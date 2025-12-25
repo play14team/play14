@@ -4,7 +4,13 @@ import { Enum_Event_Eventstatus, Event } from "@/models/strapi"
 import { EventAttributes, createEvent } from "ics"
 import Link from "next/link"
 
-const ICalendar = ({ event }: { event: Event }) => {
+const ICalendar = ({
+  event,
+  asButton = false,
+}: {
+  event: Event
+  asButton?: boolean
+}) => {
   const start = new Date(event.start)
   const end = new Date(event.end)
 
@@ -97,6 +103,20 @@ const ICalendar = ({ event }: { event: Event }) => {
     document.body.removeChild(anchor)
 
     URL.revokeObjectURL(url)
+  }
+
+  if (asButton) {
+    return (
+      <Link
+        href="#"
+        onClick={handleDownload}
+        className="default-btn"
+        aria-label="Add event to your calendar"
+        style={{ backgroundColor: "#0098dd" }}
+      >
+        <i className="flaticon-calendar"></i>Add to Calendar
+      </Link>
+    )
   }
 
   return (

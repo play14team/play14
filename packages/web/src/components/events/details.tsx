@@ -13,7 +13,6 @@ import {
 } from "@/models/strapi"
 import Map from "../map"
 import EventDate from "./date"
-import ICalendar from "./ical"
 import EventsNavigator from "./nav"
 import EventSidebar from "./sidebar"
 import EventTabs from "./tabs"
@@ -129,11 +128,6 @@ export default function EventDetails({ event }: { event: Event }) {
                 )}
               </ul>
             </div>
-            <ul className="d-flex">
-              <li>
-                <ICalendar event={event} />
-              </li>
-            </ul>
           </div>
         </div>
 
