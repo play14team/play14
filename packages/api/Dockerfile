@@ -38,6 +38,9 @@ COPY packages/design/package.json ./packages/design/
 # Copy API source code
 COPY packages/api ./packages/api
 
+# Rebuild native modules for Node.js (bun may have compiled them differently)
+RUN npm rebuild
+
 # Add node_modules/.bin to PATH for strapi CLI
 ENV PATH=/app/node_modules/.bin:$PATH
 
@@ -62,8 +65,8 @@ ENV STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN}
 
 WORKDIR /app
 
-# Copy dependencies and built application
-COPY --from=deps /app/node_modules ./node_modules
+# Copy rebuilt dependencies (with native modules compiled for Node.js) and built application
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/api ./packages/api
 
 # Add node_modules/.bin to PATH for strapi CLI
