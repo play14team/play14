@@ -84,18 +84,25 @@ $theme-colors: (
       display: flex;
       flex-direction: column;
 
-      // Ensure the map container fills the height
-      > div {
+      // Ensure the shadow wrapper fills the height
+      .shadow {
         flex: 1;
-        height: 0; // Force flex child to respect flex: 1
         display: flex;
         flex-direction: column;
+        min-height: 0;
+        height: 100%;
 
         // Handle the inner map container
         > div {
           flex: 1;
-          height: 100%;
+          min-height: 0;
         }
+      }
+
+      // Fallback for cases without shadow wrapper
+      > div:not(.shadow) {
+        flex: 1;
+        height: 100%;
       }
     }
 
