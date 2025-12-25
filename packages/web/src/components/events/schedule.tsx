@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { ComponentEventsTimetable, Maybe } from "@/models/strapi"
 
 const EventSchedule = ({
@@ -24,11 +23,7 @@ const EventSchedule = ({
                     return (
                       slot && (
                         <li key={slot.id}>
-                          <Link
-                            href="#"
-                            className="d-flex justify-content-between align-items-center"
-                            onClick={(e) => e.preventDefault()}
-                          >
+                          <div className="d-flex justify-content-between align-items-center">
                             <span className="courses-name">
                               {slot.description}
                             </span>
@@ -40,7 +35,7 @@ const EventSchedule = ({
                                 {slot.time.substring(0, 5)}
                               </span>
                             </div>
-                          </Link>
+                          </div>
                         </li>
                       )
                     )
