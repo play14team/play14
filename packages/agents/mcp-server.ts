@@ -17,6 +17,11 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { ApifyClient } from "apify-client";
+import type {
+  StrapiPlayer,
+  SocialNetwork,
+  StrapiResponse,
+} from "./lib/types.js";
 
 // ============================================================================
 // Configuration
@@ -25,6 +30,9 @@ import { ApifyClient } from "apify-client";
 const STRAPI_URL = process.env.STRAPI_URL || "http://localhost:1337";
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 const APIFY_API_TOKEN = process.env.APIFY_API_TOKEN;
+// Configurable Apify actor for LinkedIn scraping (pay-per-use, no subscription required)
+const APIFY_LINKEDIN_ACTOR =
+  process.env.APIFY_LINKEDIN_ACTOR || "vulnv/linkedin-profile-scraper";
 
 // Validate required tokens
 function validateConfig(): void {
@@ -46,8 +54,27 @@ const apifyClient = APIFY_API_TOKEN
   ? new ApifyClient({ token: APIFY_API_TOKEN })
   : null;
 
+// Sanitize error messages to prevent leaking sensitive data (tokens, full URLs with params, etc.)
+function sanitizeErrorMessage(message: string): string {
+  // Remove potential API tokens (common patterns)
+  let sanitized = message.replace(/Bearer\s+[a-zA-Z0-9_-]+/gi, "Bearer [REDACTED]");
+  sanitized = sanitized.replace(/api[_-]?token[=:]\s*[a-zA-Z0-9_-]+/gi, "api_token=[REDACTED]");
+  sanitized = sanitized.replace(/apify_api_[a-zA-Z0-9]+/gi, "[REDACTED_APIFY_TOKEN]");
+  // Remove long hex strings that might be tokens
+  sanitized = sanitized.replace(/[a-f0-9]{64,}/gi, "[REDACTED_TOKEN]");
+  return sanitized;
+}
+
 // Fetch with timeout helper
 const FETCH_TIMEOUT_MS = 30000;
+
+// Rate limiting: delay between consecutive Strapi requests (ms)
+const STRAPI_REQUEST_DELAY_MS = 100;
+
+// Sleep helper for rate limiting
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function fetchWithTimeout(
   url: string,
@@ -70,6 +97,91 @@ async function fetchWithTimeout(
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+// Fetch with retry and exponential backoff for transient errors
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit = {},
+  maxRetries: number = 3
+): Promise<Response> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetchWithTimeout(url, options);
+
+      // Retry on 429 (rate limited) or 5xx (server errors)
+      if (response.status === 429 || response.status >= 500) {
+        if (attempt < maxRetries) {
+          const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000);
+          await sleep(backoffMs);
+          continue;
+        }
+      }
+
+      return response;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      if (attempt < maxRetries) {
+        const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000);
+        await sleep(backoffMs);
+      }
+    }
+  }
+
+  throw lastError || new Error("Request failed after retries");
+}
+
+// Simple HTML sanitization for bio field
+// Only allows safe tags (<p>, <br>, <strong>, <em>, <ul>, <ol>, <li>, <a>)
+// Escapes all other HTML and prevents XSS
+function sanitizeHtmlBio(html: string): string {
+  if (!html) return "";
+
+  // Allowed tags (simple whitelist approach)
+  const allowedTags = ["p", "br", "strong", "em", "b", "i", "ul", "ol", "li", "a"];
+
+  // First, escape everything
+  let sanitized = html
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+
+  // Then, unescape allowed tags (simple opening and closing tags)
+  for (const tag of allowedTags) {
+    // Opening tags (with optional attributes for <a>)
+    if (tag === "a") {
+      // Only allow href attribute with http/https URLs
+      sanitized = sanitized.replace(
+        new RegExp(
+          `&lt;a\\s+href=&quot;(https?://[^&]+)&quot;&gt;`,
+          "gi"
+        ),
+        '<a href="$1" target="_blank" rel="noopener noreferrer">'
+      );
+    } else {
+      sanitized = sanitized.replace(
+        new RegExp(`&lt;${tag}(&gt;|\\s[^&]*&gt;)`, "gi"),
+        `<${tag}>`
+      );
+    }
+    // Closing tags
+    sanitized = sanitized.replace(
+      new RegExp(`&lt;/${tag}&gt;`, "gi"),
+      `</${tag}>`
+    );
+    // Self-closing tags (like <br />)
+    sanitized = sanitized.replace(
+      new RegExp(`&lt;${tag}\\s*/&gt;`, "gi"),
+      `<${tag} />`
+    );
+  }
+
+  return sanitized;
 }
 
 // ============================================================================
@@ -187,38 +299,8 @@ const tools = [
 // Tool Implementations
 // ============================================================================
 
-interface SocialNetwork {
-  id: number;
-  url: string;
-  type: string;
-}
-
-interface Player {
-  id: number;
-  documentId: string;
-  name: string;
-  slug: string;
-  company?: string;
-  tagline?: string;
-  bio?: string;
-  website?: string;
-  avatar?: {
-    id: number;
-    url: string;
-    width?: number;
-    height?: number;
-  };
-  socialNetworks?: SocialNetwork[];
-}
-
-interface StrapiResponse<T> {
-  data: T;
-  meta?: {
-    pagination?: {
-      total: number;
-    };
-  };
-}
+// Type alias for compatibility (uses imported StrapiPlayer from lib/types.ts)
+type Player = StrapiPlayer;
 
 async function listPlayersWithLinkedIn(
   page: number = 1,
@@ -260,7 +342,8 @@ async function listPlayersWithLinkedIn(
       "sort[0]": "name:asc",
     });
 
-    const response = await fetchWithTimeout(
+    // Use fetchWithRetry for automatic retry on transient errors
+    const response = await fetchWithRetry(
       `${STRAPI_URL}/api/players?${params}`,
       {
         headers: strapiHeaders,
@@ -271,7 +354,9 @@ async function listPlayersWithLinkedIn(
       const errorBody = await response
         .text()
         .catch(() => "Unable to read error body");
-      throw new Error(`Strapi API error: ${response.status} - ${errorBody}`);
+      throw new Error(
+        `Strapi API error: ${response.status} - ${sanitizeErrorMessage(errorBody)}`
+      );
     }
 
     const result: StrapiResponse<Player[]> = await response.json();
@@ -312,6 +397,9 @@ async function listPlayersWithLinkedIn(
     }
 
     currentStart += BATCH_SIZE;
+
+    // Rate limiting: small delay between batch requests
+    await sleep(STRAPI_REQUEST_DELAY_MS);
 
     // Safety check to prevent infinite loops
     if (currentStart > 10000) {
@@ -356,7 +444,9 @@ async function getPlayer(documentId: string): Promise<object> {
       throw new Error(`Player not found: ${documentId}`);
     }
     const errorBody = await response.text().catch(() => "Unable to read error body");
-    throw new Error(`Strapi API error: ${response.status} - ${errorBody}`);
+    throw new Error(
+      `Strapi API error: ${response.status} - ${sanitizeErrorMessage(errorBody)}`
+    );
   }
 
   const result: StrapiResponse<Player> = await response.json();
@@ -399,14 +489,12 @@ async function scrapeLinkedInProfile(linkedinUrl: string): Promise<object> {
   const normalizedUrl = `https://www.linkedin.com/in/${match[1]}`;
 
   try {
-    // Run Apify actor - using vulnv/linkedin-profile-scraper (pay-per-use, no subscription)
-    // Cost: $0.05 start fee + $0.00425 per profile
-    const run = await apifyClient
-      .actor("vulnv/linkedin-profile-scraper")
-      .call({
-        urls: [normalizedUrl],
-        resolveEmails: false,
-      });
+    // Run configurable Apify actor for LinkedIn scraping
+    // Default: vulnv/linkedin-profile-scraper (pay-per-use, ~$0.05 start + $0.00425/profile)
+    const run = await apifyClient.actor(APIFY_LINKEDIN_ACTOR).call({
+      urls: [normalizedUrl],
+      resolveEmails: false,
+    });
 
     // Get results
     const { items } = await apifyClient
@@ -481,7 +569,8 @@ async function updatePlayer(
 
   if (data.company !== undefined) updateData.company = data.company;
   if (data.tagline !== undefined) updateData.tagline = data.tagline;
-  if (data.bio !== undefined) updateData.bio = data.bio;
+  // Sanitize bio HTML to prevent XSS
+  if (data.bio !== undefined) updateData.bio = sanitizeHtmlBio(data.bio);
   if (data.website !== undefined) updateData.website = data.website;
   if (data.avatarId !== undefined) updateData.avatar = data.avatarId;
 
@@ -497,7 +586,9 @@ async function updatePlayer(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to update player: ${response.status} - ${errorText}`);
+    throw new Error(
+      `Failed to update player: ${response.status} - ${sanitizeErrorMessage(errorText)}`
+    );
   }
 
   const result: StrapiResponse<Player> = await response.json();
@@ -508,6 +599,34 @@ async function updatePlayer(
     name: result.data.name,
     updatedFields: Object.keys(updateData),
   };
+}
+
+// Allowlist of domains for avatar downloads (SSRF protection)
+const ALLOWED_AVATAR_DOMAINS = [
+  "media.licdn.com", // LinkedIn CDN
+  "static.licdn.com", // LinkedIn static assets
+  "platform-lookaside.fbsbx.com", // Facebook/Meta CDN
+  "lh3.googleusercontent.com", // Google profile photos
+  "avatars.githubusercontent.com", // GitHub avatars
+  "pbs.twimg.com", // Twitter/X profile photos
+  "gravatar.com", // Gravatar
+  "www.gravatar.com",
+];
+
+// Check if hostname resolves to a private IP (SSRF protection)
+function isPrivateHostname(hostname: string): boolean {
+  const privatePatterns = [
+    /^localhost$/i,
+    /^127\./,
+    /^10\./,
+    /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+    /^192\.168\./,
+    /^169\.254\./, // Link-local
+    /^::1$/, // IPv6 localhost
+    /^fc00:/i, // IPv6 private
+    /^fe80:/i, // IPv6 link-local
+  ];
+  return privatePatterns.some((pattern) => pattern.test(hostname));
 }
 
 async function uploadAvatar(
@@ -522,7 +641,19 @@ async function uploadAvatar(
       throw new Error("Only HTTP(S) URLs are allowed");
     }
   } catch {
-    throw new Error(`Invalid image URL: ${imageUrl}`);
+    throw new Error("Invalid image URL format");
+  }
+
+  // SSRF Protection: Block private IP ranges
+  if (isPrivateHostname(url.hostname)) {
+    throw new Error("Private/internal URLs are not allowed");
+  }
+
+  // SSRF Protection: Only allow known CDN domains for avatars
+  if (!ALLOWED_AVATAR_DOMAINS.some((domain) => url.hostname.endsWith(domain))) {
+    throw new Error(
+      `Domain not allowed for avatar downloads. Allowed: ${ALLOWED_AVATAR_DOMAINS.join(", ")}`
+    );
   }
 
   // Validate filename to prevent path traversal
@@ -555,7 +686,9 @@ async function uploadAvatar(
 
   if (!uploadResponse.ok) {
     const errorText = await uploadResponse.text();
-    throw new Error(`Failed to upload image: ${uploadResponse.status} - ${errorText}`);
+    throw new Error(
+      `Failed to upload image: ${uploadResponse.status} - ${sanitizeErrorMessage(errorText)}`
+    );
   }
 
   const uploadedFiles = await uploadResponse.json();
