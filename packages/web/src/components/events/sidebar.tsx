@@ -70,7 +70,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {medium.url}
+                      {medium.url || "Link"}
                     </Link>
                   </div>
                 </li>
@@ -136,9 +136,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
         <div className="btn-box">
           <Link
             href={`mailto:${event.contactEmail}`}
-            className="default-btn"
+            className="default-btn btn-gray"
             aria-label="Send email to event team"
-            style={{ backgroundColor: "#6b6b84" }}
           >
             <i className="flaticon-team"></i>Contact Team
           </Link>
@@ -158,9 +157,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
             href={photosAlbum.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="default-btn"
+            className="default-btn btn-green"
             aria-label="View event photos album"
-            style={{ backgroundColor: "#92c900" }}
           >
             <i className="flaticon-view"></i>View Photos
           </Link>
@@ -173,9 +171,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
             href={videosLibrary.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="default-btn"
+            className="default-btn btn-blue"
             aria-label="View event videos library"
-            style={{ backgroundColor: "#0098dd" }}
           >
             <i className="flaticon-google-play"></i>View Videos
           </Link>

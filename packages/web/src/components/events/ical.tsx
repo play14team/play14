@@ -79,30 +79,36 @@ const ICalendar = ({
         : "CONFIRMED"
   }
 
-  async function handleDownload() {
-    const filename = `${event.name}.ics`
-    const file: File = await new Promise((resolve, reject) => {
-      createEvent(evt, (error, value) => {
-        if (error) {
-          reject(error)
-        }
+  async function handleDownload(e: React.MouseEvent) {
+    e.preventDefault()
 
-        resolve(new File([value], filename, { type: "text/calendar" }))
+    try {
+      const filename = `${event.name}.ics`
+      const file: File = await new Promise((resolve, reject) => {
+        createEvent(evt, (error, value) => {
+          if (error) {
+            reject(error)
+          }
+
+          resolve(new File([value], filename, { type: "text/calendar" }))
+        })
       })
-    })
-    const url = URL.createObjectURL(file)
+      const url = URL.createObjectURL(file)
 
-    // trying to assign the file URL to a window could cause cross-site
-    // issues so this is a workaround using HTML5
-    const anchor = document.createElement("a")
-    anchor.href = url
-    anchor.download = filename
+      // trying to assign the file URL to a window could cause cross-site
+      // issues so this is a workaround using HTML5
+      const anchor = document.createElement("a")
+      anchor.href = url
+      anchor.download = filename
 
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
+      document.body.appendChild(anchor)
+      anchor.click()
+      document.body.removeChild(anchor)
 
-    URL.revokeObjectURL(url)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Failed to download calendar event:", error)
+    }
   }
 
   if (asButton) {
@@ -110,9 +116,8 @@ const ICalendar = ({
       <Link
         href="#"
         onClick={handleDownload}
-        className="default-btn"
+        className="default-btn btn-gray"
         aria-label="Add event to your calendar"
-        style={{ backgroundColor: "#6b6b84" }}
       >
         <i className="flaticon-calendar"></i>Add to Calendar
       </Link>
