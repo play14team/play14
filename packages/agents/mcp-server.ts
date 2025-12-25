@@ -107,7 +107,20 @@ const APIFY_MIN_DELAY_MS = parseInt(
   process.env.APIFY_MIN_DELAY_MS || "5000",
   10
 );
+
+// Retry/backoff constants
+const RETRY_INITIAL_DELAY_MS = 1000;
+const RETRY_MAX_DELAY_MS = 10000;
+
+// Bio preview length for list display
+const BIO_PREVIEW_LENGTH = 100;
+
+// Strapi batch fetch size (max allowed by API)
+const STRAPI_BATCH_SIZE = 100;
+
 // Track last scrape time for rate limiting
+// Note: This uses a global variable which is safe in MCP servers since they run
+// single-threaded via stdio transport. Concurrent requests are serialized.
 let lastApifyScrapeTime = 0;
 
 // Sleep helper for rate limiting
@@ -165,7 +178,10 @@ async function fetchWithRetry(
       // Retry on 429 (rate limited) or 5xx (server errors)
       if (response.status === 429 || response.status >= 500) {
         if (attempt < maxRetries) {
-          const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000);
+          const backoffMs = Math.min(
+            RETRY_INITIAL_DELAY_MS * Math.pow(2, attempt),
+            RETRY_MAX_DELAY_MS
+          );
           await sleep(backoffMs);
           continue;
         }
@@ -176,7 +192,10 @@ async function fetchWithRetry(
       lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt < maxRetries) {
-        const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000);
+        const backoffMs = Math.min(
+          RETRY_INITIAL_DELAY_MS * Math.pow(2, attempt),
+          RETRY_MAX_DELAY_MS
+        );
         await sleep(backoffMs);
       }
     }
@@ -290,7 +309,7 @@ function sanitizeHtmlBio(html: string): string {
  * Truncate bio for preview display.
  * Strips HTML first to avoid breaking mid-tag, then truncates plain text.
  */
-function truncateBioPreview(bio: string, maxLength: number = 100): string {
+function truncateBioPreview(bio: string, maxLength: number = BIO_PREVIEW_LENGTH): string {
   if (!bio) return "";
 
   // Strip HTML first to get plain text
@@ -470,8 +489,7 @@ async function listPlayersWithLinkedIn(
 
   // First, we need to fetch ALL players to find those with LinkedIn
   // because Strapi can't filter on nested component fields
-  // We'll fetch in batches of 100 (max allowed)
-  const BATCH_SIZE = 100;
+  // We'll fetch in batches (uses STRAPI_BATCH_SIZE constant)
   let allPlayersWithLinkedIn: Array<{
     documentId: string;
     name: string;
@@ -495,7 +513,7 @@ async function listPlayersWithLinkedIn(
     const params = new URLSearchParams({
       "populate[socialNetworks]": "true",
       "populate[avatar]": "true",
-      "pagination[limit]": String(BATCH_SIZE),
+      "pagination[limit]": String(STRAPI_BATCH_SIZE),
       "pagination[start]": String(currentStart),
       "sort[0]": "name:asc",
     });
@@ -540,7 +558,7 @@ async function listPlayersWithLinkedIn(
         currentData: {
           company: player.company || null,
           tagline: player.tagline || null,
-          bio: player.bio ? truncateBioPreview(player.bio, 100) : null,
+          bio: player.bio ? truncateBioPreview(player.bio, BIO_PREVIEW_LENGTH) : null,
           website: player.website || null,
           hasAvatar: !!player.avatar,
           avatarUrl: player.avatar?.url || null,
@@ -550,11 +568,11 @@ async function listPlayersWithLinkedIn(
     allPlayersWithLinkedIn = allPlayersWithLinkedIn.concat(playersWithLinkedIn);
 
     // Check if we've fetched all players
-    if (result.data.length < BATCH_SIZE) {
+    if (result.data.length < STRAPI_BATCH_SIZE) {
       break; // No more data
     }
 
-    currentStart += BATCH_SIZE;
+    currentStart += STRAPI_BATCH_SIZE;
 
     // Rate limiting: small delay between batch requests
     await sleep(STRAPI_REQUEST_DELAY_MS);
@@ -637,14 +655,24 @@ async function scrapeLinkedInProfile(linkedinUrl: string): Promise<object> {
     throw new Error("APIFY_API_TOKEN not configured");
   }
 
-  // Normalize URL
+  // Normalize and sanitize LinkedIn URL
+  // Extract only the username part, stripping any query params or extra path segments
+  // This prevents injection via URL parameters while keeping valid profile URLs
   const match = linkedinUrl.match(
     /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+)/i
   );
   if (!match) {
     throw new Error(`Invalid LinkedIn URL: ${linkedinUrl}`);
   }
-  const normalizedUrl = `https://www.linkedin.com/in/${match[1]}`;
+
+  // Validate username doesn't contain suspicious patterns
+  const username = match[1];
+  if (username.length > 100) {
+    throw new Error("LinkedIn username too long");
+  }
+
+  // Construct clean URL with only the username (no query params, fragments, or extra paths)
+  const normalizedUrl = `https://www.linkedin.com/in/${username}`;
 
   try {
     // Rate limiting: wait if needed before making request
