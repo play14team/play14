@@ -83,6 +83,24 @@ const MAX_BIO_LENGTH = parseInt(
   10
 );
 
+// Maximum length for company name (configurable via env)
+const MAX_COMPANY_LENGTH = parseInt(
+  process.env.MAX_COMPANY_LENGTH || "200",
+  10
+);
+
+// Maximum length for tagline/headline (configurable via env)
+const MAX_TAGLINE_LENGTH = parseInt(
+  process.env.MAX_TAGLINE_LENGTH || "500",
+  10
+);
+
+// Maximum total players to fetch (safety limit, configurable via env)
+const MAX_PLAYERS_FETCH = parseInt(
+  process.env.MAX_PLAYERS_FETCH || "10000",
+  10
+);
+
 // Rate limiting for Apify/LinkedIn scraping
 // Minimum delay between scrape requests (configurable via env)
 const APIFY_MIN_DELAY_MS = parseInt(
@@ -411,6 +429,37 @@ const tools = [
 // Type alias for compatibility (uses imported StrapiPlayer from lib/types.ts)
 type Player = StrapiPlayer;
 
+// ============================================================================
+// Tool Argument Types (for type-safe request handling)
+// ============================================================================
+
+interface ListPlayersArgs {
+  page?: number;
+  pageSize?: number;
+}
+
+interface GetPlayerArgs {
+  documentId: string;
+}
+
+interface ScrapeLinkedInArgs {
+  linkedinUrl: string;
+}
+
+interface UpdatePlayerArgs {
+  documentId: string;
+  company?: string;
+  tagline?: string;
+  bio?: string;
+  website?: string;
+  avatarId?: number;
+}
+
+interface UploadAvatarArgs {
+  imageUrl: string;
+  filename: string;
+}
+
 async function listPlayersWithLinkedIn(
   page: number = 1,
   pageSize: number = 20
@@ -510,8 +559,8 @@ async function listPlayersWithLinkedIn(
     // Rate limiting: small delay between batch requests
     await sleep(STRAPI_REQUEST_DELAY_MS);
 
-    // Safety check to prevent infinite loops
-    if (currentStart > 10000) {
+    // Safety check to prevent infinite loops (uses configurable MAX_PLAYERS_FETCH)
+    if (currentStart >= MAX_PLAYERS_FETCH) {
       break;
     }
   }
@@ -677,6 +726,22 @@ async function updatePlayer(
     avatarId?: number;
   }
 ): Promise<object> {
+  // Validate company length if provided
+  if (data.company !== undefined && data.company.length > MAX_COMPANY_LENGTH) {
+    return {
+      success: false,
+      error: `Company name exceeds maximum length of ${MAX_COMPANY_LENGTH} characters (current: ${data.company.length})`,
+    };
+  }
+
+  // Validate tagline length if provided
+  if (data.tagline !== undefined && data.tagline.length > MAX_TAGLINE_LENGTH) {
+    return {
+      success: false,
+      error: `Tagline exceeds maximum length of ${MAX_TAGLINE_LENGTH} characters (current: ${data.tagline.length})`,
+    };
+  }
+
   // Validate website URL if provided
   if (data.website !== undefined && data.website !== "") {
     const websiteValidation = isValidWebsiteUrl(data.website);
@@ -819,9 +884,26 @@ async function uploadAvatar(
     );
   }
 
-  // Validate filename to prevent path traversal
+  // Validate filename to prevent path traversal and ensure safe characters
   if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
     throw new Error("Invalid filename: must not contain path separators");
+  }
+
+  // Allowlist for image extensions
+  const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+  const lowerFilename = filename.toLowerCase();
+  const hasValidExtension = ALLOWED_EXTENSIONS.some((ext) => lowerFilename.endsWith(ext));
+  if (!hasValidExtension) {
+    throw new Error(
+      `Invalid file extension. Allowed: ${ALLOWED_EXTENSIONS.join(", ")}`
+    );
+  }
+
+  // Sanitize filename: only allow alphanumeric, dash, underscore, dot
+  const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+  if (sanitizedFilename !== filename) {
+    // Log but continue with sanitized name
+    console.error(`Filename sanitized: "${filename}" -> "${sanitizedFilename}"`);
   }
 
   // Download the image
@@ -833,9 +915,9 @@ async function uploadAvatar(
   const imageBlob = await imageResponse.blob();
   const imageBuffer = await imageBlob.arrayBuffer();
 
-  // Create form data
+  // Create form data (use sanitized filename)
   const formData = new FormData();
-  const file = new File([imageBuffer], filename, { type: imageBlob.type });
+  const file = new File([imageBuffer], sanitizedFilename, { type: imageBlob.type });
   formData.append("files", file);
 
   // Upload to Strapi
@@ -914,32 +996,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     let result: object;
 
     switch (name) {
-      case "list_players_with_linkedin":
-        result = await listPlayersWithLinkedIn(
-          (args as { page?: number }).page,
-          (args as { pageSize?: number }).pageSize
-        );
+      case "list_players_with_linkedin": {
+        const listArgs = (args ?? {}) as ListPlayersArgs;
+        result = await listPlayersWithLinkedIn(listArgs.page, listArgs.pageSize);
         break;
+      }
 
-      case "get_player":
-        result = await getPlayer((args as { documentId: string }).documentId);
+      case "get_player": {
+        const getArgs = (args ?? {}) as unknown as GetPlayerArgs;
+        result = await getPlayer(getArgs.documentId);
         break;
+      }
 
-      case "scrape_linkedin_profile":
-        result = await scrapeLinkedInProfile(
-          (args as { linkedinUrl: string }).linkedinUrl
-        );
+      case "scrape_linkedin_profile": {
+        const scrapeArgs = (args ?? {}) as unknown as ScrapeLinkedInArgs;
+        result = await scrapeLinkedInProfile(scrapeArgs.linkedinUrl);
         break;
+      }
 
       case "update_player": {
-        const updateArgs = args as {
-          documentId: string;
-          company?: string;
-          tagline?: string;
-          bio?: string;
-          website?: string;
-          avatarId?: number;
-        };
+        const updateArgs = (args ?? {}) as unknown as UpdatePlayerArgs;
         result = await updatePlayer(updateArgs.documentId, {
           company: updateArgs.company,
           tagline: updateArgs.tagline,
@@ -950,12 +1026,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         break;
       }
 
-      case "upload_avatar":
-        result = await uploadAvatar(
-          (args as { imageUrl: string }).imageUrl,
-          (args as { filename: string }).filename
-        );
+      case "upload_avatar": {
+        const uploadArgs = (args ?? {}) as unknown as UploadAvatarArgs;
+        result = await uploadAvatar(uploadArgs.imageUrl, uploadArgs.filename);
         break;
+      }
 
       default:
         throw new Error(`Unknown tool: ${name}`);

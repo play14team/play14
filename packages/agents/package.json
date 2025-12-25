@@ -5,7 +5,8 @@
   "type": "module",
   "description": "MCP tools for play14 platform automation (used by Claude Code agents)",
   "scripts": {
-    "mcp-server": "bun run mcp-server.ts"
+    "mcp-server": "bun run mcp-server.ts",
+    "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
