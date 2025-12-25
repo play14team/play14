@@ -19,5 +19,10 @@
     "test": "bun --filter play14-web test",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/.next packages/*/build packages/*/dist"
   },
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "@types/node": "^24.10.4",
+    "typescript": "^5.9.3"
+  },
   "packageManager": "bun@1.3.5"
 }

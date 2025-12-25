@@ -1,0 +1,16 @@
+{
+  "name": "play14-agents",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP tools for play14 platform automation (used by Claude Code agents)",
+  "scripts": {
+    "mcp-server": "bun run mcp-server.ts",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.0.0",
+    "apify-client": "2.11.3",
+    "dotenv": "16.4.7"
+  }
+}
