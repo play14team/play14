@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.0.0",
-    "apify-client": "2.11.3",
+    "apify-client": "^2.21.0",
     "dotenv": "16.4.7"
   }
 }

@@ -138,8 +138,7 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "mainField": "day"
+          "editable": true
         },
         "list": {
           "label": "timetable",
@@ -153,8 +152,7 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "mainField": "link"
+          "editable": true
         },
         "list": {
           "label": "registration",
@@ -242,8 +240,7 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "mainField": "category"
+          "editable": true
         },
         "list": {
           "label": "sponsorships",
@@ -257,8 +254,7 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "mainField": "type"
+          "editable": true
         },
         "list": {
           "label": "media",
@@ -315,8 +311,7 @@
           "description": "",
           "placeholder": "",
           "visible": true,
-          "editable": true,
-          "mainField": "destination"
+          "editable": true
         },
         "list": {
           "label": "finance",
@@ -392,6 +387,14 @@
       }
     },
     "layouts": {
+      "list": [
+        "name",
+        "start",
+        "end",
+        "location",
+        "venue",
+        "defaultImage"
+      ],
       "edit": [
         [
           {
@@ -505,14 +508,6 @@
             "size": 12
           }
         ]
-      ],
-      "list": [
-        "name",
-        "start",
-        "end",
-        "location",
-        "venue",
-        "defaultImage"
       ]
     }
   },

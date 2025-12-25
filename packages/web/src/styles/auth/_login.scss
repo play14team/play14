@@ -1,0 +1,234 @@
+@use "sass:color";
+
+// ===========================================
+// Login Page Styles
+// ===========================================
+
+.auth-login-page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-login-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--color-surface);
+  border-radius: 16px;
+  padding: 40px 32px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+}
+
+.auth-login-header {
+  text-align: center;
+  margin-bottom: 32px;
+
+  h1 {
+    margin: 20px 0 8px;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+}
+
+.auth-error-message {
+  background-color: rgba(216, 0, 0, 0.1);
+  border: 1px solid var(--color-red);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--color-red);
+  text-align: center;
+}
+
+.auth-login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-button);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.auth-login-btn-icon {
+  flex-shrink: 0;
+}
+
+.auth-login-btn-google {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+  }
+}
+
+.auth-login-btn-github {
+  background-color: #24292e;
+  color: white;
+  border-color: #24292e;
+
+  &:hover {
+    background-color: #2f363d;
+  }
+}
+
+.auth-login-btn-linkedin {
+  background-color: #0a66c2;
+  color: white;
+  border-color: #0a66c2;
+
+  &:hover {
+    background-color: #004182;
+  }
+}
+
+.auth-login-footer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+}
+
+// ===========================================
+// Error Page Styles
+// ===========================================
+
+.auth-error-page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.auth-error-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--color-surface);
+  border-radius: 16px;
+  padding: 40px 32px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.auth-error-header {
+  margin-bottom: 24px;
+}
+
+.auth-error-content {
+  margin-bottom: 32px;
+
+  .auth-error-icon {
+    margin-bottom: 16px;
+
+    i {
+      font-size: 56px;
+      color: var(--color-red);
+    }
+  }
+
+  h1 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+}
+
+.auth-error-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+
+  .btn {
+    min-width: 120px;
+  }
+
+  .btn-primary {
+    background-color: var(--color-orange);
+    border-color: var(--color-orange);
+    color: white;
+
+    &:hover {
+      background-color: color.adjust(#ff5200, $lightness: -10%);
+    }
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    border-color: var(--color-border);
+    color: var(--color-text);
+
+    &:hover {
+      background-color: var(--color-surface-hover);
+    }
+  }
+}
+
+.auth-error-contact {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+
+    a {
+      color: var(--color-blue);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

@@ -325,6 +325,36 @@ Critical variables (see `.env.example`):
 
 - `CRON_ENABLED=false` (set true in production to enable automated tasks)
 
+## API Guidelines
+
+### Document Service API Only
+
+**Always use the Document Service API** (`strapi.documents()`) for all database operations. The old Query API (`strapi.query()`) is deprecated in Strapi 5.
+
+```typescript
+// ✅ CORRECT - Document Service API
+const user = await strapi.documents("plugin::users-permissions.user").findFirst({
+  filters: { id: userId },
+  populate: { player: true },
+})
+
+await strapi.documents("plugin::users-permissions.user").update({
+  documentId: user.documentId,
+  data: { player: playerId } as any, // Type assertion needed for extended relations
+})
+
+// ❌ DEPRECATED - Query API (do not use)
+const user = await strapi.query("plugin::users-permissions.user").findOne({
+  where: { id: userId },
+  populate: { player: true },
+})
+```
+
+**Key differences**:
+- `findOne({ where })` → `findFirst({ filters })` or `findOne({ documentId })`
+- `update({ where, data })` → `update({ documentId, data })`
+- Use `as any` for custom relations not in Strapi types (e.g., `player` on users-permissions)
+
 ## Common Pitfalls
 
 1. **Slug Conflicts**: Don't manually set slugs - lifecycle hooks auto-generate them

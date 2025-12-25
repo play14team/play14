@@ -911,6 +911,78 @@
     },
     {
       "action": "plugin::content-manager.explorer.create",
+      "subject": "api::player-claim.player-claim",
+      "properties": {
+        "fields": [
+          "status",
+          "user",
+          "player",
+          "reason",
+          "adminNotes",
+          "processedAt"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "txnc6u9tmr9i0icsane31pux",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::player-claim.player-claim",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "bwzn7chz1i5ncoov0pqyn1ri",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::player-claim.player-claim",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "x7tjhcjycm2lmdo0xs5cb19p",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::player-claim.player-claim",
+      "properties": {
+        "fields": [
+          "status",
+          "user",
+          "player",
+          "reason",
+          "adminNotes",
+          "processedAt"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "vx8fmbedo3lliz3170s3x939",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::player-claim.player-claim",
+      "properties": {
+        "fields": [
+          "status",
+          "user",
+          "player",
+          "reason",
+          "adminNotes",
+          "processedAt"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "hr6674l6iy6fc8vgvacn6kmz",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
       "subject": "api::player.player",
       "properties": {
         "fields": [
@@ -935,7 +1007,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "ryekp7efquasvpvfw2vbih6g",
+      "documentId": "xknccyx5qmv77zfnx9wd8tu3",
       "locale": null
     },
     {
@@ -982,7 +1054,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "oxpjn2fqs4umqtimx59i58o0",
+      "documentId": "qf7otbq756xaf209d18u2930",
       "locale": null
     },
     {
@@ -1011,7 +1083,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "rrm9vkl9mf5su79zxflprvri",
+      "documentId": "ktm249d3818wyot91oyjs7zo",
       "locale": null
     },
     {
@@ -1672,6 +1744,42 @@
       "locale": null
     },
     {
+      "action": "plugin::documentation.read",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "vb797kbmhomkqaj4ugk3qdg4",
+      "locale": null
+    },
+    {
+      "action": "plugin::documentation.settings.read",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "qr45ax9sz36sygu6osexys66",
+      "locale": null
+    },
+    {
+      "action": "plugin::documentation.settings.regenerate",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "m5tns0cbejk0ugctv2hq0jsb",
+      "locale": null
+    },
+    {
+      "action": "plugin::documentation.settings.update",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "ry5i68y7rbx6oghyy2iaq0lu",
+      "locale": null
+    },
+    {
       "action": "plugin::email.settings.read",
       "subject": null,
       "properties": {},
@@ -1714,6 +1822,15 @@
       "conditions": [],
       "actionParameters": {},
       "documentId": "m76fus9y87m1t7jrr6bz6z01",
+      "locale": null
+    },
+    {
+      "action": "plugin::strapi-cache.purge-cache",
+      "subject": null,
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "m7q2nk6jbcxli8nmii6azct9",
       "locale": null
     },
     {

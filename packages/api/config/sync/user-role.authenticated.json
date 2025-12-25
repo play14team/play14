@@ -16,6 +16,51 @@
       "locale": null
     },
     {
+      "action": "api::player-claim.custom-player-claim.cancelClaim",
+      "documentId": "fdcta7llogdeuumcehb0w96i",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.checkMatch",
+      "documentId": "nu9olf85e5hi3ygbk4ttq7vi",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.findMyClaims",
+      "documentId": "lfj8l5rh8d8cfeb8ijkpajii",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.getSuggestions",
+      "documentId": "awca98f0hmnnkb67xss46th3",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.submitClaim",
+      "documentId": "wujqwxpg5sx5fkwpb1e27dxp",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.autoLink",
+      "documentId": "igiqpfks5fsekupsxjzefceb",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.createForUser",
+      "documentId": "xopxou4545ky7ormzbuih81h",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.findMe",
+      "documentId": "daabmzzt34js5gpn5e7ios8u",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.updateMe",
+      "documentId": "qgyybrzmaona6av9f9l4dmmv",
+      "locale": null
+    },
+    {
       "action": "plugin::users-permissions.auth.connect",
       "documentId": "ni418oykm5u6q4ouqdfc5b4x",
       "locale": null
