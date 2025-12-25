@@ -160,10 +160,15 @@ export default function EventDetails({ event }: { event: Event }) {
         {isOpen() && event.registration?.widgetCode && (
           <div className="row mt-4">
             <div className="col-12">
-              <div className="events-registration-section">
-                <h3 className="mb-3">Registration</h3>
+              <section
+                className="events-registration-section"
+                aria-labelledby="registration-heading"
+              >
+                <h3 id="registration-heading" className="mb-3">
+                  Registration
+                </h3>
                 <HtmlContent>{event.registration?.widgetCode || ""}</HtmlContent>
-              </div>
+              </section>
             </div>
           </div>
         )}
