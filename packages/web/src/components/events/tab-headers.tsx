@@ -18,17 +18,17 @@ export default function TabHeaders({
         onClick={(e) => openTabSection(e, "overviewTab")}
         aria-hidden="true"
       >
-        Overview
+        <i className="bx bx-info-circle"></i> Overview
       </li>
 
       {/* Schedule */}
       <li onClick={(e) => openTabSection(e, "scheduleTab")} aria-hidden="true">
-        Schedule
+        <i className="bx bx-time"></i> Schedule
       </li>
 
       {/* Players */}
       <li onClick={(e) => openTabSection(e, "playersTab")} aria-hidden="true">
-        Players{" "}
+        <i className="bx bx-group"></i> Players{" "}
         {participantCount && participantCount > 0
           ? `(${participantCount})`
           : ""}
@@ -36,7 +36,7 @@ export default function TabHeaders({
 
       {/* Photos */}
       <li onClick={(e) => openTabSection(e, "photosTab")} aria-hidden="true">
-        Photos{" "}
+        <i className="bx bx-images"></i> Photos{" "}
         {event.images && event.images.length > 0
           ? `(${event.images.length})`
           : ""}

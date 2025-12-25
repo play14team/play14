@@ -112,7 +112,7 @@ const ICalendar = ({
         onClick={handleDownload}
         className="default-btn"
         aria-label="Add event to your calendar"
-        style={{ backgroundColor: "#0098dd" }}
+        style={{ backgroundColor: "#6b6b84" }}
       >
         <i className="flaticon-calendar"></i>Add to Calendar
       </Link>

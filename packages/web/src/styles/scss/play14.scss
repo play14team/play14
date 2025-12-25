@@ -64,3 +64,40 @@ $theme-colors: (
     font-weight: bold;
   }
 }
+
+// Event map and sidebar responsive layout
+.event-map-sidebar-row {
+  // On desktop, make the row use flexbox with equal height columns
+  @media (min-width: 992px) {
+    display: flex;
+    align-items: stretch;
+
+    .col-lg-8,
+    .col-lg-4 {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .events-details-location {
+      flex: 1;
+      min-height: 450px;
+      height: 100%;
+
+      // Ensure the map container fills the height
+      > div {
+        height: 100%;
+      }
+    }
+
+    .events-details-info {
+      height: 100%;
+    }
+  }
+
+  // On mobile/tablet, use fixed height for map
+  @media (max-width: 991px) {
+    .events-details-location {
+      height: 450px;
+    }
+  }
+}

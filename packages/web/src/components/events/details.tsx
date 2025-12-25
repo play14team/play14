@@ -131,16 +131,16 @@ export default function EventDetails({ event }: { event: Event }) {
           </div>
         </div>
 
-        <div className="row">
+        <div className="row event-map-sidebar-row">
           <div className="col-lg-8 col-md-12">
             <div className="events-details-location">
               {venue && venue.location && (
-                <Map location={venue.location} height={"450px"} popup />
+                <Map location={venue.location} height={"100%"} popup />
               )}
               {!venue && eventLocation.location && (
                 <Map
                   location={eventLocation.location}
-                  height={"450px"}
+                  height={"100%"}
                   zoom={12}
                 />
               )}

@@ -1003,14 +1003,28 @@ body,
           }
 
           .courses-meta {
-            .status {
-              i {
-                color: var(--color-orange);
-              }
+            .questions {
+              background-color: var(--color-bg-muted);
+              color: var(--color-blue);
             }
 
             .duration {
-              color: var(--color-text-secondary);
+              background-color: var(--color-bg-elevated);
+              color: var(--color-orange);
+            }
+
+            .status {
+              background-color: var(--color-bg-elevated);
+              color: var(--color-text);
+
+              i {
+                color: var(--color-orange);
+              }
+
+              &.locked {
+                background-color: transparent;
+                color: var(--color-text-muted);
+              }
             }
           }
         }
