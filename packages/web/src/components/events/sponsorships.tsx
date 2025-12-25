@@ -21,7 +21,7 @@ const EventSponsorships = (props: {
               return (
                 sponsor && (
                   <EventSponsor
-                    key={`${item.id}-${sponsor.id || index}`}
+                    key={`${item.id}-${sponsor.name}-${index}`}
                     sponsor={sponsor}
                     category={category}
                   />
