@@ -223,7 +223,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
-          context: ${{ env.WORKING_DIRECTORY }}
+          context: .
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

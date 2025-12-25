@@ -11,8 +11,8 @@ services:
   play14-api:
     container_name: play14-api
     build:
-      context: ./packages/api
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: packages/api/Dockerfile.dev
     image: play14-api:dev
     restart: unless-stopped
     env_file: ./packages/api/.env
@@ -28,12 +28,10 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       NODE_ENV: ${NODE_ENV}
     volumes:
-      - ./packages/api/config:/opt/app/config
-      - ./packages/api/src:/opt/app/src
-      - ./packages/api/package.json:/opt/package.json
-      - ./packages/api/bun.lock:/opt/bun.lock
-      - ./packages/api/.env:/opt/app/.env
-      - ./packages/api/public/uploads:/opt/app/public/uploads
+      - ./packages/api/config:/app/packages/api/config
+      - ./packages/api/src:/app/packages/api/src
+      - ./packages/api/.env:/app/packages/api/.env
+      - ./packages/api/public/uploads:/app/packages/api/public/uploads
     ports:
       - "1337:1337"
     networks:
@@ -79,25 +77,25 @@ services:
   play14-web:
     container_name: play14-web
     build:
-      context: ./packages/ui
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: packages/web/Dockerfile.dev
       target: development
       cache_from:
         - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-web:dev-cache
       cache_to:
         - type=inline
     env_file:
-      - ./packages/ui/.env.local
+      - ./packages/web/.env.local
     ports:
       - "3000:3000"
     volumes:
-      - ./packages/ui/src:/app/src:z
-      - ./packages/ui/public:/app/public:z
-      - ./packages/ui/next.config.js:/app/next.config.js:z
-      - ./packages/ui/tsconfig.json:/app/tsconfig.json:z
-      - ./packages/ui/.prettierrc:/app/.prettierrc:z
-      - ./packages/ui/eslint.config.mjs:/app/eslint.config.mjs:z
-      - ui-node_modules:/app/node_modules
+      - ./packages/web/src:/app/packages/web/src:z
+      - ./packages/web/public:/app/packages/web/public:z
+      - ./packages/web/next.config.js:/app/packages/web/next.config.js:z
+      - ./packages/web/tsconfig.json:/app/packages/web/tsconfig.json:z
+      - ./packages/web/.prettierrc:/app/packages/web/.prettierrc:z
+      - ./packages/web/eslint.config.mjs:/app/packages/web/eslint.config.mjs:z
+      - web-node_modules:/app/node_modules
     environment:
       - NODE_ENV=development
       - STRAPI_API_URL=http://play14-api:1337
@@ -124,7 +122,7 @@ services:
 volumes:
   play14-api-data:
   pgadmin-data:
-  ui-node_modules:
+  web-node_modules:
 
 networks:
   play14-api:

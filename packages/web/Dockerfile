@@ -1,4 +1,5 @@
 # Multi-stage production Dockerfile for Next.js 16 standalone output
+# Build context: monorepo root (use -f packages/web/Dockerfile .)
 # Optimized for minimal image size and security
 
 # Stage 1: Dependencies
@@ -7,10 +8,15 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Copy package files
+# Copy root package files
 COPY package.json bun.lock ./
 
-# Install dependencies with frozen lockfile
+# Copy ALL workspace package.json files (bun workspaces require all to exist)
+COPY packages/api/package.json ./packages/api/
+COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
+
+# Install dependencies
 RUN bun install --frozen-lockfile
 
 # Stage 2: Builder
@@ -20,9 +26,24 @@ WORKDIR /app
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package.json ./package.json
+COPY --from=deps /app/bun.lock ./bun.lock
 
-# Copy application source
-COPY . .
+# Copy ALL workspace package.json files for workspace resolution
+COPY packages/api/package.json ./packages/api/
+COPY packages/web/package.json ./packages/web/
+COPY packages/design/package.json ./packages/design/
+
+# Copy web package source
+COPY packages/web ./packages/web
+
+# Re-run bun install to properly link workspace packages and create binaries
+RUN bun install --frozen-lockfile
+
+# Add node_modules/.bin to PATH for next CLI
+ENV PATH=/app/node_modules/.bin:$PATH
+
+WORKDIR /app/packages/web
 
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -43,19 +64,19 @@ ENV NEXT_PUBLIC_WEB_VITALS=${NEXT_PUBLIC_WEB_VITALS}
 # Build application
 RUN bun run build
 
-# Stage 3: Runner
-FROM node:20-alpine AS runner
+# Stage 3: Runner (bun-only)
+FROM oven/bun:1.3.5-alpine AS runner
 
 WORKDIR /app
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 # Copy standalone output
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/packages/web/.next/standalone ./
+COPY --from=builder /app/packages/web/.next/static ./packages/web/.next/static
+COPY --from=builder /app/packages/web/public ./packages/web/public
 
 # Set ownership
 RUN chown -R nextjs:nodejs /app
@@ -71,9 +92,9 @@ ENV HOSTNAME="0.0.0.0"
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Health check
+# Health check using bun
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" || exit 1
+  CMD bun -e "const http = require('http'); http.get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" || exit 1
 
-# Start the application
-CMD ["node", "server.js"]
+# Start the application with bun
+CMD ["bun", "packages/web/server.js"]
