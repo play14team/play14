@@ -18,6 +18,11 @@ const EventSidebar = ({ event }: { event: Event }) => {
     (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos,
   )
 
+  // Find videos library URL from media
+  const videosLibrary = event.media?.find(
+    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Videos,
+  )
+
   return (
     <aside className="events-details-info">
       <h4 className="orange pb-3" style={{ textAlign: "center" }}>
@@ -55,7 +60,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
           event.media.map(
             (medium) =>
               medium &&
-              medium.type !== Enum_Componenteventsmedia_Type.Photos && (
+              medium.type !== Enum_Componenteventsmedia_Type.Photos &&
+              medium.type !== Enum_Componenteventsmedia_Type.Videos && (
                 <li key={medium.id}>
                   <div className="d-flex justify-content-between align-items-center">
                     <span>{medium.type}</span>
@@ -64,11 +70,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {medium.type == Enum_Componenteventsmedia_Type.Videos && (
-                        <>
-                          <i className="bx bx-video"></i> go to library
-                        </>
-                      )}
+                      {medium.url}
                     </Link>
                   </div>
                 </li>
@@ -143,11 +145,12 @@ const EventSidebar = ({ event }: { event: Event }) => {
         </div>
       )}
 
-      {event.eventStatus !== Enum_Event_Eventstatus.Cancelled && (
-        <div className="btn-box">
-          <ICalendar event={event} asButton={true} />
-        </div>
-      )}
+      {event.eventStatus !== Enum_Event_Eventstatus.Cancelled &&
+        event.eventStatus !== Enum_Event_Eventstatus.Over && (
+          <div className="btn-box">
+            <ICalendar event={event} asButton={true} />
+          </div>
+        )}
 
       {photosAlbum?.url && (
         <div className="btn-box">
@@ -160,6 +163,21 @@ const EventSidebar = ({ event }: { event: Event }) => {
             style={{ backgroundColor: "#92c900" }}
           >
             <i className="flaticon-gallery"></i>View Photos
+          </Link>
+        </div>
+      )}
+
+      {videosLibrary?.url && (
+        <div className="btn-box">
+          <Link
+            href={videosLibrary.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="default-btn"
+            aria-label="View event videos library"
+            style={{ backgroundColor: "#92c900" }}
+          >
+            <i className="flaticon-video-player"></i>View Videos
           </Link>
         </div>
       )}
