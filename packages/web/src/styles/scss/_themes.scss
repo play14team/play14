@@ -996,19 +996,19 @@ body,
     ul {
       li {
         a {
-          background-color: var(--color-bg-elevated);
-          color: var(--color-text);
+          background-color: var(--color-bg-elevated) !important;
+          color: var(--color-text) !important;
 
           &::before {
-            color: var(--color-orange);
+            color: var(--color-orange) !important;
           }
 
           &:hover {
-            background-color: var(--color-surface-hover);
+            background-color: var(--color-surface-hover) !important;
           }
 
           .courses-name {
-            color: var(--color-text);
+            color: var(--color-text) !important;
           }
 
           .courses-meta {
