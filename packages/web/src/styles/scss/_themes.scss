@@ -980,8 +980,17 @@ body,
     border-color: var(--color-border);
     background-color: var(--color-surface);
 
+    .container {
+      color: var(--color-text);
+    }
+
     h3 {
       color: var(--color-text);
+    }
+
+    .schedule-description {
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
     }
 
     ul {

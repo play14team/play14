@@ -46,8 +46,14 @@ export default function EventTabs({
 
         {/* Schedule */}
         <div id="scheduleTab" className="tab-pane tabs_item">
-          {timetable && timetable.length > 0 && (
+          {timetable && timetable.length > 0 ? (
             <EventSchedule timetable={timetable} />
+          ) : (
+            <div className="container">
+              <p style={{ textAlign: "center", padding: "2rem" }}>
+                The schedule for this event has not been published yet.
+              </p>
+            </div>
           )}
         </div>
 

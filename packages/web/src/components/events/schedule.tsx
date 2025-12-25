@@ -15,7 +15,9 @@ const EventSchedule = ({
           item && (
             <div key={item.id} className="container">
               <h3>{item.day}</h3>
-              {item.description}
+              {item.description && (
+                <p className="schedule-description">{item.description}</p>
+              )}
               <ul>
                 {item.timeslots &&
                   item.timeslots.map((slot) => {
