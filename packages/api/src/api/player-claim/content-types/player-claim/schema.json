@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "player_claims",
+  "info": {
+    "singularName": "player-claim",
+    "pluralName": "player-claims",
+    "displayName": "Player Claim",
+    "description": "Pending requests from users to claim existing player profiles"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "claimStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected"],
+      "default": "pending",
+      "required": true
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "player": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    },
+    "reason": {
+      "type": "text",
+      "maxLength": 1000
+    },
+    "adminNotes": {
+      "type": "text",
+      "maxLength": 1000
+    },
+    "processedAt": {
+      "type": "datetime"
+    }
+  }
+}

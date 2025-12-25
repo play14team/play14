@@ -982,6 +982,43 @@ export interface ApiHostingHosting extends Struct.SingleTypeSchema {
   }
 }
 
+export interface ApiPlayerClaimPlayerClaim extends Struct.CollectionTypeSchema {
+  collectionName: "player_claims"
+  info: {
+    description: "Pending requests from users to claim existing player profiles"
+    displayName: "Player Claim"
+    pluralName: "player-claims"
+    singularName: "player-claim"
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    adminNotes: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000
+      }>
+    claimStatus: Schema.Attribute.Enumeration<["pending", "approved", "rejected"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"pending">
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<"oneToMany", "api::player-claim.player-claim"> &
+      Schema.Attribute.Private
+    player: Schema.Attribute.Relation<"manyToOne", "api::player.player">
+    processedAt: Schema.Attribute.DateTime
+    publishedAt: Schema.Attribute.DateTime
+    reason: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    user: Schema.Attribute.Relation<"manyToOne", "plugin::users-permissions.user">
+  }
+}
+
 export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
   collectionName: "players"
   info: {
@@ -1573,6 +1610,7 @@ declare module "@strapi/strapi" {
       "api::history.history": ApiHistoryHistory
       "api::home.home": ApiHomeHome
       "api::hosting.hosting": ApiHostingHosting
+      "api::player-claim.player-claim": ApiPlayerClaimPlayerClaim
       "api::player.player": ApiPlayerPlayer
       "api::sponsor.sponsor": ApiSponsorSponsor
       "api::tag.tag": ApiTagTag

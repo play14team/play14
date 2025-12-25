@@ -1,3 +1,5 @@
+@use "sass:color";
+
 $red: #d80000;
 $orange: #ff5200;
 $yellow: #ffc900;
@@ -58,7 +60,7 @@ $theme-colors: (
   background-color: #6b6b84 !important;
 
   &:hover {
-    background-color: darken(#6b6b84, 10%) !important;
+    background-color: color.adjust(#6b6b84, $lightness: -10%) !important;
   }
 }
 
@@ -66,7 +68,7 @@ $theme-colors: (
   background-color: $green !important;
 
   &:hover {
-    background-color: darken($green, 10%) !important;
+    background-color: color.adjust($green, $lightness: -10%) !important;
   }
 }
 
@@ -74,7 +76,7 @@ $theme-colors: (
   background-color: $blue !important;
 
   &:hover {
-    background-color: darken($blue, 10%) !important;
+    background-color: color.adjust($blue, $lightness: -10%) !important;
   }
 }
 

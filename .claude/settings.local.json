@@ -45,7 +45,13 @@
       "Bash(ls:*)",
       "Bash(git add:*)",
       "Bash(git merge-base:*)",
-      "Bash(git worktree:*)"
+      "Bash(git worktree:*)",
+      "Bash(lsof:*)",
+      "Bash(ss:*)",
+      "Bash(timeout 5 curl:*)",
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)"
     ]
   }
 }

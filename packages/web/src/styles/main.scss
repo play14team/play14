@@ -5,6 +5,19 @@
 @use "../components/home/statistics.scss";
 @use "../components/layout/values.scss";
 
+// UI Components
+@use "ui/avatar";
+@use "ui/dropdown";
+
+// Auth pages
+@use "auth/login";
+
+// Admin pages
+@use "admin/layout";
+@use "admin/sidebar";
+@use "admin/forms";
+@use "admin/claims";
+
 @import "css/bootstrap.min.css";
 @import "css/animate.min.css";
 @import "css/boxicons.min.css";

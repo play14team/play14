@@ -1,0 +1,84 @@
+{
+  "name": "Mentor",
+  "description": "Role for mentors who guide #play14 events.",
+  "type": "mentor",
+  "documentId": "sdz9tgoqwq3zje37sd49svdy",
+  "locale": null,
+  "permissions": [
+    {
+      "action": "api::event.event.find",
+      "documentId": "fu9pbws3ptstzng2mfnf12yo",
+      "locale": null
+    },
+    {
+      "action": "api::event.event.findOne",
+      "documentId": "mmgyoktdmhmtwdnec4oc3t54",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.cancelClaim",
+      "documentId": "mentor-cancel-claim-001",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.checkMatch",
+      "documentId": "mentor-check-match-001",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.findMyClaims",
+      "documentId": "mentor-find-my-claims-001",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.getSuggestions",
+      "documentId": "mentor-get-suggestions-001",
+      "locale": null
+    },
+    {
+      "action": "api::player-claim.custom-player-claim.submitClaim",
+      "documentId": "mentor-submit-claim-001",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.autoLink",
+      "documentId": "nwohk7luihxs62uzg47r2mn1",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.createForUser",
+      "documentId": "k3qxntnmqlyireedrs6v19cw",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.deletePicture",
+      "documentId": "kio0bcs7iaykzu1hj29mv8se",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.findMe",
+      "documentId": "iq6h3f5wj99qrxlai26kx30m",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.updateMe",
+      "documentId": "fhbcz9o6flderfulpxpjlkv4",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.uploadPicture",
+      "documentId": "tls1yg068sivtk0nb4o0swv2",
+      "locale": null
+    },
+    {
+      "action": "plugin::users-permissions.auth.connect",
+      "documentId": "hmsqmvwe0dysh851vf0v04em",
+      "locale": null
+    },
+    {
+      "action": "plugin::users-permissions.user.me",
+      "documentId": "vx8tjbm1fs20zkipmg6aofy4",
+      "locale": null
+    }
+  ]
+}

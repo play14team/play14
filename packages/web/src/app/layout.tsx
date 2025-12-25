@@ -1,16 +1,9 @@
-import Footer from "@/components/layout/footer"
-import Loader from "@/components/layout/loader"
-import Navbar from "@/components/layout/navbar"
 import { ThemeProvider } from "@/components/utils/theme-provider"
-import { WebVitals } from "@/components/utils/web-vitals"
 import "@/styles/main.scss"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import Script from "next/script"
-import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
-const displayWebVitals = process.env.NEXT_PUBLIC_WEB_VITALS === "true"
 const title = "#play14 - play is the way"
 const description =
   "#play14 is a worldwide gathering of like-minded people who believe that playing is the best way to learn, share and be creative!"
@@ -53,22 +46,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Script src="https://widget.weezevent.com/weez.js" />
       <body className={inter.className}>
-        <ThemeProvider>
-          <Navbar />
-          <main>
-            <div className="container">
-              <div className="pt-100 pb-70">
-                <Suspense fallback={<Loader />}>
-                  {displayWebVitals && <WebVitals />}
-                  {children}
-                </Suspense>
-              </div>
-            </div>
-          </main>
-          <Footer />
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

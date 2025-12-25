@@ -5,7 +5,25 @@ import React, { useState } from "react"
 import Logo from "./logo"
 import SearchBox from "./searchbox"
 import ThemeToggle from "./theme-toggle"
-const Navbar = () => {
+import AuthStatusClient from "./auth-status-client"
+
+interface AuthUser {
+  id: number
+  username: string
+  email: string
+  player?: {
+    slug: string
+    avatar?: {
+      url: string
+    }
+  }
+}
+
+interface NavbarProps {
+  initialUser?: AuthUser | null
+}
+
+const Navbar = ({ initialUser = null }: NavbarProps) => {
   const [collapsed, setCollapsed] = useState(true)
 
   const toggleNavbar = () => {
@@ -219,6 +237,7 @@ const Navbar = () => {
 
                 <SearchBox />
                 <ThemeToggle />
+                <AuthStatusClient initialUser={initialUser} />
               </div>
             </nav>
           </div>
