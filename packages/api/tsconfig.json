@@ -8,11 +8,15 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "strict": false,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   },
   "include": [
     "./",
-    "src/**/*.json"
+    "src/**/*.json",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules/",
@@ -23,8 +27,9 @@
     "src/admin/",
     "**/*.test.ts",
     "**/*.test.js",
-    "src/plugins/**",
+    "src/plugins/*/admin/**",
     "bootstrap/",
-    "types/generated/**"
+    "types/generated/**",
+    "database/migrations/**"
   ]
 }
