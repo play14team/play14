@@ -1,0 +1,156 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  h1 {
+    margin: 0 0 2rem;
+    font-size: 2rem;
+    color: #333;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+
+  p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.browseLink {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: #f47920;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+
+  &:hover {
+    background: #e06810;
+  }
+}
+
+.orders {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.orderCard {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.orderNumber {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.statusPaid {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.statusPending {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.statusRefunded {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.statusCancelled {
+  background: #fafafa;
+  color: #757575;
+}
+
+.eventInfo {
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0 0 0.25rem;
+    font-size: 1.2rem;
+
+    a {
+      color: #333;
+      text-decoration: none;
+
+      &:hover {
+        color: #f47920;
+      }
+    }
+  }
+}
+
+.eventDate {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.orderMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0.75rem;
+}
+
+.ticketCount {
+  color: #666;
+}
+
+.amount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.purchaseDate {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.viewDetails {
+  color: #f47920;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

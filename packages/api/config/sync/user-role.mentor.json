@@ -51,6 +51,41 @@
       "locale": null
     },
     {
+      "action": "api::event.custom-event.createEvent",
+      "documentId": "mentor-event-create-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getEventForEdit",
+      "documentId": "mentor-event-get-for-edit-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getLocations",
+      "documentId": "mentor-event-get-locations-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getMyEvents",
+      "documentId": "mentor-event-get-my-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getOrganizers",
+      "documentId": "mentor-event-get-organizers-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getVenues",
+      "documentId": "mentor-event-get-venues-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.updateEvent",
+      "documentId": "mentor-event-update-001",
+      "locale": null
+    },
+    {
       "action": "api::event.event.find",
       "documentId": "fu9pbws3ptstzng2mfnf12yo",
       "locale": null
@@ -106,13 +141,108 @@
       "locale": null
     },
     {
+      "action": "api::player.custom-player.getPlayerForEdit",
+      "documentId": "mentor-player-get-for-edit-001",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.listPlayers",
+      "documentId": "mentor-player-list-001",
+      "locale": null
+    },
+    {
       "action": "api::player.custom-player.updateMe",
       "documentId": "fhbcz9o6flderfulpxpjlkv4",
       "locale": null
     },
     {
+      "action": "api::player.custom-player.updatePlayer",
+      "documentId": "mentor-player-update-001",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.updatePlayerPosition",
+      "documentId": "mentor-player-update-position-001",
+      "locale": null
+    },
+    {
       "action": "api::player.custom-player.uploadPicture",
       "documentId": "tls1yg068sivtk0nb4o0swv2",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.createAccount",
+      "documentId": "mentor-stripe-create-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getAccountStatus",
+      "documentId": "mentor-stripe-status-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getDashboardLink",
+      "documentId": "mentor-stripe-dashboard-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getEventHostAccounts",
+      "documentId": "mentor-stripe-event-accounts-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getOnboardingLink",
+      "documentId": "mentor-stripe-onboarding-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.linkAccountToEvent",
+      "documentId": "mentor-stripe-link-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.unlinkAccountFromEvent",
+      "documentId": "mentor-stripe-unlink-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.getMyOrders",
+      "documentId": "mentor-ticket-my-orders-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.getOrderStatus",
+      "documentId": "mentor-ticket-status-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.initiateOrder",
+      "documentId": "mentor-ticket-initiate-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.requestRefund",
+      "documentId": "mentor-ticket-refund-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.createTicketType",
+      "documentId": "mentor-ticket-type-create-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.deleteTicketType",
+      "documentId": "mentor-ticket-type-delete-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.getEventOrders",
+      "documentId": "mentor-ticket-event-orders-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.updateTicketType",
+      "documentId": "mentor-ticket-type-update-001",
       "locale": null
     },
     {

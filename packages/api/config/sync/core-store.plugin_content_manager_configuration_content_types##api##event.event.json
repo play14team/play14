@@ -319,6 +319,92 @@
           "sortable": false
         }
       },
+      "ticketTypes": {
+        "edit": {
+          "label": "ticketTypes",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "ticketTypes",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "globalCapacity": {
+        "edit": {
+          "label": "globalCapacity",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "globalCapacity",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "ticketingEnabled": {
+        "edit": {
+          "label": "ticketingEnabled",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "ticketingEnabled",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "paymentProvider": {
+        "edit": {
+          "label": "paymentProvider",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "paymentProvider",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "stripeAccountId": {
+        "edit": {
+          "label": "stripeAccountId",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "stripeAccountId",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "stripeAccount": {
+        "edit": {
+          "label": "stripeAccount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "stripeAccountId"
+        },
+        "list": {
+          "label": "stripeAccount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "createdAt": {
         "edit": {
           "label": "createdAt",
@@ -506,6 +592,36 @@
           {
             "name": "finance",
             "size": 12
+          }
+        ],
+        [
+          {
+            "name": "ticketTypes",
+            "size": 6
+          },
+          {
+            "name": "globalCapacity",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "ticketingEnabled",
+            "size": 4
+          },
+          {
+            "name": "paymentProvider",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "stripeAccountId",
+            "size": 6
+          },
+          {
+            "name": "stripeAccount",
+            "size": 6
           }
         ]
       ]

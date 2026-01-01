@@ -402,7 +402,7 @@ export default function PlayerProfileForm({ player }: Props) {
                 setPosition(e.target.value as typeof position)
               }
               required
-              disabled={player.position !== "Founder"}
+              disabled
               className="admin-select"
             >
               {POSITION_OPTIONS.map((pos) => (
@@ -411,11 +411,9 @@ export default function PlayerProfileForm({ player }: Props) {
                 </option>
               ))}
             </select>
-            {player.position !== "Founder" && (
-              <p className="admin-form-help">
-                Only Founders can change player positions
-              </p>
-            )}
+            <p className="admin-form-help">
+              Only other organizers can change your position
+            </p>
           </div>
         </div>
 

@@ -9,6 +9,8 @@
     "db": "podman-compose up -d play14-db",
     "api": "cd packages/api && bun dev",
     "web": "cd packages/web && bun dev",
+    "stripe": "podman-compose up -d stripe-webhook",
+    "stripe:cli": "stripe listen --forward-to localhost:1337/api/ticket-orders/webhook",
     "build": "bun --filter play14-api build && bun --filter play14-web build",
     "build:api": "bun --filter play14-api build",
     "build:web": "bun --filter play14-web build",

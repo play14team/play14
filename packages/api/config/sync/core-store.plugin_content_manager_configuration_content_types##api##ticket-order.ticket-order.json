@@ -1,0 +1,433 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::ticket-order.ticket-order",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "orderNumber",
+      "defaultSortBy": "orderNumber",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "orderNumber": {
+        "edit": {
+          "label": "orderNumber",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "orderNumber",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "status": {
+        "edit": {
+          "label": "status",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "status",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "totalAmount": {
+        "edit": {
+          "label": "totalAmount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "totalAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "currency": {
+        "edit": {
+          "label": "currency",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "currency",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "paymentProvider": {
+        "edit": {
+          "label": "paymentProvider",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "paymentProvider",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "providerOrderId": {
+        "edit": {
+          "label": "providerOrderId",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "providerOrderId",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "providerSessionId": {
+        "edit": {
+          "label": "providerSessionId",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "providerSessionId",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "purchaserEmail": {
+        "edit": {
+          "label": "purchaserEmail",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "purchaserEmail",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "purchaserName": {
+        "edit": {
+          "label": "purchaserName",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "purchaserName",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "paidAt": {
+        "edit": {
+          "label": "paidAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "paidAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "refundedAt": {
+        "edit": {
+          "label": "refundedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "refundedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "refundAmount": {
+        "edit": {
+          "label": "refundAmount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "refundAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "refundReason": {
+        "edit": {
+          "label": "refundReason",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "refundReason",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "ticketDetails": {
+        "edit": {
+          "label": "ticketDetails",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "ticketDetails",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "player": {
+        "edit": {
+          "label": "player",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "player",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "event": {
+        "edit": {
+          "label": "event",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "event",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "tickets": {
+        "edit": {
+          "label": "tickets",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "ticketCode"
+        },
+        "list": {
+          "label": "tickets",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "orderNumber",
+        "status",
+        "totalAmount"
+      ],
+      "edit": [
+        [
+          {
+            "name": "orderNumber",
+            "size": 6
+          },
+          {
+            "name": "status",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "totalAmount",
+            "size": 4
+          },
+          {
+            "name": "currency",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "paymentProvider",
+            "size": 6
+          },
+          {
+            "name": "providerOrderId",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "providerSessionId",
+            "size": 6
+          },
+          {
+            "name": "purchaserEmail",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "purchaserName",
+            "size": 6
+          },
+          {
+            "name": "paidAt",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "refundedAt",
+            "size": 6
+          },
+          {
+            "name": "refundAmount",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "refundReason",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "ticketDetails",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "player",
+            "size": 6
+          },
+          {
+            "name": "event",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "tickets",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::ticket-order.ticket-order"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

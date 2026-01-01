@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tickets",
+  "info": {
+    "singularName": "ticket",
+    "pluralName": "tickets",
+    "displayName": "Ticket",
+    "description": "Individual tickets for event attendance"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "ticketCode": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["valid", "used", "cancelled", "refunded"],
+      "default": "valid",
+      "required": true
+    },
+    "attendeeName": {
+      "type": "string",
+      "required": true
+    },
+    "attendeeEmail": {
+      "type": "email",
+      "required": true
+    },
+    "checkedInAt": {
+      "type": "datetime"
+    },
+    "ticketType": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::ticket-type.ticket-type"
+    },
+    "order": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::ticket-order.ticket-order",
+      "inversedBy": "tickets"
+    },
+    "player": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event"
+    }
+  }
+}

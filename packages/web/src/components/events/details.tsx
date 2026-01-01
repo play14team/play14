@@ -17,7 +17,7 @@ import EventsNavigator from "./nav"
 import EventSidebar from "./sidebar"
 import EventTabs from "./tabs"
 import UpcomingEventTimer from "./timer"
-import HtmlContent from "../layout/html-content"
+import EventRegistration from "./registration"
 
 export default function EventDetails({ event }: { event: Event }) {
   const defaultImage = event.defaultImage as UploadFile
@@ -167,21 +167,7 @@ export default function EventDetails({ event }: { event: Event }) {
           </div>
         </div>
 
-        {isOpen() && event.registration?.widgetCode && (
-          <div className="row mt-4">
-            <div className="col-12">
-              <section
-                className="events-registration-section"
-                aria-labelledby="registration-heading"
-              >
-                <h3 id="registration-heading" className="mb-3">
-                  Registration
-                </h3>
-                <HtmlContent>{event.registration.widgetCode}</HtmlContent>
-              </section>
-            </div>
-          </div>
-        )}
+        {isOpen() && <EventRegistration event={event} />}
 
         <div className="row">
           <div className="courses-details-desc">

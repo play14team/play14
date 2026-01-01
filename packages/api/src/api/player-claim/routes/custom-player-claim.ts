@@ -9,6 +9,7 @@ export default {
       method: "GET",
       path: "/player-claims/check-match",
       handler: "custom-player-claim.checkMatch",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -19,6 +20,7 @@ export default {
       method: "GET",
       path: "/player-claims/suggestions",
       handler: "custom-player-claim.getSuggestions",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -29,6 +31,7 @@ export default {
       method: "GET",
       path: "/player-claims/me",
       handler: "custom-player-claim.findMyClaims",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -39,6 +42,7 @@ export default {
       method: "POST",
       path: "/player-claims",
       handler: "custom-player-claim.submitClaim",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -49,6 +53,7 @@ export default {
       method: "DELETE",
       path: "/player-claims/:id",
       handler: "custom-player-claim.cancelClaim",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -59,6 +64,7 @@ export default {
       method: "GET",
       path: "/player-claims/pending",
       handler: "custom-player-claim.getPendingClaims",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -69,6 +75,7 @@ export default {
       method: "PUT",
       path: "/player-claims/:id/approve",
       handler: "custom-player-claim.approveClaim",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -79,6 +86,7 @@ export default {
       method: "PUT",
       path: "/player-claims/:id/reject",
       handler: "custom-player-claim.rejectClaim",
+      info: { apiName: "player-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],

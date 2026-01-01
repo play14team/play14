@@ -1,0 +1,87 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ticket_orders",
+  "info": {
+    "singularName": "ticket-order",
+    "pluralName": "ticket-orders",
+    "displayName": "Ticket Order",
+    "description": "Ticket purchase orders"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "orderNumber": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["pending", "paid", "cancelled", "refunded", "partially_refunded"],
+      "default": "pending",
+      "required": true
+    },
+    "totalAmount": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "currency": {
+      "type": "string",
+      "required": true,
+      "default": "EUR"
+    },
+    "paymentProvider": {
+      "type": "enumeration",
+      "enum": ["stripe", "humanitix", "manual"],
+      "required": true
+    },
+    "providerOrderId": {
+      "type": "string"
+    },
+    "providerSessionId": {
+      "type": "string"
+    },
+    "purchaserEmail": {
+      "type": "email",
+      "required": true
+    },
+    "purchaserName": {
+      "type": "string",
+      "required": true
+    },
+    "paidAt": {
+      "type": "datetime"
+    },
+    "refundedAt": {
+      "type": "datetime"
+    },
+    "refundAmount": {
+      "type": "decimal",
+      "min": 0
+    },
+    "refundReason": {
+      "type": "text"
+    },
+    "ticketDetails": {
+      "type": "json"
+    },
+    "player": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event"
+    },
+    "tickets": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket.ticket",
+      "mappedBy": "order"
+    }
+  }
+}
