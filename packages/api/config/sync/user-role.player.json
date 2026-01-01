@@ -6,6 +6,36 @@
   "locale": null,
   "permissions": [
     {
+      "action": "api::attendance-claim.custom-attendance-claim.cancelClaim",
+      "documentId": "player-attendance-cancel-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getMyClaims",
+      "documentId": "player-attendance-my-claims-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getOverEvents",
+      "documentId": "player-attendance-over-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getPendingClaimsForPlayer",
+      "documentId": "player-attendance-pending-player-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.searchEvents",
+      "documentId": "player-attendance-search-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.submitClaim",
+      "documentId": "player-attendance-submit-001",
+      "locale": null
+    },
+    {
       "action": "api::event.event.find",
       "documentId": "jp5k740tycizjww3cb4gb9m2",
       "locale": null

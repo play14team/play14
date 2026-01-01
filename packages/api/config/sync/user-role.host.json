@@ -6,6 +6,51 @@
   "locale": null,
   "permissions": [
     {
+      "action": "api::attendance-claim.custom-attendance-claim.approveClaim",
+      "documentId": "host-attendance-approve-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.cancelClaim",
+      "documentId": "host-attendance-cancel-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getMyClaims",
+      "documentId": "host-attendance-my-claims-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getOverEvents",
+      "documentId": "host-attendance-over-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getPendingClaimsForMyEvents",
+      "documentId": "host-attendance-pending-my-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getPendingClaimsForPlayer",
+      "documentId": "host-attendance-pending-player-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.rejectClaim",
+      "documentId": "host-attendance-reject-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.searchEvents",
+      "documentId": "host-attendance-search-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.submitClaim",
+      "documentId": "host-attendance-submit-001",
+      "locale": null
+    },
+    {
       "action": "api::event.event.find",
       "documentId": "iqoukjwe7os9m5kw4z4xi3mo",
       "locale": null

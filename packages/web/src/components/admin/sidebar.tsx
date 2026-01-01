@@ -17,6 +17,7 @@ interface NavItem {
   label: string
   exact?: boolean
   founderOnly?: boolean
+  organizerOnly?: boolean
 }
 
 export default function AdminSidebar({ user }: AdminSidebarProps) {
@@ -25,6 +26,10 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
 
   const isFounder = user.player?.position === "Founder"
+  const isOrganizer =
+    user.player?.position === "Host" ||
+    user.player?.position === "Mentor" ||
+    isFounder
 
   const handleSignOut = async () => {
     await fetch("/api/auth/signout", { method: "POST" })
@@ -45,20 +50,30 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       label: "My Profile",
     },
     {
+      href: "/admin/claim-attendance",
+      icon: "bx-calendar-plus",
+      label: "Claim Attendance",
+    },
+    {
+      href: "/admin/attendance-claims",
+      icon: "bx-calendar-check",
+      label: "Attendance Claims",
+      organizerOnly: true,
+    },
+    {
       href: "/admin/claims",
       icon: "bx-user-check",
-      label: "Claims",
+      label: "Player Claims",
       founderOnly: true,
     },
-    // Future items
-    // { href: "/admin/events", icon: "bx-calendar", label: "Events" },
-    // { href: "/admin/players", icon: "bx-group", label: "Players" },
   ]
 
   // Filter nav items based on user role
-  const visibleNavItems = navItems.filter(
-    (item) => !item.founderOnly || isFounder
-  )
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.founderOnly && !isFounder) return false
+    if (item.organizerOnly && !isOrganizer) return false
+    return true
+  })
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) {

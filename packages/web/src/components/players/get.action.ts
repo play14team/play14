@@ -233,3 +233,40 @@ export async function getPlayerNav() {
 
   return allPlayers
 }
+
+const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+
+// Types for pending attendance claims
+interface PendingAttendanceClaim {
+  documentId: string
+  claimStatus: "pending"
+  event: EventItem
+}
+
+/**
+ * Get pending attendance claims for a player
+ * Used to display pending events on player profile
+ */
+export async function getPendingAttendanceClaims(
+  playerDocumentId: string
+): Promise<PendingAttendanceClaim[]> {
+  try {
+    const response = await fetch(
+      `${STRAPI_URL}/api/attendance-claims/player/${playerDocumentId}`,
+      { cache: "no-store" }
+    )
+
+    if (!response.ok) {
+      console.error(
+        `[Players] Failed to fetch pending claims: ${response.status}`
+      )
+      return []
+    }
+
+    const data = await response.json()
+    return data.data || []
+  } catch (error) {
+    console.error("[Players] Failed to fetch pending attendance claims:", error)
+    return []
+  }
+}
