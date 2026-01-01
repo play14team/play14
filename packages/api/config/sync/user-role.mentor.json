@@ -6,6 +6,51 @@
   "locale": null,
   "permissions": [
     {
+      "action": "api::attendance-claim.custom-attendance-claim.approveClaim",
+      "documentId": "mentor-attendance-approve-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.cancelClaim",
+      "documentId": "mentor-attendance-cancel-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getMyClaims",
+      "documentId": "mentor-attendance-my-claims-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getOverEvents",
+      "documentId": "mentor-attendance-over-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getPendingClaimsForMyEvents",
+      "documentId": "mentor-attendance-pending-my-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.getPendingClaimsForPlayer",
+      "documentId": "mentor-attendance-pending-player-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.rejectClaim",
+      "documentId": "mentor-attendance-reject-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.searchEvents",
+      "documentId": "mentor-attendance-search-001",
+      "locale": null
+    },
+    {
+      "action": "api::attendance-claim.custom-attendance-claim.submitClaim",
+      "documentId": "mentor-attendance-submit-001",
+      "locale": null
+    },
+    {
       "action": "api::event.event.find",
       "documentId": "fu9pbws3ptstzng2mfnf12yo",
       "locale": null

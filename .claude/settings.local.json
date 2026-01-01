@@ -51,7 +51,8 @@
       "Bash(timeout 5 curl:*)",
       "Bash(test:*)",
       "Bash(cat:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -426,6 +426,47 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   }
 }
 
+export interface ApiAttendanceClaimAttendanceClaim extends Struct.CollectionTypeSchema {
+  collectionName: "attendance_claims"
+  info: {
+    description: "Pending requests from players to claim event attendance"
+    displayName: "Attendance Claim"
+    pluralName: "attendance-claims"
+    singularName: "attendance-claim"
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    adminNotes: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000
+      }>
+    claimStatus: Schema.Attribute.Enumeration<["pending", "approved", "rejected"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"pending">
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    event: Schema.Attribute.Relation<"manyToOne", "api::event.event">
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::attendance-claim.attendance-claim"
+    > &
+      Schema.Attribute.Private
+    player: Schema.Attribute.Relation<"manyToOne", "api::player.player">
+    processedAt: Schema.Attribute.DateTime
+    processedBy: Schema.Attribute.Relation<"manyToOne", "api::player.player">
+    publishedAt: Schema.Attribute.DateTime
+    reason: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000
+      }>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+  }
+}
+
 export interface ApiEventLocationEventLocation extends Struct.CollectionTypeSchema {
   collectionName: "event_locations"
   info: {
@@ -1602,6 +1643,7 @@ declare module "@strapi/strapi" {
       "admin::transfer-token-permission": AdminTransferTokenPermission
       "admin::user": AdminUser
       "api::article.article": ApiArticleArticle
+      "api::attendance-claim.attendance-claim": ApiAttendanceClaimAttendanceClaim
       "api::event-location.event-location": ApiEventLocationEventLocation
       "api::event.event": ApiEventEvent
       "api::expectation.expectation": ApiExpectationExpectation

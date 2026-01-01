@@ -6,11 +6,20 @@ export default function TabHeaders({
   attendedCount,
   hostedCount,
   mentoredCount,
+  pendingCount,
 }: {
   attendedCount?: number
   hostedCount?: number
   mentoredCount?: number
+  pendingCount?: number
 }) {
+  const attendedLabel =
+    attendedCount && attendedCount > 0
+      ? pendingCount && pendingCount > 0
+        ? `(${attendedCount}, ${pendingCount} pending)`
+        : `(${attendedCount})`
+      : ""
+
   return (
     <ul className="nav nav-tabs" id="myTab" role="tablist">
       <li
@@ -21,8 +30,7 @@ export default function TabHeaders({
         Biography
       </li>
       <li onClick={(e) => openTabSection(e, "tab2")} aria-hidden="true">
-        Attended{" "}
-        {attendedCount && attendedCount > 0 ? `(${attendedCount})` : ""}
+        Attended {attendedLabel}
       </li>
       <li onClick={(e) => openTabSection(e, "tab3")} aria-hidden="true">
         Hosted {hostedCount && hostedCount > 0 ? `(${hostedCount})` : ""}

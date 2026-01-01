@@ -7,7 +7,12 @@ import { Event } from "@/models/strapi"
 import EventDate from "./date"
 import EventStatus from "./status"
 
-const EventCard = ({ event }: { event: Event }) => {
+interface EventCardProps {
+  event: Event
+  isPending?: boolean
+}
+
+const EventCard = ({ event, isPending }: EventCardProps) => {
   const url = `/events/${encodeURIComponent(event.slug)}`
   const image = event.defaultImage || "#"
   const countryCode = event.location?.country || "LU"
@@ -99,7 +104,13 @@ const EventCard = ({ event }: { event: Event }) => {
             </li>
             <li>
               <span className="location">
-                <EventStatus status={event.eventStatus} />
+                {isPending ? (
+                  <span className="event-status event-status-pending">
+                    <i className="bx bx-time-five"></i> Pending
+                  </span>
+                ) : (
+                  <EventStatus status={event.eventStatus} />
+                )}
               </span>
             </li>
           </ul>

@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "attendance_claims",
+  "info": {
+    "singularName": "attendance-claim",
+    "pluralName": "attendance-claims",
+    "displayName": "Attendance Claim",
+    "description": "Pending requests from players to claim event attendance"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "claimStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "approved", "rejected"],
+      "default": "pending",
+      "required": true
+    },
+    "player": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event"
+    },
+    "reason": {
+      "type": "text",
+      "maxLength": 1000
+    },
+    "adminNotes": {
+      "type": "text",
+      "maxLength": 1000
+    },
+    "processedAt": {
+      "type": "datetime"
+    },
+    "processedBy": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    }
+  }
+}
