@@ -9,6 +9,7 @@ export default {
       method: "GET",
       path: "/attendance-claims/events",
       handler: "custom-attendance-claim.getOverEvents",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -19,6 +20,7 @@ export default {
       method: "GET",
       path: "/attendance-claims/events/search",
       handler: "custom-attendance-claim.searchEvents",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -29,6 +31,7 @@ export default {
       method: "GET",
       path: "/attendance-claims/me",
       handler: "custom-attendance-claim.getMyClaims",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -39,6 +42,7 @@ export default {
       method: "POST",
       path: "/attendance-claims",
       handler: "custom-attendance-claim.submitClaim",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -49,6 +53,7 @@ export default {
       method: "DELETE",
       path: "/attendance-claims/:id",
       handler: "custom-attendance-claim.cancelClaim",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -59,6 +64,7 @@ export default {
       method: "GET",
       path: "/attendance-claims/for-my-events",
       handler: "custom-attendance-claim.getPendingClaimsForMyEvents",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -69,6 +75,7 @@ export default {
       method: "PUT",
       path: "/attendance-claims/:id/approve",
       handler: "custom-attendance-claim.approveClaim",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -79,6 +86,7 @@ export default {
       method: "PUT",
       path: "/attendance-claims/:id/reject",
       handler: "custom-attendance-claim.rejectClaim",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],
@@ -89,6 +97,7 @@ export default {
       method: "GET",
       path: "/attendance-claims/player/:playerDocumentId",
       handler: "custom-attendance-claim.getPendingClaimsForPlayer",
+      info: { apiName: "attendance-claim", type: "content-api" },
       config: {
         policies: [],
         middlewares: [],

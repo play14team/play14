@@ -91,6 +91,81 @@
     },
     {
       "action": "plugin::content-manager.explorer.create",
+      "subject": "api::attendance-claim.attendance-claim",
+      "properties": {
+        "fields": [
+          "claimStatus",
+          "player",
+          "event",
+          "reason",
+          "adminNotes",
+          "processedAt",
+          "processedBy"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "om2uhxy8qobp28tmw045hipt",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::attendance-claim.attendance-claim",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "azdx1jd7l606ihm7hdoe4ym4",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::attendance-claim.attendance-claim",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "y0l0z6tm9yroef0bn0mk7s48",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::attendance-claim.attendance-claim",
+      "properties": {
+        "fields": [
+          "claimStatus",
+          "player",
+          "event",
+          "reason",
+          "adminNotes",
+          "processedAt",
+          "processedBy"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "becrwsoo0ge58gtpxrmsj3fj",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::attendance-claim.attendance-claim",
+      "properties": {
+        "fields": [
+          "claimStatus",
+          "player",
+          "event",
+          "reason",
+          "adminNotes",
+          "processedAt",
+          "processedBy"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "f2l73qx6xwhyem7dwnpd9gmg",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
       "subject": "api::event-location.event-location",
       "properties": {
         "fields": [
@@ -193,7 +268,13 @@
           "finance.expenses",
           "finance.destination",
           "finance.result",
-          "finance.resultAmount"
+          "finance.resultAmount",
+          "ticketTypes",
+          "globalCapacity",
+          "ticketingEnabled",
+          "paymentProvider",
+          "stripeAccountId",
+          "stripeAccount"
         ],
         "locales": [
           "en",
@@ -202,7 +283,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "a6ogkz5w5aeoj7spzzge3pku",
+      "documentId": "btcqreto8hv381gv1yw9gmm1",
       "locale": null
     },
     {
@@ -268,7 +349,13 @@
           "finance.expenses",
           "finance.destination",
           "finance.result",
-          "finance.resultAmount"
+          "finance.resultAmount",
+          "ticketTypes",
+          "globalCapacity",
+          "ticketingEnabled",
+          "paymentProvider",
+          "stripeAccountId",
+          "stripeAccount"
         ],
         "locales": [
           "en",
@@ -277,7 +364,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "f3eppxx4v0uo47g235jeuky3",
+      "documentId": "edzq699yxuvfu32o2bslbyj0",
       "locale": null
     },
     {
@@ -315,7 +402,13 @@
           "finance.expenses",
           "finance.destination",
           "finance.result",
-          "finance.resultAmount"
+          "finance.resultAmount",
+          "ticketTypes",
+          "globalCapacity",
+          "ticketingEnabled",
+          "paymentProvider",
+          "stripeAccountId",
+          "stripeAccount"
         ],
         "locales": [
           "en",
@@ -324,7 +417,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "oimvju1y1ombvnbqckzft1io",
+      "documentId": "ehq2l95qy6jtn0uyennornak",
       "locale": null
     },
     {
@@ -914,7 +1007,7 @@
       "subject": "api::player-claim.player-claim",
       "properties": {
         "fields": [
-          "status",
+          "claimStatus",
           "user",
           "player",
           "reason",
@@ -924,7 +1017,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "txnc6u9tmr9i0icsane31pux",
+      "documentId": "inn71uwzxi5ay9xsv1b00bgd",
       "locale": null
     },
     {
@@ -950,7 +1043,7 @@
       "subject": "api::player-claim.player-claim",
       "properties": {
         "fields": [
-          "status",
+          "claimStatus",
           "user",
           "player",
           "reason",
@@ -960,7 +1053,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "vx8fmbedo3lliz3170s3x939",
+      "documentId": "s9yk52uywsi9fe39l8szgefa",
       "locale": null
     },
     {
@@ -968,7 +1061,7 @@
       "subject": "api::player-claim.player-claim",
       "properties": {
         "fields": [
-          "status",
+          "claimStatus",
           "user",
           "player",
           "reason",
@@ -978,7 +1071,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "hr6674l6iy6fc8vgvacn6kmz",
+      "documentId": "fyil0u82l1r2uj19gidclrx4",
       "locale": null
     },
     {
@@ -1002,12 +1095,13 @@
           "user",
           "documented",
           "proposed",
-          "location"
+          "location",
+          "stripeAccount"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "xknccyx5qmv77zfnx9wd8tu3",
+      "documentId": "eag6h3qlu3nhsguo0bn3iior",
       "locale": null
     },
     {
@@ -1049,12 +1143,13 @@
           "user",
           "documented",
           "proposed",
-          "location"
+          "location",
+          "stripeAccount"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "qf7otbq756xaf209d18u2930",
+      "documentId": "blx66n5g8l9vxc9y3rl7qinv",
       "locale": null
     },
     {
@@ -1078,12 +1173,13 @@
           "user",
           "documented",
           "proposed",
-          "location"
+          "location",
+          "stripeAccount"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "ktm249d3818wyot91oyjs7zo",
+      "documentId": "js6g4bvoklxlvlx4tzadwprt",
       "locale": null
     },
     {
@@ -1153,6 +1249,90 @@
       "conditions": [],
       "actionParameters": {},
       "documentId": "ffbjz2nyag18l9cikunvketp",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::stripe-account.stripe-account",
+      "properties": {
+        "fields": [
+          "stripeAccountId",
+          "player",
+          "accountStatus",
+          "chargesEnabled",
+          "payoutsEnabled",
+          "detailsSubmitted",
+          "country",
+          "defaultCurrency",
+          "businessName",
+          "onboardingCompletedAt"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "zzvtoxb0qbilbgw1ei3i1vhl",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::stripe-account.stripe-account",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "htmt099j5ey7ai21i4v2djoo",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::stripe-account.stripe-account",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "mk0v5cart0iltsmxcnu22vx1",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::stripe-account.stripe-account",
+      "properties": {
+        "fields": [
+          "stripeAccountId",
+          "player",
+          "accountStatus",
+          "chargesEnabled",
+          "payoutsEnabled",
+          "detailsSubmitted",
+          "country",
+          "defaultCurrency",
+          "businessName",
+          "onboardingCompletedAt"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "xnt2h0hsdbszmn10s5zwxi1l",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::stripe-account.stripe-account",
+      "properties": {
+        "fields": [
+          "stripeAccountId",
+          "player",
+          "accountStatus",
+          "chargesEnabled",
+          "payoutsEnabled",
+          "detailsSubmitted",
+          "country",
+          "defaultCurrency",
+          "businessName",
+          "onboardingCompletedAt"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "zwj9byj6xnn01x1i9c6odtfd",
       "locale": null
     },
     {
@@ -1279,6 +1459,279 @@
       "conditions": [],
       "actionParameters": {},
       "documentId": "u0b6wweu38znw7os39jlkx3m",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::ticket-order.ticket-order",
+      "properties": {
+        "fields": [
+          "orderNumber",
+          "status",
+          "totalAmount",
+          "currency",
+          "paymentProvider",
+          "providerOrderId",
+          "providerSessionId",
+          "purchaserEmail",
+          "purchaserName",
+          "paidAt",
+          "refundedAt",
+          "refundAmount",
+          "refundReason",
+          "ticketDetails",
+          "player",
+          "event",
+          "tickets"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "t7hyvv5088776ffvn63w21cj",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::ticket-order.ticket-order",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "dox18fi3c6rdj5b3owyivpbm",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::ticket-order.ticket-order",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "ilg8drxoh3e81c8c4hnc186o",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::ticket-order.ticket-order",
+      "properties": {
+        "fields": [
+          "orderNumber",
+          "status",
+          "totalAmount",
+          "currency",
+          "paymentProvider",
+          "providerOrderId",
+          "providerSessionId",
+          "purchaserEmail",
+          "purchaserName",
+          "paidAt",
+          "refundedAt",
+          "refundAmount",
+          "refundReason",
+          "ticketDetails",
+          "player",
+          "event",
+          "tickets"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "zy5uo0zyubg4gkff1ooifoz3",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::ticket-order.ticket-order",
+      "properties": {
+        "fields": [
+          "orderNumber",
+          "status",
+          "totalAmount",
+          "currency",
+          "paymentProvider",
+          "providerOrderId",
+          "providerSessionId",
+          "purchaserEmail",
+          "purchaserName",
+          "paidAt",
+          "refundedAt",
+          "refundAmount",
+          "refundReason",
+          "ticketDetails",
+          "player",
+          "event",
+          "tickets"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "qg7ey5lwg7hi69cfpxof6tk7",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::ticket-type.ticket-type",
+      "properties": {
+        "fields": [
+          "name",
+          "description",
+          "price",
+          "currency",
+          "capacity",
+          "soldCount",
+          "validFrom",
+          "validUntil",
+          "sortOrder",
+          "isActive",
+          "event"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "do9ayjul2d47ivnvviter4wr",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::ticket-type.ticket-type",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "iu7ji8x4tjpwqdklvl4oo8u5",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::ticket-type.ticket-type",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "p5gh7wickkq1szu933pd2fvd",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::ticket-type.ticket-type",
+      "properties": {
+        "fields": [
+          "name",
+          "description",
+          "price",
+          "currency",
+          "capacity",
+          "soldCount",
+          "validFrom",
+          "validUntil",
+          "sortOrder",
+          "isActive",
+          "event"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "f27b18xfke822qie033r47mf",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::ticket-type.ticket-type",
+      "properties": {
+        "fields": [
+          "name",
+          "description",
+          "price",
+          "currency",
+          "capacity",
+          "soldCount",
+          "validFrom",
+          "validUntil",
+          "sortOrder",
+          "isActive",
+          "event"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "kf99wgpz7ns1oexqv5593nic",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
+      "subject": "api::ticket.ticket",
+      "properties": {
+        "fields": [
+          "ticketCode",
+          "status",
+          "attendeeName",
+          "attendeeEmail",
+          "checkedInAt",
+          "ticketType",
+          "order",
+          "player",
+          "event"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "ei99q1fdlpndfujs1zczyxvp",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::ticket.ticket",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "r8acdte4hy9iyoltbv442f3j",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::ticket.ticket",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "rzbllgvrka7n8q5jx3xjsye0",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::ticket.ticket",
+      "properties": {
+        "fields": [
+          "ticketCode",
+          "status",
+          "attendeeName",
+          "attendeeEmail",
+          "checkedInAt",
+          "ticketType",
+          "order",
+          "player",
+          "event"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "nb5zt8pe78tljecjngcmaxw5",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::ticket.ticket",
+      "properties": {
+        "fields": [
+          "ticketCode",
+          "status",
+          "attendeeName",
+          "attendeeEmail",
+          "checkedInAt",
+          "ticketType",
+          "order",
+          "player",
+          "event"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "mcz1juti2plh6l10jqugxl9q",
       "locale": null
     },
     {

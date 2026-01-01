@@ -250,6 +250,21 @@
           "sortable": false
         }
       },
+      "stripeAccount": {
+        "edit": {
+          "label": "stripeAccount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "stripeAccountId"
+        },
+        "list": {
+          "label": "stripeAccount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "createdAt": {
         "edit": {
           "label": "createdAt",
@@ -409,6 +424,12 @@
           },
           {
             "name": "proposed",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "stripeAccount",
             "size": 6
           }
         ]

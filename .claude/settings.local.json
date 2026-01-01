@@ -52,7 +52,11 @@
       "Bash(test:*)",
       "Bash(cat:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(podman volume inspect:*)",
+      "Bash(podman ps:*)",
+      "Bash(podman exec:*)",
+      "Bash(podman inspect:*)"
     ]
   }
 }

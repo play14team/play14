@@ -1,0 +1,241 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::attendance-claim.attendance-claim",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "documentId",
+      "defaultSortBy": "documentId",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "claimStatus": {
+        "edit": {
+          "label": "claimStatus",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "claimStatus",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "player": {
+        "edit": {
+          "label": "player",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "player",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "event": {
+        "edit": {
+          "label": "event",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "event",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "reason": {
+        "edit": {
+          "label": "reason",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "reason",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "adminNotes": {
+        "edit": {
+          "label": "adminNotes",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "adminNotes",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "processedAt": {
+        "edit": {
+          "label": "processedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "processedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "processedBy": {
+        "edit": {
+          "label": "processedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "processedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "claimStatus",
+        "player",
+        "event"
+      ],
+      "edit": [
+        [
+          {
+            "name": "claimStatus",
+            "size": 6
+          },
+          {
+            "name": "player",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "event",
+            "size": 6
+          },
+          {
+            "name": "reason",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "adminNotes",
+            "size": 6
+          },
+          {
+            "name": "processedAt",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "processedBy",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::attendance-claim.attendance-claim"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

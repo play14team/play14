@@ -13,6 +13,11 @@ const EventSidebar = ({ event }: { event: Event }) => {
   const eventName = encodeURI(event.name!)
   const text = encodeURI("Take a look at #play14 ") + eventName
 
+  // Check if Stripe ticketing is enabled (scrolls to registration section)
+  const eventData = event as any
+  const hasStripeTicketing =
+    eventData.ticketingEnabled && eventData.paymentProvider === "stripe"
+
   // Find photos album URL from media
   const photosAlbum = event.media?.find(
     (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos,
@@ -113,7 +118,18 @@ const EventSidebar = ({ event }: { event: Event }) => {
         </li> */}
       </ul>
 
+      {/* Get Tickets button for Stripe ticketing - scrolls to registration section */}
+      {event.eventStatus == Enum_Event_Eventstatus.Open && hasStripeTicketing && (
+        <div className="btn-box">
+          <a href="#registration-heading" className="default-btn">
+            <i className="flaticon-ticket"></i>Get Tickets
+          </a>
+        </div>
+      )}
+
+      {/* Book Now button for external registration links (only if not using Stripe ticketing) */}
       {event.eventStatus == Enum_Event_Eventstatus.Open &&
+        !hasStripeTicketing &&
         event.registration &&
         event.registration.link && (
           <div className="btn-box">
@@ -125,10 +141,6 @@ const EventSidebar = ({ event }: { event: Event }) => {
             >
               <i className="flaticon-user"></i>Book Now
             </Link>
-            {/* <p>
-              You must <Link href="/login">login</Link> before registering an
-              event.
-            </p> */}
           </div>
         )}
 

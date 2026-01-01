@@ -44,13 +44,13 @@ services:
     platform: linux/arm64
     restart: unless-stopped
     env_file: ./packages/api/.env
-    image: postgres:17.6-alpine
+    image: docker.io/library/postgres:17.6-alpine
     environment:
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - play14-api-data:/var/lib/postgresql/data/
+      - play14-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     networks:
@@ -58,7 +58,7 @@ services:
 
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4:latest
+    image: docker.io/dpage/pgadmin4:latest
     restart: unless-stopped
     ports:
       - "5050:80"
@@ -73,6 +73,16 @@ services:
       - play14-api
     depends_on:
       - play14-db
+
+  stripe-webhook:
+    container_name: stripe-webhook
+    image: docker.io/stripe/stripe-cli:latest
+    command: listen --forward-to http://play14-api:1337/api/ticket-orders/webhook
+    environment:
+      - STRIPE_API_KEY=${STRIPE_SECRET_KEY}
+    networks:
+      - play14-api
+    restart: unless-stopped
 
   play14-web:
     container_name: play14-web
@@ -120,7 +130,8 @@ services:
       start_period: 40s
 
 volumes:
-  play14-api-data:
+  play14-data:
+    external: true
   pgadmin-data:
   web-node_modules:
 

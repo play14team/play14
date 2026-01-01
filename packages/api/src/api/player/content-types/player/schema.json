@@ -94,6 +94,12 @@
     "location": {
       "type": "customField",
       "customField": "global::map-field"
+    },
+    "stripeAccount": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::stripe-account.stripe-account",
+      "mappedBy": "player"
     }
   }
 }

@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "stripe_accounts",
+  "info": {
+    "singularName": "stripe-account",
+    "pluralName": "stripe-accounts",
+    "displayName": "Stripe Account",
+    "description": "Connected Stripe accounts for event hosts"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "stripeAccountId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "player": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::player.player",
+      "inversedBy": "stripeAccount"
+    },
+    "accountStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "active", "restricted", "disabled"],
+      "default": "pending",
+      "required": true
+    },
+    "chargesEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "payoutsEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "detailsSubmitted": {
+      "type": "boolean",
+      "default": false
+    },
+    "country": {
+      "type": "string",
+      "maxLength": 2
+    },
+    "defaultCurrency": {
+      "type": "string",
+      "maxLength": 3,
+      "default": "eur"
+    },
+    "businessName": {
+      "type": "string"
+    },
+    "onboardingCompletedAt": {
+      "type": "datetime"
+    }
+  }
+}

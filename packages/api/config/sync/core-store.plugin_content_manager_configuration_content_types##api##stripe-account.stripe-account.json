@@ -1,0 +1,295 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::stripe-account.stripe-account",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "stripeAccountId",
+      "defaultSortBy": "stripeAccountId",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "stripeAccountId": {
+        "edit": {
+          "label": "stripeAccountId",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "stripeAccountId",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "player": {
+        "edit": {
+          "label": "player",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "player",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "accountStatus": {
+        "edit": {
+          "label": "accountStatus",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "accountStatus",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "chargesEnabled": {
+        "edit": {
+          "label": "chargesEnabled",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "chargesEnabled",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "payoutsEnabled": {
+        "edit": {
+          "label": "payoutsEnabled",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "payoutsEnabled",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "detailsSubmitted": {
+        "edit": {
+          "label": "detailsSubmitted",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "detailsSubmitted",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "country": {
+        "edit": {
+          "label": "country",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "country",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "defaultCurrency": {
+        "edit": {
+          "label": "defaultCurrency",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "defaultCurrency",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "businessName": {
+        "edit": {
+          "label": "businessName",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "businessName",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "onboardingCompletedAt": {
+        "edit": {
+          "label": "onboardingCompletedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "onboardingCompletedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "stripeAccountId",
+        "player",
+        "accountStatus"
+      ],
+      "edit": [
+        [
+          {
+            "name": "stripeAccountId",
+            "size": 6
+          },
+          {
+            "name": "player",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "accountStatus",
+            "size": 6
+          },
+          {
+            "name": "chargesEnabled",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "payoutsEnabled",
+            "size": 4
+          },
+          {
+            "name": "detailsSubmitted",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "country",
+            "size": 6
+          },
+          {
+            "name": "defaultCurrency",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "businessName",
+            "size": 6
+          },
+          {
+            "name": "onboardingCompletedAt",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::stripe-account.stripe-account"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

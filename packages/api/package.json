@@ -45,6 +45,7 @@
     "strapi-plugin-webp-converter": "^1.0.4",
     "strapi-provider-email-resend": "^1.0.4",
     "strapi-provider-upload-azure-storage": "^3.5.0",
+    "stripe": "^20.1.0",
     "styled-components": "^6.1.19"
   },
   "strapi": {

@@ -197,6 +197,22 @@ export async function requireFounder(callbackUrl?: string): Promise<Session & { 
   return session
 }
 
+/**
+ * Require Organizer role - redirects if user is not Host, Mentor, or Founder
+ */
+export async function requireOrganizer(callbackUrl?: string): Promise<Session & { player: Player }> {
+  const session = await requirePlayer(callbackUrl)
+
+  const position = session.player.position || ""
+  const isOrganizer = ["Host", "Mentor", "Founder"].includes(position)
+
+  if (!isOrganizer) {
+    redirect("/admin")
+  }
+
+  return session
+}
+
 // ============================================================================
 // AUTH ACTIONS (for server actions)
 // ============================================================================

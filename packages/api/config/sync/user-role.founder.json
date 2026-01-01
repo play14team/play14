@@ -101,6 +101,41 @@
       "locale": null
     },
     {
+      "action": "api::event.custom-event.createEvent",
+      "documentId": "founder-event-create-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getEventForEdit",
+      "documentId": "founder-event-get-for-edit-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getLocations",
+      "documentId": "founder-event-get-locations-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getMyEvents",
+      "documentId": "founder-event-get-my-events-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getOrganizers",
+      "documentId": "founder-event-get-organizers-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.getVenues",
+      "documentId": "founder-event-get-venues-001",
+      "locale": null
+    },
+    {
+      "action": "api::event.custom-event.updateEvent",
+      "documentId": "founder-event-update-001",
+      "locale": null
+    },
+    {
       "action": "api::event.event.create",
       "documentId": "fzvviz30qj94z139vutjmgts",
       "locale": null
@@ -321,8 +356,28 @@
       "locale": null
     },
     {
+      "action": "api::player.custom-player.getPlayerForEdit",
+      "documentId": "founder-player-get-for-edit-001",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.listPlayers",
+      "documentId": "founder-player-list-001",
+      "locale": null
+    },
+    {
       "action": "api::player.custom-player.updateMe",
       "documentId": "zn2povp9ye384pcvb1hi02bd",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.updatePlayer",
+      "documentId": "founder-player-update-001",
+      "locale": null
+    },
+    {
+      "action": "api::player.custom-player.updatePlayerPosition",
+      "documentId": "founder-player-update-position-001",
       "locale": null
     },
     {
@@ -381,6 +436,41 @@
       "locale": null
     },
     {
+      "action": "api::stripe-account.custom-stripe-account.createAccount",
+      "documentId": "founder-stripe-create-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getAccountStatus",
+      "documentId": "founder-stripe-status-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getDashboardLink",
+      "documentId": "founder-stripe-dashboard-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getEventHostAccounts",
+      "documentId": "founder-stripe-event-accounts-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.getOnboardingLink",
+      "documentId": "founder-stripe-onboarding-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.linkAccountToEvent",
+      "documentId": "founder-stripe-link-001",
+      "locale": null
+    },
+    {
+      "action": "api::stripe-account.custom-stripe-account.unlinkAccountFromEvent",
+      "documentId": "founder-stripe-unlink-001",
+      "locale": null
+    },
+    {
       "action": "api::tag.tag.create",
       "documentId": "qop6w5v56ak167kpbqrj4c9i",
       "locale": null
@@ -428,6 +518,56 @@
     {
       "action": "api::testimonial.testimonial.update",
       "documentId": "vvn5lr7nnbprgkkaie049j0u",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.getAvailableTickets",
+      "documentId": "zjootpy1thxy3jyr4iq5jz1u",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.getMyOrders",
+      "documentId": "founder-ticket-my-orders-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.getOrderStatus",
+      "documentId": "founder-ticket-status-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.initiateOrder",
+      "documentId": "founder-ticket-initiate-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.requestRefund",
+      "documentId": "founder-ticket-refund-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.webhook.handleStripeWebhook",
+      "documentId": "cuyrkcfbcfsx61fo8y1u7kij",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.createTicketType",
+      "documentId": "founder-ticket-type-create-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.deleteTicketType",
+      "documentId": "founder-ticket-type-delete-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.getEventOrders",
+      "documentId": "founder-ticket-event-orders-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-type.custom-ticket-type.updateTicketType",
+      "documentId": "founder-ticket-type-update-001",
       "locale": null
     },
     {

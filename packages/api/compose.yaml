@@ -45,7 +45,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
-      - play14-api-data:/var/lib/postgresql/data/
+      - play14-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     networks:
@@ -70,7 +70,8 @@ services:
       - play14-db
 
 volumes:
-  play14-api-data:
+  play14-data:
+    external: true
   pgadmin-data:
 
 networks:

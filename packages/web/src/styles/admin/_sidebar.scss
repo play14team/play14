@@ -41,6 +41,17 @@
         display: none;
       }
     }
+
+    .admin-sidebar-section {
+      margin-bottom: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+
+      &:first-child {
+        border-top: none;
+        padding-top: 0;
+      }
+    }
   }
 }
 
@@ -127,6 +138,24 @@
   li {
     margin-bottom: 4px;
   }
+}
+
+.admin-sidebar-section {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.admin-sidebar-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  padding: 0 16px 8px;
+  margin: 0;
 }
 
 .admin-sidebar-link {

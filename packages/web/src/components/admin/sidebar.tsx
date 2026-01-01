@@ -20,16 +20,20 @@ interface NavItem {
   organizerOnly?: boolean
 }
 
+interface NavSection {
+  title: string
+  items: NavItem[]
+}
+
 export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
 
   const isFounder = user.player?.position === "Founder"
-  const isOrganizer =
-    user.player?.position === "Host" ||
-    user.player?.position === "Mentor" ||
-    isFounder
+  const isMentor = user.player?.position === "Mentor"
+  const isHost = user.player?.position === "Host"
+  const isOrganizer = isHost || isMentor || isFounder
 
   const handleSignOut = async () => {
     await fetch("/api/auth/signout", { method: "POST" })
@@ -37,43 +41,86 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     router.refresh()
   }
 
-  const navItems: NavItem[] = [
+  const navSections: NavSection[] = [
     {
-      href: "/admin",
-      icon: "bx-grid-alt",
-      label: "Dashboard",
-      exact: true,
+      title: "General",
+      items: [
+        {
+          href: "/admin",
+          icon: "bx-grid-alt",
+          label: "Dashboard",
+          exact: true,
+        },
+        {
+          href: "/admin/profile",
+          icon: "bx-user",
+          label: "My Profile",
+        },
+        {
+          href: "/admin/stripe",
+          icon: "bx-credit-card",
+          label: "Stripe Config",
+          organizerOnly: true,
+        },
+      ],
     },
     {
-      href: "/admin/profile",
-      icon: "bx-user",
-      label: "My Profile",
+      title: "Events",
+      items: [
+        {
+          href: "/admin/events",
+          icon: "bx-calendar",
+          label: "My Events",
+          organizerOnly: true,
+        },
+        {
+          href: "/admin/my-tickets",
+          icon: "bx-purchase-tag",
+          label: "My Tickets",
+        },
+        {
+          href: "/admin/claim-attendance",
+          icon: "bx-calendar-plus",
+          label: "Claim Attendance",
+        },
+      ],
     },
     {
-      href: "/admin/claim-attendance",
-      icon: "bx-calendar-plus",
-      label: "Claim Attendance",
-    },
-    {
-      href: "/admin/attendance-claims",
-      icon: "bx-calendar-check",
-      label: "Attendance Claims",
-      organizerOnly: true,
-    },
-    {
-      href: "/admin/claims",
-      icon: "bx-user-check",
-      label: "Player Claims",
-      founderOnly: true,
+      title: "Management",
+      items: [
+        {
+          href: "/admin/players",
+          icon: "bx-group",
+          label: "Players",
+          organizerOnly: true,
+        },
+        {
+          href: "/admin/attendance-claims",
+          icon: "bx-calendar-check",
+          label: "Attendance Claims",
+          organizerOnly: true,
+        },
+        {
+          href: "/admin/claims",
+          icon: "bx-user-check",
+          label: "Player Claims",
+          founderOnly: true,
+        },
+      ],
     },
   ]
 
-  // Filter nav items based on user role
-  const visibleNavItems = navItems.filter((item) => {
-    if (item.founderOnly && !isFounder) return false
-    if (item.organizerOnly && !isOrganizer) return false
-    return true
-  })
+  // Filter sections and items based on user role
+  const visibleSections = navSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => {
+        if (item.founderOnly && !isFounder) return false
+        if (item.organizerOnly && !isOrganizer) return false
+        return true
+      }),
+    }))
+    .filter((section) => section.items.length > 0)
 
   const isActive = (href: string, exact?: boolean) => {
     if (exact) {
@@ -116,20 +163,27 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       </div>
 
       <nav className="admin-sidebar-nav">
-        <ul>
-          {visibleNavItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={`admin-sidebar-link ${isActive(item.href, item.exact) ? "active" : ""}`}
-                title={collapsed ? item.label : undefined}
-              >
-                <i className={`bx ${item.icon}`}></i>
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {visibleSections.map((section) => (
+          <div key={section.title} className="admin-sidebar-section">
+            {!collapsed && (
+              <h3 className="admin-sidebar-section-title">{section.title}</h3>
+            )}
+            <ul>
+              {section.items.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`admin-sidebar-link ${isActive(item.href, item.exact) ? "active" : ""}`}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <i className={`bx ${item.icon}`}></i>
+                    {!collapsed && <span>{item.label}</span>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       <div className="admin-sidebar-footer">

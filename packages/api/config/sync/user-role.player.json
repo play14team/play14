@@ -116,6 +116,26 @@
       "locale": null
     },
     {
+      "action": "api::ticket-order.custom-ticket-order.getMyOrders",
+      "documentId": "player-ticket-my-orders-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.getOrderStatus",
+      "documentId": "player-ticket-status-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.initiateOrder",
+      "documentId": "player-ticket-initiate-001",
+      "locale": null
+    },
+    {
+      "action": "api::ticket-order.custom-ticket-order.requestRefund",
+      "documentId": "player-ticket-refund-001",
+      "locale": null
+    },
+    {
       "action": "plugin::users-permissions.auth.connect",
       "documentId": "z6m73molcng12h9l62viup5r",
       "locale": null

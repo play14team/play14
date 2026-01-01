@@ -177,6 +177,58 @@
         }
       },
       "component": "reporting.finance"
+    },
+    "ticketTypes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::ticket-type.ticket-type",
+      "mappedBy": "event"
+    },
+    "globalCapacity": {
+      "type": "integer",
+      "min": 0,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "ticketingEnabled": {
+      "type": "boolean",
+      "default": false,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "paymentProvider": {
+      "type": "enumeration",
+      "enum": ["stripe", "humanitix", "manual", "none"],
+      "default": "none",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "stripeAccountId": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "stripeAccount": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::stripe-account.stripe-account",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
     }
   }
 }
