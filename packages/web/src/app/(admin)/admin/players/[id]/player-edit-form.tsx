@@ -273,7 +273,7 @@ export default function PlayerEditForm({ player, currentUserPosition }: Props) {
         <div className="admin-form-row">
           <div className="admin-form-group full-width">
             <label htmlFor="bio">Bio</label>
-            <SimpleEditor value={bio} onChange={setBio} placeholder="Write a bio..." />
+            <SimpleEditor content={bio} onChange={setBio} placeholder="Write a bio..." />
           </div>
         </div>
 

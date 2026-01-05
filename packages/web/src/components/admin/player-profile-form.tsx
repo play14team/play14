@@ -368,9 +368,6 @@ export default function PlayerProfileForm({ player }: Props) {
                 <i className="bx bx-pencil"></i>
               </button>
             </div>
-            <p className="admin-form-help">
-              Click the edit icon to upload a square picture. Images larger than 800x800px will be automatically resized.
-            </p>
             {isUploadingPicture && (
               <div className="admin-avatar-uploading">
                 <i className="bx bx-loader-alt bx-spin"></i>

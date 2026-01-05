@@ -6,6 +6,8 @@ import Link from "next/link"
 import SimpleEditor from "@/components/ui/simple-editor"
 import {
   updateEvent,
+  publishEvent,
+  unpublishEvent,
   type EventForEdit,
   type LocationOption,
   type VenueOption,
@@ -19,6 +21,11 @@ import type {
   HostStripeAccount,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import StripeAccountSelector from "@/components/admin/stripe-account-selector"
+import FinanceEditor from "@/components/admin/finance-editor"
+import MediaLinksEditor from "@/components/admin/media-links-editor"
+import ScheduleEditor from "@/components/admin/schedule-editor"
+import EventImageManager from "@/components/admin/event-image-manager"
+import SponsorEditor from "@/components/admin/sponsor-editor"
 
 // Common European countries for the dropdown
 const COUNTRIES = [
@@ -104,8 +111,10 @@ export default function EventEditForm({
 }: Props) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [isPublished, setIsPublished] = useState(event.isPublished ?? false)
 
   // Form state - Event Details
   const [name, setName] = useState(event.name)
@@ -236,6 +245,24 @@ export default function EventEditForm({
     }
 
     setIsSubmitting(false)
+  }
+
+  const handlePublishToggle = async () => {
+    setIsPublishing(true)
+    setError(null)
+
+    const result = isPublished
+      ? await unpublishEvent(event.slug)
+      : await publishEvent(event.slug)
+
+    if (result.success) {
+      setIsPublished(!isPublished)
+      router.refresh()
+    } else {
+      setError(result.error || `Failed to ${isPublished ? "unpublish" : "publish"} event`)
+    }
+
+    setIsPublishing(false)
   }
 
   return (
@@ -572,32 +599,32 @@ export default function EventEditForm({
         </div>
       </div>
 
-      {/* Timetable Preview Section */}
-      {event.timetable && event.timetable.length > 0 && (
-        <div className="admin-form-section admin-info-section">
-          <h2>Schedule Preview</h2>
-          <div className="timetable-preview">
-            {event.timetable.map((day, dayIndex) => (
-              <div key={dayIndex} className="timetable-day">
-                <h3>
-                  {day.day} - {day.description}
-                </h3>
-                <ul>
-                  {day.timeslots?.map((slot, slotIndex) => (
-                    <li key={slotIndex}>
-                      <strong>{slot.time.substring(0, 5)}</strong> -{" "}
-                      {slot.description}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <p className="admin-form-help">
-            To modify the schedule in detail, use the Strapi admin panel.
-          </p>
-        </div>
-      )}
+      {/* Images Section */}
+      <div className="admin-form-section">
+        <h2>Event Images</h2>
+        <p className="admin-form-section-description">
+          Upload or select images for the event. The default image appears on event cards and listings.
+        </p>
+        <EventImageManager
+          eventSlug={event.slug}
+          defaultImage={event.defaultImage}
+          galleryImages={event.images || []}
+          onUpdate={() => router.refresh()}
+        />
+      </div>
+
+      {/* Schedule Section */}
+      <div className="admin-form-section">
+        <h2>Event Schedule</h2>
+        <p className="admin-form-section-description">
+          Define the timetable for each day of the event with activities and timeslots.
+        </p>
+        <ScheduleEditor
+          eventSlug={event.slug}
+          timetable={event.timetable || []}
+          onUpdate={() => router.refresh()}
+        />
+      </div>
 
       {/* Payment Settings Section */}
       <div className="admin-form-section">
@@ -741,6 +768,104 @@ export default function EventEditForm({
         </div>
       </div>
 
+      {/* Media Links Section */}
+      <div className="admin-form-section">
+        <h2>Photo & Video Galleries</h2>
+        <p className="admin-form-section-description">
+          Link to external photo albums or video collections from this event.
+        </p>
+        <MediaLinksEditor
+          eventSlug={event.slug}
+          mediaLinks={event.media || []}
+          onUpdate={() => router.refresh()}
+        />
+      </div>
+
+      {/* Sponsors Section */}
+      <div className="admin-form-section">
+        <h2>Sponsors</h2>
+        <p className="admin-form-section-description">
+          Manage sponsors for this event organized by category (Gold, Silver, etc.).
+        </p>
+        <SponsorEditor
+          eventSlug={event.slug}
+          sponsorships={event.sponsorships || []}
+          onUpdate={() => router.refresh()}
+        />
+      </div>
+
+      {/* Finance Section */}
+      <div className="admin-form-section">
+        <h2>Event Finance</h2>
+        <p className="admin-form-section-description">
+          Track revenue, expenses, and financial results for this event.
+        </p>
+        <FinanceEditor
+          eventSlug={event.slug}
+          finance={event.finance}
+          onUpdate={() => router.refresh()}
+        />
+      </div>
+
+      {/* Publication Status */}
+      <div className="admin-form-section">
+        <h2>Publication</h2>
+        <div className="publication-status">
+          <div className="publication-status-info">
+            <span className={`publication-badge ${isPublished ? "published" : "draft"}`}>
+              {isPublished ? (
+                <>
+                  <i className="bx bx-check-circle"></i>
+                  Published
+                </>
+              ) : (
+                <>
+                  <i className="bx bx-edit"></i>
+                  Draft
+                </>
+              )}
+            </span>
+            <p className="publication-description">
+              {isPublished
+                ? "This event is visible to the public on the website."
+                : "This event is only visible to organizers. Publish it to make it public."}
+            </p>
+          </div>
+          <div className="publication-actions">
+            <Link
+              href={`/admin/events/${event.slug}/preview`}
+              className="admin-btn admin-btn-secondary"
+            >
+              <i className="bx bx-show"></i>
+              Preview
+            </Link>
+            <button
+              type="button"
+              onClick={handlePublishToggle}
+              disabled={isPublishing}
+              className={`admin-btn ${isPublished ? "admin-btn-warning" : "admin-btn-success"}`}
+            >
+              {isPublishing ? (
+                <>
+                  <i className="bx bx-loader-alt bx-spin"></i>
+                  {isPublished ? "Unpublishing..." : "Publishing..."}
+                </>
+              ) : isPublished ? (
+                <>
+                  <i className="bx bx-hide"></i>
+                  Unpublish
+                </>
+              ) : (
+                <>
+                  <i className="bx bx-globe"></i>
+                  Publish
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Actions */}
       <div className="admin-form-actions">
         <button
@@ -761,14 +886,16 @@ export default function EventEditForm({
           )}
         </button>
 
-        <Link
-          href={`/events/${event.slug}`}
-          className="admin-btn admin-btn-secondary"
-          target="_blank"
-        >
-          <i className="bx bx-link-external"></i>
-          View Public Page
-        </Link>
+        {isPublished && (
+          <Link
+            href={`/events/${event.slug}`}
+            className="admin-btn admin-btn-secondary"
+            target="_blank"
+          >
+            <i className="bx bx-link-external"></i>
+            View Public Page
+          </Link>
+        )}
       </div>
     </form>
   )

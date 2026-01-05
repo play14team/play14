@@ -6,29 +6,72 @@ interface ImageCropperProps {
   image: string
   onCrop: (blob: Blob) => void
   onCancel: () => void
+  /** Aspect ratio as width/height (e.g., 6/5 = 1.2 for 600x500). Use 0 for free aspect ratio. Default is 1 (square). */
+  aspectRatio?: number
+  /** Output width in pixels. Height is calculated from aspect ratio. Default is 600. For free aspect ratio, this is the max dimension on the longest edge. */
+  outputWidth?: number
+  /** JPEG quality (0-1). Default is 0.9. Use lower values like 0.85 for smaller file sizes. */
+  quality?: number
 }
 
-export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperProps) {
+export default function ImageCropper({
+  image,
+  onCrop,
+  onCancel,
+  aspectRatio = 1,
+  outputWidth = 600,
+  quality = 0.9,
+}: ImageCropperProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [img, setImg] = useState<HTMLImageElement | null>(null)
-  const [crop, setCrop] = useState({ x: 0, y: 0, size: 0 })
+  // Crop area defined by x, y, width, height
+  const [crop, setCrop] = useState({ x: 0, y: 0, width: 0, height: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
+
+  // Free aspect ratio mode when aspectRatio is 0
+  const isFreeAspect = aspectRatio === 0
 
   useEffect(() => {
     const imgElement = new Image()
     imgElement.onload = () => {
       setImg(imgElement)
-      // Initialize crop to center square
-      const minDimension = Math.min(imgElement.width, imgElement.height)
-      setCrop({
-        x: (imgElement.width - minDimension) / 2,
-        y: (imgElement.height - minDimension) / 2,
-        size: minDimension,
-      })
+
+      if (isFreeAspect) {
+        // Free aspect ratio: use full image as initial crop
+        setCrop({
+          x: 0,
+          y: 0,
+          width: imgElement.width,
+          height: imgElement.height,
+        })
+      } else {
+        // Fixed aspect ratio: find the largest crop area that fits within the image
+        const imgRatio = imgElement.width / imgElement.height
+
+        let cropWidth: number
+        let cropHeight: number
+
+        if (imgRatio > aspectRatio) {
+          // Image is wider than crop area - constrain by height
+          cropHeight = imgElement.height
+          cropWidth = cropHeight * aspectRatio
+        } else {
+          // Image is taller than crop area - constrain by width
+          cropWidth = imgElement.width
+          cropHeight = cropWidth / aspectRatio
+        }
+
+        setCrop({
+          x: (imgElement.width - cropWidth) / 2,
+          y: (imgElement.height - cropHeight) / 2,
+          width: cropWidth,
+          height: cropHeight,
+        })
+      }
     }
     imgElement.src = image
-  }, [image])
+  }, [image, aspectRatio, isFreeAspect])
 
   useEffect(() => {
     if (!img || !canvasRef.current) return
@@ -55,25 +98,26 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
     // Clear the crop area
     const cropX = crop.x * scale
     const cropY = crop.y * scale
-    const cropSize = crop.size * scale
+    const cropWidth = crop.width * scale
+    const cropHeight = crop.height * scale
 
-    ctx.clearRect(cropX, cropY, cropSize, cropSize)
+    ctx.clearRect(cropX, cropY, cropWidth, cropHeight)
     ctx.drawImage(
       img,
       crop.x,
       crop.y,
-      crop.size,
-      crop.size,
+      crop.width,
+      crop.height,
       cropX,
       cropY,
-      cropSize,
-      cropSize
+      cropWidth,
+      cropHeight
     )
 
     // Draw crop border
     ctx.strokeStyle = "#ff6b00"
     ctx.lineWidth = 2
-    ctx.strokeRect(cropX, cropY, cropSize, cropSize)
+    ctx.strokeRect(cropX, cropY, cropWidth, cropHeight)
 
     // Draw corner handles
     const handleSize = 10
@@ -81,11 +125,11 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
     // Top-left
     ctx.fillRect(cropX - handleSize / 2, cropY - handleSize / 2, handleSize, handleSize)
     // Top-right
-    ctx.fillRect(cropX + cropSize - handleSize / 2, cropY - handleSize / 2, handleSize, handleSize)
+    ctx.fillRect(cropX + cropWidth - handleSize / 2, cropY - handleSize / 2, handleSize, handleSize)
     // Bottom-left
-    ctx.fillRect(cropX - handleSize / 2, cropY + cropSize - handleSize / 2, handleSize, handleSize)
+    ctx.fillRect(cropX - handleSize / 2, cropY + cropHeight - handleSize / 2, handleSize, handleSize)
     // Bottom-right
-    ctx.fillRect(cropX + cropSize - handleSize / 2, cropY + cropSize - handleSize / 2, handleSize, handleSize)
+    ctx.fillRect(cropX + cropWidth - handleSize / 2, cropY + cropHeight - handleSize / 2, handleSize, handleSize)
   }, [img, crop])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -116,8 +160,8 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
     let newY = y - dragStart.y
 
     // Constrain to image bounds
-    newX = Math.max(0, Math.min(newX, img.width - crop.size))
-    newY = Math.max(0, Math.min(newY, img.height - crop.size))
+    newX = Math.max(0, Math.min(newX, img.width - crop.width))
+    newY = Math.max(0, Math.min(newY, img.height - crop.height))
 
     setCrop({ ...crop, x: newX, y: newY })
   }
@@ -133,43 +177,99 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
     // - Positive delta (zoom out): increase crop size (show more of image)
     // - Negative delta (zoom in): decrease crop size (show less of image, zoom into detail)
     // The delta is inverted here because the buttons are labeled + for zoom in (smaller crop)
-    const newSize = crop.size - delta
 
-    // Calculate constraints based on image dimensions
-    const minDimension = Math.min(img.width, img.height)
+    if (isFreeAspect) {
+      // For free aspect ratio, scale both dimensions proportionally
+      const currentRatio = crop.width / crop.height
+      const newWidth = crop.width - delta
+      const newHeight = newWidth / currentRatio
 
-    // Minimum crop size: 100px or 10% of min dimension (whichever is larger)
-    const minCropSize = Math.max(100, minDimension * 0.1)
+      // Calculate constraints
+      const minWidth = Math.max(100, img.width * 0.1)
+      const minHeight = Math.max(100, img.height * 0.1)
 
-    // Maximum crop size: the full min dimension (to keep it square and within bounds)
-    const maxCropSize = minDimension
+      // Constrain the new dimensions
+      const constrainedWidth = Math.max(minWidth, Math.min(newWidth, img.width))
+      const constrainedHeight = Math.max(minHeight, Math.min(newHeight, img.height))
 
-    // Constrain the new size
-    const constrainedSize = Math.max(minCropSize, Math.min(newSize, maxCropSize))
+      if (constrainedWidth === crop.width && constrainedHeight === crop.height) return
 
-    // If size didn't change, no need to update
-    if (constrainedSize === crop.size) return
+      // Adjust position to keep crop centered
+      const centerX = crop.x + crop.width / 2
+      const centerY = crop.y + crop.height / 2
 
-    // Adjust position to keep crop centered on the same point
-    const centerX = crop.x + crop.size / 2
-    const centerY = crop.y + crop.size / 2
+      let newX = centerX - constrainedWidth / 2
+      let newY = centerY - constrainedHeight / 2
 
-    let newX = centerX - constrainedSize / 2
-    let newY = centerY - constrainedSize / 2
+      // Constrain to image bounds
+      newX = Math.max(0, Math.min(newX, img.width - constrainedWidth))
+      newY = Math.max(0, Math.min(newY, img.height - constrainedHeight))
 
-    // Constrain to image bounds
-    newX = Math.max(0, Math.min(newX, img.width - constrainedSize))
-    newY = Math.max(0, Math.min(newY, img.height - constrainedSize))
+      setCrop({ x: newX, y: newY, width: constrainedWidth, height: constrainedHeight })
+    } else {
+      // Fixed aspect ratio zoom
+      const newWidth = crop.width - delta
+      const newHeight = newWidth / aspectRatio
 
-    setCrop({ x: newX, y: newY, size: constrainedSize })
+      // Calculate constraints based on image dimensions
+      const minWidth = Math.max(100, img.width * 0.1)
+
+      // Maximum size that fits within image bounds
+      const maxByWidth = img.width
+      const maxByHeight = img.height * aspectRatio
+      const maxWidth = Math.min(maxByWidth, maxByHeight)
+
+      // Constrain the new width
+      const constrainedWidth = Math.max(minWidth, Math.min(newWidth, maxWidth))
+      const constrainedHeight = constrainedWidth / aspectRatio
+
+      // Verify it fits within image bounds
+      if (constrainedWidth > img.width || constrainedHeight > img.height) return
+      if (constrainedWidth === crop.width) return
+
+      // Adjust position to keep crop centered on the same point
+      const centerX = crop.x + crop.width / 2
+      const centerY = crop.y + crop.height / 2
+
+      let newX = centerX - constrainedWidth / 2
+      let newY = centerY - constrainedHeight / 2
+
+      // Constrain to image bounds
+      newX = Math.max(0, Math.min(newX, img.width - constrainedWidth))
+      newY = Math.max(0, Math.min(newY, img.height - constrainedHeight))
+
+      setCrop({ x: newX, y: newY, width: constrainedWidth, height: constrainedHeight })
+    }
   }
 
   const handleCrop = async () => {
     if (!img) return
 
+    // Calculate output dimensions
+    let finalWidth: number
+    let finalHeight: number
+
+    if (isFreeAspect) {
+      // For free aspect ratio, outputWidth is the max dimension on the longest edge
+      const maxDimension = outputWidth
+      if (crop.width >= crop.height) {
+        // Landscape or square
+        finalWidth = Math.min(crop.width, maxDimension)
+        finalHeight = Math.round((finalWidth / crop.width) * crop.height)
+      } else {
+        // Portrait
+        finalHeight = Math.min(crop.height, maxDimension)
+        finalWidth = Math.round((finalHeight / crop.height) * crop.width)
+      }
+    } else {
+      // Fixed aspect ratio: use outputWidth and calculate height from ratio
+      finalWidth = outputWidth
+      finalHeight = Math.round(outputWidth / aspectRatio)
+    }
+
     const canvas = document.createElement("canvas")
-    canvas.width = 800
-    canvas.height = 800
+    canvas.width = finalWidth
+    canvas.height = finalHeight
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
@@ -178,12 +278,12 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
       img,
       crop.x,
       crop.y,
-      crop.size,
-      crop.size,
+      crop.width,
+      crop.height,
       0,
       0,
-      800,
-      800
+      finalWidth,
+      finalHeight
     )
 
     canvas.toBlob(
@@ -193,8 +293,25 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
         }
       },
       "image/jpeg",
-      0.9
+      quality
     )
+  }
+
+  // Format aspect ratio for display
+  const formatRatio = () => {
+    if (isFreeAspect) return "Free"
+    if (aspectRatio === 1) return "1:1 (Square)"
+    if (Math.abs(aspectRatio - 6 / 5) < 0.01) return "6:5"
+    return `${aspectRatio.toFixed(2)}:1`
+  }
+
+  // Format output dimensions for display
+  const formatOutput = () => {
+    if (isFreeAspect) {
+      return `Max ${outputWidth}px`
+    }
+    const outputHeight = Math.round(outputWidth / aspectRatio)
+    return `${outputWidth}×${outputHeight}px`
   }
 
   return (
@@ -203,6 +320,7 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
         <div className="image-cropper-header">
           <h3>Crop Your Image</h3>
           <p>Drag to reposition, use zoom buttons to adjust size</p>
+          <p className="image-cropper-ratio">Aspect ratio: {formatRatio()} • Output: {formatOutput()}</p>
         </div>
 
         <div className="image-cropper-canvas-container">
@@ -250,7 +368,7 @@ export default function ImageCropper({ image, onCrop, onCancel }: ImageCropperPr
             className="admin-btn admin-btn-primary"
           >
             <i className="bx bx-check"></i>
-            Crop & Upload
+            Upload
           </button>
         </div>
       </div>

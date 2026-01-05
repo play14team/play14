@@ -36,7 +36,7 @@ export default async function PlayerEditPage({ params }: PageProps) {
         </Link>
       </div>
 
-      <PlayerEditForm player={player} currentUserPosition={session.player.position} />
+      <PlayerEditForm player={player} currentUserPosition={session.player.position ?? "Player"} />
     </div>
   )
 }

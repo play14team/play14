@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@keyv/sqlite": "^4.0.6",
+    "@strapi/client": "^1.6.0",
     "@mapbox/mapbox-gl-geocoder": "^5.1.2",
     "@mapbox/mapbox-sdk": "^0.16.2",
     "@radix-ui/react-avatar": "^1.1.2",
