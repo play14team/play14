@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi"
+import { bootstrapPermissions } from "./bootstrap/permissions"
 
 export default {
   /**
@@ -210,5 +211,8 @@ export default {
     } else {
       strapi.log.info("[LinkedIn OAuth] No LinkedIn configuration found in grant store")
     }
+
+    // Bootstrap user role permissions
+    await bootstrapPermissions(strapi)
   },
 }

@@ -6,6 +6,53 @@
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 
+/**
+ * Get or create a folder in the media library by name
+ * @param strapi - Strapi instance
+ * @param folderName - Name of the folder to find or create
+ * @returns The folder ID
+ */
+async function getOrCreateMediaFolder(
+  strapi: Core.Strapi,
+  folderName: string
+): Promise<number> {
+  // Try to find existing folder by name at root level
+  const existingFolder = await strapi.db.query("plugin::upload.folder").findOne({
+    where: {
+      name: folderName,
+      parent: null,
+    },
+  })
+
+  if (existingFolder) {
+    return existingFolder.id
+  }
+
+  // Create the folder if it doesn't exist
+  // Get the next pathId
+  const maxPathIdResult = await strapi.db
+    .query("plugin::upload.folder")
+    .findMany({
+      orderBy: { pathId: "desc" },
+      limit: 1,
+    })
+
+  const nextPathId = maxPathIdResult.length > 0 ? maxPathIdResult[0].pathId + 1 : 1
+
+  const newFolder = await strapi.db.query("plugin::upload.folder").create({
+    data: {
+      name: folderName,
+      pathId: nextPathId,
+      path: `/${nextPathId}`,
+      parent: null,
+    },
+  })
+
+  strapi.log.info(`[Media] Created folder "${folderName}" with ID ${newFolder.id}`)
+
+  return newFolder.id
+}
+
 interface PlayerUpdateData {
   name?: string
   position?: string
@@ -185,14 +232,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Prepare file(s)
       const fileArray = Array.isArray(files.files) ? files.files : [files.files]
 
+      // Get or create the "players" folder for avatar uploads
+      const playersFolderId = await getOrCreateMediaFolder(strapi, "players")
+
       // Upload the file(s) and link to the player's avatar field
-      // Note: Files will be placed in "API Uploads" folder as folder assignment
-      // is an admin panel-only feature in Strapi
       await uploadService.upload({
         data: {
           refId: playerId,
           ref: "api::player.player",
           field: "avatar",
+          fileInfo: {
+            folder: playersFolderId,
+          },
         },
         files: fileArray,
       })

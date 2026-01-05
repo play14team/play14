@@ -16,6 +16,7 @@ export interface EventForEdit {
   tagline?: string
   description?: string
   contactEmail?: string
+  isPublished?: boolean
   location?: {
     documentId: string
     name: string
@@ -35,9 +36,11 @@ export interface EventForEdit {
     name: string
   }[]
   timetable?: {
-    day: string
+    id?: number
+    day: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday"
     description: string
     timeslots: {
+      id?: number
       time: string
       description: string
     }[]
@@ -64,6 +67,66 @@ export interface EventForEdit {
     chargesEnabled: boolean
     payoutsEnabled: boolean
   }
+  finance?: {
+    id?: number
+    revenue: number
+    expenses: number
+    destination: string
+    result: "Profit" | "Loss"
+    resultAmount: number
+  }
+  media?: {
+    id?: number
+    url: string
+    type: "Photos" | "Videos"
+  }[]
+  defaultImage?: {
+    id: number
+    documentId?: string
+    name: string
+    url: string
+    width?: number
+    height?: number
+    formats?: {
+      thumbnail?: { url: string; width: number; height: number }
+      small?: { url: string; width: number; height: number }
+      medium?: { url: string; width: number; height: number }
+      large?: { url: string; width: number; height: number }
+    }
+  } | null
+  images?: {
+    id: number
+    documentId?: string
+    name: string
+    url: string
+    width?: number
+    height?: number
+    formats?: {
+      thumbnail?: { url: string; width: number; height: number }
+      small?: { url: string; width: number; height: number }
+      medium?: { url: string; width: number; height: number }
+      large?: { url: string; width: number; height: number }
+    }
+  }[]
+  sponsorships?: {
+    id?: number
+    category: string
+    sponsors: {
+      documentId: string
+      name: string
+      url?: string
+      logo?: {
+        id: number
+        url: string
+        width?: number
+        height?: number
+        formats?: {
+          thumbnail?: { url: string; width: number; height: number }
+          small?: { url: string; width: number; height: number }
+        }
+      } | null
+    }[]
+  }[]
 }
 
 export interface LocationOption {
@@ -255,5 +318,119 @@ export async function getOrganizers(): Promise<OrganizerOption[]> {
   } catch (error) {
     console.log("[getOrganizers] Exception:", error)
     return []
+  }
+}
+
+export interface PublishResult {
+  success: boolean
+  isPublished?: boolean
+  error?: string
+}
+
+/**
+ * Publish a draft event
+ */
+export async function publishEvent(slug: string): Promise<PublishResult> {
+  const jwt = await getAuthCookie()
+
+  if (!jwt) {
+    return { success: false, error: "Not authenticated" }
+  }
+
+  try {
+    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/publish`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      return {
+        success: false,
+        error:
+          errorData.error?.message ||
+          `Failed to publish event (${response.status})`,
+      }
+    }
+
+    const responseData = await response.json()
+    return {
+      success: true,
+      isPublished: responseData.data?.isPublished,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    }
+  }
+}
+
+/**
+ * Unpublish an event
+ */
+export async function unpublishEvent(slug: string): Promise<PublishResult> {
+  const jwt = await getAuthCookie()
+
+  if (!jwt) {
+    return { success: false, error: "Not authenticated" }
+  }
+
+  try {
+    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/unpublish`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      return {
+        success: false,
+        error:
+          errorData.error?.message ||
+          `Failed to unpublish event (${response.status})`,
+      }
+    }
+
+    const responseData = await response.json()
+    return {
+      success: true,
+      isPublished: responseData.data?.isPublished,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    }
+  }
+}
+
+/**
+ * Get event publication status
+ */
+export async function getEventPublishStatus(
+  slug: string
+): Promise<{ isPublished: boolean } | null> {
+  const jwt = await getAuthCookie()
+  if (!jwt) return null
+
+  try {
+    // Use the preview endpoint to get the publish status
+    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/preview`, {
+      headers: { Authorization: `Bearer ${jwt}` },
+      cache: "no-store",
+    })
+
+    if (!response.ok) return null
+    const data = await response.json()
+    return { isPublished: data.data?.isPublished ?? false }
+  } catch {
+    return null
   }
 }

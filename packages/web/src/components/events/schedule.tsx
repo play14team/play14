@@ -1,49 +1,61 @@
 "use client"
 
 import { ComponentEventsTimetable, Maybe } from "@/models/strapi"
+import styles from "./schedule.module.scss"
 
 const EventSchedule = ({
   timetable,
 }: {
   timetable: Array<Maybe<ComponentEventsTimetable>>
 }) => {
+  const formatTime = (time: string) => {
+    // Extract HH:mm from time string
+    return time.substring(0, 5)
+  }
+
   return (
-    <div className="courses-curriculum">
-      {timetable.map((item) => {
+    <div className={styles.schedule}>
+      {timetable.map((day) => {
+        if (!day) return null
+
         return (
-          item && (
-            <div key={item.id} className="container">
-              <h3>{item.day}</h3>
-              {item.description && (
-                <p className="schedule-description">{item.description}</p>
-              )}
-              <ul>
-                {item.timeslots &&
-                  item.timeslots.map((slot) => {
-                    return (
-                      slot && (
-                        <li key={slot.id}>
-                          <div className="d-flex justify-content-between align-items-center">
-                            <span className="courses-name">
-                              {slot.description}
-                            </span>
-                            <div className="courses-meta">
-                              <span className="status">
-                                <i className="bx bx-alarm"></i>
-                              </span>
-                              <span className="duration">
-                                {slot.time.substring(0, 5)}
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                      )
-                    )
-                  })}
-              </ul>
-              <br />
+          <div key={day.id} className={styles.day}>
+            {/* Day Header */}
+            <div className={styles.dayHeader}>
+              <div className={styles.dayIcon}>
+                <i className="bx bx-calendar" />
+              </div>
+              <h3 className={styles.dayTitle}>{day.day}</h3>
             </div>
-          )
+
+            {/* Day Description */}
+            {day.description && (
+              <p className={styles.dayDescription}>{day.description}</p>
+            )}
+
+            {/* Timeline */}
+            {day.timeslots && day.timeslots.length > 0 && (
+              <div className={styles.timeline}>
+                {day.timeslots.map((slot) => {
+                  if (!slot) return null
+
+                  return (
+                    <div key={slot.id} className={styles.timeslot}>
+                      <div className={styles.timeLabel}>
+                        <span className={styles.time}>
+                          <i className={`bx bx-time ${styles.timeIcon}`} />
+                          {formatTime(slot.time)}
+                        </span>
+                      </div>
+                      <div className={styles.timeslotContent}>
+                        <p className={styles.activityName}>{slot.description}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
         )
       })}
     </div>

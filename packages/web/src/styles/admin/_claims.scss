@@ -1247,6 +1247,90 @@
   }
 }
 
+// Event card wrapper with quick actions
+.event-card-wrapper {
+  position: relative;
+
+  &:hover .event-card-quick-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.event-card-quick-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.event-quick-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+
+  i {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text);
+    transform: scale(1.05);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.draft {
+    &:hover {
+      background-color: #16a34a;
+      color: white;
+    }
+  }
+
+  &.published {
+    &:hover {
+      background-color: #d97706;
+      color: white;
+    }
+  }
+}
+
+// Filter tab badge
+.filter-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  margin-left: 6px;
+  background-color: var(--color-orange);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 9px;
+}
+
 // ===========================================
 // Attendance Claims Event Groups
 // ===========================================

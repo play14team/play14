@@ -1,5 +1,7 @@
 import "server-only"
 import qs from "qs"
+import { strapi, type StrapiClient } from "@strapi/client"
+import { getAuthCookie } from "./auth"
 
 const STRAPI_REST_ENDPOINT =
   (process.env.STRAPI_API_URL || "").replace(/\/$/, "") + "/api"
@@ -236,3 +238,59 @@ export function getDocumentId(
 ): string | null {
   return item?.documentId || item?.id?.toString() || null
 }
+
+// ============================================================================
+// @strapi/client SDK Integration
+// ============================================================================
+
+const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+
+/**
+ * Get an authenticated Strapi client instance.
+ * Uses the current user's JWT from the auth cookie.
+ *
+ * @returns Strapi client configured with baseURL and auth token
+ * @throws Error if user is not authenticated
+ *
+ * @example
+ * ```typescript
+ * const client = await getStrapiClient()
+ * const events = client.collection('events')
+ * const allEvents = await events.find()
+ * ```
+ */
+export async function getStrapiClient(): Promise<StrapiClient> {
+  const jwt = await getAuthCookie()
+  if (!jwt) {
+    throw new Error("Not authenticated - cannot create Strapi client")
+  }
+
+  return strapi({
+    baseURL: `${STRAPI_URL}/api`,
+    auth: jwt,
+  })
+}
+
+/**
+ * Get a Strapi client instance without authentication.
+ * Use this for public endpoints that don't require auth.
+ *
+ * @returns Strapi client configured with baseURL only
+ *
+ * @example
+ * ```typescript
+ * const client = getPublicStrapiClient()
+ * const events = client.collection('events')
+ * const publicEvents = await events.find({ filters: { isPublished: true } })
+ * ```
+ */
+export function getPublicStrapiClient(): StrapiClient {
+  return strapi({
+    baseURL: `${STRAPI_URL}/api`,
+  })
+}
+
+/**
+ * Re-export the StrapiClient type for use in other modules
+ */
+export type { StrapiClient }

@@ -355,6 +355,171 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
 - `update({ where, data })` → `update({ documentId, data })`
 - Use `as any` for custom relations not in Strapi types (e.g., `player` on users-permissions)
 
+## Permission Management for Custom API Endpoints
+
+**CRITICAL**: When adding or modifying custom API endpoints, always configure permissions using the existing bootstrap mechanism.
+
+### Permission Setup Pattern
+
+1. **Define action constants** in `src/bootstrap/permissions/actions.ts`:
+   ```typescript
+   export const EVENT_ACTIONS = {
+     // ... existing actions
+     UPDATE_SCHEDULE: "api::event.custom-event.updateSchedule",
+   }
+   ```
+
+2. **Map permissions to roles** in `src/bootstrap/permissions/definitions.ts`:
+   ```typescript
+   { action: EVENT_ACTIONS.UPDATE_SCHEDULE, minimumRole: ROLE_TYPES.HOST },
+   ```
+
+3. **Bootstrap auto-grants permissions** based on position hierarchy (Player < Host < Mentor < Founder)
+
+### Key Files
+- `src/bootstrap/permissions/actions.ts` - Action constant definitions
+- `src/bootstrap/permissions/definitions.ts` - Role-to-permission mapping
+- `src/bootstrap/index.ts` - Bootstrap entry point
+
+### Common Mistakes
+- **403 Forbidden**: Missing permission definition for new endpoint
+- **Permission not applied**: Action name mismatch between route handler and definition
+- **Wrong hierarchy**: Using incorrect `minimumRole` (e.g., `HOST` when should be `MENTOR`)
+
+## Media Library API & Folder Management
+
+### Strapi Upload Plugin Architecture
+
+Strapi 5's upload plugin uses these internal tables:
+- `plugin::upload.file` - Files with metadata, URLs, and `folder` relation
+- `plugin::upload.folder` - Folder hierarchy with `pathId`, `path`, `parent`, and `name`
+
+**Important**: The `folderPath` field on files is marked as `private: true` in Strapi's schema, so it's NOT exposed via Content API. Custom endpoints are required for folder-aware file queries.
+
+### Custom Media Endpoints
+
+We've implemented custom endpoints because Strapi's Content API doesn't support filtering files by folder:
+
+**`/api/media-files`** (`src/api/media-file/`)
+- Lists files with folder filtering: `?filters[folder]=<id>` or `?filters[folder][$null]=true` (root level)
+- Supports `mime`, `name` filtering and pagination
+- Queries `plugin::upload.file` directly via `strapi.db.query()`
+
+**`/api/media-folders`** (`src/api/media-folder/`)
+- Lists folders with parent filtering: `?filters[parent]=<id>` or `?filters[parent][$null]=true` (root)
+- Returns folder counts (children, files)
+- Queries `plugin::upload.folder` directly
+
+### Uploading Files to Specific Folders
+
+When using the upload service programmatically, specify the folder via `fileInfo.folder`:
+
+```typescript
+const uploadService = strapi.plugin("upload").service("upload")
+
+// Get or create folder first
+const folderId = await getOrCreateMediaFolder(strapi, "players")
+
+await uploadService.upload({
+  data: {
+    refId: entityId,
+    ref: "api::player.player",
+    field: "avatar",
+    fileInfo: {
+      folder: folderId, // Folder ID (number)
+    },
+  },
+  files: fileArray,
+})
+```
+
+### Creating Folders Programmatically
+
+Folders require unique `pathId` values:
+
+```typescript
+async function getOrCreateMediaFolder(strapi, folderName: string): Promise<number> {
+  // Check if exists at root level
+  const existing = await strapi.db.query("plugin::upload.folder").findOne({
+    where: { name: folderName, parent: null },
+  })
+  if (existing) return existing.id
+
+  // Get next pathId
+  const maxResult = await strapi.db.query("plugin::upload.folder").findMany({
+    orderBy: { pathId: "desc" },
+    limit: 1,
+  })
+  const nextPathId = maxResult.length > 0 ? maxResult[0].pathId + 1 : 1
+
+  // Create folder
+  const folder = await strapi.db.query("plugin::upload.folder").create({
+    data: {
+      name: folderName,
+      pathId: nextPathId,
+      path: `/${nextPathId}`,
+      parent: null,
+    },
+  })
+  return folder.id
+}
+```
+
+### Permissions for Media Endpoints
+
+Media library endpoints require permission grants in `src/bootstrap/permissions/`:
+
+```typescript
+// actions.ts
+export const MEDIA_FOLDER_ACTIONS = {
+  FIND: "api::media-folder.media-folder.find",
+} as const
+
+export const MEDIA_FILE_ACTIONS = {
+  FIND: "api::media-file.media-file.find",
+} as const
+
+// definitions.ts
+{ action: MEDIA_FOLDER_ACTIONS.FIND, minimumRole: ROLE_TYPES.HOST },
+{ action: MEDIA_FILE_ACTIONS.FIND, minimumRole: ROLE_TYPES.HOST },
+```
+
+### Image MIME Types
+
+When validating web-displayable images, use correct MIME types:
+- `image/jpeg` (NOT `image/jpg` - that's invalid)
+- `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `image/avif`
+- `image/heic` is NOT web-displayable (browsers don't support it)
+
+### Media Folder Organization
+
+Media files are organized into folders by content type:
+
+**Player Avatars**: `players/`
+- Uploaded via `/api/players/me/picture` endpoint
+- Uses `getOrCreateMediaFolder()` in `custom-player.ts`
+
+**Event Images**: `events/{locationSlug}/{eventSlug}/`
+- Uploaded via `/api/events/:slug/images` endpoint
+- Creates nested folder hierarchy: events → location → event
+- Uses `getOrCreateEventImageFolder()` in `custom-event.ts`
+- Falls back to `unknown-location` if event has no location set
+- **Default image aspect ratio**: Must be 6:5 (e.g., 600x500, 1200x1000). Validated before upload.
+- Gallery images have no aspect ratio requirement
+
+Example folder structure:
+```
+events/
+├── luxembourg/
+│   ├── luxembourg-01/
+│   └── luxembourg-06/
+├── paris/
+│   └── paris-03/
+└── unknown-location/
+    └── virtual-event-02/
+players/
+```
+
 ## Common Pitfalls
 
 1. **Slug Conflicts**: Don't manually set slugs - lifecycle hooks auto-generate them
@@ -365,6 +530,7 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
 6. **Bun Only**: Never use npm or yarn - package manager pinned to bun@1.3.5
 7. **Cron Jobs**: Disabled by default - enable with `CRON_ENABLED=true` in production
 8. **File Watching**: Admin panel ignores `config/sync/**`, `bootstrap/md/**`, `bootstrap/json/**`
+9. **Permissions**: Always add permission definitions when creating custom API endpoints - see "Permission Management" section above
 
 ## Reference Documentation
 

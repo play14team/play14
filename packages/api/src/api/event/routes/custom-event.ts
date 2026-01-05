@@ -87,6 +87,118 @@ export default {
         description: "Update event (organizer only)",
       },
     },
+    {
+      method: "POST",
+      path: "/events/:slug/publish",
+      handler: "custom-event.publishEvent",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Publish a draft event (organizer only)",
+      },
+    },
+    {
+      method: "POST",
+      path: "/events/:slug/unpublish",
+      handler: "custom-event.unpublishEvent",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Unpublish an event (organizer only)",
+      },
+    },
+    {
+      method: "GET",
+      path: "/events/:slug/preview",
+      handler: "custom-event.previewEvent",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Preview a draft event (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/events/:slug/finance",
+      handler: "custom-event.updateFinance",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Update event finance data (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/events/:slug/media-links",
+      handler: "custom-event.updateMediaLinks",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Update event media links (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/events/:slug/schedule",
+      handler: "custom-event.updateSchedule",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Update event schedule/timetable (organizer only)",
+      },
+    },
+    // Image management routes
+    {
+      method: "POST",
+      path: "/events/:slug/images",
+      handler: "custom-event.uploadImage",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Upload an image to event (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/events/:slug/images/:field",
+      handler: "custom-event.setImageFromLibrary",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Set existing library image as event image (organizer only)",
+      },
+    },
+    {
+      method: "DELETE",
+      path: "/events/:slug/images/:field/:fileId",
+      handler: "custom-event.removeImage",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Remove image from event (organizer only)",
+      },
+    },
+    // Sponsorship management route
+    {
+      method: "PUT",
+      path: "/events/:slug/sponsorships",
+      handler: "custom-event.updateSponsorships",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Update event sponsorships (organizer only)",
+      },
+    },
     // Public route to find event by slug - MUST be last (catch-all pattern)
     {
       method: "GET",
