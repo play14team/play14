@@ -10,7 +10,7 @@ interface ImageCropperProps {
   aspectRatio?: number
   /** Output width in pixels. Height is calculated from aspect ratio. Default is 600. For free aspect ratio, this is the max dimension on the longest edge. */
   outputWidth?: number
-  /** JPEG quality (0-1). Default is 0.9. Use lower values like 0.85 for smaller file sizes. */
+  /** WebP quality (0-1). Default is 0.9. Use lower values like 0.85 for smaller file sizes. */
   quality?: number
 }
 
@@ -292,7 +292,7 @@ export default function ImageCropper({
           onCrop(blob)
         }
       },
-      "image/jpeg",
+      "image/webp",
       quality
     )
   }

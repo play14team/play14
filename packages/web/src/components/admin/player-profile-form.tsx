@@ -11,6 +11,8 @@ import {
 import { updatePlayerProfile, type PlayerUpdateData } from "./player-profile.action"
 import SimpleEditor from "@/components/ui/simple-editor"
 import ImageCropper from "./image-cropper"
+import PlayerProfileActions from "./player-profile-actions"
+import { useToast } from "./toast"
 
 const SOCIAL_NETWORK_TYPES = [
   "Twitter",
@@ -40,10 +42,9 @@ interface Props {
 
 export default function PlayerProfileForm({ player }: Props) {
   const router = useRouter()
+  const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isUploadingPicture, setIsUploadingPicture] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   // Form state
   const [name, setName] = useState(player.name)
@@ -118,7 +119,7 @@ export default function PlayerProfileForm({ player }: Props) {
       // Draw resized image
       ctx.drawImage(img, 0, 0, width, height)
 
-      // Convert to blob
+      // Convert to WebP blob for optimized file size
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -127,7 +128,7 @@ export default function PlayerProfileForm({ player }: Props) {
             reject(new Error("Failed to create blob"))
           }
         },
-        "image/jpeg",
+        "image/webp",
         0.9
       )
     })
@@ -135,18 +136,17 @@ export default function PlayerProfileForm({ player }: Props) {
 
   const validateAndUploadPicture = async (file: File) => {
     setIsUploadingPicture(true)
-    setError(null)
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      setError("Please select an image file")
+      toast.error("Please select an image file")
       setIsUploadingPicture(false)
       return
     }
 
     // Validate file size (10MB before processing)
     if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB")
+      toast.error("File size must be less than 10MB")
       setIsUploadingPicture(false)
       return
     }
@@ -174,8 +174,10 @@ export default function PlayerProfileForm({ player }: Props) {
         // Resize if image is larger than 800x800
         if (img.width > 800 || img.height > 800) {
           const resizedBlob = await resizeImage(img, 800)
-          fileToUpload = new File([resizedBlob], file.name, {
-            type: "image/jpeg",
+          // Replace extension with .webp for optimized file size
+          const baseName = file.name.replace(/\.[^/.]+$/, "")
+          fileToUpload = new File([resizedBlob], `${baseName}.webp`, {
+            type: "image/webp",
           })
         }
 
@@ -184,14 +186,13 @@ export default function PlayerProfileForm({ player }: Props) {
 
         if (result.success && result.player) {
           setCurrentAvatar(result.player.avatar)
-          setSuccess(true)
+          toast.success("Avatar updated!")
           router.refresh()
-          setTimeout(() => setSuccess(false), 3000)
         } else {
-          setError(result.error || "Failed to upload avatar")
+          toast.error(result.error || "Failed to upload avatar")
         }
       } catch (err) {
-        setError(
+        toast.error(
           err instanceof Error ? err.message : "Failed to process image"
         )
       }
@@ -201,7 +202,7 @@ export default function PlayerProfileForm({ player }: Props) {
 
     img.onerror = () => {
       URL.revokeObjectURL(objectUrl)
-      setError("Failed to load image")
+      toast.error("Failed to load image")
       setIsUploadingPicture(false)
     }
 
@@ -216,12 +217,12 @@ export default function PlayerProfileForm({ player }: Props) {
     setImageToCrop(null)
     setOriginalFile(null)
     setIsUploadingPicture(true)
-    setError(null)
 
     try {
-      // Create a file from the cropped blob
-      const croppedFile = new File([blob], originalFile?.name || "cropped.jpg", {
-        type: "image/jpeg",
+      // Create a file from the cropped blob with .webp extension
+      const baseName = originalFile?.name?.replace(/\.[^/.]+$/, "") || "cropped"
+      const croppedFile = new File([blob], `${baseName}.webp`, {
+        type: "image/webp",
       })
 
       // Upload the cropped file
@@ -229,14 +230,13 @@ export default function PlayerProfileForm({ player }: Props) {
 
       if (result.success && result.player) {
         setCurrentAvatar(result.player.avatar)
-        setSuccess(true)
+        toast.success("Avatar updated!")
         router.refresh()
-        setTimeout(() => setSuccess(false), 3000)
       } else {
-        setError(result.error || "Failed to upload avatar")
+        toast.error(result.error || "Failed to upload avatar")
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload image")
+      toast.error(err instanceof Error ? err.message : "Failed to upload image")
     }
 
     setIsUploadingPicture(false)
@@ -253,15 +253,15 @@ export default function PlayerProfileForm({ player }: Props) {
 
   const handlePictureDelete = async () => {
     setIsUploadingPicture(true)
-    setError(null)
 
     const result = await deletePlayerPicture()
 
     if (result.success && result.player) {
       setCurrentAvatar(result.player.avatar)
+      toast.success("Avatar removed")
       router.refresh()
     } else {
-      throw new Error(result.error || "Failed to delete avatar")
+      toast.error(result.error || "Failed to delete avatar")
     }
 
     setIsUploadingPicture(false)
@@ -270,8 +270,6 @@ export default function PlayerProfileForm({ player }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError(null)
-    setSuccess(false)
 
     const data: PlayerUpdateData = {
       name,
@@ -283,19 +281,13 @@ export default function PlayerProfileForm({ player }: Props) {
       socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
     }
 
-    console.log("[Form] Submitting data:", JSON.stringify(data, null, 2))
-    console.log("[Form] Player documentId:", player.documentId)
-
     const result = await updatePlayerProfile(player.documentId, data)
 
-    console.log("[Form] Result:", result)
-
     if (result.success) {
-      setSuccess(true)
+      toast.success("Profile updated successfully!")
       router.refresh()
-      setTimeout(() => setSuccess(false), 3000)
     } else {
-      setError(result.error || "Failed to update profile")
+      toast.error(result.error || "Failed to update profile")
     }
 
     setIsSubmitting(false)
@@ -312,232 +304,209 @@ export default function PlayerProfileForm({ player }: Props) {
       )}
 
       <form onSubmit={handleSubmit} className="admin-form">
-        {error && (
-          <div className="admin-alert admin-alert-error">
-            <i className="bx bx-error-circle"></i>
-            {error}
-          </div>
-        )}
+        <div className="profile-edit-layout">
+          <div className="profile-edit-content">
+            <div className="admin-form-section">
+              <h2>Basic Information</h2>
 
-        {success && (
-          <div className="admin-alert admin-alert-success">
-            <i className="bx bx-check-circle"></i>
-            Profile updated successfully!
-          </div>
-        )}
+              <div className="profile-header-row">
+                <div className="profile-header-fields">
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label htmlFor="name">Name *</label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="admin-input"
+                      />
+                    </div>
 
-      <div className="admin-form-section">
-        <h2>Basic Information</h2>
+                    <div className="admin-form-group">
+                      <label htmlFor="position">Position *</label>
+                      <select
+                        id="position"
+                        value={position}
+                        onChange={(e) =>
+                          setPosition(e.target.value as typeof position)
+                        }
+                        required
+                        disabled
+                        className="admin-select"
+                      >
+                        {POSITION_OPTIONS.map((pos) => (
+                          <option key={pos} value={pos}>
+                            {pos}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="admin-form-help">
+                        Only other organizers can change your position
+                      </p>
+                    </div>
+                  </div>
 
-        <div className="admin-form-row">
-          <div className="admin-form-group admin-form-avatar">
-            <label>Avatar</label>
-            <div className="admin-avatar-container">
-              {currentAvatar?.url ? (
-                <div className="admin-avatar-preview">
-                  <Image
-                    src={currentAvatar.url}
-                    alt={player.name}
-                    width={120}
-                    height={120}
-                  />
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label htmlFor="company">Company</label>
+                      <input
+                        type="text"
+                        id="company"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        className="admin-input"
+                        placeholder="Your company or organization"
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label htmlFor="website">Website</label>
+                      <input
+                        type="url"
+                        id="website"
+                        value={website}
+                        onChange={(e) => setWebsite(e.target.value)}
+                        className="admin-input"
+                        placeholder="https://yourwebsite.com"
+                      />
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="admin-avatar-placeholder">
-                  <i className="bx bx-user"></i>
+
+                <div className="admin-form-group admin-form-avatar">
+                  <label>Avatar</label>
+                  <div className="admin-avatar-container">
+                    {currentAvatar?.url ? (
+                      <div className="admin-avatar-preview">
+                        <Image
+                          src={currentAvatar.url}
+                          alt={player.name}
+                          width={120}
+                          height={120}
+                        />
+                      </div>
+                    ) : (
+                      <div className="admin-avatar-placeholder">
+                        <i className="bx bx-user"></i>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const input = document.createElement("input")
+                        input.type = "file"
+                        input.accept = "image/*"
+                        input.onchange = async (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0]
+                          if (file) {
+                            await validateAndUploadPicture(file)
+                          }
+                        }
+                        input.click()
+                      }}
+                      disabled={isUploadingPicture}
+                      className="admin-avatar-edit-btn"
+                      title="Change avatar"
+                    >
+                      <i className="bx bx-pencil"></i>
+                    </button>
+                  </div>
+                  {isUploadingPicture && (
+                    <div className="admin-avatar-uploading">
+                      <i className="bx bx-loader-alt bx-spin"></i>
+                      Uploading...
+                    </div>
+                  )}
                 </div>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  const input = document.createElement("input")
-                  input.type = "file"
-                  input.accept = "image/*"
-                  input.onchange = async (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0]
-                    if (file) {
-                      await validateAndUploadPicture(file)
-                    }
-                  }
-                  input.click()
-                }}
-                disabled={isUploadingPicture}
-                className="admin-avatar-edit-btn"
-                title="Change avatar"
-              >
-                <i className="bx bx-pencil"></i>
-              </button>
-            </div>
-            {isUploadingPicture && (
-              <div className="admin-avatar-uploading">
-                <i className="bx bx-loader-alt bx-spin"></i>
-                Uploading...
               </div>
-            )}
-          </div>
-        </div>
 
-        <div className="admin-form-row">
-          <div className="admin-form-group">
-            <label htmlFor="name">Name *</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="admin-input"
-            />
-          </div>
+              <div className="admin-form-group">
+                <label htmlFor="tagline">Tagline</label>
+                <input
+                  type="text"
+                  id="tagline"
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  className="admin-input"
+                  placeholder="A short description about yourself"
+                  maxLength={150}
+                />
+                <p className="admin-form-help">{tagline.length}/150 characters</p>
+              </div>
 
-          <div className="admin-form-group">
-            <label htmlFor="position">Position *</label>
-            <select
-              id="position"
-              value={position}
-              onChange={(e) =>
-                setPosition(e.target.value as typeof position)
-              }
-              required
-              disabled
-              className="admin-select"
-            >
-              {POSITION_OPTIONS.map((pos) => (
-                <option key={pos} value={pos}>
-                  {pos}
-                </option>
-              ))}
-            </select>
-            <p className="admin-form-help">
-              Only other organizers can change your position
-            </p>
-          </div>
-        </div>
-
-        <div className="admin-form-row">
-          <div className="admin-form-group">
-            <label htmlFor="company">Company</label>
-            <input
-              type="text"
-              id="company"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              className="admin-input"
-              placeholder="Your company or organization"
-            />
-          </div>
-
-          <div className="admin-form-group">
-            <label htmlFor="website">Website</label>
-            <input
-              type="url"
-              id="website"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              className="admin-input"
-              placeholder="https://yourwebsite.com"
-            />
-          </div>
-        </div>
-
-        <div className="admin-form-group">
-          <label htmlFor="tagline">Tagline</label>
-          <input
-            type="text"
-            id="tagline"
-            value={tagline}
-            onChange={(e) => setTagline(e.target.value)}
-            className="admin-input"
-            placeholder="A short description about yourself"
-            maxLength={150}
-          />
-          <p className="admin-form-help">{tagline.length}/150 characters</p>
-        </div>
-
-        <div className="admin-form-group">
-          <label htmlFor="bio">Bio</label>
-          <SimpleEditor
-            content={bio}
-            onChange={setBio}
-            placeholder="Tell us about yourself, your experience with #play14, and what you're passionate about..."
-          />
-        </div>
-      </div>
-
-      <div className="admin-form-section">
-        <h2>Social Networks</h2>
-        <p className="admin-form-section-description">
-          Add links to your social media profiles to help others connect with
-          you.
-        </p>
-
-        <div className="admin-social-networks">
-          {socialNetworks.map((sn, index) => (
-            <div key={index} className="admin-social-network-row">
-              <select
-                value={sn.type}
-                onChange={(e) =>
-                  handleSocialNetworkChange(index, "type", e.target.value)
-                }
-                className="admin-select admin-select-sm"
-              >
-                {SOCIAL_NETWORK_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="url"
-                value={sn.url}
-                onChange={(e) =>
-                  handleSocialNetworkChange(index, "url", e.target.value)
-                }
-                className="admin-input"
-                placeholder="https://..."
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveSocialNetwork(index)}
-                className="admin-btn-icon admin-btn-danger"
-                title="Remove"
-              >
-                <i className="bx bx-trash"></i>
-              </button>
+              <div className="admin-form-group">
+                <label htmlFor="bio">Bio</label>
+                <SimpleEditor
+                  content={bio}
+                  onChange={setBio}
+                  placeholder="Tell us about yourself, your experience with #play14, and what you're passionate about..."
+                />
+              </div>
             </div>
-          ))}
 
-          <button
-            type="button"
-            onClick={handleAddSocialNetwork}
-            className="admin-btn admin-btn-secondary"
-          >
-            <i className="bx bx-plus"></i>
-            Add Social Network
-          </button>
+            <div className="admin-form-section">
+              <h2>Social Networks</h2>
+              <p className="admin-form-section-description">
+                Add links to your social media profiles to help others connect with
+                you.
+              </p>
+
+              <div className="admin-social-networks">
+                {socialNetworks.map((sn, index) => (
+                  <div key={index} className="admin-social-network-row">
+                    <select
+                      value={sn.type}
+                      onChange={(e) =>
+                        handleSocialNetworkChange(index, "type", e.target.value)
+                      }
+                      className="admin-select admin-select-sm"
+                    >
+                      {SOCIAL_NETWORK_TYPES.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="url"
+                      value={sn.url}
+                      onChange={(e) =>
+                        handleSocialNetworkChange(index, "url", e.target.value)
+                      }
+                      className="admin-input"
+                      placeholder="https://..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSocialNetwork(index)}
+                      className="admin-btn-icon admin-btn-danger"
+                      title="Remove"
+                    >
+                      <i className="bx bx-trash"></i>
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={handleAddSocialNetwork}
+                  className="admin-btn admin-btn-secondary"
+                >
+                  <i className="bx bx-plus"></i>
+                  Add Social Network
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <PlayerProfileActions
+            playerSlug={player.slug}
+            isSubmitting={isSubmitting}
+          />
         </div>
-      </div>
-
-      <div className="admin-form-actions">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="admin-btn admin-btn-primary"
-        >
-          {isSubmitting ? (
-            <>
-              <i className="bx bx-loader-alt bx-spin"></i>
-              Saving...
-            </>
-          ) : (
-            <>
-              <i className="bx bx-save"></i>
-              Save Changes
-            </>
-          )}
-        </button>
-      </div>
-    </form>
+      </form>
     </>
   )
 }

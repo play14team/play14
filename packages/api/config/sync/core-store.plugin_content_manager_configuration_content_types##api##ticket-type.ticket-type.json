@@ -242,12 +242,6 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "name",
-        "description",
-        "price"
-      ],
       "edit": [
         [
           {
@@ -305,6 +299,13 @@
             "size": 6
           }
         ]
+      ],
+      "list": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "currency"
       ]
     },
     "uid": "api::ticket-type.ticket-type"

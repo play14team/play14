@@ -1,6 +1,9 @@
 "use server"
 
 import { getAuthCookie } from "@/libs/auth"
+import type { TimetableDay } from "./schedule.types"
+import type { MediaLink } from "./media-links.action"
+import type { FinanceData } from "./finance.action"
 
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
@@ -66,6 +69,10 @@ export interface EventForEdit {
     accountStatus: string
     chargesEnabled: boolean
     payoutsEnabled: boolean
+  }
+  registration?: {
+    link?: string
+    widgetCode?: string
   }
   finance?: {
     id?: number
@@ -145,6 +152,18 @@ export interface OrganizerOption {
   documentId: string
   name: string
   position: string
+  avatar?: {
+    url: string
+  } | null
+}
+
+export type TicketingMode = "internal" | "external" | "none"
+
+// Sponsorship format for API submission (sponsor documentIds only)
+export interface SponsorshipUpdateData {
+  id?: number
+  category: string
+  sponsors: string[] // Array of sponsor documentIds
 }
 
 export interface EventUpdateData {
@@ -153,15 +172,36 @@ export interface EventUpdateData {
   end?: string
   timezone?: string
   eventStatus?: string
-  tagline?: string
-  description?: string
-  contactEmail?: string
+  tagline?: string | null
+  description?: string | null
+  contactEmail?: string | null
   locationId?: string
   venueId?: string
-  newLocation?: { name: string; country: string }
+  newLocation?: {
+    name: string
+    country: string
+    location?: {
+      geometry?: { coordinates?: [number, number]; type?: string }
+      place_name?: string
+    }
+  }
   newVenue?: { name: string; addressDetails?: string }
   hostIds?: string[]
   mentorIds?: string[]
+  // Ticketing
+  ticketingMode?: TicketingMode
+  registration?: {
+    link?: string
+    widgetCode?: string
+  }
+  // Sponsorships
+  sponsorships?: SponsorshipUpdateData[]
+  // Schedule (timetable)
+  schedule?: TimetableDay[]
+  // Media links
+  mediaLinks?: MediaLink[]
+  // Finance data
+  finance?: FinanceData
 }
 
 export interface UpdateEventResult {

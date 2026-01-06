@@ -96,4 +96,4 @@ export interface ConnectPaymentProvider extends PaymentProvider {
   createCheckoutSessionWithConnect(params: CreateCheckoutWithConnectParams): Promise<CheckoutSession>
 }
 
-export type PaymentProviderType = "stripe" | "humanitix" | "manual"
+export type PaymentProviderType = "stripe" | "manual"

@@ -2,7 +2,8 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTheme } from "next-themes"
 import Avatar from "@/components/ui/avatar"
 import Logo from "@/components/layout/logo"
 import type { StrapiUser } from "@/libs/auth"
@@ -29,6 +30,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [collapsed, setCollapsed] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const isFounder = user.player?.position === "Founder"
   const isMentor = user.player?.position === "Mentor"
@@ -71,6 +78,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           href: "/admin/events",
           icon: "bx-calendar",
           label: "My Events",
+          organizerOnly: true,
+        },
+        {
+          href: "/admin/locations",
+          icon: "bx-map-alt",
+          label: "Locations",
           organizerOnly: true,
         },
         {
@@ -187,6 +200,16 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       </nav>
 
       <div className="admin-sidebar-footer">
+        <button
+          type="button"
+          className="admin-sidebar-link"
+          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+          title={collapsed ? `Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode` : undefined}
+          aria-label={`Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`}
+        >
+          <i className={`bx ${mounted && resolvedTheme === "dark" ? "bx-sun" : "bx-moon"}`}></i>
+          {!collapsed && <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
+        </button>
         <Link
           href="/"
           className="admin-sidebar-link"

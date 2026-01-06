@@ -1,10 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import {
-  updateEventMediaLinks,
-  type MediaLink,
-} from "@/app/(admin)/admin/events/[slug]/media-links.action"
+import type { MediaLink } from "@/app/(admin)/admin/events/[slug]/media-links.action"
 
 const MEDIA_TYPES = [
   { value: "Photos", label: "Photos", icon: "bx-images" },
@@ -12,9 +9,8 @@ const MEDIA_TYPES = [
 ] as const
 
 interface Props {
-  eventSlug: string
   mediaLinks: MediaLink[]
-  onUpdate: () => void
+  onChange: (mediaLinks: MediaLink[]) => void
 }
 
 interface EditingLink {
@@ -23,12 +19,9 @@ interface EditingLink {
   type: "Photos" | "Videos"
 }
 
-export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Props) {
-  const [links, setLinks] = useState<MediaLink[]>(mediaLinks)
+export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
   const [editing, setEditing] = useState<EditingLink | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   const startAdding = () => {
     setEditing({
@@ -40,7 +33,7 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
   }
 
   const startEditing = (index: number) => {
-    const link = links[index]
+    const link = mediaLinks[index]
     setEditing({
       index,
       url: link.url,
@@ -63,7 +56,7 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
     }
   }
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!editing) return
 
     // Validate URL
@@ -85,52 +78,22 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
     let updatedLinks: MediaLink[]
     if (editing.index === null) {
       // Adding new
-      updatedLinks = [...links, newLink]
+      updatedLinks = [...mediaLinks, newLink]
     } else {
       // Editing existing
-      updatedLinks = links.map((link, i) => (i === editing.index ? newLink : link))
+      updatedLinks = mediaLinks.map((link, i) => (i === editing.index ? newLink : link))
     }
 
-    setIsLoading(true)
+    onChange(updatedLinks)
+    setEditing(null)
     setError(null)
-
-    const result = await updateEventMediaLinks(eventSlug, updatedLinks)
-
-    setIsLoading(false)
-
-    if (result.success) {
-      setLinks(updatedLinks)
-      setEditing(null)
-      setSuccess(true)
-      onUpdate()
-      setTimeout(() => setSuccess(false), 3000)
-    } else {
-      setError(result.error || "Failed to save media links")
-    }
   }
 
-  const handleDelete = async (index: number) => {
+  const handleDelete = (index: number) => {
     if (!confirm("Are you sure you want to remove this link?")) {
       return
     }
-
-    const updatedLinks = links.filter((_, i) => i !== index)
-
-    setIsLoading(true)
-    setError(null)
-
-    const result = await updateEventMediaLinks(eventSlug, updatedLinks)
-
-    setIsLoading(false)
-
-    if (result.success) {
-      setLinks(updatedLinks)
-      setSuccess(true)
-      onUpdate()
-      setTimeout(() => setSuccess(false), 3000)
-    } else {
-      setError(result.error || "Failed to remove media link")
-    }
+    onChange(mediaLinks.filter((_, i) => i !== index))
   }
 
   const getTypeInfo = (type: "Photos" | "Videos") => {
@@ -146,16 +109,9 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
         </div>
       )}
 
-      {success && (
-        <div className="admin-alert admin-alert-success">
-          <i className="bx bx-check-circle"></i>
-          Media links saved successfully
-        </div>
-      )}
-
       {/* Existing links */}
       <div className="media-links-list">
-        {links.map((link, index) => (
+        {mediaLinks.map((link, index) => (
           <div key={index} className="media-link-card">
             {editing?.index === index ? (
               // Editing mode
@@ -192,15 +148,13 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
                   <button
                     type="button"
                     onClick={handleSave}
-                    disabled={isLoading}
                     className="admin-btn admin-btn-primary admin-btn-sm"
                   >
-                    {isLoading ? "Saving..." : "Save"}
+                    Done
                   </button>
                   <button
                     type="button"
                     onClick={cancelEditing}
-                    disabled={isLoading}
                     className="admin-btn admin-btn-secondary admin-btn-sm"
                   >
                     Cancel
@@ -240,7 +194,7 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
                     onClick={() => handleDelete(index)}
                     className="admin-btn admin-btn-icon admin-btn-danger"
                     title="Delete"
-                    disabled={editing !== null || isLoading}
+                    disabled={editing !== null}
                   >
                     <i className="bx bx-trash"></i>
                   </button>
@@ -291,15 +245,13 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={isLoading}
                 className="admin-btn admin-btn-primary admin-btn-sm"
               >
-                {isLoading ? "Adding..." : "Add Media Link"}
+                Add Media Link
               </button>
               <button
                 type="button"
                 onClick={cancelEditing}
-                disabled={isLoading}
                 className="admin-btn admin-btn-secondary admin-btn-sm"
               >
                 Cancel
@@ -317,7 +269,7 @@ export default function MediaLinksEditor({ eventSlug, mediaLinks, onUpdate }: Pr
         </button>
       )}
 
-      {links.length === 0 && !editing && (
+      {mediaLinks.length === 0 && !editing && (
         <p className="media-links-empty">
           No external photo or video links added yet. Add links to Google Photos, Flickr, YouTube playlists, etc.
         </p>

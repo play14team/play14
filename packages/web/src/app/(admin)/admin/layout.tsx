@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { requireAuth } from "@/libs/auth"
 import AdminSidebar from "@/components/admin/sidebar"
+import { AdminProviders } from "@/components/admin/admin-providers"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -22,11 +23,13 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="admin-layout">
-      <AdminSidebar user={session.user} />
-      <div className="admin-main">
-        <main className="admin-content">{children}</main>
+    <AdminProviders>
+      <div className="admin-layout">
+        <AdminSidebar user={session.user} />
+        <div className="admin-main">
+          <main className="admin-content">{children}</main>
+        </div>
       </div>
-    </div>
+    </AdminProviders>
   )
 }
