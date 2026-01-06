@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { updateEventSchedule } from "@/app/(admin)/admin/events/[slug]/schedule.action"
 import {
   DAYS_OF_WEEK,
   type DayOfWeek,
@@ -10,9 +9,8 @@ import {
 } from "@/app/(admin)/admin/events/[slug]/schedule.types"
 
 interface Props {
-  eventSlug: string
-  timetable: TimetableDay[]
-  onUpdate: () => void
+  schedule: TimetableDay[]
+  onChange: (schedule: TimetableDay[]) => void
 }
 
 interface EditingDay {
@@ -22,15 +20,12 @@ interface EditingDay {
   timeslots: Timeslot[]
 }
 
-export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props) {
-  const [days, setDays] = useState<TimetableDay[]>(timetable)
+export default function ScheduleEditor({ schedule, onChange }: Props) {
   const [editing, setEditing] = useState<EditingDay | null>(null)
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set())
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
-  const usedDays = new Set(days.map((d) => d.day))
+  const usedDays = new Set(schedule.map((d) => d.day))
   const availableDays = DAYS_OF_WEEK.filter((d) => !usedDays.has(d) || editing?.day === d)
 
   const toggleExpanded = (index: number) => {
@@ -59,7 +54,7 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
   }
 
   const startEditing = (index: number) => {
-    const day = days[index]
+    const day = schedule[index]
     setEditing({
       index,
       day: day.day,
@@ -106,7 +101,7 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
     setEditing({ ...editing, timeslots: newTimeslots })
   }
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!editing) return
 
     // Validate
@@ -141,54 +136,24 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
 
     let updatedDays: TimetableDay[]
     if (editing.index === null) {
-      updatedDays = [...days, newDay]
+      updatedDays = [...schedule, newDay]
     } else {
-      updatedDays = days.map((d, i) => (i === editing.index ? newDay : d))
+      updatedDays = schedule.map((d, i) => (i === editing.index ? newDay : d))
     }
 
     // Sort days by day of week
     updatedDays.sort((a, b) => DAYS_OF_WEEK.indexOf(a.day) - DAYS_OF_WEEK.indexOf(b.day))
 
-    setIsLoading(true)
+    onChange(updatedDays)
+    setEditing(null)
     setError(null)
-
-    const result = await updateEventSchedule(eventSlug, updatedDays)
-
-    setIsLoading(false)
-
-    if (result.success) {
-      setDays(updatedDays)
-      setEditing(null)
-      setSuccess(true)
-      onUpdate()
-      setTimeout(() => setSuccess(false), 3000)
-    } else {
-      setError(result.error || "Failed to save schedule")
-    }
   }
 
-  const handleDelete = async (index: number) => {
+  const handleDelete = (index: number) => {
     if (!confirm("Are you sure you want to remove this day from the schedule?")) {
       return
     }
-
-    const updatedDays = days.filter((_, i) => i !== index)
-
-    setIsLoading(true)
-    setError(null)
-
-    const result = await updateEventSchedule(eventSlug, updatedDays)
-
-    setIsLoading(false)
-
-    if (result.success) {
-      setDays(updatedDays)
-      setSuccess(true)
-      onUpdate()
-      setTimeout(() => setSuccess(false), 3000)
-    } else {
-      setError(result.error || "Failed to remove day from schedule")
-    }
+    onChange(schedule.filter((_, i) => i !== index))
   }
 
   const formatTime = (time: string) => {
@@ -204,16 +169,9 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
         </div>
       )}
 
-      {success && (
-        <div className="admin-alert admin-alert-success">
-          <i className="bx bx-check-circle"></i>
-          Schedule saved successfully
-        </div>
-      )}
-
       {/* Existing days */}
       <div className="schedule-days-list">
-        {days.map((day, index) => (
+        {schedule.map((day, index) => (
           <div key={index} className="schedule-day-card">
             {editing?.index === index ? (
               // Editing mode
@@ -287,15 +245,13 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
                   <button
                     type="button"
                     onClick={handleSave}
-                    disabled={isLoading}
                     className="admin-btn admin-btn-primary admin-btn-sm"
                   >
-                    {isLoading ? "Saving..." : "Save"}
+                    Done
                   </button>
                   <button
                     type="button"
                     onClick={cancelEditing}
-                    disabled={isLoading}
                     className="admin-btn admin-btn-secondary admin-btn-sm"
                   >
                     Cancel
@@ -346,7 +302,7 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
                         type="button"
                         onClick={() => handleDelete(index)}
                         className="admin-btn admin-btn-danger admin-btn-sm"
-                        disabled={editing !== null || isLoading}
+                        disabled={editing !== null}
                       >
                         <i className="bx bx-trash"></i>
                         Remove
@@ -434,15 +390,13 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={isLoading}
                 className="admin-btn admin-btn-primary admin-btn-sm"
               >
-                {isLoading ? "Adding..." : "Add Day"}
+                Add Day
               </button>
               <button
                 type="button"
                 onClick={cancelEditing}
-                disabled={isLoading}
                 className="admin-btn admin-btn-secondary admin-btn-sm"
               >
                 Cancel
@@ -460,7 +414,7 @@ export default function ScheduleEditor({ eventSlug, timetable, onUpdate }: Props
         </button>
       )}
 
-      {days.length === 0 && !editing && (
+      {schedule.length === 0 && !editing && (
         <p className="schedule-empty">
           No schedule defined yet. Add days and timeslots to create the event schedule.
         </p>

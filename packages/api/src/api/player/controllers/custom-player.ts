@@ -176,7 +176,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         data: sanitizedData,
         populate: {
           avatar: true,
-          picture: true,
           socialNetworks: true,
         },
       })

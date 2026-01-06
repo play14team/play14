@@ -310,6 +310,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         ],
       },
       fields: ["documentId", "name", "position"],
+      populate: {
+        avatar: { fields: ["url"] },
+      },
       sort: { name: "asc" },
     })
 
@@ -322,6 +325,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         documentId: p.documentId,
         name: p.name,
         position: p.position,
+        avatar: p.avatar ? { url: p.avatar.url } : null,
       })),
     })
   },
@@ -435,13 +439,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Create location if needed
     let finalLocationId = locationId
     if (newLocation) {
+      const locationData: Record<string, unknown> = {
+        name: newLocation.name.trim(),
+        country: newLocation.country,
+      }
+
+      // Add map location if provided
+      if (newLocation.location?.geometry?.coordinates) {
+        locationData.location = newLocation.location
+      }
+
       const createdLocation = await strapi
         .documents("api::event-location.event-location")
         .create({
-          data: {
-            name: newLocation.name.trim(),
-            country: newLocation.country,
-          },
+          data: locationData,
         })
       finalLocationId = createdLocation.documentId
 
@@ -681,8 +692,32 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     }
 
-    // Handle location update (by documentId)
-    if (requestData.locationId) {
+    // Handle location update (by documentId or create new)
+    if (requestData.newLocation) {
+      // Create new location
+      const { newLocation } = requestData
+      if (newLocation.name && newLocation.country) {
+        const locationData: Record<string, unknown> = {
+          name: newLocation.name.trim(),
+          country: newLocation.country,
+        }
+
+        // Add map location if provided
+        if (newLocation.location?.geometry?.coordinates) {
+          locationData.location = newLocation.location
+        }
+
+        const createdLocation = await strapi
+          .documents("api::event-location.event-location")
+          .create({ data: locationData })
+
+        updateData.location = createdLocation.id
+
+        strapi.log.info(
+          `[Event] New location "${newLocation.name}" created by ${player.name}`
+        )
+      }
+    } else if (requestData.locationId) {
       const location = await strapi
         .documents("api::event-location.event-location")
         .findOne({ documentId: requestData.locationId })
@@ -732,6 +767,103 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           (p: any) => p && ORGANIZER_POSITIONS.includes(p.position)
         )
         updateData.mentors = validMentors.map((p: any) => p.id)
+      }
+    }
+
+    // Handle ticketing mode
+    if (requestData.ticketingMode !== undefined) {
+      const mode = requestData.ticketingMode
+      if (mode === "internal") {
+        updateData.ticketingEnabled = true
+        updateData.paymentProvider = "stripe"
+        // Clear external registration
+        updateData.registration = { link: null, widgetCode: null }
+      } else if (mode === "external") {
+        updateData.ticketingEnabled = false
+        updateData.paymentProvider = "none"
+        // Set external registration if provided
+        if (requestData.registration) {
+          updateData.registration = {
+            link: requestData.registration.link || null,
+            widgetCode: requestData.registration.widgetCode || null,
+          }
+        }
+      } else {
+        // mode === "none"
+        updateData.ticketingEnabled = false
+        updateData.paymentProvider = "none"
+        updateData.registration = { link: null, widgetCode: null }
+      }
+    }
+
+    // Handle sponsorships update
+    if (requestData.sponsorships !== undefined) {
+      if (Array.isArray(requestData.sponsorships)) {
+        // Transform sponsorships - sponsors are passed as documentIds
+        const transformedSponsorships = await Promise.all(
+          requestData.sponsorships.map(async (sponsorship: any) => {
+            const sponsorConnections = await Promise.all(
+              sponsorship.sponsors.map(async (sponsorDocId: string) => {
+                const sponsor = await strapi.documents("api::sponsor.sponsor").findFirst({
+                  filters: { documentId: { $eq: sponsorDocId } },
+                  fields: ["id"],
+                })
+                return sponsor?.id
+              })
+            )
+            return {
+              ...(sponsorship.id ? { id: sponsorship.id } : {}),
+              category: sponsorship.category,
+              sponsors: sponsorConnections.filter(Boolean),
+            }
+          })
+        )
+        updateData.sponsorships = transformedSponsorships
+      }
+    }
+
+    // Handle schedule/timetable update
+    if (requestData.schedule !== undefined) {
+      if (Array.isArray(requestData.schedule)) {
+        // Helper to normalize time to HH:mm:ss format
+        const normalizeTime = (time: string): string => {
+          if (time.includes(":") && time.split(":").length >= 3) {
+            return time.substring(0, 8)
+          }
+          return `${time}:00`
+        }
+        updateData.timetable = requestData.schedule.map((day: any) => ({
+          day: day.day,
+          description: day.description,
+          timeslots: day.timeslots.map((slot: any) => ({
+            time: normalizeTime(slot.time),
+            description: slot.description,
+          })),
+        }))
+      }
+    }
+
+    // Handle media links update
+    if (requestData.mediaLinks !== undefined) {
+      if (Array.isArray(requestData.mediaLinks)) {
+        updateData.media = requestData.mediaLinks.map((item: any) => ({
+          url: item.url,
+          type: item.type,
+        }))
+      }
+    }
+
+    // Handle finance update
+    if (requestData.finance !== undefined) {
+      const { revenue, expenses, destination } = requestData.finance
+      const resultAmount = Math.abs(revenue - expenses)
+      const result = revenue >= expenses ? "Profit" : "Loss"
+      updateData.finance = {
+        revenue,
+        expenses,
+        destination: destination || "",
+        result,
+        resultAmount,
       }
     }
 

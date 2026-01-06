@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import SimpleEditor from "@/components/ui/simple-editor"
+import { useToast } from "@/components/admin/toast"
 import {
   updatePlayer,
   updatePlayerPosition,
@@ -77,9 +78,8 @@ function getAllowedPositions(
 
 export default function PlayerEditForm({ player, currentUserPosition }: Props) {
   const router = useRouter()
+  const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   // Form state
   const [name, setName] = useState(player.name)
@@ -120,8 +120,6 @@ export default function PlayerEditForm({ player, currentUserPosition }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError(null)
-    setSuccess(false)
 
     // Update profile data
     const data: PlayerUpdateData = {
@@ -136,7 +134,7 @@ export default function PlayerEditForm({ player, currentUserPosition }: Props) {
     const profileResult = await updatePlayer(player.documentId, data)
 
     if (!profileResult.success) {
-      setError(profileResult.error || "Failed to update profile")
+      toast.error(profileResult.error || "Failed to update profile")
       setIsSubmitting(false)
       return
     }
@@ -145,34 +143,19 @@ export default function PlayerEditForm({ player, currentUserPosition }: Props) {
     if (position !== player.position) {
       const positionResult = await updatePlayerPosition(player.documentId, position)
       if (!positionResult.success) {
-        setError(positionResult.error || "Failed to update position")
+        toast.error(positionResult.error || "Failed to update position")
         setIsSubmitting(false)
         return
       }
     }
 
-    setSuccess(true)
+    toast.success("Player profile updated!")
     router.refresh()
-    setTimeout(() => setSuccess(false), 3000)
     setIsSubmitting(false)
   }
 
   return (
     <form onSubmit={handleSubmit} className="admin-form">
-      {error && (
-        <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="admin-alert admin-alert-success">
-          <i className="bx bx-check-circle"></i>
-          Player profile updated successfully!
-        </div>
-      )}
-
       <div className="admin-form-section">
         <h2>Basic Information</h2>
 

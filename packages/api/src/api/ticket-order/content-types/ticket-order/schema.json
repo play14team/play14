@@ -34,7 +34,7 @@
     },
     "paymentProvider": {
       "type": "enumeration",
-      "enum": ["stripe", "humanitix", "manual"],
+      "enum": ["stripe", "manual"],
       "required": true
     },
     "providerOrderId": {

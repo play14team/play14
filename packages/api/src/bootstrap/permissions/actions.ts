@@ -172,11 +172,19 @@ export const EXPECTATION_ACTIONS = {
 } as const
 
 export const EVENT_LOCATION_ACTIONS = {
+  // Standard CRUD
   FIND: "api::event-location.event-location.find",
   FIND_ONE: "api::event-location.event-location.findOne",
   CREATE: "api::event-location.event-location.create",
   UPDATE: "api::event-location.event-location.update",
   DELETE: "api::event-location.event-location.delete",
+
+  // Custom actions for admin panel
+  LIST: "api::event-location.custom-event-location.list",
+  FIND_ONE_ADMIN: "api::event-location.custom-event-location.findOne",
+  CREATE_ADMIN: "api::event-location.custom-event-location.create",
+  UPDATE_ADMIN: "api::event-location.custom-event-location.update",
+  DELETE_ADMIN: "api::event-location.custom-event-location.delete",
 } as const
 
 export const FORMAT_ACTIONS = {

@@ -18,6 +18,9 @@
 @use "admin/forms";
 @use "admin/claims";
 @use "admin/event-create";
+@use "admin/event-edit";
+@use "admin/profile-edit";
+@use "admin/locations";
 
 @import "css/bootstrap.min.css";
 @import "css/animate.min.css";

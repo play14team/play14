@@ -84,8 +84,10 @@ export default function EventImageManager({
     setError(null)
 
     try {
-      const croppedFile = new File([blob], originalFile?.name || "cropped.jpg", {
-        type: "image/jpeg",
+      // Replace extension with .webp for optimized file size
+      const baseName = originalFile?.name?.replace(/\.[^/.]+$/, "") || "cropped"
+      const croppedFile = new File([blob], `${baseName}.webp`, {
+        type: "image/webp",
       })
 
       const result = await uploadEventImage(eventSlug, croppedFile, cropTarget)

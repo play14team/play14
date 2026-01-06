@@ -6,8 +6,6 @@ import Image from "next/image"
 import {
   getAvailableSponsors,
   createSponsor,
-  uploadSponsorLogo,
-  updateEventSponsorships,
   type Sponsor,
   type Sponsorship,
 } from "@/app/(admin)/admin/events/[slug]/sponsor.action"
@@ -15,16 +13,13 @@ import {
 const DEFAULT_CATEGORIES = ["Gold", "Silver", "Bronze", "Partner"]
 
 interface Props {
-  eventSlug: string
   sponsorships: Sponsorship[]
-  onUpdate: () => void
+  onChange: (sponsorships: Sponsorship[]) => void
 }
 
-export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Props) {
-  const [localSponsorships, setLocalSponsorships] = useState<Sponsorship[]>(sponsorships)
+export default function SponsorEditor({ sponsorships, onChange }: Props) {
   const [availableSponsors, setAvailableSponsors] = useState<Sponsor[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForCategory, setCreateForCategory] = useState<string | null>(null)
@@ -45,42 +40,20 @@ export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Pro
     setIsLoading(false)
   }
 
-  const handleSave = async () => {
-    setIsSaving(true)
-    setError(null)
-
-    // Transform sponsorships for API - only send sponsor documentIds
-    const apiSponsorships = localSponsorships.map((s) => ({
-      id: s.id,
-      category: s.category,
-      sponsors: s.sponsors.map((sp) => sp.documentId),
-    }))
-
-    const result = await updateEventSponsorships(eventSlug, apiSponsorships as any)
-
-    if (result.success) {
-      onUpdate()
-    } else {
-      setError(result.error || "Failed to save sponsorships")
-    }
-
-    setIsSaving(false)
-  }
-
   const addCategory = (category: string) => {
-    if (localSponsorships.some((s) => s.category === category)) {
+    if (sponsorships.some((s) => s.category === category)) {
       return // Category already exists
     }
-    setLocalSponsorships([...localSponsorships, { category, sponsors: [] }])
+    onChange([...sponsorships, { category, sponsors: [] }])
   }
 
   const removeCategory = (category: string) => {
-    setLocalSponsorships(localSponsorships.filter((s) => s.category !== category))
+    onChange(sponsorships.filter((s) => s.category !== category))
   }
 
   const addSponsorToCategory = (category: string, sponsor: Sponsor) => {
-    setLocalSponsorships(
-      localSponsorships.map((s) => {
+    onChange(
+      sponsorships.map((s) => {
         if (s.category === category) {
           // Don't add if already in category
           if (s.sponsors.some((sp) => sp.documentId === sponsor.documentId)) {
@@ -94,8 +67,8 @@ export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Pro
   }
 
   const removeSponsorFromCategory = (category: string, sponsorDocId: string) => {
-    setLocalSponsorships(
-      localSponsorships.map((s) => {
+    onChange(
+      sponsorships.map((s) => {
         if (s.category === category) {
           return {
             ...s,
@@ -132,14 +105,10 @@ export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Pro
   // Get sponsors not already in any category
   const getUnusedSponsors = useCallback(() => {
     const usedIds = new Set(
-      localSponsorships.flatMap((s) => s.sponsors.map((sp) => sp.documentId))
+      sponsorships.flatMap((s) => s.sponsors.map((sp) => sp.documentId))
     )
     return availableSponsors.filter((s) => !usedIds.has(s.documentId))
-  }, [availableSponsors, localSponsorships])
-
-  // Check if there are unsaved changes
-  const hasChanges =
-    JSON.stringify(localSponsorships) !== JSON.stringify(sponsorships)
+  }, [availableSponsors, sponsorships])
 
   return (
     <div className="sponsor-editor">
@@ -152,7 +121,7 @@ export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Pro
 
       {/* Category Cards */}
       <div className="sponsor-categories">
-        {localSponsorships.map((sponsorship) => (
+        {sponsorships.map((sponsorship) => (
           <div key={sponsorship.category} className="sponsor-category-card">
             <div className="sponsor-category-header">
               <h4>{sponsorship.category}</h4>
@@ -291,7 +260,7 @@ export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Pro
             >
               <option value="">Add category...</option>
               {DEFAULT_CATEGORIES.filter(
-                (cat) => !localSponsorships.some((s) => s.category === cat)
+                (cat) => !sponsorships.some((s) => s.category === cat)
               ).map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
@@ -302,38 +271,6 @@ export default function SponsorEditor({ eventSlug, sponsorships, onUpdate }: Pro
           )}
         </div>
       </div>
-
-      {/* Save Button */}
-      {hasChanges && (
-        <div className="sponsor-editor-actions">
-          <button
-            type="button"
-            className="admin-btn admin-btn-primary"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <i className="bx bx-loader-alt bx-spin"></i>
-                Saving...
-              </>
-            ) : (
-              <>
-                <i className="bx bx-save"></i>
-                Save Sponsorships
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            className="admin-btn admin-btn-secondary"
-            onClick={() => setLocalSponsorships(sponsorships)}
-            disabled={isSaving}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
 
       {/* Create Sponsor Modal */}
       {showCreateModal && (

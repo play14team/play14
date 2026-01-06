@@ -12,7 +12,6 @@ interface EventRegistrationProps {
 /**
  * Unified registration component that handles multiple registration methods:
  * - Stripe ticketing (when ticketingEnabled && paymentProvider === "stripe")
- * - Humanitix widget (when paymentProvider === "humanitix" && widgetCode exists)
  * - External registration link (when registration.link exists)
  * - Embedded widget code (when registration.widgetCode exists)
  */
@@ -20,19 +19,11 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
   const eventData = event as any // Type assertion for new fields
   const hasStripeTicketing =
     eventData.ticketingEnabled && eventData.paymentProvider === "stripe"
-  const hasHumanitixWidget =
-    eventData.paymentProvider === "humanitix" && event.registration?.widgetCode
   const hasExternalLink = event.registration?.link
-  const hasWidgetCode =
-    event.registration?.widgetCode && !hasHumanitixWidget
+  const hasWidgetCode = event.registration?.widgetCode
 
   // No registration options available
-  if (
-    !hasStripeTicketing &&
-    !hasHumanitixWidget &&
-    !hasExternalLink &&
-    !hasWidgetCode
-  ) {
+  if (!hasStripeTicketing && !hasExternalLink && !hasWidgetCode) {
     return null
   }
 
@@ -54,15 +45,15 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
             </div>
           )}
 
-          {/* Humanitix or other widget embed */}
-          {(hasHumanitixWidget || hasWidgetCode) && (
+          {/* External widget embed (Eventbrite, etc.) */}
+          {hasWidgetCode && (
             <div className="registration-widget mb-4">
               <HtmlContent>{event.registration!.widgetCode!}</HtmlContent>
             </div>
           )}
 
           {/* External registration link (shown as prominent button if no other options) */}
-          {hasExternalLink && !hasStripeTicketing && !hasHumanitixWidget && (
+          {hasExternalLink && !hasStripeTicketing && (
             <div className="registration-link">
               <Link
                 href={event.registration!.link!}

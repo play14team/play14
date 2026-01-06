@@ -153,6 +153,13 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: TICKET_TYPE_ACTIONS.DELETE_TICKET_TYPE, minimumRole: ROLE_TYPES.HOST },
   { action: TICKET_TYPE_ACTIONS.GET_EVENT_ORDERS, minimumRole: ROLE_TYPES.HOST },
 
+  // Event location management (admin panel)
+  { action: EVENT_LOCATION_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_LOCATION_ACTIONS.FIND_ONE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_LOCATION_ACTIONS.CREATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_LOCATION_ACTIONS.UPDATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_LOCATION_ACTIONS.DELETE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+
   // ==================== FOUNDER ROLE ====================
   // Full administrative access - these are founder-only
 

@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import SimpleEditor from "@/components/ui/simple-editor"
+import { useToast } from "@/components/admin/toast"
 import {
   createEvent,
   type LocationOption,
@@ -58,8 +59,8 @@ interface Props {
 
 export default function EventCreateForm({ locations, venues }: Props) {
   const router = useRouter()
+  const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   // Form state
   const [name, setName] = useState("")
@@ -136,12 +137,11 @@ export default function EventCreateForm({ locations, venues }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError(null)
 
     // Build the start datetime
     const startDateTime = new Date(`${startDate}T${startTime}:00`)
     if (isNaN(startDateTime.getTime())) {
-      setError("Invalid start date/time")
+      toast.error("Invalid start date/time")
       setIsSubmitting(false)
       return
     }
@@ -149,14 +149,14 @@ export default function EventCreateForm({ locations, venues }: Props) {
     // Build the end datetime
     const endDateTime = new Date(`${endDate}T${endTime}:00`)
     if (isNaN(endDateTime.getTime())) {
-      setError("Invalid end date/time")
+      toast.error("Invalid end date/time")
       setIsSubmitting(false)
       return
     }
 
     // Validate end is after start
     if (endDateTime <= startDateTime) {
-      setError("End date/time must be after start date/time")
+      toast.error("End date/time must be after start date/time")
       setIsSubmitting(false)
       return
     }
@@ -173,14 +173,14 @@ export default function EventCreateForm({ locations, venues }: Props) {
     // Handle location
     if (locationMode === "existing") {
       if (!selectedLocationId) {
-        setError("Please select a location")
+        toast.error("Please select a location")
         setIsSubmitting(false)
         return
       }
       data.locationId = selectedLocationId
     } else {
       if (!newLocationName.trim() || !newLocationCountry) {
-        setError("Please provide location name and country")
+        toast.error("Please provide location name and country")
         setIsSubmitting(false)
         return
       }
@@ -203,10 +203,11 @@ export default function EventCreateForm({ locations, venues }: Props) {
     const result = await createEvent(data)
 
     if (result.success && result.event) {
+      toast.success("Event created successfully!")
       // Redirect to the event edit page
       router.push(`/admin/events/${result.event.slug}`)
     } else {
-      setError(result.error || "Failed to create event")
+      toast.error(result.error || "Failed to create event")
     }
 
     setIsSubmitting(false)
@@ -214,13 +215,6 @@ export default function EventCreateForm({ locations, venues }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="admin-form">
-      {error && (
-        <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
-          {error}
-        </div>
-      )}
-
       <div className="admin-form-section">
         <h2>Event Details</h2>
 

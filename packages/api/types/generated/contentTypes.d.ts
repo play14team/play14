@@ -471,7 +471,7 @@ export interface ApiEventLocationEventLocation extends Struct.CollectionTypeSche
   collectionName: "event_locations"
   info: {
     description: ""
-    displayName: "EventLocation"
+    displayName: "Event Location"
     pluralName: "event-locations"
     singularName: "event-location"
   }
@@ -584,7 +584,7 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    paymentProvider: Schema.Attribute.Enumeration<["stripe", "humanitix", "manual", "none"]> &
+    paymentProvider: Schema.Attribute.Enumeration<["stripe", "manual", "none"]> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
@@ -1287,8 +1287,7 @@ export interface ApiTicketOrderTicketOrder extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private
     orderNumber: Schema.Attribute.String & Schema.Attribute.Required & Schema.Attribute.Unique
     paidAt: Schema.Attribute.DateTime
-    paymentProvider: Schema.Attribute.Enumeration<["stripe", "humanitix", "manual"]> &
-      Schema.Attribute.Required
+    paymentProvider: Schema.Attribute.Enumeration<["stripe", "manual"]> & Schema.Attribute.Required
     player: Schema.Attribute.Relation<"manyToOne", "api::player.player">
     providerOrderId: Schema.Attribute.String
     providerSessionId: Schema.Attribute.String

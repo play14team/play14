@@ -15,10 +15,6 @@ export function getPaymentProvider(providerType: PaymentProviderType): PaymentPr
       }
       return stripeProvider
 
-    case "humanitix":
-      // Humanitix is embed-only, no payment provider implementation
-      throw new Error("Humanitix does not support programmatic payment processing")
-
     case "manual":
       throw new Error("Manual payment does not support programmatic processing")
 

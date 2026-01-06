@@ -1,42 +1,42 @@
 "use client"
 
-import { useState } from "react"
-import {
-  updateEventFinance,
-  type Finance,
-  type FinanceData,
-} from "@/app/(admin)/admin/events/[slug]/finance.action"
+import { useState, useEffect } from "react"
+import type { FinanceData } from "@/app/(admin)/admin/events/[slug]/finance.action"
 
 interface Props {
-  eventSlug: string
-  finance?: Finance | null
-  onUpdate: () => void
+  financeData: FinanceData | null
+  onChange: (data: FinanceData | null) => void
 }
 
-export default function FinanceEditor({ eventSlug, finance, onUpdate }: Props) {
+export default function FinanceEditor({ financeData, onChange }: Props) {
   const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   // Form state
-  const [revenue, setRevenue] = useState(finance?.revenue ?? 0)
-  const [expenses, setExpenses] = useState(finance?.expenses ?? 0)
-  const [destination, setDestination] = useState(finance?.destination ?? "")
+  const [revenue, setRevenue] = useState(financeData?.revenue ?? 0)
+  const [expenses, setExpenses] = useState(financeData?.expenses ?? 0)
+  const [destination, setDestination] = useState(financeData?.destination ?? "")
+
+  // Update form state when financeData prop changes
+  useEffect(() => {
+    setRevenue(financeData?.revenue ?? 0)
+    setExpenses(financeData?.expenses ?? 0)
+    setDestination(financeData?.destination ?? "")
+  }, [financeData])
 
   // Auto-calculated values
   const resultAmount = Math.abs(revenue - expenses)
   const result: "Profit" | "Loss" = revenue >= expenses ? "Profit" : "Loss"
 
   const resetForm = () => {
-    setRevenue(finance?.revenue ?? 0)
-    setExpenses(finance?.expenses ?? 0)
-    setDestination(finance?.destination ?? "")
+    setRevenue(financeData?.revenue ?? 0)
+    setExpenses(financeData?.expenses ?? 0)
+    setDestination(financeData?.destination ?? "")
     setIsEditing(false)
     setError(null)
   }
 
-  const handleSave = async () => {
+  const handleSave = () => {
     // Validate
     if (revenue < 0 || expenses < 0) {
       setError("Revenue and expenses must be positive numbers")
@@ -48,29 +48,27 @@ export default function FinanceEditor({ eventSlug, finance, onUpdate }: Props) {
       return
     }
 
-    setIsLoading(true)
-    setError(null)
-    setSuccess(false)
-
     const data: FinanceData = {
       revenue,
       expenses,
       destination: destination.trim(),
     }
 
-    const response = await updateEventFinance(eventSlug, data)
+    onChange(data)
+    setIsEditing(false)
+    setError(null)
+  }
 
-    setIsLoading(false)
-
-    if (response.success) {
-      setSuccess(true)
-      setIsEditing(false)
-      onUpdate()
-      // Auto-hide success message
-      setTimeout(() => setSuccess(false), 3000)
-    } else {
-      setError(response.error || "Failed to save finance data")
+  const handleClear = () => {
+    if (!confirm("Are you sure you want to clear the finance data?")) {
+      return
     }
+    onChange(null)
+    setRevenue(0)
+    setExpenses(0)
+    setDestination("")
+    setIsEditing(false)
+    setError(null)
   }
 
   const formatCurrency = (amount: number) => {
@@ -86,13 +84,6 @@ export default function FinanceEditor({ eventSlug, finance, onUpdate }: Props) {
         <div className="admin-alert admin-alert-error">
           <i className="bx bx-error-circle"></i>
           {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="admin-alert admin-alert-success">
-          <i className="bx bx-check-circle"></i>
-          Finance data saved successfully
         </div>
       )}
 
@@ -166,25 +157,13 @@ export default function FinanceEditor({ eventSlug, finance, onUpdate }: Props) {
             <button
               type="button"
               onClick={handleSave}
-              disabled={isLoading}
               className="admin-btn admin-btn-primary admin-btn-sm"
             >
-              {isLoading ? (
-                <>
-                  <i className="bx bx-loader-alt bx-spin"></i>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <i className="bx bx-save"></i>
-                  Save Finance Data
-                </>
-              )}
+              Done
             </button>
             <button
               type="button"
               onClick={resetForm}
-              disabled={isLoading}
               className="admin-btn admin-btn-secondary admin-btn-sm"
             >
               Cancel
@@ -194,26 +173,26 @@ export default function FinanceEditor({ eventSlug, finance, onUpdate }: Props) {
       ) : (
         // View mode
         <div className="finance-view">
-          {finance ? (
+          {financeData ? (
             <>
               <div className="finance-summary">
                 <div className="finance-item">
                   <span className="finance-label">Revenue</span>
-                  <span className="finance-value">{formatCurrency(finance.revenue)}</span>
+                  <span className="finance-value">{formatCurrency(financeData.revenue)}</span>
                 </div>
                 <div className="finance-item">
                   <span className="finance-label">Expenses</span>
-                  <span className="finance-value">{formatCurrency(finance.expenses)}</span>
+                  <span className="finance-value">{formatCurrency(financeData.expenses)}</span>
                 </div>
-                <div className={`finance-item finance-result ${finance.result.toLowerCase()}`}>
-                  <span className="finance-label">{finance.result}</span>
-                  <span className="finance-value">{formatCurrency(finance.resultAmount)}</span>
+                <div className={`finance-item finance-result ${result.toLowerCase()}`}>
+                  <span className="finance-label">{result}</span>
+                  <span className="finance-value">{formatCurrency(resultAmount)}</span>
                 </div>
               </div>
-              {finance.destination && (
+              {financeData.destination && (
                 <div className="finance-destination">
                   <span className="finance-label">Destination</span>
-                  <span className="finance-value">{finance.destination}</span>
+                  <span className="finance-value">{financeData.destination}</span>
                 </div>
               )}
             </>
@@ -221,14 +200,26 @@ export default function FinanceEditor({ eventSlug, finance, onUpdate }: Props) {
             <p className="finance-empty">No financial data recorded yet.</p>
           )}
 
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="admin-btn admin-btn-secondary"
-          >
-            <i className="bx bx-edit"></i>
-            {finance ? "Edit Finance Data" : "Add Finance Data"}
-          </button>
+          <div className="finance-view-actions">
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="admin-btn admin-btn-secondary"
+            >
+              <i className="bx bx-edit"></i>
+              {financeData ? "Edit Finance Data" : "Add Finance Data"}
+            </button>
+            {financeData && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="admin-btn admin-btn-danger admin-btn-sm"
+              >
+                <i className="bx bx-trash"></i>
+                Clear
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
