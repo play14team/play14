@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { getPlayerForEdit } from "../players.action"
-import PlayerEditForm from "./player-edit-form"
+import { PlayerForm } from "@/components/admin/player-form"
 
 export const metadata: Metadata = {
   title: "Edit Player",
@@ -36,7 +36,11 @@ export default async function PlayerEditPage({ params }: PageProps) {
         </Link>
       </div>
 
-      <PlayerEditForm player={player} currentUserPosition={session.player.position ?? "Player"} />
+      <PlayerForm
+        player={player}
+        mode="admin"
+        currentUserPosition={session.player.position ?? "Player"}
+      />
     </div>
   )
 }

@@ -46,6 +46,17 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         )}
 
+        <LoginButtons
+          googleUrl={googleUrl}
+          githubUrl={githubUrl}
+          linkedinUrl={linkedinUrl}
+          callbackUrl={callbackUrl}
+        />
+
+        <div className="auth-login-divider">
+          <span>or sign in with email</span>
+        </div>
+
         <LoginForm callbackUrl={callbackUrl} />
 
         <p className="auth-register-link">
@@ -54,17 +65,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Create one
           </Link>
         </p>
-
-        <div className="auth-login-divider">
-          <span>or continue with</span>
-        </div>
-
-        <LoginButtons
-          googleUrl={googleUrl}
-          githubUrl={githubUrl}
-          linkedinUrl={linkedinUrl}
-          callbackUrl={callbackUrl}
-        />
       </div>
     </div>
   )

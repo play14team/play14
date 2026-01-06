@@ -5,6 +5,8 @@
  * - Assigns roles based on linked player position at first login
  */
 
+import { syncUserRoleWithPlayerPosition } from "../../services/user-role-sync"
+
 interface StrapiContext {
   state: {
     user?: {
@@ -33,62 +35,6 @@ interface UserRecord {
 interface StrapiPlugin {
   controllers: Record<string, unknown>
   services: Record<string, unknown>
-}
-
-// Map player positions to role types
-const POSITION_TO_ROLE: Record<string, string> = {
-  Player: "player",
-  Host: "host",
-  Mentor: "mentor",
-  Founder: "founder",
-}
-
-/**
- * Sync user role based on their linked player's position
- */
-async function syncUserRoleWithPlayerPosition(userId: number): Promise<void> {
-  // Get user with player relation
-  const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
-    filters: { id: userId },
-    populate: { role: true, player: true },
-  })
-
-  if (!userWithPlayer?.player?.position) {
-    return // No player linked or no position set
-  }
-
-  const position = userWithPlayer.player.position as string
-  const expectedRoleType = POSITION_TO_ROLE[position]
-
-  if (!expectedRoleType) {
-    return // Unknown position
-  }
-
-  // Check if user already has the correct role
-  const currentRoleType = userWithPlayer.role?.type
-  if (currentRoleType === expectedRoleType) {
-    return // Role already correct
-  }
-
-  // Find the role matching the player's position
-  const targetRole = await strapi.documents("plugin::users-permissions.role").findFirst({
-    filters: { type: expectedRoleType },
-  })
-
-  if (!targetRole) {
-    strapi.log.warn(`[OAuth] Role type "${expectedRoleType}" not found for position "${position}"`)
-    return
-  }
-
-  // Update user's role
-  await strapi.documents("plugin::users-permissions.user").update({
-    documentId: userWithPlayer.documentId,
-    data: { role: targetRole.id } as any,
-  })
-
-  strapi.log.info(
-    `[OAuth] Updated user ${userId} role from "${currentRoleType}" to "${expectedRoleType}" based on player position "${position}"`
-  )
 }
 
 export default (plugin: StrapiPlugin) => {
@@ -208,7 +154,7 @@ export default (plugin: StrapiPlugin) => {
 
       // Sync user role with their linked player's position
       try {
-        await syncUserRoleWithPlayerPosition(user.id)
+        await syncUserRoleWithPlayerPosition(strapi, user.id)
       } catch (syncError) {
         strapi.log.error(`[OAuth] Failed to sync user role: ${syncError}`)
         // Don't fail login if role sync fails

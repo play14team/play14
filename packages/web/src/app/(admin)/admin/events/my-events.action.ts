@@ -1,6 +1,7 @@
 "use server"
 
 import { getAuthCookie } from "@/libs/auth"
+import type { UploadFile } from "@/models/strapi"
 
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
@@ -12,10 +13,13 @@ export interface MyEvent {
   end: string
   eventStatus: string
   isPublished: boolean
+  isHost: boolean
+  isMentor: boolean
   location: {
     name: string
     country: string
   } | null
+  defaultImage?: UploadFile | null
 }
 
 /**

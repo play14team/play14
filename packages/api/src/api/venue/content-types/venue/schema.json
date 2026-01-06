@@ -17,12 +17,6 @@
       "type": "string",
       "required": true
     },
-    "shortName": {
-      "pluginOptions": {},
-      "type": "string",
-      "unique": true,
-      "required": false
-    },
     "logo": {
       "type": "media",
       "multiple": false,

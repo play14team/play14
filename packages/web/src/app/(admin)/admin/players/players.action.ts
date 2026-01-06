@@ -28,6 +28,7 @@ export interface PlayersListResponse {
 
 export interface PlayerForEdit {
   documentId: string
+  slug: string
   name: string
   position: string
   company: string | null
@@ -207,5 +208,116 @@ export async function updatePlayerPosition(
     return { success: true }
   } catch {
     return { success: false, error: "Failed to update position" }
+  }
+}
+
+/**
+ * Set a player's avatar from the media library (organizers only)
+ */
+export async function setPlayerAvatarFromLibrary(
+  playerId: string,
+  fileId: number
+): Promise<{ success: boolean; error?: string }> {
+  const jwt = await getAuthCookie()
+  if (!jwt) return { success: false, error: "Not authenticated" }
+
+  try {
+    const response = await fetch(
+      `${STRAPI_URL}/api/players/${playerId}/avatar/library`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data: { fileId } }),
+      }
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      return {
+        success: false,
+        error: errorData.error?.message || "Failed to set avatar",
+      }
+    }
+
+    return { success: true }
+  } catch {
+    return { success: false, error: "Failed to set avatar" }
+  }
+}
+
+/**
+ * Remove a player's avatar (organizers only)
+ */
+export async function removePlayerAvatar(
+  playerId: string
+): Promise<{ success: boolean; error?: string }> {
+  const jwt = await getAuthCookie()
+  if (!jwt) return { success: false, error: "Not authenticated" }
+
+  try {
+    const response = await fetch(
+      `${STRAPI_URL}/api/players/${playerId}/avatar`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      return {
+        success: false,
+        error: errorData.error?.message || "Failed to remove avatar",
+      }
+    }
+
+    return { success: true }
+  } catch {
+    return { success: false, error: "Failed to remove avatar" }
+  }
+}
+
+/**
+ * Upload a player's avatar from disk (organizers only)
+ */
+export async function uploadPlayerAvatar(
+  playerId: string,
+  formData: FormData
+): Promise<{ success: boolean; error?: string; avatarUrl?: string }> {
+  const jwt = await getAuthCookie()
+  if (!jwt) return { success: false, error: "Not authenticated" }
+
+  try {
+    const response = await fetch(
+      `${STRAPI_URL}/api/players/${playerId}/avatar/upload`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: formData,
+      }
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      return {
+        success: false,
+        error: errorData.error?.message || "Failed to upload avatar",
+      }
+    }
+
+    const result = await response.json()
+    return {
+      success: true,
+      avatarUrl: result.data?.avatar?.url,
+    }
+  } catch {
+    return { success: false, error: "Failed to upload avatar" }
   }
 }

@@ -157,6 +157,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * - Hosts see events they host
    * - Mentors see events they mentor
    * - Founders see all events
+   * Returns isHost/isMentor flags to enable "Mine" filtering on frontend
    */
   async getMyEvents(ctx) {
     const user = ctx.state.user
@@ -197,10 +198,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const publishedIds = new Set(publishedEvents.map((e: any) => e.documentId))
 
     // Query all events (draft status returns all documents)
+    // Include hosts and mentors to determine ownership
     const events = await strapi.documents("api::event.event").findMany({
       filters,
       populate: {
         location: { fields: ["name", "country"] },
+        defaultImage: { fields: ["url", "alternativeText", "width", "height"] },
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
       },
       sort: { start: "desc" },
     })
@@ -210,18 +215,34 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     )
 
     return ctx.send({
-      data: events.map((e: any) => ({
-        documentId: e.documentId,
-        slug: e.slug,
-        name: e.name,
-        start: e.start,
-        end: e.end,
-        eventStatus: e.eventStatus,
-        isPublished: publishedIds.has(e.documentId),
-        location: e.location
-          ? { name: e.location.name, country: e.location.country }
-          : null,
-      })),
+      data: events.map((e: any) => {
+        // Check if current player is a host or mentor of this event
+        const isHost = e.hosts?.some((h: any) => h.documentId === player.documentId) || false
+        const isMentor = e.mentors?.some((m: any) => m.documentId === player.documentId) || false
+
+        return {
+          documentId: e.documentId,
+          slug: e.slug,
+          name: e.name,
+          start: e.start,
+          end: e.end,
+          eventStatus: e.eventStatus,
+          isPublished: publishedIds.has(e.documentId),
+          isHost,
+          isMentor,
+          location: e.location
+            ? { name: e.location.name, country: e.location.country }
+            : null,
+          defaultImage: e.defaultImage
+            ? {
+                url: e.defaultImage.url,
+                alternativeText: e.defaultImage.alternativeText,
+                width: e.defaultImage.width,
+                height: e.defaultImage.height,
+              }
+            : null,
+        }
+      }),
     })
   },
 

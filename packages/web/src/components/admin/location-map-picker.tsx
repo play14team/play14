@@ -32,6 +32,8 @@ interface LocationMapPickerProps {
   autoFillFromLocation?: boolean
   /** Callback when a country is detected from geocoding (receives ISO 3166-1 alpha-2 code, e.g., "FR", "DE") */
   onCountryDetected?: (countryCode: string) => void
+  /** Geocoding precision: "city" for cities/regions (Event Locations), "address" for precise addresses (Venues) */
+  precision?: "city" | "address"
 }
 
 // Geocoder control that uses the map's geocoder
@@ -39,16 +41,26 @@ interface GeocoderControlProps {
   mapboxAccessToken: string
   onResult: (result: MapLocation) => void
   position?: "top-left" | "top-right" | "bottom-right" | "bottom-left"
+  /** Geocoding precision: "city" for cities/regions, "address" for precise addresses */
+  precision?: "city" | "address"
 }
 
-function GeocoderControl({ mapboxAccessToken, onResult, position = "top-left" }: GeocoderControlProps) {
+function GeocoderControl({ mapboxAccessToken, onResult, position = "top-left", precision = "city" }: GeocoderControlProps) {
   useControl(
     () => {
+      // Set types based on precision level
+      // "city" = place, locality, region, country (city-level, good for Event Locations)
+      // "address" = address, poi, place, locality (precise addresses, good for Venues)
+      const types = precision === "address"
+        ? "address,poi,place,locality"
+        : "place,locality,region,country"
+
       const ctrl = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
         mapboxgl: mapboxgl as any,
         marker: false,
-        placeholder: "Search for a location...",
+        placeholder: precision === "address" ? "Search for an address..." : "Search for a location...",
+        types,
       })
       ctrl.on("result", (evt: { result: any }) => {
         const result = evt.result
@@ -83,6 +95,22 @@ function extractCountryCode(feature: any): string | null {
   return null
 }
 
+// Zoom levels based on precision
+// City: lower zoom to show the city area
+// Address: higher zoom to show the precise location
+const ZOOM_LEVELS = {
+  city: {
+    initial: 10,      // When coordinates exist
+    geocode: 8,       // After geocoding from centerOnLocation
+    search: 12,       // After using search box
+  },
+  address: {
+    initial: 16,      // When coordinates exist - street level
+    geocode: 14,      // After geocoding from centerOnLocation
+    search: 17,       // After using search box - building level
+  },
+}
+
 export default function LocationMapPicker({
   value,
   onChange,
@@ -90,13 +118,15 @@ export default function LocationMapPicker({
   centerOnLocation,
   autoFillFromLocation = false,
   onCountryDetected,
+  precision = "city",
 }: LocationMapPickerProps) {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
+  const zoomLevels = ZOOM_LEVELS[precision]
   const [viewState, setViewState] = useState({
     longitude: value?.geometry?.coordinates?.[0] ?? 10,
     latitude: value?.geometry?.coordinates?.[1] ?? 48,
-    zoom: value?.geometry?.coordinates ? 10 : 3,
+    zoom: value?.geometry?.coordinates ? zoomLevels.initial : 3,
   })
 
   // Use refs for callbacks to avoid re-triggering effects when callbacks change
@@ -121,8 +151,12 @@ export default function LocationMapPicker({
 
     const geocodeLocation = async () => {
       try {
+        // Use appropriate types based on precision level
+        const types = precision === "address"
+          ? "address,poi,place,locality"
+          : "place,locality,region,country"
         const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(centerOnLocation)}.json?access_token=${token}&limit=1&types=place,locality,region,country`
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(centerOnLocation)}.json?access_token=${token}&limit=1&types=${types}`
         )
         const data = await response.json()
         if (data.features && data.features.length > 0) {
@@ -133,7 +167,7 @@ export default function LocationMapPicker({
             ...prev,
             longitude: lng,
             latitude: lat,
-            zoom: 8,
+            zoom: zoomLevels.geocode,
           }))
 
           // If autoFillFromLocation is enabled, also set the coordinates
@@ -161,7 +195,7 @@ export default function LocationMapPicker({
     // Debounce the geocoding request
     const timeoutId = setTimeout(geocodeLocation, 500)
     return () => clearTimeout(timeoutId)
-  }, [centerOnLocation, token, autoFillFromLocation])
+  }, [centerOnLocation, token, autoFillFromLocation, precision])
 
   // Update view when value changes externally
   useEffect(() => {
@@ -169,10 +203,10 @@ export default function LocationMapPicker({
       setViewState({
         longitude: value.geometry.coordinates[0],
         latitude: value.geometry.coordinates[1],
-        zoom: 10,
+        zoom: zoomLevels.initial,
       })
     }
-  }, [value])
+  }, [value, zoomLevels.initial])
 
   const isDark = mounted && resolvedTheme === "dark"
   const mapStyle = isDark
@@ -220,11 +254,11 @@ export default function LocationMapPicker({
         setViewState({
           longitude: result.geometry.coordinates[0],
           latitude: result.geometry.coordinates[1],
-          zoom: 12,
+          zoom: zoomLevels.search,
         })
       }
     },
-    [onChange]
+    [onChange, zoomLevels.search]
   )
 
   const handleClearLocation = () => {
@@ -253,6 +287,7 @@ export default function LocationMapPicker({
           <GeocoderControl
             mapboxAccessToken={token}
             onResult={handleGeocoderResult}
+            precision={precision}
           />
           <GeolocateControl
             position="top-right"

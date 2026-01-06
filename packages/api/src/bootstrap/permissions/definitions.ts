@@ -79,6 +79,9 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: PLAYER_CLAIM_ACTIONS.CANCEL_CLAIM, minimumRole: ROLE_TYPES.AUTHENTICATED },
   { action: PLAYER_CLAIM_ACTIONS.FIND_MY_CLAIMS, minimumRole: ROLE_TYPES.AUTHENTICATED },
 
+  // Attended events (viewing own attendance history)
+  { action: PLAYER_ACTIONS.GET_MY_ATTENDED_EVENTS, minimumRole: ROLE_TYPES.AUTHENTICATED },
+
   // Attendance claims (basic)
   { action: ATTENDANCE_CLAIM_ACTIONS.SEARCH_EVENTS, minimumRole: ROLE_TYPES.AUTHENTICATED },
   { action: ATTENDANCE_CLAIM_ACTIONS.GET_OVER_EVENTS, minimumRole: ROLE_TYPES.AUTHENTICATED },
@@ -133,6 +136,11 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: PLAYER_ACTIONS.UPDATE_PLAYER, minimumRole: ROLE_TYPES.HOST },
   { action: PLAYER_ACTIONS.UPDATE_PLAYER_POSITION, minimumRole: ROLE_TYPES.HOST },
 
+  // Player avatar management (organizers can manage avatars)
+  { action: PLAYER_ACTIONS.SET_AVATAR_FROM_LIBRARY, minimumRole: ROLE_TYPES.HOST },
+  { action: PLAYER_ACTIONS.REMOVE_AVATAR, minimumRole: ROLE_TYPES.HOST },
+  { action: PLAYER_ACTIONS.UPLOAD_AVATAR_FOR_PLAYER, minimumRole: ROLE_TYPES.HOST },
+
   // Attendance claim management (for own events)
   { action: ATTENDANCE_CLAIM_ACTIONS.GET_PENDING_FOR_MY_EVENTS, minimumRole: ROLE_TYPES.HOST },
   { action: ATTENDANCE_CLAIM_ACTIONS.APPROVE_CLAIM, minimumRole: ROLE_TYPES.HOST },
@@ -159,6 +167,16 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: EVENT_LOCATION_ACTIONS.CREATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
   { action: EVENT_LOCATION_ACTIONS.UPDATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
   { action: EVENT_LOCATION_ACTIONS.DELETE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+
+  // Venue management (admin panel)
+  { action: VENUE_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.FIND_ONE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.CREATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.UPDATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.DELETE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.UPLOAD_LOGO, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.SET_LOGO_FROM_LIBRARY, minimumRole: ROLE_TYPES.HOST },
+  { action: VENUE_ACTIONS.REMOVE_LOGO, minimumRole: ROLE_TYPES.HOST },
 
   // ==================== FOUNDER ROLE ====================
   // Full administrative access - these are founder-only

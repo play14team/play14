@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import LocationMapPicker, { type MapLocation } from "./location-map-picker"
 import CountrySelector from "./country-selector"
 import { createLocation } from "@/app/(admin)/admin/locations/locations.action"
@@ -20,6 +21,12 @@ export default function CreateLocationModal({
   const dialogRef = useRef<HTMLDialogElement>(null)
   const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Client-side only mounting for portal
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Form state
   const [name, setName] = useState("")
@@ -123,7 +130,10 @@ export default function CreateLocationModal({
     setIsSubmitting(false)
   }
 
-  return (
+  // Don't render on server or before mounting (for portal)
+  if (!mounted) return null
+
+  const modalContent = (
     <dialog
       ref={dialogRef}
       className="create-location-modal"
@@ -222,4 +232,7 @@ export default function CreateLocationModal({
       </div>
     </dialog>
   )
+
+  // Use portal to render outside any parent form
+  return createPortal(modalContent, document.body)
 }

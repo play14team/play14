@@ -5,6 +5,7 @@
 
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
+import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 
 /**
  * Get or create a folder in the media library by name
@@ -602,6 +603,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         `[Player] Position updated: ${targetPlayer.name} (${targetCurrentPosition} → ${newPosition}) by ${userWithPlayer.player.name} (${currentUserPosition})`
       )
 
+      // Sync the user's role to match the new position
+      try {
+        const roleUpdated = await syncUserRoleFromPlayer(strapi, playerId)
+        if (roleUpdated) {
+          strapi.log.info(
+            `[Player] Role synced for ${targetPlayer.name} after position change to ${newPosition}`
+          )
+        }
+      } catch (syncError) {
+        strapi.log.error(`[Player] Failed to sync role after position update: ${syncError}`)
+        // Don't fail the position update if role sync fails
+      }
+
       return ctx.send({
         data: updatedPlayer,
       })
@@ -858,6 +872,382 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     } catch (error) {
       strapi.log.error(`[Player] Failed to update player: ${error}`)
       return ctx.internalServerError("Failed to update player")
+    }
+  },
+
+  /**
+   * Set a player's avatar from an existing media library file (for organizers)
+   */
+  async setAvatarFromLibrary(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    // Get the current user's player to check their position
+    const userWithPlayer = await strapi
+      .documents("plugin::users-permissions.user")
+      .findFirst({
+        filters: { id: user.id },
+        populate: { player: true },
+      })
+
+    if (!userWithPlayer?.player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    const currentUserPosition = userWithPlayer.player.position
+
+    // Only organizers can set avatars from library
+    if (currentUserPosition === "Player") {
+      return ctx.forbidden("Only organizers can set player avatars from the media library")
+    }
+
+    const { id: playerId } = ctx.params
+    const { fileId } = ctx.request.body?.data || {}
+
+    if (!playerId) {
+      return ctx.badRequest("Player ID is required")
+    }
+
+    if (!fileId || typeof fileId !== "number") {
+      return ctx.badRequest("fileId is required and must be a number")
+    }
+
+    // Find the target player
+    const targetPlayer = await strapi.documents("api::player.player").findOne({
+      documentId: playerId,
+    })
+
+    if (!targetPlayer) {
+      return ctx.notFound("Player not found")
+    }
+
+    // Verify file exists
+    const file = await strapi.plugins.upload.services.upload.findOne(fileId)
+    if (!file) {
+      return ctx.badRequest("File not found in media library")
+    }
+
+    try {
+      // Update the player's avatar field with the selected file
+      const updatedPlayer = await strapi.documents("api::player.player").update({
+        documentId: playerId,
+        data: {
+          avatar: fileId,
+        } as any,
+        populate: {
+          avatar: true,
+          socialNetworks: true,
+        },
+      })
+
+      strapi.log.info(
+        `[Player] Organizer ${userWithPlayer.player.name} set avatar for player ${playerId} from library (file ${fileId})`
+      )
+
+      return ctx.send({
+        data: updatedPlayer,
+      })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to set avatar from library: ${error}`)
+      return ctx.internalServerError("Failed to set avatar from library")
+    }
+  },
+
+  /**
+   * Remove a player's avatar (for organizers)
+   */
+  async removeAvatar(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    // Get the current user's player to check their position
+    const userWithPlayer = await strapi
+      .documents("plugin::users-permissions.user")
+      .findFirst({
+        filters: { id: user.id },
+        populate: { player: true },
+      })
+
+    if (!userWithPlayer?.player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    const currentUserPosition = userWithPlayer.player.position
+
+    // Only organizers can remove avatars
+    if (currentUserPosition === "Player") {
+      return ctx.forbidden("Only organizers can remove player avatars")
+    }
+
+    const { id: playerId } = ctx.params
+
+    if (!playerId) {
+      return ctx.badRequest("Player ID is required")
+    }
+
+    // Find the target player
+    const targetPlayer = await strapi.documents("api::player.player").findOne({
+      documentId: playerId,
+      populate: { avatar: true },
+    })
+
+    if (!targetPlayer) {
+      return ctx.notFound("Player not found")
+    }
+
+    try {
+      // Clear avatar (set to null)
+      const updatedPlayer = await strapi.documents("api::player.player").update({
+        documentId: playerId,
+        data: {
+          avatar: null,
+        } as any,
+        populate: {
+          avatar: true,
+          socialNetworks: true,
+        },
+      })
+
+      strapi.log.info(
+        `[Player] Organizer ${userWithPlayer.player.name} removed avatar from player ${playerId}`
+      )
+
+      return ctx.send({
+        data: updatedPlayer,
+      })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to remove avatar: ${error}`)
+      return ctx.internalServerError("Failed to remove avatar")
+    }
+  },
+
+  /**
+   * Upload a picture for another player's profile (for organizers)
+   */
+  async uploadAvatarForPlayer(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in to upload an avatar")
+    }
+
+    // Get the current user's player to check their position
+    const userWithPlayer = await strapi
+      .documents("plugin::users-permissions.user")
+      .findFirst({
+        filters: { id: user.id },
+        populate: { player: true },
+      })
+
+    if (!userWithPlayer?.player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    const currentUserPosition = userWithPlayer.player.position
+
+    // Only organizers can upload avatars for other players
+    if (currentUserPosition === "Player") {
+      return ctx.forbidden("Only organizers can upload avatars for other players")
+    }
+
+    const { id: playerId } = ctx.params
+
+    if (!playerId) {
+      return ctx.badRequest("Player ID is required")
+    }
+
+    // Find the target player
+    const targetPlayer = await strapi.documents("api::player.player").findOne({
+      documentId: playerId,
+    })
+
+    if (!targetPlayer) {
+      return ctx.notFound("Player not found")
+    }
+
+    // Validate that files were provided
+    const files = ctx.request.files
+
+    if (!files || !files.files) {
+      return ctx.badRequest("No file provided")
+    }
+
+    try {
+      // Get the upload plugin service
+      const uploadService = strapi.plugin("upload").service("upload")
+
+      // Prepare file(s)
+      const fileArray = Array.isArray(files.files) ? files.files : [files.files]
+
+      // Get or create the "players" folder for avatar uploads
+      const playersFolderId = await getOrCreateMediaFolder(strapi, "players")
+
+      // Upload the file(s) and link to the player's avatar field
+      await uploadService.upload({
+        data: {
+          refId: targetPlayer.id,
+          ref: "api::player.player",
+          field: "avatar",
+          fileInfo: {
+            folder: playersFolderId,
+          },
+        },
+        files: fileArray,
+      })
+
+      strapi.log.info(
+        `[Player] Organizer ${userWithPlayer.player.name} uploaded avatar for player ${playerId}`
+      )
+
+      // Return the updated player with avatar
+      const updatedPlayer = await strapi.documents("api::player.player").findOne({
+        documentId: playerId,
+        populate: {
+          avatar: true,
+          socialNetworks: true,
+        },
+      })
+
+      return ctx.send({
+        data: updatedPlayer,
+      })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to upload avatar for player: ${error}`)
+      return ctx.internalServerError("Failed to upload avatar")
+    }
+  },
+
+  /**
+   * Get events the current user has attended (via tickets or approved claims)
+   * Returns events from:
+   * 1. Player's `attended` relation (from approved claims or direct additions)
+   * 2. Paid ticket orders
+   */
+  async getMyAttendedEvents(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    // Get user with player relation
+    const userWithPlayer = await strapi
+      .documents("plugin::users-permissions.user")
+      .findFirst({
+        filters: { id: user.id },
+        populate: { player: true },
+      })
+
+    if (!userWithPlayer?.player) {
+      return ctx.notFound("No player profile linked to this user")
+    }
+
+    const player = userWithPlayer.player
+
+    try {
+      // Get events from player's attended relation
+      const playerWithAttended = await strapi
+        .documents("api::player.player")
+        .findOne({
+          documentId: player.documentId,
+          populate: {
+            attended: {
+              populate: {
+                defaultImage: { fields: ["url", "width", "height", "formats"] },
+                location: { fields: ["name", "country", "slug"] },
+              },
+            },
+          },
+        })
+
+      // Get events from paid ticket orders
+      const paidOrders = await strapi
+        .documents("api::ticket-order.ticket-order")
+        .findMany({
+          filters: {
+            player: { documentId: player.documentId },
+            status: "paid",
+          },
+          populate: {
+            event: {
+              populate: {
+                defaultImage: { fields: ["url", "width", "height", "formats"] },
+                location: { fields: ["name", "country", "slug"] },
+              },
+            },
+          },
+        })
+
+      // Build a map to deduplicate events
+      const attendedMap = new Map<
+        string,
+        {
+          documentId: string
+          slug: string
+          name: string
+          start: string
+          end: string
+          eventStatus: string
+          defaultImage: any
+          location: any
+          attendanceSource: "ticket" | "claim" | "direct"
+        }
+      >()
+
+      // Add events from attended relation (claim or direct)
+      for (const event of playerWithAttended?.attended || []) {
+        attendedMap.set(event.documentId, {
+          documentId: event.documentId,
+          slug: event.slug,
+          name: event.name,
+          start: event.start,
+          end: event.end,
+          eventStatus: event.eventStatus,
+          defaultImage: event.defaultImage,
+          location: event.location,
+          attendanceSource: "claim",
+        })
+      }
+
+      // Add events from tickets (ticket takes precedence for source)
+      for (const order of paidOrders) {
+        if (order.event) {
+          const event = order.event
+          attendedMap.set(event.documentId, {
+            documentId: event.documentId,
+            slug: event.slug,
+            name: event.name,
+            start: event.start,
+            end: event.end,
+            eventStatus: event.eventStatus,
+            defaultImage: event.defaultImage,
+            location: event.location,
+            attendanceSource: "ticket",
+          })
+        }
+      }
+
+      // Convert to array and sort by start date (most recent first)
+      const attendedEvents = Array.from(attendedMap.values()).sort(
+        (a, b) => new Date(b.start).getTime() - new Date(a.start).getTime()
+      )
+
+      strapi.log.info(
+        `[Player] Retrieved ${attendedEvents.length} attended events for player ${player.documentId}`
+      )
+
+      return ctx.send({
+        data: attendedEvents,
+      })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to get attended events: ${error}`)
+      return ctx.internalServerError("Failed to get attended events")
     }
   },
 })

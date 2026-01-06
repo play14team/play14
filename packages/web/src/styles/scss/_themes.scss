@@ -12,6 +12,21 @@
   --color-yellow: #ffc900;
   --color-red: #d80000;
 
+  // Semantic/Functional colors (mapped to brand colors)
+  --color-primary: var(--color-orange);
+  --color-secondary: var(--color-blue);
+  --color-success: var(--color-green);
+  --color-warning: var(--color-yellow);
+  --color-danger: var(--color-red);
+  --color-info: var(--color-blue);
+
+  // RGB values for rgba() usage
+  --color-primary-rgb: 255, 82, 0;
+  --color-secondary-rgb: 0, 152, 221;
+  --color-success-rgb: 146, 201, 0;
+  --color-warning-rgb: 255, 201, 0;
+  --color-danger-rgb: 216, 0, 0;
+
   // Backgrounds
   --color-bg: #ffffff;
   --color-bg-alt: #fafafa;
@@ -83,6 +98,21 @@
   --color-green: #a8d900;
   --color-yellow: #ffd633;
   --color-red: #ff4444;
+
+  // Semantic/Functional colors (mapped to brand colors)
+  --color-primary: var(--color-orange);
+  --color-secondary: var(--color-blue);
+  --color-success: var(--color-green);
+  --color-warning: var(--color-yellow);
+  --color-danger: var(--color-red);
+  --color-info: var(--color-blue);
+
+  // RGB values for rgba() usage (dark mode adjusted)
+  --color-primary-rgb: 255, 107, 44;
+  --color-secondary-rgb: 62, 181, 237;
+  --color-success-rgb: 168, 217, 0;
+  --color-warning-rgb: 255, 214, 51;
+  --color-danger-rgb: 255, 68, 68;
 
   // Backgrounds
   --color-bg: #0f0f0f;
