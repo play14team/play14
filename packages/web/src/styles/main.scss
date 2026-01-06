@@ -1,3 +1,4 @@
+// Core styles (must come before @import)
 @use "scss/themes";
 @use "scss/style.scss";
 @use "scss/responsive.scss";
@@ -12,21 +13,21 @@
 // Auth pages
 @use "auth/login";
 
-// Admin pages
+// Admin pages (loaded after third-party CSS via @import order below)
 @use "admin/layout";
 @use "admin/sidebar";
 @use "admin/forms";
 @use "admin/claims";
 @use "admin/event-create";
 @use "admin/event-edit";
-@use "admin/profile-edit";
+@use "admin/player-form";
 @use "admin/locations";
+@use "admin/venues";
 
+// Third-party CSS
 @import "css/bootstrap.min.css";
 @import "css/animate.min.css";
 @import "css/boxicons.min.css";
 @import "css/flaticon.css";
-
 @import "font-awesome/css/font-awesome.min.css";
-
 @import "react-big-calendar/lib/css/react-big-calendar.css";

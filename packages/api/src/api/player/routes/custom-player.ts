@@ -115,5 +115,49 @@ export default {
         description: "Update another player's profile (organizers only)",
       },
     },
+    {
+      method: "PUT",
+      path: "/players/:id/avatar/library",
+      handler: "custom-player.setAvatarFromLibrary",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Set a player's avatar from the media library (organizers only)",
+      },
+    },
+    {
+      method: "DELETE",
+      path: "/players/:id/avatar",
+      handler: "custom-player.removeAvatar",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Remove a player's avatar (organizers only)",
+      },
+    },
+    {
+      method: "POST",
+      path: "/players/:id/avatar/upload",
+      handler: "custom-player.uploadAvatarForPlayer",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Upload an avatar for a player (organizers only)",
+      },
+    },
+    {
+      method: "GET",
+      path: "/players/me/attended-events",
+      handler: "custom-player.getMyAttendedEvents",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Get events the current user has attended (via tickets or approved claims)",
+      },
+    },
   ],
 }

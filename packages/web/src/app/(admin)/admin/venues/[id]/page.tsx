@@ -1,0 +1,42 @@
+import { requireOrganizer } from "@/libs/auth"
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import Link from "next/link"
+import { getVenueForEdit } from "../venues.action"
+import VenueEditForm from "./venue-edit-form"
+
+export const metadata: Metadata = {
+  title: "Edit Venue",
+}
+
+interface PageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function VenueEditPage({ params }: PageProps) {
+  await requireOrganizer()
+  const { id } = await params
+
+  const venue = await getVenueForEdit(id)
+
+  if (!venue) {
+    notFound()
+  }
+
+  return (
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div className="admin-page-header-content">
+          <h1>Edit Venue</h1>
+          <p>{venue.name}</p>
+        </div>
+        <Link href="/admin/venues" className="admin-btn admin-btn-secondary">
+          <i className="bx bx-arrow-back"></i>
+          Back to Venues
+        </Link>
+      </div>
+
+      <VenueEditForm venue={venue} />
+    </div>
+  )
+}

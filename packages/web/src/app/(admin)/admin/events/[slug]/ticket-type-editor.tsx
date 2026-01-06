@@ -9,13 +9,7 @@ import {
   type TicketType,
   type TicketTypeData,
 } from "./ticket-type.action"
-
-const CURRENCIES = [
-  { code: "EUR", symbol: "€" },
-  { code: "USD", symbol: "$" },
-  { code: "GBP", symbol: "£" },
-  { code: "CHF", symbol: "CHF" },
-]
+import { STRIPE_CURRENCIES, formatPrice } from "@/libs/currencies"
 
 interface Props {
   eventId: string
@@ -166,9 +160,8 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
     }
   }
 
-  const formatPrice = (price: number, currency: string) => {
-    const currencyInfo = CURRENCIES.find((c) => c.code === currency)
-    return `${currencyInfo?.symbol || currency} ${price.toFixed(2)}`
+  const formatTicketPrice = (price: number, currency: string) => {
+    return formatPrice(price, currency)
   }
 
   const sortedTickets = [...ticketTypes].sort((a, b) => a.sortOrder - b.sortOrder)
@@ -236,9 +229,9 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                       onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                       className="admin-select"
                     >
-                      {CURRENCIES.map((c) => (
+                      {STRIPE_CURRENCIES.map((c) => (
                         <option key={c.code} value={c.code}>
-                          {c.code} ({c.symbol})
+                          {c.code} ({c.symbol}) - {c.name}
                         </option>
                       ))}
                     </select>
@@ -331,7 +324,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                     <p className="ticket-type-description">{ticket.description}</p>
                   )}
                   <div className="ticket-type-details">
-                    <span className="ticket-price">{formatPrice(ticket.price, ticket.currency)}</span>
+                    <span className="ticket-price">{formatTicketPrice(ticket.price, ticket.currency)}</span>
                     {ticket.capacity && (
                       <span className="ticket-capacity">
                         {ticket.capacity - ticket.soldCount} / {ticket.capacity} available
@@ -422,9 +415,9 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                   onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                   className="admin-select"
                 >
-                  {CURRENCIES.map((c) => (
+                  {STRIPE_CURRENCIES.map((c) => (
                     <option key={c.code} value={c.code}>
-                      {c.code} ({c.symbol})
+                      {c.code} ({c.symbol}) - {c.name}
                     </option>
                   ))}
                 </select>

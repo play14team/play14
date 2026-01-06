@@ -90,6 +90,12 @@ export const PLAYER_ACTIONS = {
   GET_PLAYER_FOR_EDIT: "api::player.custom-player.getPlayerForEdit",
   UPDATE_PLAYER: "api::player.custom-player.updatePlayer",
   UPDATE_PLAYER_POSITION: "api::player.custom-player.updatePlayerPosition",
+  GET_MY_ATTENDED_EVENTS: "api::player.custom-player.getMyAttendedEvents",
+
+  // Avatar management (organizers can use these on any player including themselves)
+  SET_AVATAR_FROM_LIBRARY: "api::player.custom-player.setAvatarFromLibrary",
+  REMOVE_AVATAR: "api::player.custom-player.removeAvatar",
+  UPLOAD_AVATAR_FOR_PLAYER: "api::player.custom-player.uploadAvatarForPlayer",
 } as const
 
 // ==================== PLAYER CLAIMS ====================
@@ -244,11 +250,22 @@ export const TESTIMONIAL_ACTIONS = {
 } as const
 
 export const VENUE_ACTIONS = {
+  // Standard CRUD
   FIND: "api::venue.venue.find",
   FIND_ONE: "api::venue.venue.findOne",
   CREATE: "api::venue.venue.create",
   UPDATE: "api::venue.venue.update",
   DELETE: "api::venue.venue.delete",
+
+  // Custom actions for admin panel
+  LIST: "api::venue.custom-venue.list",
+  FIND_ONE_ADMIN: "api::venue.custom-venue.findOne",
+  CREATE_ADMIN: "api::venue.custom-venue.create",
+  UPDATE_ADMIN: "api::venue.custom-venue.update",
+  DELETE_ADMIN: "api::venue.custom-venue.delete",
+  UPLOAD_LOGO: "api::venue.custom-venue.uploadLogo",
+  SET_LOGO_FROM_LIBRARY: "api::venue.custom-venue.setLogoFromLibrary",
+  REMOVE_LOGO: "api::venue.custom-venue.removeLogo",
 } as const
 
 // ==================== PLUGINS ====================

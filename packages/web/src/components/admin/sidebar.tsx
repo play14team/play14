@@ -77,8 +77,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         {
           href: "/admin/events",
           icon: "bx-calendar",
-          label: "My Events",
-          organizerOnly: true,
+          label: "Events",
         },
         {
           href: "/admin/locations",
@@ -87,14 +86,15 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           organizerOnly: true,
         },
         {
+          href: "/admin/venues",
+          icon: "bx-building-house",
+          label: "Venues",
+          organizerOnly: true,
+        },
+        {
           href: "/admin/my-tickets",
           icon: "bx-purchase-tag",
           label: "My Tickets",
-        },
-        {
-          href: "/admin/claim-attendance",
-          icon: "bx-calendar-plus",
-          label: "Claim Attendance",
         },
       ],
     },

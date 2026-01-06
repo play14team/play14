@@ -256,7 +256,7 @@ export default function EventImageManager({
             <div className="image-preview-actions">
               <button
                 type="button"
-                className="admin-btn admin-btn-secondary admin-btn-sm"
+                className="admin-btn admin-btn-primary admin-btn-sm"
                 onClick={() => defaultImageInputRef.current?.click()}
                 disabled={isUploading}
               >
@@ -274,7 +274,7 @@ export default function EventImageManager({
               </button>
               <button
                 type="button"
-                className="admin-btn admin-btn-secondary admin-btn-sm"
+                className="admin-btn admin-btn-danger admin-btn-sm"
                 onClick={() => handleRemoveImage(defaultImage.id, "defaultImage")}
                 disabled={isUploading}
               >

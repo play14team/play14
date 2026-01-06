@@ -6,6 +6,8 @@ import { EVENT_STATUSES } from "../hooks/use-event-form"
 import type { MapLocation } from "@/components/admin/location-map-picker"
 import LocationSelector from "@/components/admin/location-selector"
 import CreateLocationModal from "@/components/admin/create-location-modal"
+import VenueSelector from "@/components/admin/venue-selector"
+import CreateVenueModal from "@/components/admin/create-venue-modal"
 
 interface BasicsTabProps {
   // Event Details
@@ -56,6 +58,7 @@ interface BasicsTabProps {
   newVenueAddress: string
   setNewVenueAddress: (value: string) => void
   venues: VenueOption[]
+  onVenueAdded?: (venue: VenueOption) => void
 }
 
 export default function BasicsTab({
@@ -93,12 +96,19 @@ export default function BasicsTab({
   newVenueAddress,
   setNewVenueAddress,
   venues,
+  onVenueAdded,
 }: BasicsTabProps) {
   // Modal state for creating new location
   const [isCreateLocationModalOpen, setIsCreateLocationModalOpen] = useState(false)
 
+  // Modal state for creating new venue
+  const [isCreateVenueModalOpen, setIsCreateVenueModalOpen] = useState(false)
+
   // Local state for locations list (to add new locations without page refresh)
   const [localLocations, setLocalLocations] = useState<LocationOption[]>(locations)
+
+  // Local state for venues list (to add new venues without page refresh)
+  const [localVenues, setLocalVenues] = useState<VenueOption[]>(venues)
 
   const handleCreateNewLocation = () => {
     setIsCreateLocationModalOpen(true)
@@ -121,6 +131,29 @@ export default function BasicsTab({
 
     // Notify parent if callback provided
     onLocationAdded?.(locationOption)
+  }
+
+  const handleCreateNewVenue = () => {
+    setIsCreateVenueModalOpen(true)
+  }
+
+  const handleVenueCreated = (newVenue: { documentId: string; name: string; addressDetails?: string }) => {
+    // Add the new venue to the local list
+    const venueOption: VenueOption = {
+      documentId: newVenue.documentId,
+      name: newVenue.name,
+      addressDetails: newVenue.addressDetails,
+    }
+    setLocalVenues((prev) => [...prev, venueOption].sort((a, b) => a.name.localeCompare(b.name)))
+
+    // Select the newly created venue
+    setSelectedVenueId(newVenue.documentId)
+
+    // Ensure we're in "existing" mode now that we have a venue selected
+    setVenueMode("existing")
+
+    // Notify parent if callback provided
+    onVenueAdded?.(venueOption)
   }
 
   return (
@@ -296,86 +329,49 @@ export default function BasicsTab({
       <div className="admin-form-section">
         <h2>Venue</h2>
         <p className="admin-form-section-description">
-          The hosting company or organization for this event.
+          The hosting company or organization for this event. Leave empty if no venue.
         </p>
 
-        <div className="admin-form-row">
-          <label className="admin-radio-option">
-            <input
-              type="radio"
-              name="venueMode"
-              value="none"
-              checked={venueMode === "none"}
-              onChange={() => setVenueMode("none")}
-            />
-            <span>No venue</span>
-          </label>
-          <label className="admin-radio-option">
-            <input
-              type="radio"
-              name="venueMode"
-              value="existing"
-              checked={venueMode === "existing"}
-              onChange={() => setVenueMode("existing")}
-            />
-            <span>Select existing venue</span>
-          </label>
-          <label className="admin-radio-option">
-            <input
-              type="radio"
-              name="venueMode"
-              value="new"
-              checked={venueMode === "new"}
-              onChange={() => setVenueMode("new")}
-            />
-            <span>Create new venue</span>
-          </label>
-        </div>
-
-        {venueMode === "existing" && (
+        <div className="venue-selector-row">
           <div className="admin-form-group">
             <label htmlFor="venue">Venue</label>
-            <select
-              id="venue"
+            <VenueSelector
+              venues={localVenues}
               value={selectedVenueId}
-              onChange={(e) => setSelectedVenueId(e.target.value)}
-              className="admin-select"
-            >
-              <option value="">Select a venue...</option>
-              {venues.map((v) => (
-                <option key={v.documentId} value={v.documentId}>
-                  {v.name}
-                </option>
-              ))}
-            </select>
+              onChange={(id) => {
+                setSelectedVenueId(id)
+                if (id) {
+                  setVenueMode("existing")
+                } else {
+                  setVenueMode("none")
+                }
+              }}
+              onCreateNew={handleCreateNewVenue}
+              placeholder="Select a venue (optional)..."
+            />
           </div>
-        )}
+          <button
+            type="button"
+            className="admin-btn admin-btn-secondary venue-create-btn"
+            onClick={handleCreateNewVenue}
+          >
+            <i className="bx bx-plus"></i>
+            Create new
+          </button>
+        </div>
 
-        {venueMode === "new" && (
-          <div className="admin-form-row">
-            <div className="admin-form-group">
-              <label htmlFor="newVenueName">Venue Name</label>
-              <input
-                type="text"
-                id="newVenueName"
-                value={newVenueName}
-                onChange={(e) => setNewVenueName(e.target.value)}
-                className="admin-input"
-                placeholder="e.g., Tech Company Inc."
-              />
-            </div>
-            <div className="admin-form-group">
-              <label htmlFor="newVenueAddress">Address Details</label>
-              <input
-                type="text"
-                id="newVenueAddress"
-                value={newVenueAddress}
-                onChange={(e) => setNewVenueAddress(e.target.value)}
-                className="admin-input"
-                placeholder="e.g., 123 Main Street"
-              />
-            </div>
-          </div>
+        {selectedVenueId && (
+          <button
+            type="button"
+            className="admin-btn admin-btn-text venue-clear-btn"
+            onClick={() => {
+              setSelectedVenueId("")
+              setVenueMode("none")
+            }}
+          >
+            <i className="bx bx-x"></i>
+            Clear venue selection
+          </button>
         )}
       </div>
 
@@ -384,6 +380,13 @@ export default function BasicsTab({
         isOpen={isCreateLocationModalOpen}
         onClose={() => setIsCreateLocationModalOpen(false)}
         onLocationCreated={handleLocationCreated}
+      />
+
+      {/* Create Venue Modal */}
+      <CreateVenueModal
+        isOpen={isCreateVenueModalOpen}
+        onClose={() => setIsCreateVenueModalOpen(false)}
+        onVenueCreated={handleVenueCreated}
       />
     </>
   )

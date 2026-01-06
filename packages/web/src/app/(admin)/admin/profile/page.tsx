@@ -1,6 +1,6 @@
 import { requirePlayer } from "@/libs/auth"
 import { getPlayerByDocumentId } from "@/libs/api/players"
-import PlayerProfileForm from "@/components/admin/player-profile-form"
+import { PlayerForm } from "@/components/admin/player-form"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export default async function ProfilePage() {
         <p>Update your player profile information</p>
       </div>
 
-      <PlayerProfileForm player={player} />
+      <PlayerForm player={player} mode="self" />
     </div>
   )
 }

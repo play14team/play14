@@ -46,18 +46,18 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
           </div>
         )}
 
-        <RegisterForm callbackUrl={callbackUrl} />
-
-        <div className="auth-login-divider">
-          <span>or continue with</span>
-        </div>
-
         <LoginButtons
           googleUrl={googleUrl}
           githubUrl={githubUrl}
           linkedinUrl={linkedinUrl}
           callbackUrl={callbackUrl}
         />
+
+        <div className="auth-login-divider">
+          <span>or register with email</span>
+        </div>
+
+        <RegisterForm callbackUrl={callbackUrl} />
 
         <div className="auth-login-footer">
           <p>

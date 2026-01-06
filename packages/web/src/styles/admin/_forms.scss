@@ -148,6 +148,29 @@
   }
 }
 
+.admin-avatar-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+
+  i {
+    font-size: 32px;
+    color: white;
+  }
+}
+
+.admin-avatar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .admin-input,
 .admin-select,
 .admin-textarea {
@@ -302,6 +325,11 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+
+  // Prevent button from stretching full width
+  > .admin-btn {
+    align-self: flex-start;
+  }
 }
 
 .admin-social-network-row {
@@ -321,6 +349,7 @@
 .admin-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 20px;
   font-size: 14px;
@@ -332,12 +361,18 @@
 
   i {
     font-size: 18px;
+    line-height: 1;
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
+}
+
+// Ensure label elements styled as buttons align properly
+label.admin-btn {
+  display: inline-flex;
 }
 
 .admin-btn-primary {
@@ -352,12 +387,12 @@
 }
 
 .admin-btn-secondary {
-  background-color: var(--color-bg-elevated);
-  border-color: var(--color-border);
-  color: var(--color-text);
+  background-color: transparent;
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
 
   &:hover:not(:disabled) {
-    background-color: var(--color-surface-hover);
+    background-color: rgba(var(--color-secondary-rgb), 0.1);
   }
 }
 
@@ -379,12 +414,40 @@
     color: var(--color-text-secondary);
   }
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: var(--color-surface-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // Secondary variant
+  &.admin-btn-secondary {
+    border-color: var(--color-border);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-surface-hover);
+      border-color: var(--color-text-tertiary);
+    }
+  }
+
+  // Danger variant
+  &.admin-btn-danger {
+    &:hover:not(:disabled) {
+      background-color: rgba(220, 38, 38, 0.1);
+      border-color: rgba(220, 38, 38, 0.3);
+
+      i {
+        color: #dc2626;
+      }
+    }
   }
 }
 
-.admin-btn-danger {
+// Standalone danger class for non-icon buttons
+.admin-btn-danger:not(.admin-btn-icon) {
   &:hover {
     background-color: rgba(220, 38, 38, 0.1);
     border-color: rgba(220, 38, 38, 0.3);
@@ -450,6 +513,23 @@
 .admin-btn-sm {
   padding: 8px 16px;
   font-size: 13px;
+
+  i {
+    font-size: 16px;
+  }
+}
+
+.admin-btn-text {
+  padding: 6px 12px;
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+
+  &:hover:not(:disabled) {
+    color: var(--color-text);
+    background-color: var(--color-bg-hover);
+  }
 
   i {
     font-size: 16px;
@@ -2273,13 +2353,14 @@
   }
 }
 
-.admin-btn-warning {
-  background-color: #d97706;
+.admin-btn.admin-btn-warning {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
   color: white;
 
   &:hover:not(:disabled) {
     color: white;
-    background-color: #b45309;
+    filter: brightness(0.9);
     transform: translateY(-1px);
   }
 }
@@ -3121,6 +3202,7 @@
 }
 
 .image-preview {
+  position: relative;
   flex-shrink: 0;
   width: 200px;
   height: 200px;
@@ -3132,6 +3214,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .admin-avatar-loading {
+    border-radius: 8px;
   }
 }
 
