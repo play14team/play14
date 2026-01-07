@@ -44,10 +44,11 @@
   --color-text-inverse: #ffffff;
 
   // Borders
-  --color-border: #eeeeee;
-  --color-border-light: #f3f2ee;
-  --color-border-input: #f5f5f5;
-  --color-border-dark: #dddddd;
+  --color-border: #c0c0c0;
+  --color-border-light: #d0d0d0;
+  --color-border-input: #d5d5d5;
+  --color-border-dark: #999999;
+  --color-border-hover: #888888;
 
   // Shadows
   --shadow-card: 0 5px 40px 10px #eaeaef;
@@ -66,6 +67,10 @@
   --input-bg-focus: transparent;
   --collapsible-header: #dddddd;
   --collapsible-content: #eeeeee;
+
+  // Admin-specific
+  --admin-bg: #ffffff;
+  --admin-surface: #f8f8f8;
 
   // Scrollbar
   --scrollbar-track: #f1f1f1;
@@ -135,6 +140,7 @@
   --color-border-light: #2a2a2a;
   --color-border-input: #3a3a3a;
   --color-border-dark: #444444;
+  --color-border-hover: #555555;
 
   // Shadows (darker, more subtle)
   --shadow-card: 0 5px 40px 10px rgba(0, 0, 0, 0.3);
@@ -152,6 +158,10 @@
   --input-bg-focus: #1a1a1a;
   --collapsible-header: #2a2a2a;
   --collapsible-content: #1e1e1e;
+
+  // Admin-specific
+  --admin-bg: #0f0f0f;
+  --admin-surface: #1e1e1e;
 
   // Scrollbar
   --scrollbar-track: #1a1a1a;

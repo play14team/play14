@@ -1,288 +1,87 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
-import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useToast } from "@/components/admin/toast"
 import {
   uploadVenueLogo,
   removeVenueLogo,
   setVenueLogoFromLibrary,
   type VenueLogo,
 } from "@/app/(admin)/admin/venues/logo.action"
-import ImageCropper from "./image-cropper"
-import MediaLibraryBrowser from "./media-library-browser"
+import ImageManager from "./image-manager"
 
-// Logo aspect ratio: 1:1 (square)
-const LOGO_ASPECT_RATIO = 1
 const LOGO_OUTPUT_SIZE = 200
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+    .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, "") // Trim leading/trailing hyphens
+}
 
 interface Props {
   venueId: string
+  venueName: string
   logo?: VenueLogo | null
   onUpdate: () => void
 }
 
-export default function VenueLogoManager({ venueId, logo, onUpdate }: Props) {
-  const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [showCropper, setShowCropper] = useState(false)
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null)
-  const [originalFile, setOriginalFile] = useState<File | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [showMediaLibrary, setShowMediaLibrary] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+export default function VenueLogoManager({ venueId, venueName, logo, onUpdate }: Props) {
+  const router = useRouter()
+  const toast = useToast()
 
-  const handleFileSelect = useCallback((file: File) => {
-    // Validate file type
-    if (!file.type.startsWith("image/")) {
-      setError("Please select an image file")
-      return
-    }
+  const handleUpload = async (blob: Blob) => {
+    const croppedFile = new File([blob], `${slugify(venueName)}.webp`, {
+      type: "image/webp",
+    })
 
-    // Validate file size (10MB max)
-    if (file.size > 10 * 1024 * 1024) {
-      setError("File size must be less than 10MB")
-      return
-    }
+    const result = await uploadVenueLogo(venueId, croppedFile)
 
-    setError(null)
-    setOriginalFile(file)
-
-    // Load image for cropper preview
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setImageToCrop(e.target?.result as string)
-      setShowCropper(true)
-    }
-    reader.readAsDataURL(file)
-  }, [])
-
-  const handleCroppedImage = async (blob: Blob) => {
-    setShowCropper(false)
-    setImageToCrop(null)
-    setIsUploading(true)
-    setError(null)
-
-    try {
-      // Replace extension with .webp for optimized file size
-      const baseName = originalFile?.name?.replace(/\.[^/.]+$/, "") || "logo"
-      const croppedFile = new File([blob], `${baseName}.webp`, {
-        type: "image/webp",
-      })
-
-      const result = await uploadVenueLogo(venueId, croppedFile)
-
-      if (result.success) {
-        onUpdate()
-      } else {
-        setError(result.error || "Failed to upload logo")
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to upload logo")
-    } finally {
-      setIsUploading(false)
-      setOriginalFile(null)
-      // Reset file input so the same file can be selected again
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
+    if (result.success) {
+      toast.success("Logo uploaded successfully!")
+      onUpdate()
+      router.refresh()
+    } else {
+      throw new Error(result.error || "Failed to upload logo")
     }
   }
 
-  const handleCancelCrop = () => {
-    setShowCropper(false)
-    setImageToCrop(null)
-    setOriginalFile(null)
-    // Reset file input so the same file can be selected again
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+  const handleRemove = async () => {
+    const result = await removeVenueLogo(venueId)
+
+    if (result.success) {
+      toast.success("Logo removed successfully!")
+      onUpdate()
+      router.refresh()
+    } else {
+      throw new Error(result.error || "Failed to remove logo")
     }
   }
 
-  const handleRemoveLogo = async () => {
-    if (!confirm("Remove the venue logo?")) {
-      return
-    }
+  const handleLibrarySelect = async (imageId: number, imageUrl: string) => {
+    const result = await setVenueLogoFromLibrary(venueId, imageId)
 
-    setIsUploading(true)
-    setError(null)
-
-    try {
-      const result = await removeVenueLogo(venueId)
-
-      if (result.success) {
-        onUpdate()
-      } else {
-        setError(result.error || "Failed to remove logo")
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to remove logo")
-    } finally {
-      setIsUploading(false)
-    }
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = () => {
-    setIsDragging(false)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-
-    const file = e.dataTransfer.files[0]
-    if (file) {
-      handleFileSelect(file)
-    }
-  }
-
-  const handleMediaLibrarySelect = async (image: { id: number }) => {
-    setIsUploading(true)
-    setError(null)
-
-    try {
-      const result = await setVenueLogoFromLibrary(venueId, image.id)
-
-      if (result.success) {
-        onUpdate()
-      } else {
-        setError(result.error || "Failed to set logo from library")
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to set logo from library")
-    } finally {
-      setIsUploading(false)
+    if (result.success) {
+      toast.success("Logo updated from library!")
+      onUpdate()
+      router.refresh()
+    } else {
+      throw new Error(result.error || "Failed to set logo from library")
     }
   }
 
   return (
-    <div className="venue-logo-manager">
-      {showCropper && imageToCrop && (
-        <ImageCropper
-          image={imageToCrop}
-          onCrop={handleCroppedImage}
-          onCancel={handleCancelCrop}
-          aspectRatio={LOGO_ASPECT_RATIO}
-          outputWidth={LOGO_OUTPUT_SIZE}
-          quality={0.9}
-        />
-      )}
-
-      <MediaLibraryBrowser
-        isOpen={showMediaLibrary}
-        onClose={() => setShowMediaLibrary(false)}
-        onSelect={handleMediaLibrarySelect}
-        title="Select Logo"
-      />
-
-      {error && (
-        <div className="admin-alert admin-alert-error admin-alert-sm">
-          <i className="bx bx-error-circle"></i>
-          {error}
-        </div>
-      )}
-
-      <div className="image-section">
-        <h4>Venue Logo</h4>
-        <p className="section-description">
-          A square logo representing the venue (200x200 recommended).
-        </p>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden-input"
-          onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) handleFileSelect(file)
-          }}
-        />
-
-        {logo ? (
-          <div className="image-preview-card">
-            <div className="image-preview logo-preview">
-              <Image
-                src={logo.url}
-                alt="Venue logo"
-                width={120}
-                height={120}
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-            <div className="image-preview-actions">
-              <button
-                type="button"
-                className="admin-btn admin-btn-secondary admin-btn-sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-              >
-                <i className="bx bx-upload"></i>
-                Upload New
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-secondary admin-btn-sm"
-                onClick={() => setShowMediaLibrary(true)}
-                disabled={isUploading}
-              >
-                <i className="bx bx-images"></i>
-                Browse Library
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-secondary admin-btn-sm"
-                onClick={handleRemoveLogo}
-                disabled={isUploading}
-              >
-                <i className="bx bx-trash"></i>
-                Remove
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="image-upload-options">
-            <div
-              className={`image-dropzone logo-dropzone ${isDragging ? "dragging" : ""}`}
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              {isUploading ? (
-                <div className="dropzone-uploading">
-                  <i className="bx bx-loader-alt bx-spin"></i>
-                  <span>Uploading...</span>
-                </div>
-              ) : (
-                <>
-                  <i className="bx bx-image-add"></i>
-                  <p>
-                    <strong>Click to upload</strong> or drag and drop
-                  </p>
-                  <span className="dropzone-hint">Square image, PNG/JPG up to 10MB</span>
-                </>
-              )}
-            </div>
-            <div className="image-upload-divider">
-              <span>or</span>
-            </div>
-            <button
-              type="button"
-              className="admin-btn admin-btn-secondary image-library-btn"
-              onClick={() => setShowMediaLibrary(true)}
-              disabled={isUploading}
-            >
-              <i className="bx bx-images"></i>
-              Browse Media Library
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+    <ImageManager
+      image={logo ? { url: logo.url } : null}
+      onUpload={handleUpload}
+      onRemove={handleRemove}
+      onLibrarySelect={handleLibrarySelect}
+      outputSize={LOGO_OUTPUT_SIZE}
+      title="Venue Logo"
+      description="A square logo representing the venue (200x200 recommended)."
+      libraryTitle="Select Logo"
+    />
   )
 }

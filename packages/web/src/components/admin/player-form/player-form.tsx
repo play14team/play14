@@ -1,15 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import type { PlayerProfile } from "@/libs/api/players"
-import { uploadPlayerPicture, deletePlayerPicture } from "@/libs/api/players"
 import SimpleEditor from "@/components/ui/simple-editor"
-import ImageCropper from "../image-cropper"
-import MediaLibraryBrowser from "../media-library-browser"
 import PlayerFormActions from "./player-form-actions"
+import PlayerAvatarManager from "./player-avatar-manager"
+import ProfileTabs, { type ProfileTabId } from "./profile-tabs"
+import StripeTab from "./stripe-tab"
 import { useToast } from "../toast"
+import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
+import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import {
   updatePlayerProfile,
   type PlayerUpdateData as ProfileUpdateData,
@@ -17,12 +18,10 @@ import {
 import {
   updatePlayer,
   updatePlayerPosition,
-  setPlayerAvatarFromLibrary,
-  removePlayerAvatar,
-  uploadPlayerAvatar,
   type PlayerForEdit,
   type PlayerUpdateData as AdminUpdateData,
 } from "@/app/(admin)/admin/players/players.action"
+import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 
 const SOCIAL_NETWORK_TYPES = [
   "Twitter",
@@ -38,6 +37,23 @@ const SOCIAL_NETWORK_TYPES = [
   "Other",
 ] as const
 
+function getSocialNetworkIcon(type: string): string {
+  switch (type) {
+    case "Email":
+      return "bx bx-envelope"
+    case "Website":
+      return "bx bx-globe"
+    case "Wikipedia":
+      return "bx bxl-wikipedia"
+    case "Xing":
+      return "bx bxl-xing"
+    case "Other":
+      return "bx bx-link"
+    default:
+      return `bx bxl-${type.toLowerCase()}`
+  }
+}
+
 const POSITION_HIERARCHY = ["Player", "Host", "Mentor", "Founder"] as const
 
 interface SocialNetworkInput {
@@ -52,6 +68,7 @@ interface Props {
   player: PlayerData
   mode: "self" | "admin"
   currentUserPosition?: string
+  stripeAccount?: StripeAccountStatus | null
 }
 
 /**
@@ -107,11 +124,15 @@ function getDemoteTarget(currentPosition: string, userPosition: string): string 
   return POSITION_HIERARCHY[currentIndex - 1]
 }
 
-export default function PlayerForm({ player, mode, currentUserPosition = "Player" }: Props) {
+export default function PlayerForm({ player, mode, currentUserPosition = "Player", stripeAccount }: Props) {
   const router = useRouter()
   const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isUploadingPicture, setIsUploadingPicture] = useState(false)
+  const [activeTab, setActiveTab] = useState<ProfileTabId>("profile")
+
+  // Navigation warning state
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
+  const pendingNavigationRef = useRef<string | null>(null)
 
   // Form state
   const [name, setName] = useState(player.name)
@@ -132,13 +153,62 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
   const [currentPosition, setCurrentPosition] = useState(player.position)
   const [isPositionUpdating, setIsPositionUpdating] = useState(false)
 
-  // Image cropper state
-  const [showCropper, setShowCropper] = useState(false)
-  const [imageToCrop, setImageToCrop] = useState<string | null>(null)
-  const [originalFile, setOriginalFile] = useState<File | null>(null)
+  // Track dirty state
+  const formValues = useMemo(
+    () => ({ name, company, tagline, bio, website, socialNetworks }),
+    [name, company, tagline, bio, website, socialNetworks]
+  )
+  const { isDirty, resetDirtyState } = useFormDirty(formValues)
 
-  // Media library state (available to organizers in both modes)
-  const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false)
+  // Browser beforeunload warning
+  useBeforeUnload(isDirty)
+
+  // Intercept Link clicks to warn about unsaved changes
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const link = target.closest("a")
+
+      if (!link) return
+
+      // Check if it's an internal navigation link
+      const href = link.getAttribute("href")
+      if (!href || href.startsWith("#") || href.startsWith("mailto:")) return
+
+      // Check if it's an external link (opens in new tab)
+      if (link.target === "_blank") return
+
+      // Prevent navigation and show dialog
+      e.preventDefault()
+      e.stopPropagation()
+      pendingNavigationRef.current = href
+      setShowUnsavedDialog(true)
+    }
+
+    // Capture phase to intercept before Next.js router
+    document.addEventListener("click", handleClick, true)
+    return () => document.removeEventListener("click", handleClick, true)
+  }, [isDirty])
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handlePopState = () => {
+      // Push current state back to prevent navigation
+      window.history.pushState(null, "", window.location.href)
+      setShowUnsavedDialog(true)
+      pendingNavigationRef.current = "back"
+    }
+
+    // Push initial state
+    window.history.pushState(null, "", window.location.href)
+    window.addEventListener("popstate", handlePopState)
+
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [isDirty])
 
   // Position action calculations (admin mode only)
   const promoteTarget = mode === "admin" ? getPromoteTarget(currentPosition, currentUserPosition) : null
@@ -164,235 +234,6 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     const updated = [...socialNetworks]
     updated[index] = { ...updated[index], [field]: value }
     setSocialNetworks(updated)
-  }
-
-  // ============================================
-  // Avatar handling - Self mode (with cropper)
-  // ============================================
-
-  const resizeImage = (
-    img: HTMLImageElement,
-    maxSize: number
-  ): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const canvas = document.createElement("canvas")
-      const ctx = canvas.getContext("2d")
-
-      if (!ctx) {
-        reject(new Error("Failed to get canvas context"))
-        return
-      }
-
-      let width = img.width
-      let height = img.height
-
-      if (width > maxSize || height > maxSize) {
-        if (width > height) {
-          height = (height / width) * maxSize
-          width = maxSize
-        } else {
-          width = (width / height) * maxSize
-          height = maxSize
-        }
-      }
-
-      canvas.width = width
-      canvas.height = height
-      ctx.drawImage(img, 0, 0, width, height)
-
-      canvas.toBlob(
-        (blob) => {
-          if (blob) {
-            resolve(blob)
-          } else {
-            reject(new Error("Failed to create blob"))
-          }
-        },
-        "image/webp",
-        0.9
-      )
-    })
-  }
-
-  const validateAndUploadPicture = async (file: File) => {
-    setIsUploadingPicture(true)
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file")
-      setIsUploadingPicture(false)
-      return
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("File size must be less than 10MB")
-      setIsUploadingPicture(false)
-      return
-    }
-
-    const img = document.createElement("img")
-    const objectUrl = URL.createObjectURL(file)
-
-    img.onload = async () => {
-      if (img.width !== img.height) {
-        // Show cropper for non-square images
-        setImageToCrop(objectUrl)
-        setOriginalFile(file)
-        setShowCropper(true)
-        setIsUploadingPicture(false)
-        return
-      }
-
-      URL.revokeObjectURL(objectUrl)
-
-      try {
-        let fileToUpload: File | Blob = file
-
-        if (img.width > 800 || img.height > 800) {
-          const resizedBlob = await resizeImage(img, 800)
-          const baseName = file.name.replace(/\.[^/.]+$/, "")
-          fileToUpload = new File([resizedBlob], `${baseName}.webp`, {
-            type: "image/webp",
-          })
-        }
-
-        if (mode === "self") {
-          const result = await uploadPlayerPicture(fileToUpload as File)
-          if (result.success && result.player) {
-            setCurrentAvatar(result.player.avatar)
-            toast.success("Avatar updated!")
-            router.refresh()
-          } else {
-            toast.error(result.error || "Failed to upload avatar")
-          }
-        } else {
-          // Admin mode - use server action
-          const formData = new FormData()
-          formData.append("files", fileToUpload as File)
-          const result = await uploadPlayerAvatar(player.documentId, formData)
-          if (result.success) {
-            if (result.avatarUrl) {
-              setCurrentAvatar({ url: result.avatarUrl })
-            }
-            toast.success("Avatar uploaded!")
-            router.refresh()
-          } else {
-            toast.error(result.error || "Failed to upload avatar")
-          }
-        }
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : "Failed to process image"
-        )
-      }
-
-      setIsUploadingPicture(false)
-    }
-
-    img.onerror = () => {
-      URL.revokeObjectURL(objectUrl)
-      toast.error("Failed to load image")
-      setIsUploadingPicture(false)
-    }
-
-    img.src = objectUrl
-  }
-
-  const handleCroppedImage = async (blob: Blob) => {
-    setShowCropper(false)
-    if (imageToCrop) {
-      URL.revokeObjectURL(imageToCrop)
-    }
-    setImageToCrop(null)
-    setOriginalFile(null)
-    setIsUploadingPicture(true)
-
-    try {
-      const baseName = originalFile?.name?.replace(/\.[^/.]+$/, "") || "cropped"
-      const croppedFile = new File([blob], `${baseName}.webp`, {
-        type: "image/webp",
-      })
-
-      if (mode === "self") {
-        const result = await uploadPlayerPicture(croppedFile)
-        if (result.success && result.player) {
-          setCurrentAvatar(result.player.avatar)
-          toast.success("Avatar updated!")
-          router.refresh()
-        } else {
-          toast.error(result.error || "Failed to upload avatar")
-        }
-      } else {
-        // Admin mode
-        const formData = new FormData()
-        formData.append("files", croppedFile)
-        const result = await uploadPlayerAvatar(player.documentId, formData)
-        if (result.success) {
-          if (result.avatarUrl) {
-            setCurrentAvatar({ url: result.avatarUrl })
-          }
-          toast.success("Avatar uploaded!")
-          router.refresh()
-        } else {
-          toast.error(result.error || "Failed to upload avatar")
-        }
-      }
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload image")
-    }
-
-    setIsUploadingPicture(false)
-  }
-
-  const handleCancelCrop = () => {
-    setShowCropper(false)
-    if (imageToCrop) {
-      URL.revokeObjectURL(imageToCrop)
-    }
-    setImageToCrop(null)
-    setOriginalFile(null)
-  }
-
-  const handlePictureDelete = async () => {
-    setIsUploadingPicture(true)
-
-    if (mode === "self") {
-      const result = await deletePlayerPicture()
-      if (result.success && result.player) {
-        setCurrentAvatar(result.player.avatar)
-        toast.success("Avatar removed")
-        router.refresh()
-      } else {
-        toast.error(result.error || "Failed to delete avatar")
-      }
-    } else {
-      const result = await removePlayerAvatar(player.documentId)
-      if (result.success) {
-        setCurrentAvatar(null)
-        toast.success("Avatar removed!")
-        router.refresh()
-      } else {
-        toast.error(result.error || "Failed to remove avatar")
-      }
-    }
-
-    setIsUploadingPicture(false)
-  }
-
-  // ============================================
-  // Avatar handling - Admin mode (media library)
-  // ============================================
-
-  const handleSelectAvatarFromLibrary = async (image: { id: number; url: string }) => {
-    setIsUploadingPicture(true)
-    const result = await setPlayerAvatarFromLibrary(player.documentId, image.id)
-    if (result.success) {
-      setCurrentAvatar({ url: image.url })
-      toast.success("Avatar updated!")
-      router.refresh()
-    } else {
-      toast.error(result.error || "Failed to set avatar")
-    }
-    setIsUploadingPicture(false)
   }
 
   // ============================================
@@ -449,6 +290,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
       const result = await updatePlayerProfile(player.documentId, data)
       if (result.success) {
         toast.success("Profile updated successfully!")
+        resetDirtyState()
         router.refresh()
       } else {
         toast.error(result.error || "Failed to update profile")
@@ -466,6 +308,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
       const result = await updatePlayer(player.documentId, data)
       if (result.success) {
         toast.success("Player profile updated!")
+        resetDirtyState()
         router.refresh()
       } else {
         toast.error(result.error || "Failed to update profile")
@@ -475,247 +318,300 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     setIsSubmitting(false)
   }
 
-  // For avatar upload trigger
-  const triggerFileUpload = () => {
-    const input = document.createElement("input")
-    input.type = "file"
-    input.accept = "image/*"
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) {
-        await validateAndUploadPicture(file)
+  // ============================================
+  // Navigation handlers for unsaved changes dialog
+  // ============================================
+
+  const buildFormData = useCallback(() => {
+    if (mode === "self") {
+      return {
+        name,
+        position: currentPosition as "Player" | "Host" | "Mentor" | "Founder",
+        company: company || undefined,
+        tagline: tagline || undefined,
+        bio: bio || undefined,
+        website: website || undefined,
+        socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
       }
     }
-    input.click()
-  }
+    return {
+      name,
+      company: company || undefined,
+      tagline: tagline || undefined,
+      bio: bio || undefined,
+      website: website || undefined,
+      socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
+    }
+  }, [mode, name, currentPosition, company, tagline, bio, website, socialNetworks])
+
+  const handleSaveAndNavigate = useCallback(async () => {
+    setIsSubmitting(true)
+
+    const data = buildFormData()
+    const result = mode === "self"
+      ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
+      : await updatePlayer(player.documentId, data as AdminUpdateData)
+
+    if (result.success) {
+      toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
+      resetDirtyState()
+      setShowUnsavedDialog(false)
+
+      // Navigate after save
+      const destination = pendingNavigationRef.current
+      pendingNavigationRef.current = null
+
+      if (destination === "back") {
+        router.back()
+      } else if (destination) {
+        router.push(destination)
+      }
+    } else {
+      toast.error(result.error || "Failed to update profile")
+    }
+
+    setIsSubmitting(false)
+  }, [buildFormData, mode, player.documentId, toast, resetDirtyState, router])
+
+  const handleDiscardAndNavigate = useCallback(() => {
+    resetDirtyState()
+    setShowUnsavedDialog(false)
+
+    const destination = pendingNavigationRef.current
+    pendingNavigationRef.current = null
+
+    if (destination === "back") {
+      router.back()
+    } else if (destination) {
+      router.push(destination)
+    }
+  }, [resetDirtyState, router])
+
+  const handleCancelNavigation = useCallback(() => {
+    pendingNavigationRef.current = null
+    setShowUnsavedDialog(false)
+  }, [])
+
+  const handleDiscard = useCallback(() => {
+    // Reset form to initial values
+    const initialName = player.name
+    const initialCompany = player.company || ""
+    const initialTagline = player.tagline || ""
+    const initialBio = player.bio || ""
+    const initialWebsite = player.website || ""
+    const initialSocialNetworks = player.socialNetworks?.map((sn) => ({
+      id: sn.id,
+      type: sn.type,
+      url: sn.url,
+    })) || []
+
+    setName(initialName)
+    setCompany(initialCompany)
+    setTagline(initialTagline)
+    setBio(initialBio)
+    setWebsite(initialWebsite)
+    setSocialNetworks(initialSocialNetworks)
+
+    // Pass the initial values to resetDirtyState to avoid stale closure issue
+    resetDirtyState({
+      name: initialName,
+      company: initialCompany,
+      tagline: initialTagline,
+      bio: initialBio,
+      website: initialWebsite,
+      socialNetworks: initialSocialNetworks,
+    })
+  }, [player, resetDirtyState])
+
+  // Show Stripe tab only in self mode for organizers
+  const showStripeTab = mode === "self" && isOrganizer
 
   return (
     <>
-      {showCropper && imageToCrop && (
-        <ImageCropper
-          image={imageToCrop}
-          onCrop={handleCroppedImage}
-          onCancel={handleCancelCrop}
+      {mode === "self" && (
+        <ProfileTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          showStripeTab={showStripeTab}
         />
       )}
 
-      <form onSubmit={handleSubmit} className="admin-form">
-        <div className="player-form-layout">
-          <div className="player-form-content">
-            <div className="admin-form-section">
-              <h2>Basic Information</h2>
+      {activeTab === "profile" && (
+        <form onSubmit={handleSubmit} className="admin-form">
+          <div className="player-form-layout">
+            <div className="player-form-content">
+              <div className="admin-form-section">
+                <h2>Basic Information</h2>
 
-              {/* 3-column header: fields | fields | avatar */}
-              <div className="player-form-header">
-                <div className="player-form-header-fields">
-                  <div className="admin-form-group">
-                    <label htmlFor="name">Name *</label>
-                    <input
-                      type="text"
-                      id="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      minLength={2}
-                      className="admin-input"
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label htmlFor="tagline">Tagline</label>
-                    <input
-                      type="text"
-                      id="tagline"
-                      value={tagline}
-                      onChange={(e) => setTagline(e.target.value)}
-                      className="admin-input"
-                      placeholder="A short description about yourself"
-                      maxLength={150}
-                    />
-                    <p className="admin-form-help">{tagline.length}/150 characters</p>
-                  </div>
-                </div>
-
-                <div className="player-form-header-fields">
-                  <div className="admin-form-group">
-                    <label htmlFor="company">Company</label>
-                    <input
-                      type="text"
-                      id="company"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      className="admin-input"
-                      placeholder="Your company or organization"
-                    />
-                  </div>
-
-                  <div className="admin-form-group">
-                    <label htmlFor="website">Website</label>
-                    <input
-                      type="url"
-                      id="website"
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
-                      className="admin-input"
-                      placeholder="https://example.com"
-                    />
-                  </div>
-                </div>
-
-                {/* Avatar column */}
-                <div className="player-form-header-avatar">
-                  <label>Avatar</label>
-                  <div className="admin-avatar-container">
-                    {currentAvatar?.url ? (
-                      <div className="admin-avatar-preview">
-                        <Image
-                          src={currentAvatar.url}
-                          alt={player.name}
-                          width={160}
-                          height={160}
-                        />
-                      </div>
-                    ) : (
-                      <div className="admin-avatar-placeholder">
-                        <i className="bx bx-user"></i>
-                      </div>
-                    )}
-                  </div>
-                  {isUploadingPicture && (
-                    <div className="admin-avatar-uploading">
-                      <i className="bx bx-loader-alt bx-spin"></i>
-                      Uploading...
+                {/* 3-column header: fields | fields | avatar */}
+                <div className="player-form-header">
+                  <div className="player-form-header-fields">
+                    <div className="admin-form-group">
+                      <label htmlFor="name">Name *</label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        minLength={2}
+                        className="admin-input"
+                      />
                     </div>
-                  )}
-                  {/* Avatar action buttons - icon only with tooltips */}
-                  {(mode === "self" || isOrganizer) && (
-                    <div className="player-form-avatar-actions">
-                      {/* Upload */}
+
+                    <div className="admin-form-group">
+                      <label htmlFor="tagline">Tagline</label>
+                      <input
+                        type="text"
+                        id="tagline"
+                        value={tagline}
+                        onChange={(e) => setTagline(e.target.value)}
+                        className="admin-input"
+                        placeholder="A short description about yourself"
+                        maxLength={150}
+                      />
+                      <p className="admin-form-help">{tagline.length}/150 characters</p>
+                    </div>
+                  </div>
+
+                  <div className="player-form-header-fields">
+                    <div className="admin-form-group">
+                      <label htmlFor="company">Company</label>
+                      <input
+                        type="text"
+                        id="company"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        className="admin-input"
+                        placeholder="Your company or organization"
+                      />
+                    </div>
+
+                    <div className="admin-form-group">
+                      <label htmlFor="website">Website</label>
+                      <input
+                        type="url"
+                        id="website"
+                        value={website}
+                        onChange={(e) => setWebsite(e.target.value)}
+                        className="admin-input"
+                        placeholder="https://example.com"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Avatar column */}
+                  <div className="player-form-header-avatar">
+                    <PlayerAvatarManager
+                      playerId={player.documentId}
+                      playerSlug={player.slug}
+                      avatar={currentAvatar}
+                      mode={mode}
+                      showLibraryButton={isOrganizer}
+                      onAvatarChange={setCurrentAvatar}
+                    />
+                  </div>
+                </div>
+
+                {/* Bio below header */}
+                <div className="admin-form-group">
+                  <label htmlFor="bio">Bio</label>
+                  <SimpleEditor
+                    content={bio}
+                    onChange={setBio}
+                    placeholder="Tell us about yourself, your experience with #play14, and what you're passionate about..."
+                  />
+                </div>
+              </div>
+
+              <div className="admin-form-section">
+                <h2>Social Networks</h2>
+                <p className="admin-form-section-description">
+                  Add links to your social media profiles to help others connect with you.
+                </p>
+
+                <div className="admin-social-networks">
+                  {socialNetworks.map((sn, index) => (
+                    <div key={index} className="admin-social-network-row">
+                      <i
+                        className={`${getSocialNetworkIcon(sn.type)} admin-social-network-icon`}
+                        title={sn.type}
+                      ></i>
+                      <select
+                        value={sn.type}
+                        onChange={(e) =>
+                          handleSocialNetworkChange(index, "type", e.target.value)
+                        }
+                        className="admin-select admin-select-sm"
+                      >
+                        {SOCIAL_NETWORK_TYPES.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="url"
+                        value={sn.url}
+                        onChange={(e) =>
+                          handleSocialNetworkChange(index, "url", e.target.value)
+                        }
+                        className="admin-input"
+                        placeholder="https://..."
+                      />
                       <button
                         type="button"
-                        className="admin-btn-icon admin-btn-secondary"
-                        onClick={triggerFileUpload}
-                        disabled={isUploadingPicture}
-                        title="Upload new avatar"
+                        onClick={() => handleRemoveSocialNetwork(index)}
+                        className="admin-btn-icon admin-btn-danger"
+                        title="Remove"
                       >
-                        <i className="bx bx-upload"></i>
+                        <i className="bx bx-trash"></i>
                       </button>
-                      {/* Library (organizers only) */}
-                      {isOrganizer && (
-                        <button
-                          type="button"
-                          className="admin-btn-icon admin-btn-secondary"
-                          onClick={() => setIsMediaLibraryOpen(true)}
-                          disabled={isUploadingPicture}
-                          title="Select from media library"
-                        >
-                          <i className="bx bx-images"></i>
-                        </button>
-                      )}
-                      {/* Remove */}
-                      {currentAvatar?.url && (
-                        <button
-                          type="button"
-                          className="admin-btn-icon admin-btn-danger"
-                          onClick={handlePictureDelete}
-                          disabled={isUploadingPicture}
-                          title="Remove avatar"
-                        >
-                          <i className="bx bx-trash"></i>
-                        </button>
-                      )}
                     </div>
-                  )}
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={handleAddSocialNetwork}
+                    className="admin-btn admin-btn-secondary"
+                  >
+                    <i className="bx bx-plus"></i>
+                    Add Social Network
+                  </button>
                 </div>
               </div>
-
-              {/* Bio below header */}
-              <div className="admin-form-group">
-                <label htmlFor="bio">Bio</label>
-                <SimpleEditor
-                  content={bio}
-                  onChange={setBio}
-                  placeholder="Tell us about yourself, your experience with #play14, and what you're passionate about..."
-                />
-              </div>
             </div>
 
-            <div className="admin-form-section">
-              <h2>Social Networks</h2>
-              <p className="admin-form-section-description">
-                Add links to your social media profiles to help others connect with you.
-              </p>
-
-              <div className="admin-social-networks">
-                {socialNetworks.map((sn, index) => (
-                  <div key={index} className="admin-social-network-row">
-                    <select
-                      value={sn.type}
-                      onChange={(e) =>
-                        handleSocialNetworkChange(index, "type", e.target.value)
-                      }
-                      className="admin-select admin-select-sm"
-                    >
-                      {SOCIAL_NETWORK_TYPES.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="url"
-                      value={sn.url}
-                      onChange={(e) =>
-                        handleSocialNetworkChange(index, "url", e.target.value)
-                      }
-                      className="admin-input"
-                      placeholder="https://..."
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSocialNetwork(index)}
-                      className="admin-btn-icon admin-btn-danger"
-                      title="Remove"
-                    >
-                      <i className="bx bx-trash"></i>
-                    </button>
-                  </div>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={handleAddSocialNetwork}
-                  className="admin-btn admin-btn-secondary"
-                >
-                  <i className="bx bx-plus"></i>
-                  Add Social Network
-                </button>
-              </div>
-            </div>
+            {/* Sticky Sidebar */}
+            <PlayerFormActions
+              playerSlug={player.slug}
+              isSubmitting={isSubmitting}
+              mode={mode}
+              currentPosition={currentPosition}
+              isPositionUpdating={isPositionUpdating}
+              promoteTarget={promoteTarget}
+              demoteTarget={demoteTarget}
+              onPromote={handlePromote}
+              onDemote={handleDemote}
+              isDirty={isDirty}
+              onDiscard={handleDiscard}
+            />
           </div>
 
-          {/* Sticky Sidebar */}
-          <PlayerFormActions
-            playerSlug={player.slug}
-            isSubmitting={isSubmitting}
-            mode={mode}
-            currentPosition={currentPosition}
-            isPositionUpdating={isPositionUpdating}
-            promoteTarget={promoteTarget}
-            demoteTarget={demoteTarget}
-            onPromote={handlePromote}
-            onDemote={handleDemote}
+          <UnsavedChangesDialog
+            isOpen={showUnsavedDialog}
+            onSave={handleSaveAndNavigate}
+            onDiscard={handleDiscardAndNavigate}
+            onCancel={handleCancelNavigation}
+            isSaving={isSubmitting}
           />
-        </div>
-      </form>
+        </form>
+      )}
 
-      {isOrganizer && (
-        <MediaLibraryBrowser
-          isOpen={isMediaLibraryOpen}
-          onClose={() => setIsMediaLibraryOpen(false)}
-          onSelect={handleSelectAvatarFromLibrary}
-          title="Select Avatar"
-        />
+      {activeTab === "stripe" && showStripeTab && (
+        <div className="admin-form">
+          <StripeTab account={stripeAccount ?? null} />
+        </div>
       )}
     </>
   )

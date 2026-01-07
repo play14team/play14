@@ -26,19 +26,19 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
   const [showCustomCategoryInput, setShowCustomCategoryInput] = useState(false)
   const [customCategoryName, setCustomCategoryName] = useState("")
 
-  // Load available sponsors on mount
-  useEffect(() => {
-    loadAvailableSponsors()
-  }, [])
-
-  const loadAvailableSponsors = async () => {
+  const loadAvailableSponsors = useCallback(async () => {
     setIsLoading(true)
     const result = await getAvailableSponsors()
     if (result.success && result.data) {
       setAvailableSponsors(result.data)
     }
     setIsLoading(false)
-  }
+  }, [])
+
+  // Load available sponsors on mount
+  useEffect(() => {
+    loadAvailableSponsors()
+  }, [loadAvailableSponsors])
 
   const addCategory = (category: string) => {
     if (sponsorships.some((s) => s.category === category)) {

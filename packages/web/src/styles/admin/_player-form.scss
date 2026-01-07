@@ -3,14 +3,60 @@
 // Used for both My Profile and Edit Player pages
 // ===========================================
 
-// Override the default admin-form max-width
-.admin-form:has(.player-form-layout) {
-  max-width: none;
+// ===========================================
+// Profile Tabs (for My Profile page)
+// ===========================================
+
+.profile-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+
+  // Hide scrollbar but allow scrolling
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-// Override admin-content max-width
-.admin-content:has(.player-form-layout) {
-  max-width: none;
+.profile-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+
+  i {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+  }
+
+  &.active {
+    background: var(--color-orange);
+    color: white;
+
+    i {
+      color: white;
+    }
+  }
 }
 
 // ===========================================
@@ -26,10 +72,6 @@
 
 .player-form-content {
   min-width: 0; // Prevent grid blowout
-
-  .admin-form-section {
-    max-width: none;
-  }
 }
 
 // ===========================================
@@ -126,7 +168,7 @@
 .player-form-actions {
   position: sticky;
   top: 32px;
-  background: var(--color-surface);
+  background: var(--admin-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 24px;

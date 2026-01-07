@@ -10,6 +10,7 @@ interface ContentTabProps {
   description: string
   setDescription: (value: string) => void
   eventSlug: string
+  eventName: string
   defaultImage: EventForEdit["defaultImage"]
   galleryImages: EventForEdit["images"]
   schedule: TimetableDay[]
@@ -21,6 +22,7 @@ export default function ContentTab({
   description,
   setDescription,
   eventSlug,
+  eventName,
   defaultImage,
   galleryImages,
   schedule,
@@ -51,6 +53,7 @@ export default function ContentTab({
         </p>
         <EventImageManager
           eventSlug={eventSlug}
+          eventName={eventName}
           defaultImage={defaultImage}
           galleryImages={galleryImages || []}
           onUpdate={onImageUpdate}

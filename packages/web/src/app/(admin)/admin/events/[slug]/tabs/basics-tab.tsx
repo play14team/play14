@@ -162,7 +162,7 @@ export default function BasicsTab({
       <div className="admin-form-section">
         <h2>Event Details</h2>
 
-        <div className="admin-form-row">
+        <div className="admin-form-row three-columns">
           <div className="admin-form-group">
             <label htmlFor="name">Event Name *</label>
             <input
@@ -190,6 +190,18 @@ export default function BasicsTab({
               ))}
             </select>
           </div>
+
+          <div className="admin-form-group">
+            <label htmlFor="contactEmail">Contact Email</label>
+            <input
+              type="email"
+              id="contactEmail"
+              value={contactEmail}
+              onChange={(e) => setContactEmail(e.target.value)}
+              className="admin-input"
+              placeholder="email@example.com"
+            />
+          </div>
         </div>
 
         <div className="admin-form-group">
@@ -203,25 +215,13 @@ export default function BasicsTab({
             placeholder="A short memorable phrase for this event"
           />
         </div>
-
-        <div className="admin-form-group">
-          <label htmlFor="contactEmail">Contact Email</label>
-          <input
-            type="email"
-            id="contactEmail"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-            className="admin-input"
-            placeholder="email@example.com"
-          />
-        </div>
       </div>
 
       {/* Date & Time Section */}
       <div className="admin-form-section">
         <h2>Date & Time</h2>
 
-        <div className="admin-form-row">
+        <div className="admin-form-row three-columns">
           <div className="admin-form-group">
             <label htmlFor="startDate">Start Date *</label>
             <input
@@ -244,6 +244,28 @@ export default function BasicsTab({
               required
               className="admin-input"
             />
+          </div>
+
+          <div className="admin-form-group">
+            <label htmlFor="timezone">Timezone</label>
+            <select
+              id="timezone"
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+              className="admin-select"
+            >
+              {timezoneRegions.map((region) => (
+                <optgroup key={region} label={region}>
+                  {allTimezones
+                    .filter((tz) => tz.region === region)
+                    .map((tz) => (
+                      <option key={tz.value} value={tz.value}>
+                        {tz.value.replace(`${region}/`, "").replace(/_/g, " ")}
+                      </option>
+                    ))}
+                </optgroup>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -272,107 +294,83 @@ export default function BasicsTab({
             />
           </div>
         </div>
+      </div>
 
-        <div className="admin-form-row">
-          <div className="admin-form-group">
-            <label htmlFor="timezone">Timezone</label>
-            <select
-              id="timezone"
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className="admin-select"
+      {/* Location & Venue Section */}
+      <div className="location-venue-row">
+        <div className="admin-form-section">
+          <h2>Location</h2>
+
+          <div className="location-selector-row">
+            <div className="admin-form-group">
+              <label htmlFor="location">Location *</label>
+              <LocationSelector
+                locations={localLocations}
+                value={selectedLocationId}
+                onChange={setSelectedLocationId}
+                onCreateNew={handleCreateNewLocation}
+                placeholder="Select a location..."
+              />
+            </div>
+            <button
+              type="button"
+              className="admin-btn admin-btn-secondary location-create-btn"
+              onClick={handleCreateNewLocation}
             >
-              {timezoneRegions.map((region) => (
-                <optgroup key={region} label={region}>
-                  {allTimezones
-                    .filter((tz) => tz.region === region)
-                    .map((tz) => (
-                      <option key={tz.value} value={tz.value}>
-                        {tz.value.replace(`${region}/`, "").replace(/_/g, " ")}
-                      </option>
-                    ))}
-                </optgroup>
-              ))}
-            </select>
+              <i className="bx bx-plus"></i>
+              Create new
+            </button>
           </div>
-          <div className="admin-form-group" />
         </div>
-      </div>
 
-      {/* Location Section */}
-      <div className="admin-form-section">
-        <h2>Location</h2>
+        <div className="admin-form-section">
+          <h2>Venue</h2>
+          <p className="admin-form-section-description">
+            The hosting company or organization for this event.
+          </p>
 
-        <div className="location-selector-row">
-          <div className="admin-form-group">
-            <label htmlFor="location">Location *</label>
-            <LocationSelector
-              locations={localLocations}
-              value={selectedLocationId}
-              onChange={setSelectedLocationId}
-              onCreateNew={handleCreateNewLocation}
-              placeholder="Select a location..."
-            />
+          <div className="venue-selector-row">
+            <div className="admin-form-group">
+              <label htmlFor="venue">Venue</label>
+              <VenueSelector
+                venues={localVenues}
+                value={selectedVenueId}
+                onChange={(id) => {
+                  setSelectedVenueId(id)
+                  if (id) {
+                    setVenueMode("existing")
+                  } else {
+                    setVenueMode("none")
+                  }
+                }}
+                onCreateNew={handleCreateNewVenue}
+                placeholder="Select a venue (optional)..."
+              />
+            </div>
+            <button
+              type="button"
+              className="admin-btn admin-btn-secondary venue-create-btn"
+              onClick={handleCreateNewVenue}
+            >
+              <i className="bx bx-plus"></i>
+              Create new
+            </button>
           </div>
-          <button
-            type="button"
-            className="admin-btn admin-btn-secondary location-create-btn"
-            onClick={handleCreateNewLocation}
-          >
-            <i className="bx bx-plus"></i>
-            Create new
-          </button>
-        </div>
-      </div>
 
-      {/* Venue Section */}
-      <div className="admin-form-section">
-        <h2>Venue</h2>
-        <p className="admin-form-section-description">
-          The hosting company or organization for this event. Leave empty if no venue.
-        </p>
-
-        <div className="venue-selector-row">
-          <div className="admin-form-group">
-            <label htmlFor="venue">Venue</label>
-            <VenueSelector
-              venues={localVenues}
-              value={selectedVenueId}
-              onChange={(id) => {
-                setSelectedVenueId(id)
-                if (id) {
-                  setVenueMode("existing")
-                } else {
-                  setVenueMode("none")
-                }
+          {selectedVenueId && (
+            <button
+              type="button"
+              className="admin-btn admin-btn-text venue-clear-btn"
+              onClick={() => {
+                setSelectedVenueId("")
+                setVenueMode("none")
               }}
-              onCreateNew={handleCreateNewVenue}
-              placeholder="Select a venue (optional)..."
-            />
-          </div>
-          <button
-            type="button"
-            className="admin-btn admin-btn-secondary venue-create-btn"
-            onClick={handleCreateNewVenue}
-          >
-            <i className="bx bx-plus"></i>
-            Create new
-          </button>
+            >
+              <i className="bx bx-x"></i>
+              Clear venue selection
+            </button>
+          )}
         </div>
-
-        {selectedVenueId && (
-          <button
-            type="button"
-            className="admin-btn admin-btn-text venue-clear-btn"
-            onClick={() => {
-              setSelectedVenueId("")
-              setVenueMode("none")
-            }}
-          >
-            <i className="bx bx-x"></i>
-            Clear venue selection
-          </button>
-        )}
       </div>
 
       {/* Create Location Modal */}

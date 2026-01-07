@@ -113,7 +113,7 @@
 // ===========================================
 
 .claim-card {
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border-radius: 12px;
   border: 1px solid var(--color-border);
   padding: 24px;
@@ -358,7 +358,7 @@
 }
 
 .claim-modal {
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border-radius: 16px;
   width: 100%;
   max-width: 480px;
@@ -551,7 +551,7 @@
   display: flex;
   gap: 16px;
   padding: 16px;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: all 0.2s ease;
@@ -721,7 +721,7 @@
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: all 0.2s ease;
@@ -1085,7 +1085,7 @@
   }
 
   &.active {
-    background-color: var(--color-surface);
+    background-color: var(--admin-surface);
     color: var(--color-text);
     box-shadow: var(--shadow-sm);
   }
@@ -1140,7 +1140,7 @@
 .event-card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border-radius: 12px;
   border: 1px solid var(--color-border);
   text-decoration: none;
@@ -1346,7 +1346,7 @@
   padding: 0;
   border: none;
   border-radius: 8px;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   color: var(--color-text-secondary);
   cursor: pointer;
   text-decoration: none;
@@ -1443,7 +1443,7 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 14px;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   color: var(--color-text);
   transition: all 0.2s ease;
 
@@ -1521,7 +1521,7 @@
   }
 
   &.active {
-    background-color: var(--color-surface);
+    background-color: var(--admin-surface);
     color: var(--color-text);
     box-shadow: var(--shadow-sm);
   }
@@ -1634,7 +1634,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
 
   i {
     font-size: 40px;
@@ -1699,7 +1699,7 @@
 }
 
 .events-sidebar-content {
-  background: var(--color-surface);
+  background: var(--admin-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 24px;
@@ -1810,7 +1810,7 @@
   }
 
   &.active {
-    background-color: var(--color-surface);
+    background-color: var(--admin-surface);
     color: var(--color-text);
     box-shadow: var(--shadow-sm);
   }
@@ -1853,7 +1853,7 @@
 .attended-event-card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border-radius: 12px;
   border: 1px solid var(--color-border);
   text-decoration: none;

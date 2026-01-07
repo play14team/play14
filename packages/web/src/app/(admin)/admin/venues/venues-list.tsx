@@ -9,7 +9,7 @@ export default function VenuesList() {
   const [venues, setVenues] = useState<VenueListItem[]>([])
   const [pagination, setPagination] = useState<VenuesListResponse["meta"]["pagination"]>({
     page: 1,
-    pageSize: 24,
+    pageSize: 54,
     pageCount: 0,
     total: 0,
   })
@@ -24,7 +24,7 @@ export default function VenuesList() {
     setError(null)
 
     try {
-      const result = await getVenues(page, 24, search || undefined)
+      const result = await getVenues(page, 54, search || undefined)
       setVenues(result.data)
       setPagination(result.meta.pagination)
     } catch {

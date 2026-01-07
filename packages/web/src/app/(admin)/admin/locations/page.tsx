@@ -13,17 +13,30 @@ export default async function LocationsPage() {
   return (
     <div className="admin-page">
       <div className="admin-page-header">
-        <div className="admin-page-header-content">
-          <h1>Event Locations</h1>
-          <p>Manage cities and regions where events take place</p>
-        </div>
-        <Link href="/admin/locations/create" className="admin-btn admin-btn-primary">
-          <i className="bx bx-plus"></i>
-          Create Location
-        </Link>
+        <h1>Event Locations</h1>
+        <p>Manage cities and regions where events take place</p>
       </div>
 
-      <LocationsList />
+      <div className="events-page-layout has-sidebar">
+        <div className="events-page-main">
+          <LocationsList />
+        </div>
+
+        <div className="events-page-sidebar">
+          <div className="events-sidebar-content">
+            <div className="events-sidebar-section">
+              <h3>Quick Actions</h3>
+              <Link
+                href="/admin/locations/create"
+                className="admin-btn admin-btn-primary admin-btn-block"
+              >
+                <i className="bx bx-plus"></i>
+                Create Location
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

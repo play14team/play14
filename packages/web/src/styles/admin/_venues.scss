@@ -133,7 +133,79 @@
 // ===========================================
 
 .venue-edit-form {
-  max-width: 900px;
+  max-width: none;
+}
+
+// ===========================================
+// Venue Edit Layout (3-column: Details | Map | Actions)
+// ===========================================
+
+.venue-edit-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 280px;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr 280px;
+
+    .venue-edit-map {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .venue-edit-actions {
+      grid-column: 2;
+      grid-row: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+
+    .venue-edit-map {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .venue-edit-actions {
+      grid-column: 1;
+      grid-row: 3;
+    }
+  }
+}
+
+.venue-edit-details {
+  min-width: 0;
+}
+
+.venue-edit-map {
+  min-width: 0;
+
+  // Ensure the map canvas renders properly in grid layout
+  .location-map-picker-container {
+    min-height: 400px;
+
+    .mapboxgl-map {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  }
+}
+
+.venue-edit-actions {
+  position: sticky;
+  top: 32px;
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .venue-logo-preview {
@@ -323,7 +395,7 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -334,7 +406,7 @@
   padding: 12px;
   border-bottom: 1px solid var(--color-border);
   border-radius: 12px 12px 0 0;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
 
   input {
     width: 100%;
@@ -425,7 +497,7 @@
   padding: 0;
   border: none;
   border-radius: 16px;
-  background-color: var(--color-surface);
+  background-color: var(--admin-surface);
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(0, 0, 0, 0.1);

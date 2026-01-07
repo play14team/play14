@@ -116,3 +116,33 @@ $theme-colors: (
     }
   }
 }
+
+// Section titles (SPONSORS, DETAILS, TEAM, etc.)
+.section-title {
+  margin-top: 3rem;
+
+  .sub-title {
+    font-size: 24px;
+    font-weight: 700;
+  }
+}
+
+// Sponsor category sections
+.sponsor-category-section {
+  margin-bottom: 2rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sponsor-category-title {
+  color: $orange;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba($orange, 0.3);
+}

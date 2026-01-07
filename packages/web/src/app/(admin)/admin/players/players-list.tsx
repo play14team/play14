@@ -24,7 +24,7 @@ export default function PlayersList() {
   const [players, setPlayers] = useState<PlayerListItem[]>([])
   const [pagination, setPagination] = useState<PlayersListResponse["meta"]["pagination"]>({
     page: 1,
-    pageSize: 50,
+    pageSize: 40,
     pageCount: 0,
     total: 0,
   })
@@ -40,7 +40,7 @@ export default function PlayersList() {
     setError(null)
 
     try {
-      const result = await getPlayers(letter || undefined, page, 50, search || undefined)
+      const result = await getPlayers(letter || undefined, page, 40, search || undefined)
       setPlayers(result.data)
       setPagination(result.meta.pagination)
     } catch {

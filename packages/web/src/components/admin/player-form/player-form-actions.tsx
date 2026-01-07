@@ -12,6 +12,8 @@ interface PlayerFormActionsProps {
   demoteTarget?: string | null
   onPromote?: () => void
   onDemote?: () => void
+  isDirty?: boolean
+  onDiscard?: () => void
 }
 
 export default function PlayerFormActions({
@@ -24,6 +26,8 @@ export default function PlayerFormActions({
   demoteTarget,
   onPromote,
   onDemote,
+  isDirty = false,
+  onDiscard,
 }: PlayerFormActionsProps) {
   const canChangePosition = promoteTarget !== null || demoteTarget !== null
   const showPositionSection = mode === "admin" && currentPosition
@@ -79,10 +83,19 @@ export default function PlayerFormActions({
 
       {/* Save & View Actions */}
       <div className="action-buttons">
+        <Link
+          href={`/players/${playerSlug}`}
+          className="admin-btn admin-btn-secondary admin-btn-block"
+          target="_blank"
+        >
+          <i className="bx bx-link-external"></i>
+          View Public Profile
+        </Link>
+
         <button
           type="submit"
           disabled={isSubmitting}
-          className="admin-btn admin-btn-primary admin-btn-block"
+          className={`admin-btn admin-btn-primary admin-btn-block ${isDirty ? "admin-btn-dirty" : ""}`}
         >
           {isSubmitting ? (
             <>
@@ -97,15 +110,25 @@ export default function PlayerFormActions({
           )}
         </button>
 
-        <Link
-          href={`/players/${playerSlug}`}
-          className="admin-btn admin-btn-secondary admin-btn-block"
-          target="_blank"
-        >
-          <i className="bx bx-link-external"></i>
-          View Public Profile
-        </Link>
+        {isDirty && onDiscard && (
+          <button
+            type="button"
+            onClick={onDiscard}
+            className="admin-btn admin-btn-danger-outline admin-btn-block"
+          >
+            <i className="bx bx-undo"></i>
+            Discard Changes
+          </button>
+        )}
       </div>
+
+      {/* Dirty State Indicator */}
+      {isDirty && (
+        <div className="dirty-indicator">
+          <i className="bx bx-edit-alt"></i>
+          <span>You have unsaved changes</span>
+        </div>
+      )}
     </div>
   )
 }

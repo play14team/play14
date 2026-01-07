@@ -1,8 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/admin/toast"
+import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
+import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import VenueMapPicker, { type MapLocation } from "@/components/admin/venue-map-picker"
 import VenueLogoManager from "@/components/admin/venue-logo-manager"
 import {
@@ -23,11 +25,72 @@ export default function VenueEditForm({ venue }: Props) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
+  // Navigation warning state
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
+  const pendingNavigationRef = useRef<string | null>(null)
+
   // Form state
   const [name, setName] = useState(venue.name)
   const [website, setWebsite] = useState(venue.website || "")
   const [addressDetails, setAddressDetails] = useState(venue.addressDetails || "")
   const [mapLocation, setMapLocation] = useState<MapLocation | null>(venue.location)
+
+  // Track dirty state
+  const formValues = useMemo(
+    () => ({ name, website, addressDetails, mapLocation }),
+    [name, website, addressDetails, mapLocation]
+  )
+  const { isDirty, resetDirtyState } = useFormDirty(formValues)
+
+  // Browser beforeunload warning
+  useBeforeUnload(isDirty)
+
+  // Intercept Link clicks to warn about unsaved changes
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const link = target.closest("a")
+
+      if (!link) return
+
+      // Check if it's an internal navigation link
+      const href = link.getAttribute("href")
+      if (!href || href.startsWith("#") || href.startsWith("mailto:")) return
+
+      // Check if it's an external link (opens in new tab)
+      if (link.target === "_blank") return
+
+      // Prevent navigation and show dialog
+      e.preventDefault()
+      e.stopPropagation()
+      pendingNavigationRef.current = href
+      setShowUnsavedDialog(true)
+    }
+
+    // Capture phase to intercept before Next.js router
+    document.addEventListener("click", handleClick, true)
+    return () => document.removeEventListener("click", handleClick, true)
+  }, [isDirty])
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    if (!isDirty) return
+
+    const handlePopState = () => {
+      // Push current state back to prevent navigation
+      window.history.pushState(null, "", window.location.href)
+      setShowUnsavedDialog(true)
+      pendingNavigationRef.current = "back"
+    }
+
+    // Push initial state
+    window.history.pushState(null, "", window.location.href)
+    window.addEventListener("popstate", handlePopState)
+
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [isDirty])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,9 +110,85 @@ export default function VenueEditForm({ venue }: Props) {
     }
 
     toast.success("Venue updated successfully!")
+    resetDirtyState()
     router.refresh()
     setIsSubmitting(false)
   }
+
+  // ============================================
+  // Navigation handlers for unsaved changes dialog
+  // ============================================
+
+  const handleSaveAndNavigate = useCallback(async () => {
+    setIsSubmitting(true)
+
+    const result = await updateVenue(venue.documentId, {
+      name: name.trim(),
+      website: website.trim() || undefined,
+      addressDetails: addressDetails.trim() || undefined,
+      location: mapLocation,
+    })
+
+    if (result.success) {
+      toast.success("Venue updated successfully!")
+      resetDirtyState()
+      setShowUnsavedDialog(false)
+
+      // Navigate after save
+      const destination = pendingNavigationRef.current
+      pendingNavigationRef.current = null
+
+      if (destination === "back") {
+        router.back()
+      } else if (destination) {
+        router.push(destination)
+      }
+    } else {
+      toast.error(result.error || "Failed to update venue")
+    }
+
+    setIsSubmitting(false)
+  }, [venue.documentId, name, website, addressDetails, mapLocation, toast, resetDirtyState, router])
+
+  const handleDiscardAndNavigate = useCallback(() => {
+    resetDirtyState()
+    setShowUnsavedDialog(false)
+
+    const destination = pendingNavigationRef.current
+    pendingNavigationRef.current = null
+
+    if (destination === "back") {
+      router.back()
+    } else if (destination) {
+      router.push(destination)
+    }
+  }, [resetDirtyState, router])
+
+  const handleCancelNavigation = useCallback(() => {
+    pendingNavigationRef.current = null
+    setShowUnsavedDialog(false)
+  }, [])
+
+  const handleDiscard = useCallback(() => {
+    // Reset form to initial values
+    const initialName = venue.name
+    const initialWebsite = venue.website || ""
+    const initialAddressDetails = venue.addressDetails || ""
+    const initialMapLocation = venue.location
+
+    setName(initialName)
+    setWebsite(initialWebsite)
+    setAddressDetails(initialAddressDetails)
+    setMapLocation(initialMapLocation)
+
+    // Pass the initial values to resetDirtyState to avoid stale closure issue
+    resetDirtyState({
+      name: initialName,
+      website: initialWebsite,
+      addressDetails: initialAddressDetails,
+      mapLocation: initialMapLocation,
+    })
+  }, [venue, resetDirtyState])
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -93,74 +232,107 @@ export default function VenueEditForm({ venue }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="admin-form venue-edit-form">
-      <div className="admin-form-section">
-        <h2>Venue Details</h2>
+      <div className="venue-edit-layout">
+        <div className="venue-edit-details">
+          <div className="admin-form-section">
+            <h2>Venue Details</h2>
 
-        <div className="admin-form-row">
-          <div className="admin-form-group">
-            <label htmlFor="name">Name *</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              minLength={2}
-              className="admin-input"
-              placeholder="e.g., Hilton Conference Center"
-            />
-            <p className="admin-form-help">
-              The full name of the venue
+            <div className="admin-form-row">
+              <div className="admin-form-group">
+                <label htmlFor="name">Name *</label>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  minLength={2}
+                  className="admin-input"
+                  placeholder="e.g., Hilton Conference Center"
+                />
+                <p className="admin-form-help">
+                  The full name of the venue
+                </p>
+              </div>
+            </div>
+
+            <div className="admin-form-row">
+              <div className="admin-form-group">
+                <VenueLogoManager
+                  venueId={venue.documentId}
+                  venueName={venue.name}
+                  logo={getLogoWithUrls()}
+                  onUpdate={handleLogoUpdate}
+                />
+              </div>
+            </div>
+
+            <div className="admin-form-row">
+              <div className="admin-form-group">
+                <label htmlFor="website">Website</label>
+                <input
+                  type="url"
+                  id="website"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  className="admin-input"
+                  placeholder="https://example.com"
+                />
+              </div>
+            </div>
+
+            <div className="admin-form-row">
+              <div className="admin-form-group">
+                <label htmlFor="addressDetails">Address Details</label>
+                <input
+                  type="text"
+                  id="addressDetails"
+                  value={addressDetails}
+                  onChange={(e) => setAddressDetails(e.target.value)}
+                  className="admin-input"
+                  placeholder="e.g., 123 Main Street, Suite 100"
+                />
+                <p className="admin-form-help">
+                  The physical address of the venue
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {venue.eventsCount > 0 && (
+            <div className="admin-form-section">
+              <h2>Associated Events</h2>
+              <p className="admin-form-section-description">
+                This venue is used by {venue.eventsCount} event{venue.eventsCount !== 1 ? "s" : ""}.
+              </p>
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <div className="venue-events-list">
+                    {venue.events.map((event) => (
+                      <a
+                        key={event.id}
+                        href={`/admin/events/${event.slug}`}
+                        className="venue-event-link"
+                      >
+                        <i className="bx bx-calendar-event"></i>
+                        <span>{event.name}</span>
+                        <i className="bx bx-link-external"></i>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="venue-edit-map">
+          <div className="admin-form-section">
+            <h2>Map Location</h2>
+            <p className="admin-form-section-description">
+              Set the coordinates for this venue on the map.
             </p>
-          </div>
-        </div>
 
-        <VenueLogoManager
-          venueId={venue.documentId}
-          logo={getLogoWithUrls()}
-          onUpdate={handleLogoUpdate}
-        />
-
-        <div className="admin-form-row">
-          <div className="admin-form-group">
-            <label htmlFor="website">Website</label>
-            <input
-              type="url"
-              id="website"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              className="admin-input"
-              placeholder="https://example.com"
-            />
-          </div>
-        </div>
-
-        <div className="admin-form-row">
-          <div className="admin-form-group">
-            <label htmlFor="addressDetails">Address Details</label>
-            <input
-              type="text"
-              id="addressDetails"
-              value={addressDetails}
-              onChange={(e) => setAddressDetails(e.target.value)}
-              className="admin-input"
-              placeholder="e.g., 123 Main Street, Suite 100"
-            />
-            <p className="admin-form-help">
-              The physical address of the venue
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="admin-form-section">
-        <h2>Map Location</h2>
-        <p className="admin-form-section-description">
-          Set the coordinates for this venue on the map. This is used for displaying the venue location.
-        </p>
-
-        <div className="admin-form-row">
-          <div className="admin-form-group full-width">
             <VenueMapPicker
               value={mapLocation}
               onChange={setMapLocation}
@@ -168,96 +340,103 @@ export default function VenueEditForm({ venue }: Props) {
             />
           </div>
         </div>
-      </div>
 
-      {venue.eventsCount > 0 && (
-        <div className="admin-form-section">
-          <h2>Associated Events</h2>
-          <p className="admin-form-section-description">
-            This venue is used by {venue.eventsCount} event{venue.eventsCount !== 1 ? "s" : ""}.
-          </p>
-          <div className="venue-events-list">
-            {venue.events.map((event) => (
-              <a
-                key={event.id}
-                href={`/admin/events/${event.slug}`}
-                className="venue-event-link"
-              >
-                <i className="bx bx-calendar-event"></i>
-                <span>{event.name}</span>
-                <i className="bx bx-link-external"></i>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="admin-form-actions">
-        <button
-          type="submit"
-          className="admin-btn admin-btn-primary"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              <i className="bx bx-loader-alt bx-spin"></i>
-              Saving...
-            </>
-          ) : (
-            <>
-              <i className="bx bx-save"></i>
-              Save Changes
-            </>
-          )}
-        </button>
-
-        {canDelete && !showDeleteConfirm && (
-          <button
-            type="button"
-            className="admin-btn admin-btn-danger"
-            onClick={() => setShowDeleteConfirm(true)}
-          >
-            <i className="bx bx-trash"></i>
-            Delete Venue
-          </button>
-        )}
-
-        {!canDelete && (
-          <p className="admin-form-help">
-            <i className="bx bx-info-circle"></i>
-            Cannot delete: this venue has {venue.eventsCount} event{venue.eventsCount !== 1 ? "s" : ""} attached.
-          </p>
-        )}
-
-        {showDeleteConfirm && (
-          <div className="admin-delete-confirm">
-            <span>Are you sure you want to delete this venue?</span>
+        <div className="venue-edit-actions">
+          <div className="action-buttons">
             <button
-              type="button"
-              className="admin-btn admin-btn-danger"
-              onClick={handleDelete}
-              disabled={isDeleting}
+              type="submit"
+              className={`admin-btn admin-btn-primary admin-btn-block ${isDirty ? "admin-btn-dirty" : ""}`}
+              disabled={isSubmitting}
             >
-              {isDeleting ? (
+              {isSubmitting ? (
                 <>
                   <i className="bx bx-loader-alt bx-spin"></i>
-                  Deleting...
+                  Saving...
                 </>
               ) : (
-                "Yes, Delete"
+                <>
+                  <i className="bx bx-save"></i>
+                  Save Changes
+                </>
               )}
             </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn-secondary"
-              onClick={() => setShowDeleteConfirm(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </button>
+
+            {isDirty && (
+              <button
+                type="button"
+                onClick={handleDiscard}
+                className="admin-btn admin-btn-danger-outline admin-btn-block"
+              >
+                <i className="bx bx-undo"></i>
+                Discard Changes
+              </button>
+            )}
+
+            {canDelete && !showDeleteConfirm && (
+              <button
+                type="button"
+                className="admin-btn admin-btn-danger admin-btn-block"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                <i className="bx bx-trash"></i>
+                Delete Venue
+              </button>
+            )}
+
+            {!canDelete && (
+              <p className="admin-form-help">
+                <i className="bx bx-info-circle"></i>
+                Cannot delete: this venue has {venue.eventsCount} event{venue.eventsCount !== 1 ? "s" : ""} attached.
+              </p>
+            )}
+
+            {showDeleteConfirm && (
+              <div className="admin-delete-confirm">
+                <span>Are you sure you want to delete this venue?</span>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-danger admin-btn-block"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <>
+                      <i className="bx bx-loader-alt bx-spin"></i>
+                      Deleting...
+                    </>
+                  ) : (
+                    "Yes, Delete"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-secondary admin-btn-block"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Dirty State Indicator */}
+          {isDirty && (
+            <div className="dirty-indicator">
+              <i className="bx bx-edit-alt"></i>
+              <span>You have unsaved changes</span>
+            </div>
+          )}
+        </div>
       </div>
+
+      <UnsavedChangesDialog
+        isOpen={showUnsavedDialog}
+        onSave={handleSaveAndNavigate}
+        onDiscard={handleDiscardAndNavigate}
+        onCancel={handleCancelNavigation}
+        isSaving={isSubmitting}
+      />
     </form>
   )
 }

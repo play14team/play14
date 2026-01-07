@@ -92,6 +92,8 @@ export interface PreviewEvent {
   mentors?: Player[]
   players?: Player[]
   media?: Array<{ id: string; url: string; type: string }>
+  ticketingEnabled?: boolean
+  paymentProvider?: string
   ticketTypes?: Array<{
     documentId: string
     name: string
