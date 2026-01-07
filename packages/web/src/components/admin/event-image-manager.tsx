@@ -10,10 +10,7 @@ import {
 } from "@/app/(admin)/admin/events/[slug]/images.action"
 import ImageCropper from "./image-cropper"
 import MediaLibraryBrowser from "./media-library-browser"
-
-// Default image aspect ratio: 6:5 (e.g., 600x500)
-const DEFAULT_IMAGE_ASPECT_RATIO = 6 / 5
-const DEFAULT_IMAGE_OUTPUT_WIDTH = 600
+import EventDefaultImageManager from "./event-default-image-manager"
 
 // Gallery images: free aspect ratio, max 1920px on longest edge
 // Optimized for web: max dimension 1920px, quality 85% for <200KB file size
@@ -23,6 +20,7 @@ const GALLERY_IMAGE_QUALITY = 0.85
 
 interface Props {
   eventSlug: string
+  eventName: string
   defaultImage?: EventImage | null
   galleryImages: EventImage[]
   onUpdate: () => void
@@ -30,25 +28,22 @@ interface Props {
 
 export default function EventImageManager({
   eventSlug,
+  eventName,
   defaultImage,
   galleryImages,
   onUpdate,
 }: Props) {
   const [isUploading, setIsUploading] = useState(false)
-  const [uploadingField, setUploadingField] = useState<"defaultImage" | "images" | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showCropper, setShowCropper] = useState(false)
   const [imageToCrop, setImageToCrop] = useState<string | null>(null)
-  const [cropTarget, setCropTarget] = useState<"defaultImage" | "images">("defaultImage")
   const [originalFile, setOriginalFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [showMediaLibrary, setShowMediaLibrary] = useState(false)
-  const [mediaLibraryTarget, setMediaLibraryTarget] = useState<"defaultImage" | "images">("defaultImage")
-  const defaultImageInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = useCallback(
-    (file: File, field: "defaultImage" | "images") => {
+    (file: File) => {
       // Validate file type
       if (!file.type.startsWith("image/")) {
         setError("Please select an image file")
@@ -62,7 +57,6 @@ export default function EventImageManager({
       }
 
       setError(null)
-      setCropTarget(field)
       setOriginalFile(file)
 
       // Load image for cropper preview
@@ -80,7 +74,6 @@ export default function EventImageManager({
     setShowCropper(false)
     setImageToCrop(null)
     setIsUploading(true)
-    setUploadingField(cropTarget)
     setError(null)
 
     try {
@@ -90,7 +83,7 @@ export default function EventImageManager({
         type: "image/webp",
       })
 
-      const result = await uploadEventImage(eventSlug, croppedFile, cropTarget)
+      const result = await uploadEventImage(eventSlug, croppedFile, "images")
 
       if (result.success) {
         onUpdate()
@@ -101,12 +94,8 @@ export default function EventImageManager({
       setError(err instanceof Error ? err.message : "Failed to upload image")
     } finally {
       setIsUploading(false)
-      setUploadingField(null)
       setOriginalFile(null)
-      // Reset file inputs so the same file can be selected again
-      if (defaultImageInputRef.current) {
-        defaultImageInputRef.current.value = ""
-      }
+      // Reset file input so the same file can be selected again
       if (galleryInputRef.current) {
         galleryInputRef.current.value = ""
       }
@@ -117,20 +106,14 @@ export default function EventImageManager({
     setShowCropper(false)
     setImageToCrop(null)
     setOriginalFile(null)
-    // Reset file inputs so the same file can be selected again
-    if (defaultImageInputRef.current) {
-      defaultImageInputRef.current.value = ""
-    }
+    // Reset file input so the same file can be selected again
     if (galleryInputRef.current) {
       galleryInputRef.current.value = ""
     }
   }
 
-  const handleRemoveImage = async (fileId: number, field: "defaultImage" | "images") => {
-    if (field === "defaultImage" && !confirm("Remove the default event image?")) {
-      return
-    }
-    if (field === "images" && !confirm("Remove this image from the gallery?")) {
+  const handleRemoveGalleryImage = async (fileId: number) => {
+    if (!confirm("Remove this image from the gallery?")) {
       return
     }
 
@@ -138,7 +121,7 @@ export default function EventImageManager({
     setError(null)
 
     try {
-      const result = await removeEventImage(eventSlug, fileId, field)
+      const result = await removeEventImage(eventSlug, fileId, "images")
 
       if (result.success) {
         onUpdate()
@@ -161,28 +144,22 @@ export default function EventImageManager({
     setIsDragging(false)
   }
 
-  const handleDrop = (e: React.DragEvent, field: "defaultImage" | "images") => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
 
     const file = e.dataTransfer.files[0]
     if (file) {
-      handleFileSelect(file, field)
+      handleFileSelect(file)
     }
-  }
-
-  const openMediaLibrary = (field: "defaultImage" | "images") => {
-    setMediaLibraryTarget(field)
-    setShowMediaLibrary(true)
   }
 
   const handleMediaLibrarySelect = async (image: EventImage) => {
     setIsUploading(true)
-    setUploadingField(mediaLibraryTarget)
     setError(null)
 
     try {
-      const result = await setEventImageFromLibrary(eventSlug, image.id, mediaLibraryTarget)
+      const result = await setEventImageFromLibrary(eventSlug, image.id, "images")
 
       if (result.success) {
         onUpdate()
@@ -193,7 +170,6 @@ export default function EventImageManager({
       setError(err instanceof Error ? err.message : "Failed to set image from library")
     } finally {
       setIsUploading(false)
-      setUploadingField(null)
     }
   }
 
@@ -204,9 +180,9 @@ export default function EventImageManager({
           image={imageToCrop}
           onCrop={handleCroppedImage}
           onCancel={handleCancelCrop}
-          aspectRatio={cropTarget === "defaultImage" ? DEFAULT_IMAGE_ASPECT_RATIO : GALLERY_IMAGE_ASPECT_RATIO}
-          outputWidth={cropTarget === "defaultImage" ? DEFAULT_IMAGE_OUTPUT_WIDTH : GALLERY_IMAGE_MAX_DIMENSION}
-          quality={cropTarget === "defaultImage" ? 0.9 : GALLERY_IMAGE_QUALITY}
+          aspectRatio={GALLERY_IMAGE_ASPECT_RATIO}
+          outputWidth={GALLERY_IMAGE_MAX_DIMENSION}
+          quality={GALLERY_IMAGE_QUALITY}
         />
       )}
 
@@ -214,7 +190,7 @@ export default function EventImageManager({
         isOpen={showMediaLibrary}
         onClose={() => setShowMediaLibrary(false)}
         onSelect={handleMediaLibrarySelect}
-        title={mediaLibraryTarget === "defaultImage" ? "Select Default Image" : "Add Gallery Image"}
+        title="Add Gallery Image"
       />
 
       {error && (
@@ -224,104 +200,13 @@ export default function EventImageManager({
         </div>
       )}
 
-      {/* Default Image Section */}
-      <div className="image-section">
-        <h4>Default Image *</h4>
-        <p className="section-description">
-          The main image displayed on event cards and at the top of the event page.
-        </p>
-
-        <input
-          ref={defaultImageInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden-input"
-          onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) handleFileSelect(file, "defaultImage")
-          }}
-        />
-
-        {defaultImage ? (
-          <div className="image-preview-card">
-            <div className="image-preview">
-              <Image
-                src={defaultImage.url}
-                alt="Default event image"
-                width={200}
-                height={200}
-                style={{ objectFit: "cover" }}
-              />
-            </div>
-            <div className="image-preview-actions">
-              <button
-                type="button"
-                className="admin-btn admin-btn-primary admin-btn-sm"
-                onClick={() => defaultImageInputRef.current?.click()}
-                disabled={isUploading}
-              >
-                <i className="bx bx-upload"></i>
-                Upload New
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-secondary admin-btn-sm"
-                onClick={() => openMediaLibrary("defaultImage")}
-                disabled={isUploading}
-              >
-                <i className="bx bx-images"></i>
-                Browse Library
-              </button>
-              <button
-                type="button"
-                className="admin-btn admin-btn-danger admin-btn-sm"
-                onClick={() => handleRemoveImage(defaultImage.id, "defaultImage")}
-                disabled={isUploading}
-              >
-                <i className="bx bx-trash"></i>
-                Remove
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="image-upload-options">
-            <div
-              className={`image-dropzone ${isDragging ? "dragging" : ""}`}
-              onClick={() => defaultImageInputRef.current?.click()}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, "defaultImage")}
-            >
-              {isUploading && uploadingField === "defaultImage" ? (
-                <div className="dropzone-uploading">
-                  <i className="bx bx-loader-alt bx-spin"></i>
-                  <span>Uploading...</span>
-                </div>
-              ) : (
-                <>
-                  <i className="bx bx-image-add"></i>
-                  <p>
-                    <strong>Click to upload</strong> or drag and drop
-                  </p>
-                  <span className="dropzone-hint">PNG, JPG up to 10MB</span>
-                </>
-              )}
-            </div>
-            <div className="image-upload-divider">
-              <span>or</span>
-            </div>
-            <button
-              type="button"
-              className="admin-btn admin-btn-secondary image-library-btn"
-              onClick={() => openMediaLibrary("defaultImage")}
-              disabled={isUploading}
-            >
-              <i className="bx bx-images"></i>
-              Browse Media Library
-            </button>
-          </div>
-        )}
-      </div>
+      {/* Default Image Section - using reusable ImageManager */}
+      <EventDefaultImageManager
+        eventSlug={eventSlug}
+        eventName={eventName}
+        defaultImage={defaultImage}
+        onUpdate={onUpdate}
+      />
 
       {/* Gallery Section */}
       <div className="image-section">
@@ -337,7 +222,7 @@ export default function EventImageManager({
           className="hidden-input"
           onChange={(e) => {
             const file = e.target.files?.[0]
-            if (file) handleFileSelect(file, "images")
+            if (file) handleFileSelect(file)
           }}
         />
 
@@ -354,7 +239,7 @@ export default function EventImageManager({
               <button
                 type="button"
                 className="gallery-item-remove"
-                onClick={() => handleRemoveImage(img.id, "images")}
+                onClick={() => handleRemoveGalleryImage(img.id)}
                 disabled={isUploading}
                 title="Remove image"
               >
@@ -368,10 +253,10 @@ export default function EventImageManager({
             onClick={() => galleryInputRef.current?.click()}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, "images")}
+            onDrop={handleDrop}
             title="Upload new image"
           >
-            {isUploading && uploadingField === "images" ? (
+            {isUploading ? (
               <i className="bx bx-loader-alt bx-spin"></i>
             ) : (
               <>
@@ -384,7 +269,7 @@ export default function EventImageManager({
           <button
             type="button"
             className="gallery-add gallery-library-btn"
-            onClick={() => openMediaLibrary("images")}
+            onClick={() => setShowMediaLibrary(true)}
             disabled={isUploading}
             title="Browse media library"
           >

@@ -63,16 +63,10 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           icon: "bx-user",
           label: "My Profile",
         },
-        {
-          href: "/admin/stripe",
-          icon: "bx-credit-card",
-          label: "Stripe Config",
-          organizerOnly: true,
-        },
       ],
     },
     {
-      title: "Events",
+      title: "Management",
       items: [
         {
           href: "/admin/events",
@@ -92,21 +86,21 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           organizerOnly: true,
         },
         {
-          href: "/admin/my-tickets",
-          icon: "bx-purchase-tag",
-          label: "My Tickets",
-        },
-      ],
-    },
-    {
-      title: "Management",
-      items: [
-        {
           href: "/admin/players",
           icon: "bx-group",
           label: "Players",
           organizerOnly: true,
         },
+        {
+          href: "/admin/my-tickets",
+          icon: "bx-purchase-tag",
+          label: "Tickets",
+        },
+      ],
+    },
+    {
+      title: "Claims",
+      items: [
         {
           href: "/admin/attendance-claims",
           icon: "bx-calendar-check",

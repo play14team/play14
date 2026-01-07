@@ -24,7 +24,7 @@ export default async function LocationEditPage({ params }: PageProps) {
   }
 
   return (
-    <div className="admin-page">
+    <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
           <h1>Edit Location</h1>

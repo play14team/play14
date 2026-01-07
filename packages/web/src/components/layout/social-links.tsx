@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 
 export default function SocialLinks({
   text,
@@ -10,11 +11,13 @@ export default function SocialLinks({
   text: string
   className: string
 }) {
-  const origin =
-    typeof window !== "undefined" && window.location.origin
-      ? window.location.origin
-      : ""
-  const url = `${origin}${usePathname()}`
+  const pathname = usePathname()
+  const [url, setUrl] = useState(pathname)
+
+  useEffect(() => {
+    // Set full URL only on client to avoid hydration mismatch
+    setUrl(`${window.location.origin}${pathname}`)
+  }, [pathname])
 
   return (
     <ul className={className}>

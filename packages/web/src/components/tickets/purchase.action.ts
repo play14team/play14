@@ -12,6 +12,12 @@ export interface TicketTypeInfo {
   currency: string
   available: number | null
   soldOut: boolean
+  // Date availability info
+  validFrom?: string
+  validUntil?: string
+  notYetAvailable: boolean
+  expired: boolean
+  withinDateRange: boolean
 }
 
 export interface EventTicketsResponse {
@@ -85,8 +91,11 @@ export interface MyOrderSummary {
 
 /**
  * Get available ticket types for an event
+ * @param eventId - The event document ID
  */
-export async function getAvailableTickets(eventId: string): Promise<EventTicketsResponse | null> {
+export async function getAvailableTickets(
+  eventId: string
+): Promise<EventTicketsResponse | null> {
   try {
     const response = await fetch(`${STRAPI_URL}/api/events/${eventId}/tickets`, {
       cache: "no-store",

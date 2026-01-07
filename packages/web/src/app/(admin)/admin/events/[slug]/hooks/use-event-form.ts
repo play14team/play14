@@ -209,6 +209,9 @@ export interface UseEventFormReturn {
   // Dirty state tracking
   formValues: EventFormValues
 
+  // Original form values (for resetting dirty state baseline)
+  originalFormValues: EventFormValues
+
   // Build data for submission
   buildSubmitData: () => { data: EventUpdateData | null; error: string | null }
 
@@ -315,6 +318,60 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   const timezoneRegions = useMemo(
     () => getTimezoneRegions(allTimezones),
     [allTimezones]
+  )
+
+  // Original form values (stable reference for dirty state reset)
+  const originalFormValues = useMemo<EventFormValues>(
+    () => ({
+      name: event.name,
+      eventStatus: event.eventStatus,
+      tagline: event.tagline || "",
+      description: event.description || "",
+      contactEmail: event.contactEmail || "",
+      startDate: formatDateForInput(event.start),
+      startTime: formatTimeForInput(event.start),
+      endDate: formatDateForInput(event.end),
+      endTime: formatTimeForInput(event.end),
+      timezone: event.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+      locationMode: event.location ? "existing" : "new",
+      selectedLocationId: event.location?.documentId || "",
+      newLocationName: "",
+      newLocationCountry: "",
+      newLocationMapLocation: null,
+      venueMode: event.venue ? "existing" : "none",
+      selectedVenueId: event.venue?.documentId || "",
+      newVenueName: "",
+      newVenueAddress: "",
+      selectedHostIds: event.hosts?.map((h) => h.documentId) || [],
+      selectedMentorIds: event.mentors?.map((m) => m.documentId) || [],
+      ticketingMode: getTicketingModeFromEvent(event),
+      registrationLink: event.registration?.link || "",
+      registrationWidgetCode: event.registration?.widgetCode || "",
+      sponsorships: (event.sponsorships || []).map((s) => ({
+        id: s.id,
+        category: s.category,
+        sponsors: s.sponsors.map((sp) => ({
+          documentId: sp.documentId,
+          name: sp.name,
+          url: sp.url,
+          logo: sp.logo,
+        })),
+      })),
+      schedule: event.timetable || [],
+      mediaLinks: (event.media || []).map((m) => ({
+        id: m.id,
+        url: m.url,
+        type: m.type,
+      })),
+      financeData: event.finance
+        ? {
+            revenue: event.finance.revenue,
+            expenses: event.finance.expenses,
+            destination: event.finance.destination,
+          }
+        : null,
+    }),
+    [event]
   )
 
   // Build data for submission
@@ -576,6 +633,9 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
       mediaLinks,
       financeData,
     },
+
+    // Original form values (for resetting dirty state baseline)
+    originalFormValues,
 
     // Submit
     buildSubmitData,

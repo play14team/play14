@@ -20,7 +20,7 @@ import type {
 import EventEditTabs, { type TabId } from "./event-edit-tabs"
 import EventEditActions from "./event-edit-actions"
 import { useEventForm } from "./hooks/use-event-form"
-import { useFormDirty, useBeforeUnload } from "./hooks/use-form-dirty"
+import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
 import { useToast } from "@/components/admin/toast"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 
@@ -227,7 +227,8 @@ export default function EventEditForm({
 
   const handleDiscard = useCallback(() => {
     form.resetForm()
-    resetDirtyState()
+    // Pass original values as the new baseline to ensure dirty state is correctly reset
+    resetDirtyState(form.originalFormValues)
   }, [form, resetDirtyState])
 
   return (
@@ -286,6 +287,7 @@ export default function EventEditForm({
               description={form.description}
               setDescription={form.setDescription}
               eventSlug={event.slug}
+              eventName={event.name}
               defaultImage={event.defaultImage}
               galleryImages={event.images}
               schedule={form.schedule}

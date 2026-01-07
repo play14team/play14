@@ -14,7 +14,7 @@ export default function LocationsList() {
   const [locations, setLocations] = useState<LocationListItem[]>([])
   const [pagination, setPagination] = useState<LocationsListResponse["meta"]["pagination"]>({
     page: 1,
-    pageSize: 24,
+    pageSize: 54,
     pageCount: 0,
     total: 0,
   })
@@ -33,7 +33,7 @@ export default function LocationsList() {
     setError(null)
 
     try {
-      const result = await getLocations(page, 24, search || undefined, country || undefined)
+      const result = await getLocations(page, 54, search || undefined, country || undefined)
       setLocations(result.data)
       setPagination(result.meta.pagination)
 

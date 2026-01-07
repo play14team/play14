@@ -1,13 +1,13 @@
 .selector {
-  background: #fff;
+  background: var(--color-surface);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
 
   h3 {
     margin: 0 0 1.5rem;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--color-text);
   }
 }
 
@@ -23,17 +23,22 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, opacity 0.2s;
+  background: var(--color-surface);
 
-  &:hover:not(.soldOut) {
-    border-color: #f47920;
+  &:hover:not(.disabled) {
+    border-color: var(--color-primary);
   }
 
-  &.soldOut {
+  &.disabled {
     opacity: 0.6;
-    background: #f5f5f5;
+    background: var(--color-bg-elevated);
+
+    .price {
+      color: var(--color-text-muted);
+    }
   }
 }
 
@@ -43,14 +48,14 @@
   h4 {
     margin: 0 0 0.25rem;
     font-size: 1.1rem;
-    color: #333;
+    color: var(--color-text);
   }
 }
 
 .description {
   margin: 0 0 0.5rem;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .priceRow {
@@ -62,15 +67,24 @@
 .price {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #f47920;
+  color: var(--color-primary);
 }
 
 .availability {
   font-size: 0.85rem;
-  color: #666;
-  background: #f0f0f0;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-elevated);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
+}
+
+.statusBadge {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg-elevated);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-style: italic;
 }
 
 .quantitySelector {
@@ -81,16 +95,17 @@
   button {
     width: 36px;
     height: 36px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    background: #fff;
+    background: var(--color-surface);
+    color: var(--color-text);
     font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s;
 
     &:hover:not(:disabled) {
-      border-color: #f47920;
-      color: #f47920;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
 
     &:disabled {
@@ -105,11 +120,12 @@
   text-align: center;
   font-size: 1.1rem;
   font-weight: 600;
+  color: var(--color-text);
 }
 
 .error {
-  color: #d32f2f;
-  background: #ffebee;
+  color: var(--color-danger);
+  background: rgba(var(--color-danger-rgb), 0.1);
   padding: 0.75rem 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
@@ -117,7 +133,7 @@
 }
 
 .summary {
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--color-border);
   padding-top: 1.5rem;
 }
 
@@ -127,12 +143,13 @@
   align-items: center;
   margin-bottom: 1rem;
   font-size: 1.1rem;
+  color: var(--color-text-secondary);
 }
 
 .totalAmount {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: var(--color-text);
 }
 
 .purchaseButton {
@@ -140,15 +157,16 @@
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fff;
-  background: #f47920;
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
 
   &:hover:not(:disabled) {
-    background: #e06810;
+    background: var(--color-orange);
+    filter: brightness(0.9);
   }
 
   &:disabled {
@@ -158,11 +176,11 @@
 }
 
 .unavailable {
-  background: #f5f5f5;
+  background: var(--color-bg-elevated);
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
-  color: #666;
+  color: var(--color-text-secondary);
 
   p {
     margin: 0.5rem 0;

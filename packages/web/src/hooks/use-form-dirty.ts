@@ -24,8 +24,8 @@ export interface UseFormDirtyOptions {
 export interface UseFormDirtyReturn {
   /** Whether the form has unsaved changes */
   isDirty: boolean
-  /** Reset the initial values to current values (call after save) */
-  resetDirtyState: () => void
+  /** Reset the baseline to current values (call after save) or to specific values (call after discard) */
+  resetDirtyState: (newBaseline?: unknown) => void
   /** Manually mark form as clean */
   markClean: () => void
 }
@@ -78,10 +78,10 @@ export function useFormDirty<T extends object>(
     onDirtyChange?.(isDirty)
   }, [isDirty, onDirtyChange])
 
-  // Reset to current values as the new baseline
-  const resetDirtyState = useCallback(() => {
-    const currentSerialized = serializeFormValues(currentValues)
-    baselineRef.current = currentSerialized
+  // Reset to current values as the new baseline, or to specific values if provided
+  const resetDirtyState = useCallback((newBaseline?: unknown) => {
+    const serialized = serializeFormValues(newBaseline ?? currentValues)
+    baselineRef.current = serialized
     setIsDirty(false)
   }, [currentValues])
 

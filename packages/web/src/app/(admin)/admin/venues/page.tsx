@@ -13,17 +13,30 @@ export default async function VenuesPage() {
   return (
     <div className="admin-page">
       <div className="admin-page-header">
-        <div className="admin-page-header-content">
-          <h1>Venues</h1>
-          <p>Manage hosting facilities and organizations for events</p>
-        </div>
-        <Link href="/admin/venues/create" className="admin-btn admin-btn-primary">
-          <i className="bx bx-plus"></i>
-          Create Venue
-        </Link>
+        <h1>Venues</h1>
+        <p>Manage hosting facilities and organizations for events</p>
       </div>
 
-      <VenuesList />
+      <div className="events-page-layout has-sidebar">
+        <div className="events-page-main">
+          <VenuesList />
+        </div>
+
+        <div className="events-page-sidebar">
+          <div className="events-sidebar-content">
+            <div className="events-sidebar-section">
+              <h3>Quick Actions</h3>
+              <Link
+                href="/admin/venues/create"
+                className="admin-btn admin-btn-primary admin-btn-block"
+              >
+                <i className="bx bx-plus"></i>
+                Create Venue
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

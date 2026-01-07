@@ -22,16 +22,30 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
   /**
    * Get available ticket types for an event
+   * Supports both published and draft events (for preview functionality)
    */
   async getAvailableTickets(ctx) {
     const { eventId } = ctx.params
 
-    const event = await strapi.documents("api::event.event").findOne({
+    // Try published first, then fall back to draft (for preview)
+    let event = await strapi.documents("api::event.event").findOne({
       documentId: eventId,
+      status: "published",
       populate: {
         ticketTypes: true,
       },
     })
+
+    if (!event) {
+      // Try draft version for preview functionality
+      event = await strapi.documents("api::event.event").findOne({
+        documentId: eventId,
+        status: "draft",
+        populate: {
+          ticketTypes: true,
+        },
+      })
+    }
 
     if (!event) {
       return ctx.notFound("Event not found")
@@ -51,22 +65,31 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const now = new Date()
     const availableTypes = (event.ticketTypes || [])
-      .filter((tt: any) => {
-        if (!tt.isActive) return false
-        if (tt.validFrom && new Date(tt.validFrom) > now) return false
-        if (tt.validUntil && new Date(tt.validUntil) < now) return false
-        return true
-      })
+      .filter((tt: any) => tt.isActive)
       .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
-      .map((tt: any) => ({
-        documentId: tt.documentId,
-        name: tt.name,
-        description: tt.description,
-        price: tt.price,
-        currency: tt.currency,
-        available: tt.capacity ? Math.max(0, tt.capacity - (tt.soldCount || 0)) : null,
-        soldOut: tt.capacity ? tt.soldCount >= tt.capacity : false,
-      }))
+      .map((tt: any) => {
+        const validFrom = tt.validFrom ? new Date(tt.validFrom) : null
+        const validUntil = tt.validUntil ? new Date(tt.validUntil) : null
+        const notYetAvailable = validFrom && validFrom > now
+        const expired = validUntil && validUntil < now
+        const withinDateRange = !notYetAvailable && !expired
+
+        return {
+          documentId: tt.documentId,
+          name: tt.name,
+          description: tt.description,
+          price: tt.price,
+          currency: tt.currency,
+          available: tt.capacity ? Math.max(0, tt.capacity - (tt.soldCount || 0)) : null,
+          soldOut: tt.capacity ? tt.soldCount >= tt.capacity : false,
+          // Date availability info
+          validFrom: tt.validFrom,
+          validUntil: tt.validUntil,
+          notYetAvailable,
+          expired,
+          withinDateRange,
+        }
+      })
 
     return ctx.send({
       data: {

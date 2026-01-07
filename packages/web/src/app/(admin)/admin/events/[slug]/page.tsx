@@ -53,7 +53,7 @@ export default async function EventEditPage({ params }: PageProps) {
   const hostAccounts = await getEventHostAccounts(event.documentId)
 
   return (
-    <div className="admin-page">
+    <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
         <h1>Edit Event</h1>
         <p>{event.name}</p>

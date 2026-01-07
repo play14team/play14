@@ -3,8 +3,8 @@ import Link from "next/link"
 import { Sponsor, UploadFile } from "@/models/strapi"
 import SocialNetworks from "../layout/socialnetworks"
 
-const EventSponsor = (props: { sponsor: Sponsor; category: string }) => {
-  const { sponsor, category } = props
+const EventSponsor = (props: { sponsor: Sponsor }) => {
+  const { sponsor } = props
   const url = sponsor.url || "#"
   const logo = sponsor.logo as UploadFile
 
@@ -27,7 +27,6 @@ const EventSponsor = (props: { sponsor: Sponsor; category: string }) => {
           <Link href={url}>
             <h3>{sponsor.name}</h3>
           </Link>
-          <span>{category}</span>
           {sponsor.socialNetworks && (
             <SocialNetworks socialNetworks={sponsor.socialNetworks} />
           )}
