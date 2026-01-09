@@ -76,6 +76,7 @@ interface Event {
   description?: string
   contactEmail?: string
   publishedAt?: string
+  ticketingMode?: "none" | "internal" | "external"
   defaultImage?: UploadFile
   images?: UploadFile[]
   location?: Location
@@ -114,6 +115,28 @@ interface Testimonial {
     tagline?: string
     avatar?: UploadFile
   }
+}
+
+/**
+ * Compute ticketingMode for backwards compatibility
+ * If ticketingMode is explicitly set to "internal" or "external", use it
+ * Otherwise derive from legacy fields (stripeAccount for internal, registration for external)
+ */
+function computeTicketingMode(event: Event & { stripeAccount?: { documentId?: string } }): "none" | "internal" | "external" {
+  // If explicitly set to internal or external, use it
+  if (event.ticketingMode === "internal" || event.ticketingMode === "external") {
+    return event.ticketingMode
+  }
+
+  // Derive from legacy fields for existing events or when mode is "none"
+  // Check stripeAccount first (internal takes priority)
+  if (event.stripeAccount?.documentId) {
+    return "internal"
+  }
+  if (event.registration?.link || event.registration?.widgetCode) {
+    return "external"
+  }
+  return "none"
 }
 
 /**
@@ -213,14 +236,21 @@ export async function getAllEvents(
  */
 export async function getEvent({ params }: SlugParamsProps) {
   const { slug } = await params
-  const response = await restQuery<Event[]>("events", {
+  const response = await restQuery<(Event & { stripeAccount?: { documentId?: string } })[]>("events", {
     filters: {
       slug: { $eq: slug },
     },
     populate: eventDetailsPopulate,
   })
 
-  return response.data?.[0] || null
+  const event = response.data?.[0]
+  if (!event) return null
+
+  // Ensure ticketingMode is computed correctly for backwards compatibility
+  return {
+    ...event,
+    ticketingMode: computeTicketingMode(event),
+  }
 }
 
 /**

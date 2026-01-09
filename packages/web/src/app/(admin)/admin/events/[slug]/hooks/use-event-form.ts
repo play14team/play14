@@ -79,18 +79,9 @@ export const EVENT_STATUSES = [
   { value: "Cancelled", label: "Cancelled" },
 ]
 
-// Determine ticketing mode from event data
+// Get ticketing mode from event data (now stored directly)
 function getTicketingModeFromEvent(event: EventForEdit): TicketingMode {
-  // If there's a registration link or widget code, it's external
-  if (event.registration?.link || event.registration?.widgetCode) {
-    return "external"
-  }
-  // If ticketing is enabled with stripe, it's internal
-  if (event.ticketingEnabled && event.paymentProvider === "stripe") {
-    return "internal"
-  }
-  // Default to none
-  return "none"
+  return event.ticketingMode || "none"
 }
 
 /** All trackable form values for dirty state detection */

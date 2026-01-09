@@ -467,6 +467,81 @@ export interface ApiAttendanceClaimAttendanceClaim extends Struct.CollectionType
   }
 }
 
+export interface ApiDiscountCodeDiscountCode extends Struct.CollectionTypeSchema {
+  collectionName: "discount_codes"
+  info: {
+    description: "Promotional discount codes for event tickets"
+    displayName: "Discount Code"
+    pluralName: "discount-codes"
+    singularName: "discount-code"
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    code: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50
+        minLength: 3
+      }>
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    createdByPlayer: Schema.Attribute.Relation<"manyToOne", "api::player.player">
+    description: Schema.Attribute.Text
+    discountType: Schema.Attribute.Enumeration<["percentage", "fixed"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"percentage">
+    discountValue: Schema.Attribute.Decimal &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      >
+    event: Schema.Attribute.Relation<"manyToOne", "api::event.event">
+    isActive: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<"oneToMany", "api::discount-code.discount-code"> &
+      Schema.Attribute.Private
+    maxDiscountAmount: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      >
+    maxUses: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      >
+    minOrderAmount: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      >
+    publishedAt: Schema.Attribute.DateTime
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    usedCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>
+    validFrom: Schema.Attribute.DateTime
+    validUntil: Schema.Attribute.DateTime
+  }
+}
+
 export interface ApiEventLocationEventLocation extends Struct.CollectionTypeSchema {
   collectionName: "event_locations"
   info: {
@@ -535,6 +610,7 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
+    discountCodes: Schema.Attribute.Relation<"oneToMany", "api::discount-code.discount-code">
     end: Schema.Attribute.DateTime &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"2023-01-03T16:30:00.000Z">
@@ -552,18 +628,6 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    globalCapacity: Schema.Attribute.Integer &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }> &
-      Schema.Attribute.SetMinMax<
-        {
-          min: 0
-        },
-        number
-      >
     hosts: Schema.Attribute.Relation<"manyToMany", "api::player.player">
     images: Schema.Attribute.Media<"images", true>
     locale: Schema.Attribute.String
@@ -584,13 +648,6 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: true
         }
       }>
-    paymentProvider: Schema.Attribute.Enumeration<["stripe", "manual", "none"]> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }> &
-      Schema.Attribute.DefaultTo<"none">
     players: Schema.Attribute.Relation<"manyToMany", "api::player.player">
     publishedAt: Schema.Attribute.DateTime
     registration: Schema.Attribute.Component<"registration.registration", false>
@@ -610,25 +667,19 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: false
         }
       }>
-    stripeAccountId: Schema.Attribute.String &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: false
-        }
-      }>
     tagline: Schema.Attribute.String &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true
         }
       }>
-    ticketingEnabled: Schema.Attribute.Boolean &
+    ticketingMode: Schema.Attribute.Enumeration<["none", "internal", "external"]> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false
         }
       }> &
-      Schema.Attribute.DefaultTo<false>
+      Schema.Attribute.DefaultTo<"none">
     ticketTypes: Schema.Attribute.Relation<"oneToMany", "api::ticket-type.ticket-type">
     timetable: Schema.Attribute.Component<"events.timetable", true>
     timezone: Schema.Attribute.String &
@@ -1123,6 +1174,11 @@ export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
     company: Schema.Attribute.String
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    defaultFoodPreferences: Schema.Attribute.Text
+    defaultTshirtSize: Schema.Attribute.Enumeration<
+      ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"]
+    > &
+      Schema.Attribute.DefaultTo<"none">
     documented: Schema.Attribute.Relation<"manyToMany", "api::game.game">
     hosted: Schema.Attribute.Relation<"manyToMany", "api::event.event">
     locale: Schema.Attribute.String & Schema.Attribute.Private
@@ -1276,16 +1332,37 @@ export interface ApiTicketOrderTicketOrder extends Struct.CollectionTypeSchema {
     draftAndPublish: false
   }
   attributes: {
+    attendeeDetails: Schema.Attribute.JSON
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
     currency: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"EUR">
+    discountAmount: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>
+    discountCode: Schema.Attribute.Relation<"manyToOne", "api::discount-code.discount-code">
     event: Schema.Attribute.Relation<"manyToOne", "api::event.event">
+    gdprConsent: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>
+    gdprConsentTimestamp: Schema.Attribute.DateTime
+    hasReservation: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>
     locale: Schema.Attribute.String & Schema.Attribute.Private
     localizations: Schema.Attribute.Relation<"oneToMany", "api::ticket-order.ticket-order"> &
       Schema.Attribute.Private
+    notes: Schema.Attribute.Text
     orderNumber: Schema.Attribute.String & Schema.Attribute.Required & Schema.Attribute.Unique
+    originalAmount: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      >
     paidAt: Schema.Attribute.DateTime
     paymentProvider: Schema.Attribute.Enumeration<["stripe", "manual"]> & Schema.Attribute.Required
     player: Schema.Attribute.Relation<"manyToOne", "api::player.player">
@@ -1303,11 +1380,24 @@ export interface ApiTicketOrderTicketOrder extends Struct.CollectionTypeSchema {
       >
     refundedAt: Schema.Attribute.DateTime
     refundReason: Schema.Attribute.Text
+    reservationCreatedAt: Schema.Attribute.DateTime
+    reservationExpiresAt: Schema.Attribute.DateTime
     status: Schema.Attribute.Enumeration<
-      ["pending", "paid", "cancelled", "refunded", "partially_refunded"]
+      [
+        "draft",
+        "pending",
+        "paid",
+        "cancelled",
+        "refunded",
+        "partially_refunded",
+        "expired",
+        "failed",
+      ]
     > &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<"pending">
+      Schema.Attribute.DefaultTo<"draft">
+    termsAccepted: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>
+    termsAcceptedTimestamp: Schema.Attribute.DateTime
     ticketDetails: Schema.Attribute.JSON
     tickets: Schema.Attribute.Relation<"oneToMany", "api::ticket.ticket">
     totalAmount: Schema.Attribute.Decimal &
@@ -1502,6 +1592,14 @@ export interface ApiTicketTypeTicketType extends Struct.CollectionTypeSchema {
         number
       >
     publishedAt: Schema.Attribute.DateTime
+    reservedCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>
     soldCount: Schema.Attribute.Integer &
       Schema.Attribute.SetMinMax<
         {
@@ -1530,8 +1628,9 @@ export interface ApiTicketTicket extends Struct.CollectionTypeSchema {
     draftAndPublish: false
   }
   attributes: {
-    attendeeEmail: Schema.Attribute.Email & Schema.Attribute.Required
-    attendeeName: Schema.Attribute.String & Schema.Attribute.Required
+    attendeeEmail: Schema.Attribute.Email
+    attendeeInfo: Schema.Attribute.Component<"attendee.attendee-info", false>
+    attendeeName: Schema.Attribute.String
     checkedInAt: Schema.Attribute.DateTime
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
@@ -1542,10 +1641,10 @@ export interface ApiTicketTicket extends Struct.CollectionTypeSchema {
     order: Schema.Attribute.Relation<"manyToOne", "api::ticket-order.ticket-order">
     player: Schema.Attribute.Relation<"manyToOne", "api::player.player">
     publishedAt: Schema.Attribute.DateTime
-    status: Schema.Attribute.Enumeration<["valid", "used", "cancelled", "refunded"]> &
+    ticketCode: Schema.Attribute.String & Schema.Attribute.Required & Schema.Attribute.Unique
+    ticketStatus: Schema.Attribute.Enumeration<["valid", "used", "cancelled", "refunded"]> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"valid">
-    ticketCode: Schema.Attribute.String & Schema.Attribute.Required & Schema.Attribute.Unique
     ticketType: Schema.Attribute.Relation<"manyToOne", "api::ticket-type.ticket-type">
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
@@ -2013,6 +2112,7 @@ declare module "@strapi/strapi" {
       "admin::user": AdminUser
       "api::article.article": ApiArticleArticle
       "api::attendance-claim.attendance-claim": ApiAttendanceClaimAttendanceClaim
+      "api::discount-code.discount-code": ApiDiscountCodeDiscountCode
       "api::event-location.event-location": ApiEventLocationEventLocation
       "api::event.event": ApiEventEvent
       "api::expectation.expectation": ApiExpectationExpectation

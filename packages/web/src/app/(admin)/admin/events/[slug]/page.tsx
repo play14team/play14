@@ -11,6 +11,7 @@ import {
   getStripeAccountStatus,
   getEventHostAccounts,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
+import { getEventDiscountCodes } from "./discount-code.action"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -49,8 +50,13 @@ export default async function EventEditPage({ params }: PageProps) {
     notFound()
   }
 
-  // Fetch host accounts after we have the event (needs documentId)
-  const hostAccounts = await getEventHostAccounts(event.documentId)
+  // Fetch host accounts and discount codes after we have the event (needs documentId)
+  const [hostAccounts, discountCodesResult] = await Promise.all([
+    getEventHostAccounts(event.documentId),
+    getEventDiscountCodes(event.documentId),
+  ])
+
+  const discountCodes = discountCodesResult.success ? discountCodesResult.data || [] : []
 
   return (
     <div className="admin-page admin-page-wide">
@@ -66,6 +72,7 @@ export default async function EventEditPage({ params }: PageProps) {
         organizers={organizers}
         hostAccounts={hostAccounts}
         playerStripeAccount={playerStripeAccount}
+        discountCodes={discountCodes}
       />
     </div>
   )

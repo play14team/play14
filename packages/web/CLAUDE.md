@@ -343,6 +343,42 @@ podman run -d \
 
 **Status:** Not implemented yet. Placeholder exists in `src/libs/safe-actions.ts` for future session-based auth middleware using `next-safe-action`.
 
+## Admin Page Layout Classes
+
+The admin section uses two layout classes to control content width:
+
+### `admin-page` (Default)
+- **Max-width:** 800px for `.admin-form` and `.admin-form-section`
+- **Use for:** List pages, simple forms, single-column layouts
+- **Examples:** `/admin/events`, `/admin/players`, `/admin/locations/create`
+
+### `admin-page admin-page-wide`
+- **Max-width:** None (full width)
+- **Use for:** Complex edit forms with multi-column layouts (sidebar + content + nested grids)
+- **Examples:** `/admin/events/[slug]`, `/admin/players/[id]`, `/admin/profile`
+
+### When to Use Wide Layout
+
+Always use `admin-page-wide` when the page contains:
+1. **PlayerForm component** - Has 3-column header layout (fields | fields | avatar)
+2. **Event edit forms** - Has sidebar + content with nested grids
+3. **Location/Venue edit forms** - Has map + form side-by-side layout
+4. **Any form using `*-form-layout` grids** with sidebar (typically `grid-template-columns: 1fr 280px`)
+
+**Common issue:** If form fields appear collapsed/zero-width, check if the page is missing `admin-page-wide`. The 800px max-width constraint can cause nested grid layouts to collapse.
+
+```tsx
+// ✅ Correct - wide layout for complex form
+<div className="admin-page admin-page-wide">
+  <PlayerForm player={player} mode="self" />
+</div>
+
+// ❌ Incorrect - narrow layout will break PlayerForm
+<div className="admin-page">
+  <PlayerForm player={player} mode="self" />
+</div>
+```
+
 ## Code Quality Rules (Codacy Integration)
 
 When using Codacy MCP Server:

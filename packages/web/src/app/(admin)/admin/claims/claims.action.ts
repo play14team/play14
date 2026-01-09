@@ -1,9 +1,7 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-import type { Player, UploadFile } from "@/models/strapi"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
+import type { UploadFile } from "@/models/strapi"
 
 // ============================================================================
 // TYPES
@@ -49,44 +47,32 @@ export interface ClaimActionResponse {
   error?: string
 }
 
+interface StrapiDataResponse<T> {
+  data: T
+}
+
 // ============================================================================
 // FETCH PENDING CLAIMS
 // ============================================================================
 
 export async function getPendingClaims(): Promise<ClaimsResponse> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<StrapiDataResponse<PlayerClaim[]>>(
+    "/player-claims/pending",
+    {},
+    { cache: "no-store" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/player-claims/pending`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      cache: "no-store",
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to fetch claims: ${response.status}`,
-      }
-    }
-
-    const data = await response.json()
-    return {
-      success: true,
-      claims: data.data || [],
-    }
-  } catch (error) {
-    console.error("[Claims] Failed to fetch pending claims:", error)
+  if (!result.ok) {
+    console.error("[Claims] Failed to fetch pending claims:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch claims",
+      error: result.error || "Failed to fetch claims",
     }
+  }
+
+  return {
+    success: true,
+    claims: result.data?.data || [],
   }
 }
 
@@ -98,48 +84,30 @@ export async function approveClaim(
   claimId: string,
   adminNotes?: string
 ): Promise<ClaimActionResponse> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/player-claims/${claimId}/approve`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
+  const result = await strapiFetch<StrapiDataResponse<PlayerClaim>>(
+    "/player-claims/:claimId/approve",
+    { claimId },
+    {
+      method: "PUT",
+      body: {
+        data: {
+          adminNotes: adminNotes || undefined,
         },
-        body: JSON.stringify({
-          data: {
-            adminNotes: adminNotes || undefined,
-          },
-        }),
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to approve claim: ${response.status}`,
-      }
+      },
     }
+  )
 
-    const data = await response.json()
-    return {
-      success: true,
-      claim: data.data,
-    }
-  } catch (error) {
-    console.error("[Claims] Failed to approve claim:", error)
+  if (!result.ok) {
+    console.error("[Claims] Failed to approve claim:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to approve claim",
+      error: result.error || "Failed to approve claim",
     }
+  }
+
+  return {
+    success: true,
+    claim: result.data?.data,
   }
 }
 
@@ -151,47 +119,29 @@ export async function rejectClaim(
   claimId: string,
   adminNotes?: string
 ): Promise<ClaimActionResponse> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/player-claims/${claimId}/reject`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
+  const result = await strapiFetch<StrapiDataResponse<PlayerClaim>>(
+    "/player-claims/:claimId/reject",
+    { claimId },
+    {
+      method: "PUT",
+      body: {
+        data: {
+          adminNotes: adminNotes || undefined,
         },
-        body: JSON.stringify({
-          data: {
-            adminNotes: adminNotes || undefined,
-          },
-        }),
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to reject claim: ${response.status}`,
-      }
+      },
     }
+  )
 
-    const data = await response.json()
-    return {
-      success: true,
-      claim: data.data,
-    }
-  } catch (error) {
-    console.error("[Claims] Failed to reject claim:", error)
+  if (!result.ok) {
+    console.error("[Claims] Failed to reject claim:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to reject claim",
+      error: result.error || "Failed to reject claim",
     }
+  }
+
+  return {
+    success: true,
+    claim: result.data?.data,
   }
 }

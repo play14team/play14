@@ -531,6 +531,7 @@ players/
 7. **Cron Jobs**: Disabled by default - enable with `CRON_ENABLED=true` in production
 8. **File Watching**: Admin panel ignores `config/sync/**`, `bootstrap/md/**`, `bootstrap/json/**`
 9. **Permissions**: Always add permission definitions when creating custom API endpoints - see "Permission Management" section above
+10. **Reserved Field Names**: In Strapi 5, `status` is a reserved field name used internally for draft/publish state. **NEVER** use `status` as a custom field name in content type schemas. Use alternative names like `ticketStatus`, `orderStatus`, `eventStatus`, etc.
 
 ## Reference Documentation
 

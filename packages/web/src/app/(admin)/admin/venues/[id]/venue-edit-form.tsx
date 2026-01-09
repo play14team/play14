@@ -7,11 +7,7 @@ import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import VenueMapPicker, { type MapLocation } from "@/components/admin/venue-map-picker"
 import VenueLogoManager from "@/components/admin/venue-logo-manager"
-import {
-  updateVenue,
-  deleteVenue,
-  type VenueForEdit,
-} from "../venues.action"
+import { updateVenue, deleteVenue, type VenueForEdit } from "../venues.action"
 import { type VenueLogo } from "../logo.action"
 
 interface Props {
@@ -212,17 +208,30 @@ export default function VenueEditForm({ venue }: Props) {
   const getLogoWithUrls = (): VenueLogo | null => {
     if (!venue.logo) return null
     const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
-    const normalizeUrl = (url: string) => url.startsWith("http") ? url : `${baseUrl}${url}`
+    const normalizeUrl = (url: string) => (url.startsWith("http") ? url : `${baseUrl}${url}`)
     return {
       id: venue.logo.id,
       name: venue.logo.name || venue.name,
       url: normalizeUrl(venue.logo.url),
-      formats: venue.logo.formats ? {
-        thumbnail: venue.logo.formats.thumbnail ? { ...venue.logo.formats.thumbnail, url: normalizeUrl(venue.logo.formats.thumbnail.url) } : undefined,
-        small: venue.logo.formats.small ? { ...venue.logo.formats.small, url: normalizeUrl(venue.logo.formats.small.url) } : undefined,
-        medium: venue.logo.formats.medium ? { ...venue.logo.formats.medium, url: normalizeUrl(venue.logo.formats.medium.url) } : undefined,
-        large: venue.logo.formats.large ? { ...venue.logo.formats.large, url: normalizeUrl(venue.logo.formats.large.url) } : undefined,
-      } : undefined,
+      formats: venue.logo.formats
+        ? {
+            thumbnail: venue.logo.formats.thumbnail
+              ? {
+                  ...venue.logo.formats.thumbnail,
+                  url: normalizeUrl(venue.logo.formats.thumbnail.url),
+                }
+              : undefined,
+            small: venue.logo.formats.small
+              ? { ...venue.logo.formats.small, url: normalizeUrl(venue.logo.formats.small.url) }
+              : undefined,
+            medium: venue.logo.formats.medium
+              ? { ...venue.logo.formats.medium, url: normalizeUrl(venue.logo.formats.medium.url) }
+              : undefined,
+            large: venue.logo.formats.large
+              ? { ...venue.logo.formats.large, url: normalizeUrl(venue.logo.formats.large.url) }
+              : undefined,
+          }
+        : undefined,
     }
   }
 
@@ -250,9 +259,7 @@ export default function VenueEditForm({ venue }: Props) {
                   className="admin-input"
                   placeholder="e.g., Hilton Conference Center"
                 />
-                <p className="admin-form-help">
-                  The full name of the venue
-                </p>
+                <p className="admin-form-help">The full name of the venue</p>
               </div>
             </div>
 
@@ -292,9 +299,7 @@ export default function VenueEditForm({ venue }: Props) {
                   className="admin-input"
                   placeholder="e.g., 123 Main Street, Suite 100"
                 />
-                <p className="admin-form-help">
-                  The physical address of the venue
-                </p>
+                <p className="admin-form-help">The physical address of the venue</p>
               </div>
             </div>
           </div>
@@ -333,11 +338,7 @@ export default function VenueEditForm({ venue }: Props) {
               Set the coordinates for this venue on the map.
             </p>
 
-            <VenueMapPicker
-              value={mapLocation}
-              onChange={setMapLocation}
-              height="400px"
-            />
+            <VenueMapPicker value={mapLocation} onChange={setMapLocation} height="400px" />
           </div>
         </div>
 
@@ -356,7 +357,7 @@ export default function VenueEditForm({ venue }: Props) {
               ) : (
                 <>
                   <i className="bx bx-save"></i>
-                  Save Changes
+                  Save changes
                 </>
               )}
             </button>
@@ -368,7 +369,7 @@ export default function VenueEditForm({ venue }: Props) {
                 className="admin-btn admin-btn-danger-outline admin-btn-block"
               >
                 <i className="bx bx-undo"></i>
-                Discard Changes
+                Discard changes
               </button>
             )}
 
@@ -379,14 +380,15 @@ export default function VenueEditForm({ venue }: Props) {
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <i className="bx bx-trash"></i>
-                Delete Venue
+                Delete venue
               </button>
             )}
 
             {!canDelete && (
               <p className="admin-form-help">
                 <i className="bx bx-info-circle"></i>
-                Cannot delete: this venue has {venue.eventsCount} event{venue.eventsCount !== 1 ? "s" : ""} attached.
+                Cannot delete: this venue has {venue.eventsCount} event
+                {venue.eventsCount !== 1 ? "s" : ""} attached.
               </p>
             )}
 

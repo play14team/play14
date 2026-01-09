@@ -1,11 +1,9 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
+import { strapiFetch } from "@/libs/strapi-client"
 import type { TimetableDay } from "./schedule.types"
 import type { MediaLink } from "./media-links.action"
 import type { FinanceData } from "./finance.action"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
 // Types for event editing
 export interface EventForEdit {
@@ -61,8 +59,7 @@ export interface EventForEdit {
     sortOrder: number
     isActive: boolean
   }[]
-  ticketingEnabled?: boolean
-  paymentProvider?: string
+  ticketingMode?: "none" | "internal" | "external"
   stripeAccount?: {
     documentId: string
     stripeAccountId: string
@@ -214,27 +211,24 @@ export interface UpdateEventResult {
   error?: string
 }
 
+interface StrapiDataResponse<T> {
+  data: T
+}
+
 /**
  * Get event data for editing
  */
 export async function getEventForEdit(
   slug: string
 ): Promise<EventForEdit | null> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return null
+  const result = await strapiFetch<StrapiDataResponse<EventForEdit>>(
+    "/events/:slug/edit",
+    { slug },
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/edit`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return null
-    const data = await response.json()
-    return data.data || null
-  } catch {
-    return null
-  }
+  if (!result.ok || !result.data) return null
+  return result.data.data || null
 }
 
 /**
@@ -244,42 +238,25 @@ export async function updateEvent(
   slug: string,
   data: EventUpdateData
 ): Promise<UpdateEventResult> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/edit`, {
+  const result = await strapiFetch<StrapiDataResponse<{ documentId: string; slug: string; name: string }>>(
+    "/events/:slug/edit",
+    { slug },
+    {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error:
-          errorData.error?.message ||
-          `Failed to update event (${response.status})`,
-      }
+      body: { data },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      event: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to update event",
     }
+  }
+
+  return {
+    success: true,
+    event: result.data?.data,
   }
 }
 
@@ -287,78 +264,46 @@ export async function updateEvent(
  * Get available event locations for the dropdown
  */
 export async function getLocations(): Promise<LocationOption[]> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return []
+  const result = await strapiFetch<StrapiDataResponse<LocationOption[]>>(
+    "/events/locations",
+    {},
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/locations`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return []
-    const data = await response.json()
-    return data.data || []
-  } catch {
-    return []
-  }
+  if (!result.ok || !result.data) return []
+  return result.data.data || []
 }
 
 /**
  * Get available venues for the dropdown
  */
 export async function getVenues(): Promise<VenueOption[]> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return []
+  const result = await strapiFetch<StrapiDataResponse<VenueOption[]>>(
+    "/events/venues",
+    {},
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/venues`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return []
-    const data = await response.json()
-    return data.data || []
-  } catch {
-    return []
-  }
+  if (!result.ok || !result.data) return []
+  return result.data.data || []
 }
 
 /**
  * Get available organizers (hosts, mentors, founders) for the dropdown
  */
 export async function getOrganizers(): Promise<OrganizerOption[]> {
-  const jwt = await getAuthCookie()
-  if (!jwt) {
-    console.log("[getOrganizers] No JWT token")
+  const result = await strapiFetch<StrapiDataResponse<OrganizerOption[]>>(
+    "/events/organizers",
+    {},
+    { cache: "no-store" }
+  )
+
+  if (!result.ok || !result.data) {
+    console.log("[getOrganizers] Failed:", result.error)
     return []
   }
 
-  try {
-    const url = `${STRAPI_URL}/api/events/organizers`
-    console.log("[getOrganizers] Fetching from:", url)
-
-    const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    console.log("[getOrganizers] Response status:", response.status)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.log("[getOrganizers] Error response:", errorText)
-      return []
-    }
-
-    const data = await response.json()
-    console.log("[getOrganizers] Got data:", JSON.stringify(data))
-    return data.data || []
-  } catch (error) {
-    console.log("[getOrganizers] Exception:", error)
-    return []
-  }
+  return result.data.data || []
 }
 
 export interface PublishResult {
@@ -371,41 +316,22 @@ export interface PublishResult {
  * Publish a draft event
  */
 export async function publishEvent(slug: string): Promise<PublishResult> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<StrapiDataResponse<{ isPublished: boolean }>>(
+    "/events/:slug/publish",
+    { slug },
+    { method: "POST" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/publish`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error:
-          errorData.error?.message ||
-          `Failed to publish event (${response.status})`,
-      }
-    }
-
-    const responseData = await response.json()
-    return {
-      success: true,
-      isPublished: responseData.data?.isPublished,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to publish event",
     }
+  }
+
+  return {
+    success: true,
+    isPublished: result.data?.data?.isPublished,
   }
 }
 
@@ -413,41 +339,22 @@ export async function publishEvent(slug: string): Promise<PublishResult> {
  * Unpublish an event
  */
 export async function unpublishEvent(slug: string): Promise<PublishResult> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<StrapiDataResponse<{ isPublished: boolean }>>(
+    "/events/:slug/unpublish",
+    { slug },
+    { method: "POST" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/unpublish`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error:
-          errorData.error?.message ||
-          `Failed to unpublish event (${response.status})`,
-      }
-    }
-
-    const responseData = await response.json()
-    return {
-      success: true,
-      isPublished: responseData.data?.isPublished,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to unpublish event",
     }
+  }
+
+  return {
+    success: true,
+    isPublished: result.data?.data?.isPublished,
   }
 }
 
@@ -457,20 +364,12 @@ export async function unpublishEvent(slug: string): Promise<PublishResult> {
 export async function getEventPublishStatus(
   slug: string
 ): Promise<{ isPublished: boolean } | null> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return null
+  const result = await strapiFetch<StrapiDataResponse<{ isPublished: boolean }>>(
+    "/events/:slug/preview",
+    { slug },
+    { cache: "no-store" }
+  )
 
-  try {
-    // Use the preview endpoint to get the publish status
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/preview`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return null
-    const data = await response.json()
-    return { isPublished: data.data?.isPublished ?? false }
-  } catch {
-    return null
-  }
+  if (!result.ok || !result.data) return null
+  return { isPublished: result.data.data?.isPublished ?? false }
 }

@@ -86,7 +86,6 @@ export default function CountrySelector({
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        aria-required={required}
       >
         <div className="country-selector-value">
           {value ? (

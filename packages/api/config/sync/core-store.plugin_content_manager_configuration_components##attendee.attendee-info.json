@@ -1,0 +1,181 @@
+{
+  "key": "plugin_content_manager_configuration_components::attendee.attendee-info",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "firstName",
+      "defaultSortBy": "firstName",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "firstName": {
+        "edit": {
+          "label": "firstName",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "firstName",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "lastName": {
+        "edit": {
+          "label": "lastName",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "lastName",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "email": {
+        "edit": {
+          "label": "email",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "email",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "tshirtSize": {
+        "edit": {
+          "label": "tshirtSize",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "tshirtSize",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "foodPreferences": {
+        "edit": {
+          "label": "foodPreferences",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "foodPreferences",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "photoConsent": {
+        "edit": {
+          "label": "photoConsent",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "photoConsent",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "photoConsentTimestamp": {
+        "edit": {
+          "label": "photoConsentTimestamp",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "photoConsentTimestamp",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "firstName",
+        "lastName",
+        "email"
+      ],
+      "edit": [
+        [
+          {
+            "name": "firstName",
+            "size": 6
+          },
+          {
+            "name": "lastName",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "email",
+            "size": 6
+          },
+          {
+            "name": "tshirtSize",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "foodPreferences",
+            "size": 6
+          },
+          {
+            "name": "photoConsent",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "photoConsentTimestamp",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "attendee.attendee-info",
+    "isComponent": true
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

@@ -27,8 +27,8 @@ export default async function ProfilePage() {
   const isOrganizer = player.position !== "Player"
   const stripeAccount = isOrganizer ? await getStripeAccountStatus() : null
 
-  // Use wide layout for organizers (who see tabs) to have consistent layout
-  const pageClassName = isOrganizer ? "admin-page admin-page-wide" : "admin-page"
+  // Always use wide layout for profile page to accommodate the 3-column header layout
+  const pageClassName = "admin-page admin-page-wide"
 
   return (
     <div className={pageClassName}>

@@ -1,4 +1,5 @@
 import { ThemeProvider } from "@/components/utils/theme-provider"
+import ScrollToTop from "@/components/utils/scroll-to-top"
 import "@/styles/main.scss"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
@@ -47,7 +48,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ScrollToTop />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

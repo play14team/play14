@@ -51,5 +51,43 @@ export default {
         description: "Request refund for an order",
       },
     },
+    {
+      method: "POST",
+      path: "/ticket-orders/:orderId/cancel",
+      handler: "custom-ticket-order.cancelOrder",
+      info: { apiName: "ticket-order", type: "content-api" },
+      config: {
+        auth: false,
+        description: "Cancel a pending order (when user abandons checkout)",
+      },
+    },
+    // Draft order flow - multi-step checkout with attendee information
+    {
+      method: "POST",
+      path: "/ticket-orders/draft",
+      handler: "custom-ticket-order.createDraftOrder",
+      info: { apiName: "ticket-order", type: "content-api" },
+      config: {
+        description: "Create a draft order to collect attendee information",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/ticket-orders/:orderId/attendees",
+      handler: "custom-ticket-order.updateAttendeeInfo",
+      info: { apiName: "ticket-order", type: "content-api" },
+      config: {
+        description: "Update attendee information for a draft order",
+      },
+    },
+    {
+      method: "POST",
+      path: "/ticket-orders/:orderId/checkout",
+      handler: "custom-ticket-order.finalizeCheckout",
+      info: { apiName: "ticket-order", type: "content-api" },
+      config: {
+        description: "Finalize a draft order and create payment session",
+      },
+    },
   ],
 }

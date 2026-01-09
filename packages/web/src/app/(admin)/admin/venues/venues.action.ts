@@ -1,8 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch, strapiFetchWithQuery } from "@/libs/strapi-client"
 
 export interface VenueListItem {
   documentId: string
@@ -69,6 +67,11 @@ export interface VenueForEdit {
   }>
 }
 
+const emptyResponse: VenuesListResponse = {
+  data: [],
+  meta: { pagination: { page: 1, pageSize: 25, pageCount: 0, total: 0 } },
+}
+
 /**
  * Get list of venues with optional search
  */
@@ -77,48 +80,27 @@ export async function getVenues(
   pageSize = 25,
   search?: string
 ): Promise<VenuesListResponse> {
-  const jwt = await getAuthCookie()
-  if (!jwt) {
-    return {
-      data: [],
-      meta: { pagination: { page: 1, pageSize: 25, pageCount: 0, total: 0 } },
-    }
+  const queryParams: Record<string, string> = {
+    page: String(page),
+    pageSize: String(pageSize),
+  }
+  if (search) {
+    queryParams.search = search
   }
 
-  try {
-    const params = new URLSearchParams({
-      page: String(page),
-      pageSize: String(pageSize),
-    })
-    if (search) {
-      params.append("search", search)
-    }
+  const result = await strapiFetchWithQuery<VenuesListResponse>(
+    "/venues/admin",
+    {},
+    queryParams,
+    { cache: "no-store" }
+  )
 
-    const response = await fetch(
-      `${STRAPI_URL}/api/venues/admin?${params.toString()}`,
-      {
-        headers: { Authorization: `Bearer ${jwt}` },
-        cache: "no-store",
-      }
-    )
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`[Venues] Failed to fetch venues: ${response.status} - ${errorText}`)
-      return {
-        data: [],
-        meta: { pagination: { page: 1, pageSize: 25, pageCount: 0, total: 0 } },
-      }
-    }
-
-    const data = await response.json()
-    return data
-  } catch {
-    return {
-      data: [],
-      meta: { pagination: { page: 1, pageSize: 25, pageCount: 0, total: 0 } },
-    }
+  if (!result.ok) {
+    console.error(`[Venues] Failed to fetch venues: ${result.status} - ${result.error}`)
+    return emptyResponse
   }
+
+  return result.data || emptyResponse
 }
 
 /**
@@ -127,24 +109,14 @@ export async function getVenues(
 export async function getVenueForEdit(
   venueId: string
 ): Promise<VenueForEdit | null> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return null
+  const result = await strapiFetch<{ data: VenueForEdit }>(
+    "/venues/admin/:venueId",
+    { venueId },
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/venues/admin/${venueId}`,
-      {
-        headers: { Authorization: `Bearer ${jwt}` },
-        cache: "no-store",
-      }
-    )
-
-    if (!response.ok) return null
-    const data = await response.json()
-    return data.data
-  } catch {
-    return null
-  }
+  if (!result.ok || !result.data) return null
+  return result.data.data
 }
 
 export interface VenueCreateData {
@@ -160,32 +132,23 @@ export interface VenueCreateData {
 export async function createVenue(
   data: VenueCreateData
 ): Promise<{ success: boolean; error?: string; documentId?: string }> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return { success: false, error: "Not authenticated" }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/venues/admin`, {
+  const result = await strapiFetch<{ data: { documentId: string } }>(
+    "/venues/admin",
+    {},
+    {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || "Failed to create venue",
-      }
+      body: { data },
     }
+  )
 
-    const result = await response.json()
-    return { success: true, documentId: result.data.documentId }
-  } catch {
-    return { success: false, error: "Failed to create venue" }
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to create venue",
+    }
   }
+
+  return { success: true, documentId: result.data?.data.documentId }
 }
 
 export interface VenueUpdateData {
@@ -202,34 +165,23 @@ export async function updateVenue(
   venueId: string,
   data: VenueUpdateData
 ): Promise<{ success: boolean; error?: string }> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return { success: false, error: "Not authenticated" }
-
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/venues/admin/${venueId}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data }),
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || "Failed to update venue",
-      }
+  const result = await strapiFetch(
+    "/venues/admin/:venueId",
+    { venueId },
+    {
+      method: "PUT",
+      body: { data },
     }
+  )
 
-    return { success: true }
-  } catch {
-    return { success: false, error: "Failed to update venue" }
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to update venue",
+    }
   }
+
+  return { success: true }
 }
 
 /**
@@ -238,30 +190,18 @@ export async function updateVenue(
 export async function deleteVenue(
   venueId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return { success: false, error: "Not authenticated" }
+  const result = await strapiFetch(
+    "/venues/admin/:venueId",
+    { venueId },
+    { method: "DELETE" }
+  )
 
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/venues/admin/${venueId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || "Failed to delete venue",
-      }
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to delete venue",
     }
-
-    return { success: true }
-  } catch {
-    return { success: false, error: "Failed to delete venue" }
   }
+
+  return { success: true }
 }

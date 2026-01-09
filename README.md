@@ -65,13 +65,14 @@ podman-compose up
 
 Available services:
 
-| Service       | Port | Description              |
-| ------------- | ---- | ------------------------ |
-| `play14-api`  | 1337 | Strapi API               |
-| `play14-db`   | 5432 | PostgreSQL database      |
-| `pgadmin`     | 5050 | Database admin UI        |
-| `play14-web`  | 3000 | Next.js frontend         |
-| `design`      | 8080 | Storybook                |
+| Service          | Port | Description                    |
+| ---------------- | ---- | ------------------------------ |
+| `play14-api`     | 1337 | Strapi API                     |
+| `play14-db`      | 5432 | PostgreSQL database            |
+| `pgadmin`        | 5050 | Database admin UI              |
+| `play14-web`     | 3000 | Next.js frontend               |
+| `design`         | 8080 | Storybook                      |
+| `stripe-webhook` | -    | Stripe CLI webhook forwarder   |
 
 ## Package Commands
 

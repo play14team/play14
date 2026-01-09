@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react"
 import Link from "next/link"
-import { getMyEvents, type MyEvent } from "./my-events.action"
+import { getMyEvents, type MyEvent } from "./events.action"
 import {
   publishEvent,
   unpublishEvent,

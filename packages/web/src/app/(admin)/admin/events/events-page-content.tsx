@@ -123,29 +123,6 @@ export default function EventsPageContent({ user }: EventsPageContentProps) {
               </Link>
             </div>
 
-            <div className="events-sidebar-section">
-              <h4>Event Stats</h4>
-              <div className="events-sidebar-stats">
-                {counts.organized !== undefined && (
-                  <div className="events-sidebar-stat">
-                    <span className="stat-value">{counts.organized}</span>
-                    <span className="stat-label">Organized</span>
-                  </div>
-                )}
-                {counts.attended !== undefined && (
-                  <div className="events-sidebar-stat">
-                    <span className="stat-value">{counts.attended}</span>
-                    <span className="stat-label">Attended</span>
-                  </div>
-                )}
-                {counts.pendingClaims !== undefined && counts.pendingClaims > 0 && (
-                  <div className="events-sidebar-stat pending">
-                    <span className="stat-value">{counts.pendingClaims}</span>
-                    <span className="stat-label">Pending Claims</span>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       )}

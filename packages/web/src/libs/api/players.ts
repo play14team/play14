@@ -1,10 +1,7 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-import { restQuery } from "@/libs/strapi-client"
+import { restQuery, strapiFetch, strapiFetchFormData } from "@/libs/strapi-client"
 import type { Player, SocialNetwork, UploadFile, GeoLocation } from "@/models/strapi"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
 /**
  * Player edit populate configuration
@@ -64,42 +61,21 @@ export async function getPlayerByDocumentId(
 export async function uploadPlayerPicture(
   file: File
 ): Promise<{ success: boolean; error?: string; player?: PlayerProfile }> {
-  const jwt = await getAuthCookie()
+  const formData = new FormData()
+  formData.append("files", file)
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
+  const result = await strapiFetchFormData<{ data: PlayerProfile }>(
+    "/players/me/picture",
+    {},
+    formData
+  )
+
+  if (!result.ok) {
+    console.error("[PlayerPicture] Upload failed:", result.error)
+    return { success: false, error: result.error || "Failed to upload picture" }
   }
 
-  try {
-    const formData = new FormData()
-    formData.append("files", file)
-
-    const response = await fetch(`${STRAPI_URL}/api/players/me/picture`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: formData,
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      const errorMessage =
-        errorData?.error?.message ||
-        `Failed to upload picture (${response.status})`
-      console.error("[PlayerPicture] Upload failed:", errorMessage, errorData)
-      return { success: false, error: errorMessage }
-    }
-
-    const responseData = await response.json()
-    return { success: true, player: responseData.data as PlayerProfile }
-  } catch (error) {
-    console.error("[PlayerPicture] Upload error:", error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    }
-  }
+  return { success: true, player: result.data?.data }
 }
 
 /**
@@ -110,36 +86,16 @@ export async function deletePlayerPicture(): Promise<{
   error?: string
   player?: PlayerProfile
 }> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<{ data: PlayerProfile }>(
+    "/players/me/picture",
+    {},
+    { method: "DELETE" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
+  if (!result.ok) {
+    console.error("[PlayerPicture] Delete failed:", result.error)
+    return { success: false, error: result.error || "Failed to delete picture" }
   }
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/players/me/picture`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      const errorMessage =
-        errorData?.error?.message ||
-        `Failed to delete picture (${response.status})`
-      console.error("[PlayerPicture] Delete failed:", errorMessage, errorData)
-      return { success: false, error: errorMessage }
-    }
-
-    const responseData = await response.json()
-    return { success: true, player: responseData.data as PlayerProfile }
-  } catch (error) {
-    console.error("[PlayerPicture] Delete error:", error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    }
-  }
+  return { success: true, player: result.data?.data }
 }

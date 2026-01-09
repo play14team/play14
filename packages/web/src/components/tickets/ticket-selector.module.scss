@@ -137,6 +137,29 @@
   padding-top: 1.5rem;
 }
 
+.subtotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+.discountRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+}
+
+.discountAmount {
+  color: var(--color-success);
+  font-weight: 500;
+}
+
 .total {
   display: flex;
   justify-content: space-between;
@@ -150,6 +173,30 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text);
+}
+
+.authStatus {
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+
+.authWarning {
+  color: var(--color-warning);
+  background: rgba(var(--color-warning-rgb), 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.authReady {
+  color: var(--color-success);
+  background: rgba(var(--color-success-rgb), 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
 }
 
 .purchaseButton {

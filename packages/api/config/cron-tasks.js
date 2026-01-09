@@ -7,6 +7,157 @@
  * is independent and doesn't depend on the order of execution.
  */
 module.exports = {
+  /**
+   * Clean up expired pending ticket orders and release reservations
+   * Stripe checkout sessions expire after 30 minutes by default
+   * This job runs every 5 minutes to clean up abandoned orders and release ticket reservations
+   */
+  cleanExpiredTicketOrders: {
+    task: async ({ strapi }) => {
+      console.log("Running expired ticket orders cleanup job");
+      const apiName = "api::ticket-order.ticket-order";
+      const ticketTypeApi = "api::ticket-type.ticket-type";
+
+      const now = new Date();
+      // Fallback: Orders older than 30 minutes that are still pending
+      const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+      // Find orders that are expired either by:
+      // 1. reservationExpiresAt has passed (explicit Stripe session expiry)
+      // 2. createdAt is older than 30 minutes (fallback for orders without explicit expiry)
+      const expiredOrders = await strapi.documents(apiName).findMany({
+        filters: {
+          status: "pending",
+          $or: [
+            { reservationExpiresAt: { $lt: now.toISOString() } },
+            {
+              reservationExpiresAt: { $null: true },
+              createdAt: { $lt: thirtyMinutesAgo.toISOString() },
+            },
+          ],
+        },
+      });
+
+      console.log("Expired pending orders found:", expiredOrders.length);
+
+      // Process each order sequentially to properly release reservations
+      for (const order of expiredOrders) {
+        console.log(`Processing expired order ${order.orderNumber}`);
+
+        // Release reservations if order has them
+        if (order.hasReservation) {
+          const ticketDetails = order.ticketDetails || [];
+
+          for (const detail of ticketDetails) {
+            const ticketType = await strapi.documents(ticketTypeApi).findOne({
+              documentId: detail.ticketTypeId,
+            });
+
+            if (ticketType) {
+              const newReservedCount = Math.max(
+                0,
+                (ticketType.reservedCount || 0) - detail.quantity
+              );
+
+              await strapi.documents(ticketTypeApi).update({
+                documentId: detail.ticketTypeId,
+                data: { reservedCount: newReservedCount },
+              });
+
+              console.log(
+                `Released ${detail.quantity} reservations for ticket type ${detail.ticketTypeId} (new reserved: ${newReservedCount})`
+              );
+            }
+          }
+        }
+
+        // Mark order as expired and clear reservation flags
+        await strapi.documents(apiName).update({
+          documentId: order.documentId,
+          data: {
+            status: "expired",
+            hasReservation: false,
+            reservationCreatedAt: null,
+            reservationExpiresAt: null,
+          },
+        });
+
+        console.log(`Order ${order.orderNumber} marked as expired`);
+      }
+    },
+    options: {
+      // Every 5 minutes for faster reservation cleanup
+      rule: "0 */5 * * * *",
+    },
+  },
+
+  /**
+   * Health check for reservation count drift
+   * Detects if reservedCount on ticket types doesn't match actual pending reservations
+   * This can happen if orders are manually modified or if there are bugs
+   * Runs daily and logs warnings (does not auto-fix to avoid data loss)
+   */
+  reservationHealthCheck: {
+    task: async ({ strapi }) => {
+      console.log("Running reservation health check");
+      const orderApiName = "api::ticket-order.ticket-order";
+      const ticketTypeApiName = "api::ticket-type.ticket-type";
+
+      // Find all ticket types with non-zero reservedCount
+      const ticketTypesWithReservations = await strapi
+        .documents(ticketTypeApiName)
+        .findMany({
+          filters: {
+            reservedCount: { $gt: 0 },
+          },
+        });
+
+      if (ticketTypesWithReservations.length === 0) {
+        console.log("No ticket types with reservations to check");
+        return;
+      }
+
+      // For each ticket type, calculate expected reservations from pending orders
+      for (const ticketType of ticketTypesWithReservations) {
+        // Find all pending orders with reservations for this ticket type
+        const ordersWithReservation = await strapi
+          .documents(orderApiName)
+          .findMany({
+            filters: {
+              status: "pending",
+              hasReservation: true,
+            },
+          });
+
+        // Sum up reserved quantities for this ticket type
+        let expectedReserved = 0;
+        for (const order of ordersWithReservation) {
+          const ticketDetails = order.ticketDetails || [];
+          for (const detail of ticketDetails) {
+            if (detail.ticketTypeId === ticketType.documentId) {
+              expectedReserved += detail.quantity;
+            }
+          }
+        }
+
+        const actualReserved = ticketType.reservedCount || 0;
+        const drift = actualReserved - expectedReserved;
+
+        if (drift !== 0) {
+          console.warn(
+            `[Reservation Drift] Ticket type ${ticketType.documentId} (${ticketType.name}): ` +
+              `actual=${actualReserved}, expected=${expectedReserved}, drift=${drift}`
+          );
+        }
+      }
+
+      console.log("Reservation health check completed");
+    },
+    options: {
+      // Daily at 01:00
+      rule: "0 0 1 * * *",
+    },
+  },
   eventStatus: {
     task: async ({ strapi }) => {
       const now = new Date();

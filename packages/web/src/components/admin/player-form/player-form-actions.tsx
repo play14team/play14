@@ -66,7 +66,7 @@ export default function PlayerFormActions({
           {demoteTarget && (
             <button
               type="button"
-              className="admin-btn admin-btn-warning admin-btn-block"
+              className="admin-btn admin-btn-danger admin-btn-block"
               onClick={onDemote}
               disabled={isPositionUpdating}
             >
@@ -89,8 +89,10 @@ export default function PlayerFormActions({
           target="_blank"
         >
           <i className="bx bx-link-external"></i>
-          View Public Profile
+          View public profile
         </Link>
+
+        <hr />
 
         <button
           type="submit"
@@ -105,7 +107,7 @@ export default function PlayerFormActions({
           ) : (
             <>
               <i className="bx bx-save"></i>
-              Save Changes
+              Save changes
             </>
           )}
         </button>
@@ -117,7 +119,7 @@ export default function PlayerFormActions({
             className="admin-btn admin-btn-danger-outline admin-btn-block"
           >
             <i className="bx bx-undo"></i>
-            Discard Changes
+            Discard changes
           </button>
         )}
       </div>

@@ -77,11 +77,11 @@ services:
   stripe-webhook:
     container_name: stripe-webhook
     image: docker.io/stripe/stripe-cli:latest
-    command: listen --forward-to http://play14-api:1337/api/ticket-orders/webhook
-    environment:
-      - STRIPE_API_KEY=${STRIPE_SECRET_KEY}
-    networks:
-      - play14-api
+    entrypoint: /bin/sh
+    command: ["-c", "stripe listen --forward-to http://localhost:1337/api/webhooks/stripe --api-key $$STRIPE_SECRET_KEY"]
+    env_file:
+      - packages/api/.env
+    network_mode: host
     restart: unless-stopped
 
   play14-web:

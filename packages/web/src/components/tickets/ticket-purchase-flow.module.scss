@@ -42,3 +42,96 @@
     color: var(--color-danger);
   }
 }
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  transition: all 0.2s;
+
+  &.active {
+    background: var(--color-primary);
+    color: var(--color-text-inverse);
+
+    .stepNumber {
+      background: rgba(255, 255, 255, 0.2);
+      color: inherit;
+    }
+  }
+
+  &.completed {
+    color: var(--color-success);
+
+    .stepNumber {
+      background: var(--color-success);
+      color: var(--color-text-inverse);
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 0.5rem;
+
+    .stepLabel {
+      display: none;
+    }
+  }
+}
+
+.stepNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--color-border);
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.stepLabel {
+  font-weight: 500;
+}
+
+.stepDivider {
+  width: 30px;
+  height: 2px;
+  background: var(--color-border);
+
+  @media (max-width: 600px) {
+    width: 20px;
+  }
+}
+
+.processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  color: var(--color-text-secondary);
+
+  p {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+  }
+}

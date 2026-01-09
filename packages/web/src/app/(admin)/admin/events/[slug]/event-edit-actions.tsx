@@ -25,9 +25,7 @@ export default function EventEditActions({
     <div className="event-edit-actions">
       {/* Publication Status */}
       <div className="action-status">
-        <span
-          className={`publication-badge ${isPublished ? "published" : "draft"}`}
-        >
+        <span className={`publication-badge ${isPublished ? "published" : "draft"}`}>
           {isPublished ? (
             <>
               <i className="bx bx-check-circle"></i>
@@ -41,27 +39,38 @@ export default function EventEditActions({
           )}
         </span>
         <p className="status-description">
-          {isPublished
-            ? "This event is visible to the public."
-            : "Only visible to organizers."}
+          {isPublished ? "This event is visible to the public." : "Only visible to organizers."}
         </p>
       </div>
 
       {/* Action Buttons */}
       <div className="action-buttons">
-        <Link
-          href={`/admin/events/${eventSlug}/preview`}
-          className="admin-btn admin-btn-secondary admin-btn-block"
-        >
-          <i className="bx bx-show"></i>
-          Preview
-        </Link>
+        {!isPublished && (
+          <Link
+            href={`/admin/events/${eventSlug}/preview`}
+            className="admin-btn admin-btn-secondary admin-btn-block"
+          >
+            <i className="bx bx-show"></i>
+            Preview
+          </Link>
+        )}
+
+        {isPublished && (
+          <Link
+            href={`/events/${eventSlug}`}
+            className="admin-btn admin-btn-secondary admin-btn-block"
+            target="_blank"
+          >
+            <i className="bx bx-link-external"></i>
+            View public page
+          </Link>
+        )}
 
         <button
           type="button"
           onClick={onPublishToggle}
           disabled={isPublishing}
-          className={`admin-btn admin-btn-block ${isPublished ? "admin-btn-warning" : "admin-btn-success"}`}
+          className={`admin-btn admin-btn-block ${isPublished ? "admin-btn-danger" : "admin-btn-success"}`}
         >
           {isPublishing ? (
             <>
@@ -81,6 +90,8 @@ export default function EventEditActions({
           )}
         </button>
 
+        <hr />
+
         <button
           type="submit"
           disabled={isSubmitting}
@@ -94,7 +105,7 @@ export default function EventEditActions({
           ) : (
             <>
               <i className="bx bx-save"></i>
-              Save Changes
+              Save changes
             </>
           )}
         </button>
@@ -106,19 +117,8 @@ export default function EventEditActions({
             className="admin-btn admin-btn-danger-outline admin-btn-block"
           >
             <i className="bx bx-undo"></i>
-            Discard Changes
+            Discard changes
           </button>
-        )}
-
-        {isPublished && (
-          <Link
-            href={`/events/${eventSlug}`}
-            className="admin-btn admin-btn-secondary admin-btn-block"
-            target="_blank"
-          >
-            <i className="bx bx-link-external"></i>
-            View Public Page
-          </Link>
         )}
       </div>
 

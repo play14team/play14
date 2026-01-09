@@ -97,7 +97,7 @@ export default async function TicketSuccessPage({ params, searchParams }: Succes
           <Link href={`/events/${resolvedParams.slug}`} className={styles.button}>
             Return to Event
           </Link>
-          <Link href="/account/tickets" className={styles.buttonSecondary}>
+          <Link href="/admin/tickets" className={styles.buttonSecondary}>
             View All My Tickets
           </Link>
         </div>

@@ -47,6 +47,10 @@ jobs:
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: bun run typecheck
 
+      - name: Run tests
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: bun run test
+
   build-pr:
     name: Build PR Image
     runs-on: ubuntu-latest

@@ -44,6 +44,12 @@ export default function TermsOfService() {
             the country or region where the event is organized. The currency,
             ticket prices and fees will be adapted accordingly.
           </p>
+          <p>
+            For online ticket purchases made through our website, please refer to our{" "}
+            <a href="/terms-of-sale">General Terms and Conditions of Sale</a> for
+            detailed information about the purchase process, refunds, and attendee
+            requirements.
+          </p>
         </div>
         <div className="pt-5">
           <h2>4. Refund Policy</h2>

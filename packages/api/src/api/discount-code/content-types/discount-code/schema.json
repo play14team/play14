@@ -1,0 +1,73 @@
+{
+  "kind": "collectionType",
+  "collectionName": "discount_codes",
+  "info": {
+    "singularName": "discount-code",
+    "pluralName": "discount-codes",
+    "displayName": "Discount Code",
+    "description": "Promotional discount codes for event tickets"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "code": {
+      "type": "string",
+      "required": true,
+      "minLength": 3,
+      "maxLength": 50
+    },
+    "discountType": {
+      "type": "enumeration",
+      "enum": ["percentage", "fixed"],
+      "required": true,
+      "default": "percentage"
+    },
+    "discountValue": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "maxUses": {
+      "type": "integer",
+      "min": 0
+    },
+    "usedCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "validFrom": {
+      "type": "datetime"
+    },
+    "validUntil": {
+      "type": "datetime"
+    },
+    "minOrderAmount": {
+      "type": "decimal",
+      "min": 0
+    },
+    "maxDiscountAmount": {
+      "type": "decimal",
+      "min": 0
+    },
+    "isActive": {
+      "type": "boolean",
+      "default": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "discountCodes"
+    },
+    "createdByPlayer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    }
+  }
+}

@@ -530,8 +530,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         venue: venueNumericId,
         hosts: [player.id],
         timetable: timetable,
-        ticketingEnabled: false,
-        paymentProvider: "none",
+        ticketingMode: "none",
       } as any,
       status: "draft",
     })
@@ -603,6 +602,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             "payoutsEnabled",
           ],
         },
+        registration: {
+          fields: ["id", "link", "widgetCode"],
+        },
         finance: true,
         media: true,
         defaultImage: true,
@@ -643,9 +645,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       status: "published",
     })
 
+    // Compute ticketingMode for backwards compatibility
+    // If explicitly set to internal or external, use it; otherwise derive from legacy fields
+    let ticketingMode = (event as any).ticketingMode
+    if (ticketingMode !== "internal" && ticketingMode !== "external") {
+      // Derive from legacy fields for existing events or when mode is "none"
+      if ((event as any).stripeAccount) {
+        ticketingMode = "internal"
+      } else if ((event as any).registration?.link || (event as any).registration?.widgetCode) {
+        ticketingMode = "external"
+      } else {
+        ticketingMode = "none"
+      }
+    }
+
     return ctx.send({
       data: {
         ...event,
+        ticketingMode,
         isPublished: !!publishedEvent,
       },
     })
@@ -794,27 +811,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Handle ticketing mode
     if (requestData.ticketingMode !== undefined) {
       const mode = requestData.ticketingMode
-      if (mode === "internal") {
-        updateData.ticketingEnabled = true
-        updateData.paymentProvider = "stripe"
-        // Clear external registration
-        updateData.registration = { link: null, widgetCode: null }
-      } else if (mode === "external") {
-        updateData.ticketingEnabled = false
-        updateData.paymentProvider = "none"
-        // Set external registration if provided
-        if (requestData.registration) {
-          updateData.registration = {
-            link: requestData.registration.link || null,
-            widgetCode: requestData.registration.widgetCode || null,
-          }
+      updateData.ticketingMode = mode
+      // Only update registration data when in external mode
+      // Preserve existing registration data when switching modes to allow toggling
+      if (mode === "external" && requestData.registration) {
+        updateData.registration = {
+          link: requestData.registration.link || null,
+          widgetCode: requestData.registration.widgetCode || null,
         }
-      } else {
-        // mode === "none"
-        updateData.ticketingEnabled = false
-        updateData.paymentProvider = "none"
-        updateData.registration = { link: null, widgetCode: null }
       }
+      // Note: We don't clear registration data when switching away from external
+      // This allows users to switch back without losing their configuration
     }
 
     // Handle sponsorships update
@@ -888,10 +895,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     }
 
-    // Update the event
+    // Update the event (publish immediately if already published)
+    // Check if event is currently published
+    const publishedEvent = await strapi.documents("api::event.event").findFirst({
+      filters: { documentId: { $eq: event.documentId } },
+      fields: ["documentId"],
+      status: "published",
+    })
+
     const updated = await strapi.documents("api::event.event").update({
       documentId: event.documentId,
       data: updateData,
+      status: publishedEvent ? "published" : "draft",
     })
 
     strapi.log.info(
@@ -1130,9 +1145,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       status: "published",
     })
 
+    // Compute ticketingMode for backwards compatibility
+    // If explicitly set to internal or external, use it; otherwise derive from legacy fields
+    let ticketingMode = (event as any).ticketingMode
+    if (ticketingMode !== "internal" && ticketingMode !== "external") {
+      // Derive from legacy fields for existing events or when mode is "none"
+      if ((event as any).stripeAccount) {
+        ticketingMode = "internal"
+      } else if ((event as any).registration?.link || (event as any).registration?.widgetCode) {
+        ticketingMode = "external"
+      } else {
+        ticketingMode = "none"
+      }
+    }
+
     return ctx.send({
       data: {
         ...event,
+        ticketingMode,
         isPublished: !!publishedEvent,
         isDraft: !publishedEvent,
       },
@@ -1933,5 +1963,530 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       strapi.log.error(`[Event] Update sponsorships failed: ${error}`)
       return ctx.badRequest("Failed to update sponsorships")
     }
+  },
+
+  /**
+   * Get revenue analytics for an event
+   * Aggregates ticket order data for dashboards
+   */
+  async getRevenueAnalytics(ctx) {
+    const user = ctx.state.user
+    const { eventId } = ctx.params
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Find the event and verify organizer access
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+        ticketTypes: { fields: ["documentId", "name", "price", "currency"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    // Verify organizer access
+    const isHost = (event as any).hosts?.some(
+      (h: any) => h.documentId === player.documentId
+    )
+    const isMentor = (event as any).mentors?.some(
+      (m: any) => m.documentId === player.documentId
+    )
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to view this event's revenue analytics")
+    }
+
+    // Fetch all orders for this event
+    const orders = await strapi.documents("api::ticket-order.ticket-order").findMany({
+      filters: {
+        event: { documentId: eventId },
+      },
+      populate: {
+        tickets: { fields: ["documentId"] },
+        discountCode: { fields: ["documentId", "code"] },
+      },
+    })
+
+    // Initialize aggregation data
+    const statusCounts: Record<string, { count: number; amount: number }> = {
+      pending: { count: 0, amount: 0 },
+      paid: { count: 0, amount: 0 },
+      cancelled: { count: 0, amount: 0 },
+      refunded: { count: 0, amount: 0 },
+      partially_refunded: { count: 0, amount: 0 },
+      expired: { count: 0, amount: 0 },
+    }
+
+    const ticketTypeRevenue: Record<string, { name: string; price: number; quantity: number; revenue: number }> = {}
+    const timelineData: Record<string, { orders: number; revenue: number }> = {}
+
+    let totalRevenue = 0
+    let totalRefunded = 0
+    let totalTickets = 0
+    let totalDiscounted = 0
+    let codesUsedCount = 0
+    let currency = "EUR"
+
+    // Process each order
+    for (const order of orders as any[]) {
+      const status = order.status || "pending"
+      const amount = order.totalAmount || 0
+      currency = order.currency || currency
+
+      // Aggregate by status
+      if (statusCounts[status]) {
+        statusCounts[status].count++
+        statusCounts[status].amount += amount
+      }
+
+      // Only count paid orders for revenue
+      if (status === "paid" || status === "partially_refunded") {
+        totalRevenue += amount
+        totalTickets += order.tickets?.length || 0
+
+        // Track discount usage
+        if (order.discountAmount && order.discountAmount > 0) {
+          totalDiscounted += order.discountAmount
+          if (order.discountCode) {
+            codesUsedCount++
+          }
+        }
+
+        // Aggregate by date (for timeline)
+        if (order.paidAt) {
+          const dateKey = order.paidAt.split("T")[0] // YYYY-MM-DD
+          if (!timelineData[dateKey]) {
+            timelineData[dateKey] = { orders: 0, revenue: 0 }
+          }
+          timelineData[dateKey].orders++
+          timelineData[dateKey].revenue += amount
+        }
+
+        // Aggregate by ticket type (from ticketDetails JSON)
+        const ticketDetails = order.ticketDetails || []
+        for (const detail of ticketDetails) {
+          const typeId = detail.ticketTypeId
+          if (!ticketTypeRevenue[typeId]) {
+            ticketTypeRevenue[typeId] = {
+              name: detail.ticketTypeName || "Unknown",
+              price: detail.unitPrice || 0,
+              quantity: 0,
+              revenue: 0,
+            }
+          }
+          ticketTypeRevenue[typeId].quantity += detail.quantity || 0
+          ticketTypeRevenue[typeId].revenue += (detail.unitPrice || 0) * (detail.quantity || 0)
+        }
+      }
+
+      // Track refunds
+      if (status === "refunded" || status === "partially_refunded") {
+        totalRefunded += order.refundAmount || 0
+      }
+    }
+
+    // Calculate summary metrics
+    const paidOrderCount = statusCounts.paid.count + statusCounts.partially_refunded.count
+    const averageOrderValue = paidOrderCount > 0 ? totalRevenue / paidOrderCount : 0
+    const netRevenue = totalRevenue - totalRefunded
+
+    // Convert timeline to sorted array
+    const timeline = Object.entries(timelineData)
+      .map(([date, data]) => ({ date, ...data }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+
+    // Convert ticket type revenue to array
+    const byTicketType = Object.entries(ticketTypeRevenue)
+      .map(([ticketTypeId, data]) => ({
+        ticketTypeId,
+        ticketTypeName: data.name,
+        price: data.price,
+        quantity: data.quantity,
+        revenue: data.revenue,
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+
+    return ctx.send({
+      data: {
+        summary: {
+          totalRevenue: Math.round(totalRevenue * 100) / 100,
+          totalRefunded: Math.round(totalRefunded * 100) / 100,
+          netRevenue: Math.round(netRevenue * 100) / 100,
+          totalOrders: paidOrderCount,
+          totalTickets,
+          averageOrderValue: Math.round(averageOrderValue * 100) / 100,
+          currency,
+        },
+        byStatus: statusCounts,
+        byTicketType,
+        timeline,
+        discountUsage: {
+          totalDiscounted: Math.round(totalDiscounted * 100) / 100,
+          codesUsed: codesUsedCount,
+        },
+      },
+    })
+  },
+
+  /**
+   * Get participants (tickets) for an event (organizer only)
+   */
+  async getParticipants(ctx) {
+    const user = ctx.state.user
+    const { eventId } = ctx.params
+    const { page = 1, pageSize = 50 } = ctx.request.query
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Find the event and verify organizer access
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    // Verify organizer access
+    const isHost = (event as any).hosts?.some(
+      (h: any) => h.documentId === player.documentId
+    )
+    const isMentor = (event as any).mentors?.some(
+      (m: any) => m.documentId === player.documentId
+    )
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to view participants for this event")
+    }
+
+    // Fetch participants (tickets) for this event with valid/used status
+    const tickets = await strapi.documents("api::ticket.ticket").findMany({
+      filters: {
+        event: { documentId: eventId },
+        ticketStatus: { $in: ["valid", "used"] },
+      },
+      populate: {
+        ticketType: { fields: ["documentId", "name"] },
+        order: {
+          fields: ["documentId", "orderNumber", "purchaserName", "purchaserEmail", "status", "paidAt"],
+        },
+        attendeeInfo: true,
+      },
+      sort: { createdAt: "desc" },
+      start: (parseInt(page as string, 10) - 1) * parseInt(pageSize as string, 10),
+      limit: parseInt(pageSize as string, 10),
+    })
+
+    // Get total count for pagination
+    const totalTickets = await strapi.documents("api::ticket.ticket").findMany({
+      filters: {
+        event: { documentId: eventId },
+        ticketStatus: { $in: ["valid", "used"] },
+      },
+      fields: ["documentId"],
+    })
+
+    const total = totalTickets.length
+    const pageNum = parseInt(page as string, 10)
+    const pageSizeNum = parseInt(pageSize as string, 10)
+
+    return ctx.send({
+      data: {
+        participants: tickets.map((ticket: any) => ({
+          documentId: ticket.documentId,
+          ticketCode: ticket.ticketCode,
+          ticketStatus: ticket.ticketStatus,
+          attendeeName: ticket.attendeeName,
+          attendeeEmail: ticket.attendeeEmail,
+          attendeeInfo: ticket.attendeeInfo,
+          checkedInAt: ticket.checkedInAt,
+          ticketType: ticket.ticketType
+            ? { documentId: ticket.ticketType.documentId, name: ticket.ticketType.name }
+            : null,
+          order: ticket.order
+            ? {
+                documentId: ticket.order.documentId,
+                orderNumber: ticket.order.orderNumber,
+                purchaserName: ticket.order.purchaserName,
+                purchaserEmail: ticket.order.purchaserEmail,
+                status: ticket.order.status,
+                paidAt: ticket.order.paidAt,
+              }
+            : null,
+          createdAt: ticket.createdAt,
+        })),
+        pagination: {
+          page: pageNum,
+          pageSize: pageSizeNum,
+          pageCount: Math.ceil(total / pageSizeNum),
+          total,
+        },
+      },
+    })
+  },
+
+  /**
+   * Get participant statistics for an event (organizer only)
+   */
+  async getParticipantStats(ctx) {
+    const user = ctx.state.user
+    const { eventId } = ctx.params
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Find the event and verify organizer access
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    // Verify organizer access
+    const isHost = (event as any).hosts?.some(
+      (h: any) => h.documentId === player.documentId
+    )
+    const isMentor = (event as any).mentors?.some(
+      (m: any) => m.documentId === player.documentId
+    )
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to view participant stats for this event")
+    }
+
+    // Get total valid/used tickets
+    const totalTickets = await strapi.documents("api::ticket.ticket").findMany({
+      filters: {
+        event: { documentId: eventId },
+        ticketStatus: { $in: ["valid", "used"] },
+      },
+      fields: ["documentId"],
+    })
+
+    // Get checked-in tickets
+    const checkedInTickets = await strapi.documents("api::ticket.ticket").findMany({
+      filters: {
+        event: { documentId: eventId },
+        ticketStatus: { $eq: "used" },
+      },
+      fields: ["documentId"],
+    })
+
+    const total = totalTickets.length
+    const checkedIn = checkedInTickets.length
+
+    return ctx.send({
+      data: {
+        total,
+        checkedIn,
+        pending: total - checkedIn,
+      },
+    })
+  },
+
+  /**
+   * Check in a participant (organizer only)
+   */
+  async checkInParticipant(ctx) {
+    const user = ctx.state.user
+    const { eventId, ticketId } = ctx.params
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Find the event and verify organizer access
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    // Verify organizer access
+    const isHost = (event as any).hosts?.some(
+      (h: any) => h.documentId === player.documentId
+    )
+    const isMentor = (event as any).mentors?.some(
+      (m: any) => m.documentId === player.documentId
+    )
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to check in participants for this event")
+    }
+
+    // Find the ticket and verify it belongs to this event
+    const ticket = await strapi.documents("api::ticket.ticket").findOne({
+      documentId: ticketId,
+      populate: {
+        event: { fields: ["documentId"] },
+      },
+    })
+
+    if (!ticket) {
+      return ctx.notFound("Ticket not found")
+    }
+
+    if ((ticket as any).event?.documentId !== eventId) {
+      return ctx.badRequest("Ticket does not belong to this event")
+    }
+
+    if (ticket.ticketStatus !== "valid") {
+      return ctx.badRequest(`Cannot check in ticket with status: ${ticket.ticketStatus}`)
+    }
+
+    // Update ticket to checked in
+    const updated = await strapi.documents("api::ticket.ticket").update({
+      documentId: ticketId,
+      data: {
+        ticketStatus: "used",
+        checkedInAt: new Date().toISOString(),
+      } as any,
+    })
+
+    strapi.log.info(
+      `[Event] Participant checked in for "${event.name}" by ${player.name}: ${ticket.ticketCode}`
+    )
+
+    return ctx.send({
+      data: {
+        documentId: updated.documentId,
+        ticketStatus: updated.ticketStatus,
+        checkedInAt: (updated as any).checkedInAt,
+      },
+    })
+  },
+
+  /**
+   * Undo check-in for a participant (organizer only)
+   */
+  async undoCheckIn(ctx) {
+    const user = ctx.state.user
+    const { eventId, ticketId } = ctx.params
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Find the event and verify organizer access
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    // Verify organizer access
+    const isHost = (event as any).hosts?.some(
+      (h: any) => h.documentId === player.documentId
+    )
+    const isMentor = (event as any).mentors?.some(
+      (m: any) => m.documentId === player.documentId
+    )
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to manage participants for this event")
+    }
+
+    // Find the ticket and verify it belongs to this event
+    const ticket = await strapi.documents("api::ticket.ticket").findOne({
+      documentId: ticketId,
+      populate: {
+        event: { fields: ["documentId"] },
+      },
+    })
+
+    if (!ticket) {
+      return ctx.notFound("Ticket not found")
+    }
+
+    if ((ticket as any).event?.documentId !== eventId) {
+      return ctx.badRequest("Ticket does not belong to this event")
+    }
+
+    if (ticket.ticketStatus !== "used") {
+      return ctx.badRequest(`Cannot undo check-in for ticket with status: ${ticket.ticketStatus}`)
+    }
+
+    // Update ticket to valid (undo check-in)
+    const updated = await strapi.documents("api::ticket.ticket").update({
+      documentId: ticketId,
+      data: {
+        ticketStatus: "valid",
+        checkedInAt: null,
+      } as any,
+    })
+
+    strapi.log.info(
+      `[Event] Participant check-in undone for "${event.name}" by ${player.name}: ${ticket.ticketCode}`
+    )
+
+    return ctx.send({
+      data: {
+        documentId: updated.documentId,
+        ticketStatus: updated.ticketStatus,
+        checkedInAt: null,
+      },
+    })
   },
 })

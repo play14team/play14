@@ -56,7 +56,13 @@
       "Bash(podman volume inspect:*)",
       "Bash(podman ps:*)",
       "Bash(podman exec:*)",
-      "Bash(podman inspect:*)"
+      "Bash(podman inspect:*)",
+      "Bash(podman logs:*)",
+      "Bash(npx tsc:*)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_stripe_stripe__get_stripe_account_info",
+      "Bash(PLAYWRIGHT_BROWSERS_PATH=/usr/bin npx playwright install:*)",
+      "Bash(gh api:*)"
     ]
   }
 }

@@ -6,18 +6,18 @@
   h1 {
     margin: 0 0 2rem;
     font-size: 2rem;
-    color: #333;
+    color: var(--color-text);
   }
 }
 
 .empty {
   text-align: center;
   padding: 3rem;
-  background: #f9f9f9;
+  background: var(--color-bg-elevated);
   border-radius: 8px;
 
   p {
-    color: #666;
+    color: var(--color-text-secondary);
     margin-bottom: 1.5rem;
   }
 }
@@ -25,14 +25,15 @@
 .browseLink {
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background: #f47920;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
   text-decoration: none;
   border-radius: 6px;
   font-weight: 600;
 
   &:hover {
-    background: #e06810;
+    filter: brightness(0.85);
+    color: var(--color-text-inverse);
   }
 }
 
@@ -43,14 +44,14 @@
 }
 
 .orderCard {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1.5rem;
   transition: box-shadow 0.2s;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
   }
 }
 
@@ -64,7 +65,7 @@
 .orderNumber {
   font-family: monospace;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .status {
@@ -75,23 +76,23 @@
 }
 
 .statusPaid {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(var(--color-success-rgb), 0.15);
+  color: var(--color-success);
 }
 
 .statusPending {
-  background: #fff3e0;
-  color: #ef6c00;
+  background: rgba(var(--color-warning-rgb), 0.15);
+  color: var(--color-warning);
 }
 
 .statusRefunded {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: rgba(var(--color-secondary-rgb), 0.15);
+  color: var(--color-secondary);
 }
 
 .statusCancelled {
-  background: #fafafa;
-  color: #757575;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-muted);
 }
 
 .eventInfo {
@@ -102,11 +103,11 @@
     font-size: 1.2rem;
 
     a {
-      color: #333;
+      color: var(--color-text);
       text-decoration: none;
 
       &:hover {
-        color: #f47920;
+        color: var(--color-primary);
       }
     }
   }
@@ -114,7 +115,7 @@
 
 .eventDate {
   margin: 0;
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -123,29 +124,29 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
   margin-bottom: 0.75rem;
 }
 
 .ticketCount {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .amount {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text);
 }
 
 .purchaseDate {
   margin: 0 0 0.75rem;
   font-size: 0.85rem;
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 .viewDetails {
-  color: #f47920;
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9rem;

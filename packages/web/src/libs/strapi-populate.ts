@@ -72,6 +72,9 @@ export const eventDetailsPopulate = {
   registration: {
     fields: ["link", "widgetCode"],
   },
+  stripeAccount: {
+    fields: ["documentId"],
+  },
   sponsorships: {
     populate: {
       sponsors: {

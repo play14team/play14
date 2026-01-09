@@ -4,17 +4,6 @@ const AUTH_COOKIE_NAME = "play14_auth"
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
 /**
- * Validate callback URL to prevent open redirect attacks
- */
-function isValidCallbackUrl(url: string): boolean {
-  // Only allow relative paths starting with /
-  if (url.startsWith("/") && !url.startsWith("//")) {
-    return true
-  }
-  return false
-}
-
-/**
  * OAuth callback route handler
  *
  * This route handles the callback from Strapi after OAuth authentication.
@@ -97,13 +86,11 @@ export async function GET(
 
     console.log(`[OAuth] Successfully obtained Strapi JWT for user:`, data.user?.email)
 
-    // Get the callback URL (where the user wanted to go before login)
-    // Validate to prevent open redirect attacks
-    const requestedCallbackUrl = searchParams.get("callbackUrl")
-    const callbackUrl =
-      requestedCallbackUrl && isValidCallbackUrl(requestedCallbackUrl)
-        ? requestedCallbackUrl
-        : "/admin"
+    // Redirect to the auth callback page, which will read the stored callback URL
+    // from sessionStorage (set by AuthGate before OAuth) and redirect appropriately.
+    // This is necessary because this server-side route cannot access sessionStorage.
+    // The callback page handles the final redirect to the user's original destination.
+    const callbackUrl = "/auth/callback"
 
     // Create redirect response and set Strapi JWT cookie
     const response = NextResponse.redirect(new URL(callbackUrl, request.url))

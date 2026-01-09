@@ -1,8 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
 
 export interface SocialNetworkInput {
   id?: string
@@ -33,64 +31,38 @@ export async function updatePlayerProfile(
   _documentId: string,
   data: PlayerUpdateData
 ): Promise<UpdateResult> {
-  const jwt = await getAuthCookie()
+  // Format social networks for Strapi component
+  const socialNetworks = data.socialNetworks?.map((sn) => ({
+    ...(sn.id ? { id: sn.id } : {}),
+    type: sn.type,
+    url: sn.url,
+  }))
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
+  const requestBody = {
+    data: {
+      name: data.name,
+      position: data.position,
+      company: data.company || null,
+      tagline: data.tagline || null,
+      bio: data.bio || null,
+      website: data.website || null,
+      socialNetworks: socialNetworks || [],
+    },
   }
 
-  try {
-    // Format social networks for Strapi component
-    const socialNetworks = data.socialNetworks?.map((sn) => ({
-      ...(sn.id ? { id: sn.id } : {}),
-      type: sn.type,
-      url: sn.url,
-    }))
-
-    const requestBody = {
-      data: {
-        name: data.name,
-        position: data.position,
-        company: data.company || null,
-        tagline: data.tagline || null,
-        bio: data.bio || null,
-        website: data.website || null,
-        socialNetworks: socialNetworks || [],
-      },
-    }
-
-    console.log("[PlayerProfile] Updating current user's player profile")
-    console.log("[PlayerProfile] Request body:", JSON.stringify(requestBody, null, 2))
-
-    // Use the custom /players/me endpoint that validates ownership
-    const response = await fetch(`${STRAPI_URL}/api/players/me`, {
+  const result = await strapiFetch(
+    "/players/me",
+    {},
+    {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify(requestBody),
-    })
-
-    console.log("[PlayerProfile] Response status:", response.status)
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      const errorMessage =
-        errorData?.error?.message ||
-        `Failed to update profile (${response.status})`
-      console.error("[PlayerProfile] Update failed:", errorMessage, errorData)
-      return { success: false, error: errorMessage }
+      body: requestBody,
     }
+  )
 
-    const responseData = await response.json().catch(() => ({}))
-    console.log("[PlayerProfile] Update successful:", responseData?.data?.documentId)
-    return { success: true }
-  } catch (error) {
-    console.error("[PlayerProfile] Update error:", error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    }
+  if (!result.ok) {
+    console.error("[PlayerProfile] Update failed:", result.error)
+    return { success: false, error: result.error || "Failed to update profile" }
   }
+
+  return { success: true }
 }

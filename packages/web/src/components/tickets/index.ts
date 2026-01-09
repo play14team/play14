@@ -1,3 +1,5 @@
 export { default as TicketSelector } from "./ticket-selector"
 export { default as TicketPurchaseFlow } from "./ticket-purchase-flow"
+export { default as DiscountCodeInput } from "./discount-code-input"
+export { default as AuthGate } from "./auth-gate"
 export * from "./purchase.action"

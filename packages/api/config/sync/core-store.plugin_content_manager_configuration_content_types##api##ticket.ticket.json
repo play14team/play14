@@ -33,16 +33,16 @@
           "sortable": true
         }
       },
-      "status": {
+      "ticketStatus": {
         "edit": {
-          "label": "status",
+          "label": "ticketStatus",
           "description": "",
           "placeholder": "",
           "visible": true,
           "editable": true
         },
         "list": {
-          "label": "status",
+          "label": "ticketStatus",
           "searchable": true,
           "sortable": true
         }
@@ -73,6 +73,20 @@
           "label": "attendeeEmail",
           "searchable": true,
           "sortable": true
+        }
+      },
+      "attendeeInfo": {
+        "edit": {
+          "label": "attendeeInfo",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "attendeeInfo",
+          "searchable": false,
+          "sortable": false
         }
       },
       "checkedInAt": {
@@ -220,17 +234,13 @@
       "list": [
         "id",
         "ticketCode",
-        "status",
-        "attendeeName"
+        "attendeeName",
+        "ticketStatus"
       ],
       "edit": [
         [
           {
             "name": "ticketCode",
-            "size": 6
-          },
-          {
-            "name": "status",
             "size": 6
           }
         ],
@@ -267,6 +277,18 @@
         [
           {
             "name": "event",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "attendeeInfo",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "ticketStatus",
             "size": 6
           }
         ]

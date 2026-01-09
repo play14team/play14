@@ -1,8 +1,7 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
+import { strapiFetch } from "@/libs/strapi-client"
 import type { UploadFile } from "@/models/strapi"
-import { getMyEvents as getMyEventsOriginal } from "./my-events.action"
 import {
   getClaimableEvents as getClaimableEventsOriginal,
   searchClaimableEvents as searchClaimableEventsOriginal,
@@ -11,14 +10,28 @@ import {
   cancelAttendanceClaim as cancelAttendanceClaimOriginal,
 } from "../claim-attendance/claim-attendance.action"
 
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
-
 // ============================================================================
 // TYPES
 // ============================================================================
 
-// Re-export types (types are allowed in "use server" files)
-export type { MyEvent } from "./my-events.action"
+export interface MyEvent {
+  documentId: string
+  slug: string
+  name: string
+  start: string
+  end: string
+  eventStatus: string
+  isPublished: boolean
+  isHost: boolean
+  isMentor: boolean
+  location: {
+    name: string
+    country: string
+  } | null
+  defaultImage?: UploadFile | null
+}
+
+// Re-export types from claim-attendance
 export type {
   EventLocation,
   ClaimableEvent,
@@ -52,16 +65,30 @@ export interface AttendedEventsResponse {
 }
 
 // ============================================================================
-// WRAPPER FUNCTIONS FOR EXISTING ACTIONS
-// (use server files can only export async functions, not re-exports)
+// MY EVENTS (ORGANIZED)
 // ============================================================================
 
 /**
- * Get events organized by the current user
+ * Get events for the current organizer
+ * - Hosts see events they host
+ * - Mentors see events they mentor
+ * - Founders see all events
  */
-export async function getMyEvents() {
-  return getMyEventsOriginal()
+export async function getMyEvents(): Promise<MyEvent[]> {
+  const result = await strapiFetch<{ data: MyEvent[] }>(
+    "/events/my-events",
+    {},
+    { cache: "no-store" }
+  )
+
+  if (!result.ok || !result.data) return []
+  return result.data.data || []
 }
+
+// ============================================================================
+// WRAPPER FUNCTIONS FOR CLAIM-ATTENDANCE ACTIONS
+// (use server files can only export async functions, not re-exports)
+// ============================================================================
 
 /**
  * Get claimable events (past events)
@@ -106,38 +133,22 @@ export async function cancelAttendanceClaim(claimId: string) {
  * Get events the current user has attended (via tickets or approved claims)
  */
 export async function getMyAttendedEvents(): Promise<AttendedEventsResponse> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<{ data: AttendedEvent[] }>(
+    "/players/me/attended-events",
+    {},
+    { cache: "no-store" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/players/me/attended-events`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      cache: "no-store",
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to fetch attended events: ${response.status}`,
-      }
-    }
-
-    const data = await response.json()
-    return {
-      success: true,
-      events: data.data || [],
-    }
-  } catch (error) {
-    console.error("[Events] Failed to fetch attended events:", error)
+  if (!result.ok) {
+    console.error("[Events] Failed to fetch attended events:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch attended events",
+      error: result.error || "Failed to fetch attended events",
     }
+  }
+
+  return {
+    success: true,
+    events: result.data?.data || [],
   }
 }

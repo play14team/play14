@@ -132,7 +132,7 @@ The #play14 Team
 
       <p>${isPartialRefund ? "Some of your tickets may still be valid. Please check your account for details." : "Your tickets have been cancelled and are no longer valid for entry."}</p>
 
-      <a href="${frontendUrl}/admin/my-tickets" class="btn">View Your Tickets</a>
+      <a href="${frontendUrl}/admin/tickets" class="btn">View Your Tickets</a>
     </div>
     <div class="footer">
       <p>If you have any questions, please contact the event organizers.</p>

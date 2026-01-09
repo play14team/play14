@@ -1,0 +1,352 @@
+{
+  "key": "plugin_content_manager_configuration_content_types::api::discount-code.discount-code",
+  "value": {
+    "settings": {
+      "bulkable": true,
+      "filterable": true,
+      "searchable": true,
+      "pageSize": 10,
+      "mainField": "code",
+      "defaultSortBy": "code",
+      "defaultSortOrder": "ASC"
+    },
+    "metadatas": {
+      "id": {
+        "edit": {},
+        "list": {
+          "label": "id",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "code": {
+        "edit": {
+          "label": "code",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "code",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "discountType": {
+        "edit": {
+          "label": "discountType",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "discountType",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "discountValue": {
+        "edit": {
+          "label": "discountValue",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "discountValue",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "maxUses": {
+        "edit": {
+          "label": "maxUses",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "maxUses",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "usedCount": {
+        "edit": {
+          "label": "usedCount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "usedCount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "validFrom": {
+        "edit": {
+          "label": "validFrom",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "validFrom",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "validUntil": {
+        "edit": {
+          "label": "validUntil",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "validUntil",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "minOrderAmount": {
+        "edit": {
+          "label": "minOrderAmount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "minOrderAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "maxDiscountAmount": {
+        "edit": {
+          "label": "maxDiscountAmount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "maxDiscountAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "isActive": {
+        "edit": {
+          "label": "isActive",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "isActive",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "description": {
+        "edit": {
+          "label": "description",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "description",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "event": {
+        "edit": {
+          "label": "event",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "event",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdByPlayer": {
+        "edit": {
+          "label": "createdByPlayer",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "createdByPlayer",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdAt": {
+        "edit": {
+          "label": "createdAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "createdAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedAt": {
+        "edit": {
+          "label": "updatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true
+        },
+        "list": {
+          "label": "updatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "createdBy": {
+        "edit": {
+          "label": "createdBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "createdBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "updatedBy": {
+        "edit": {
+          "label": "updatedBy",
+          "description": "",
+          "placeholder": "",
+          "visible": false,
+          "editable": true,
+          "mainField": "firstname"
+        },
+        "list": {
+          "label": "updatedBy",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "documentId": {
+        "edit": {},
+        "list": {
+          "label": "documentId",
+          "searchable": true,
+          "sortable": true
+        }
+      }
+    },
+    "layouts": {
+      "list": [
+        "id",
+        "code",
+        "discountType",
+        "discountValue"
+      ],
+      "edit": [
+        [
+          {
+            "name": "code",
+            "size": 6
+          },
+          {
+            "name": "discountType",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "discountValue",
+            "size": 4
+          },
+          {
+            "name": "maxUses",
+            "size": 4
+          },
+          {
+            "name": "usedCount",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "validFrom",
+            "size": 6
+          },
+          {
+            "name": "validUntil",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "minOrderAmount",
+            "size": 4
+          },
+          {
+            "name": "maxDiscountAmount",
+            "size": 4
+          },
+          {
+            "name": "isActive",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "description",
+            "size": 6
+          },
+          {
+            "name": "event",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "createdByPlayer",
+            "size": 6
+          }
+        ]
+      ]
+    },
+    "uid": "api::discount-code.discount-code"
+  },
+  "type": "object",
+  "environment": null,
+  "tag": null
+}

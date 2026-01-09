@@ -7,11 +7,7 @@ import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import CountrySelector from "@/components/admin/country-selector"
-import {
-  updateLocation,
-  deleteLocation,
-  type LocationForEdit,
-} from "../locations.action"
+import { updateLocation, deleteLocation, type LocationForEdit } from "../locations.action"
 
 interface Props {
   location: LocationForEdit
@@ -52,10 +48,7 @@ export default function LocationEditForm({ location }: Props) {
   )
 
   // Track dirty state
-  const formValues = useMemo(
-    () => ({ name, country, mapLocation }),
-    [name, country, mapLocation]
-  )
+  const formValues = useMemo(() => ({ name, country, mapLocation }), [name, country, mapLocation])
   const { isDirty, resetDirtyState } = useFormDirty(formValues)
 
   // Browser beforeunload warning
@@ -238,9 +231,7 @@ export default function LocationEditForm({ location }: Props) {
                 className="admin-input"
                 placeholder="e.g., Paris, Luxembourg, Berlin"
               />
-              <p className="admin-form-help">
-                The city or region name where events take place
-              </p>
+              <p className="admin-form-help">The city or region name where events take place</p>
             </div>
 
             <div className="admin-form-group">
@@ -258,7 +249,8 @@ export default function LocationEditForm({ location }: Props) {
             <div className="admin-form-section">
               <h2>Associated Events</h2>
               <p className="admin-form-section-description">
-                This location is used by {location.eventsCount} event{location.eventsCount !== 1 ? "s" : ""}.
+                This location is used by {location.eventsCount} event
+                {location.eventsCount !== 1 ? "s" : ""}.
               </p>
               <div className="location-events-list">
                 {location.events.map((event) => (
@@ -310,7 +302,7 @@ export default function LocationEditForm({ location }: Props) {
               ) : (
                 <>
                   <i className="bx bx-save"></i>
-                  Save Changes
+                  Save changes
                 </>
               )}
             </button>
@@ -322,7 +314,7 @@ export default function LocationEditForm({ location }: Props) {
                 className="admin-btn admin-btn-danger-outline admin-btn-block"
               >
                 <i className="bx bx-undo"></i>
-                Discard Changes
+                Discard changes
               </button>
             )}
 
@@ -333,14 +325,15 @@ export default function LocationEditForm({ location }: Props) {
                 onClick={() => setShowDeleteConfirm(true)}
               >
                 <i className="bx bx-trash"></i>
-                Delete Location
+                Delete location
               </button>
             )}
 
             {!canDelete && (
               <p className="admin-form-help">
                 <i className="bx bx-info-circle"></i>
-                Cannot delete: this location has {location.eventsCount} event{location.eventsCount !== 1 ? "s" : ""} attached.
+                Cannot delete: this location has {location.eventsCount} event
+                {location.eventsCount !== 1 ? "s" : ""} attached.
               </p>
             )}
 

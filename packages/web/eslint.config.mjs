@@ -11,6 +11,7 @@ const eslintConfig = [
       "public/**",
       ".codacy/**",
       "src/models/**",
+      "coverage/**",
     ],
   },
   ...nextVitals,
