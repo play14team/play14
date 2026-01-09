@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { cancelPendingOrder } from "@/components/tickets/purchase.action"
 import styles from "./page.module.scss"
 
 interface CancelledPageProps {
@@ -8,6 +9,12 @@ interface CancelledPageProps {
 
 export default async function TicketCancelledPage({ params, searchParams }: CancelledPageProps) {
   const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+
+  // Cancel the pending order if we have an order ID
+  if (resolvedSearchParams.order) {
+    await cancelPendingOrder(resolvedSearchParams.order)
+  }
 
   return (
     <div className={styles.container}>

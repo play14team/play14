@@ -3,6 +3,97 @@ import qs from "qs"
 import { strapi, type StrapiClient } from "@strapi/client"
 import { getAuthCookie } from "./auth"
 
+// ============================================================================
+// SSRF Protection Utilities
+// ============================================================================
+
+/**
+ * Validates that a path segment is a safe identifier (slug, documentId, or numeric id)
+ * Prevents SSRF attacks by ensuring path segments don't contain path traversal or URL manipulation
+ *
+ * Valid formats:
+ * - Slugs: alphanumeric with hyphens and underscores (e.g., "my-event-2024")
+ * - Document IDs: alphanumeric (e.g., "abc123def456")
+ * - Numeric IDs: positive integers (e.g., "123")
+ *
+ * @throws Error if the identifier is invalid
+ */
+export function validatePathSegment(value: string, paramName: string = "id"): string {
+  if (!value || typeof value !== "string") {
+    throw new Error(`Invalid ${paramName}: must be a non-empty string`)
+  }
+
+  // Trim whitespace
+  const trimmed = value.trim()
+
+  // Check for empty after trim
+  if (trimmed.length === 0) {
+    throw new Error(`Invalid ${paramName}: must not be empty`)
+  }
+
+  // Check for maximum length to prevent DoS
+  if (trimmed.length > 255) {
+    throw new Error(`Invalid ${paramName}: exceeds maximum length`)
+  }
+
+  // Valid slug/documentId pattern: alphanumeric, hyphens, underscores
+  // This prevents path traversal (../, ..\), URL manipulation, and injection
+  const safePattern = /^[a-zA-Z0-9_-]+$/
+  if (!safePattern.test(trimmed)) {
+    throw new Error(`Invalid ${paramName}: contains invalid characters`)
+  }
+
+  return trimmed
+}
+
+/**
+ * Validates multiple path segments at once
+ * @throws Error if any identifier is invalid
+ */
+export function validatePathSegments(
+  segments: Record<string, string>
+): Record<string, string> {
+  const validated: Record<string, string> = {}
+  for (const [name, value] of Object.entries(segments)) {
+    validated[name] = validatePathSegment(value, name)
+  }
+  return validated
+}
+
+/**
+ * Builds a safe API URL with validated path segments
+ * Use this for all API calls with user-provided path parameters
+ *
+ * @example
+ * ```typescript
+ * // Instead of: `${STRAPI_URL}/api/events/${slug}/edit`
+ * // Use: buildApiUrl('/events/:slug/edit', { slug })
+ * const url = buildApiUrl('/events/:slug/edit', { slug })
+ * ```
+ */
+export function buildApiUrl(
+  pathTemplate: string,
+  params: Record<string, string> = {}
+): string {
+  // Validate all parameters first
+  const validatedParams = validatePathSegments(params)
+
+  // Replace placeholders with validated values
+  let path = pathTemplate
+  for (const [name, value] of Object.entries(validatedParams)) {
+    path = path.replace(`:${name}`, encodeURIComponent(value))
+  }
+
+  // Ensure no unreplaced placeholders remain
+  if (path.includes(":")) {
+    const missingParams = path.match(/:[a-zA-Z_]+/g)
+    throw new Error(`Missing required path parameters: ${missingParams?.join(", ")}`)
+  }
+
+  const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+  return `${STRAPI_URL}${path.startsWith("/api") ? path : `/api${path}`}`
+}
+
 const STRAPI_REST_ENDPOINT =
   (process.env.STRAPI_API_URL || "").replace(/\/$/, "") + "/api"
 
@@ -294,3 +385,269 @@ export function getPublicStrapiClient(): StrapiClient {
  * Re-export the StrapiClient type for use in other modules
  */
 export type { StrapiClient }
+
+// ============================================================================
+// Safe Fetch Helpers using @strapi/client
+// ============================================================================
+
+/**
+ * Options for strapiFetch
+ */
+export interface StrapiFetchOptions {
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
+  body?: unknown
+  headers?: Record<string, string>
+  cache?: RequestCache
+  /** Skip authentication entirely (for public endpoints) */
+  noAuth?: boolean
+  /** Use auth if available, but don't fail if not authenticated */
+  optionalAuth?: boolean
+}
+
+/**
+ * Result type for strapiFetch
+ */
+export interface StrapiFetchResult<T> {
+  ok: boolean
+  status: number
+  data?: T
+  error?: string
+}
+
+/**
+ * Build a safe path with validated parameters
+ * Internal helper for strapiFetch
+ */
+function buildSafePath(
+  pathTemplate: string,
+  params: Record<string, string> = {}
+): string {
+  // Validate all parameters first
+  const validatedParams = validatePathSegments(params)
+
+  // Replace placeholders with validated values
+  let path = pathTemplate
+  for (const [name, value] of Object.entries(validatedParams)) {
+    path = path.replace(`:${name}`, encodeURIComponent(value))
+  }
+
+  // Ensure no unreplaced placeholders remain
+  if (path.includes(":")) {
+    const missingParams = path.match(/:[a-zA-Z_]+/g)
+    throw new Error(`Missing required path parameters: ${missingParams?.join(", ")}`)
+  }
+
+  // Ensure path starts with /
+  return path.startsWith("/") ? path : `/${path}`
+}
+
+/**
+ * Get appropriate Strapi client based on auth options
+ */
+async function getClientForOptions(options: Pick<StrapiFetchOptions, "noAuth" | "optionalAuth">): Promise<StrapiClient> {
+  if (options.noAuth) {
+    return getPublicStrapiClient()
+  }
+  if (options.optionalAuth) {
+    const jwt = await getAuthCookie()
+    if (jwt) {
+      return strapi({
+        baseURL: `${STRAPI_URL}/api`,
+        auth: jwt,
+      })
+    }
+    return getPublicStrapiClient()
+  }
+  return getStrapiClient()
+}
+
+/**
+ * Safe fetch using @strapi/client with SSRF-protected path building.
+ * Validates all path parameters before making the request.
+ *
+ * @param pathTemplate - Path template with :param placeholders (e.g., "/events/:slug/edit")
+ * @param params - Object mapping param names to values
+ * @param options - Fetch options (method, body, headers, noAuth, optionalAuth)
+ * @returns Promise with fetch result
+ *
+ * @example
+ * ```typescript
+ * // GET request
+ * const result = await strapiFetch<EventData>("/events/:slug/edit", { slug })
+ *
+ * // POST request with body
+ * const result = await strapiFetch<EventData>("/events/:slug/publish", { slug }, {
+ *   method: "POST",
+ *   body: { data: { ... } }
+ * })
+ *
+ * // Public endpoint (no auth)
+ * const result = await strapiFetch<EventData>("/events/:eventId/tickets", { eventId }, { noAuth: true })
+ *
+ * // Optional auth (use if available)
+ * const result = await strapiFetch<OrderData>("/ticket-orders", {}, { optionalAuth: true, method: "POST", body: {...} })
+ * ```
+ */
+export async function strapiFetch<T>(
+  pathTemplate: string,
+  params: Record<string, string> = {},
+  options: StrapiFetchOptions = {}
+): Promise<StrapiFetchResult<T>> {
+  const path = buildSafePath(pathTemplate, params)
+  const { method = "GET", body, headers = {}, cache, noAuth, optionalAuth } = options
+
+  try {
+    const client = await getClientForOptions({ noAuth, optionalAuth })
+
+    const response = await client.fetch(path, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      cache,
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } }
+      return {
+        ok: false,
+        status: response.status,
+        error: errorData?.error?.message || `Request failed (${response.status})`,
+      }
+    }
+
+    const data = await response.json() as T
+    return {
+      ok: true,
+      status: response.status,
+      data,
+    }
+  } catch (error) {
+    // Handle "Not authenticated" error for non-auth endpoints gracefully
+    if (noAuth || optionalAuth) {
+      // If auth fails and it's optional, return error result
+      const errorMsg = error instanceof Error ? error.message : "Unknown error occurred"
+      return {
+        ok: false,
+        status: 0,
+        error: errorMsg,
+      }
+    }
+    return {
+      ok: false,
+      status: 0,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    }
+  }
+}
+
+/**
+ * Safe fetch for FormData uploads using @strapi/client.
+ * Does not set Content-Type header (let browser set it with boundary).
+ *
+ * @param pathTemplate - Path template with :param placeholders
+ * @param params - Object mapping param names to values
+ * @param formData - FormData to upload
+ * @returns Promise with fetch result
+ */
+export async function strapiFetchFormData<T>(
+  pathTemplate: string,
+  params: Record<string, string> = {},
+  formData: FormData
+): Promise<StrapiFetchResult<T>> {
+  const client = await getStrapiClient()
+  const path = buildSafePath(pathTemplate, params)
+
+  try {
+    const response = await client.fetch(path, {
+      method: "POST",
+      body: formData,
+      // Don't set Content-Type - browser will set it with boundary
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } }
+      return {
+        ok: false,
+        status: response.status,
+        error: errorData?.error?.message || `Upload failed (${response.status})`,
+      }
+    }
+
+    const data = await response.json() as T
+    return {
+      ok: true,
+      status: response.status,
+      data,
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    }
+  }
+}
+
+/**
+ * Safe fetch with query parameters using @strapi/client.
+ *
+ * @param pathTemplate - Path template with :param placeholders
+ * @param params - Object mapping param names to values
+ * @param queryParams - URLSearchParams or object for query string
+ * @param options - Additional fetch options
+ * @returns Promise with fetch result
+ */
+export async function strapiFetchWithQuery<T>(
+  pathTemplate: string,
+  params: Record<string, string> = {},
+  queryParams: URLSearchParams | Record<string, string>,
+  options: Omit<StrapiFetchOptions, "body"> = {}
+): Promise<StrapiFetchResult<T>> {
+  const client = await getStrapiClient()
+  const basePath = buildSafePath(pathTemplate, params)
+
+  const queryString =
+    queryParams instanceof URLSearchParams
+      ? queryParams.toString()
+      : new URLSearchParams(queryParams).toString()
+
+  const path = queryString ? `${basePath}?${queryString}` : basePath
+
+  const { method = "GET", headers = {}, cache } = options
+
+  try {
+    const response = await client.fetch(path, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...headers,
+      },
+      cache,
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } }
+      return {
+        ok: false,
+        status: response.status,
+        error: errorData?.error?.message || `Request failed (${response.status})`,
+      }
+    }
+
+    const data = await response.json() as T
+    return {
+      ok: true,
+      status: response.status,
+      data,
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    }
+  }
+}

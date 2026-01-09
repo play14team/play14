@@ -1,0 +1,38 @@
+{
+  "collectionName": "components_attendee_attendee_info",
+  "info": {
+    "displayName": "Attendee Info",
+    "icon": "user",
+    "description": "Per-ticket attendee information for events"
+  },
+  "attributes": {
+    "firstName": {
+      "type": "string",
+      "required": true
+    },
+    "lastName": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "tshirtSize": {
+      "type": "enumeration",
+      "enum": ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"],
+      "default": "none"
+    },
+    "foodPreferences": {
+      "type": "text"
+    },
+    "photoConsent": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "photoConsentTimestamp": {
+      "type": "datetime"
+    }
+  }
+}

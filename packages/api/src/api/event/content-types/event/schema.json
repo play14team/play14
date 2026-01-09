@@ -193,40 +193,14 @@
       "target": "api::ticket-type.ticket-type",
       "mappedBy": "event"
     },
-    "globalCapacity": {
-      "type": "integer",
-      "min": 0,
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
-    },
-    "ticketingEnabled": {
-      "type": "boolean",
-      "default": false,
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
-    },
-    "paymentProvider": {
+    "ticketingMode": {
       "type": "enumeration",
       "enum": [
-        "stripe",
-        "manual",
-        "none"
+        "none",
+        "internal",
+        "external"
       ],
       "default": "none",
-      "pluginOptions": {
-        "i18n": {
-          "localized": false
-        }
-      }
-    },
-    "stripeAccountId": {
-      "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": false
@@ -242,6 +216,12 @@
           "localized": false
         }
       }
+    },
+    "discountCodes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::discount-code.discount-code",
+      "mappedBy": "event"
     }
   }
 }

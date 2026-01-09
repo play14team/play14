@@ -11,39 +11,50 @@ interface EventRegistrationProps {
 
 /**
  * Unified registration component that handles multiple registration methods:
- * - Stripe ticketing (when ticketingEnabled && paymentProvider === "stripe")
- * - External registration link (when registration.link exists)
- * - Embedded widget code (when registration.widgetCode exists)
+ * - Stripe ticketing (when ticketingMode === "internal")
+ * - External registration (when ticketingMode === "external" with link or widgetCode)
  */
 export default function EventRegistration({ event }: EventRegistrationProps) {
-  const eventData = event as any // Type assertion for new fields
-  const hasStripeTicketing =
-    eventData.ticketingEnabled && eventData.paymentProvider === "stripe"
+  const ticketingMode = event.ticketingMode || "none"
+
+  // No registration when ticketing is disabled
+  if (ticketingMode === "none") {
+    return null
+  }
+
+  // Internal ticketing via Stripe
+  if (ticketingMode === "internal") {
+    return (
+      <div className="row mt-4">
+        <div className="col-12">
+          <section className="events-registration-section" aria-labelledby="registration-heading">
+            <h3 id="registration-heading" className="mb-3" style={{ scrollMarginTop: "150px" }}>
+              Registration
+            </h3>
+            <div className="registration-tickets mb-4">
+              <TicketPurchaseFlow eventId={event.documentId!} />
+            </div>
+          </section>
+        </div>
+      </div>
+    )
+  }
+
+  // External ticketing
   const hasExternalLink = event.registration?.link
   const hasWidgetCode = event.registration?.widgetCode
 
-  // No registration options available
-  if (!hasStripeTicketing && !hasExternalLink && !hasWidgetCode) {
+  if (!hasExternalLink && !hasWidgetCode) {
     return null
   }
 
   return (
     <div className="row mt-4">
       <div className="col-12">
-        <section
-          className="events-registration-section"
-          aria-labelledby="registration-heading"
-        >
-          <h3 id="registration-heading" className="mb-3">
+        <section className="events-registration-section" aria-labelledby="registration-heading">
+          <h3 id="registration-heading" className="mb-3" style={{ scrollMarginTop: "150px" }}>
             Registration
           </h3>
-
-          {/* Stripe ticketing - show ticket selector */}
-          {hasStripeTicketing && (
-            <div className="registration-tickets mb-4">
-              <TicketPurchaseFlow eventId={event.documentId!} />
-            </div>
-          )}
 
           {/* External widget embed (Eventbrite, etc.) */}
           {hasWidgetCode && (
@@ -52,8 +63,8 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
             </div>
           )}
 
-          {/* External registration link (shown as prominent button if no other options) */}
-          {hasExternalLink && !hasStripeTicketing && (
+          {/* External registration link */}
+          {hasExternalLink && (
             <div className="registration-link">
               <Link
                 href={event.registration!.link!}

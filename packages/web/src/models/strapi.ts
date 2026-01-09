@@ -187,6 +187,7 @@ export interface Event {
   eventStatus: Enum_Event_Eventstatus | string
   description?: string
   contactEmail?: string
+  ticketingMode?: "none" | "internal" | "external"
   defaultImage?: UploadFile
   images?: UploadFile[]
   location?: Location

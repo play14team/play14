@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { getMyEvents, type MyEvent } from "../my-events.action"
+import { getMyEvents, type MyEvent } from "../events.action"
 import { publishEvent, unpublishEvent } from "../[slug]/event-edit.action"
 import {
   EventCard,

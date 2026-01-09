@@ -6,13 +6,14 @@ import type { FinanceData } from "@/app/(admin)/admin/events/[slug]/finance.acti
 interface Props {
   financeData: FinanceData | null
   onChange: (data: FinanceData | null) => void
+  defaultRevenue?: number
 }
 
-export default function FinanceEditor({ financeData, onChange }: Props) {
+export default function FinanceEditor({ financeData, onChange, defaultRevenue = 0 }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Form state
+  // Form state - use defaultRevenue only when there's no existing financeData
   const [revenue, setRevenue] = useState(financeData?.revenue ?? 0)
   const [expenses, setExpenses] = useState(financeData?.expenses ?? 0)
   const [destination, setDestination] = useState(financeData?.destination ?? "")
@@ -23,6 +24,14 @@ export default function FinanceEditor({ financeData, onChange }: Props) {
     setExpenses(financeData?.expenses ?? 0)
     setDestination(financeData?.destination ?? "")
   }, [financeData])
+
+  // When entering edit mode without existing data, use defaultRevenue
+  const handleStartEditing = () => {
+    if (!financeData && defaultRevenue > 0) {
+      setRevenue(defaultRevenue)
+    }
+    setIsEditing(true)
+  }
 
   // Auto-calculated values
   const resultAmount = Math.abs(revenue - expenses)
@@ -203,7 +212,7 @@ export default function FinanceEditor({ financeData, onChange }: Props) {
           <div className="finance-view-actions">
             <button
               type="button"
-              onClick={() => setIsEditing(true)}
+              onClick={handleStartEditing}
               className="admin-btn admin-btn-secondary"
             >
               <i className="bx bx-edit"></i>

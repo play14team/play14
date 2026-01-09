@@ -470,8 +470,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
         documentId: eventId,
         data: {
           stripeAccount: stripeAccount.id,
-          ticketingEnabled: true,
-          paymentProvider: "stripe",
+          ticketingMode: "internal",
         } as any,
       })
 
@@ -523,7 +522,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
         documentId: eventId,
         data: {
           stripeAccount: null,
-          ticketingEnabled: false,
+          ticketingMode: "none",
         } as any,
       })
 

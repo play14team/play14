@@ -1,9 +1,5 @@
 import Link from "next/link"
-import {
-  Enum_Componenteventsmedia_Type,
-  Enum_Event_Eventstatus,
-  Event,
-} from "@/models/strapi"
+import { Enum_Componenteventsmedia_Type, Enum_Event_Eventstatus, Event } from "@/models/strapi"
 import SocialLinks from "../layout/social-links"
 import EventStatus from "./status"
 import EventTime from "./time"
@@ -13,19 +9,27 @@ const EventSidebar = ({ event }: { event: Event }) => {
   const eventName = encodeURI(event.name!)
   const text = encodeURI("Take a look at #play14 ") + eventName
 
-  // Check if Stripe ticketing is enabled (scrolls to registration section)
-  const eventData = event as any
-  const hasStripeTicketing =
-    eventData.ticketingEnabled && eventData.paymentProvider === "stripe"
+  // Registration button logic:
+  // - internal: scroll to registration section (Stripe tickets)
+  // - external with widget: scroll to registration section (embedded widget)
+  // - external with link only: open external link
+  // - none: no button
+  const ticketingMode = event.ticketingMode || "none"
+  const hasWidget = !!event.registration?.widgetCode
+  const hasExternalLink = !!event.registration?.link
+  const shouldScrollToRegistration =
+    ticketingMode === "internal" || (ticketingMode === "external" && hasWidget)
+  const shouldOpenExternalLink =
+    ticketingMode === "external" && !hasWidget && hasExternalLink
 
   // Find photos album URL from media
   const photosAlbum = event.media?.find(
-    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos,
+    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos
   )
 
   // Find videos library URL from media
   const videosLibrary = event.media?.find(
-    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Videos,
+    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Videos
   )
 
   return (
@@ -70,79 +74,36 @@ const EventSidebar = ({ event }: { event: Event }) => {
                 <li key={medium.id}>
                   <div className="d-flex justify-content-between align-items-center">
                     <span>{medium.type}</span>
-                    <Link
-                      href={medium.url || "#"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <Link href={medium.url || "#"} target="_blank" rel="noopener noreferrer">
                       {medium.url || "Link"}
                     </Link>
                   </div>
                 </li>
-              ),
+              )
           )}
-
-        {/* <li>
-          <div className="d-flex justify-content-between align-items-center">
-            <span>Pay With</span>
-            <div className="payment-method">
-              <Image
-                src={payment1}
-                className="shadow"
-                alt="payment-card"
-                style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                }}
-              />
-              <Image
-                src={payment2}
-                className="shadow"
-                alt="payment-card"
-                style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                }}
-              />
-              <Image
-                src={payment3}
-                className="shadow"
-                alt="payment-card"
-                style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                }}
-              />
-            </div>
-          </div>
-        </li> */}
       </ul>
 
-      {/* Get Tickets button for Stripe ticketing - scrolls to registration section */}
-      {event.eventStatus == Enum_Event_Eventstatus.Open && hasStripeTicketing && (
+      {/* Registration button - scrolls to section for internal/widget, opens link for external link only */}
+      {event.eventStatus == Enum_Event_Eventstatus.Open && shouldScrollToRegistration && (
         <div className="btn-box">
           <a href="#registration-heading" className="default-btn">
-            <i className="flaticon-ticket"></i>Get Tickets
+            <i className="flaticon-price-tag"></i>Get Tickets
           </a>
         </div>
       )}
 
-      {/* Book Now button for external registration links (only if not using Stripe ticketing) */}
-      {event.eventStatus == Enum_Event_Eventstatus.Open &&
-        !hasStripeTicketing &&
-        event.registration &&
-        event.registration.link && (
-          <div className="btn-box">
-            <Link
-              href={event.registration.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="default-btn"
-            >
-              <i className="flaticon-user"></i>Book Now
-            </Link>
-          </div>
-        )}
+      {event.eventStatus == Enum_Event_Eventstatus.Open && shouldOpenExternalLink && (
+        <div className="btn-box">
+          <Link
+            href={event.registration!.link!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="default-btn"
+          >
+            <i className="flaticon-user"></i>Book Now
+          </Link>
+        </div>
+      )}
 
       {event.contactEmail && (
         <div className="btn-box">

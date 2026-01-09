@@ -34,20 +34,6 @@
           "sortable": true
         }
       },
-      "shortName": {
-        "edit": {
-          "label": "shortName",
-          "description": "",
-          "placeholder": "",
-          "visible": true,
-          "editable": true
-        },
-        "list": {
-          "label": "shortName",
-          "searchable": true,
-          "sortable": true
-        }
-      },
       "logo": {
         "edit": {
           "label": "logo",
@@ -245,10 +231,6 @@
         [
           {
             "name": "events",
-            "size": 6
-          },
-          {
-            "name": "shortName",
             "size": 6
           }
         ]

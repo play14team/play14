@@ -68,6 +68,11 @@ export const EVENT_ACTIONS = {
   SET_IMAGE_FROM_LIBRARY: "api::event.custom-event.setImageFromLibrary",
   REMOVE_IMAGE: "api::event.custom-event.removeImage",
   UPDATE_SPONSORSHIPS: "api::event.custom-event.updateSponsorships",
+  GET_REVENUE_ANALYTICS: "api::event.custom-event.getRevenueAnalytics",
+  GET_PARTICIPANTS: "api::event.custom-event.getParticipants",
+  GET_PARTICIPANT_STATS: "api::event.custom-event.getParticipantStats",
+  CHECK_IN_PARTICIPANT: "api::event.custom-event.checkInParticipant",
+  UNDO_CHECK_IN: "api::event.custom-event.undoCheckIn",
 } as const
 
 // ==================== PLAYERS ====================
@@ -149,7 +154,12 @@ export const TICKET_ORDER_ACTIONS = {
   GET_ORDER_STATUS: "api::ticket-order.custom-ticket-order.getOrderStatus",
   INITIATE_ORDER: "api::ticket-order.custom-ticket-order.initiateOrder",
   REQUEST_REFUND: "api::ticket-order.custom-ticket-order.requestRefund",
+  CANCEL_ORDER: "api::ticket-order.custom-ticket-order.cancelOrder",
   HANDLE_STRIPE_WEBHOOK: "api::ticket-order.webhook.handleStripeWebhook",
+  // Draft order flow (multi-step checkout with attendee info)
+  CREATE_DRAFT_ORDER: "api::ticket-order.custom-ticket-order.createDraftOrder",
+  UPDATE_ATTENDEE_INFO: "api::ticket-order.custom-ticket-order.updateAttendeeInfo",
+  FINALIZE_CHECKOUT: "api::ticket-order.custom-ticket-order.finalizeCheckout",
 } as const
 
 // ==================== TICKET TYPES ====================
@@ -158,6 +168,15 @@ export const TICKET_TYPE_ACTIONS = {
   UPDATE_TICKET_TYPE: "api::ticket-type.custom-ticket-type.updateTicketType",
   DELETE_TICKET_TYPE: "api::ticket-type.custom-ticket-type.deleteTicketType",
   GET_EVENT_ORDERS: "api::ticket-type.custom-ticket-type.getEventOrders",
+} as const
+
+// ==================== DISCOUNT CODES ====================
+export const DISCOUNT_CODE_ACTIONS = {
+  CREATE: "api::discount-code.custom-discount-code.createDiscountCode",
+  UPDATE: "api::discount-code.custom-discount-code.updateDiscountCode",
+  DELETE: "api::discount-code.custom-discount-code.deleteDiscountCode",
+  LIST: "api::discount-code.custom-discount-code.getEventDiscountCodes",
+  VALIDATE: "api::discount-code.custom-discount-code.validateDiscountCode",
 } as const
 
 // ==================== CONTENT TYPES (CRUD) ====================

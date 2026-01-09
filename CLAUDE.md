@@ -81,6 +81,60 @@ podman-compose down
 - `pgadmin`: Database admin UI (port 5050)
 - `play14-web`: Next.js frontend (port 3000)
 - `design`: Storybook (port 8080)
+- `stripe-webhook`: Stripe CLI webhook forwarder (forwards to API on host network)
+
+## UI Development
+
+When creating or modifying UI components, always consider both light and dark mode. Ensure styles work correctly in both themes.
+
+## API Permissions Bootstrap
+
+When adding or modifying content types, controllers, or routes in the API package that require permission handling, remember to update the permissions bootstrap files:
+
+- `packages/api/src/bootstrap/permissions/actions.ts` - Define new permission actions
+- `packages/api/src/bootstrap/permissions/definitions.ts` - Configure role-based permission assignments
+
+This ensures that new API endpoints have proper access control configured automatically on bootstrap.
+
+## Stripe Integration
+
+The platform uses Stripe Connect for event ticketing, allowing hosts to receive payments directly to their own Stripe Express accounts.
+
+### Environment Variables (packages/api/.env)
+
+```bash
+STRIPE_SECRET_KEY=sk_test_xxx      # Stripe API secret key
+STRIPE_WEBHOOK_SECRET=whsec_xxx    # Webhook signature verification
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx # Public key (also in web/.env.local)
+STRIPE_PLATFORM_FEE_PERCENT=0      # Platform fee (0% for non-profit)
+```
+
+### Webhook Endpoint
+
+- **Route**: `POST /api/webhooks/stripe`
+- **Handler**: `packages/api/src/api/ticket-order/controllers/webhook.ts`
+- **Auth**: None (uses Stripe signature verification)
+
+### Local Development with Stripe CLI
+
+For local webhook testing, use the `stripe-webhook` container defined in `compose.yaml`:
+
+```bash
+# Start the Stripe webhook forwarder
+podman-compose up stripe-webhook
+
+# Or run Stripe CLI manually
+stripe listen --forward-to localhost:1337/api/webhooks/stripe
+```
+
+The container uses the official Stripe CLI image and forwards webhook events to the local API. It requires `STRIPE_SECRET_KEY` to be set in `packages/api/.env`.
+
+### Key Files
+
+- `packages/api/src/services/payment/providers/stripe.ts` - Stripe service provider
+- `packages/api/src/api/ticket-order/controllers/webhook.ts` - Webhook handler
+- `packages/api/src/api/stripe-account/` - Connected accounts management
+- `docs/specs/stripe-connect-ticketing.md` - Full technical specification
 
 ## Codacy Integration
 

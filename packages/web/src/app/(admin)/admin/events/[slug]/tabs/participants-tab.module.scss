@@ -1,0 +1,332 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 3rem;
+  color: var(--color-text-secondary);
+
+  i {
+    font-size: 1.5rem;
+  }
+}
+
+// Stats Grid
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.statIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(var(--color-primary-rgb, 59, 130, 246), 0.1);
+  color: var(--color-primary, #3b82f6);
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.5rem;
+  }
+
+  .checkedIn & {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+  }
+
+  .pending & {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+  }
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+// Filters
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.searchBox {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+
+  i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    font-size: 1.25rem;
+  }
+
+  input {
+    padding-left: 40px;
+    width: 100%;
+  }
+}
+
+.statusFilters {
+  display: flex;
+  gap: 0.5rem;
+
+  @media (max-width: 600px) {
+    width: 100%;
+    justify-content: stretch;
+  }
+}
+
+.filterButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  @media (max-width: 600px) {
+    flex: 1;
+    padding: 0.5rem;
+  }
+
+  &:hover {
+    border-color: var(--color-primary, #3b82f6);
+    color: var(--color-primary, #3b82f6);
+  }
+
+  &.active {
+    border-color: var(--color-primary, #3b82f6);
+    background: rgba(var(--color-primary-rgb, 59, 130, 246), 0.1);
+    color: var(--color-primary, #3b82f6);
+    font-weight: 500;
+  }
+}
+
+// Table
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  th {
+    background: var(--color-bg-elevated);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s ease;
+
+    &:last-child td {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--color-bg-elevated);
+    }
+  }
+
+  .checkedInRow {
+    background: rgba(76, 175, 80, 0.05);
+
+    &:hover {
+      background: rgba(76, 175, 80, 0.1);
+    }
+  }
+}
+
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.name {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.ticketCode {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--color-text-muted);
+}
+
+// Status Badge
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.875rem;
+  }
+
+  &.checkedIn {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4caf50;
+
+    @media (prefers-color-scheme: dark) {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+    }
+  }
+
+  &.pending {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+
+    @media (prefers-color-scheme: dark) {
+      background: rgba(255, 152, 0, 0.2);
+      color: #ffb74d;
+    }
+  }
+}
+
+.checkedInTime {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 0.125rem;
+}
+
+// Action Button
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  i {
+    font-size: 1rem;
+  }
+
+  &.checkIn {
+    background: #4caf50;
+    color: white;
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: #43a047;
+    }
+  }
+
+  &.undo {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-text-secondary);
+      color: var(--color-text);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Empty State
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+  text-align: center;
+
+  i {
+    font-size: 3rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+}

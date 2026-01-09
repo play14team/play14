@@ -195,7 +195,7 @@ export default function LocationMapPicker({
     // Debounce the geocoding request
     const timeoutId = setTimeout(geocodeLocation, 500)
     return () => clearTimeout(timeoutId)
-  }, [centerOnLocation, token, autoFillFromLocation, precision])
+  }, [centerOnLocation, token, autoFillFromLocation, precision, zoomLevels.geocode])
 
   // Update view when value changes externally
   useEffect(() => {

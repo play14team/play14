@@ -1,8 +1,10 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import {
+  strapiFetch,
+  strapiFetchFormData,
+  strapiFetchWithQuery,
+} from "@/libs/strapi-client"
 
 // Types for sponsor management
 export interface SponsorLogo {
@@ -39,41 +41,27 @@ export interface SponsorActionResult<T = void> {
  * Get all available sponsors for selection
  */
 export async function getAvailableSponsors(): Promise<SponsorActionResult<Sponsor[]>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    // Fetch all sponsors with pagination disabled (limit -1 not supported, use large number)
-    const response = await fetch(
-      `${STRAPI_URL}/api/sponsors?sort=name:asc&populate=logo&pagination[pageSize]=1000`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to fetch sponsors (${response.status})`,
-      }
+  // Fetch all sponsors with pagination disabled (limit -1 not supported, use large number)
+  const result = await strapiFetchWithQuery<{ data: Sponsor[] }>(
+    "/sponsors",
+    {},
+    {
+      "sort": "name:asc",
+      "populate": "logo",
+      "pagination[pageSize]": "1000",
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: responseData.data || [],
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to fetch sponsors",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data || [],
   }
 }
 
@@ -84,40 +72,25 @@ export async function createSponsor(data: {
   name: string
   url?: string
 }): Promise<SponsorActionResult<Sponsor>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/sponsors`, {
+  const result = await strapiFetch<{ data: Sponsor }>(
+    "/sponsors",
+    {},
+    {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to create sponsor (${response.status})`,
-      }
+      body: { data },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to create sponsor",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data,
   }
 }
 
@@ -128,54 +101,44 @@ export async function uploadSponsorLogo(
   sponsorId: string,
   file: File
 ): Promise<SponsorActionResult<SponsorLogo>> {
-  const jwt = await getAuthCookie()
+  // First upload the file
+  const formData = new FormData()
+  formData.append("files", file)
+  formData.append("refId", sponsorId)
+  formData.append("ref", "api::sponsor.sponsor")
+  formData.append("field", "logo")
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
+  // Note: /upload doesn't have user input in the path, so it's safe
+  // The sponsorId is in the form body, validated by Strapi server-side
+  const result = await strapiFetchFormData<Array<{
+    id: number
+    url: string
+    width?: number
+    height?: number
+    formats?: SponsorLogo["formats"]
+  }>>(
+    "/upload",
+    {},
+    formData
+  )
 
-  try {
-    // First upload the file
-    const formData = new FormData()
-    formData.append("files", file)
-    formData.append("refId", sponsorId)
-    formData.append("ref", "api::sponsor.sponsor")
-    formData.append("field", "logo")
-
-    const uploadResponse = await fetch(`${STRAPI_URL}/api/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: formData,
-    })
-
-    if (!uploadResponse.ok) {
-      const errorData = await uploadResponse.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to upload logo (${uploadResponse.status})`,
-      }
-    }
-
-    const uploadedFiles = await uploadResponse.json()
-    const uploadedFile = uploadedFiles[0]
-
-    return {
-      success: true,
-      data: {
-        id: uploadedFile.id,
-        url: uploadedFile.url,
-        width: uploadedFile.width,
-        height: uploadedFile.height,
-        formats: uploadedFile.formats,
-      },
-    }
-  } catch (error) {
+  if (!result.ok || !result.data || result.data.length === 0) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to upload logo",
     }
+  }
+
+  const uploadedFile = result.data[0]
+  return {
+    success: true,
+    data: {
+      id: uploadedFile.id,
+      url: uploadedFile.url,
+      width: uploadedFile.width,
+      height: uploadedFile.height,
+      formats: uploadedFile.formats,
+    },
   }
 }
 
@@ -186,39 +149,24 @@ export async function updateEventSponsorships(
   slug: string,
   sponsorships: Sponsorship[]
 ): Promise<SponsorActionResult<Sponsorship[]>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/sponsorships`, {
+  const result = await strapiFetch<{ data: Sponsorship[] }>(
+    "/events/:slug/sponsorships",
+    { slug },
+    {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data: { sponsorships } }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to update sponsorships (${response.status})`,
-      }
+      body: { data: { sponsorships } },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to update sponsorships",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data,
   }
 }

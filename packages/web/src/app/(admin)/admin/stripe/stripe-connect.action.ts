@@ -1,8 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch, strapiFetchWithQuery } from "@/libs/strapi-client"
 
 // Types for Stripe Connect
 export interface StripeAccountStatus {
@@ -61,21 +59,14 @@ export interface HostStripeAccount {
  * Get the current user's Stripe account status
  */
 export async function getStripeAccountStatus(): Promise<StripeAccountStatus | null> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return null
+  const result = await strapiFetch<{ data: StripeAccountStatus }>(
+    "/stripe/connect/status",
+    {},
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/stripe/connect/status`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return null
-    const data = await response.json()
-    return data.data || null
-  } catch {
-    return null
-  }
+  if (!result.ok || !result.data) return null
+  return result.data.data || null
 }
 
 /**
@@ -85,40 +76,25 @@ export async function createStripeAccount(
   country: string = "FR",
   businessType: "individual" | "company" = "individual"
 ): Promise<CreateAccountResult> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/stripe/connect/create-account`, {
+  const result = await strapiFetch<{ data: CreateAccountResult["data"] }>(
+    "/stripe/connect/create-account",
+    {},
+    {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ country, businessType }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to create account (${response.status})`,
-      }
+      body: { country, businessType },
     }
+  )
 
-    const data = await response.json()
-    return {
-      success: true,
-      data: data.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to create account",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data,
   }
 }
 
@@ -126,44 +102,31 @@ export async function createStripeAccount(
  * Get onboarding URL to complete Stripe setup
  */
 export async function getOnboardingUrl(returnPath: string): Promise<OnboardingLinkResult> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
   // Build absolute URLs using the web app's base URL
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   const returnUrl = `${baseUrl}${returnPath}`
   const refreshUrl = `${baseUrl}${returnPath}?refresh=true`
 
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/stripe/connect/onboarding-link?returnUrl=${encodeURIComponent(returnUrl)}&refreshUrl=${encodeURIComponent(refreshUrl)}`,
-      {
-        headers: { Authorization: `Bearer ${jwt}` },
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to get onboarding link (${response.status})`,
-      }
+  const result = await strapiFetchWithQuery<{ data: { url: string; expiresAt?: string } }>(
+    "/stripe/connect/onboarding-link",
+    {},
+    {
+      returnUrl: returnUrl,
+      refreshUrl: refreshUrl,
     }
+  )
 
-    const data = await response.json()
-    return {
-      success: true,
-      url: data.data.url,
-      expiresAt: data.data.expiresAt,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to get onboarding link",
     }
+  }
+
+  return {
+    success: true,
+    url: result.data?.data.url,
+    expiresAt: result.data?.data.expiresAt,
   }
 }
 
@@ -171,35 +134,21 @@ export async function getOnboardingUrl(returnPath: string): Promise<OnboardingLi
  * Get Stripe Express dashboard URL
  */
 export async function getDashboardUrl(): Promise<DashboardLinkResult> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<{ data: { url: string } }>(
+    "/stripe/connect/dashboard-link",
+    {}
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/stripe/connect/dashboard-link`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to get dashboard link (${response.status})`,
-      }
-    }
-
-    const data = await response.json()
-    return {
-      success: true,
-      url: data.data.url,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to get dashboard link",
     }
+  }
+
+  return {
+    success: true,
+    url: result.data?.data.url,
   }
 }
 
@@ -207,21 +156,14 @@ export async function getDashboardUrl(): Promise<DashboardLinkResult> {
  * Get all Stripe accounts from hosts/mentors of an event
  */
 export async function getEventHostAccounts(eventId: string): Promise<HostStripeAccount[]> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return []
+  const result = await strapiFetch<{ data: HostStripeAccount[] }>(
+    "/stripe/connect/event/:eventId/accounts",
+    { eventId },
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/stripe/connect/event/${eventId}/accounts`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return []
-    const data = await response.json()
-    return data.data || []
-  } catch {
-    return []
-  }
+  if (!result.ok || !result.data) return []
+  return result.data.data || []
 }
 
 /**
@@ -233,70 +175,41 @@ export async function linkStripeAccountToEvent(
   eventId: string,
   stripeAccountId: string
 ): Promise<LinkAccountResult> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/stripe/connect/link-event/${eventId}`, {
+  const result = await strapiFetch(
+    "/stripe/connect/link-event/:eventId",
+    { eventId },
+    {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ stripeAccountId }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to link account (${response.status})`,
-      }
+      body: { stripeAccountId },
     }
+  )
 
-    return { success: true }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to link account",
     }
   }
+
+  return { success: true }
 }
 
 /**
  * Unlink Stripe account from an event
  */
 export async function unlinkStripeAccountFromEvent(eventId: string): Promise<LinkAccountResult> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch(
+    "/stripe/connect/unlink-event/:eventId",
+    { eventId },
+    { method: "POST" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/stripe/connect/unlink-event/${eventId}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to unlink account (${response.status})`,
-      }
-    }
-
-    return { success: true }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to unlink account",
     }
   }
+
+  return { success: true }
 }

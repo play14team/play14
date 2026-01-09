@@ -1,8 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
 
 // Types for finance management
 export interface FinanceData {
@@ -26,6 +24,10 @@ export interface ActionResult<T = void> {
   error?: string
 }
 
+interface StrapiDataResponse<T> {
+  data: T
+}
+
 /**
  * Update event finance data
  */
@@ -33,39 +35,24 @@ export async function updateEventFinance(
   slug: string,
   data: FinanceData
 ): Promise<ActionResult<Finance>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/finance`, {
+  const result = await strapiFetch<StrapiDataResponse<Finance>>(
+    "/events/:slug/finance",
+    { slug },
+    {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to update finance data (${response.status})`,
-      }
+      body: { data },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to update finance data",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data,
   }
 }

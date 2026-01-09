@@ -464,7 +464,6 @@
       "properties": {
         "fields": [
           "name",
-          "shortName",
           "logo",
           "website",
           "socialNetworks.url",
@@ -485,7 +484,6 @@
       "properties": {
         "fields": [
           "name",
-          "shortName",
           "logo",
           "website",
           "socialNetworks.url",
@@ -506,7 +504,6 @@
       "properties": {
         "fields": [
           "name",
-          "shortName",
           "logo",
           "website",
           "socialNetworks.url",

@@ -92,7 +92,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           organizerOnly: true,
         },
         {
-          href: "/admin/my-tickets",
+          href: "/admin/tickets",
           icon: "bx-purchase-tag",
           label: "Tickets",
         },

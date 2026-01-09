@@ -16,19 +16,21 @@
       "required": true,
       "unique": true
     },
-    "status": {
+    "ticketStatus": {
       "type": "enumeration",
       "enum": ["valid", "used", "cancelled", "refunded"],
       "default": "valid",
       "required": true
     },
     "attendeeName": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "attendeeEmail": {
-      "type": "email",
-      "required": true
+      "type": "email"
+    },
+    "attendeeInfo": {
+      "type": "component",
+      "component": "attendee.attendee-info"
     },
     "checkedInAt": {
       "type": "datetime"

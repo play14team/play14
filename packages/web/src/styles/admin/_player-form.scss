@@ -84,16 +84,26 @@
   gap: 32px;
   align-items: start;
   margin-bottom: 24px;
+
+  // Ensure all direct children stretch to fill their grid cells
+  > * {
+    min-width: 0;
+  }
 }
 
 .player-form-header-fields {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-width: 0;
+  width: 100%;
 
   .admin-form-group {
     margin-bottom: 0;
+    width: 100%;
+
+    .admin-input {
+      width: 100%;
+    }
   }
 }
 

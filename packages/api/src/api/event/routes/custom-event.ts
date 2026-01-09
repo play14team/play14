@@ -199,6 +199,63 @@ export default {
         description: "Update event sponsorships (organizer only)",
       },
     },
+    // Revenue analytics route
+    {
+      method: "GET",
+      path: "/events/:eventId/revenue-analytics",
+      handler: "custom-event.getRevenueAnalytics",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Get revenue analytics for an event (organizer only)",
+      },
+    },
+    // Participants management routes
+    {
+      method: "GET",
+      path: "/events/:eventId/participants",
+      handler: "custom-event.getParticipants",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Get participants (tickets) for an event (organizer only)",
+      },
+    },
+    {
+      method: "GET",
+      path: "/events/:eventId/participants/stats",
+      handler: "custom-event.getParticipantStats",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Get participant statistics for an event (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/events/:eventId/participants/:ticketId/check-in",
+      handler: "custom-event.checkInParticipant",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Check in a participant (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/events/:eventId/participants/:ticketId/undo-check-in",
+      handler: "custom-event.undoCheckIn",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Undo check-in for a participant (organizer only)",
+      },
+    },
     // Public route to find event by slug - MUST be last (catch-all pattern)
     {
       method: "GET",

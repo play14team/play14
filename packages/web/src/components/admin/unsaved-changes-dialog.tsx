@@ -71,11 +71,7 @@ export default function UnsavedChangesDialog({
   }
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="unsaved-changes-dialog"
-      onClick={handleBackdropClick}
-    >
+    <dialog ref={dialogRef} className="unsaved-changes-dialog" onClick={handleBackdropClick}>
       <div className="unsaved-changes-content">
         <div className="unsaved-changes-icon">
           <i className="bx bx-error-circle"></i>
@@ -84,8 +80,8 @@ export default function UnsavedChangesDialog({
         <h2>Unsaved Changes</h2>
 
         <p>
-          You have unsaved changes that will be lost if you navigate away. What
-          would you like to do?
+          You have unsaved changes that will be lost if you navigate away. What would you like to
+          do?
         </p>
 
         <div className="unsaved-changes-actions">
@@ -103,7 +99,7 @@ export default function UnsavedChangesDialog({
             ) : (
               <>
                 <i className="bx bx-save"></i>
-                Save Changes
+                Save changes
               </>
             )}
           </button>
@@ -115,7 +111,7 @@ export default function UnsavedChangesDialog({
             disabled={isSaving}
           >
             <i className="bx bx-trash"></i>
-            Discard Changes
+            Discard changes
           </button>
 
           <button

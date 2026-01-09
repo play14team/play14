@@ -1,9 +1,7 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
+import { strapiFetch, strapiFetchWithQuery, validatePathSegment } from "@/libs/strapi-client"
 import type { UploadFile } from "@/models/strapi"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
 // ============================================================================
 // TYPES
@@ -54,44 +52,38 @@ export interface ClaimActionResponse {
   error?: string
 }
 
+interface StrapiDataResponse<T> {
+  data: T
+}
+
+interface EventsDataResponse {
+  data: {
+    events: ClaimableEvent[]
+  }
+}
+
 // ============================================================================
 // GET CLAIMABLE EVENTS
 // ============================================================================
 
 export async function getClaimableEvents(): Promise<EventsResponse> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<EventsDataResponse>(
+    "/attendance-claims/events",
+    {},
+    { cache: "no-store" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/attendance-claims/events`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      cache: "no-store",
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to fetch events: ${response.status}`,
-      }
-    }
-
-    const data = await response.json()
-    return {
-      success: true,
-      events: data.data?.events || [],
-    }
-  } catch (error) {
-    console.error("[AttendanceClaims] Failed to fetch claimable events:", error)
+  if (!result.ok) {
+    console.error("[AttendanceClaims] Failed to fetch claimable events:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch events",
+      error: result.error || "Failed to fetch events",
     }
+  }
+
+  return {
+    success: true,
+    events: result.data?.data?.events || [],
   }
 }
 
@@ -100,42 +92,26 @@ export async function getClaimableEvents(): Promise<EventsResponse> {
 // ============================================================================
 
 export async function searchClaimableEvents(query: string): Promise<EventsResponse> {
-  const jwt = await getAuthCookie()
+  // Note: query is validated as a search string, not a path segment
+  // It's passed as a query parameter, so encodeURIComponent is sufficient
+  const result = await strapiFetchWithQuery<EventsDataResponse>(
+    "/attendance-claims/events/search",
+    {},
+    { query },
+    { cache: "no-store" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/attendance-claims/events/search?query=${encodeURIComponent(query)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`,
-        },
-        cache: "no-store",
-      }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to search events: ${response.status}`,
-      }
-    }
-
-    const data = await response.json()
-    return {
-      success: true,
-      events: data.data?.events || [],
-    }
-  } catch (error) {
-    console.error("[AttendanceClaims] Failed to search events:", error)
+  if (!result.ok) {
+    console.error("[AttendanceClaims] Failed to search events:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to search events",
+      error: result.error || "Failed to search events",
     }
+  }
+
+  return {
+    success: true,
+    events: result.data?.data?.events || [],
   }
 }
 
@@ -144,39 +120,23 @@ export async function searchClaimableEvents(query: string): Promise<EventsRespon
 // ============================================================================
 
 export async function getMyAttendanceClaims(): Promise<ClaimsResponse> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<StrapiDataResponse<AttendanceClaim[]>>(
+    "/attendance-claims/me",
+    {},
+    { cache: "no-store" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/attendance-claims/me`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      cache: "no-store",
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to fetch claims: ${response.status}`,
-      }
-    }
-
-    const data = await response.json()
-    return {
-      success: true,
-      claims: data.data || [],
-    }
-  } catch (error) {
-    console.error("[AttendanceClaims] Failed to fetch my claims:", error)
+  if (!result.ok) {
+    console.error("[AttendanceClaims] Failed to fetch my claims:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch claims",
+      error: result.error || "Failed to fetch claims",
     }
+  }
+
+  return {
+    success: true,
+    claims: result.data?.data || [],
   }
 }
 
@@ -188,46 +148,41 @@ export async function submitAttendanceClaim(
   eventId: string,
   reason: string
 ): Promise<ClaimActionResponse> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
+  // Validate eventId before using in request body (defense in depth)
+  try {
+    validatePathSegment(eventId, "eventId")
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Invalid event ID",
+    }
   }
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/attendance-claims`, {
+  const result = await strapiFetch<StrapiDataResponse<AttendanceClaim>>(
+    "/attendance-claims",
+    {},
+    {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      body: {
         data: {
           eventId,
           reason,
         },
-      }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to submit claim: ${response.status}`,
-      }
+      },
     }
+  )
 
-    const data = await response.json()
-    return {
-      success: true,
-      claim: data.data,
-    }
-  } catch (error) {
-    console.error("[AttendanceClaims] Failed to submit claim:", error)
+  if (!result.ok) {
+    console.error("[AttendanceClaims] Failed to submit claim:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to submit claim",
+      error: result.error || "Failed to submit claim",
     }
+  }
+
+  return {
+    success: true,
+    claim: result.data?.data,
   }
 }
 
@@ -236,34 +191,19 @@ export async function submitAttendanceClaim(
 // ============================================================================
 
 export async function cancelAttendanceClaim(claimId: string): Promise<ClaimActionResponse> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch<void>(
+    "/attendance-claims/:claimId",
+    { claimId },
+    { method: "DELETE" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/attendance-claims/${claimId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to cancel claim: ${response.status}`,
-      }
-    }
-
-    return { success: true }
-  } catch (error) {
-    console.error("[AttendanceClaims] Failed to cancel claim:", error)
+  if (!result.ok) {
+    console.error("[AttendanceClaims] Failed to cancel claim:", result.error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to cancel claim",
+      error: result.error || "Failed to cancel claim",
     }
   }
+
+  return { success: true }
 }

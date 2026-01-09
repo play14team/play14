@@ -1,8 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
 
 // Types
 export interface LocationOption {
@@ -45,42 +43,28 @@ export interface CreateEventResult {
  * Get available event locations for the dropdown
  */
 export async function getLocations(): Promise<LocationOption[]> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return []
+  const result = await strapiFetch<{ data: LocationOption[] }>(
+    "/events/locations",
+    {},
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/locations`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return []
-    const data = await response.json()
-    return data.data || []
-  } catch {
-    return []
-  }
+  if (!result.ok || !result.data) return []
+  return result.data.data || []
 }
 
 /**
  * Get available venues for the dropdown
  */
 export async function getVenues(): Promise<VenueOption[]> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return []
+  const result = await strapiFetch<{ data: VenueOption[] }>(
+    "/events/venues",
+    {},
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/venues`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return []
-    const data = await response.json()
-    return data.data || []
-  } catch {
-    return []
-  }
+  if (!result.ok || !result.data) return []
+  return result.data.data || []
 }
 
 /**
@@ -89,41 +73,24 @@ export async function getVenues(): Promise<VenueOption[]> {
 export async function createEvent(
   data: EventCreateData
 ): Promise<CreateEventResult> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/create`, {
+  const result = await strapiFetch<{ data: CreateEventResult["event"] }>(
+    "/events/create",
+    {},
+    {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error:
-          errorData.error?.message ||
-          `Failed to create event (${response.status})`,
-      }
+      body: { data },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      event: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to create event",
     }
+  }
+
+  return {
+    success: true,
+    event: result.data?.data,
   }
 }

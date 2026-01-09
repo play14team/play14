@@ -477,7 +477,7 @@ label.admin-btn {
     }
   }
 
-  // Danger variant - red icon by default, red background on hover
+  // Danger variant - red icon by default, light red background on hover
   &.admin-btn-danger {
     background-color: transparent;
     border-color: rgba(220, 38, 38, 0.3);
@@ -487,24 +487,12 @@ label.admin-btn {
     }
 
     &:hover:not(:disabled) {
-      background-color: #dc2626;
-      border-color: #dc2626;
+      background-color: rgba(220, 38, 38, 0.1);
+      border-color: rgba(220, 38, 38, 0.5);
 
       i {
-        color: white;
+        color: #dc2626;
       }
-    }
-  }
-}
-
-// Standalone danger class for non-icon buttons
-.admin-btn-danger:not(.admin-btn-icon) {
-  &:hover {
-    background-color: rgba(220, 38, 38, 0.1);
-    border-color: rgba(220, 38, 38, 0.3);
-
-    i {
-      color: #dc2626;
     }
   }
 }
@@ -1336,6 +1324,155 @@ label.admin-btn {
   }
 
   .ticket-type-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+// ===========================================
+// Discount Code Editor
+// ===========================================
+
+.discount-code-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.discount-code-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.discount-code-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+  }
+
+  &.discount-inactive {
+    opacity: 0.6;
+    background-color: var(--color-bg);
+  }
+
+  &.discount-code-new {
+    border-style: dashed;
+    border-color: var(--color-primary);
+    background-color: var(--color-bg);
+  }
+}
+
+.discount-code-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.discount-code-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.discount-code-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  font-family: monospace;
+}
+
+.discount-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+
+  &.inactive {
+    background-color: var(--color-bg-elevated);
+    color: var(--color-text-muted);
+  }
+
+  &.used {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    color: var(--color-primary);
+  }
+}
+
+.discount-code-description {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0 0 8px;
+}
+
+.discount-code-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.discount-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.discount-min,
+.discount-max {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.discount-code-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.discount-code-form {
+  width: 100%;
+
+  h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    color: var(--color-text);
+  }
+
+  .discount-code-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .discount-code-card {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .discount-code-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .discount-code-details {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;

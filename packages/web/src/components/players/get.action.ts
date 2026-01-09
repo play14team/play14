@@ -234,7 +234,7 @@ export async function getPlayerNav() {
   return allPlayers
 }
 
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
 
 // Types for pending attendance claims
 interface PendingAttendanceClaim {
@@ -250,23 +250,18 @@ interface PendingAttendanceClaim {
 export async function getPendingAttendanceClaims(
   playerDocumentId: string
 ): Promise<PendingAttendanceClaim[]> {
-  try {
-    const response = await fetch(
-      `${STRAPI_URL}/api/attendance-claims/player/${playerDocumentId}`,
-      { cache: "no-store" }
+  const result = await strapiFetch<{ data: PendingAttendanceClaim[] }>(
+    "/attendance-claims/player/:playerDocumentId",
+    { playerDocumentId },
+    { cache: "no-store", noAuth: true }
+  )
+
+  if (!result.ok) {
+    console.error(
+      `[Players] Failed to fetch pending claims: ${result.status}`
     )
-
-    if (!response.ok) {
-      console.error(
-        `[Players] Failed to fetch pending claims: ${response.status}`
-      )
-      return []
-    }
-
-    const data = await response.json()
-    return data.data || []
-  } catch (error) {
-    console.error("[Players] Failed to fetch pending attendance claims:", error)
     return []
   }
+
+  return result.data?.data || []
 }

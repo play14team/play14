@@ -1,5 +1,26 @@
 import type { Schema, Struct } from "@strapi/strapi"
 
+export interface AttendeeAttendeeInfo extends Struct.ComponentSchema {
+  collectionName: "components_attendee_attendee_info"
+  info: {
+    description: "Per-ticket attendee information for events"
+    displayName: "Attendee Info"
+    icon: "user"
+  }
+  attributes: {
+    email: Schema.Attribute.Email & Schema.Attribute.Required
+    firstName: Schema.Attribute.String & Schema.Attribute.Required
+    foodPreferences: Schema.Attribute.Text
+    lastName: Schema.Attribute.String & Schema.Attribute.Required
+    photoConsent: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>
+    photoConsentTimestamp: Schema.Attribute.DateTime
+    tshirtSize: Schema.Attribute.Enumeration<["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"]> &
+      Schema.Attribute.DefaultTo<"none">
+  }
+}
+
 export interface ContactSocialNetwork extends Struct.ComponentSchema {
   collectionName: "components_contact_social_networks"
   info: {
@@ -258,6 +279,7 @@ export interface SharedSeo extends Struct.ComponentSchema {
 declare module "@strapi/strapi" {
   export module Public {
     export interface ComponentSchemas {
+      "attendee.attendee-info": AttendeeAttendeeInfo
       "contact.social-network": ContactSocialNetwork
       "default.history-item": DefaultHistoryItem
       "events.media": EventsMedia

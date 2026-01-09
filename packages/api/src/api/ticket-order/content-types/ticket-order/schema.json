@@ -18,8 +18,8 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["pending", "paid", "cancelled", "refunded", "partially_refunded"],
-      "default": "pending",
+      "enum": ["draft", "pending", "paid", "cancelled", "refunded", "partially_refunded", "expired", "failed"],
+      "default": "draft",
       "required": true
     },
     "totalAmount": {
@@ -64,6 +64,9 @@
     "refundReason": {
       "type": "text"
     },
+    "notes": {
+      "type": "text"
+    },
     "ticketDetails": {
       "type": "json"
     },
@@ -82,6 +85,48 @@
       "relation": "oneToMany",
       "target": "api::ticket.ticket",
       "mappedBy": "order"
+    },
+    "discountCode": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::discount-code.discount-code"
+    },
+    "discountAmount": {
+      "type": "decimal",
+      "min": 0,
+      "default": 0
+    },
+    "originalAmount": {
+      "type": "decimal",
+      "min": 0
+    },
+    "attendeeDetails": {
+      "type": "json",
+      "description": "Attendee info collected before payment, keyed by ticket index"
+    },
+    "gdprConsent": {
+      "type": "boolean",
+      "default": false
+    },
+    "gdprConsentTimestamp": {
+      "type": "datetime"
+    },
+    "termsAccepted": {
+      "type": "boolean",
+      "default": false
+    },
+    "termsAcceptedTimestamp": {
+      "type": "datetime"
+    },
+    "hasReservation": {
+      "type": "boolean",
+      "default": false
+    },
+    "reservationCreatedAt": {
+      "type": "datetime"
+    },
+    "reservationExpiresAt": {
+      "type": "datetime"
     }
   }
 }

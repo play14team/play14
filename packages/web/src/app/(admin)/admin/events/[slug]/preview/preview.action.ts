@@ -1,8 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
 
 // Types matching the public event interface for preview consistency
 interface UploadFile {
@@ -92,8 +90,7 @@ export interface PreviewEvent {
   mentors?: Player[]
   players?: Player[]
   media?: Array<{ id: string; url: string; type: string }>
-  ticketingEnabled?: boolean
-  paymentProvider?: string
+  ticketingMode?: "none" | "internal" | "external"
   ticketTypes?: Array<{
     documentId: string
     name: string
@@ -118,19 +115,12 @@ export interface PreviewEvent {
 export async function getEventPreview(
   slug: string
 ): Promise<PreviewEvent | null> {
-  const jwt = await getAuthCookie()
-  if (!jwt) return null
+  const result = await strapiFetch<{ data: PreviewEvent }>(
+    "/events/:slug/preview",
+    { slug },
+    { cache: "no-store" }
+  )
 
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${slug}/preview`, {
-      headers: { Authorization: `Bearer ${jwt}` },
-      cache: "no-store",
-    })
-
-    if (!response.ok) return null
-    const data = await response.json()
-    return data.data || null
-  } catch {
-    return null
-  }
+  if (!result.ok || !result.data) return null
+  return result.data.data || null
 }

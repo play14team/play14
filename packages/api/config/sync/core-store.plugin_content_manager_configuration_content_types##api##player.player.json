@@ -265,6 +265,34 @@
           "sortable": true
         }
       },
+      "defaultTshirtSize": {
+        "edit": {
+          "label": "defaultTshirtSize",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "defaultTshirtSize",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "defaultFoodPreferences": {
+        "edit": {
+          "label": "defaultFoodPreferences",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "defaultFoodPreferences",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "createdAt": {
         "edit": {
           "label": "createdAt",
@@ -430,6 +458,16 @@
         [
           {
             "name": "stripeAccount",
+            "size": 6
+          },
+          {
+            "name": "defaultTshirtSize",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "defaultFoodPreferences",
             "size": 6
           }
         ]

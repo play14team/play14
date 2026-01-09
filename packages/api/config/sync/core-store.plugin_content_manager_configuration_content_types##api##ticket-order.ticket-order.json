@@ -201,6 +201,20 @@
           "sortable": true
         }
       },
+      "notes": {
+        "edit": {
+          "label": "notes",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "notes",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "ticketDetails": {
         "edit": {
           "label": "ticketDetails",
@@ -258,6 +272,119 @@
           "label": "tickets",
           "searchable": false,
           "sortable": false
+        }
+      },
+      "discountCode": {
+        "edit": {
+          "label": "discountCode",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "code"
+        },
+        "list": {
+          "label": "discountCode",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "discountAmount": {
+        "edit": {
+          "label": "discountAmount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "discountAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "originalAmount": {
+        "edit": {
+          "label": "originalAmount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "originalAmount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "attendeeDetails": {
+        "edit": {
+          "label": "attendeeDetails",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "attendeeDetails",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "gdprConsent": {
+        "edit": {
+          "label": "gdprConsent",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "gdprConsent",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "gdprConsentTimestamp": {
+        "edit": {
+          "label": "gdprConsentTimestamp",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "gdprConsentTimestamp",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "termsAccepted": {
+        "edit": {
+          "label": "termsAccepted",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "termsAccepted",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "termsAcceptedTimestamp": {
+        "edit": {
+          "label": "termsAcceptedTimestamp",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "termsAcceptedTimestamp",
+          "searchable": true,
+          "sortable": true
         }
       },
       "createdAt": {
@@ -332,7 +459,9 @@
         "id",
         "orderNumber",
         "status",
-        "totalAmount"
+        "totalAmount",
+        "currency",
+        "purchaserEmail"
       ],
       "edit": [
         [
@@ -420,6 +549,52 @@
         [
           {
             "name": "tickets",
+            "size": 6
+          },
+          {
+            "name": "discountCode",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "discountAmount",
+            "size": 4
+          },
+          {
+            "name": "originalAmount",
+            "size": 4
+          }
+        ],
+        [
+          {
+            "name": "notes",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "attendeeDetails",
+            "size": 12
+          }
+        ],
+        [
+          {
+            "name": "gdprConsent",
+            "size": 4
+          },
+          {
+            "name": "gdprConsentTimestamp",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "termsAccepted",
+            "size": 4
+          },
+          {
+            "name": "termsAcceptedTimestamp",
             "size": 6
           }
         ]

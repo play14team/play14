@@ -16,6 +16,91 @@ import type {
   AccountLink,
 } from "../types"
 
+/**
+ * ISO 4217 currency codes supported by this platform.
+ *
+ * NOTE: Stripe supports 135+ currencies, but we intentionally limit to currencies
+ * commonly used by #play14 events to:
+ * 1. Ensure proper testing coverage for payment flows
+ * 2. Maintain consistent decimal handling (some currencies like JPY are zero-decimal)
+ * 3. Reduce risk of currency-related payment errors
+ *
+ * To add a new currency:
+ * 1. Add it to this set
+ * 2. Verify it works with Stripe Connect in your target countries
+ * 3. Test the full payment flow including refunds
+ * 4. Update documentation if needed
+ *
+ * For Stripe's full currency list, see: https://stripe.com/docs/currencies
+ */
+const SUPPORTED_CURRENCIES = new Set([
+  // Major currencies
+  "usd", // US Dollar
+  "eur", // Euro
+  "gbp", // British Pound
+  "cad", // Canadian Dollar
+  "aud", // Australian Dollar
+  "jpy", // Japanese Yen (zero-decimal)
+  "chf", // Swiss Franc
+  "nzd", // New Zealand Dollar
+  // European currencies
+  "sek", // Swedish Krona
+  "nok", // Norwegian Krone
+  "dkk", // Danish Krone
+  "pln", // Polish Zloty
+  "czk", // Czech Koruna
+  "huf", // Hungarian Forint
+  "ron", // Romanian Leu
+  "bgn", // Bulgarian Lev
+  "hrk", // Croatian Kuna (legacy, now EUR)
+  "isk", // Icelandic Króna
+  // Asia-Pacific
+  "inr", // Indian Rupee
+  "sgd", // Singapore Dollar
+  "hkd", // Hong Kong Dollar
+  "thb", // Thai Baht
+  "myr", // Malaysian Ringgit
+  "php", // Philippine Peso
+  "idr", // Indonesian Rupiah
+  "krw", // South Korean Won (zero-decimal)
+  "twd", // Taiwan Dollar
+  // Americas
+  "mxn", // Mexican Peso
+  "brl", // Brazilian Real
+  "ars", // Argentine Peso
+  "clp", // Chilean Peso (zero-decimal)
+  "cop", // Colombian Peso
+  // Middle East & Africa
+  "ils", // Israeli New Shekel
+  "zar", // South African Rand
+  "aed", // UAE Dirham
+  "sar", // Saudi Riyal
+])
+
+/**
+ * Validate and normalize currency code
+ * @throws Error if currency is invalid
+ */
+function validateCurrency(currency: string | undefined): string {
+  if (!currency || typeof currency !== "string") {
+    throw new Error("Currency is required")
+  }
+
+  const normalized = currency.toLowerCase().trim()
+
+  if (normalized.length !== 3) {
+    throw new Error(`Invalid currency code: ${currency}. Must be a 3-letter ISO 4217 code.`)
+  }
+
+  if (!SUPPORTED_CURRENCIES.has(normalized)) {
+    throw new Error(
+      `Unsupported currency: ${currency}. Supported currencies: ${Array.from(SUPPORTED_CURRENCIES).join(", ")}`
+    )
+  }
+
+  return normalized
+}
+
 export class StripeProvider implements ConnectPaymentProvider {
   private stripe: Stripe
   private webhookSecret: string
@@ -32,11 +117,13 @@ export class StripeProvider implements ConnectPaymentProvider {
   }
 
   async createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession> {
+    const currency = validateCurrency(params.currency)
+
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: params.lineItems.map((item) => ({
         price_data: {
-          currency: params.currency.toLowerCase(),
+          currency,
           product_data: {
             name: item.name,
             description: item.description,
@@ -69,16 +156,18 @@ export class StripeProvider implements ConnectPaymentProvider {
   async createCheckoutSessionWithConnect(
     params: CreateCheckoutWithConnectParams
   ): Promise<CheckoutSession> {
+    const currency = validateCurrency(params.currency)
+
     const totalAmount = params.lineItems.reduce(
       (sum, item) => sum + Math.round(item.unitPrice * 100) * item.quantity,
       0
     )
 
     const session = await this.stripe.checkout.sessions.create({
-      payment_method_types: ["card", "sepa_debit", "bancontact", "ideal", "giropay", "eps", "p24"],
+      payment_method_types: ["card"],
       line_items: params.lineItems.map((item) => ({
         price_data: {
-          currency: params.currency.toLowerCase(),
+          currency,
           product_data: {
             name: item.name,
             description: item.description,

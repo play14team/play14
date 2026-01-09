@@ -2,7 +2,9 @@
 
 import StripeAccountSelector from "@/components/admin/stripe-account-selector"
 import TicketTypeEditor from "../ticket-type-editor"
+import DiscountCodeEditor from "../discount-code-editor"
 import type { TicketType } from "../ticket-type.action"
+import type { DiscountCode } from "../discount-code.action"
 import type { EventForEdit, TicketingMode } from "../event-edit.action"
 import type {
   StripeAccountStatus,
@@ -12,6 +14,7 @@ import type {
 interface TicketsTabProps {
   eventDocumentId: string
   ticketTypes: TicketType[]
+  discountCodes: DiscountCode[]
   stripeAccount: EventForEdit["stripeAccount"]
   hostAccounts: HostStripeAccount[]
   playerAccount: StripeAccountStatus | null
@@ -28,6 +31,7 @@ interface TicketsTabProps {
 export default function TicketsTab({
   eventDocumentId,
   ticketTypes,
+  discountCodes,
   stripeAccount,
   hostAccounts,
   playerAccount,
@@ -129,6 +133,19 @@ export default function TicketsTab({
             <TicketTypeEditor
               eventId={eventDocumentId}
               ticketTypes={ticketTypes}
+              onUpdate={onUpdate}
+            />
+          </div>
+
+          {/* Discount Codes Section */}
+          <div className="admin-form-section">
+            <h2>Discount Codes</h2>
+            <p className="admin-form-section-description">
+              Create promotional codes to offer discounts on ticket purchases.
+            </p>
+            <DiscountCodeEditor
+              eventId={eventDocumentId}
+              discountCodes={discountCodes}
               onUpdate={onUpdate}
             />
           </div>

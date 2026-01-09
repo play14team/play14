@@ -12,6 +12,7 @@ import {
   type OrganizerOption,
 } from "./event-edit.action"
 import type { TicketType } from "./ticket-type.action"
+import type { DiscountCode } from "./discount-code.action"
 import type {
   StripeAccountStatus,
   HostStripeAccount,
@@ -28,7 +29,9 @@ import BasicsTab from "./tabs/basics-tab"
 import ContentTab from "./tabs/content-tab"
 import ScheduleTicketsTab from "./tabs/schedule-tickets-tab"
 import TeamSponsorsTab from "./tabs/team-sponsors-tab"
-import MediaFinanceTab from "./tabs/media-finance-tab"
+import ParticipantsTab from "./tabs/participants-tab"
+import MediaTab from "./tabs/media-tab"
+import FinanceTab from "./tabs/finance-tab"
 
 interface Props {
   event: EventForEdit
@@ -37,6 +40,7 @@ interface Props {
   organizers: OrganizerOption[]
   hostAccounts: HostStripeAccount[]
   playerStripeAccount: StripeAccountStatus | null
+  discountCodes: DiscountCode[]
 }
 
 export default function EventEditForm({
@@ -46,6 +50,7 @@ export default function EventEditForm({
   organizers,
   hostAccounts,
   playerStripeAccount,
+  discountCodes,
 }: Props) {
   const router = useRouter()
   const toast = useToast()
@@ -300,6 +305,7 @@ export default function EventEditForm({
             <ScheduleTicketsTab
               eventDocumentId={event.documentId}
               ticketTypes={(event.ticketTypes || []) as TicketType[]}
+              discountCodes={discountCodes}
               stripeAccount={event.stripeAccount}
               hostAccounts={hostAccounts}
               playerAccount={playerStripeAccount}
@@ -327,10 +333,23 @@ export default function EventEditForm({
             />
           )}
 
+          {activeTab === "participants" && (
+            <ParticipantsTab
+              eventDocumentId={event.documentId}
+              onUpdate={handleUpdate}
+            />
+          )}
+
           {activeTab === "media" && (
-            <MediaFinanceTab
+            <MediaTab
               mediaLinks={form.mediaLinks}
               onMediaLinksChange={form.setMediaLinks}
+            />
+          )}
+
+          {activeTab === "finance" && (
+            <FinanceTab
+              eventDocumentId={event.documentId}
               financeData={form.financeData}
               onFinanceChange={form.setFinanceData}
             />

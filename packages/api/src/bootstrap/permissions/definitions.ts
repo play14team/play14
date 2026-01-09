@@ -23,6 +23,7 @@ import {
   STRIPE_ACCOUNT_ACTIONS,
   TICKET_ORDER_ACTIONS,
   TICKET_TYPE_ACTIONS,
+  DISCOUNT_CODE_ACTIONS,
   ARTICLE_ACTIONS,
   EXPECTATION_ACTIONS,
   EVENT_LOCATION_ACTIONS,
@@ -108,6 +109,11 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: TICKET_ORDER_ACTIONS.INITIATE_ORDER, minimumRole: ROLE_TYPES.PLAYER },
   { action: TICKET_ORDER_ACTIONS.REQUEST_REFUND, minimumRole: ROLE_TYPES.PLAYER },
 
+  // Draft order flow (multi-step checkout with attendee info)
+  { action: TICKET_ORDER_ACTIONS.CREATE_DRAFT_ORDER, minimumRole: ROLE_TYPES.PLAYER },
+  { action: TICKET_ORDER_ACTIONS.UPDATE_ATTENDEE_INFO, minimumRole: ROLE_TYPES.PLAYER },
+  { action: TICKET_ORDER_ACTIONS.FINALIZE_CHECKOUT, minimumRole: ROLE_TYPES.PLAYER },
+
   // ==================== HOST ROLE ====================
   // These require organizer (Host/Mentor/Founder) status
 
@@ -129,6 +135,11 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: EVENT_ACTIONS.SET_IMAGE_FROM_LIBRARY, minimumRole: ROLE_TYPES.HOST },
   { action: EVENT_ACTIONS.REMOVE_IMAGE, minimumRole: ROLE_TYPES.HOST },
   { action: EVENT_ACTIONS.UPDATE_SPONSORSHIPS, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.GET_REVENUE_ANALYTICS, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.GET_PARTICIPANTS, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.GET_PARTICIPANT_STATS, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.CHECK_IN_PARTICIPANT, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.UNDO_CHECK_IN, minimumRole: ROLE_TYPES.HOST },
 
   // Player management (for event organizers)
   { action: PLAYER_ACTIONS.LIST_PLAYERS, minimumRole: ROLE_TYPES.HOST },
@@ -160,6 +171,13 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: TICKET_TYPE_ACTIONS.UPDATE_TICKET_TYPE, minimumRole: ROLE_TYPES.HOST },
   { action: TICKET_TYPE_ACTIONS.DELETE_TICKET_TYPE, minimumRole: ROLE_TYPES.HOST },
   { action: TICKET_TYPE_ACTIONS.GET_EVENT_ORDERS, minimumRole: ROLE_TYPES.HOST },
+
+  // Discount code management
+  { action: DISCOUNT_CODE_ACTIONS.CREATE, minimumRole: ROLE_TYPES.HOST },
+  { action: DISCOUNT_CODE_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.HOST },
+  { action: DISCOUNT_CODE_ACTIONS.DELETE, minimumRole: ROLE_TYPES.HOST },
+  { action: DISCOUNT_CODE_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
+  { action: DISCOUNT_CODE_ACTIONS.VALIDATE, minimumRole: ROLE_TYPES.PUBLIC },
 
   // Event location management (admin panel)
   { action: EVENT_LOCATION_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
@@ -315,4 +333,7 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Available tickets (public for event pages)
   { action: TICKET_ORDER_ACTIONS.GET_AVAILABLE_TICKETS, minimumRole: ROLE_TYPES.FOUNDER },
+
+  // Cancel pending order (public - called when user abandons checkout)
+  { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.FOUNDER },
 ]

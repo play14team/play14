@@ -1,14 +1,26 @@
 "use client"
 
-import { useState } from "react"
-import type { TicketTypeInfo, TicketSelection } from "./purchase.action"
+import { useState, useEffect } from "react"
+import type {
+  TicketTypeInfo,
+  TicketSelection,
+  AuthStatus,
+  DiscountValidationResult,
+} from "./purchase.action"
+import { validateDiscountCode } from "./purchase.action"
+import DiscountCodeInput from "./discount-code-input"
 import styles from "./ticket-selector.module.scss"
 
 interface TicketSelectorProps {
+  eventId: string
   eventName: string
   ticketTypes: TicketTypeInfo[]
   hasPaymentProvider: boolean
-  onPurchase: (tickets: TicketSelection[]) => Promise<void>
+  authStatus: AuthStatus | null
+  onPurchase: (tickets: TicketSelection[], discountCode?: string) => Promise<void>
+  onAuthRequired: (quantities: Record<string, number>, discountCode?: string) => void
+  initialQuantities?: Record<string, number>
+  initialDiscountCode?: string
 }
 
 /**
@@ -24,23 +36,60 @@ function formatDate(dateString: string): string {
 }
 
 export default function TicketSelector({
+  eventId,
   eventName,
   ticketTypes,
   hasPaymentProvider,
+  authStatus,
   onPurchase,
+  onAuthRequired,
+  initialQuantities,
+  initialDiscountCode,
 }: TicketSelectorProps) {
-  const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const [quantities, setQuantities] = useState<Record<string, number>>(initialQuantities || {})
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [appliedDiscount, setAppliedDiscount] = useState<DiscountValidationResult | null>(null)
+  const [pendingDiscountCode, setPendingDiscountCode] = useState<string | undefined>(initialDiscountCode)
+
+  // Update quantities if initialQuantities changes (after OAuth redirect)
+  useEffect(() => {
+    if (initialQuantities && Object.keys(initialQuantities).length > 0) {
+      setQuantities(initialQuantities)
+    }
+  }, [initialQuantities])
+
+  // Set pending discount code when initial value changes
+  useEffect(() => {
+    if (initialDiscountCode) {
+      setPendingDiscountCode(initialDiscountCode)
+    }
+  }, [initialDiscountCode])
 
   const currency = ticketTypes[0]?.currency || "EUR"
 
-  // Only count purchasable tickets in total
-  const totalAmount = ticketTypes
+  // Calculate subtotal (before discount)
+  const subtotal = ticketTypes
     .filter((tt) => tt.withinDateRange && !tt.soldOut)
     .reduce((sum, tt) => {
       return sum + tt.price * (quantities[tt.documentId] || 0)
     }, 0)
+
+  // Calculate discount amount
+  const discountAmount = appliedDiscount?.valid
+    ? appliedDiscount.discountType === "percentage"
+      ? subtotal * (appliedDiscount.discountValue! / 100)
+      : Math.min(appliedDiscount.discountValue!, subtotal)
+    : 0
+
+  // Apply max discount cap if set
+  const finalDiscountAmount =
+    appliedDiscount?.discountAmount !== undefined
+      ? Math.min(discountAmount, appliedDiscount.discountAmount)
+      : discountAmount
+
+  // Total after discount
+  const totalAmount = Math.max(0, subtotal - finalDiscountAmount)
 
   const totalQuantity = Object.entries(quantities)
     .filter(([id]) => {
@@ -74,6 +123,12 @@ export default function TicketSelector({
   }
 
   const handlePurchase = async () => {
+    // Check if user is authenticated
+    if (!authStatus?.isAuthenticated) {
+      onAuthRequired(quantities, appliedDiscount?.code)
+      return
+    }
+
     const selectedTickets = Object.entries(quantities)
       .filter(([id, qty]) => {
         if (qty <= 0) return false
@@ -91,12 +146,20 @@ export default function TicketSelector({
     setError(null)
 
     try {
-      await onPurchase(selectedTickets)
+      await onPurchase(selectedTickets, appliedDiscount?.code)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to process order")
     } finally {
       setIsProcessing(false)
     }
+  }
+
+  const handleDiscountApplied = (result: DiscountValidationResult) => {
+    setAppliedDiscount(result)
+  }
+
+  const handleDiscountRemoved = () => {
+    setAppliedDiscount(null)
   }
 
   /**
@@ -197,14 +260,64 @@ export default function TicketSelector({
         })}
       </div>
 
+      {/* Discount Code Section */}
+      {totalQuantity > 0 && (
+        <DiscountCodeInput
+          eventId={eventId}
+          orderAmount={subtotal}
+          onValidCode={handleDiscountApplied}
+          onRemoveCode={handleDiscountRemoved}
+          appliedDiscount={appliedDiscount}
+          validateDiscountCode={validateDiscountCode}
+          initialCode={pendingDiscountCode}
+        />
+      )}
+
       {error && <p className={styles.error}>{error}</p>}
 
       <div className={styles.summary}>
+        {/* Show subtotal and discount when discount is applied */}
+        {appliedDiscount?.valid && finalDiscountAmount > 0 && (
+          <>
+            <div className={styles.subtotalRow}>
+              <span>Subtotal ({totalQuantity} {totalQuantity === 1 ? "ticket" : "tickets"}):</span>
+              <span>{currency} {subtotal.toFixed(2)}</span>
+            </div>
+            <div className={styles.discountRow}>
+              <span>Discount ({appliedDiscount.code}):</span>
+              <span className={styles.discountAmount}>-{currency} {finalDiscountAmount.toFixed(2)}</span>
+            </div>
+          </>
+        )}
+
         <div className={styles.total}>
-          <span>Total ({totalQuantity} {totalQuantity === 1 ? "ticket" : "tickets"}):</span>
+          <span>
+            {appliedDiscount?.valid && finalDiscountAmount > 0
+              ? "Total:"
+              : `Total (${totalQuantity} ${totalQuantity === 1 ? "ticket" : "tickets"}):`}
+          </span>
           <span className={styles.totalAmount}>
             {currency} {totalAmount.toFixed(2)}
           </span>
+        </div>
+
+        {/* Auth status indicator */}
+        <div className={styles.authStatus}>
+          {!authStatus?.isAuthenticated && (
+            <p className={styles.authWarning}>
+              You&apos;ll need to sign in to complete your purchase
+            </p>
+          )}
+          {authStatus?.isAuthenticated && !authStatus.hasPlayer && (
+            <p className={styles.authWarning}>
+              You&apos;ll need to set up your player profile to continue
+            </p>
+          )}
+          {authStatus?.isAuthenticated && authStatus.hasPlayer && (
+            <p className={styles.authReady}>
+              Purchasing as {authStatus.player?.name}
+            </p>
+          )}
         </div>
 
         <button
@@ -213,7 +326,11 @@ export default function TicketSelector({
           onClick={handlePurchase}
           disabled={totalQuantity === 0 || isProcessing}
         >
-          {isProcessing ? "Processing..." : "Proceed to Payment"}
+          {isProcessing
+            ? "Processing..."
+            : !authStatus?.isAuthenticated
+              ? "Sign in to Purchase"
+              : "Proceed to Payment"}
         </button>
       </div>
     </div>

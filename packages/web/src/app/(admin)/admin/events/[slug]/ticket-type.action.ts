@@ -1,9 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
-import { revalidatePath } from "next/cache"
-
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+import { strapiFetch } from "@/libs/strapi-client"
 
 // Types for ticket type management
 export interface TicketTypeData {
@@ -45,40 +42,25 @@ export async function createTicketType(
   eventId: string,
   data: TicketTypeData
 ): Promise<ActionResult<TicketType>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/events/${eventId}/ticket-types`, {
+  const result = await strapiFetch<{ data: TicketType }>(
+    "/events/:eventId/ticket-types",
+    { eventId },
+    {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to create ticket type (${response.status})`,
-      }
+      body: { data },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to create ticket type",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data,
   }
 }
 
@@ -89,40 +71,25 @@ export async function updateTicketType(
   ticketTypeId: string,
   data: Partial<TicketTypeData>
 ): Promise<ActionResult<TicketType>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/ticket-types/${ticketTypeId}`, {
+  const result = await strapiFetch<{ data: TicketType }>(
+    "/ticket-types/:ticketTypeId",
+    { ticketTypeId },
+    {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to update ticket type (${response.status})`,
-      }
+      body: { data },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: responseData.data,
-    }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to update ticket type",
     }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data,
   }
 }
 
@@ -130,77 +97,49 @@ export async function updateTicketType(
  * Delete a ticket type (only if no tickets sold)
  */
 export async function deleteTicketType(ticketTypeId: string): Promise<ActionResult> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch(
+    "/ticket-types/:ticketTypeId",
+    { ticketTypeId },
+    { method: "DELETE" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/ticket-types/${ticketTypeId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to delete ticket type (${response.status})`,
-      }
-    }
-
-    return { success: true }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to delete ticket type",
     }
   }
+
+  return { success: true }
 }
 
 /**
  * Reorder ticket types for an event
  */
 export async function reorderTicketTypes(
-  eventId: string,
+  _eventId: string,
   orderedIds: string[]
 ): Promise<ActionResult> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
   // Update sortOrder for each ticket type
-  try {
-    const updatePromises = orderedIds.map((documentId, index) =>
-      fetch(`${STRAPI_URL}/api/ticket-types/${documentId}`, {
+  const updatePromises = orderedIds.map((documentId, index) =>
+    strapiFetch(
+      "/ticket-types/:documentId",
+      { documentId },
+      {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({ data: { sortOrder: index } }),
-      })
+        body: { data: { sortOrder: index } },
+      }
     )
+  )
 
-    const results = await Promise.all(updatePromises)
-    const failed = results.filter((r) => !r.ok)
+  const results = await Promise.all(updatePromises)
+  const failed = results.filter((r) => !r.ok)
 
-    if (failed.length > 0) {
-      return { success: false, error: "Failed to reorder some ticket types" }
-    }
-
-    return { success: true }
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    }
+  if (failed.length > 0) {
+    return { success: false, error: "Failed to reorder some ticket types" }
   }
+
+  return { success: true }
 }
 
 /**

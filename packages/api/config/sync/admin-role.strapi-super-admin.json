@@ -166,6 +166,99 @@
     },
     {
       "action": "plugin::content-manager.explorer.create",
+      "subject": "api::discount-code.discount-code",
+      "properties": {
+        "fields": [
+          "code",
+          "discountType",
+          "discountValue",
+          "maxUses",
+          "usedCount",
+          "validFrom",
+          "validUntil",
+          "minOrderAmount",
+          "maxDiscountAmount",
+          "isActive",
+          "description",
+          "event",
+          "createdByPlayer"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "e18him35apc1bzobv01qwo7m",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.delete",
+      "subject": "api::discount-code.discount-code",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "y4c2m9djc9sok4sbvlc80vll",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.publish",
+      "subject": "api::discount-code.discount-code",
+      "properties": {},
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "bdnov5mp3ej8h7p5k6xwxyhg",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.read",
+      "subject": "api::discount-code.discount-code",
+      "properties": {
+        "fields": [
+          "code",
+          "discountType",
+          "discountValue",
+          "maxUses",
+          "usedCount",
+          "validFrom",
+          "validUntil",
+          "minOrderAmount",
+          "maxDiscountAmount",
+          "isActive",
+          "description",
+          "event",
+          "createdByPlayer"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "ny5zbf6z1m1za73jkn7e2rhw",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.update",
+      "subject": "api::discount-code.discount-code",
+      "properties": {
+        "fields": [
+          "code",
+          "discountType",
+          "discountValue",
+          "maxUses",
+          "usedCount",
+          "validFrom",
+          "validUntil",
+          "minOrderAmount",
+          "maxDiscountAmount",
+          "isActive",
+          "description",
+          "event",
+          "createdByPlayer"
+        ]
+      },
+      "conditions": [],
+      "actionParameters": {},
+      "documentId": "z8y2qn15remfo62y83n0af9s",
+      "locale": null
+    },
+    {
+      "action": "plugin::content-manager.explorer.create",
       "subject": "api::event-location.event-location",
       "properties": {
         "fields": [
@@ -270,11 +363,9 @@
           "finance.result",
           "finance.resultAmount",
           "ticketTypes",
-          "globalCapacity",
-          "ticketingEnabled",
-          "paymentProvider",
-          "stripeAccountId",
-          "stripeAccount"
+          "ticketingMode",
+          "stripeAccount",
+          "discountCodes"
         ],
         "locales": [
           "en",
@@ -283,7 +374,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "btcqreto8hv381gv1yw9gmm1",
+      "documentId": "mur8w3ymuwrbnlotld1vopgs",
       "locale": null
     },
     {
@@ -351,11 +442,9 @@
           "finance.result",
           "finance.resultAmount",
           "ticketTypes",
-          "globalCapacity",
-          "ticketingEnabled",
-          "paymentProvider",
-          "stripeAccountId",
-          "stripeAccount"
+          "ticketingMode",
+          "stripeAccount",
+          "discountCodes"
         ],
         "locales": [
           "en",
@@ -364,7 +453,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "edzq699yxuvfu32o2bslbyj0",
+      "documentId": "zcnnglhzdbxas006g6csmlkx",
       "locale": null
     },
     {
@@ -404,11 +493,9 @@
           "finance.result",
           "finance.resultAmount",
           "ticketTypes",
-          "globalCapacity",
-          "ticketingEnabled",
-          "paymentProvider",
-          "stripeAccountId",
-          "stripeAccount"
+          "ticketingMode",
+          "stripeAccount",
+          "discountCodes"
         ],
         "locales": [
           "en",
@@ -417,7 +504,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "ehq2l95qy6jtn0uyennornak",
+      "documentId": "bsqfmovcg0rl97sm2zl9zo3u",
       "locale": null
     },
     {
@@ -1096,12 +1183,14 @@
           "documented",
           "proposed",
           "location",
-          "stripeAccount"
+          "stripeAccount",
+          "defaultTshirtSize",
+          "defaultFoodPreferences"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "eag6h3qlu3nhsguo0bn3iior",
+      "documentId": "n43ohc03i4ykfhm8ac13gke0",
       "locale": null
     },
     {
@@ -1144,12 +1233,14 @@
           "documented",
           "proposed",
           "location",
-          "stripeAccount"
+          "stripeAccount",
+          "defaultTshirtSize",
+          "defaultFoodPreferences"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "blx66n5g8l9vxc9y3rl7qinv",
+      "documentId": "wc84j8m3q7kzf282pk0xz7y9",
       "locale": null
     },
     {
@@ -1174,12 +1265,14 @@
           "documented",
           "proposed",
           "location",
-          "stripeAccount"
+          "stripeAccount",
+          "defaultTshirtSize",
+          "defaultFoodPreferences"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "js6g4bvoklxlvlx4tzadwprt",
+      "documentId": "v7ptu9vgc94mojbb1uns9arz",
       "locale": null
     },
     {
@@ -1479,15 +1572,24 @@
           "refundedAt",
           "refundAmount",
           "refundReason",
+          "notes",
           "ticketDetails",
           "player",
           "event",
-          "tickets"
+          "tickets",
+          "discountCode",
+          "discountAmount",
+          "originalAmount",
+          "attendeeDetails",
+          "gdprConsent",
+          "gdprConsentTimestamp",
+          "termsAccepted",
+          "termsAcceptedTimestamp"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "t7hyvv5088776ffvn63w21cj",
+      "documentId": "nd3m2oge51i5ea1e9a46pi8s",
       "locale": null
     },
     {
@@ -1526,15 +1628,24 @@
           "refundedAt",
           "refundAmount",
           "refundReason",
+          "notes",
           "ticketDetails",
           "player",
           "event",
-          "tickets"
+          "tickets",
+          "discountCode",
+          "discountAmount",
+          "originalAmount",
+          "attendeeDetails",
+          "gdprConsent",
+          "gdprConsentTimestamp",
+          "termsAccepted",
+          "termsAcceptedTimestamp"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "zy5uo0zyubg4gkff1ooifoz3",
+      "documentId": "ypur23ysw2dpfw7ezogqoduh",
       "locale": null
     },
     {
@@ -1555,15 +1666,24 @@
           "refundedAt",
           "refundAmount",
           "refundReason",
+          "notes",
           "ticketDetails",
           "player",
           "event",
-          "tickets"
+          "tickets",
+          "discountCode",
+          "discountAmount",
+          "originalAmount",
+          "attendeeDetails",
+          "gdprConsent",
+          "gdprConsentTimestamp",
+          "termsAccepted",
+          "termsAcceptedTimestamp"
         ]
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "qg7ey5lwg7hi69cfpxof6tk7",
+      "documentId": "ice7geimsxbllj31w84sdntb",
       "locale": null
     },
     {
@@ -1659,9 +1779,16 @@
       "properties": {
         "fields": [
           "ticketCode",
-          "status",
+          "ticketStatus",
           "attendeeName",
           "attendeeEmail",
+          "attendeeInfo.firstName",
+          "attendeeInfo.lastName",
+          "attendeeInfo.email",
+          "attendeeInfo.tshirtSize",
+          "attendeeInfo.foodPreferences",
+          "attendeeInfo.photoConsent",
+          "attendeeInfo.photoConsentTimestamp",
           "checkedInAt",
           "ticketType",
           "order",
@@ -1671,7 +1798,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "ei99q1fdlpndfujs1zczyxvp",
+      "documentId": "z1k6j179q49r8gkxnufflfao",
       "locale": null
     },
     {
@@ -1698,9 +1825,16 @@
       "properties": {
         "fields": [
           "ticketCode",
-          "status",
+          "ticketStatus",
           "attendeeName",
           "attendeeEmail",
+          "attendeeInfo.firstName",
+          "attendeeInfo.lastName",
+          "attendeeInfo.email",
+          "attendeeInfo.tshirtSize",
+          "attendeeInfo.foodPreferences",
+          "attendeeInfo.photoConsent",
+          "attendeeInfo.photoConsentTimestamp",
           "checkedInAt",
           "ticketType",
           "order",
@@ -1710,7 +1844,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "nb5zt8pe78tljecjngcmaxw5",
+      "documentId": "k5ohjphxio415a8nnw3vhbbr",
       "locale": null
     },
     {
@@ -1719,9 +1853,16 @@
       "properties": {
         "fields": [
           "ticketCode",
-          "status",
+          "ticketStatus",
           "attendeeName",
           "attendeeEmail",
+          "attendeeInfo.firstName",
+          "attendeeInfo.lastName",
+          "attendeeInfo.email",
+          "attendeeInfo.tshirtSize",
+          "attendeeInfo.foodPreferences",
+          "attendeeInfo.photoConsent",
+          "attendeeInfo.photoConsentTimestamp",
           "checkedInAt",
           "ticketType",
           "order",
@@ -1731,7 +1872,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "mcz1juti2plh6l10jqugxl9q",
+      "documentId": "ma8d084ov1tge1b0lcfq3xcp",
       "locale": null
     },
     {
@@ -1740,7 +1881,6 @@
       "properties": {
         "fields": [
           "name",
-          "shortName",
           "logo",
           "website",
           "socialNetworks.url",
@@ -1752,7 +1892,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "uvkc07rrea05vldu5n1tnmc4",
+      "documentId": "jqsatss1psqwrbdha64q3z1l",
       "locale": null
     },
     {
@@ -1779,7 +1919,6 @@
       "properties": {
         "fields": [
           "name",
-          "shortName",
           "logo",
           "website",
           "socialNetworks.url",
@@ -1791,7 +1930,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "wyy0790jxkhpjl1wwxdly5l0",
+      "documentId": "f4k13fyka4x032jh6h9cabeu",
       "locale": null
     },
     {
@@ -1800,7 +1939,6 @@
       "properties": {
         "fields": [
           "name",
-          "shortName",
           "logo",
           "website",
           "socialNetworks.url",
@@ -1812,7 +1950,7 @@
       },
       "conditions": [],
       "actionParameters": {},
-      "documentId": "s7zgkkgzro4dvafbru33nn8o",
+      "documentId": "ixd23ibv96jixvsjkown4n0q",
       "locale": null
     },
     {

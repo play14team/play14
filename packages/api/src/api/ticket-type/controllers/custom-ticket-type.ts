@@ -333,7 +333,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       populate: {
         player: { fields: ["documentId", "name"] },
         tickets: {
-          fields: ["ticketCode", "status", "attendeeName"],
+          fields: ["ticketCode", "ticketStatus", "attendeeName"],
           populate: {
             ticketType: { fields: ["name"] },
           },

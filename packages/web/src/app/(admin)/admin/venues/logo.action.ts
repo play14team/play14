@@ -1,6 +1,6 @@
 "use server"
 
-import { getAuthCookie } from "@/libs/auth"
+import { strapiFetch, strapiFetchFormData } from "@/libs/strapi-client"
 
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
@@ -24,7 +24,7 @@ function normalizeUrl(url: string | undefined): string {
 /**
  * Normalize all URLs in a VenueLogo object
  */
-function normalizeLogoUrls(file: any): any {
+function normalizeLogoUrls(file: VenueLogo): VenueLogo {
   return {
     ...file,
     url: normalizeUrl(file.url),
@@ -79,42 +79,25 @@ export async function uploadVenueLogo(
   venueId: string,
   file: File
 ): Promise<LogoActionResult<VenueLogo>> {
-  const jwt = await getAuthCookie()
+  const formData = new FormData()
+  formData.append("files", file)
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
+  const result = await strapiFetchFormData<{ data: VenueLogo }>(
+    "/venues/admin/:venueId/logo",
+    { venueId },
+    formData
+  )
 
-  try {
-    const formData = new FormData()
-    formData.append("files", file)
-
-    const response = await fetch(`${STRAPI_URL}/api/venues/admin/${venueId}/logo`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: formData,
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to upload logo (${response.status})`,
-      }
-    }
-
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: normalizeLogoUrls(responseData.data),
-    }
-  } catch (error) {
+  if (!result.ok || !result.data) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to upload logo",
     }
+  }
+
+  return {
+    success: true,
+    data: normalizeLogoUrls(result.data.data),
   }
 }
 
@@ -127,40 +110,25 @@ export async function setVenueLogoFromLibrary(
   venueId: string,
   fileId: number
 ): Promise<LogoActionResult<VenueLogo>> {
-  const jwt = await getAuthCookie()
-
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/venues/admin/${venueId}/logo/library`, {
+  const result = await strapiFetch<{ data: VenueLogo }>(
+    "/venues/admin/:venueId/logo/library",
+    { venueId },
+    {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({ data: { fileId } }),
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to set logo (${response.status})`,
-      }
+      body: { data: { fileId } },
     }
+  )
 
-    const responseData = await response.json()
-    return {
-      success: true,
-      data: normalizeLogoUrls(responseData.data),
-    }
-  } catch (error) {
+  if (!result.ok || !result.data) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to set logo",
     }
+  }
+
+  return {
+    success: true,
+    data: normalizeLogoUrls(result.data.data),
   }
 }
 
@@ -169,33 +137,18 @@ export async function setVenueLogoFromLibrary(
  * @param venueId Venue document ID
  */
 export async function removeVenueLogo(venueId: string): Promise<LogoActionResult> {
-  const jwt = await getAuthCookie()
+  const result = await strapiFetch(
+    "/venues/admin/:venueId/logo",
+    { venueId },
+    { method: "DELETE" }
+  )
 
-  if (!jwt) {
-    return { success: false, error: "Not authenticated" }
-  }
-
-  try {
-    const response = await fetch(`${STRAPI_URL}/api/venues/admin/${venueId}/logo`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      return {
-        success: false,
-        error: errorData.error?.message || `Failed to remove logo (${response.status})`,
-      }
-    }
-
-    return { success: true }
-  } catch (error) {
+  if (!result.ok) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      error: result.error || "Failed to remove logo",
     }
   }
+
+  return { success: true }
 }
