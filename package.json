@@ -18,7 +18,10 @@
     "lint:fix": "bun --filter play14-web lint:fix",
     "typecheck": "bun --filter play14-web typecheck",
     "format": "bun --filter play14-web format",
-    "test": "bun --filter play14-web test",
+    "test": "bun --filter play14-api test && bun --filter play14-web test",
+    "test:api": "bun --filter play14-api test",
+    "test:web": "bun --filter play14-web test",
+    "test:all": "bun --filter play14-api test && bun --filter play14-api test:integration && bun --filter play14-web test",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/.next packages/*/build packages/*/dist"
   },
   "devDependencies": {

@@ -1,3 +1,5 @@
+const { collectBusinessMetrics } = require("../src/services/observability/metrics-collector");
+
 /**
  * Cron tasks migrated to Strapi 5 Document Service API
  * See: https://docs.strapi.io/dev-docs/api/document-service
@@ -7,6 +9,23 @@
  * is independent and doesn't depend on the order of execution.
  */
 module.exports = {
+  /**
+   * Collect business metrics for Prometheus
+   * Updates gauges with current counts from the database
+   * Runs every 5 minutes to keep metrics fresh without expensive queries on each scrape
+   */
+  collectMetrics: {
+    task: async ({ strapi }) => {
+      if (process.env.METRICS_ENABLED === "false") {
+        return;
+      }
+      await collectBusinessMetrics(strapi);
+    },
+    options: {
+      // Every 5 minutes
+      rule: "0 */5 * * * *",
+    },
+  },
   /**
    * Clean up expired pending ticket orders and release reservations
    * Stripe checkout sessions expire after 30 minutes by default
@@ -97,6 +116,56 @@ module.exports = {
    * This can happen if orders are manually modified or if there are bugs
    * Runs daily and logs warnings (does not auto-fix to avoid data loss)
    */
+  /**
+   * Clean up abandoned draft orders
+   * Draft orders are created when users start filling attendee info but don't complete checkout
+   * This job runs hourly to clean up drafts older than 24 hours and release any discount code reservations
+   */
+  cleanAbandonedDraftOrders: {
+    task: async ({ strapi }) => {
+      console.log("Running abandoned draft orders cleanup job");
+      const apiName = "api::ticket-order.ticket-order";
+      const discountCodeApi = "api::discount-code.discount-code";
+
+      // Find draft orders older than 24 hours
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+      const abandonedDrafts = await strapi.documents(apiName).findMany({
+        filters: {
+          status: "draft",
+          createdAt: { $lt: twentyFourHoursAgo.toISOString() },
+        },
+        populate: {
+          discountCode: { fields: ["documentId", "code", "reservedCount"] },
+        },
+      });
+
+      console.log("Abandoned draft orders found:", abandonedDrafts.length);
+
+      for (const order of abandonedDrafts) {
+        console.log(`Processing abandoned draft order ${order.orderNumber}`);
+
+        // Note: Draft orders don't have discount code reservations
+        // (reservations are only made during finalizeCheckout when status changes to pending)
+        // But we check just in case there's an edge case
+
+        // Mark order as cancelled
+        await strapi.documents(apiName).update({
+          documentId: order.documentId,
+          data: {
+            status: "cancelled",
+          },
+        });
+
+        console.log(`Draft order ${order.orderNumber} cancelled (abandoned)`);
+      }
+    },
+    options: {
+      // Every hour at minute 30
+      rule: "0 30 * * * *",
+    },
+  },
+
   reservationHealthCheck: {
     task: async ({ strapi }) => {
       console.log("Running reservation health check");

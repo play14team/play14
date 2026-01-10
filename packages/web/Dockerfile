@@ -15,6 +15,7 @@ COPY package.json bun.lock ./
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
+COPY packages/agents/package.json ./packages/agents/
 
 # Install dependencies
 RUN bun install --frozen-lockfile
@@ -33,6 +34,7 @@ COPY --from=deps /app/bun.lock ./bun.lock
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
+COPY packages/agents/package.json ./packages/agents/
 
 # Copy web package source
 COPY packages/web ./packages/web
@@ -54,12 +56,28 @@ ARG STRAPI_API_URL
 ARG STRAPI_API_SECRET
 ARG NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 ARG NEXT_PUBLIC_WEB_VITALS
+ARG NEXT_PUBLIC_URL
+
+# Sentry build arguments (for source maps upload and client-side tracking)
+ARG SENTRY_AUTH_TOKEN
+ARG SENTRY_ORG
+ARG SENTRY_PROJECT
+ARG NEXT_PUBLIC_SENTRY_DSN
+ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT
 
 # Set build-time environment variables
 ENV STRAPI_API_URL=${STRAPI_API_URL}
 ENV STRAPI_API_SECRET=${STRAPI_API_SECRET}
 ENV NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
 ENV NEXT_PUBLIC_WEB_VITALS=${NEXT_PUBLIC_WEB_VITALS}
+ENV NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
+
+# Sentry environment variables (for build-time source map upload)
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+ENV SENTRY_ORG=${SENTRY_ORG}
+ENV SENTRY_PROJECT=${SENTRY_PROJECT}
+ENV NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN}
+ENV NEXT_PUBLIC_SENTRY_ENVIRONMENT=${NEXT_PUBLIC_SENTRY_ENVIRONMENT}
 
 # Build application
 RUN bun run build

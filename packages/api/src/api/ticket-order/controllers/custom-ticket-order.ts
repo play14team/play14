@@ -3,7 +3,14 @@
  * Handles ticket purchase flow, order status, and refunds
  */
 
+import crypto from "crypto"
 import type { Core } from "@strapi/strapi"
+import slugify from "slugify"
+import {
+  generateEventICS,
+  generateGoogleCalendarUrl,
+  generateOutlookCalendarUrl,
+} from "../../../libs/calendar"
 import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
@@ -11,7 +18,22 @@ import {
   createReservations,
   releaseReservations,
   getReservationExpiry,
+  sellTicketsAtomic,
+  reserveDiscountCode,
+  releaseDiscountCode,
+  confirmDiscountCode,
+  useDiscountCodeAtomic,
 } from "../../../services/ticketing"
+
+interface AttendeeInfo {
+  firstName: string
+  lastName: string
+  email: string
+  tshirtSize?: string
+  foodPreferences?: string
+  photoConsent: boolean
+  photoConsentTimestamp?: string
+}
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
@@ -325,22 +347,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       })
     }
 
-    // Apply discount code if provided
+    // Apply discount code if provided - use atomic reservation to prevent TOCTOU race condition
     let discountAmount = 0
     let appliedDiscountCode: { id: number; documentId: string; code: string } | null = null
 
     if (discountCodeString) {
-      const discountResult = await this.validateAndApplyDiscount(eventId, discountCodeString, originalAmount)
+      // Use atomic reservation to prevent race condition where two users validate
+      // the same discount code near its usage limit simultaneously
+      const discountResult = await reserveDiscountCode(strapi, eventId, discountCodeString, originalAmount)
 
-      if ("error" in discountResult) {
-        return ctx.badRequest(discountResult.error)
+      if (!discountResult.success) {
+        return ctx.badRequest(discountResult.error || "Failed to apply discount code")
       }
 
-      discountAmount = discountResult.discountAmount
+      discountAmount = discountResult.discountAmount!
       appliedDiscountCode = {
-        id: discountResult.id,
-        documentId: discountResult.documentId,
-        code: discountResult.code,
+        id: discountResult.discountCode!.id,
+        documentId: discountResult.discountCode!.documentId,
+        code: discountResult.discountCode!.code,
       }
     }
 
@@ -441,10 +465,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       )
 
       if (!reservationResult.success) {
-        // Reservation failed - clean up and return error
+        // Reservation failed - clean up order and release discount code reservation
         await strapi.documents("api::ticket-order.ticket-order").delete({
           documentId: order.documentId,
         })
+        // Release the discount code reservation if one was made
+        if (appliedDiscountCode) {
+          await releaseDiscountCode(strapi, appliedDiscountCode.documentId)
+        }
         strapi.log.warn(`[Ticketing] Reservation failed for order ${orderNumber}: ${reservationResult.error}`)
         return ctx.badRequest(reservationResult.error || "Failed to reserve tickets")
       }
@@ -465,10 +493,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
     } catch (error: any) {
-      // Clean up the order if Stripe session creation fails
+      // Clean up the order and release discount code reservation if Stripe session creation fails
       await strapi.documents("api::ticket-order.ticket-order").delete({
         documentId: order.documentId,
       })
+      // Release the discount code reservation if one was made
+      if (appliedDiscountCode) {
+        await releaseDiscountCode(strapi, appliedDiscountCode.documentId)
+      }
 
       strapi.log.error(`[Ticketing] Failed to create checkout session: ${error.message}`)
       return ctx.internalServerError("Failed to create payment session")
@@ -477,6 +509,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
   /**
    * Get order status and details
+   * SECURITY: Unauthenticated users get limited info, authenticated owners get full details
    */
   async getOrderStatus(ctx) {
     const { orderId } = ctx.params
@@ -505,14 +538,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.notFound("Order not found")
     }
 
-    // For authenticated users, verify they can access this order
+    // Determine access level
+    let hasFullAccess = false
+
     if (user) {
       const player = await this.getLinkedPlayer(user.id)
       const isOwner =
         order.purchaserEmail === user.email || (player && order.player?.id === player.id)
 
-      if (!isOwner) {
-        // Allow if user is a host/mentor of the event
+      if (isOwner) {
+        hasFullAccess = true
+      } else {
+        // Check if user is a host/mentor of the event
         const event = await strapi.documents("api::event.event").findOne({
           documentId: order.event?.documentId,
           populate: {
@@ -526,12 +563,42 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           (event?.hosts?.some((h: any) => h.id === player.id) ||
             event?.mentors?.some((m: any) => m.id === player.id))
 
-        if (!isOrganizer) {
+        if (isOrganizer) {
+          hasFullAccess = true
+        } else {
           return ctx.forbidden("Access denied")
         }
       }
     }
 
+    // SECURITY: Unauthenticated users only see basic order status (no PII)
+    // This allows the success/cancelled page to show order status after Stripe redirect
+    if (!hasFullAccess) {
+      return ctx.send({
+        data: {
+          documentId: order.documentId,
+          orderNumber: order.orderNumber,
+          status: order.status,
+          totalAmount: order.totalAmount,
+          currency: order.currency,
+          // Mask purchaser info for unauthenticated requests
+          purchaserName: order.purchaserName?.split(" ")[0] + " ***",
+          paidAt: order.paidAt,
+          event: order.event
+            ? {
+                name: order.event.name,
+                slug: order.event.slug,
+                start: order.event.start,
+                end: order.event.end,
+              }
+            : null,
+          // Only show ticket count, not details
+          ticketCount: order.tickets?.length || 0,
+        },
+      })
+    }
+
+    // Full access - return all details
     return ctx.send({
       data: {
         documentId: order.documentId,
@@ -730,16 +797,48 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
   /**
    * Cancel a pending order (when user abandons checkout)
+   * Requires authentication and ownership verification to prevent unauthorized cancellation
    */
   async cancelOrder(ctx) {
     const { orderId } = ctx.params
+    const user = ctx.state.user
+
+    // Require authentication for cancellation
+    if (!user) {
+      return ctx.unauthorized("You must be logged in to cancel an order")
+    }
 
     const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
       documentId: orderId,
+      populate: {
+        player: { fields: ["id", "documentId"] },
+        event: {
+          fields: ["id", "documentId"],
+          populate: {
+            hosts: { fields: ["id"] },
+            mentors: { fields: ["id"] },
+          },
+        },
+        discountCode: { fields: ["documentId", "code"] },
+      },
     })
 
     if (!order) {
       return ctx.notFound("Order not found")
+    }
+
+    // Verify ownership or organizer status
+    const player = await this.getLinkedPlayer(user.id)
+    const isOwner =
+      order.purchaserEmail === user.email || (player && order.player?.id === player.id)
+
+    const isOrganizer =
+      player &&
+      (order.event?.hosts?.some((h: any) => h.id === player.id) ||
+        order.event?.mentors?.some((m: any) => m.id === player.id))
+
+    if (!isOwner && !isOrganizer) {
+      return ctx.forbidden("Access denied - you can only cancel your own orders")
     }
 
     // Only pending or draft orders can be cancelled this way
@@ -751,6 +850,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // (only pending orders have reservations, draft orders don't)
     if (order.status === "pending") {
       await releaseReservations(strapi, orderId)
+
+      // Release any discount code reservation
+      if (order.discountCode?.documentId) {
+        await releaseDiscountCode(strapi, order.discountCode.documentId)
+        strapi.log.info(`[Ticketing] Released discount code reservation for ${order.discountCode.code}`)
+      }
     }
 
     // Update order status to cancelled
@@ -759,7 +864,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       data: { status: "cancelled" } as any,
     })
 
-    strapi.log.info(`[Ticketing] Order ${order.orderNumber} cancelled by user`)
+    strapi.log.info(`[Ticketing] Order ${order.orderNumber} cancelled by user ${user.email}`)
 
     return ctx.send({
       data: { success: true },
@@ -788,6 +893,45 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("You must have a player profile to purchase tickets", {
         details: { code: "PLAYER_REQUIRED" },
       })
+    }
+
+    // RATE LIMITING: Limit draft orders per user to prevent abuse
+    // Uses a time-based window (last hour) to prevent rapid-fire creation
+    // Combined with cron job that cleans up drafts older than 24 hours
+    const MAX_PENDING_DRAFTS = 5
+    const MAX_DRAFTS_PER_HOUR = 10
+
+    // Check total pending draft orders (regardless of age)
+    const existingDrafts = await strapi.documents("api::ticket-order.ticket-order").findMany({
+      filters: {
+        player: { id: player.id },
+        status: "draft",
+      },
+      limit: MAX_PENDING_DRAFTS + 1,
+    })
+
+    if (existingDrafts.length >= MAX_PENDING_DRAFTS) {
+      return ctx.badRequest(
+        `You have too many pending orders. Please complete or cancel existing orders before creating new ones. (Maximum: ${MAX_PENDING_DRAFTS})`,
+        { details: { code: "RATE_LIMITED", maxDrafts: MAX_PENDING_DRAFTS } }
+      )
+    }
+
+    // Check time-based rate: limit orders created in the last hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    const recentOrders = await strapi.documents("api::ticket-order.ticket-order").findMany({
+      filters: {
+        player: { id: player.id },
+        createdAt: { $gt: oneHourAgo.toISOString() },
+      },
+      limit: MAX_DRAFTS_PER_HOUR + 1,
+    })
+
+    if (recentOrders.length >= MAX_DRAFTS_PER_HOUR) {
+      return ctx.badRequest(
+        "You have created too many orders recently. Please wait before creating new orders.",
+        { details: { code: "RATE_LIMITED_TIME", maxPerHour: MAX_DRAFTS_PER_HOUR } }
+      )
     }
 
     const { eventId, tickets, discountCode: discountCodeString } = ctx.request.body?.data || {}
@@ -1059,9 +1203,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         return ctx.badRequest(`Attendee ${i + 1}: Name contains invalid characters`)
       }
 
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      // Email validation - stricter pattern that rejects common invalid formats
+      // Validates: local-part@domain.tld format with reasonable constraints
+      // - Local part: letters, numbers, dots, hyphens, underscores, plus signs
+      // - Domain: letters, numbers, hyphens
+      // - TLD: 2-10 letters
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/
       if (!emailRegex.test(attendee.email)) {
+        return ctx.badRequest(`Attendee ${i + 1}: Invalid email format`)
+      }
+
+      // Additional check: ensure no consecutive dots in local part or domain
+      if (/\.\./.test(attendee.email)) {
+        return ctx.badRequest(`Attendee ${i + 1}: Invalid email format (consecutive dots not allowed)`)
+      }
+
+      // Ensure local part doesn't start or end with a dot
+      const localPart = attendee.email.split("@")[0]
+      if (localPart.startsWith(".") || localPart.endsWith(".")) {
         return ctx.badRequest(`Attendee ${i + 1}: Invalid email format`)
       }
 
@@ -1133,6 +1292,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             ticketTypes: true,
           },
         },
+        discountCode: true,
       },
     })
 
@@ -1190,21 +1350,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Handle free orders (no Stripe needed)
-    // Free orders skip reservations and update soldCount directly
+    // SECURITY: Use atomic sellTicketsAtomic to prevent overselling via race condition
     if ((order as any).totalAmount === 0) {
-      // Update soldCount directly for each ticket type (no reservation needed)
-      for (const detail of ticketDetails) {
-        const ticketType = await strapi.documents("api::ticket-type.ticket-type").findOne({
-          documentId: detail.ticketTypeId,
-        })
-        if (ticketType) {
-          await strapi.documents("api::ticket-type.ticket-type").update({
-            documentId: detail.ticketTypeId,
-            data: {
-              soldCount: (ticketType.soldCount || 0) + detail.quantity,
-            } as any,
-          })
-        }
+      // Atomically update soldCount with capacity check to prevent overselling
+      const sellResult = await sellTicketsAtomic(strapi, ticketDetails)
+
+      if (!sellResult.success) {
+        strapi.log.warn(`[Ticketing] Free order ${order.orderNumber} failed: ${sellResult.error}`)
+        return ctx.badRequest(sellResult.error || "Failed to complete free order")
+      }
+
+      // Atomically use the discount code if one was applied
+      // (for free orders, we directly use it since there's no payment flow)
+      if (order.discountCode?.documentId) {
+        await confirmDiscountCode(strapi, order.discountCode.documentId, false)
       }
 
       // Update order to paid immediately
@@ -1290,6 +1449,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         })
       }
 
+      // Reserve the discount code atomically (if one was applied to this order)
+      // This prevents TOCTOU race conditions where the same discount code could
+      // exceed its usage limit
+      let discountCodeReserved = false
+      if (order.discountCode?.documentId) {
+        const discountReservation = await reserveDiscountCode(
+          strapi,
+          event.documentId,
+          order.discountCode.code,
+          (order as any).originalAmount
+        )
+
+        if (!discountReservation.success) {
+          // Discount code is no longer valid - fail checkout
+          strapi.log.warn(
+            `[Ticketing] Discount code reservation failed for order ${order.orderNumber}: ${discountReservation.error}`
+          )
+          return ctx.badRequest(discountReservation.error || "Discount code is no longer available")
+        }
+        discountCodeReserved = true
+      }
+
       // Update order to pending with session info
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: order.documentId,
@@ -1313,7 +1494,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       )
 
       if (!reservationResult.success) {
-        // Reservation failed - revert order to draft status
+        // Reservation failed - revert order to draft status and release discount code
         await strapi.documents("api::ticket-order.ticket-order").update({
           documentId: order.documentId,
           data: {
@@ -1321,6 +1502,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             providerSessionId: null,
           } as any,
         })
+        // Release the discount code reservation if we made one
+        if (discountCodeReserved && order.discountCode?.documentId) {
+          await releaseDiscountCode(strapi, order.discountCode.documentId)
+        }
         strapi.log.warn(`[Ticketing] Reservation failed for order ${order.orderNumber}: ${reservationResult.error}`)
         return ctx.badRequest(reservationResult.error || "Failed to reserve tickets")
       }
@@ -1345,10 +1530,756 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * Process a completed order (create tickets, players, send emails)
    * Called after payment or for free orders
    */
-  async processCompletedOrder(order: any) {
-    // This will be implemented in the webhook handler
-    // For free orders, we need to create tickets here
+  async processCompletedOrder(orderInput: any) {
+    // Re-fetch order with full population needed for ticket creation
+    const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
+      documentId: orderInput.documentId,
+      populate: {
+        event: {
+          fields: ["id", "documentId", "name", "slug", "start", "end", "contactEmail", "description", "eventStatus"],
+          populate: {
+            ticketTypes: true,
+            location: { fields: ["name", "country"] },
+            venue: { fields: ["name", "website", "location"] },
+          },
+        },
+        player: true,
+        discountCode: true,
+      },
+    })
+
+    if (!order) {
+      strapi.log.error(`[Ticketing] Order not found for processing: ${orderInput.documentId}`)
+      return
+    }
+
     strapi.log.info(`[Ticketing] Processing completed order ${order.orderNumber}`)
-    // Ticket creation logic will be added in webhook update
+
+    const ticketDetails = order.ticketDetails || []
+    const attendeeDetails = ((order as any).attendeeDetails || []) as AttendeeInfo[]
+
+    // Track created tickets for confirmation email
+    const createdTickets: Array<{
+      ticketCode: string
+      ticketTypeName: string
+      attendeeName: string
+      attendeeEmail: string
+      player: any
+      isNewPlayer: boolean
+    }> = []
+
+    // Create tickets - use attendee details if available, otherwise fall back to purchaser info
+    let ticketIndex = 0
+    for (const detail of ticketDetails as any[]) {
+      const ticketType = (order.event as any)?.ticketTypes?.find(
+        (tt: any) => tt.documentId === detail.ticketTypeId
+      )
+
+      if (!ticketType) {
+        strapi.log.warn(`[Ticketing] Ticket type not found: ${detail.ticketTypeId}`)
+        continue
+      }
+
+      // Create individual tickets
+      for (let i = 0; i < detail.quantity; i++) {
+        // Get attendee info for this ticket (if available)
+        const attendee = attendeeDetails[ticketIndex]
+        let attendeeName: string
+        let attendeeEmail: string
+        let attendeeInfo: any = null
+        let ticketPlayer: any = null
+        let isNewPlayer = false
+
+        if (attendee) {
+          // Use collected attendee information
+          attendeeName = `${attendee.firstName} ${attendee.lastName}`
+          attendeeEmail = attendee.email
+
+          // Build attendeeInfo component data
+          attendeeInfo = {
+            firstName: attendee.firstName,
+            lastName: attendee.lastName,
+            email: attendee.email,
+            tshirtSize: attendee.tshirtSize || "none",
+            foodPreferences: attendee.foodPreferences || null,
+            photoConsent: attendee.photoConsent,
+            photoConsentTimestamp: attendee.photoConsentTimestamp || null,
+          }
+
+          // Find or create player for this attendee
+          const playerResult = await this.findOrCreatePlayerForAttendee(
+            attendee,
+            order.player,
+            order.event
+          )
+          ticketPlayer = playerResult.player
+          isNewPlayer = playerResult.isNew
+        } else {
+          // Fall back to purchaser info (legacy behavior)
+          attendeeName = order.purchaserName
+          attendeeEmail = order.purchaserEmail
+          ticketPlayer = order.player
+        }
+
+        const ticket = await strapi.documents("api::ticket.ticket").create({
+          data: {
+            ticketCode: generateTicketCode(),
+            ticketStatus: "valid",
+            attendeeName,
+            attendeeEmail,
+            attendeeInfo,
+            ticketType: ticketType.id,
+            order: order.id,
+            player: ticketPlayer?.id || null,
+            event: (order.event as any).id,
+          } as any,
+        })
+
+        createdTickets.push({
+          ticketCode: ticket.ticketCode,
+          ticketTypeName: ticketType.name,
+          attendeeName,
+          attendeeEmail,
+          player: ticketPlayer,
+          isNewPlayer,
+        })
+
+        ticketIndex++
+      }
+    }
+
+    // Add all ticket players to event attendees
+    const playersToAddToEvent = new Set<string>()
+    for (const ticket of createdTickets) {
+      if (ticket.player?.documentId) {
+        playersToAddToEvent.add(ticket.player.documentId)
+      }
+    }
+
+    for (const playerDocId of playersToAddToEvent) {
+      await this.addPlayerToEventAttendees(playerDocId, order.event)
+    }
+
+    // Send confirmation email to purchaser
+    await this.sendOrderConfirmationEmail(order, createdTickets)
+
+    // Send invitation emails to new players (attendees who got a new profile created)
+    for (const ticket of createdTickets) {
+      if (ticket.isNewPlayer && ticket.player) {
+        // Don't send invitation to purchaser (they already got confirmation email)
+        if (ticket.attendeeEmail.toLowerCase() !== order.purchaserEmail.toLowerCase()) {
+          await this.sendPlayerInvitationEmail(
+            ticket.attendeeEmail,
+            ticket.attendeeName,
+            ticket.player,
+            ticket.ticketCode,
+            order.event
+          )
+        }
+      }
+    }
+
+    strapi.log.info(
+      `[Ticketing] Order ${order.orderNumber} processed successfully with ${createdTickets.length} tickets`
+    )
+  },
+
+  /**
+   * Find or create a player profile for an attendee
+   */
+  async findOrCreatePlayerForAttendee(
+    attendee: AttendeeInfo,
+    purchaserPlayer: any,
+    event: any
+  ): Promise<{ player: any; isNew: boolean }> {
+    // Validate attendee data
+    if (!attendee.firstName || !attendee.lastName) {
+      throw new Error("Attendee first name and last name are required")
+    }
+
+    if (!attendee.email) {
+      throw new Error("Attendee email is required")
+    }
+
+    // Sanitize and validate name (2-100 chars, no special control characters)
+    const firstName = attendee.firstName.trim().slice(0, 50)
+    const lastName = attendee.lastName.trim().slice(0, 50)
+
+    if (firstName.length < 1 || lastName.length < 1) {
+      throw new Error("Attendee first name and last name cannot be empty")
+    }
+
+    // Check for invalid characters (control characters)
+    const invalidCharPattern = /[\x00-\x1F\x7F]/
+    if (invalidCharPattern.test(firstName) || invalidCharPattern.test(lastName)) {
+      throw new Error("Attendee name contains invalid characters")
+    }
+
+    // Email validation - stricter pattern that rejects common invalid formats
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/
+    if (!emailPattern.test(attendee.email)) {
+      throw new Error(`Invalid attendee email format: ${attendee.email}`)
+    }
+
+    // Additional email validation checks
+    if (/\.\./.test(attendee.email)) {
+      throw new Error(`Invalid attendee email format (consecutive dots): ${attendee.email}`)
+    }
+
+    const localPart = attendee.email.split("@")[0]
+    if (localPart.startsWith(".") || localPart.endsWith(".")) {
+      throw new Error(`Invalid attendee email format: ${attendee.email}`)
+    }
+
+    const attendeeName = `${firstName} ${lastName}`
+    const attendeeEmail = attendee.email.toLowerCase().trim()
+
+    // 1. If attendee email matches purchaser's player, use their player
+    if (purchaserPlayer) {
+      // Find the user linked to purchaser player to get their email
+      const purchaserPlayerDoc = await strapi.documents("api::player.player").findOne({
+        documentId: purchaserPlayer.documentId,
+        populate: { user: { fields: ["email"] } },
+      })
+
+      if (purchaserPlayerDoc?.user?.email?.toLowerCase() === attendeeEmail) {
+        strapi.log.info(`[Ticketing] Attendee ${attendeeName} matched to purchaser player`)
+        return { player: purchaserPlayer, isNew: false }
+      }
+    }
+
+    // 2. Look for a user with this email and get their player
+    const existingUser = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { email: { $eqi: attendeeEmail } },
+      populate: { player: true },
+    })
+
+    if (existingUser?.player) {
+      strapi.log.info(`[Ticketing] Found existing player via user email: ${attendeeName}`)
+
+      // Update player's default preferences if they don't have them set
+      if (attendee.tshirtSize || attendee.foodPreferences) {
+        const playerDoc = await strapi.documents("api::player.player").findOne({
+          documentId: existingUser.player.documentId,
+        })
+
+        if (playerDoc) {
+          const updateData: any = {}
+          if (attendee.tshirtSize && !playerDoc.defaultTshirtSize) {
+            updateData.defaultTshirtSize = attendee.tshirtSize
+          }
+          if (attendee.foodPreferences && !playerDoc.defaultFoodPreferences) {
+            updateData.defaultFoodPreferences = attendee.foodPreferences
+          }
+          if (Object.keys(updateData).length > 0) {
+            await strapi.documents("api::player.player").update({
+              documentId: existingUser.player.documentId,
+              data: updateData,
+            })
+          }
+        }
+      }
+
+      return { player: existingUser.player, isNew: false }
+    }
+
+    // 3. Look for an existing player by exact name match (only if NOT linked to a user)
+    // SECURITY: Only match unlinked players to prevent assigning tickets to wrong user's profile
+    const existingPlayerByName = await strapi.documents("api::player.player").findFirst({
+      filters: {
+        name: { $eqi: attendeeName },
+      },
+      populate: { user: true },
+    })
+
+    if (existingPlayerByName && !existingPlayerByName.user) {
+      // Player exists and is not linked to any user - safe to use
+      strapi.log.info(`[Ticketing] Found existing unlinked player by name: ${attendeeName}`)
+
+      // Update player's default preferences if they don't have them set
+      const updateData: any = {}
+      if (attendee.tshirtSize && !existingPlayerByName.defaultTshirtSize) {
+        updateData.defaultTshirtSize = attendee.tshirtSize
+      }
+      if (attendee.foodPreferences && !existingPlayerByName.defaultFoodPreferences) {
+        updateData.defaultFoodPreferences = attendee.foodPreferences
+      }
+      if (Object.keys(updateData).length > 0) {
+        await strapi.documents("api::player.player").update({
+          documentId: existingPlayerByName.documentId,
+          data: updateData,
+        })
+      }
+
+      return { player: existingPlayerByName, isNew: false }
+    }
+
+    // 4. Create a new player profile (unlinked to any user)
+    // If a player with same name exists but IS linked, we create a new one with unique slug
+    const baseSlug = slugify(attendeeName, { lower: true, strict: true })
+
+    // Ensure unique slug with retry loop
+    let slug = baseSlug
+    let slugAttempts = 0
+    const maxSlugAttempts = 10
+
+    while (slugAttempts < maxSlugAttempts) {
+      const existingSlug = await strapi.documents("api::player.player").findFirst({
+        filters: { slug },
+      })
+
+      if (!existingSlug) {
+        break // Slug is unique
+      }
+
+      // Generate a more unique suffix using timestamp + random
+      const timestamp = Date.now().toString(36)
+      const random = crypto.randomBytes(2).toString("hex")
+      slug = `${baseSlug}-${timestamp.slice(-4)}${random}`
+      slugAttempts++
+    }
+
+    if (slugAttempts >= maxSlugAttempts) {
+      throw new Error(`Failed to generate unique slug for player: ${attendeeName}`)
+    }
+
+    // For name uniqueness, append a suffix if needed
+    let playerName = attendeeName
+    if (existingPlayerByName) {
+      // Player with same name exists but is linked to a user - create with unique name
+      const timestamp = Date.now().toString(36).slice(-4)
+      playerName = `${attendeeName} (${timestamp})`
+      strapi.log.info(`[Ticketing] Creating player with unique name: ${playerName} (original name taken)`)
+    }
+
+    const newPlayer = await strapi.documents("api::player.player").create({
+      data: {
+        name: playerName,
+        slug,
+        position: "Player",
+        defaultTshirtSize: attendee.tshirtSize || "none",
+        defaultFoodPreferences: attendee.foodPreferences || null,
+      } as any,
+    })
+
+    strapi.log.info(
+      `[Ticketing] Created new player profile for attendee: ${playerName} (${newPlayer.documentId})`
+    )
+
+    return { player: newPlayer, isNew: true }
+  },
+
+  /**
+   * Add a player to an event's attendees list
+   */
+  async addPlayerToEventAttendees(playerDocumentId: string, event: any) {
+    const playerDoc = await strapi.documents("api::player.player").findOne({
+      documentId: playerDocumentId,
+      populate: { attended: { fields: ["id", "documentId"] } },
+    })
+
+    if (!playerDoc) return
+
+    const currentAttendedIds = playerDoc.attended?.map((e: any) => e.id) || []
+    const alreadyAttending = playerDoc.attended?.some(
+      (e: any) => e.documentId === event.documentId
+    )
+
+    if (!alreadyAttending) {
+      await strapi.documents("api::player.player").update({
+        documentId: playerDocumentId,
+        data: {
+          attended: [...currentAttendedIds, event.id],
+        } as any,
+      })
+
+      strapi.log.info(
+        `[Ticketing] Player ${playerDocumentId} added to event ${event.documentId} attendees`
+      )
+    }
+  },
+
+  /**
+   * Send order confirmation email with calendar attachment
+   */
+  async sendOrderConfirmationEmail(
+    order: any,
+    createdTickets: Array<{
+      ticketCode: string
+      ticketTypeName: string
+      attendeeName: string
+      attendeeEmail: string
+      player: any
+      isNewPlayer: boolean
+    }>
+  ) {
+    const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
+    const logoUrl =
+      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
+
+    // Build ticket list for plain text
+    const ticketList = createdTickets
+      .map((t) => `- ${t.ticketTypeName}: ${t.ticketCode} (${t.attendeeName})`)
+      .join("\n")
+
+    // Build ticket list for HTML
+    const ticketListHtml = createdTickets
+      .map(
+        (t) =>
+          `<li>
+            <strong>${t.ticketTypeName}</strong>: <code>${t.ticketCode}</code>
+            <br/><span style="color: #666; font-size: 13px;">Attendee: ${t.attendeeName}</span>
+          </li>`
+      )
+      .join("")
+
+    // Generate calendar data
+    let icsContent: string | null = null
+    let googleCalendarUrl = ""
+    let outlookCalendarUrl = ""
+
+    try {
+      const eventData = {
+        name: order.event.name,
+        slug: order.event.slug,
+        description: order.event.description,
+        start: order.event.start,
+        end: order.event.end,
+        eventStatus: order.event.eventStatus,
+        contactEmail: order.event.contactEmail,
+        venue: order.event.venue,
+      }
+
+      icsContent = await generateEventICS(eventData)
+      googleCalendarUrl = generateGoogleCalendarUrl(eventData)
+      outlookCalendarUrl = generateOutlookCalendarUrl(eventData)
+    } catch (calError: any) {
+      strapi.log.warn(`[Ticketing] Failed to generate calendar data: ${calError.message}`)
+    }
+
+    // Format event date for display
+    const eventDate = new Date(order.event.start).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+    const eventTime = new Date(order.event.start).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+
+    const eventLocation = order.event.venue
+      ? `${order.event.venue.name}${order.event.venue.location?.place_name ? ` - ${order.event.venue.location.place_name}` : ""}`
+      : order.event.location
+        ? `${order.event.location.name}, ${order.event.location.country}`
+        : "Location TBA"
+
+    // Calendar section HTML
+    const calendarSectionHtml = `
+      <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
+        <h3 style="margin-top: 0; color: #1976d2;">Add to Your Calendar</h3>
+        <p style="margin-bottom: 15px;">
+          <strong>Date:</strong> ${eventDate} at ${eventTime}<br/>
+          <strong>Location:</strong> ${eventLocation}
+        </p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          ${googleCalendarUrl ? `<a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #4285f4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Google Calendar</a>` : ""}
+          ${outlookCalendarUrl ? `<a href="${outlookCalendarUrl}" target="_blank" style="display: inline-block; background: #0078d4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Outlook</a>` : ""}
+        </div>
+        <p style="margin-top: 12px; margin-bottom: 0; font-size: 12px; color: #666;">
+          An .ics calendar file is also attached to this email for other calendar apps.
+        </p>
+      </div>
+    `
+
+    try {
+      const emailOptions: any = {
+        to: order.purchaserEmail,
+        subject: `[#play14] Your tickets for ${order.event.name}`,
+        text: `
+Thank you for your order!
+
+Order: ${order.orderNumber}
+Event: ${order.event.name}
+Date: ${eventDate} at ${eventTime}
+Location: ${eventLocation}
+Amount: ${order.currency} ${order.totalAmount.toFixed(2)}
+
+Your tickets:
+${ticketList}
+
+Add to your calendar:
+- Google Calendar: ${googleCalendarUrl}
+- Outlook: ${outlookCalendarUrl}
+
+View your tickets: ${frontendUrl}/admin/tickets
+${order.event.contactEmail ? `\nQuestions about the event? Contact the organizers at ${order.event.contactEmail}` : ""}
+
+See you at the event!
+
+The #play14 Team
+        `.trim(),
+        html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .header { background: #1a1a1a; padding: 30px 20px; text-align: center; }
+    .header img { max-width: 200px; height: auto; }
+    .content { padding: 30px 20px; background: #ffffff; }
+    .tickets { background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .tickets ul { margin: 0; padding: 0; list-style: none; }
+    .tickets li { padding: 12px 0; border-bottom: 1px solid #eee; }
+    .tickets li:last-child { border-bottom: none; }
+    .footer { text-align: center; padding: 20px; background: #f5f5f5; color: #666; font-size: 12px; }
+    code { background: #fff3e0; padding: 4px 8px; border-radius: 4px; font-family: monospace; color: #f47920; }
+    .btn { display: inline-block; background: #f47920; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
+    h2 { color: #333; margin-top: 0; }
+    h3 { color: #333; margin-top: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="${logoUrl}" alt="#play14" />
+    </div>
+    <div class="content">
+      <h2>Thank you for your order!</h2>
+      <p><strong>Order:</strong> ${order.orderNumber}</p>
+      <p><strong>Event:</strong> ${order.event.name}</p>
+      <p><strong>Amount:</strong> ${order.currency} ${order.totalAmount.toFixed(2)}</p>
+
+      <div class="tickets">
+        <h3>Your Tickets</h3>
+        <ul>
+          ${ticketListHtml}
+        </ul>
+      </div>
+
+      ${calendarSectionHtml}
+
+      <p>Keep these ticket codes safe - you'll need them for check-in at the event.</p>
+
+      ${order.event.contactEmail ? `<p>If you have any questions about the event, contact the organizers at <a href="mailto:${order.event.contactEmail}" style="color: #f47920;">${order.event.contactEmail}</a></p>` : ""}
+
+      <a href="${frontendUrl}/admin/tickets" class="btn">View Your Tickets</a>
+    </div>
+    <div class="footer">
+      <p>See you at the event!</p>
+      <p>The #play14 Team</p>
+      <p><a href="${frontendUrl}" style="color: #f47920;">play14.org</a></p>
+    </div>
+  </div>
+</body>
+</html>
+        `.trim(),
+      }
+
+      // Add ICS attachment if generated successfully
+      if (icsContent) {
+        emailOptions.attachments = [
+          {
+            filename: `${order.event.slug || "play14-event"}.ics`,
+            content: Buffer.from(icsContent),
+            contentType: "text/calendar",
+          },
+        ]
+      }
+
+      await strapi.plugin("email").service("email").send(emailOptions)
+
+      strapi.log.info(`[Ticketing] Confirmation email sent to ${order.purchaserEmail}`)
+    } catch (error: any) {
+      strapi.log.error(
+        `[Ticketing] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message}`
+      )
+    }
+  },
+
+  /**
+   * Send invitation email to a newly created player with calendar attachment
+   */
+  async sendPlayerInvitationEmail(
+    email: string,
+    playerName: string,
+    player: any,
+    ticketCode: string,
+    event: any
+  ) {
+    const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
+    const logoUrl =
+      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
+
+    const eventDate = new Date(event.start).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+
+    const eventTime = new Date(event.start).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+
+    const eventLocation = event.venue
+      ? `${event.venue.name}${event.venue.location?.place_name ? ` - ${event.venue.location.place_name}` : ""}`
+      : event.location
+        ? `${event.location.name}, ${event.location.country}`
+        : "Location TBA"
+
+    // Claim URL with player document ID
+    const claimUrl = `${frontendUrl}/auth/register?claim=${player.documentId}`
+
+    // Generate calendar data
+    let icsContent: string | null = null
+    let googleCalendarUrl = ""
+    let outlookCalendarUrl = ""
+
+    try {
+      const eventData = {
+        name: event.name,
+        slug: event.slug,
+        description: event.description,
+        start: event.start,
+        end: event.end,
+        eventStatus: event.eventStatus,
+        contactEmail: event.contactEmail,
+        venue: event.venue,
+      }
+
+      icsContent = await generateEventICS(eventData)
+      googleCalendarUrl = generateGoogleCalendarUrl(eventData)
+      outlookCalendarUrl = generateOutlookCalendarUrl(eventData)
+    } catch (calError: any) {
+      strapi.log.warn(`[Ticketing] Failed to generate calendar for invitation: ${calError.message}`)
+    }
+
+    // Calendar section HTML
+    const calendarSectionHtml = `
+      <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
+        <h3 style="margin-top: 0; color: #1976d2;">Add to Your Calendar</h3>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          ${googleCalendarUrl ? `<a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #4285f4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Google Calendar</a>` : ""}
+          ${outlookCalendarUrl ? `<a href="${outlookCalendarUrl}" target="_blank" style="display: inline-block; background: #0078d4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Outlook</a>` : ""}
+        </div>
+        <p style="margin-top: 12px; margin-bottom: 0; font-size: 12px; color: #666;">
+          An .ics calendar file is also attached to this email.
+        </p>
+      </div>
+    `
+
+    try {
+      const emailOptions: any = {
+        to: email,
+        subject: `[#play14] Your ticket for ${event.name} - Create your profile`,
+        text: `
+Hi ${playerName.split(" ")[0]},
+
+You've been registered for ${event.name}!
+
+Your ticket: ${ticketCode}
+Event: ${event.name}
+Date: ${eventDate} at ${eventTime}
+Location: ${eventLocation}
+
+Add to your calendar:
+- Google Calendar: ${googleCalendarUrl}
+- Outlook: ${outlookCalendarUrl}
+
+Create your #play14 account to:
+- Manage your profile
+- View your tickets
+- Connect with the community
+
+Create your account: ${claimUrl}
+
+See you at the event!
+The #play14 Team
+        `.trim(),
+        html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .header { background: #1a1a1a; padding: 30px 20px; text-align: center; }
+    .header img { max-width: 200px; height: auto; }
+    .content { padding: 30px 20px; background: #ffffff; }
+    .ticket-info { background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .ticket-code { font-size: 24px; font-weight: bold; color: #f47920; letter-spacing: 2px; }
+    .footer { text-align: center; padding: 20px; background: #f5f5f5; color: #666; font-size: 12px; }
+    .btn { display: inline-block; background: #f47920; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
+    h2 { color: #333; margin-top: 0; }
+    .features { margin: 20px 0; padding-left: 20px; }
+    .features li { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="${logoUrl}" alt="#play14" />
+    </div>
+    <div class="content">
+      <h2>Welcome to #play14!</h2>
+      <p>Hi ${playerName.split(" ")[0]},</p>
+      <p>You've been registered for <strong>${event.name}</strong>!</p>
+
+      <div class="ticket-info">
+        <p><strong>Your Ticket</strong></p>
+        <p class="ticket-code">${ticketCode}</p>
+        <p style="margin-top: 15px; margin-bottom: 0;">
+          <strong>Event:</strong> ${event.name}<br/>
+          <strong>Date:</strong> ${eventDate} at ${eventTime}<br/>
+          <strong>Location:</strong> ${eventLocation}
+        </p>
+      </div>
+
+      ${calendarSectionHtml}
+
+      <p>Create your #play14 account to:</p>
+      <ul class="features">
+        <li>Manage your player profile</li>
+        <li>View all your tickets</li>
+        <li>Connect with the community</li>
+        <li>Get updates about events</li>
+      </ul>
+
+      <a href="${claimUrl}" class="btn">Create Your Account</a>
+
+      <p style="margin-top: 30px;">See you at the event!</p>
+    </div>
+    <div class="footer">
+      <p>The #play14 Team</p>
+      <p><a href="${frontendUrl}" style="color: #f47920;">play14.org</a></p>
+    </div>
+  </div>
+</body>
+</html>
+        `.trim(),
+      }
+
+      // Add ICS attachment if generated successfully
+      if (icsContent) {
+        emailOptions.attachments = [
+          {
+            filename: `${event.slug || "play14-event"}.ics`,
+            content: Buffer.from(icsContent),
+            contentType: "text/calendar",
+          },
+        ]
+      }
+
+      await strapi.plugin("email").service("email").send(emailOptions)
+
+      strapi.log.info(`[Ticketing] Player invitation email sent to ${email}`)
+    } catch (error: any) {
+      strapi.log.error(`[Ticketing] Failed to send player invitation email to ${email}: ${error.message}`)
+    }
   },
 })

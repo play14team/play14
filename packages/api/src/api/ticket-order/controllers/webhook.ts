@@ -2,6 +2,7 @@
  * Webhook controller for handling Stripe payment events
  */
 
+import crypto from "crypto"
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 import {
@@ -11,7 +12,12 @@ import {
 } from "../../../libs/calendar"
 import { generateTicketCode } from "../../../libs/tickets"
 import { getPaymentProvider } from "../../../services/payment"
-import { confirmReservations, releaseReservations } from "../../../services/ticketing"
+import {
+  confirmReservations,
+  releaseReservations,
+  confirmDiscountCode,
+  releaseDiscountCode,
+} from "../../../services/ticketing"
 
 interface AttendeeInfo {
   firstName: string
@@ -124,168 +130,192 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return
     }
 
-    if (order.status !== "pending") {
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} already processed (status: ${order.status})`)
+    // IDEMPOTENCY: Use atomic conditional update to prevent duplicate processing
+    // If two webhooks arrive simultaneously, only one will succeed in changing status
+    const knex = strapi.db.connection
+    const updateResult = await knex("ticket_orders")
+      .where("document_id", order.documentId)
+      .where("status", "pending")
+      .update({ status: "processing" })
+
+    if (updateResult === 0) {
+      // Either order was already processed or is being processed by another webhook
+      strapi.log.info(`[Webhook] Order ${order.orderNumber} already being processed or completed (status: ${order.status})`)
       return
     }
 
-    const ticketDetails = order.ticketDetails || []
-    const attendeeDetails = (order.attendeeDetails || []) as AttendeeInfo[]
+    strapi.log.info(`[Webhook] Processing order ${order.orderNumber} (locked with processing status)`)
 
-    // Track created tickets for confirmation email
-    const createdTickets: Array<{
-      ticketCode: string
-      ticketTypeName: string
-      attendeeName: string
-      attendeeEmail: string
-      player: any
-      isNewPlayer: boolean
-    }> = []
+    try {
+      const ticketDetails = order.ticketDetails || []
+      const attendeeDetails = (order.attendeeDetails || []) as AttendeeInfo[]
 
-    // Keep track of total tickets created per ticket type for sold count updates
-    const ticketTypeQuantities = new Map<string, number>()
+      // Track created tickets for confirmation email
+      const createdTickets: Array<{
+        ticketCode: string
+        ticketTypeName: string
+        attendeeName: string
+        attendeeEmail: string
+        player: any
+        isNewPlayer: boolean
+      }> = []
 
-    // Create tickets - use attendee details if available, otherwise fall back to purchaser info
-    let ticketIndex = 0
-    for (const detail of ticketDetails as any[]) {
-      const ticketType = order.event?.ticketTypes?.find(
-        (tt: any) => tt.documentId === detail.ticketTypeId
-      )
+      // Keep track of total tickets created per ticket type for sold count updates
+      const ticketTypeQuantities = new Map<string, number>()
 
-      if (!ticketType) {
-        strapi.log.warn(`[Webhook] Ticket type not found: ${detail.ticketTypeId}`)
-        continue
-      }
+      // Create tickets - use attendee details if available, otherwise fall back to purchaser info
+      let ticketIndex = 0
+      for (const detail of ticketDetails as any[]) {
+        const ticketType = order.event?.ticketTypes?.find(
+          (tt: any) => tt.documentId === detail.ticketTypeId
+        )
 
-      // Create individual tickets
-      for (let i = 0; i < detail.quantity; i++) {
-        // Get attendee info for this ticket (if available)
-        const attendee = attendeeDetails[ticketIndex]
-        let attendeeName: string
-        let attendeeEmail: string
-        let attendeeInfo: any = null
-        let ticketPlayer: any = null
-        let isNewPlayer = false
+        if (!ticketType) {
+          strapi.log.warn(`[Webhook] Ticket type not found: ${detail.ticketTypeId}`)
+          continue
+        }
 
-        if (attendee) {
-          // Use collected attendee information
-          attendeeName = `${attendee.firstName} ${attendee.lastName}`
-          attendeeEmail = attendee.email
+        // Create individual tickets
+        for (let i = 0; i < detail.quantity; i++) {
+          // Get attendee info for this ticket (if available)
+          const attendee = attendeeDetails[ticketIndex]
+          let attendeeName: string
+          let attendeeEmail: string
+          let attendeeInfo: any = null
+          let ticketPlayer: any = null
+          let isNewPlayer = false
 
-          // Build attendeeInfo component data
-          attendeeInfo = {
-            firstName: attendee.firstName,
-            lastName: attendee.lastName,
-            email: attendee.email,
-            tshirtSize: attendee.tshirtSize || "none",
-            foodPreferences: attendee.foodPreferences || null,
-            photoConsent: attendee.photoConsent,
-            photoConsentTimestamp: attendee.photoConsentTimestamp || null,
+          if (attendee) {
+            // Use collected attendee information
+            attendeeName = `${attendee.firstName} ${attendee.lastName}`
+            attendeeEmail = attendee.email
+
+            // Build attendeeInfo component data
+            attendeeInfo = {
+              firstName: attendee.firstName,
+              lastName: attendee.lastName,
+              email: attendee.email,
+              tshirtSize: attendee.tshirtSize || "none",
+              foodPreferences: attendee.foodPreferences || null,
+              photoConsent: attendee.photoConsent,
+              photoConsentTimestamp: attendee.photoConsentTimestamp || null,
+            }
+
+            // Find or create player for this attendee
+            const playerResult = await this.findOrCreatePlayerForAttendee(
+              attendee,
+              order.player,
+              order.event
+            )
+            ticketPlayer = playerResult.player
+            isNewPlayer = playerResult.isNew
+          } else {
+            // Fall back to purchaser info (legacy behavior)
+            attendeeName = order.purchaserName
+            attendeeEmail = order.purchaserEmail
+            ticketPlayer = order.player
           }
 
-          // Find or create player for this attendee
-          const playerResult = await this.findOrCreatePlayerForAttendee(
-            attendee,
-            order.player,
-            order.event
-          )
-          ticketPlayer = playerResult.player
-          isNewPlayer = playerResult.isNew
-        } else {
-          // Fall back to purchaser info (legacy behavior)
-          attendeeName = order.purchaserName
-          attendeeEmail = order.purchaserEmail
-          ticketPlayer = order.player
-        }
+          const ticket = await strapi.documents("api::ticket.ticket").create({
+            data: {
+              ticketCode: generateTicketCode(),
+              ticketStatus: "valid",
+              attendeeName,
+              attendeeEmail,
+              attendeeInfo,
+              ticketType: ticketType.id,
+              order: order.id,
+              player: ticketPlayer?.id || null,
+              event: order.event.id,
+            } as any,
+          })
 
-        const ticket = await strapi.documents("api::ticket.ticket").create({
-          data: {
-            ticketCode: generateTicketCode(),
-            ticketStatus: "valid",
+          createdTickets.push({
+            ticketCode: ticket.ticketCode,
+            ticketTypeName: ticketType.name,
             attendeeName,
             attendeeEmail,
-            attendeeInfo,
-            ticketType: ticketType.id,
-            order: order.id,
-            player: ticketPlayer?.id || null,
-            event: order.event.id,
-          } as any,
-        })
+            player: ticketPlayer,
+            isNewPlayer,
+          })
 
-        createdTickets.push({
-          ticketCode: ticket.ticketCode,
-          ticketTypeName: ticketType.name,
-          attendeeName,
-          attendeeEmail,
-          player: ticketPlayer,
-          isNewPlayer,
-        })
+          // Track quantity for this ticket type
+          const currentCount = ticketTypeQuantities.get(ticketType.documentId) || 0
+          ticketTypeQuantities.set(ticketType.documentId, currentCount + 1)
 
-        // Track quantity for this ticket type
-        const currentCount = ticketTypeQuantities.get(ticketType.documentId) || 0
-        ticketTypeQuantities.set(ticketType.documentId, currentCount + 1)
-
-        ticketIndex++
-      }
-    }
-
-    // Confirm reservations - converts reserved tickets to sold
-    // This atomically decrements reservedCount and increments soldCount
-    await confirmReservations(strapi, order.documentId, ticketTypeQuantities)
-
-    // Update order status
-    await strapi.documents("api::ticket-order.ticket-order").update({
-      documentId: order.documentId,
-      data: {
-        status: "paid",
-        providerOrderId: paymentIntent,
-        paidAt: new Date().toISOString(),
-      } as any,
-    })
-
-    // Increment discount code usage count if applicable
-    if (order.discountCode) {
-      await strapi.documents("api::discount-code.discount-code").update({
-        documentId: (order.discountCode as any).documentId,
-        data: {
-          usedCount: ((order.discountCode as any).usedCount || 0) + 1,
-        } as any,
-      })
-      strapi.log.info(`[Webhook] Discount code ${(order.discountCode as any).code} usage incremented`)
-    }
-
-    // Add all ticket players to event attendees
-    const playersToAddToEvent = new Set<string>()
-    for (const ticket of createdTickets) {
-      if (ticket.player?.documentId) {
-        playersToAddToEvent.add(ticket.player.documentId)
-      }
-    }
-
-    for (const playerDocId of playersToAddToEvent) {
-      await this.addPlayerToEventAttendees(playerDocId, order.event)
-    }
-
-    // Send confirmation email to purchaser
-    await this.sendConfirmationEmail(order, createdTickets)
-
-    // Send invitation emails to new players (attendees who got a new profile created)
-    for (const ticket of createdTickets) {
-      if (ticket.isNewPlayer && ticket.player) {
-        // Don't send invitation to purchaser (they already got confirmation email)
-        if (ticket.attendeeEmail.toLowerCase() !== order.purchaserEmail.toLowerCase()) {
-          await this.sendPlayerInvitationEmail(
-            ticket.attendeeEmail,
-            ticket.attendeeName,
-            ticket.player,
-            ticket.ticketCode,
-            order.event
-          )
+          ticketIndex++
         }
       }
-    }
 
-    strapi.log.info(`[Webhook] Order ${order.orderNumber} completed successfully with ${createdTickets.length} tickets`)
+      // Confirm reservations - converts reserved tickets to sold
+      // This atomically decrements reservedCount and increments soldCount
+      await confirmReservations(strapi, order.documentId, ticketTypeQuantities)
+
+      // Update order status to paid (from processing)
+      await strapi.documents("api::ticket-order.ticket-order").update({
+        documentId: order.documentId,
+        data: {
+          status: "paid",
+          providerOrderId: paymentIntent,
+          paidAt: new Date().toISOString(),
+        } as any,
+      })
+
+      // Confirm discount code usage if applicable - moves reserved to used atomically
+      // SECURITY: Uses atomic confirmDiscountCode to ensure correct count even with concurrent requests
+      if (order.discountCode?.documentId) {
+        // hasReservation indicates whether the order had an active reservation at checkout time
+        const hadReservation = (order as any).hasReservation
+        await confirmDiscountCode(strapi, order.discountCode.documentId, hadReservation)
+        strapi.log.info(`[Webhook] Discount code ${(order.discountCode as any).code} usage confirmed`)
+      }
+
+      // Add all ticket players to event attendees
+      const playersToAddToEvent = new Set<string>()
+      for (const ticket of createdTickets) {
+        if (ticket.player?.documentId) {
+          playersToAddToEvent.add(ticket.player.documentId)
+        }
+      }
+
+      for (const playerDocId of playersToAddToEvent) {
+        await this.addPlayerToEventAttendees(playerDocId, order.event)
+      }
+
+      // Send confirmation email to purchaser
+      await this.sendConfirmationEmail(order, createdTickets)
+
+      // Send invitation emails to new players (attendees who got a new profile created)
+      for (const ticket of createdTickets) {
+        if (ticket.isNewPlayer && ticket.player) {
+          // Don't send invitation to purchaser (they already got confirmation email)
+          if (ticket.attendeeEmail.toLowerCase() !== order.purchaserEmail.toLowerCase()) {
+            await this.sendPlayerInvitationEmail(
+              ticket.attendeeEmail,
+              ticket.attendeeName,
+              ticket.player,
+              ticket.ticketCode,
+              order.event
+            )
+          }
+        }
+      }
+
+      strapi.log.info(`[Webhook] Order ${order.orderNumber} completed successfully with ${createdTickets.length} tickets`)
+    } catch (error: any) {
+      // Processing failed - revert status back to pending so webhook can be retried
+      strapi.log.error(`[Webhook] Failed to process order ${order.orderNumber}: ${error.message}`)
+
+      await knex("ticket_orders")
+        .where("document_id", order.documentId)
+        .where("status", "processing")
+        .update({ status: "pending" })
+
+      strapi.log.info(`[Webhook] Order ${order.orderNumber} status reverted to pending for retry`)
+
+      // Re-throw to signal failure to Stripe (will retry webhook)
+      throw error
+    }
   },
 
   /**
@@ -319,9 +349,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       throw new Error("Attendee name contains invalid characters")
     }
 
-    // Validate email format
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    // Email validation - stricter pattern that rejects common invalid formats
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/
     if (!emailPattern.test(attendee.email)) {
+      throw new Error(`Invalid attendee email format: ${attendee.email}`)
+    }
+
+    // Additional email validation checks
+    if (/\.\./.test(attendee.email)) {
+      throw new Error(`Invalid attendee email format (consecutive dots): ${attendee.email}`)
+    }
+
+    const localPart = attendee.email.split("@")[0]
+    if (localPart.startsWith(".") || localPart.endsWith(".")) {
       throw new Error(`Invalid attendee email format: ${attendee.email}`)
     }
 
@@ -377,7 +417,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return { player: existingUser.player, isNew: false }
     }
 
-    // 3. Look for an existing player by exact name match
+    // 3. Look for an existing player by exact name match (only if NOT linked to a user)
+    // SECURITY: Only match unlinked players to prevent assigning tickets to wrong user's profile
     const existingPlayerByName = await strapi.documents("api::player.player").findFirst({
       filters: {
         name: { $eqi: attendeeName },
@@ -385,10 +426,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       populate: { user: true },
     })
 
-    if (existingPlayerByName) {
-      // Player exists - use them regardless of whether they're linked to a user
-      // (Player names are unique, so we can't create a new one with the same name)
-      strapi.log.info(`[Webhook] Found existing player by name: ${attendeeName} (linked: ${!!existingPlayerByName.user})`)
+    if (existingPlayerByName && !existingPlayerByName.user) {
+      // Player exists and is not linked to any user - safe to use
+      strapi.log.info(`[Webhook] Found existing unlinked player by name: ${attendeeName}`)
 
       // Update player's default preferences if they don't have them set
       const updateData: any = {}
@@ -409,6 +449,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // 4. Create a new player profile (unlinked to any user)
+    // If a player with same name exists but IS linked, we create a new one with unique slug/name
     const baseSlug = slugify(attendeeName, { lower: true, strict: true })
 
     // Ensure unique slug with retry loop (more robust than single random suffix)
@@ -427,7 +468,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Generate a more unique suffix using timestamp + random
       const timestamp = Date.now().toString(36)
-      const random = Math.random().toString(36).substring(2, 6)
+      const random = crypto.randomBytes(2).toString("hex")
       slug = `${baseSlug}-${timestamp.slice(-4)}${random}`
       slugAttempts++
     }
@@ -436,9 +477,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       throw new Error(`Failed to generate unique slug for player: ${attendeeName}`)
     }
 
+    // For name uniqueness, append a suffix if needed
+    let playerName = attendeeName
+    if (existingPlayerByName) {
+      // Player with same name exists but is linked to a user - create with unique name
+      const timestamp = Date.now().toString(36).slice(-4)
+      playerName = `${attendeeName} (${timestamp})`
+      strapi.log.info(`[Webhook] Creating player with unique name: ${playerName} (original name taken)`)
+    }
+
     const newPlayer = await strapi.documents("api::player.player").create({
       data: {
-        name: attendeeName,
+        name: playerName,
         slug,
         position: "Player",
         defaultTshirtSize: attendee.tshirtSize || "none",
@@ -446,7 +496,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       } as any,
     })
 
-    strapi.log.info(`[Webhook] Created new player profile for attendee: ${attendeeName} (${newPlayer.documentId})`)
+    strapi.log.info(`[Webhook] Created new player profile for attendee: ${playerName} (${newPlayer.documentId})`)
 
     return { player: newPlayer, isNew: true }
   },
@@ -492,7 +542,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     event: any
   ) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-    const logoUrl = "https://play14.org/logo/play14_600x200_transparent-dark.png"
+    const logoUrl =
+      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
 
     const eventDate = new Date(event.start).toLocaleDateString("en-US", {
       weekday: "long",
@@ -688,6 +739,7 @@ The #play14 Team
       filters: { providerSessionId: sessionId },
       populate: {
         event: { fields: ["id", "documentId", "name"] },
+        discountCode: { fields: ["documentId", "code"] },
       },
     })
 
@@ -703,6 +755,12 @@ The #play14 Team
 
     // Release any ticket reservations before marking expired
     await releaseReservations(strapi, order.documentId)
+
+    // Release any discount code reservation
+    if (order.discountCode?.documentId) {
+      await releaseDiscountCode(strapi, order.discountCode.documentId)
+      strapi.log.info(`[Webhook] Released discount code reservation for ${order.discountCode.code}`)
+    }
 
     // Update order status to expired
     await strapi.documents("api::ticket-order.ticket-order").update({
@@ -740,6 +798,7 @@ The #play14 Team
       },
       populate: {
         event: { fields: ["id", "documentId", "name", "slug"] },
+        discountCode: { fields: ["documentId", "code"] },
       },
     })
 
@@ -757,6 +816,12 @@ The #play14 Team
     if (order.status === "pending") {
       // Release any ticket reservations before marking failed
       await releaseReservations(strapi, order.documentId)
+
+      // Release any discount code reservation
+      if (order.discountCode?.documentId) {
+        await releaseDiscountCode(strapi, order.discountCode.documentId)
+        strapi.log.info(`[Webhook] Released discount code reservation for ${order.discountCode.code}`)
+      }
 
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: order.documentId,
@@ -778,6 +843,8 @@ The #play14 Team
    */
   async sendPaymentFailedEmail(order: any, errorMessage: string) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
+    const logoUrl =
+      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
 
     try {
       await strapi.plugin("email").service("email").send({
@@ -814,7 +881,7 @@ The #play14 Team
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://play14.org/logo/play14_600x200_transparent-dark.png" alt="#play14" />
+      <img src="${logoUrl}" alt="#play14" />
     </div>
     <div class="content">
       <h2>Payment Failed</h2>
@@ -994,7 +1061,8 @@ The #play14 Team
   ) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
     // Logo URL must be publicly accessible for email clients (dark variant for dark header background)
-    const logoUrl = "https://play14.org/logo/play14_600x200_transparent-dark.png"
+    const logoUrl =
+      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
 
     let tickets: any[]
 

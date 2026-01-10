@@ -57,8 +57,7 @@ export default {
       handler: "custom-ticket-order.cancelOrder",
       info: { apiName: "ticket-order", type: "content-api" },
       config: {
-        auth: false,
-        description: "Cancel a pending order (when user abandons checkout)",
+        description: "Cancel a pending order (requires authentication and ownership)",
       },
     },
     // Draft order flow - multi-step checkout with attendee information

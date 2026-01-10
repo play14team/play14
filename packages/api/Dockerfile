@@ -3,7 +3,8 @@
 
 # Stage 1: Dependencies
 FROM oven/bun:1.3.5-alpine AS deps
-RUN apk add --no-cache libc6-compat build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3 make g++
+RUN apk add --no-cache libc6-compat build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3 make g++ \
+    && ln -sf /usr/bin/python3 /usr/bin/python
 
 WORKDIR /app
 
@@ -14,13 +15,15 @@ COPY package.json bun.lock ./
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
+COPY packages/agents/package.json ./packages/agents/
 
 # Install dependencies
 RUN bun install --frozen-lockfile
 
 # Stage 2: Builder
 FROM oven/bun:1.3.5-alpine AS builder
-RUN apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3 make g++ nodejs
+RUN apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git python3 make g++ nodejs \
+    && ln -sf /usr/bin/python3 /usr/bin/python
 
 WORKDIR /app
 
@@ -33,6 +36,7 @@ COPY --from=deps /app/bun.lock ./bun.lock
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
+COPY packages/agents/package.json ./packages/agents/
 
 # Copy API source code
 COPY packages/api ./packages/api

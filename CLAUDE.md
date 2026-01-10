@@ -35,29 +35,35 @@ bun install
 
 ### Development
 
+**Package names for bun --filter**: `play14-api`, `play14-web`, `play14-design`
+
 ```bash
 # Run individual package in dev mode (with watch)
-bun --filter api dev          # Start API with database (Strapi develop mode)
-bun --filter web dev           # Start Next.js web with Turbopack
-bun --filter design dev
+bun --filter play14-api dev          # Start API with database (Strapi develop mode)
+bun --filter play14-web dev          # Start Next.js web with Turbopack
+bun --filter play14-design dev
 
 # API-specific commands
-bun --filter api develop      # Strapi develop mode with auto-reload
-bun --filter api build        # Build Strapi admin panel
-bun --filter api start        # Production mode without reload
-bun --filter api db           # Start database only
-bun --filter api down         # Stop containers
+bun --filter play14-api develop      # Strapi develop mode with auto-reload
+bun --filter play14-api build        # Build Strapi admin panel
+bun --filter play14-api start        # Production mode without reload
+bun --filter play14-api db           # Start database only
+bun --filter play14-api down         # Stop containers
+bun --filter play14-api test         # Run unit tests
+bun --filter play14-api test:integration  # Run integration tests
 
 # Web-specific commands
-bun --filter web develop       # Next.js dev with Turbopack
-bun --filter web build         # Production build
-bun --filter web start         # Run production server
-bun --filter web lint          # ESLint check
-bun --filter web format        # Prettier format
+bun --filter play14-web develop      # Next.js dev with Turbopack
+bun --filter play14-web build        # Production build
+bun --filter play14-web start        # Run production server
+bun --filter play14-web lint         # ESLint check
+bun --filter play14-web format       # Prettier format
+bun --filter play14-web test         # Run unit tests
+bun --filter play14-web test:e2e     # Run E2E tests (Playwright)
 
 # Work with Storybook
-bun --filter design storybook          # Start Storybook dev server
-bun --filter design build-storybook    # Build Storybook
+bun --filter play14-design storybook          # Start Storybook dev server
+bun --filter play14-design build-storybook    # Build Storybook
 ```
 
 ### Container Development

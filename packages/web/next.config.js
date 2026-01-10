@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 
+const { withSentryConfig } = require("@sentry/nextjs")
 const path = require("path")
 
 const nextConfig = {
@@ -35,4 +36,31 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+// Sentry configuration for source map uploads and build-time options
+const sentryConfig = {
+  // For all available options, see:
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // Upload a larger set of source maps for prettier stack traces
+  widenClientFileUpload: true,
+
+  // Hide source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Automatically tree-shake Sentry logger statements
+  disableLogger: true,
+
+  // Disable Vercel-specific features (cloud-agnostic)
+  automaticVercelMonitors: false,
+}
+
+// Only wrap with Sentry if DSN is configured
+module.exports = process.env.SENTRY_DSN
+  ? withSentryConfig(nextConfig, sentryConfig)
+  : nextConfig

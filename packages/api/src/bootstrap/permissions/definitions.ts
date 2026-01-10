@@ -328,12 +328,12 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: CONTENT_TYPE_BUILDER_ACTIONS.GET_CONTENT_TYPE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: CONTENT_TYPE_BUILDER_ACTIONS.GET_CONTENT_TYPES, minimumRole: ROLE_TYPES.FOUNDER },
 
-  // Stripe webhook (public - needed for Stripe callbacks)
-  { action: TICKET_ORDER_ACTIONS.HANDLE_STRIPE_WEBHOOK, minimumRole: ROLE_TYPES.FOUNDER },
+  // Stripe webhook (public - needed for Stripe callbacks, uses signature verification)
+  { action: TICKET_ORDER_ACTIONS.HANDLE_STRIPE_WEBHOOK, minimumRole: ROLE_TYPES.PUBLIC },
 
-  // Available tickets (public for event pages)
-  { action: TICKET_ORDER_ACTIONS.GET_AVAILABLE_TICKETS, minimumRole: ROLE_TYPES.FOUNDER },
+  // Available tickets (public for event pages to show ticket availability)
+  { action: TICKET_ORDER_ACTIONS.GET_AVAILABLE_TICKETS, minimumRole: ROLE_TYPES.PUBLIC },
 
-  // Cancel pending order (public - called when user abandons checkout)
-  { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.FOUNDER },
+  // Cancel pending order (authenticated - users can cancel their own pending orders)
+  { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.AUTHENTICATED },
 ]

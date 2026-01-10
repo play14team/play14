@@ -188,6 +188,7 @@ jobs:
         needs.check-pr-merge.outputs.is_pr_merge == 'false' ||
         (needs.check-pr-merge.outputs.is_pr_merge == 'true' && needs.retag-pr-image.outputs.image_retagged != 'true')
       )
+    environment: production
     permissions:
       id-token: write
       contents: read
@@ -228,6 +229,10 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${{ secrets.STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN }}
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+            SENTRY_PROJECT=play14-api
+            SENTRY_ENVIRONMENT=production
 
   deploy:
     name: Deploy to Production

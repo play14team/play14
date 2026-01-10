@@ -218,8 +218,8 @@ export class StripeProvider implements ConnectPaymentProvider {
   }
 
   async verifyWebhookSignature(payload: string, signature: string): Promise<WebhookEvent> {
-    if (!this.webhookSecret) {
-      throw new Error("STRIPE_WEBHOOK_SECRET environment variable is not set")
+    if (!this.webhookSecret || this.webhookSecret.trim().length === 0) {
+      throw new Error("STRIPE_WEBHOOK_SECRET environment variable is not set or empty")
     }
 
     const event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret)

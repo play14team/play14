@@ -1,0 +1,116 @@
+/**
+ * Strapi test instance manager for integration tests
+ *
+ * Provides lifecycle management for a real Strapi instance
+ * configured with PostgreSQL test database for integration testing.
+ *
+ * Requires the test database container to be running:
+ *   podman-compose up play14-db-test
+ */
+
+import type { Core } from "@strapi/strapi"
+import { resolve } from "path"
+
+let strapiInstance: Core.Strapi | null = null
+
+/**
+ * Setup a Strapi test instance with test configuration
+ *
+ * This creates a real Strapi instance with:
+ * - PostgreSQL test database (play14-db-test container on port 5433)
+ * - Mock payment provider (automatically used when NODE_ENV=test)
+ * - Full server mounted and ready for HTTP requests
+ *
+ * Prerequisites:
+ * - Test database container running: `podman-compose up play14-db-test`
+ */
+export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
+  if (strapiInstance) {
+    return strapiInstance
+  }
+
+  // Set test environment - must be set before Strapi loads
+  process.env.NODE_ENV = "test"
+
+  // PostgreSQL test database configuration
+  // Uses the play14-db-test container from compose.yaml
+  process.env.DATABASE_CLIENT = "postgres"
+  process.env.DATABASE_HOST = process.env.TEST_DATABASE_HOST || "localhost"
+  process.env.DATABASE_PORT = process.env.TEST_DATABASE_PORT || "5433"
+  process.env.DATABASE_NAME = process.env.TEST_DATABASE_NAME || "play14_test"
+  process.env.DATABASE_USERNAME = process.env.TEST_DATABASE_USERNAME || "test_user"
+  process.env.DATABASE_PASSWORD = process.env.TEST_DATABASE_PASSWORD || "test_password"
+  process.env.DATABASE_SCHEMA = "public"
+  process.env.DATABASE_SSL = "false"
+
+  // Stripe environment variables (used by mock provider detection)
+  // The actual Stripe SDK won't be used since NODE_ENV=test triggers mock provider
+  process.env.STRIPE_SECRET_KEY = "sk_test_mock_key_for_testing"
+  process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_secret_for_testing"
+  process.env.STRIPE_PUBLISHABLE_KEY = "pk_test_mock_key_for_testing"
+  process.env.STRIPE_PLATFORM_FEE_PERCENT = "0"
+
+  // Frontend URL for redirects
+  process.env.FRONTEND_URL = "http://localhost:3000"
+
+  // Disable email sending in tests
+  process.env.RESEND_API_KEY = "re_test_mock"
+
+  // Disable cron jobs in tests
+  process.env.CRON_ENABLED = "false"
+
+  // Dynamic import of Strapi
+  // For TypeScript projects, we need distDir for compiled controllers/routes
+  // The global setup ensures Strapi is built before tests run
+  const { createStrapi } = await import("@strapi/strapi")
+
+  const appDir = process.cwd()
+  strapiInstance = await createStrapi({
+    appDir,
+    distDir: resolve(appDir, "dist"),
+  }).load()
+
+  // Mount the server for HTTP requests
+  await strapiInstance.server.mount()
+
+  return strapiInstance
+}
+
+/**
+ * Teardown the Strapi test instance
+ *
+ * Destroys the Strapi instance and clears the singleton
+ */
+export async function teardownStrapiTestInstance(): Promise<void> {
+  if (strapiInstance) {
+    await strapiInstance.destroy()
+    strapiInstance = null
+  }
+}
+
+/**
+ * Get the current Strapi instance
+ *
+ * @throws Error if instance not initialized
+ */
+export function getStrapiInstance(): Core.Strapi {
+  if (!strapiInstance) {
+    throw new Error("Strapi instance not initialized. Call setupStrapiTestInstance first.")
+  }
+  return strapiInstance
+}
+
+/**
+ * Check if Strapi instance is initialized
+ */
+export function isStrapiInstanceReady(): boolean {
+  return strapiInstance !== null
+}
+
+/**
+ * Get the HTTP server for supertest requests
+ */
+export function getHttpServer() {
+  const strapi = getStrapiInstance()
+  return strapi.server.httpServer
+}

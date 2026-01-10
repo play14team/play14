@@ -527,6 +527,14 @@ export interface ApiDiscountCodeDiscountCode extends Struct.CollectionTypeSchema
         number
       >
     publishedAt: Schema.Attribute.DateTime
+    reservedCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
     usedCount: Schema.Attribute.Integer &
@@ -1386,6 +1394,7 @@ export interface ApiTicketOrderTicketOrder extends Struct.CollectionTypeSchema {
       [
         "draft",
         "pending",
+        "processing",
         "paid",
         "cancelled",
         "refunded",

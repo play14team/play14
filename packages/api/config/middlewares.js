@@ -1,5 +1,38 @@
 module.exports = ({ env }) => [
   "strapi::errors",
+  // Prometheus metrics middleware (early for accurate timing)
+  {
+    name: "global::metrics",
+    config: {
+      enabled: env.bool("METRICS_ENABLED", true),
+    },
+  },
+  // Sentry middleware for error tracking and APM
+  {
+    name: "global::sentry",
+    config: {
+      enabled: env.bool("SENTRY_ENABLED", true),
+    },
+  },
+  // Rate limiting for critical API endpoints
+  {
+    name: "global::rate-limit",
+    config: {
+      max: parseInt(env("RATE_LIMIT_MAX", "30"), 10),
+      windowMs: parseInt(env("RATE_LIMIT_WINDOW_MS", "60000"), 10), // 1 minute
+      message: "Too many requests, please try again later.",
+      // Only apply rate limiting to these critical paths
+      onlyPaths: [
+        "^/api/ticket-orders$", // Ticket purchase initiation
+        "^/api/ticket-orders/initiate-checkout$",
+        "^/api/ticket-orders/initiate-free-checkout$",
+        "^/api/players/me$", // Profile updates
+        "^/api/auth/local$", // Login
+        "^/api/auth/local/register$", // Registration
+        "^/api/auth/forgot-password$", // Password reset
+      ],
+    },
+  },
   {
     name: "strapi::security",
     config: {

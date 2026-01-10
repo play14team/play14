@@ -18,7 +18,7 @@
     },
     "status": {
       "type": "enumeration",
-      "enum": ["draft", "pending", "paid", "cancelled", "refunded", "partially_refunded", "expired", "failed"],
+      "enum": ["draft", "pending", "processing", "paid", "cancelled", "refunded", "partially_refunded", "expired", "failed"],
       "default": "draft",
       "required": true
     },
@@ -41,7 +41,8 @@
       "type": "string"
     },
     "providerSessionId": {
-      "type": "string"
+      "type": "string",
+      "index": true
     },
     "purchaserEmail": {
       "type": "email",
