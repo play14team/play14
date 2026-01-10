@@ -14,7 +14,6 @@ concurrency:
 
 env:
   NODE_VERSION: "20"
-  STRAPI_API_URL: "https://community.play14.org"
   REGISTRY: play14containerregistry.azurecr.io
   IMAGE_NAME: play14/play14-web
   CONTAINER_APP_NAME: play14-ui
@@ -217,6 +216,7 @@ jobs:
         needs.check-pr-merge.outputs.is_pr_merge == 'false' ||
         (needs.check-pr-merge.outputs.is_pr_merge == 'true' && needs.retag-pr-image.outputs.image_retagged != 'true')
       )
+    environment: production
     permissions:
       id-token: write
       contents: read
@@ -256,15 +256,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            STRAPI_API_URL=${{ env.STRAPI_API_URL }}
+            STRAPI_API_URL=${{ vars.STRAPI_API_URL }}
             STRAPI_API_SECRET=${{ secrets.STRAPI_API_SECRET }}
             NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
+            NEXT_PUBLIC_URL=${{ vars.NEXT_PUBLIC_URL }}
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+            SENTRY_PROJECT=play14-web
+            NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+            NEXT_PUBLIC_SENTRY_ENVIRONMENT=${{ vars.SENTRY_ENVIRONMENT }}
 
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [check-pr-merge, retag-pr-image, build-production]
     if: always() && (needs.retag-pr-image.result == 'success' || needs.build-production.result == 'success')
+    environment: production
     permissions:
       id-token: write
       contents: read
@@ -295,7 +302,7 @@ jobs:
               -g "$RESOURCE_GROUP" \
               --image "$REGISTRY/$IMAGE_NAME:${{ github.sha }}" \
               --set-env-vars \
-                STRAPI_API_URL="$STRAPI_API_URL" \
+                STRAPI_API_URL="${{ vars.STRAPI_API_URL }}" \
                 STRAPI_API_SECRET=secretref:strapi-api-secret \
                 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=secretref:mapbox-token
 
@@ -356,7 +363,7 @@ jobs:
           echo "**Environment:** Production" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** ${{ steps.get-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** \`$REGISTRY/$IMAGE_NAME:${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Backend:** $STRAPI_API_URL" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** ${{ vars.STRAPI_API_URL }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ needs.retag-pr-image.result }}" == "success" ]; then

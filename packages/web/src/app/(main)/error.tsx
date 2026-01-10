@@ -1,5 +1,6 @@
 "use client" // Error components must be Client Components
 
+import * as Sentry from "@sentry/nextjs"
 import ErrorMessage from "@/components/layout/error-message"
 import { useEffect } from "react"
 
@@ -11,7 +12,9 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
+    // Report to Sentry for error tracking
+    Sentry.captureException(error)
+    // Also log to console for debugging
     console.error(error)
   }, [error])
 

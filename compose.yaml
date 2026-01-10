@@ -27,6 +27,10 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       NODE_ENV: ${NODE_ENV}
+      # Observability (optional - set in .env to enable)
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENABLED: ${SENTRY_ENABLED:-false}
+      METRICS_ENABLED: ${METRICS_ENABLED:-true}
     volumes:
       - ./packages/api/config:/app/packages/api/config
       - ./packages/api/src:/app/packages/api/src
@@ -84,6 +88,27 @@ services:
     network_mode: host
     restart: unless-stopped
 
+  # Test database - isolated from development database
+  # Used for integration tests
+  play14-db-test:
+    container_name: play14-db-test
+    platform: linux/arm64
+    image: docker.io/library/postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: play14_test
+    ports:
+      - "5433:5432"
+    networks:
+      - play14-api
+    # No volume - data is ephemeral for tests
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d play14_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   play14-web:
     container_name: play14-web
     build:
@@ -109,6 +134,9 @@ services:
     environment:
       - NODE_ENV=development
       - STRAPI_API_URL=http://play14-api:1337
+      # Observability (optional - set in .env.local to enable)
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN:-}
     command: bun run develop
     networks:
       - play14-api

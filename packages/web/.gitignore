@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 .github/instructions/codacy.instructions.md
+
+# Sentry Config File
+.env.sentry-build-plugin

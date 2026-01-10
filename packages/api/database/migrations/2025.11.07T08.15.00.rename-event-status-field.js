@@ -13,6 +13,13 @@
 async function up(knex) {
   console.log("Starting migration: Rename event status field");
 
+  // Check if the events table exists first (for fresh database installations)
+  const hasEventsTable = await knex.schema.hasTable("events");
+  if (!hasEventsTable) {
+    console.log("Events table does not exist yet, skipping migration (will be created by schema sync)");
+    return;
+  }
+
   // Check if the 'status' column exists before renaming
   const hasStatusColumn = await knex.schema.hasColumn("events", "status");
   const hasEventStatusColumn = await knex.schema.hasColumn(

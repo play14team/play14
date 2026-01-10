@@ -62,7 +62,13 @@
       "mcp__plugin_playwright_playwright__browser_navigate",
       "mcp__plugin_stripe_stripe__get_stripe_account_info",
       "Bash(PLAYWRIGHT_BROWSERS_PATH=/usr/bin npx playwright install:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(bunx vitest:*)",
+      "mcp__playwright__browser_navigate"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright"
+  ]
 }

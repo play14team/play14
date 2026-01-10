@@ -177,10 +177,10 @@ function getStatus(eventStatus?: string): EventStatus {
  *
  * Order of operations (important for security):
  * 1. Strip tags first - removes <script>, <a href="...">, etc.
- * 2. Decode entities - converts &amp; → &, &lt; → < for readable plain text
+ * 2. Decode entities in a SINGLE PASS using a map to prevent double-unescaping
  *
- * This order prevents attacks where encoded tags like &lt;script&gt; could become
- * <script> if decoded before stripping.
+ * The single-pass approach prevents attacks where double-encoded entities like
+ * &amp;lt; could become &lt; and then < if decoded in multiple passes.
  */
 function stripHtml(html: string): string {
   // First, strip HTML tags in a loop to handle nested/malformed content
@@ -192,18 +192,40 @@ function stripHtml(html: string): string {
     text = text.replace(/<[^>]*>/g, "")
   } while (text !== previous)
 
-  // After tags are stripped, decode HTML entities to their literal characters
-  // This is safe now because there are no tags left to potentially create
-  text = text
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#x27;/g, "'")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)))
+  // Decode HTML entities in a SINGLE PASS to prevent double-unescaping attacks
+  // Using a single regex with a replacement map ensures &amp;lt; stays as &lt;
+  // rather than being decoded twice to <
+  const entityMap: Record<string, string> = {
+    "&nbsp;": " ",
+    "&amp;": "&",
+    "&lt;": "<",
+    "&gt;": ">",
+    "&quot;": '"',
+    "&#39;": "'",
+    "&#x27;": "'",
+  }
+
+  // Single-pass entity replacement using one regex
+  text = text.replace(
+    /&(?:nbsp|amp|lt|gt|quot|#39|#x27|#(\d+)|#x([0-9a-fA-F]+));/gi,
+    (match, decimalCode, hexCode) => {
+      // Check named/common entities first
+      const mapped = entityMap[match.toLowerCase()]
+      if (mapped !== undefined) {
+        return mapped
+      }
+      // Handle decimal numeric entities (&#123;)
+      if (decimalCode !== undefined) {
+        return String.fromCharCode(parseInt(decimalCode, 10))
+      }
+      // Handle hex numeric entities (&#xABC;)
+      if (hexCode !== undefined) {
+        return String.fromCharCode(parseInt(hexCode, 16))
+      }
+      // Return original if no match (shouldn't happen with this regex)
+      return match
+    }
+  )
 
   // Normalize whitespace
   return text.replace(/\s+/g, " ").trim()

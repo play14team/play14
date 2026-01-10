@@ -1,5 +1,6 @@
 import type { Core } from "@strapi/strapi"
 import { bootstrapPermissions } from "./bootstrap/permissions"
+import { initSentry } from "./services/observability/sentry"
 
 export default {
   /**
@@ -9,6 +10,8 @@ export default {
    * This gives you an opportunity to extend code.
    */
   register({ strapi }: { strapi: Core.Strapi }) {
+    // Initialize Sentry early for error tracking and APM
+    initSentry()
     // Override LinkedIn provider to use OpenID Connect (OIDC) instead of deprecated scopes
     // LinkedIn deprecated r_liteprofile and r_emailaddress scopes in favor of OpenID Connect
     // See: https://github.com/strapi/strapi/issues/19641
