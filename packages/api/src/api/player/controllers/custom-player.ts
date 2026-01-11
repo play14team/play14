@@ -5,6 +5,8 @@
 
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
+import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
+import { isValidUrl } from "../../../libs/validation"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 
 /**
@@ -147,6 +149,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (field in updateData) {
         sanitizedData[field] = updateData[field as keyof PlayerUpdateData]
       }
+    }
+
+    // Sanitize HTML content in bio field to prevent XSS
+    if (sanitizedData.bio !== undefined) {
+      sanitizedData.bio = sanitizeHtml(sanitizedData.bio as string | null | undefined)
+    }
+
+    // Sanitize plain text fields (strip any HTML)
+    if (sanitizedData.tagline !== undefined) {
+      sanitizedData.tagline = sanitizePlainText(sanitizedData.tagline as string | null | undefined)
+    }
+    if (sanitizedData.company !== undefined) {
+      sanitizedData.company = sanitizePlainText(sanitizedData.company as string | null | undefined)
+    }
+
+    // Validate website URL
+    if (sanitizedData.website !== undefined && sanitizedData.website !== null) {
+      const websiteStr = String(sanitizedData.website).trim()
+      if (websiteStr !== "" && !isValidUrl(websiteStr)) {
+        return ctx.badRequest("Invalid website URL format")
+      }
+      sanitizedData.website = websiteStr || null
     }
 
     // Position changes are not allowed via updateMe - use updatePlayerPosition instead
@@ -844,6 +868,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (field in updateData) {
         sanitizedData[field] = updateData[field as keyof PlayerUpdateData]
       }
+    }
+
+    // Sanitize HTML content in bio field to prevent XSS
+    if (sanitizedData.bio !== undefined) {
+      sanitizedData.bio = sanitizeHtml(sanitizedData.bio as string | null | undefined)
+    }
+
+    // Sanitize plain text fields (strip any HTML)
+    if (sanitizedData.tagline !== undefined) {
+      sanitizedData.tagline = sanitizePlainText(sanitizedData.tagline as string | null | undefined)
+    }
+    if (sanitizedData.company !== undefined) {
+      sanitizedData.company = sanitizePlainText(sanitizedData.company as string | null | undefined)
+    }
+
+    // Validate website URL
+    if (sanitizedData.website !== undefined && sanitizedData.website !== null) {
+      const websiteStr = String(sanitizedData.website).trim()
+      if (websiteStr !== "" && !isValidUrl(websiteStr)) {
+        return ctx.badRequest("Invalid website URL format")
+      }
+      sanitizedData.website = websiteStr || null
     }
 
     // Don't allow changing slug or documentId

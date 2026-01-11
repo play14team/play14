@@ -94,6 +94,16 @@
   }
 }
 
+.auth-login-btn-microsoft {
+  background-color: #0078d4;
+  color: white;
+  border-color: #0078d4;
+
+  &:hover {
+    background-color: #005a9e;
+  }
+}
+
 .auth-login-btn-github {
   background-color: #24292e;
   color: white;

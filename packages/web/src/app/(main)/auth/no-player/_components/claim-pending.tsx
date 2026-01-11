@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import Logo from "@/components/layout/logo"
 import type { PendingClaim } from "@/components/auth/player-linking/types"
+import DefaultPlayerImage from "@/components/ui/default-player-image"
 
 interface ClaimPendingProps {
   claim: PendingClaim
@@ -42,13 +43,11 @@ export default function ClaimPending({
               unoptimized
             />
           ) : (
-            <Image
-              src="/default-player.png"
+            <DefaultPlayerImage
               alt="default"
               width={60}
               height={60}
               style={{ objectFit: "cover", borderRadius: "50%" }}
-              unoptimized
             />
           )}
         </div>

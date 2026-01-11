@@ -2,9 +2,7 @@
  * Webhook controller for handling Stripe payment events
  */
 
-import crypto from "crypto"
 import type { Core } from "@strapi/strapi"
-import slugify from "slugify"
 import {
   generateEventICS,
   generateGoogleCalendarUrl,
@@ -17,7 +15,15 @@ import {
   releaseReservations,
   confirmDiscountCode,
   releaseDiscountCode,
+  findOrCreatePlayerForAttendee,
+  addPlayerToEventAttendees,
 } from "../../../services/ticketing"
+import {
+  claimWebhookEvent,
+  markWebhookCompleted,
+  markWebhookFailed,
+  releaseWebhookClaim,
+} from "../../../services/webhook"
 
 interface AttendeeInfo {
   firstName: string
@@ -55,13 +61,34 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const payload = unparsedBody
 
+    let event: any
+
     try {
       const provider = getPaymentProvider("stripe")
-      const event = await provider.verifyWebhookSignature(payload, signature)
+      event = await provider.verifyWebhookSignature(payload, signature)
+    } catch (error: any) {
+      strapi.log.error(`[Webhook] Signature verification failed: ${error.message}`)
+      return ctx.badRequest("Webhook verification failed")
+    }
 
-      strapi.log.info(`[Webhook] Received Stripe event: ${event.type}`)
+    const eventId = event.id as string
+    const eventType = event.type as string
 
-      switch (event.type) {
+    strapi.log.info(`[Webhook] Received Stripe event: ${eventType} (${eventId})`)
+
+    // IDEMPOTENCY: Claim the event for processing
+    // Uses atomic INSERT with unique constraint to prevent duplicate processing
+    const idempotencyResult = await claimWebhookEvent(strapi, eventId, eventType)
+
+    if (!idempotencyResult.shouldProcess) {
+      strapi.log.info(
+        `[Webhook] Event ${eventId} already processed (status: ${idempotencyResult.status}) - returning success`
+      )
+      return ctx.send({ received: true, duplicate: true })
+    }
+
+    try {
+      switch (eventType) {
         case "checkout.session.completed":
           await this.handleCheckoutCompleted(event.data)
           break
@@ -83,13 +110,30 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           break
 
         default:
-          strapi.log.info(`[Webhook] Unhandled event type: ${event.type}`)
+          strapi.log.info(`[Webhook] Unhandled event type: ${eventType}`)
       }
+
+      // Mark event as successfully processed
+      await markWebhookCompleted(strapi, eventId)
 
       return ctx.send({ received: true })
     } catch (error: any) {
-      strapi.log.error(`[Webhook] Error processing webhook: ${error.message}`)
-      return ctx.badRequest("Webhook verification failed")
+      strapi.log.error(`[Webhook] Error processing event ${eventId}: ${error.message}`)
+
+      // For retryable errors, release the claim so Stripe can retry
+      // For non-retryable errors, mark as failed to prevent endless retries
+      const isRetryable = this.isRetryableError(error)
+
+      if (isRetryable) {
+        await releaseWebhookClaim(strapi, eventId)
+        // Return 500 to signal Stripe should retry
+        ctx.status = 500
+        return ctx.send({ error: "Processing failed, will retry" })
+      } else {
+        await markWebhookFailed(strapi, eventId, error.message)
+        // Return 200 to prevent Stripe from retrying non-retryable errors
+        return ctx.send({ received: true, error: error.message })
+      }
     }
   },
 
@@ -140,7 +184,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     if (updateResult === 0) {
       // Either order was already processed or is being processed by another webhook
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} already being processed or completed (status: ${order.status})`)
+      // Re-fetch the order to get the current status for accurate logging
+      const currentOrder = await strapi.documents("api::ticket-order.ticket-order").findFirst({
+        filters: { documentId: order.documentId },
+        fields: ["status"],
+      })
+      const currentStatus = currentOrder?.status || "unknown"
+      strapi.log.info(`[Webhook] Order ${order.orderNumber} skipped - current status: ${currentStatus} (was not pending)`)
       return
     }
 
@@ -201,11 +251,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
               photoConsentTimestamp: attendee.photoConsentTimestamp || null,
             }
 
-            // Find or create player for this attendee
-            const playerResult = await this.findOrCreatePlayerForAttendee(
+            // Find or create player for this attendee using shared service
+            const playerResult = await findOrCreatePlayerForAttendee(
+              strapi,
               attendee,
               order.player,
-              order.event
+              "[Webhook]"
             )
             ticketPlayer = playerResult.player
             isNewPlayer = playerResult.isNew
@@ -279,7 +330,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
 
       for (const playerDocId of playersToAddToEvent) {
-        await this.addPlayerToEventAttendees(playerDocId, order.event)
+        await addPlayerToEventAttendees(strapi, playerDocId, order.event, "[Webhook]")
       }
 
       // Send confirmation email to purchaser
@@ -315,219 +366,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Re-throw to signal failure to Stripe (will retry webhook)
       throw error
-    }
-  },
-
-  /**
-   * Find or create a player profile for an attendee
-   */
-  async findOrCreatePlayerForAttendee(
-    attendee: AttendeeInfo,
-    purchaserPlayer: any,
-    event: any
-  ): Promise<{ player: any; isNew: boolean }> {
-    // Validate attendee data
-    if (!attendee.firstName || !attendee.lastName) {
-      throw new Error("Attendee first name and last name are required")
-    }
-
-    if (!attendee.email) {
-      throw new Error("Attendee email is required")
-    }
-
-    // Sanitize and validate name (2-100 chars, no special control characters)
-    const firstName = attendee.firstName.trim().slice(0, 50)
-    const lastName = attendee.lastName.trim().slice(0, 50)
-
-    if (firstName.length < 1 || lastName.length < 1) {
-      throw new Error("Attendee first name and last name cannot be empty")
-    }
-
-    // Check for invalid characters (control characters)
-    const invalidCharPattern = /[\x00-\x1F\x7F]/
-    if (invalidCharPattern.test(firstName) || invalidCharPattern.test(lastName)) {
-      throw new Error("Attendee name contains invalid characters")
-    }
-
-    // Email validation - stricter pattern that rejects common invalid formats
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/
-    if (!emailPattern.test(attendee.email)) {
-      throw new Error(`Invalid attendee email format: ${attendee.email}`)
-    }
-
-    // Additional email validation checks
-    if (/\.\./.test(attendee.email)) {
-      throw new Error(`Invalid attendee email format (consecutive dots): ${attendee.email}`)
-    }
-
-    const localPart = attendee.email.split("@")[0]
-    if (localPart.startsWith(".") || localPart.endsWith(".")) {
-      throw new Error(`Invalid attendee email format: ${attendee.email}`)
-    }
-
-    const attendeeName = `${firstName} ${lastName}`
-    const attendeeEmail = attendee.email.toLowerCase().trim()
-
-    // 1. If attendee email matches purchaser's player, use their player
-    if (purchaserPlayer) {
-      // Find the user linked to purchaser player to get their email
-      const purchaserPlayerDoc = await strapi.documents("api::player.player").findOne({
-        documentId: purchaserPlayer.documentId,
-        populate: { user: { fields: ["email"] } },
-      })
-
-      if (purchaserPlayerDoc?.user?.email?.toLowerCase() === attendeeEmail) {
-        strapi.log.info(`[Webhook] Attendee ${attendeeName} matched to purchaser player`)
-        return { player: purchaserPlayer, isNew: false }
-      }
-    }
-
-    // 2. Look for a user with this email and get their player
-    const existingUser = await strapi.documents("plugin::users-permissions.user").findFirst({
-      filters: { email: { $eqi: attendeeEmail } },
-      populate: { player: true },
-    })
-
-    if (existingUser?.player) {
-      strapi.log.info(`[Webhook] Found existing player via user email: ${attendeeName}`)
-
-      // Update player's default preferences if they don't have them set
-      if (attendee.tshirtSize || attendee.foodPreferences) {
-        const playerDoc = await strapi.documents("api::player.player").findOne({
-          documentId: existingUser.player.documentId,
-        })
-
-        if (playerDoc) {
-          const updateData: any = {}
-          if (attendee.tshirtSize && !playerDoc.defaultTshirtSize) {
-            updateData.defaultTshirtSize = attendee.tshirtSize
-          }
-          if (attendee.foodPreferences && !playerDoc.defaultFoodPreferences) {
-            updateData.defaultFoodPreferences = attendee.foodPreferences
-          }
-          if (Object.keys(updateData).length > 0) {
-            await strapi.documents("api::player.player").update({
-              documentId: existingUser.player.documentId,
-              data: updateData,
-            })
-          }
-        }
-      }
-
-      return { player: existingUser.player, isNew: false }
-    }
-
-    // 3. Look for an existing player by exact name match (only if NOT linked to a user)
-    // SECURITY: Only match unlinked players to prevent assigning tickets to wrong user's profile
-    const existingPlayerByName = await strapi.documents("api::player.player").findFirst({
-      filters: {
-        name: { $eqi: attendeeName },
-      },
-      populate: { user: true },
-    })
-
-    if (existingPlayerByName && !existingPlayerByName.user) {
-      // Player exists and is not linked to any user - safe to use
-      strapi.log.info(`[Webhook] Found existing unlinked player by name: ${attendeeName}`)
-
-      // Update player's default preferences if they don't have them set
-      const updateData: any = {}
-      if (attendee.tshirtSize && !existingPlayerByName.defaultTshirtSize) {
-        updateData.defaultTshirtSize = attendee.tshirtSize
-      }
-      if (attendee.foodPreferences && !existingPlayerByName.defaultFoodPreferences) {
-        updateData.defaultFoodPreferences = attendee.foodPreferences
-      }
-      if (Object.keys(updateData).length > 0) {
-        await strapi.documents("api::player.player").update({
-          documentId: existingPlayerByName.documentId,
-          data: updateData,
-        })
-      }
-
-      return { player: existingPlayerByName, isNew: false }
-    }
-
-    // 4. Create a new player profile (unlinked to any user)
-    // If a player with same name exists but IS linked, we create a new one with unique slug/name
-    const baseSlug = slugify(attendeeName, { lower: true, strict: true })
-
-    // Ensure unique slug with retry loop (more robust than single random suffix)
-    let slug = baseSlug
-    let slugAttempts = 0
-    const maxSlugAttempts = 10
-
-    while (slugAttempts < maxSlugAttempts) {
-      const existingSlug = await strapi.documents("api::player.player").findFirst({
-        filters: { slug },
-      })
-
-      if (!existingSlug) {
-        break // Slug is unique
-      }
-
-      // Generate a more unique suffix using timestamp + random
-      const timestamp = Date.now().toString(36)
-      const random = crypto.randomBytes(2).toString("hex")
-      slug = `${baseSlug}-${timestamp.slice(-4)}${random}`
-      slugAttempts++
-    }
-
-    if (slugAttempts >= maxSlugAttempts) {
-      throw new Error(`Failed to generate unique slug for player: ${attendeeName}`)
-    }
-
-    // For name uniqueness, append a suffix if needed
-    let playerName = attendeeName
-    if (existingPlayerByName) {
-      // Player with same name exists but is linked to a user - create with unique name
-      const timestamp = Date.now().toString(36).slice(-4)
-      playerName = `${attendeeName} (${timestamp})`
-      strapi.log.info(`[Webhook] Creating player with unique name: ${playerName} (original name taken)`)
-    }
-
-    const newPlayer = await strapi.documents("api::player.player").create({
-      data: {
-        name: playerName,
-        slug,
-        position: "Player",
-        defaultTshirtSize: attendee.tshirtSize || "none",
-        defaultFoodPreferences: attendee.foodPreferences || null,
-      } as any,
-    })
-
-    strapi.log.info(`[Webhook] Created new player profile for attendee: ${playerName} (${newPlayer.documentId})`)
-
-    return { player: newPlayer, isNew: true }
-  },
-
-  /**
-   * Add a player to an event's attendees list
-   */
-  async addPlayerToEventAttendees(playerDocumentId: string, event: any) {
-    const playerDoc = await strapi.documents("api::player.player").findOne({
-      documentId: playerDocumentId,
-      populate: { attended: { fields: ["id", "documentId"] } },
-    })
-
-    if (!playerDoc) return
-
-    const currentAttendedIds = playerDoc.attended?.map((e: any) => e.id) || []
-    const alreadyAttending = playerDoc.attended?.some(
-      (e: any) => e.documentId === event.documentId
-    )
-
-    if (!alreadyAttending) {
-      await strapi.documents("api::player.player").update({
-        documentId: playerDocumentId,
-        data: {
-          attended: [...currentAttendedIds, event.id],
-        } as any,
-      })
-
-      strapi.log.info(
-        `[Webhook] Player ${playerDocumentId} added to event ${event.documentId} attendees`
-      )
     }
   },
 
@@ -788,19 +626,42 @@ The #play14 Team
     }
 
     // Find the order by payment intent (stored in providerOrderId after checkout completion)
-    // Note: For failed payments during checkout, the order might still have the session ID
-    const order = await strapi.documents("api::ticket-order.ticket-order").findFirst({
-      filters: {
-        $or: [
-          { providerOrderId: paymentIntentId },
-          { providerSessionId: { $contains: paymentIntentId } },
-        ],
-      },
+    let order = await strapi.documents("api::ticket-order.ticket-order").findFirst({
+      filters: { providerOrderId: paymentIntentId },
       populate: {
         event: { fields: ["id", "documentId", "name", "slug"] },
         discountCode: { fields: ["documentId", "code"] },
       },
     })
+
+    // If not found by providerOrderId, try looking up via session metadata
+    // This handles cases where payment fails during checkout (before completion)
+    if (!order) {
+      const provider = getPaymentProvider("stripe")
+      if (provider.getSessionByPaymentIntent) {
+        const sessionData = await provider.getSessionByPaymentIntent(paymentIntentId)
+        if (sessionData?.orderId) {
+          order = await strapi.documents("api::ticket-order.ticket-order").findFirst({
+            filters: { documentId: sessionData.orderId },
+            populate: {
+              event: { fields: ["id", "documentId", "name", "slug"] },
+              discountCode: { fields: ["documentId", "code"] },
+            },
+          })
+        }
+      }
+    }
+
+    // Fallback: try finding by providerSessionId containing payment intent
+    if (!order) {
+      order = await strapi.documents("api::ticket-order.ticket-order").findFirst({
+        filters: { providerSessionId: { $contains: paymentIntentId } },
+        populate: {
+          event: { fields: ["id", "documentId", "name", "slug"] },
+          discountCode: { fields: ["documentId", "code"] },
+        },
+      })
+    }
 
     if (!order) {
       strapi.log.info(`[Webhook] No order found for failed payment intent: ${paymentIntentId}`)
@@ -932,7 +793,9 @@ The #play14 Team
     const order = await strapi.documents("api::ticket-order.ticket-order").findFirst({
       filters: { providerOrderId: paymentIntent },
       populate: {
-        tickets: true,
+        tickets: {
+          populate: { ticketType: { fields: ["documentId"] } },
+        },
         player: true,
         event: true,
       },
@@ -958,12 +821,26 @@ The #play14 Team
       } as any,
     })
 
-    // Update all tickets to refunded
+    // Update all tickets to refunded and decrement sold counts
+    const ticketTypeCounts = new Map<string, number>()
     for (const ticket of order.tickets || []) {
       await strapi.documents("api::ticket.ticket").update({
         documentId: ticket.documentId,
         data: { ticketStatus: "refunded" } as any,
       })
+
+      // Count tickets per ticket type for sold_count decrement
+      if (ticket.ticketType?.documentId) {
+        const current = ticketTypeCounts.get(ticket.ticketType.documentId) || 0
+        ticketTypeCounts.set(ticket.ticketType.documentId, current + 1)
+      }
+    }
+
+    // Decrement sold_count for each ticket type
+    for (const [ticketTypeDocumentId, count] of ticketTypeCounts) {
+      await strapi.db.connection("ticket_types")
+        .where("document_id", ticketTypeDocumentId)
+        .decrement("sold_count", count)
     }
 
     // Remove player from event attendees
@@ -1272,5 +1149,39 @@ The #play14 Team
       // 3. Store failed email attempts for later retry
       strapi.log.error(`[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message}`)
     }
+  },
+
+  /**
+   * Determine if an error is retryable (Stripe should retry the webhook)
+   * Non-retryable errors are logged and prevent endless retry loops
+   */
+  isRetryableError(error: any): boolean {
+    // Database connection errors are retryable
+    if (error.code === "ECONNREFUSED" || error.code === "ETIMEDOUT") {
+      return true
+    }
+
+    // Database deadlock/lock timeout errors are retryable
+    if (error.code === "40P01" || error.code === "40001") {
+      return true
+    }
+
+    // Network errors are retryable
+    if (error.message?.includes("network") || error.message?.includes("timeout")) {
+      return true
+    }
+
+    // Email sending failures are NOT retryable (order is still valid)
+    if (error.message?.includes("email") || error.message?.includes("SMTP")) {
+      return false
+    }
+
+    // Validation errors are NOT retryable (bad data won't fix itself)
+    if (error.message?.includes("Invalid") || error.message?.includes("validation")) {
+      return false
+    }
+
+    // Default to retryable for unknown errors (safer to retry)
+    return true
   },
 })

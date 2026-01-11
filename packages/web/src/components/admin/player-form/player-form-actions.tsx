@@ -98,6 +98,7 @@ export default function PlayerFormActions({
           type="submit"
           disabled={isSubmitting}
           className={`admin-btn admin-btn-primary admin-btn-block ${isDirty ? "admin-btn-dirty" : ""}`}
+          data-save-shortcut
         >
           {isSubmitting ? (
             <>

@@ -3,9 +3,12 @@
  *
  * This file is run once before all integration tests start.
  * It initializes the Strapi instance and sets up the test environment.
+ *
+ * Prerequisites:
+ * - PostgreSQL test database running: podman-compose up -d play14-db-test
  */
 
-import { rm, stat } from "fs/promises"
+import { stat } from "fs/promises"
 import { resolve } from "path"
 import { exec } from "child_process"
 import { promisify } from "util"
@@ -37,25 +40,10 @@ export async function setup() {
     }
   }
 
-  // Clean up any existing test database
-  const testDbPath = resolve(apiDir, ".tmp/test.db")
-  try {
-    await rm(testDbPath, { force: true })
-    console.log("  ✓ Cleaned up existing test database")
-  } catch {
-    // File doesn't exist, which is fine
-  }
-
   console.log("  ✓ Integration test setup complete\n")
 }
 
 export async function teardown() {
   console.log("\n🧹 Running integration test teardown...")
-
-  // Optionally clean up test database after all tests
-  // Keeping it can be useful for debugging failed tests
-  // const testDbPath = resolve(process.cwd(), "packages/api/.tmp/test.db")
-  // await rm(testDbPath, { force: true })
-
   console.log("  ✓ Integration test teardown complete\n")
 }

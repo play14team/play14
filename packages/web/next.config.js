@@ -53,14 +53,13 @@ const sentryConfig = {
   // Hide source maps from generated client bundles
   hideSourceMaps: true,
 
-  // Automatically tree-shake Sentry logger statements
-  disableLogger: true,
-
-  // Disable Vercel-specific features (cloud-agnostic)
-  automaticVercelMonitors: false,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true, // replaces disableLogger
+    },
+    automaticVercelMonitors: true, // moved under webpack
+  },
 }
 
 // Only wrap with Sentry if DSN is configured
-module.exports = process.env.SENTRY_DSN
-  ? withSentryConfig(nextConfig, sentryConfig)
-  : nextConfig
+module.exports = process.env.SENTRY_DSN ? withSentryConfig(nextConfig, sentryConfig) : nextConfig

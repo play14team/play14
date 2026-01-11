@@ -210,6 +210,7 @@ export default function CreateVenueModal({
             className="admin-btn admin-btn-primary"
             onClick={handleSubmit}
             disabled={isSubmitting}
+            data-save-shortcut
           >
             {isSubmitting ? (
               <>

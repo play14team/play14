@@ -2,6 +2,7 @@
 
 interface LoginButtonsProps {
   googleUrl: string
+  microsoftUrl: string
   githubUrl: string
   linkedinUrl: string
   callbackUrl: string
@@ -9,6 +10,7 @@ interface LoginButtonsProps {
 
 export default function LoginButtons({
   googleUrl,
+  microsoftUrl,
   githubUrl,
   linkedinUrl,
   callbackUrl,
@@ -50,6 +52,25 @@ export default function LoginButtons({
           />
         </svg>
         Continue with Google
+      </button>
+
+      <button
+        type="button"
+        className="auth-login-btn auth-login-btn-microsoft"
+        onClick={() => handleLogin(microsoftUrl)}
+      >
+        <svg
+          className="auth-login-btn-icon"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+        >
+          <path
+            fill="currentColor"
+            d="M2 2h9v9H2V2zm11 0h9v9h-9V2zM2 13h9v9H2v-9zm11 0h9v9h-9v-9z"
+          />
+        </svg>
+        Continue with Microsoft
       </button>
 
       <button

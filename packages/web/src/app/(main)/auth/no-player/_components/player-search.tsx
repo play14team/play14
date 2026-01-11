@@ -5,6 +5,7 @@ import Image from "next/image"
 import Logo from "@/components/layout/logo"
 import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
 import { searchPlayers } from "@/components/auth/player-linking/player-linking.action"
+import DefaultPlayerImage from "@/components/ui/default-player-image"
 
 interface PlayerSearchProps {
   onClaim: (player: PlayerSuggestion) => void
@@ -89,13 +90,11 @@ export default function PlayerSearch({
                       unoptimized
                     />
                   ) : (
-                    <Image
-                      src="/default-player.png"
+                    <DefaultPlayerImage
                       alt="default"
                       width={50}
                       height={50}
                       style={{ objectFit: "cover", borderRadius: "50%" }}
-                      unoptimized
                     />
                   )}
                 </div>

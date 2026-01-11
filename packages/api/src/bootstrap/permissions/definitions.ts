@@ -2,7 +2,7 @@
  * Permission definitions mapping each action to its minimum required role
  *
  * Each role inherits all permissions from roles below it in the hierarchy:
- * public < authenticated < player < host < mentor < founder
+ * public < player < host < mentor < founder
  *
  * When adding a new endpoint:
  * 1. Add the action constant to actions.ts
@@ -24,6 +24,7 @@ import {
   TICKET_ORDER_ACTIONS,
   TICKET_TYPE_ACTIONS,
   DISCOUNT_CODE_ACTIONS,
+  IMPORT_ACTIONS,
   ARTICLE_ACTIONS,
   EXPECTATION_ACTIONS,
   EVENT_LOCATION_ACTIONS,
@@ -60,38 +61,38 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   // User me (needed for auth flow)
   { action: USER_ACTIONS.ME, minimumRole: ROLE_TYPES.PUBLIC },
 
-  // ==================== AUTHENTICATED ROLE ====================
-  // These require authentication but no specific player/organizer status
+  // ==================== PLAYER ROLE (BASE ACCESS) ====================
+  // Default role for logged-in users (player link may not exist yet)
 
   // Events (read)
-  { action: EVENT_ACTIONS.FIND, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: EVENT_ACTIONS.FIND_ONE, minimumRole: ROLE_TYPES.AUTHENTICATED },
+  { action: EVENT_ACTIONS.FIND, minimumRole: ROLE_TYPES.PLAYER },
+  { action: EVENT_ACTIONS.FIND_ONE, minimumRole: ROLE_TYPES.PLAYER },
 
   // Player profile management
-  { action: PLAYER_ACTIONS.FIND_ME, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_ACTIONS.UPDATE_ME, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_ACTIONS.CREATE_FOR_USER, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_ACTIONS.AUTO_LINK, minimumRole: ROLE_TYPES.AUTHENTICATED },
+  { action: PLAYER_ACTIONS.FIND_ME, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_ACTIONS.UPDATE_ME, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_ACTIONS.CREATE_FOR_USER, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_ACTIONS.AUTO_LINK, minimumRole: ROLE_TYPES.PLAYER },
 
   // Player claim process (for users without a player yet)
-  { action: PLAYER_CLAIM_ACTIONS.CHECK_MATCH, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_CLAIM_ACTIONS.GET_SUGGESTIONS, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_CLAIM_ACTIONS.SUBMIT_CLAIM, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_CLAIM_ACTIONS.CANCEL_CLAIM, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: PLAYER_CLAIM_ACTIONS.FIND_MY_CLAIMS, minimumRole: ROLE_TYPES.AUTHENTICATED },
+  { action: PLAYER_CLAIM_ACTIONS.CHECK_MATCH, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_CLAIM_ACTIONS.GET_SUGGESTIONS, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_CLAIM_ACTIONS.SUBMIT_CLAIM, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_CLAIM_ACTIONS.CANCEL_CLAIM, minimumRole: ROLE_TYPES.PLAYER },
+  { action: PLAYER_CLAIM_ACTIONS.FIND_MY_CLAIMS, minimumRole: ROLE_TYPES.PLAYER },
 
   // Attended events (viewing own attendance history)
-  { action: PLAYER_ACTIONS.GET_MY_ATTENDED_EVENTS, minimumRole: ROLE_TYPES.AUTHENTICATED },
+  { action: PLAYER_ACTIONS.GET_MY_ATTENDED_EVENTS, minimumRole: ROLE_TYPES.PLAYER },
 
   // Attendance claims (basic)
-  { action: ATTENDANCE_CLAIM_ACTIONS.SEARCH_EVENTS, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: ATTENDANCE_CLAIM_ACTIONS.GET_OVER_EVENTS, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: ATTENDANCE_CLAIM_ACTIONS.GET_MY_CLAIMS, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: ATTENDANCE_CLAIM_ACTIONS.GET_PENDING_FOR_PLAYER, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: ATTENDANCE_CLAIM_ACTIONS.SUBMIT_CLAIM, minimumRole: ROLE_TYPES.AUTHENTICATED },
-  { action: ATTENDANCE_CLAIM_ACTIONS.CANCEL_CLAIM, minimumRole: ROLE_TYPES.AUTHENTICATED },
+  { action: ATTENDANCE_CLAIM_ACTIONS.SEARCH_EVENTS, minimumRole: ROLE_TYPES.PLAYER },
+  { action: ATTENDANCE_CLAIM_ACTIONS.GET_OVER_EVENTS, minimumRole: ROLE_TYPES.PLAYER },
+  { action: ATTENDANCE_CLAIM_ACTIONS.GET_MY_CLAIMS, minimumRole: ROLE_TYPES.PLAYER },
+  { action: ATTENDANCE_CLAIM_ACTIONS.GET_PENDING_FOR_PLAYER, minimumRole: ROLE_TYPES.PLAYER },
+  { action: ATTENDANCE_CLAIM_ACTIONS.SUBMIT_CLAIM, minimumRole: ROLE_TYPES.PLAYER },
+  { action: ATTENDANCE_CLAIM_ACTIONS.CANCEL_CLAIM, minimumRole: ROLE_TYPES.PLAYER },
 
-  // ==================== PLAYER ROLE ====================
+  // ==================== PLAYER ROLE (LINKED PROFILE) ====================
   // These require a linked player profile
 
   // Profile pictures
@@ -178,6 +179,9 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: DISCOUNT_CODE_ACTIONS.DELETE, minimumRole: ROLE_TYPES.HOST },
   { action: DISCOUNT_CODE_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
   { action: DISCOUNT_CODE_ACTIONS.VALIDATE, minimumRole: ROLE_TYPES.PUBLIC },
+
+  // CSV imports (organizers)
+  { action: IMPORT_ACTIONS.UPLOAD_AUDIENCE_ATTENDEES, minimumRole: ROLE_TYPES.HOST },
 
   // Event location management (admin panel)
   { action: EVENT_LOCATION_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
@@ -334,6 +338,6 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   // Available tickets (public for event pages to show ticket availability)
   { action: TICKET_ORDER_ACTIONS.GET_AVAILABLE_TICKETS, minimumRole: ROLE_TYPES.PUBLIC },
 
-  // Cancel pending order (authenticated - users can cancel their own pending orders)
-  { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.AUTHENTICATED },
+  // Cancel pending order (player - users can cancel their own pending orders)
+  { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.PLAYER },
 ]

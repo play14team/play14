@@ -2,6 +2,129 @@ import type { Core } from "@strapi/strapi"
 import { bootstrapPermissions } from "./bootstrap/permissions"
 import { initSentry } from "./services/observability/sentry"
 
+/**
+ * Validate CORS configuration for security.
+ * SECURITY: Wildcard CORS ("*") allows any website to make authenticated requests,
+ * which is a significant security risk in production.
+ */
+function validateCorsConfiguration(strapi: Core.Strapi): void {
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+  const nodeEnv = process.env.NODE_ENV
+
+  // Check if ALLOWED_ORIGINS is not set
+  if (!allowedOrigins) {
+    if (nodeEnv === "production") {
+      throw new Error(
+        "CRITICAL: ALLOWED_ORIGINS environment variable is not set. " +
+          "In production, you must explicitly configure allowed CORS origins. " +
+          "Example: ALLOWED_ORIGINS=https://play14.org,https://www.play14.org"
+      )
+    } else {
+      strapi.log.warn(
+        "[Bootstrap] ALLOWED_ORIGINS not set - CORS will block all cross-origin requests. " +
+          "Set ALLOWED_ORIGINS for local development (e.g., ALLOWED_ORIGINS=http://localhost:3000)"
+      )
+    }
+    return
+  }
+
+  // Check if wildcard is used
+  const origins = allowedOrigins.split(",").map((o) => o.trim())
+  if (origins.includes("*")) {
+    if (nodeEnv === "production") {
+      throw new Error(
+        "CRITICAL: ALLOWED_ORIGINS contains wildcard '*' which is not allowed in production. " +
+          "This allows any website to make authenticated requests to your API. " +
+          "Configure specific domains: ALLOWED_ORIGINS=https://play14.org,https://www.play14.org"
+      )
+    } else {
+      strapi.log.warn(
+        "[Bootstrap] ALLOWED_ORIGINS contains wildcard '*'. " +
+          "This is acceptable for development but must not be used in production."
+      )
+    }
+  } else {
+    strapi.log.info(`[Bootstrap] CORS configured for origins: ${origins.join(", ")}`)
+  }
+}
+
+/**
+ * Validate that webhook middleware is properly configured for signature verification.
+ * SECURITY: The body middleware must have includeUnparsed:true for Stripe webhook
+ * signature verification to work. Without this, the raw body is not available and
+ * signature verification would fail silently, potentially allowing forged payment events.
+ */
+function validateWebhookMiddlewareConfig(strapi: Core.Strapi): void {
+  const middlewares = strapi.config.get("middlewares") as any[]
+
+  if (!Array.isArray(middlewares)) {
+    throw new Error(
+      "CRITICAL: Middlewares configuration is not an array. Cannot validate webhook security."
+    )
+  }
+
+  // Find the body middleware configuration
+  const bodyMiddleware = middlewares.find(
+    (m) => m === "strapi::body" || (typeof m === "object" && m?.name === "strapi::body")
+  )
+
+  if (!bodyMiddleware) {
+    throw new Error(
+      "CRITICAL: strapi::body middleware not found. Webhook signature verification will fail."
+    )
+  }
+
+  // If it's just the string "strapi::body", it uses defaults (no includeUnparsed)
+  if (bodyMiddleware === "strapi::body") {
+    throw new Error(
+      "CRITICAL: Body middleware must be configured with includeUnparsed:true for webhook " +
+        "signature verification. Update config/middlewares.js to use: " +
+        "{ name: 'strapi::body', config: { includeUnparsed: true } }"
+    )
+  }
+
+  // Check the config object
+  if (typeof bodyMiddleware === "object" && bodyMiddleware?.config?.includeUnparsed !== true) {
+    throw new Error(
+      "CRITICAL: Body middleware must have includeUnparsed:true for webhook signature verification. " +
+        "Payment webhook signatures cannot be verified without the raw request body. " +
+        "Update config/middlewares.js: { name: 'strapi::body', config: { includeUnparsed: true } }"
+    )
+  }
+
+  strapi.log.info("[Bootstrap] Webhook middleware configuration validated: includeUnparsed is enabled")
+}
+
+/**
+ * Ensure unique index exists on processed_webhooks.event_id for idempotency.
+ * Strapi's schema sync creates the table but doesn't enforce unique constraints at DB level.
+ */
+async function ensureProcessedWebhooksIndex(strapi: Core.Strapi): Promise<void> {
+  const knex = strapi.db.connection
+
+  // Check if the table exists
+  const hasTable = await knex.schema.hasTable("processed_webhooks")
+  if (!hasTable) {
+    strapi.log.info("[Bootstrap] processed_webhooks table not found, skipping index creation")
+    return
+  }
+
+  // Check if unique index already exists (PostgreSQL-specific)
+  const result = await knex.raw(
+    `SELECT 1 FROM pg_indexes WHERE indexname = 'processed_webhooks_event_id_unique'`
+  )
+
+  if (result.rows.length === 0) {
+    strapi.log.info("[Bootstrap] Creating unique index on processed_webhooks.event_id")
+    await knex.raw(
+      `CREATE UNIQUE INDEX processed_webhooks_event_id_unique ON processed_webhooks(event_id)`
+    )
+    strapi.log.info("[Bootstrap] Unique index created successfully")
+  } else {
+    strapi.log.debug("[Bootstrap] processed_webhooks unique index already exists")
+  }
+}
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -180,6 +303,14 @@ export default {
    * run jobs, or perform some special logic.
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // SECURITY: Validate critical security configurations before anything else
+    validateCorsConfiguration(strapi)
+    validateWebhookMiddlewareConfig(strapi)
+
+    // Ensure unique index on processed_webhooks.event_id for idempotency
+    // This must run after schema sync (which happens before bootstrap)
+    await ensureProcessedWebhooksIndex(strapi)
+
     // Update LinkedIn OAuth scopes in the grant store to use OpenID Connect
     // The grant configuration is stored in the database and used by the OAuth flow
     const grantStore = strapi.store({
@@ -217,5 +348,6 @@ export default {
 
     // Bootstrap user role permissions
     await bootstrapPermissions(strapi)
+
   },
 }

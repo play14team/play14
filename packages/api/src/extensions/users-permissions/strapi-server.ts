@@ -73,6 +73,17 @@ export default (plugin: StrapiPlugin) => {
         return ctx.notFound()
       }
 
+      const invitationStatus = userWithPlayer.invitationStatus
+      if (["pending", "sent", "reminded"].includes(invitationStatus)) {
+        await strapi.documents("plugin::users-permissions.user").update({
+          documentId: userWithPlayer.documentId,
+          data: {
+            invitationStatus: "accepted",
+            invitationAcceptedAt: new Date().toISOString(),
+          } as any,
+        })
+      }
+
       // Remove sensitive fields
       const sanitizedUser = {
         id: userWithPlayer.id,

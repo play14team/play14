@@ -606,7 +606,8 @@ export async function strapiFetchWithQuery<T>(
   queryParams: URLSearchParams | Record<string, string>,
   options: Omit<StrapiFetchOptions, "body"> = {}
 ): Promise<StrapiFetchResult<T>> {
-  const client = await getStrapiClient()
+  const { method = "GET", headers = {}, cache, noAuth, optionalAuth } = options
+  const client = await getClientForOptions({ noAuth, optionalAuth })
   const basePath = buildSafePath(pathTemplate, params)
 
   const queryString =
@@ -615,8 +616,6 @@ export async function strapiFetchWithQuery<T>(
       : new URLSearchParams(queryParams).toString()
 
   const path = queryString ? `${basePath}?${queryString}` : basePath
-
-  const { method = "GET", headers = {}, cache } = options
 
   try {
     const response = await client.fetch(path, {
@@ -644,6 +643,14 @@ export async function strapiFetchWithQuery<T>(
       data,
     }
   } catch (error) {
+    if (noAuth || optionalAuth) {
+      const errorMsg = error instanceof Error ? error.message : "Unknown error occurred"
+      return {
+        ok: false,
+        status: 0,
+        error: errorMsg,
+      }
+    }
     return {
       ok: false,
       status: 0,

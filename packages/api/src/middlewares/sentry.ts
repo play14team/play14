@@ -69,6 +69,24 @@ export default (
 
           // Record response status
           span.setAttribute("http.status_code", ctx.response.status)
+
+          // Capture 5xx errors even when handled by strapi::errors middleware
+          if (ctx.response.status >= 500) {
+            Sentry.captureException(
+              new Error(
+                `HTTP ${ctx.response.status}: ${ctx.request.method} ${ctx.request.path}`
+              ),
+              {
+                extra: {
+                  path: ctx.request.path,
+                  method: ctx.request.method,
+                  query: ctx.request.query,
+                  status: ctx.response.status,
+                },
+              }
+            )
+          }
+
           if (ctx.response.status >= 400) {
             span.setStatus({ code: 2, message: `HTTP ${ctx.response.status}` }) // Error status
           }

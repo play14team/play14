@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Player, UploadFile } from "@/models/strapi"
 import SocialNetworks from "../layout/socialnetworks"
+import DefaultPlayerImage from "../ui/default-player-image"
 
 const PlayerCard = ({ player }: { player: Player }) => {
   const url = player.slug ? `/players/${player.slug}` : "#"
@@ -36,8 +37,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
           )}
           {!avatar && (
             <Link href={url}>
-              <Image
-                src="/default-player.png"
+              <DefaultPlayerImage
                 alt="default player image"
                 className="shadow img-border"
                 width={500}
@@ -48,7 +48,6 @@ const PlayerCard = ({ player }: { player: Player }) => {
                   width: "100%",
                   height: "300px",
                 }}
-                unoptimized
               />
             </Link>
           )}

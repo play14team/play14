@@ -23,6 +23,7 @@
     "src/admin/",
     "**/*.test.ts",
     "**/*.test.js",
+    "vitest*.config.*",
     "src/plugins/**",
     "bootstrap/",
     "types/generated/**"

@@ -66,36 +66,48 @@ export interface MockPaymentState {
   accounts: Map<string, MockAccount>
 }
 
-// Singleton state instance
-let mockState: MockPaymentState | null = null
-let sessionCounter = 0
+// Use global state to ensure it's shared across module instances
+// This is necessary because vitest and Strapi might load different module instances
+declare global {
+  var __mockPaymentState: MockPaymentState | undefined
+  var __mockSessionCounter: number | undefined
+}
 
 /**
  * Get or create the mock state instance
+ * Uses global to ensure state is shared even if module is loaded multiple times
  */
 export function getMockPaymentState(): MockPaymentState {
-  if (!mockState) {
-    mockState = {
+  if (!globalThis.__mockPaymentState) {
+    globalThis.__mockPaymentState = {
       sessions: new Map(),
       paymentIntents: new Map(),
       refunds: new Map(),
       accounts: new Map(),
     }
   }
-  return mockState
+  return globalThis.__mockPaymentState
+}
+
+function getSessionCounter(): number {
+  return globalThis.__mockSessionCounter || 0
+}
+
+function incrementSessionCounter(): number {
+  globalThis.__mockSessionCounter = (globalThis.__mockSessionCounter || 0) + 1
+  return globalThis.__mockSessionCounter
 }
 
 /**
  * Reset mock state - call this in beforeEach of tests
  */
 export function resetMockPaymentState(): void {
-  if (mockState) {
-    mockState.sessions.clear()
-    mockState.paymentIntents.clear()
-    mockState.refunds.clear()
-    mockState.accounts.clear()
-  }
-  sessionCounter = 0
+  const state = getMockPaymentState()
+  state.sessions.clear()
+  state.paymentIntents.clear()
+  state.refunds.clear()
+  state.accounts.clear()
+  globalThis.__mockSessionCounter = 0
 }
 
 /**
@@ -219,9 +231,9 @@ export class MockPaymentProvider implements ConnectPaymentProvider {
   }
 
   async createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession> {
-    sessionCounter++
-    const sessionId = `cs_test_${sessionCounter}_${Date.now()}`
-    const paymentIntentId = `pi_test_${sessionCounter}_${Date.now()}`
+    const counter = incrementSessionCounter()
+    const sessionId = `cs_test_${counter}_${Date.now()}`
+    const paymentIntentId = `pi_test_${counter}_${Date.now()}`
 
     const totalAmount = params.lineItems.reduce(
       (sum, item) => sum + item.unitPrice * item.quantity,
@@ -315,6 +327,7 @@ export class MockPaymentProvider implements ConnectPaymentProvider {
 
     const event = JSON.parse(payload)
     return {
+      id: event.id,
       type: event.type,
       data: event.data.object,
     }
@@ -337,6 +350,25 @@ export class MockPaymentProvider implements ConnectPaymentProvider {
     if (pi.status === "succeeded") return "paid"
     if (pi.status === "requires_payment_method") return "failed"
     return "pending"
+  }
+
+  async getSessionByPaymentIntent(paymentIntentId: string): Promise<{
+    sessionId: string
+    orderId?: string
+    metadata: Record<string, string>
+  } | null> {
+    // Always get fresh state to ensure test-set sessions are visible
+    const currentState = getMockPaymentState()
+    for (const session of currentState.sessions.values()) {
+      if (session.paymentIntent === paymentIntentId) {
+        return {
+          sessionId: session.id,
+          orderId: session.metadata?.orderId,
+          metadata: session.metadata || {},
+        }
+      }
+    }
+    return null
   }
 
   // Stripe Connect methods

@@ -225,6 +225,7 @@ export class StripeProvider implements ConnectPaymentProvider {
     const event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret)
 
     return {
+      id: event.id,
       type: event.type,
       data: event.data.object as unknown as Record<string, unknown>,
     }
@@ -243,6 +244,29 @@ export class StripeProvider implements ConnectPaymentProvider {
         return "pending"
       default:
         return "failed"
+    }
+  }
+
+  async getSessionByPaymentIntent(paymentIntentId: string): Promise<{
+    sessionId: string
+    orderId?: string
+    metadata: Record<string, string>
+  } | null> {
+    // Search for checkout sessions with this payment intent
+    const sessions = await this.stripe.checkout.sessions.list({
+      payment_intent: paymentIntentId,
+      limit: 1,
+    })
+
+    if (sessions.data.length === 0) {
+      return null
+    }
+
+    const session = sessions.data[0]
+    return {
+      sessionId: session.id,
+      orderId: session.metadata?.orderId,
+      metadata: (session.metadata as Record<string, string>) || {},
     }
   }
 

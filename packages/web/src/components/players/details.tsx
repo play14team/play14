@@ -5,6 +5,7 @@ import Map from "../map"
 import PlayersNavigator from "./nav"
 import PlayerSidebar from "./sidebar"
 import PlayerTabs from "./tabs"
+import DefaultPlayerImage from "../ui/default-player-image"
 
 // Helper to check if location is a GeoLocation object (has coordinates)
 function isGeoLocation(
@@ -58,9 +59,7 @@ const PlayerDetails = ({ player }: { player: Player }) => {
                 />
               )}
               {!avatar && (
-                <Image
-                  src={"/default-player.png"}
-                  alt={"default player image"}
+                <DefaultPlayerImage
                   width={350}
                   height={350}
                   priority
@@ -72,7 +71,6 @@ const PlayerDetails = ({ player }: { player: Player }) => {
                     maxHeight: "450px",
                     objectFit: "cover",
                   }}
-                  unoptimized
                 />
               )}
               <div className="content">

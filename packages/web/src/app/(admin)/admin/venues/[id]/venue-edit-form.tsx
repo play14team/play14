@@ -348,6 +348,7 @@ export default function VenueEditForm({ venue }: Props) {
               type="submit"
               className={`admin-btn admin-btn-primary admin-btn-block ${isDirty ? "admin-btn-dirty" : ""}`}
               disabled={isSubmitting}
+              data-save-shortcut
             >
               {isSubmitting ? (
                 <>

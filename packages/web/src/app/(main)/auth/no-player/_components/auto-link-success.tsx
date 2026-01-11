@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Logo from "@/components/layout/logo"
 import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
+import DefaultPlayerImage from "@/components/ui/default-player-image"
 
 interface AutoLinkSuccessProps {
   player: PlayerSuggestion
@@ -31,13 +32,11 @@ export default function AutoLinkSuccess({ player, onComplete }: AutoLinkSuccessP
               unoptimized
             />
           ) : (
-            <Image
-              src="/default-player.png"
+            <DefaultPlayerImage
               alt="default"
               width={80}
               height={80}
               style={{ objectFit: "cover", borderRadius: "50%" }}
-              unoptimized
             />
           )}
         </div>

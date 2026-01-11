@@ -56,6 +56,24 @@
       "default": false,
       "configurable": false
     },
+    "invitationStatus": {
+      "type": "enumeration",
+      "enum": ["none", "pending", "sent", "reminded", "accepted"],
+      "default": "none",
+      "private": true
+    },
+    "invitationSentAt": {
+      "type": "datetime",
+      "private": true
+    },
+    "invitationReminderSentAt": {
+      "type": "datetime",
+      "private": true
+    },
+    "invitationAcceptedAt": {
+      "type": "datetime",
+      "private": true
+    },
     "role": {
       "type": "relation",
       "relation": "manyToOne",

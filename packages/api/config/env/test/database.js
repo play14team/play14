@@ -1,23 +1,27 @@
 /**
  * Test database configuration
  *
- * Uses SQLite for fast, isolated test runs.
- * The test database file is created in .tmp/test.db
+ * Uses PostgreSQL test container (play14-db-test) on port 5433 for isolated test runs.
+ * Start the test database with: podman-compose up -d play14-db-test
  *
- * Note: We explicitly don't set a schema as SQLite doesn't support schemas.
  * This configuration completely replaces the default database.js config.
  */
 module.exports = ({ env }) => ({
   connection: {
-    client: "sqlite",
+    client: "postgres",
     connection: {
-      filename: env("DATABASE_FILENAME", ".tmp/test.db"),
+      host: env("DATABASE_HOST", "localhost"),
+      port: env.int("DATABASE_PORT", 5433),
+      database: env("DATABASE_NAME", "play14_test"),
+      user: env("DATABASE_USERNAME", "test_user"),
+      password: env("DATABASE_PASSWORD", "test_password"),
+      schema: env("DATABASE_SCHEMA", "public"),
+      ssl: false,
     },
-    useNullAsDefault: true,
-    debug: false,
     pool: {
       min: 1,
-      max: 1,
+      max: 5,
     },
+    debug: false,
   },
 })

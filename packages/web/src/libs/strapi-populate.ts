@@ -90,6 +90,7 @@ export const eventDetailsPopulate = {
     },
   },
   hosts: {
+    filters: { visible: { $eq: true } },
     populate: {
       avatar: {
         fields: imageFields,
@@ -101,6 +102,7 @@ export const eventDetailsPopulate = {
     sort: ["name:asc"],
   },
   mentors: {
+    filters: { visible: { $eq: true } },
     populate: {
       avatar: {
         fields: imageFields,
@@ -112,6 +114,7 @@ export const eventDetailsPopulate = {
     sort: ["name:asc"],
   },
   players: {
+    filters: { visible: { $eq: true } },
     populate: {
       avatar: {
         fields: imageFields,

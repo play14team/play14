@@ -20,7 +20,7 @@ import {
 } from "../../../test-utils/factories"
 
 // Mock Stripe SDK
-const mockStripeInstance = {
+const mockStripeInstance = vi.hoisted(() => ({
   checkout: {
     sessions: {
       create: vi.fn(),
@@ -43,10 +43,20 @@ const mockStripeInstance = {
   webhooks: {
     constructEvent: vi.fn(),
   },
-}
+}))
+
+const StripeMock = vi.hoisted(
+  () =>
+    class StripeMock {
+      constructor() {
+        return mockStripeInstance
+      }
+    }
+)
 
 vi.mock("stripe", () => ({
-  default: vi.fn(() => mockStripeInstance),
+  __esModule: true,
+  default: StripeMock,
 }))
 
 // Set environment variables before importing the provider

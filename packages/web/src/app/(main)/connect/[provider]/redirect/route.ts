@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 
 const AUTH_COOKIE_NAME = "play14_auth"
-const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+
+/** Get the Strapi API URL - read at request time for runtime env support */
+function getStrapiUrl(): string {
+  return process.env.STRAPI_API_URL || "http://localhost:1337"
+}
+
+/** Get the public site URL - read at request time for runtime env support */
+function getPublicUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL || ""
+}
 
 /**
  * OAuth callback route handler
@@ -26,6 +35,10 @@ export async function GET(
   const { provider } = await params
   const searchParams = request.nextUrl.searchParams
 
+  // Use PUBLIC_URL if available to handle reverse proxy scenarios where request.url
+  // contains the internal container URL (e.g., 0.0.0.0:3000) instead of the public URL
+  const baseUrl = getPublicUrl() || request.url
+
   // Get the access token from the OAuth provider (via Strapi's redirect)
   const providerToken = searchParams.get("access_token")
 
@@ -34,20 +47,20 @@ export async function GET(
   if (error) {
     console.error(`[OAuth] Error from ${provider}:`, error)
     return NextResponse.redirect(
-      new URL(`/auth/error?error=${encodeURIComponent(error)}`, request.url)
+      new URL(`/auth/error?error=${encodeURIComponent(error)}`, baseUrl)
     )
   }
 
   if (!providerToken) {
     console.error(`[OAuth] No access token received from ${provider}`)
     return NextResponse.redirect(
-      new URL("/auth/error?error=no_token", request.url)
+      new URL("/auth/error?error=no_token", baseUrl)
     )
   }
 
   // Exchange the provider's access_token for a Strapi JWT
   // This is required because the token from the OAuth provider is NOT the Strapi JWT
-  const exchangeUrl = `${STRAPI_URL}/api/auth/${provider}/callback?access_token=${providerToken}`
+  const exchangeUrl = `${getStrapiUrl()}/api/auth/${provider}/callback?access_token=${providerToken}`
   console.log(`[OAuth] Exchanging ${provider} token for Strapi JWT`)
   console.log(`[OAuth] Exchange URL:`, exchangeUrl.substring(0, 100) + "...")
   try {
@@ -70,7 +83,7 @@ export async function GET(
         // Not JSON, use raw error
       }
       return NextResponse.redirect(
-        new URL(`/auth/error?error=${errorCode}`, request.url)
+        new URL(`/auth/error?error=${errorCode}`, baseUrl)
       )
     }
 
@@ -80,7 +93,7 @@ export async function GET(
     if (!strapiJwt) {
       console.error(`[OAuth] No JWT in Strapi response:`, data)
       return NextResponse.redirect(
-        new URL("/auth/error?error=no_jwt", request.url)
+        new URL("/auth/error?error=no_jwt", baseUrl)
       )
     }
 
@@ -93,7 +106,7 @@ export async function GET(
     const callbackUrl = "/auth/callback"
 
     // Create redirect response and set Strapi JWT cookie
-    const response = NextResponse.redirect(new URL(callbackUrl, request.url))
+    const response = NextResponse.redirect(new URL(callbackUrl, baseUrl))
 
     response.cookies.set(AUTH_COOKIE_NAME, strapiJwt, {
       httpOnly: true,
@@ -106,8 +119,9 @@ export async function GET(
     return response
   } catch (err) {
     console.error(`[OAuth] Token exchange error:`, err)
+    const errorBaseUrl = getPublicUrl() || request.url
     return NextResponse.redirect(
-      new URL("/auth/error?error=token_exchange_error", request.url)
+      new URL("/auth/error?error=token_exchange_error", errorBaseUrl)
     )
   }
 }

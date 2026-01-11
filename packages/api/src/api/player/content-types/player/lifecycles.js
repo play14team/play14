@@ -25,4 +25,25 @@ module.exports = {
     const { data } = player.params;
     validate(data);
   },
+  /**
+   * After updating a player, sync the linked user's role if:
+   * - The user relation was modified (player linked to user via admin)
+   * - The player has a linked user
+   */
+  async afterUpdate(event) {
+    const { result, params } = event;
+
+    // Check if user relation was modified and player has a linked user
+    if (params.data?.user !== undefined && result.user) {
+      try {
+        const { syncUserRoleFromPlayer } = await import("../../../../services/user-role-sync/index.js");
+        const updated = await syncUserRoleFromPlayer(strapi, result.documentId);
+        if (updated) {
+          strapi.log.info(`[Player Lifecycle] User role synced after player ${result.documentId} was linked to user`);
+        }
+      } catch (err) {
+        strapi.log.error(`[Player Lifecycle] Failed to sync role after user link: ${err}`);
+      }
+    }
+  },
 };

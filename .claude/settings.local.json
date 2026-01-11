@@ -64,7 +64,9 @@
       "Bash(PLAYWRIGHT_BROWSERS_PATH=/usr/bin npx playwright install:*)",
       "Bash(gh api:*)",
       "Bash(bunx vitest:*)",
-      "mcp__playwright__browser_navigate"
+      "mcp__playwright__browser_navigate",
+      "Bash(wc:*)",
+      "Bash(node -e:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

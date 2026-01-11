@@ -89,6 +89,20 @@
           "sortable": true
         }
       },
+      "reservedCount": {
+        "edit": {
+          "label": "reservedCount",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "reservedCount",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "validFrom": {
         "edit": {
           "label": "validFrom",
@@ -340,6 +354,10 @@
           {
             "name": "createdByPlayer",
             "size": 6
+          },
+          {
+            "name": "reservedCount",
+            "size": 4
           }
         ]
       ]

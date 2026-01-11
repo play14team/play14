@@ -387,6 +387,48 @@
           "sortable": true
         }
       },
+      "hasReservation": {
+        "edit": {
+          "label": "hasReservation",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "hasReservation",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "reservationCreatedAt": {
+        "edit": {
+          "label": "reservationCreatedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "reservationCreatedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "reservationExpiresAt": {
+        "edit": {
+          "label": "reservationExpiresAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "reservationExpiresAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "createdAt": {
         "edit": {
           "label": "createdAt",
@@ -595,6 +637,22 @@
           },
           {
             "name": "termsAcceptedTimestamp",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "hasReservation",
+            "size": 4
+          },
+          {
+            "name": "reservationCreatedAt",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "reservationExpiresAt",
             "size": 6
           }
         ]

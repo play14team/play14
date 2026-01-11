@@ -367,6 +367,409 @@ describe("Webhook Handlers", () => {
     })
   })
 
+  describe("Event-level idempotency", () => {
+    it("records processed events in processed_webhooks table", async () => {
+      // Arrange
+      const { player } = await createAuthenticatedUser(strapi)
+      const event = await seedTestEvent(strapi, {
+        eventStatus: "Open",
+        ticketingMode: "internal",
+        ticketTypes: [
+          { name: "Standard", price: 50, capacity: 100 },
+        ],
+      })
+
+      const sessionId = `cs_test_record_${Date.now()}`
+      const paymentIntentId = `pi_test_record_${Date.now()}`
+      const eventId = `evt_test_record_${Date.now()}`
+
+      const order = await seedTestOrder(strapi, {
+        event: event.id,
+        player: player.id,
+        status: "pending",
+        providerSessionId: sessionId,
+        hasReservation: true,
+        ticketDetails: [
+          { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1, unitPrice: 50 },
+        ],
+      })
+
+      const mockState = getMockPaymentState()
+      mockState.sessions.set(sessionId, {
+        id: sessionId,
+        url: `https://checkout.stripe.com/pay/${sessionId}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order.documentId },
+        paymentIntent: paymentIntentId,
+        amountTotal: 5000,
+        currency: "eur",
+      })
+      mockState.paymentIntents.set(paymentIntentId, {
+        id: paymentIntentId,
+        amount: 5000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: {},
+      })
+
+      // Act
+      await sendCheckoutCompleted(httpServer, sessionId, undefined, eventId)
+      await waitForWebhookProcessing()
+
+      // Assert - verify event recorded in processed_webhooks table
+      const processedWebhook = await strapi.db.connection("processed_webhooks")
+        .where("event_id", eventId)
+        .first()
+
+      expect(processedWebhook).toBeDefined()
+      expect(processedWebhook.event_id).toBe(eventId)
+      expect(processedWebhook.event_type).toBe("checkout.session.completed")
+      expect(processedWebhook.provider).toBe("stripe")
+      expect(processedWebhook.status).toBe("completed")
+    })
+
+    it("prevents duplicate processing with same event ID across different sessions", async () => {
+      // This tests the event-level idempotency rather than order-level
+      // Even if someone sends a webhook with the same event ID for a different session,
+      // it should be rejected
+      const { player } = await createAuthenticatedUser(strapi)
+      const event = await seedTestEvent(strapi, {
+        eventStatus: "Open",
+        ticketingMode: "internal",
+        ticketTypes: [
+          { name: "Standard", price: 50, capacity: 100 },
+        ],
+      })
+
+      const sessionId1 = `cs_test_dup1_${Date.now()}`
+      const sessionId2 = `cs_test_dup2_${Date.now()}`
+      const paymentIntentId1 = `pi_test_dup1_${Date.now()}`
+      const paymentIntentId2 = `pi_test_dup2_${Date.now()}`
+      const sharedEventId = `evt_test_shared_${Date.now()}`
+
+      // Create two orders
+      const order1 = await seedTestOrder(strapi, {
+        event: event.id,
+        player: player.id,
+        status: "pending",
+        providerSessionId: sessionId1,
+        hasReservation: true,
+        ticketDetails: [
+          { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1, unitPrice: 50 },
+        ],
+      })
+
+      const order2 = await seedTestOrder(strapi, {
+        event: event.id,
+        player: player.id,
+        status: "pending",
+        providerSessionId: sessionId2,
+        hasReservation: true,
+        ticketDetails: [
+          { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1, unitPrice: 50 },
+        ],
+      })
+
+      const mockState = getMockPaymentState()
+      // Set up session 1
+      mockState.sessions.set(sessionId1, {
+        id: sessionId1,
+        url: `https://checkout.stripe.com/pay/${sessionId1}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order1.documentId },
+        paymentIntent: paymentIntentId1,
+        amountTotal: 5000,
+        currency: "eur",
+      })
+      mockState.paymentIntents.set(paymentIntentId1, {
+        id: paymentIntentId1,
+        amount: 5000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: {},
+      })
+      // Set up session 2
+      mockState.sessions.set(sessionId2, {
+        id: sessionId2,
+        url: `https://checkout.stripe.com/pay/${sessionId2}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order2.documentId },
+        paymentIntent: paymentIntentId2,
+        amountTotal: 5000,
+        currency: "eur",
+      })
+      mockState.paymentIntents.set(paymentIntentId2, {
+        id: paymentIntentId2,
+        amount: 5000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: {},
+      })
+
+      // Act - send webhook for session 1 with shared event ID
+      const response1 = await sendCheckoutCompleted(httpServer, sessionId1, undefined, sharedEventId)
+      await waitForWebhookProcessing()
+
+      // Act - try to send webhook for session 2 with the SAME event ID
+      // Reset session 2 to open state since simulateMockCheckoutComplete was called
+      mockState.sessions.set(sessionId2, {
+        id: sessionId2,
+        url: `https://checkout.stripe.com/pay/${sessionId2}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order2.documentId },
+        paymentIntent: paymentIntentId2,
+        amountTotal: 5000,
+        currency: "eur",
+      })
+      const response2 = await sendCheckoutCompleted(httpServer, sessionId2, undefined, sharedEventId)
+
+      // Assert - both should return 200 (idempotent)
+      expect(response1.status).toBe(200)
+      expect(response2.status).toBe(200)
+      expect(response2.body.duplicate).toBe(true)
+
+      // Only order 1 should be paid
+      const updatedOrder1 = await strapi.documents("api::ticket-order.ticket-order").findOne({
+        documentId: order1.documentId,
+      })
+      const updatedOrder2 = await strapi.documents("api::ticket-order.ticket-order").findOne({
+        documentId: order2.documentId,
+      })
+
+      expect(updatedOrder1.status).toBe("paid")
+      expect(updatedOrder2.status).toBe("pending") // Not processed due to duplicate event ID
+    })
+
+    it("handles concurrent webhook deliveries with same event ID", async () => {
+      // Arrange
+      const { player } = await createAuthenticatedUser(strapi)
+      const event = await seedTestEvent(strapi, {
+        eventStatus: "Open",
+        ticketingMode: "internal",
+        ticketTypes: [
+          { name: "Standard", price: 50, capacity: 100 },
+        ],
+      })
+
+      const sessionId = `cs_test_concurrent_${Date.now()}`
+      const paymentIntentId = `pi_test_concurrent_${Date.now()}`
+      const eventId = `evt_test_concurrent_${Date.now()}`
+
+      const order = await seedTestOrder(strapi, {
+        event: event.id,
+        player: player.id,
+        status: "pending",
+        providerSessionId: sessionId,
+        hasReservation: true,
+        ticketDetails: [
+          { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2, unitPrice: 50 },
+        ],
+      })
+
+      const mockState = getMockPaymentState()
+      mockState.sessions.set(sessionId, {
+        id: sessionId,
+        url: `https://checkout.stripe.com/pay/${sessionId}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order.documentId },
+        paymentIntent: paymentIntentId,
+        amountTotal: 10000,
+        currency: "eur",
+      })
+      mockState.paymentIntents.set(paymentIntentId, {
+        id: paymentIntentId,
+        amount: 10000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: {},
+      })
+
+      // Act - send 3 concurrent webhooks with the same event ID
+      const responses = await Promise.all([
+        sendCheckoutCompleted(httpServer, sessionId, undefined, eventId),
+        sendCheckoutCompleted(httpServer, sessionId, undefined, eventId),
+        sendCheckoutCompleted(httpServer, sessionId, undefined, eventId),
+      ])
+
+      await waitForWebhookProcessing()
+
+      // Assert - all should return 200
+      responses.forEach((response) => {
+        expect(response.status).toBe(200)
+      })
+
+      // Exactly 2 tickets should be created (not 6)
+      const tickets = await strapi.documents("api::ticket.ticket").findMany({
+        filters: { order: { documentId: order.documentId } },
+      })
+      expect(tickets).toHaveLength(2)
+
+      // Only one processed_webhooks entry
+      const processedCount = await strapi.db.connection("processed_webhooks")
+        .where("event_id", eventId)
+        .count("* as count")
+        .first()
+      expect(Number(processedCount.count)).toBe(1)
+    })
+
+    it("records failed events with error metadata", async () => {
+      // Arrange - create an order that will fail processing
+      const { player } = await createAuthenticatedUser(strapi)
+      const event = await seedTestEvent(strapi, {
+        eventStatus: "Open",
+        ticketingMode: "internal",
+        ticketTypes: [
+          { name: "Standard", price: 50, capacity: 100 },
+        ],
+      })
+
+      const sessionId = `cs_test_fail_record_${Date.now()}`
+      const paymentIntentId = `pi_test_fail_record_${Date.now()}`
+      const eventId = `evt_test_fail_record_${Date.now()}`
+
+      const order = await seedTestOrder(strapi, {
+        event: event.id,
+        player: player.id,
+        status: "pending",
+        providerSessionId: sessionId,
+        hasReservation: true,
+        ticketDetails: [
+          { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1, unitPrice: 50 },
+        ],
+      })
+
+      const mockState = getMockPaymentState()
+      mockState.sessions.set(sessionId, {
+        id: sessionId,
+        url: `https://checkout.stripe.com/pay/${sessionId}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order.documentId },
+        paymentIntent: paymentIntentId,
+        amountTotal: 5000,
+        currency: "eur",
+      })
+
+      // Act - send payment failed webhook
+      const response = await sendPaymentFailed(
+        httpServer,
+        sessionId,
+        "card_declined",
+        "Your card was declined",
+        eventId
+      )
+
+      await waitForWebhookProcessing()
+
+      // Assert
+      expect(response.status).toBe(200)
+
+      // Verify event recorded
+      const processedWebhook = await strapi.db.connection("processed_webhooks")
+        .where("event_id", eventId)
+        .first()
+
+      expect(processedWebhook).toBeDefined()
+      expect(processedWebhook.event_type).toBe("payment_intent.payment_failed")
+      expect(processedWebhook.status).toBe("completed")
+    })
+
+    it("different event types with different IDs are processed independently", async () => {
+      // Arrange
+      const { player } = await createAuthenticatedUser(strapi)
+      const event = await seedTestEvent(strapi, {
+        eventStatus: "Open",
+        ticketingMode: "internal",
+        ticketTypes: [
+          { name: "Standard", price: 50, capacity: 100 },
+        ],
+      })
+
+      const sessionId = `cs_test_multi_${Date.now()}`
+      const paymentIntentId = `pi_test_multi_${Date.now()}`
+      const completedEventId = `evt_test_completed_${Date.now()}`
+      const failedEventId = `evt_test_failed_${Date.now()}`
+
+      const order = await seedTestOrder(strapi, {
+        event: event.id,
+        player: player.id,
+        status: "pending",
+        providerSessionId: sessionId,
+        hasReservation: true,
+        ticketDetails: [
+          { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1, unitPrice: 50 },
+        ],
+      })
+
+      const mockState = getMockPaymentState()
+      mockState.sessions.set(sessionId, {
+        id: sessionId,
+        url: `https://checkout.stripe.com/pay/${sessionId}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId: order.documentId },
+        paymentIntent: paymentIntentId,
+        amountTotal: 5000,
+        currency: "eur",
+      })
+      mockState.paymentIntents.set(paymentIntentId, {
+        id: paymentIntentId,
+        amount: 5000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: {},
+      })
+
+      // Act - send checkout completed
+      await sendCheckoutCompleted(httpServer, sessionId, undefined, completedEventId)
+      await waitForWebhookProcessing()
+
+      // Try to send a payment failed with different event ID (should process but order already paid)
+      // Reset mock state for the payment intent (simulate a retry scenario)
+      mockState.paymentIntents.set(paymentIntentId, {
+        id: paymentIntentId,
+        amount: 5000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: {},
+      })
+      await sendPaymentFailed(httpServer, sessionId, "card_declined", "Declined", failedEventId)
+      await waitForWebhookProcessing()
+
+      // Assert - both events should be recorded
+      const completedRecord = await strapi.db.connection("processed_webhooks")
+        .where("event_id", completedEventId)
+        .first()
+      const failedRecord = await strapi.db.connection("processed_webhooks")
+        .where("event_id", failedEventId)
+        .first()
+
+      expect(completedRecord).toBeDefined()
+      expect(failedRecord).toBeDefined()
+      expect(completedRecord.event_type).toBe("checkout.session.completed")
+      expect(failedRecord.event_type).toBe("payment_intent.payment_failed")
+    })
+  })
+
   describe("Webhook signature verification", () => {
     it("rejects webhooks with invalid signature", async () => {
       // Act

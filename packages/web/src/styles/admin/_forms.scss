@@ -353,6 +353,32 @@
   margin-top: 6px;
 }
 
+.admin-sample-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-sample-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.admin-sample-preview {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-subtle);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  overflow-x: auto;
+  white-space: pre;
+}
+
 // ===========================================
 // Social Networks
 // ===========================================
@@ -4215,7 +4241,7 @@ label.admin-btn {
 
 .admin-toast-container {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   z-index: 10000;
   display: flex;
@@ -4225,9 +4251,10 @@ label.admin-btn {
   pointer-events: none;
 
   @media (max-width: 640px) {
-    top: 12px;
-    right: 12px;
-    left: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    right: calc(12px + env(safe-area-inset-right));
+    left: calc(12px + env(safe-area-inset-left));
+    padding-bottom: 8px;
     max-width: none;
   }
 }

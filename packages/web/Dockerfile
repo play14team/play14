@@ -17,8 +17,8 @@ COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
 COPY packages/agents/package.json ./packages/agents/
 
-# Install dependencies
-RUN bun install --frozen-lockfile
+# Install only web package dependencies (skip API's native modules like better-sqlite3)
+RUN bun install --frozen-lockfile --filter=play14-web
 
 # Stage 2: Builder
 FROM oven/bun:1.3.5-alpine AS builder
@@ -40,7 +40,7 @@ COPY packages/agents/package.json ./packages/agents/
 COPY packages/web ./packages/web
 
 # Re-run bun install to properly link workspace packages and create binaries
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --filter=play14-web
 
 # Add node_modules/.bin to PATH for next CLI
 ENV PATH=/app/node_modules/.bin:$PATH

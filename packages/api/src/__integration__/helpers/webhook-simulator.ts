@@ -22,10 +22,11 @@ export async function sendWebhookEvent(
   httpServer: Server,
   eventType: string,
   data: Record<string, unknown>,
-  signature: string = "mock_signature_valid"
+  signature: string = "mock_signature_valid",
+  eventId?: string
 ): Promise<request.Response> {
   const payload = JSON.stringify({
-    id: `evt_test_${Date.now()}`,
+    id: eventId || `evt_test_${Date.now()}`,
     object: "event",
     type: eventType,
     data: { object: data },
@@ -42,19 +43,58 @@ export async function sendWebhookEvent(
 
 /**
  * Simulate and send a checkout.session.completed webhook
+ *
+ * If the session doesn't exist in mock state (can happen due to module isolation
+ * in certain test runners), creates a minimal session entry before completing it.
  */
 export async function sendCheckoutCompleted(
   httpServer: Server,
-  sessionId: string
+  sessionId: string,
+  metadata?: { orderId?: string },
+  eventId?: string
 ): Promise<request.Response> {
+  const state = getMockPaymentState()
+
+  // Ensure session exists in mock state - handles module isolation edge cases
+  if (!state.sessions.has(sessionId)) {
+    const paymentIntentId = `pi_${sessionId.replace("cs_", "")}`
+    state.sessions.set(sessionId, {
+      id: sessionId,
+      url: `https://checkout.stripe.com/c/pay/${sessionId}`,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      metadata: metadata || {},
+      customerEmail: "test@example.com",
+      amountTotal: 10000,
+      currency: "eur",
+      paymentIntent: paymentIntentId,
+      paymentStatus: "unpaid",
+      status: "open",
+    })
+    state.paymentIntents.set(paymentIntentId, {
+      id: paymentIntentId,
+      amount: 10000,
+      currency: "eur",
+      status: "requires_payment_method",
+      metadata: {},
+    })
+  }
+
   // Update mock state to reflect completed checkout
   simulateMockCheckoutComplete(sessionId)
 
   // Create and send webhook event
-  const { payload, signature } = createMockWebhookEvent(
+  const { payload: basePayload, signature } = createMockWebhookEvent(
     "checkout.session.completed",
     sessionId
   )
+
+  // If explicit event ID provided, replace the auto-generated one
+  let payload = basePayload
+  if (eventId) {
+    const parsed = JSON.parse(basePayload)
+    parsed.id = eventId
+    payload = JSON.stringify(parsed)
+  }
 
   return request(httpServer)
     .post("/api/webhooks/stripe")
@@ -65,19 +105,50 @@ export async function sendCheckoutCompleted(
 
 /**
  * Simulate and send a checkout.session.expired webhook
+ *
+ * If the session doesn't exist in mock state, creates a minimal session entry.
  */
 export async function sendCheckoutExpired(
   httpServer: Server,
-  sessionId: string
+  sessionId: string,
+  metadata?: { orderId?: string },
+  eventId?: string
 ): Promise<request.Response> {
+  const state = getMockPaymentState()
+
+  // Ensure session exists in mock state
+  if (!state.sessions.has(sessionId)) {
+    const paymentIntentId = `pi_${sessionId.replace("cs_", "")}`
+    state.sessions.set(sessionId, {
+      id: sessionId,
+      url: `https://checkout.stripe.com/c/pay/${sessionId}`,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      metadata: metadata || {},
+      customerEmail: "test@example.com",
+      amountTotal: 10000,
+      currency: "eur",
+      paymentIntent: paymentIntentId,
+      paymentStatus: "unpaid",
+      status: "open",
+    })
+  }
+
   // Update mock state to reflect expired checkout
   simulateMockCheckoutExpired(sessionId)
 
   // Create and send webhook event
-  const { payload, signature } = createMockWebhookEvent(
+  const { payload: basePayload, signature } = createMockWebhookEvent(
     "checkout.session.expired",
     sessionId
   )
+
+  // If explicit event ID provided, replace the auto-generated one
+  let payload = basePayload
+  if (eventId) {
+    const parsed = JSON.parse(basePayload)
+    parsed.id = eventId
+    payload = JSON.stringify(parsed)
+  }
 
   return request(httpServer)
     .post("/api/webhooks/stripe")
@@ -88,22 +159,50 @@ export async function sendCheckoutExpired(
 
 /**
  * Simulate and send a payment_intent.payment_failed webhook
+ *
+ * If the session doesn't exist in mock state, creates a minimal session entry.
  */
 export async function sendPaymentFailed(
   httpServer: Server,
   sessionId: string,
   errorCode: string = "card_declined",
-  errorMessage: string = "Your card was declined"
+  errorMessage: string = "Your card was declined",
+  eventId?: string
 ): Promise<request.Response> {
+  const state = getMockPaymentState()
+
+  // Ensure session exists in mock state
+  if (!state.sessions.has(sessionId)) {
+    const paymentIntentId = `pi_${sessionId.replace("cs_", "")}`
+    state.sessions.set(sessionId, {
+      id: sessionId,
+      url: `https://checkout.stripe.com/c/pay/${sessionId}`,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+      metadata: {},
+      customerEmail: "test@example.com",
+      amountTotal: 10000,
+      currency: "eur",
+      paymentIntent: paymentIntentId,
+      paymentStatus: "unpaid",
+      status: "open",
+    })
+    state.paymentIntents.set(paymentIntentId, {
+      id: paymentIntentId,
+      amount: 10000,
+      currency: "eur",
+      status: "requires_payment_method",
+      metadata: {},
+    })
+  }
+
   // Update mock state to reflect failed payment
   simulateMockPaymentFailed(sessionId)
 
-  const state = getMockPaymentState()
   const session = state.sessions.get(sessionId)
 
   // Create and send webhook event
   const payload = JSON.stringify({
-    id: `evt_test_${Date.now()}`,
+    id: eventId || `evt_test_${Date.now()}`,
     object: "event",
     type: "payment_intent.payment_failed",
     data: {
@@ -133,10 +232,11 @@ export async function sendPaymentFailed(
 export async function sendChargeRefunded(
   httpServer: Server,
   paymentIntentId: string,
-  amount: number
+  amount: number,
+  eventId?: string
 ): Promise<request.Response> {
   const payload = JSON.stringify({
-    id: `evt_test_${Date.now()}`,
+    id: eventId || `evt_test_${Date.now()}`,
     object: "event",
     type: "charge.refunded",
     data: {

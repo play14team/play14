@@ -214,6 +214,7 @@ export default function CreateLocationModal({
               type="submit"
               className="admin-btn admin-btn-primary"
               disabled={isSubmitting}
+              data-save-shortcut
             >
               {isSubmitting ? (
                 <>

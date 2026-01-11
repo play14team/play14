@@ -1,4 +1,6 @@
 const { collectBusinessMetrics } = require("../src/services/observability/metrics-collector");
+const { cleanupOldWebhookRecords } = require("../src/services/webhook");
+const { processUserInvitations } = require("../src/services/user-invitations");
 
 /**
  * Cron tasks migrated to Strapi 5 Document Service API
@@ -163,6 +165,22 @@ module.exports = {
     options: {
       // Every hour at minute 30
       rule: "0 30 * * * *",
+    },
+  },
+  inviteNewUsers: {
+    task: async ({ strapi }) => {
+      if (process.env.INVITATION_EMAILS_ENABLED === "false") {
+        console.log(
+          "User invitation job skipped (INVITATION_EMAILS_ENABLED=false)"
+        );
+        return;
+      }
+      console.log("Running user invitation job");
+      await processUserInvitations(strapi);
+    },
+    options: {
+      // Every day at 09:00
+      rule: "0 0 9 * * *",
     },
   },
 
@@ -357,3 +375,16 @@ async function setPosition(apiName, player, position) {
     data: { position: position },
   });
 }
+
+module.exports.cleanProcessedWebhooks = {
+  task: async ({ strapi }) => {
+    console.log("Running processed webhooks cleanup job");
+    // Clean up webhook records older than 7 days
+    const deletedCount = await cleanupOldWebhookRecords(strapi, 7);
+    console.log(`Cleaned up ${deletedCount} old webhook records`);
+  },
+  options: {
+    // Daily at 02:00
+    rule: "0 0 2 * * *",
+  },
+};
