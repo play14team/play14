@@ -1,8 +1,0 @@
-{
-    "conventionalCommits.scopes": [
-        "events"
-    ],
-    "terminal.integrated.enablePersistentSessions": true,
-    "terminal.integrated.persistentSessionReviveProcess": "onExit",
-    "claude.commitMessage.includeClaudeCodeAttribution": false
-}

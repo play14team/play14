@@ -23,11 +23,11 @@ export async function generateAuthToken(strapi: Core.Strapi, userId: number): Pr
  */
 export async function createAuthenticatedUser(
   strapi: Core.Strapi,
-  options: {
+ options: {
     email?: string
     username?: string
     playerName?: string
-    role?: "authenticated" | "player" | "host" | "public"
+    role?: "player" | "host" | "public"
   } = {}
 ): Promise<{
   user: { id: number; documentId: string; email: string; username: string }

@@ -2,6 +2,7 @@ import moment from "moment"
 import Image from "next/image"
 import Link from "next/link"
 import { UploadFile } from "@/models/strapi"
+import DefaultPlayerImage from "../ui/default-player-image"
 
 export interface NavLink {
   slug: string
@@ -99,14 +100,12 @@ function getImage(image?: UploadFile) {
     )
   else
     return (
-      <Image
-        src={"/default-player.png"}
-        alt={"default player image"}
+      <DefaultPlayerImage
+        alt="default player image"
         sizes="100vw"
         width={500}
         height={500}
         style={{ objectFit: "cover" }}
-        unoptimized
       />
     )
 }

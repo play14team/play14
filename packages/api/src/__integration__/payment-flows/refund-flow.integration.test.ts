@@ -219,8 +219,8 @@ describe("Refund Flow", () => {
       const response = await request(httpServer)
         .post(`/api/ticket-orders/${order.documentId}/refund`)
 
-      // Assert
-      expect(response.status).toBe(401)
+      // Assert - Strapi returns 403 (Forbidden) for unauthenticated requests to protected routes
+      expect(response.status).toBe(403)
     })
   })
 

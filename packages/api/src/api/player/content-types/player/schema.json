@@ -17,10 +17,15 @@
       "required": true,
       "unique": true
     },
+    "visible": {
+      "type": "boolean",
+      "default": true
+    },
     "slug": {
       "type": "uid",
       "targetField": "name",
-      "required": true
+      "required": true,
+      "unique": true
     },
     "position": {
       "type": "enumeration",
@@ -104,10 +109,12 @@
     "defaultTshirtSize": {
       "type": "enumeration",
       "enum": ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"],
-      "default": "none"
+      "default": "none",
+      "private": true
     },
     "defaultFoodPreferences": {
-      "type": "text"
+      "type": "text",
+      "private": true
     }
   }
 }

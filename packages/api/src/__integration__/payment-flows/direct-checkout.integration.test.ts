@@ -18,7 +18,7 @@ import {
 } from "../../test-utils/strapi-test-instance"
 import { cleanupTestData, seedTestEvent } from "../../test-utils/seed-database"
 import { createAuthenticatedUser, getAuthHeader } from "../helpers/auth"
-import { resetMockPaymentState } from "../../services/payment"
+import { resetMockPaymentState, getMockPaymentState } from "../../services/payment"
 import { sendCheckoutCompleted } from "../helpers/webhook-simulator"
 
 describe("Direct Checkout Flow", () => {
@@ -86,7 +86,7 @@ describe("Direct Checkout Flow", () => {
       // Arrange
       const { token } = await createAuthenticatedUser(strapi)
       const event = await seedTestEvent(strapi, {
-        eventStatus: "Passed",
+        eventStatus: "Over",
         ticketingMode: "internal",
         ticketTypes: [
           { name: "Regular", price: 75, capacity: 50 },
@@ -167,8 +167,8 @@ describe("Direct Checkout Flow", () => {
           },
         })
 
-      // Assert
-      expect(response.status).toBe(401)
+      // Assert - Strapi returns 403 (Forbidden) for unauthenticated requests to protected routes
+      expect(response.status).toBe(403)
     })
 
     it("validates ticket quantity bounds", async () => {
@@ -318,6 +318,31 @@ describe("Direct Checkout Flow", () => {
         documentId: orderId,
       })
       const sessionId = order.providerSessionId
+      const paymentIntentId = `pi_${sessionId}`
+
+      // Step 2.5: Register the session in test's mock state
+      // Note: Strapi runs compiled code from dist/ which has its own module instance,
+      // so we need to sync the session to the test's mock state for webhook simulation
+      const mockState = getMockPaymentState()
+      mockState.sessions.set(sessionId, {
+        id: sessionId,
+        url: `https://checkout.stripe.com/pay/${sessionId}`,
+        expiresAt: new Date(Date.now() + 1800000),
+        paymentStatus: "unpaid",
+        status: "open",
+        customerEmail: "test@example.com",
+        metadata: { orderId },
+        paymentIntent: paymentIntentId,
+        amountTotal: 10000,
+        currency: "eur",
+      })
+      mockState.paymentIntents.set(paymentIntentId, {
+        id: paymentIntentId,
+        amount: 10000,
+        currency: "eur",
+        status: "requires_payment_method",
+        metadata: { orderId },
+      })
 
       // Step 3: Simulate successful payment via webhook
       const webhookResponse = await sendCheckoutCompleted(

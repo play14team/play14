@@ -5,6 +5,7 @@
 
 import type { Core } from "@strapi/strapi"
 import Stripe from "stripe"
+import { STRIPE_DEFAULTS } from "../../../services/ticketing"
 
 export default ({ strapi }: { strapi: Core.Strapi }) => {
   // Initialize Stripe client
@@ -95,9 +96,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
         const stripe = getStripe()
 
         // Create Express connected account
+        // Default country can be configured via STRIPE_DEFAULT_COUNTRY env var
+        const accountCountry = country || STRIPE_DEFAULTS.DEFAULT_COUNTRY
         const account = await stripe.accounts.create({
           type: "express",
-          country: country || "FR", // Default to France
+          country: accountCountry,
           email: user.email,
           capabilities: {
             card_payments: { requested: true },
@@ -120,7 +123,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
             chargesEnabled: account.charges_enabled,
             payoutsEnabled: account.payouts_enabled,
             detailsSubmitted: account.details_submitted,
-            country: account.country || country || "FR",
+            country: account.country || accountCountry,
             defaultCurrency: account.default_currency || "eur",
           } as any,
         })

@@ -3,15 +3,14 @@
  * Handles ticket purchase flow, order status, and refunds
  */
 
-import crypto from "crypto"
 import type { Core } from "@strapi/strapi"
-import slugify from "slugify"
 import {
   generateEventICS,
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
 } from "../../../libs/calendar"
 import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
+import { validateEmail, validateName } from "../../../libs/validation"
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
 import {
@@ -23,6 +22,9 @@ import {
   releaseDiscountCode,
   confirmDiscountCode,
   useDiscountCodeAtomic,
+  findOrCreatePlayerForAttendee as findOrCreatePlayerService,
+  addPlayerToEventAttendees,
+  ORDER_LIMITS,
 } from "../../../services/ticketing"
 
 interface AttendeeInfo {
@@ -251,7 +253,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     }
 
-    // Use player/user data for purchaser info
+    // Use player data for purchaser info
     const email = user.email
     const name = player.name || user.username
 
@@ -898,8 +900,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // RATE LIMITING: Limit draft orders per user to prevent abuse
     // Uses a time-based window (last hour) to prevent rapid-fire creation
     // Combined with cron job that cleans up drafts older than 24 hours
-    const MAX_PENDING_DRAFTS = 5
-    const MAX_DRAFTS_PER_HOUR = 10
+    // Limits can be configured via TICKETING_MAX_PENDING_DRAFTS and TICKETING_MAX_DRAFTS_PER_HOUR env vars
 
     // Check total pending draft orders (regardless of age)
     const existingDrafts = await strapi.documents("api::ticket-order.ticket-order").findMany({
@@ -907,13 +908,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         player: { id: player.id },
         status: "draft",
       },
-      limit: MAX_PENDING_DRAFTS + 1,
+      limit: ORDER_LIMITS.MAX_PENDING_DRAFTS + 1,
     })
 
-    if (existingDrafts.length >= MAX_PENDING_DRAFTS) {
+    if (existingDrafts.length >= ORDER_LIMITS.MAX_PENDING_DRAFTS) {
       return ctx.badRequest(
-        `You have too many pending orders. Please complete or cancel existing orders before creating new ones. (Maximum: ${MAX_PENDING_DRAFTS})`,
-        { details: { code: "RATE_LIMITED", maxDrafts: MAX_PENDING_DRAFTS } }
+        `You have too many pending orders. Please complete or cancel existing orders before creating new ones. (Maximum: ${ORDER_LIMITS.MAX_PENDING_DRAFTS})`,
+        { details: { code: "RATE_LIMITED", maxDrafts: ORDER_LIMITS.MAX_PENDING_DRAFTS } }
       )
     }
 
@@ -924,13 +925,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         player: { id: player.id },
         createdAt: { $gt: oneHourAgo.toISOString() },
       },
-      limit: MAX_DRAFTS_PER_HOUR + 1,
+      limit: ORDER_LIMITS.MAX_DRAFTS_PER_HOUR + 1,
     })
 
-    if (recentOrders.length >= MAX_DRAFTS_PER_HOUR) {
+    if (recentOrders.length >= ORDER_LIMITS.MAX_DRAFTS_PER_HOUR) {
       return ctx.badRequest(
         "You have created too many orders recently. Please wait before creating new orders.",
-        { details: { code: "RATE_LIMITED_TIME", maxPerHour: MAX_DRAFTS_PER_HOUR } }
+        { details: { code: "RATE_LIMITED_TIME", maxPerHour: ORDER_LIMITS.MAX_DRAFTS_PER_HOUR } }
       )
     }
 
@@ -960,7 +961,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     }
 
-    // Use player/user data for purchaser info
+    // Use player data for purchaser info
     const email = user.email
     const name = player.name || user.username
 
@@ -1168,7 +1169,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest(`Expected ${expectedCount} attendees, got ${attendees?.length || 0}`)
     }
 
-    // Validate each attendee
+    // Validate each attendee using the validation library
     for (let i = 0; i < attendees.length; i++) {
       const attendee = attendees[i]
 
@@ -1186,42 +1187,30 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         return ctx.badRequest(`Attendee ${i + 1}: Email, first name, and last name must be strings`)
       }
 
-      // Sanitize and validate name length (2-50 chars each)
-      const firstName = attendee.firstName.trim()
-      const lastName = attendee.lastName.trim()
-
-      if (firstName.length < 1 || firstName.length > 50) {
-        return ctx.badRequest(`Attendee ${i + 1}: First name must be 1-50 characters`)
-      }
-      if (lastName.length < 1 || lastName.length > 50) {
-        return ctx.badRequest(`Attendee ${i + 1}: Last name must be 1-50 characters`)
-      }
-
-      // Check for invalid characters (control characters)
-      const invalidCharPattern = /[\x00-\x1F\x7F]/
-      if (invalidCharPattern.test(firstName) || invalidCharPattern.test(lastName)) {
-        return ctx.badRequest(`Attendee ${i + 1}: Name contains invalid characters`)
+      // Validate first name using the validation library
+      const firstNameResult = validateName(attendee.firstName, {
+        minLength: 1,
+        maxLength: 50,
+        field: "First name",
+      })
+      if (!firstNameResult.valid) {
+        return ctx.badRequest(`Attendee ${i + 1}: ${firstNameResult.error}`)
       }
 
-      // Email validation - stricter pattern that rejects common invalid formats
-      // Validates: local-part@domain.tld format with reasonable constraints
-      // - Local part: letters, numbers, dots, hyphens, underscores, plus signs
-      // - Domain: letters, numbers, hyphens
-      // - TLD: 2-10 letters
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/
-      if (!emailRegex.test(attendee.email)) {
-        return ctx.badRequest(`Attendee ${i + 1}: Invalid email format`)
+      // Validate last name using the validation library
+      const lastNameResult = validateName(attendee.lastName, {
+        minLength: 1,
+        maxLength: 50,
+        field: "Last name",
+      })
+      if (!lastNameResult.valid) {
+        return ctx.badRequest(`Attendee ${i + 1}: ${lastNameResult.error}`)
       }
 
-      // Additional check: ensure no consecutive dots in local part or domain
-      if (/\.\./.test(attendee.email)) {
-        return ctx.badRequest(`Attendee ${i + 1}: Invalid email format (consecutive dots not allowed)`)
-      }
-
-      // Ensure local part doesn't start or end with a dot
-      const localPart = attendee.email.split("@")[0]
-      if (localPart.startsWith(".") || localPart.endsWith(".")) {
-        return ctx.badRequest(`Attendee ${i + 1}: Invalid email format`)
+      // Validate email using the validation library (handles RFC 5322, IDN, plus addressing, etc.)
+      const emailResult = validateEmail(attendee.email)
+      if (!emailResult.valid) {
+        return ctx.badRequest(`Attendee ${i + 1}: ${emailResult.error}`)
       }
 
       // Validate optional fields if present
@@ -1352,18 +1341,30 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Handle free orders (no Stripe needed)
     // SECURITY: Use atomic sellTicketsAtomic to prevent overselling via race condition
     if ((order as any).totalAmount === 0) {
+      // Re-validate and atomically use the discount code if one was applied
+      // (for free orders, we validate + use in one atomic operation since there's no payment flow)
+      // This prevents TOCTOU where the discount code became unavailable since draft creation
+      if (order.discountCode?.documentId) {
+        const discountResult = await useDiscountCodeAtomic(
+          strapi,
+          event.documentId,
+          order.discountCode.code,
+          (order as any).originalAmount
+        )
+        if (!discountResult.success) {
+          strapi.log.warn(
+            `[Ticketing] Discount code validation failed for free order ${order.orderNumber}: ${discountResult.error}`
+          )
+          return ctx.badRequest(discountResult.error || "Discount code is no longer available")
+        }
+      }
+
       // Atomically update soldCount with capacity check to prevent overselling
       const sellResult = await sellTicketsAtomic(strapi, ticketDetails)
 
       if (!sellResult.success) {
         strapi.log.warn(`[Ticketing] Free order ${order.orderNumber} failed: ${sellResult.error}`)
         return ctx.badRequest(sellResult.error || "Failed to complete free order")
-      }
-
-      // Atomically use the discount code if one was applied
-      // (for free orders, we directly use it since there's no payment flow)
-      if (order.discountCode?.documentId) {
-        await confirmDiscountCode(strapi, order.discountCode.documentId, false)
       }
 
       // Update order to paid immediately
@@ -1391,6 +1392,27 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Create Stripe checkout session
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
+
+    // IMPORTANT: Reserve discount code BEFORE creating Stripe session to prevent race condition.
+    // If we created the session first and discount reservation failed, the session would be orphaned.
+    let discountCodeReserved = false
+    if (order.discountCode?.documentId) {
+      const discountReservation = await reserveDiscountCode(
+        strapi,
+        event.documentId,
+        order.discountCode.code,
+        (order as any).originalAmount
+      )
+
+      if (!discountReservation.success) {
+        // Discount code is no longer valid - fail checkout before creating Stripe session
+        strapi.log.warn(
+          `[Ticketing] Discount code reservation failed for order ${order.orderNumber}: ${discountReservation.error}`
+        )
+        return ctx.badRequest(discountReservation.error || "Discount code is no longer available")
+      }
+      discountCodeReserved = true
+    }
 
     try {
       const provider = getPaymentProvider("stripe") as ConnectPaymentProvider
@@ -1449,28 +1471,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         })
       }
 
-      // Reserve the discount code atomically (if one was applied to this order)
-      // This prevents TOCTOU race conditions where the same discount code could
-      // exceed its usage limit
-      let discountCodeReserved = false
-      if (order.discountCode?.documentId) {
-        const discountReservation = await reserveDiscountCode(
-          strapi,
-          event.documentId,
-          order.discountCode.code,
-          (order as any).originalAmount
-        )
-
-        if (!discountReservation.success) {
-          // Discount code is no longer valid - fail checkout
-          strapi.log.warn(
-            `[Ticketing] Discount code reservation failed for order ${order.orderNumber}: ${discountReservation.error}`
-          )
-          return ctx.badRequest(discountReservation.error || "Discount code is no longer available")
-        }
-        discountCodeReserved = true
-      }
-
       // Update order to pending with session info
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: order.documentId,
@@ -1521,6 +1521,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
     } catch (error: any) {
+      // Release the discount code reservation if Stripe session creation fails
+      if (discountCodeReserved && order.discountCode?.documentId) {
+        await releaseDiscountCode(strapi, order.discountCode.documentId)
+      }
       strapi.log.error(`[Ticketing] Failed to create checkout session: ${error.message}`)
       return ctx.internalServerError("Failed to create payment session")
     }
@@ -1657,7 +1661,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     for (const playerDocId of playersToAddToEvent) {
-      await this.addPlayerToEventAttendees(playerDocId, order.event)
+      await this.addPlayerToEvent(playerDocId, order.event)
     }
 
     // Send confirmation email to purchaser
@@ -1686,217 +1690,22 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
   /**
    * Find or create a player profile for an attendee
+   * Delegates to the shared player service
    */
   async findOrCreatePlayerForAttendee(
     attendee: AttendeeInfo,
     purchaserPlayer: any,
-    event: any
+    _event: any
   ): Promise<{ player: any; isNew: boolean }> {
-    // Validate attendee data
-    if (!attendee.firstName || !attendee.lastName) {
-      throw new Error("Attendee first name and last name are required")
-    }
-
-    if (!attendee.email) {
-      throw new Error("Attendee email is required")
-    }
-
-    // Sanitize and validate name (2-100 chars, no special control characters)
-    const firstName = attendee.firstName.trim().slice(0, 50)
-    const lastName = attendee.lastName.trim().slice(0, 50)
-
-    if (firstName.length < 1 || lastName.length < 1) {
-      throw new Error("Attendee first name and last name cannot be empty")
-    }
-
-    // Check for invalid characters (control characters)
-    const invalidCharPattern = /[\x00-\x1F\x7F]/
-    if (invalidCharPattern.test(firstName) || invalidCharPattern.test(lastName)) {
-      throw new Error("Attendee name contains invalid characters")
-    }
-
-    // Email validation - stricter pattern that rejects common invalid formats
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/
-    if (!emailPattern.test(attendee.email)) {
-      throw new Error(`Invalid attendee email format: ${attendee.email}`)
-    }
-
-    // Additional email validation checks
-    if (/\.\./.test(attendee.email)) {
-      throw new Error(`Invalid attendee email format (consecutive dots): ${attendee.email}`)
-    }
-
-    const localPart = attendee.email.split("@")[0]
-    if (localPart.startsWith(".") || localPart.endsWith(".")) {
-      throw new Error(`Invalid attendee email format: ${attendee.email}`)
-    }
-
-    const attendeeName = `${firstName} ${lastName}`
-    const attendeeEmail = attendee.email.toLowerCase().trim()
-
-    // 1. If attendee email matches purchaser's player, use their player
-    if (purchaserPlayer) {
-      // Find the user linked to purchaser player to get their email
-      const purchaserPlayerDoc = await strapi.documents("api::player.player").findOne({
-        documentId: purchaserPlayer.documentId,
-        populate: { user: { fields: ["email"] } },
-      })
-
-      if (purchaserPlayerDoc?.user?.email?.toLowerCase() === attendeeEmail) {
-        strapi.log.info(`[Ticketing] Attendee ${attendeeName} matched to purchaser player`)
-        return { player: purchaserPlayer, isNew: false }
-      }
-    }
-
-    // 2. Look for a user with this email and get their player
-    const existingUser = await strapi.documents("plugin::users-permissions.user").findFirst({
-      filters: { email: { $eqi: attendeeEmail } },
-      populate: { player: true },
-    })
-
-    if (existingUser?.player) {
-      strapi.log.info(`[Ticketing] Found existing player via user email: ${attendeeName}`)
-
-      // Update player's default preferences if they don't have them set
-      if (attendee.tshirtSize || attendee.foodPreferences) {
-        const playerDoc = await strapi.documents("api::player.player").findOne({
-          documentId: existingUser.player.documentId,
-        })
-
-        if (playerDoc) {
-          const updateData: any = {}
-          if (attendee.tshirtSize && !playerDoc.defaultTshirtSize) {
-            updateData.defaultTshirtSize = attendee.tshirtSize
-          }
-          if (attendee.foodPreferences && !playerDoc.defaultFoodPreferences) {
-            updateData.defaultFoodPreferences = attendee.foodPreferences
-          }
-          if (Object.keys(updateData).length > 0) {
-            await strapi.documents("api::player.player").update({
-              documentId: existingUser.player.documentId,
-              data: updateData,
-            })
-          }
-        }
-      }
-
-      return { player: existingUser.player, isNew: false }
-    }
-
-    // 3. Look for an existing player by exact name match (only if NOT linked to a user)
-    // SECURITY: Only match unlinked players to prevent assigning tickets to wrong user's profile
-    const existingPlayerByName = await strapi.documents("api::player.player").findFirst({
-      filters: {
-        name: { $eqi: attendeeName },
-      },
-      populate: { user: true },
-    })
-
-    if (existingPlayerByName && !existingPlayerByName.user) {
-      // Player exists and is not linked to any user - safe to use
-      strapi.log.info(`[Ticketing] Found existing unlinked player by name: ${attendeeName}`)
-
-      // Update player's default preferences if they don't have them set
-      const updateData: any = {}
-      if (attendee.tshirtSize && !existingPlayerByName.defaultTshirtSize) {
-        updateData.defaultTshirtSize = attendee.tshirtSize
-      }
-      if (attendee.foodPreferences && !existingPlayerByName.defaultFoodPreferences) {
-        updateData.defaultFoodPreferences = attendee.foodPreferences
-      }
-      if (Object.keys(updateData).length > 0) {
-        await strapi.documents("api::player.player").update({
-          documentId: existingPlayerByName.documentId,
-          data: updateData,
-        })
-      }
-
-      return { player: existingPlayerByName, isNew: false }
-    }
-
-    // 4. Create a new player profile (unlinked to any user)
-    // If a player with same name exists but IS linked, we create a new one with unique slug
-    const baseSlug = slugify(attendeeName, { lower: true, strict: true })
-
-    // Ensure unique slug with retry loop
-    let slug = baseSlug
-    let slugAttempts = 0
-    const maxSlugAttempts = 10
-
-    while (slugAttempts < maxSlugAttempts) {
-      const existingSlug = await strapi.documents("api::player.player").findFirst({
-        filters: { slug },
-      })
-
-      if (!existingSlug) {
-        break // Slug is unique
-      }
-
-      // Generate a more unique suffix using timestamp + random
-      const timestamp = Date.now().toString(36)
-      const random = crypto.randomBytes(2).toString("hex")
-      slug = `${baseSlug}-${timestamp.slice(-4)}${random}`
-      slugAttempts++
-    }
-
-    if (slugAttempts >= maxSlugAttempts) {
-      throw new Error(`Failed to generate unique slug for player: ${attendeeName}`)
-    }
-
-    // For name uniqueness, append a suffix if needed
-    let playerName = attendeeName
-    if (existingPlayerByName) {
-      // Player with same name exists but is linked to a user - create with unique name
-      const timestamp = Date.now().toString(36).slice(-4)
-      playerName = `${attendeeName} (${timestamp})`
-      strapi.log.info(`[Ticketing] Creating player with unique name: ${playerName} (original name taken)`)
-    }
-
-    const newPlayer = await strapi.documents("api::player.player").create({
-      data: {
-        name: playerName,
-        slug,
-        position: "Player",
-        defaultTshirtSize: attendee.tshirtSize || "none",
-        defaultFoodPreferences: attendee.foodPreferences || null,
-      } as any,
-    })
-
-    strapi.log.info(
-      `[Ticketing] Created new player profile for attendee: ${playerName} (${newPlayer.documentId})`
-    )
-
-    return { player: newPlayer, isNew: true }
+    return findOrCreatePlayerService(strapi, attendee, purchaserPlayer, "[Ticketing]")
   },
 
   /**
    * Add a player to an event's attendees list
+   * Delegates to the shared player service
    */
-  async addPlayerToEventAttendees(playerDocumentId: string, event: any) {
-    const playerDoc = await strapi.documents("api::player.player").findOne({
-      documentId: playerDocumentId,
-      populate: { attended: { fields: ["id", "documentId"] } },
-    })
-
-    if (!playerDoc) return
-
-    const currentAttendedIds = playerDoc.attended?.map((e: any) => e.id) || []
-    const alreadyAttending = playerDoc.attended?.some(
-      (e: any) => e.documentId === event.documentId
-    )
-
-    if (!alreadyAttending) {
-      await strapi.documents("api::player.player").update({
-        documentId: playerDocumentId,
-        data: {
-          attended: [...currentAttendedIds, event.id],
-        } as any,
-      })
-
-      strapi.log.info(
-        `[Ticketing] Player ${playerDocumentId} added to event ${event.documentId} attendees`
-      )
-    }
+  async addPlayerToEvent(playerDocumentId: string, event: any) {
+    return addPlayerToEventAttendees(strapi, playerDocumentId, event, "[Ticketing]")
   },
 
   /**

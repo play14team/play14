@@ -239,7 +239,7 @@ export async function checkAuthStatus(): Promise<AuthStatus> {
     "/users/me",
     {},
     { populate: "player" },
-    { cache: "no-store" }
+    { cache: "no-store", optionalAuth: true }
   )
 
   if (!result.ok || !result.data) {

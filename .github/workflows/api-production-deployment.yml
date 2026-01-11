@@ -16,191 +16,44 @@ env:
   WORKING_DIRECTORY: packages/api
 
 jobs:
-  check-pr-merge:
-    name: Check if PR was merged
+  build-and-push:
+    name: Build and Push Production Image
     runs-on: ubuntu-latest
-    outputs:
-      pr_number: ${{ steps.check.outputs.pr_number }}
-      pr_head_sha: ${{ steps.check.outputs.pr_head_sha }}
-      is_pr_merge: ${{ steps.check.outputs.is_pr_merge }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Check if commit is from PR merge
-        id: check
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set +e
-
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "Commit message: $COMMIT_MSG"
-
-          PR_NUMBER=$(echo "$COMMIT_MSG" | grep -oP 'Merge pull request #\K\d+' || echo "$COMMIT_MSG" | grep -oP '\(#\K\d+(?=\))\s*$' || echo "")
-
-          if [ -n "$PR_NUMBER" ]; then
-            echo "✅ Detected PR merge: #$PR_NUMBER"
-            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
-
-            echo "Fetching PR details from GitHub API..."
-
-            if ! command -v jq &> /dev/null; then
-              echo "❌ ERROR: jq is not installed"
-              echo "is_pr_merge=false" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            if ! PR_DATA=$(gh api repos/${{ github.repository }}/pulls/$PR_NUMBER 2>&1); then
-              echo "❌ Failed to fetch PR data from GitHub API"
-              echo "is_pr_merge=false" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            PR_HEAD_SHA=$(echo "$PR_DATA" | jq -r '.head.sha')
-
-            if [ -n "$PR_HEAD_SHA" ] && [ "$PR_HEAD_SHA" != "null" ]; then
-              echo "✅ Retrieved PR head SHA: $PR_HEAD_SHA"
-              echo "pr_head_sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
-              echo "is_pr_merge=true" >> $GITHUB_OUTPUT
-            else
-              echo "⚠️ Could not extract PR head SHA"
-              echo "is_pr_merge=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "ℹ️ No PR number found - direct push to main"
-            echo "is_pr_merge=false" >> $GITHUB_OUTPUT
-          fi
-
-  retag-pr-image:
-    name: Retag PR Image for Production
-    runs-on: ubuntu-latest
-    needs: check-pr-merge
-    if: needs.check-pr-merge.outputs.is_pr_merge == 'true'
-    outputs:
-      image_retagged: ${{ steps.retag.outputs.success }}
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Log in to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Retag PR image for production (server-side)
-        id: retag
-        continue-on-error: true
-        env:
-          PR_NUMBER: ${{ needs.check-pr-merge.outputs.pr_number }}
-          PR_HEAD_SHA: ${{ needs.check-pr-merge.outputs.pr_head_sha }}
-          COMMIT_SHA: ${{ github.sha }}
-          REGISTRY: ${{ env.REGISTRY }}
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
-          ACR_NAME: play14containerregistry
-        run: |
-          set +e
-
-          PR_TAG="pr-${PR_NUMBER}-${PR_HEAD_SHA}"
-          SOURCE_IMAGE="${REGISTRY}/${IMAGE_NAME}:${PR_TAG}"
-
-          echo "Looking for PR image: $SOURCE_IMAGE"
-
-          # Check if PR image exists
-          if ! az acr repository show-tags --name "$ACR_NAME" --repository "$IMAGE_NAME" --output json | grep -q "$PR_TAG"; then
-            echo "⚠️ PR image not found in registry: $SOURCE_IMAGE"
-            echo "success=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-
-          echo "✅ PR image found in registry"
-          echo "Using server-side retagging with az acr import (no network transfer)..."
-
-          # Function to import with retry and exponential backoff
-          import_with_retry() {
-            local TARGET_TAG=$1
-            local MAX_RETRIES=3
-            local ATTEMPT=1
-
-            while [ $ATTEMPT -le $MAX_RETRIES ]; do
-              echo "Attempt $ATTEMPT/$MAX_RETRIES: Importing tag '$TARGET_TAG'..."
-
-              if OUTPUT=$(az acr import \
-                --name "$ACR_NAME" \
-                --source "$SOURCE_IMAGE" \
-                --image "${IMAGE_NAME}:${TARGET_TAG}" \
-                --force 2>&1); then
-                echo "✅ Successfully imported tag: $TARGET_TAG"
-                return 0
-              fi
-
-              echo "⚠️ Import failed. Error: $OUTPUT"
-
-              if [ $ATTEMPT -lt $MAX_RETRIES ]; then
-                BACKOFF=$((5 * (2 ** (ATTEMPT - 1))))  # 5s, 10s, 20s
-                echo "Retrying in ${BACKOFF} seconds..."
-                sleep $BACKOFF
-              fi
-
-              ATTEMPT=$((ATTEMPT + 1))
-            done
-
-            echo "❌ Failed to import tag '$TARGET_TAG' after $MAX_RETRIES attempts"
-            return 1
-          }
-
-          # Import all tags (server-side, no network transfer)
-          FAILED=false
-
-          if ! import_with_retry "${COMMIT_SHA}"; then
-            FAILED=true
-          fi
-
-          if ! import_with_retry "${PR_HEAD_SHA}"; then
-            FAILED=true
-          fi
-
-          if ! import_with_retry "latest"; then
-            FAILED=true
-          fi
-
-          if [ "$FAILED" = true ]; then
-            echo "❌ Some tags failed to import"
-            echo "success=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-
-          echo "✅ Successfully retagged PR image for production (server-side)"
-          echo "success=true" >> $GITHUB_OUTPUT
-
-  build-production:
-    name: Build Production Image
-    runs-on: ubuntu-latest
-    needs: [check-pr-merge, retag-pr-image]
-    if: |
-      always() && (
-        needs.check-pr-merge.outputs.is_pr_merge == 'false' ||
-        (needs.check-pr-merge.outputs.is_pr_merge == 'true' && needs.retag-pr-image.outputs.image_retagged != 'true')
-      )
     environment: production
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Log fallback reason if retagging failed
-        if: needs.check-pr-merge.outputs.is_pr_merge == 'true' && needs.retag-pr-image.outputs.image_retagged != 'true'
-        run: |
-          echo "⚠️ FALLBACK: Building new image because PR image retagging failed"
-
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.5
+
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Type check
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: bun run tsc --noEmit
+
+      - name: Build Strapi admin panel
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          NODE_ENV: production
+          STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN: ${{ secrets.STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN }}
+        run: bun run build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -223,35 +76,18 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          file: ${{ env.WORKING_DIRECTORY }}/Dockerfile
+          file: packages/api/Dockerfile.ci
           context: .
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=${{ secrets.STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN }}
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
-            SENTRY_PROJECT=play14-api
-            SENTRY_ENVIRONMENT=production
 
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [check-pr-merge, retag-pr-image, build-production]
-    if: always() && (needs.retag-pr-image.result == 'success' || needs.build-production.result == 'success')
+    needs: build-and-push
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - name: Log deployment source
-        run: |
-          if [ "${{ needs.retag-pr-image.result }}" == "success" ]; then
-            echo "🚀 Deploying retagged PR image (fast path)"
-          elif [ "${{ needs.build-production.result }}" == "success" ]; then
-            echo "🚀 Deploying newly built image"
-          fi
-
       - name: Log in to Azure
         uses: azure/login@v2
         with:

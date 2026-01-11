@@ -44,6 +44,7 @@ export interface RefundResult {
 }
 
 export interface WebhookEvent {
+  id: string
   type: string
   data: Record<string, unknown>
 }
@@ -78,11 +79,25 @@ export interface AccountLink {
   expiresAt: Date
 }
 
+/**
+ * Session metadata retrieved from payment provider
+ */
+export interface SessionMetadata {
+  sessionId: string
+  orderId?: string
+  metadata: Record<string, string>
+}
+
 export interface PaymentProvider {
   createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession>
   processRefund(params: RefundParams): Promise<RefundResult>
   verifyWebhookSignature(payload: string, signature: string): Promise<WebhookEvent>
   getOrderStatus(providerOrderId: string): Promise<"paid" | "pending" | "failed">
+  /**
+   * Get session metadata by payment intent ID
+   * Used by webhook handlers to find orders when payment fails
+   */
+  getSessionByPaymentIntent?(paymentIntentId: string): Promise<SessionMetadata | null>
 }
 
 /**

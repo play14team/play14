@@ -6,7 +6,6 @@
 
 export const ROLE_TYPES = {
   PUBLIC: "public",
-  AUTHENTICATED: "authenticated",
   PLAYER: "player",
   HOST: "host",
   MENTOR: "mentor",
@@ -21,7 +20,6 @@ export type RoleType = (typeof ROLE_TYPES)[keyof typeof ROLE_TYPES]
  */
 export const ROLE_HIERARCHY: RoleType[] = [
   ROLE_TYPES.PUBLIC,
-  ROLE_TYPES.AUTHENTICATED,
   ROLE_TYPES.PLAYER,
   ROLE_TYPES.HOST,
   ROLE_TYPES.MENTOR,
@@ -35,10 +33,6 @@ export const ROLE_METADATA: Record<RoleType, { name: string; description: string
   [ROLE_TYPES.PUBLIC]: {
     name: "Public",
     description: "Default role given to unauthenticated user.",
-  },
-  [ROLE_TYPES.AUTHENTICATED]: {
-    name: "Authenticated",
-    description: "Default role given to authenticated user.",
   },
   [ROLE_TYPES.PLAYER]: {
     name: "Player",

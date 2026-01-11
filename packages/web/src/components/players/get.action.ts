@@ -54,6 +54,10 @@ interface Player {
   mentored?: EventItem[]
 }
 
+const visibleFilter = {
+  $or: [{ visible: { $eq: true } }, { visible: { $null: true } }],
+}
+
 /**
  * Build filter object for player queries
  */
@@ -61,7 +65,7 @@ function buildPlayerFilters(
   position?: string,
   letter?: string,
 ): Record<string, unknown> {
-  const filters: Record<string, unknown> = {}
+  const filters: Record<string, unknown> = { ...visibleFilter }
   if (position) {
     filters.position = { $eqi: position }
   }
@@ -143,6 +147,7 @@ export async function getPlayerLetterCounts(): Promise<Record<string, number>> {
     while (true) {
       const response = await restQuery<Array<{ name: string }>>("players", {
         fields: ["name"],
+        filters: { ...visibleFilter },
         pagination: { page, pageSize },
         sort: ["name:asc"],
       })
@@ -181,6 +186,7 @@ export async function getPlayer({ params }: SlugParamsProps) {
   const { slug } = await params
   const response = await restQuery<Player[]>("players", {
     filters: {
+      ...visibleFilter,
       slug: { $eq: slug },
     },
     populate: playerDetailsPopulate,
@@ -196,6 +202,7 @@ export async function getPlayer({ params }: SlugParamsProps) {
 export async function getPlayerSlugs() {
   const response = await restQuery<Array<{ slug: string }>>("players", {
     fields: ["slug"],
+    filters: { ...visibleFilter },
     pagination: { page: 1, pageSize: 5000 },
   })
 
@@ -218,6 +225,7 @@ export async function getPlayerNav() {
     const response = await restQuery<Player[]>("players", {
       sort: ["name:asc"],
       pagination: { page, pageSize },
+      filters: { ...visibleFilter },
       populate: playerNavPopulate,
     })
 

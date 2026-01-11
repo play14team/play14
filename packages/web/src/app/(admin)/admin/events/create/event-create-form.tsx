@@ -540,6 +540,7 @@ export default function EventCreateForm({ locations, venues }: Props) {
           type="submit"
           disabled={isSubmitting}
           className="admin-btn admin-btn-primary"
+          data-save-shortcut
         >
           {isSubmitting ? (
             <>

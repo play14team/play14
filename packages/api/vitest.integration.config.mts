@@ -1,8 +1,11 @@
 /**
  * Vitest configuration for integration tests
  *
- * Integration tests run against a real Strapi instance with SQLite database.
+ * Integration tests run against a real Strapi instance with PostgreSQL database.
  * They test full HTTP request/response cycles and database interactions.
+ *
+ * Prerequisites:
+ * - PostgreSQL test database running: podman-compose up -d play14-db-test
  */
 
 import { defineConfig } from "vitest/config"
@@ -19,23 +22,30 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 60000,
 
-    // Run tests sequentially to avoid database conflicts
-    pool: "forks",
+    // Run all tests in a single thread to ensure:
+    // 1. Only one Strapi instance is created (Strapi can't be loaded twice)
+    // 2. Module singletons (mock payment state) are shared between checkout and webhook
+    pool: "threads",
     poolOptions: {
-      forks: {
-        singleFork: true,
+      threads: {
+        singleThread: true,
+        isolate: false,
       },
     },
+
+    // Run test files sequentially
+    fileParallelism: false,
 
     // Global setup/teardown for Strapi instance
     globalSetup: "./src/__integration__/setup.ts",
 
     root: ".",
 
-    // Inline Strapi and lodash to handle ESM module resolution issues
+    // Inline dependencies to ensure module singletons are shared correctly
+    // This prevents vitest from creating separate module instances for payment provider
     server: {
       deps: {
-        inline: [/lodash/, /@strapi/],
+        inline: [/lodash/, /@strapi/, /services\/payment/],
       },
     },
   },

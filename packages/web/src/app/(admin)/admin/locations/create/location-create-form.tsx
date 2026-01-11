@@ -111,6 +111,7 @@ export default function LocationCreateForm() {
           type="submit"
           className="admin-btn admin-btn-primary"
           disabled={isSubmitting}
+          data-save-shortcut
         >
           {isSubmitting ? (
             <>

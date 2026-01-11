@@ -240,7 +240,7 @@ export async function signOut(redirectTo: string = "/"): Promise<void> {
 // STRAPI AUTH HELPERS
 // ============================================================================
 
-export type OAuthProvider = "google" | "github" | "linkedin"
+export type OAuthProvider = "google" | "microsoft" | "github" | "linkedin"
 
 /**
  * Get the OAuth connect URL for a provider

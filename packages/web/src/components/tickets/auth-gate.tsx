@@ -20,6 +20,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
   const [error, setError] = useState<string | null>(null)
 
   const googleUrl = `${STRAPI_URL}/api/connect/google`
+  const microsoftUrl = `${STRAPI_URL}/api/connect/microsoft`
   const githubUrl = `${STRAPI_URL}/api/connect/github`
   const linkedinUrl = `${STRAPI_URL}/api/connect/linkedin`
 
@@ -97,6 +98,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
           {/* Reuse LoginButtons component */}
           <LoginButtons
             googleUrl={googleUrl}
+            microsoftUrl={microsoftUrl}
             githubUrl={githubUrl}
             linkedinUrl={linkedinUrl}
             callbackUrl={callbackUrl}

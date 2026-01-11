@@ -25,6 +25,15 @@ vi.mock("../../../services/ticketing", () => ({
   releaseReservations: vi.fn().mockResolvedValue(undefined),
   confirmDiscountCode: vi.fn().mockResolvedValue(undefined),
   releaseDiscountCode: vi.fn().mockResolvedValue(undefined),
+  findOrCreatePlayerForAttendee: vi.fn().mockResolvedValue({ player: { id: 1, documentId: "test-player-123" }, isNew: false }),
+  addPlayerToEventAttendees: vi.fn().mockResolvedValue(undefined),
+}))
+
+vi.mock("../../../services/webhook", () => ({
+  claimWebhookEvent: vi.fn().mockResolvedValue({ shouldProcess: true, alreadyProcessed: false }),
+  markWebhookCompleted: vi.fn().mockResolvedValue(undefined),
+  markWebhookFailed: vi.fn().mockResolvedValue(undefined),
+  releaseWebhookClaim: vi.fn().mockResolvedValue(undefined),
 }))
 
 vi.mock("slugify", () => ({
@@ -37,7 +46,15 @@ import {
   releaseReservations,
   confirmDiscountCode,
   releaseDiscountCode,
+  findOrCreatePlayerForAttendee,
+  addPlayerToEventAttendees,
 } from "../../../services/ticketing"
+import {
+  claimWebhookEvent,
+  markWebhookCompleted,
+  markWebhookFailed,
+  releaseWebhookClaim,
+} from "../../../services/webhook"
 import { generateTicketCode } from "../../../libs/tickets"
 
 // Helper to create mock Knex query builder
@@ -157,6 +174,7 @@ describe("webhook controller", () => {
       const sessionData = { id: "cs_test_123" }
 
       mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_test_123",
         type: "checkout.session.completed",
         data: sessionData,
       })
@@ -167,8 +185,38 @@ describe("webhook controller", () => {
       await controller.handleStripeWebhook(ctx)
 
       expect(mockProvider.verifyWebhookSignature).toHaveBeenCalled()
+      expect(claimWebhookEvent).toHaveBeenCalledWith(
+        mockStrapi,
+        "evt_test_123",
+        "checkout.session.completed"
+      )
       expect(controller.handleCheckoutCompleted).toHaveBeenCalledWith(sessionData)
+      expect(markWebhookCompleted).toHaveBeenCalledWith(mockStrapi, "evt_test_123")
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
+    })
+
+    it("returns success without processing when event already processed", async () => {
+      const ctx = createMockContext()
+
+      mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_duplicate_123",
+        type: "checkout.session.completed",
+        data: { id: "cs_test_123" },
+      })
+
+      // Mock that event was already processed
+      ;(claimWebhookEvent as Mock).mockResolvedValueOnce({
+        shouldProcess: false,
+        alreadyProcessed: true,
+        status: "completed",
+      })
+
+      controller.handleCheckoutCompleted = vi.fn()
+
+      await controller.handleStripeWebhook(ctx)
+
+      expect(controller.handleCheckoutCompleted).not.toHaveBeenCalled()
+      expect(ctx.send).toHaveBeenCalledWith({ received: true, duplicate: true })
     })
 
     it("verifies signature and routes checkout.session.expired event", async () => {
@@ -176,6 +224,7 @@ describe("webhook controller", () => {
       const sessionData = { id: "cs_test_expired" }
 
       mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_expired_123",
         type: "checkout.session.expired",
         data: sessionData,
       })
@@ -193,6 +242,7 @@ describe("webhook controller", () => {
       const paymentData = { id: "pi_test_failed" }
 
       mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_failed_123",
         type: "payment_intent.payment_failed",
         data: paymentData,
       })
@@ -210,6 +260,7 @@ describe("webhook controller", () => {
       const chargeData = { id: "ch_test", payment_intent: "pi_test" }
 
       mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_refund_123",
         type: "charge.refunded",
         data: chargeData,
       })
@@ -227,6 +278,7 @@ describe("webhook controller", () => {
       const accountData = { id: "acct_test" }
 
       mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_account_123",
         type: "account.updated",
         data: accountData,
       })
@@ -243,6 +295,7 @@ describe("webhook controller", () => {
       const ctx = createMockContext()
 
       mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_unhandled_123",
         type: "some.unhandled.event",
         data: {},
       })
@@ -266,6 +319,114 @@ describe("webhook controller", () => {
 
       expect(ctx.badRequest).toHaveBeenCalledWith("Webhook verification failed")
       expect(mockStrapi.log.error).toHaveBeenCalled()
+    })
+
+    it("releases claim and returns 500 for retryable errors", async () => {
+      const ctx = createMockContext()
+
+      mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_retry_123",
+        type: "checkout.session.completed",
+        data: { id: "cs_test_123" },
+      })
+
+      // Mock a retryable database error
+      const dbError = new Error("Connection refused")
+      ;(dbError as any).code = "ECONNREFUSED"
+      controller.handleCheckoutCompleted = vi.fn().mockRejectedValue(dbError)
+
+      await controller.handleStripeWebhook(ctx)
+
+      expect(releaseWebhookClaim).toHaveBeenCalledWith(mockStrapi, "evt_retry_123")
+      expect(ctx.status).toBe(500)
+      expect(ctx.send).toHaveBeenCalledWith({ error: "Processing failed, will retry" })
+    })
+
+    it("marks failed and returns 200 for non-retryable errors", async () => {
+      const ctx = createMockContext()
+
+      mockProvider.verifyWebhookSignature.mockResolvedValue({
+        id: "evt_fail_123",
+        type: "checkout.session.completed",
+        data: { id: "cs_test_123" },
+      })
+
+      // Mock a non-retryable validation error
+      const validationError = new Error("Invalid attendee email format")
+      controller.handleCheckoutCompleted = vi.fn().mockRejectedValue(validationError)
+
+      await controller.handleStripeWebhook(ctx)
+
+      expect(markWebhookFailed).toHaveBeenCalledWith(
+        mockStrapi,
+        "evt_fail_123",
+        "Invalid attendee email format"
+      )
+      expect(ctx.send).toHaveBeenCalledWith({
+        received: true,
+        error: "Invalid attendee email format",
+      })
+    })
+  })
+
+  describe("isRetryableError", () => {
+    it("returns true for ECONNREFUSED errors", () => {
+      const error = new Error("Connection refused")
+      ;(error as any).code = "ECONNREFUSED"
+      expect(controller.isRetryableError(error)).toBe(true)
+    })
+
+    it("returns true for ETIMEDOUT errors", () => {
+      const error = new Error("Connection timed out")
+      ;(error as any).code = "ETIMEDOUT"
+      expect(controller.isRetryableError(error)).toBe(true)
+    })
+
+    it("returns true for PostgreSQL deadlock errors (40P01)", () => {
+      const error = new Error("Deadlock detected")
+      ;(error as any).code = "40P01"
+      expect(controller.isRetryableError(error)).toBe(true)
+    })
+
+    it("returns true for PostgreSQL serialization errors (40001)", () => {
+      const error = new Error("Serialization failure")
+      ;(error as any).code = "40001"
+      expect(controller.isRetryableError(error)).toBe(true)
+    })
+
+    it("returns true for network errors", () => {
+      const error = new Error("network request failed")
+      expect(controller.isRetryableError(error)).toBe(true)
+    })
+
+    it("returns true for timeout errors in message", () => {
+      const error = new Error("Request timeout after 30s")
+      expect(controller.isRetryableError(error)).toBe(true)
+    })
+
+    it("returns false for email/SMTP errors", () => {
+      const error = new Error("SMTP connection failed")
+      expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("returns false for email sending errors", () => {
+      const error = new Error("Failed to send email to user")
+      expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("returns false for validation errors", () => {
+      const error = new Error("Invalid email format")
+      expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("returns false for Invalid data errors", () => {
+      const error = new Error("Invalid attendee data")
+      expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("returns true for unknown errors (default to retryable)", () => {
+      const error = new Error("Something unexpected happened")
+      expect(controller.isRetryableError(error)).toBe(true)
     })
   })
 
@@ -380,7 +541,7 @@ describe("webhook controller", () => {
       await controller.handleCheckoutCompleted({ id: "cs_test_123" })
 
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
-        expect.stringContaining("already being processed or completed")
+        expect.stringContaining("skipped - current status: paid")
       )
     })
 
@@ -872,138 +1033,8 @@ describe("webhook controller", () => {
     })
   })
 
-  describe("findOrCreatePlayerForAttendee", () => {
-    const baseAttendee = {
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane@example.com",
-      photoConsent: true,
-    }
-
-    const mockEvent = { id: 1, documentId: "event-123" }
-    const mockPurchaserPlayer = { id: 1, documentId: "purchaser-player-123" }
-
-    it("throws error when first name is missing", async () => {
-      await expect(
-        controller.findOrCreatePlayerForAttendee(
-          { ...baseAttendee, firstName: "" },
-          null,
-          mockEvent
-        )
-      ).rejects.toThrow("Attendee first name and last name are required")
-    })
-
-    it("throws error when last name is missing", async () => {
-      await expect(
-        controller.findOrCreatePlayerForAttendee(
-          { ...baseAttendee, lastName: "" },
-          null,
-          mockEvent
-        )
-      ).rejects.toThrow("Attendee first name and last name are required")
-    })
-
-    it("throws error for invalid email format", async () => {
-      await expect(
-        controller.findOrCreatePlayerForAttendee(
-          { ...baseAttendee, email: "invalid-email" },
-          null,
-          mockEvent
-        )
-      ).rejects.toThrow("Invalid attendee email format")
-    })
-
-    it("throws error when name contains control characters", async () => {
-      await expect(
-        controller.findOrCreatePlayerForAttendee(
-          { ...baseAttendee, firstName: "Jane\x00" },
-          null,
-          mockEvent
-        )
-      ).rejects.toThrow("Attendee name contains invalid characters")
-    })
-
-    it("returns purchaser player when attendee email matches", async () => {
-      const playerDocs = {
-        findOne: vi.fn().mockResolvedValue({
-          ...mockPurchaserPlayer,
-          user: { email: "jane@example.com" },
-        }),
-      }
-
-      mockStrapi.documents.mockReturnValue(playerDocs)
-
-      const result = await controller.findOrCreatePlayerForAttendee(
-        baseAttendee,
-        mockPurchaserPlayer,
-        mockEvent
-      )
-
-      expect(result.player).toEqual(mockPurchaserPlayer)
-      expect(result.isNew).toBe(false)
-    })
-
-    it("finds existing player by user email", async () => {
-      const existingPlayer = { id: 2, documentId: "existing-player" }
-
-      mockStrapi.documents.mockImplementation((type: string) => {
-        if (type === "api::player.player") {
-          return {
-            findOne: vi.fn().mockResolvedValue({
-              ...mockPurchaserPlayer,
-              user: { email: "other@example.com" }, // Different email
-            }),
-          }
-        }
-        if (type === "plugin::users-permissions.user") {
-          return {
-            findFirst: vi.fn().mockResolvedValue({
-              player: existingPlayer,
-            }),
-          }
-        }
-        return {}
-      })
-
-      const result = await controller.findOrCreatePlayerForAttendee(
-        baseAttendee,
-        mockPurchaserPlayer,
-        mockEvent
-      )
-
-      expect(result.player).toEqual(existingPlayer)
-      expect(result.isNew).toBe(false)
-    })
-
-    it("creates new player when no existing player found", async () => {
-      const newPlayer = { id: 99, documentId: "new-player-123" }
-
-      mockStrapi.documents.mockImplementation((type: string) => {
-        if (type === "api::player.player") {
-          return {
-            findOne: vi.fn().mockResolvedValue(null),
-            findFirst: vi.fn().mockResolvedValue(null), // No existing player by name
-            create: vi.fn().mockResolvedValue(newPlayer),
-          }
-        }
-        if (type === "plugin::users-permissions.user") {
-          return {
-            findFirst: vi.fn().mockResolvedValue(null), // No existing user
-          }
-        }
-        return {}
-      })
-
-      const result = await controller.findOrCreatePlayerForAttendee(
-        baseAttendee,
-        null, // No purchaser player
-        mockEvent
-      )
-
-      expect(result.player).toEqual(newPlayer)
-      expect(result.isNew).toBe(true)
-    })
-  })
+  // Note: findOrCreatePlayerForAttendee tests moved to player-service.test.ts
+  // The function is now in the shared ticketing service
 
   describe("sendConfirmationEmail", () => {
     it("sends email with ticket details", async () => {
@@ -1058,10 +1089,8 @@ describe("webhook controller", () => {
         },
       }
 
-      // Should not throw
-      await expect(
-        controller.sendConfirmationEmail(order, [])
-      ).resolves.not.toThrow()
+      // Should not throw - just await and check it completes
+      await controller.sendConfirmationEmail(order, [])
 
       expect(mockStrapi.log.error).toHaveBeenCalledWith(
         expect.stringContaining("ALERT: Failed to send confirmation email")
@@ -1098,9 +1127,8 @@ describe("webhook controller", () => {
         event: { name: "Test Event" },
       }
 
-      await expect(
-        controller.sendPaymentFailedEmail(order, "Error")
-      ).resolves.not.toThrow()
+      // Should not throw - just await and check it completes
+      await controller.sendPaymentFailedEmail(order, "Error")
 
       expect(mockStrapi.log.error).toHaveBeenCalledWith(
         expect.stringContaining("Failed to send payment failed email")
@@ -1108,64 +1136,6 @@ describe("webhook controller", () => {
     })
   })
 
-  describe("addPlayerToEventAttendees", () => {
-    it("adds player to event attendees if not already attending", async () => {
-      const playerDocs = {
-        findOne: vi.fn().mockResolvedValue({
-          attended: [{ id: 2, documentId: "other-event" }],
-        }),
-        update: vi.fn().mockResolvedValue({}),
-      }
-
-      mockStrapi.documents.mockReturnValue(playerDocs)
-
-      await controller.addPlayerToEventAttendees("player-123", {
-        id: 1,
-        documentId: "event-123",
-      })
-
-      expect(playerDocs.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          documentId: "player-123",
-          data: {
-            attended: [2, 1], // Existing + new event
-          },
-        })
-      )
-    })
-
-    it("does not add player if already attending", async () => {
-      const playerDocs = {
-        findOne: vi.fn().mockResolvedValue({
-          attended: [{ id: 1, documentId: "event-123" }],
-        }),
-        update: vi.fn(),
-      }
-
-      mockStrapi.documents.mockReturnValue(playerDocs)
-
-      await controller.addPlayerToEventAttendees("player-123", {
-        id: 1,
-        documentId: "event-123",
-      })
-
-      expect(playerDocs.update).not.toHaveBeenCalled()
-    })
-
-    it("returns early when player is not found", async () => {
-      const playerDocs = {
-        findOne: vi.fn().mockResolvedValue(null),
-        update: vi.fn(),
-      }
-
-      mockStrapi.documents.mockReturnValue(playerDocs)
-
-      await controller.addPlayerToEventAttendees("player-123", {
-        id: 1,
-        documentId: "event-123",
-      })
-
-      expect(playerDocs.update).not.toHaveBeenCalled()
-    })
-  })
+  // Note: addPlayerToEventAttendees tests moved to player-service.test.ts
+  // The function is now in the shared ticketing service
 })

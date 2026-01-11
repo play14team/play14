@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "processed_webhooks",
+  "info": {
+    "singularName": "processed-webhook",
+    "pluralName": "processed-webhooks",
+    "displayName": "Processed Webhook",
+    "description": "Tracks processed webhook events for idempotency"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "eventId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 255
+    },
+    "eventType": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "provider": {
+      "type": "enumeration",
+      "enum": ["stripe"],
+      "default": "stripe",
+      "required": true
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": ["processing", "completed", "failed"],
+      "default": "processing",
+      "required": true
+    },
+    "processedAt": {
+      "type": "datetime"
+    },
+    "metadata": {
+      "type": "json"
+    }
+  }
+}

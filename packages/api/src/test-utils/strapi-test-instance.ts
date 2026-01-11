@@ -33,15 +33,16 @@ export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
   process.env.NODE_ENV = "test"
 
   // PostgreSQL test database configuration
-  // Uses the play14-db-test container from compose.yaml
+  // Respects environment variables if already set (e.g., by CI), otherwise uses defaults
+  // CI sets DATABASE_* directly, local dev can use TEST_DATABASE_* for overrides
   process.env.DATABASE_CLIENT = "postgres"
-  process.env.DATABASE_HOST = process.env.TEST_DATABASE_HOST || "localhost"
-  process.env.DATABASE_PORT = process.env.TEST_DATABASE_PORT || "5433"
-  process.env.DATABASE_NAME = process.env.TEST_DATABASE_NAME || "play14_test"
-  process.env.DATABASE_USERNAME = process.env.TEST_DATABASE_USERNAME || "test_user"
-  process.env.DATABASE_PASSWORD = process.env.TEST_DATABASE_PASSWORD || "test_password"
-  process.env.DATABASE_SCHEMA = "public"
-  process.env.DATABASE_SSL = "false"
+  process.env.DATABASE_HOST = process.env.DATABASE_HOST || process.env.TEST_DATABASE_HOST || "localhost"
+  process.env.DATABASE_PORT = process.env.DATABASE_PORT || process.env.TEST_DATABASE_PORT || "5433"
+  process.env.DATABASE_NAME = process.env.DATABASE_NAME || process.env.TEST_DATABASE_NAME || "play14_test"
+  process.env.DATABASE_USERNAME = process.env.DATABASE_USERNAME || process.env.TEST_DATABASE_USERNAME || "test_user"
+  process.env.DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || process.env.TEST_DATABASE_PASSWORD || "test_password"
+  process.env.DATABASE_SCHEMA = process.env.DATABASE_SCHEMA || "public"
+  process.env.DATABASE_SSL = process.env.DATABASE_SSL || "false"
 
   // Stripe environment variables (used by mock provider detection)
   // The actual Stripe SDK won't be used since NODE_ENV=test triggers mock provider
@@ -79,9 +80,23 @@ export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
 /**
  * Teardown the Strapi test instance
  *
- * Destroys the Strapi instance and clears the singleton
+ * Note: With sequential test execution (fileParallelism: false), we don't actually
+ * destroy Strapi here to allow subsequent test files to reuse the same instance.
+ * The process exit will handle cleanup. Only call this if you need to force cleanup.
  */
 export async function teardownStrapiTestInstance(): Promise<void> {
+  // Don't destroy - let other test files reuse the instance
+  // The singleton pattern in setupStrapiTestInstance will return the existing instance
+  // Strapi will be cleaned up when the process exits
+}
+
+/**
+ * Force teardown the Strapi test instance
+ *
+ * Use this only when you need to explicitly destroy the instance,
+ * such as in a global teardown or when testing Strapi lifecycle.
+ */
+export async function forceDestroyStrapi(): Promise<void> {
   if (strapiInstance) {
     await strapiInstance.destroy()
     strapiInstance = null

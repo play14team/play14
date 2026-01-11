@@ -79,6 +79,12 @@ export async function cleanupTestData(strapi: Core.Strapi): Promise<void> {
   await knex("players").del()
   await knex("up_users").del()
 
+  // Clean up processed webhooks (table may not exist if schema is not migrated)
+  const hasProcessedWebhooks = await knex.schema.hasTable("processed_webhooks")
+  if (hasProcessedWebhooks) {
+    await knex("processed_webhooks").del()
+  }
+
   // Reset counter
   seedCounter = 0
 }
@@ -94,8 +100,8 @@ export async function seedTestUser(
   const email = data.email || `testuser_${id}@example.com`
   const username = data.username || `testuser_${id}`
 
-  // Get the authenticated role (or specified role)
-  const roleType = data.role || "authenticated"
+  // Get the player role (or specified role)
+  const roleType = data.role || "player"
   const role = await strapi.query("plugin::users-permissions.role").findOne({
     where: { type: roleType },
   })

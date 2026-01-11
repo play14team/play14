@@ -4,6 +4,7 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { syncUserRoleWithPlayerPosition } from "../../../services/user-role-sync"
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
@@ -449,6 +450,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       populate: { player: true },
     })
     strapi.log.info(`[PlayerClaim] Verification - User ${claim.user.id} now has player: ${verifyUser?.player?.id || "NONE"}`)
+
+    // Sync user role based on the linked player's position
+    try {
+      await syncUserRoleWithPlayerPosition(strapi, claim.user.id)
+      strapi.log.info(`[PlayerClaim] User role synced with player position for user ${claim.user.id}`)
+    } catch (syncError) {
+      strapi.log.error(`[PlayerClaim] Failed to sync user role: ${syncError}`)
+      // Don't fail claim approval if role sync fails
+    }
 
     // Update the claim status
     // Note: Type cast needed until types are regenerated after schema creation

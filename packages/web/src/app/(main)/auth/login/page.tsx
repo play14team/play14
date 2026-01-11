@@ -26,6 +26,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const callbackUrl = params.callbackUrl || "/admin"
   const googleUrl = getOAuthConnectUrl("google")
+  const microsoftUrl = getOAuthConnectUrl("microsoft")
   const githubUrl = getOAuthConnectUrl("github")
   const linkedinUrl = getOAuthConnectUrl("linkedin")
 
@@ -48,6 +49,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <LoginButtons
           googleUrl={googleUrl}
+          microsoftUrl={microsoftUrl}
           githubUrl={githubUrl}
           linkedinUrl={linkedinUrl}
           callbackUrl={callbackUrl}

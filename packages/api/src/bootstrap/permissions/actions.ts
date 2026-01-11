@@ -179,6 +179,11 @@ export const DISCOUNT_CODE_ACTIONS = {
   VALIDATE: "api::discount-code.custom-discount-code.validateDiscountCode",
 } as const
 
+// ==================== IMPORTS ====================
+export const IMPORT_ACTIONS = {
+  UPLOAD_AUDIENCE_ATTENDEES: "api::import.import.uploadAudienceAttendees",
+} as const
+
 // ==================== CONTENT TYPES (CRUD) ====================
 export const ARTICLE_ACTIONS = {
   FIND: "api::article.article.find",

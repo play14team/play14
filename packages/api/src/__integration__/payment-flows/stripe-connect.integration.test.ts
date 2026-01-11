@@ -213,8 +213,8 @@ describe("Stripe Connect Integration", () => {
 
   describe("Stripe Connect Account Management Routes", () => {
     it("GET /stripe/connect/status returns account status", async () => {
-      // Arrange
-      const { token, player } = await createAuthenticatedUser(strapi)
+      // Arrange - use createEventHost since Stripe Connect requires host role
+      const { token, player } = await createEventHost(strapi)
 
       // Create and link account to player
       const stripeAccount = await seedStripeAccount(strapi, {

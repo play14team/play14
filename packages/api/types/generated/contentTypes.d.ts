@@ -1182,10 +1182,11 @@ export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
     company: Schema.Attribute.String
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
-    defaultFoodPreferences: Schema.Attribute.Text
+    defaultFoodPreferences: Schema.Attribute.Text & Schema.Attribute.Private
     defaultTshirtSize: Schema.Attribute.Enumeration<
       ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"]
     > &
+      Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<"none">
     documented: Schema.Attribute.Relation<"manyToMany", "api::game.game">
     hosted: Schema.Attribute.Relation<"manyToMany", "api::event.event">
@@ -1199,14 +1200,60 @@ export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required
     proposed: Schema.Attribute.Relation<"manyToMany", "api::game.game">
     publishedAt: Schema.Attribute.DateTime
-    slug: Schema.Attribute.UID<"name"> & Schema.Attribute.Required
+    slug: Schema.Attribute.UID<"name"> & Schema.Attribute.Required & Schema.Attribute.Unique
     socialNetworks: Schema.Attribute.Component<"contact.social-network", true>
     stripeAccount: Schema.Attribute.Relation<"oneToOne", "api::stripe-account.stripe-account">
     tagline: Schema.Attribute.String
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
     user: Schema.Attribute.Relation<"oneToOne", "plugin::users-permissions.user">
+    visible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>
     website: Schema.Attribute.String
+  }
+}
+
+export interface ApiProcessedWebhookProcessedWebhook extends Struct.CollectionTypeSchema {
+  collectionName: "processed_webhooks"
+  info: {
+    description: "Tracks processed webhook events for idempotency"
+    displayName: "Processed Webhook"
+    pluralName: "processed-webhooks"
+    singularName: "processed-webhook"
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    eventId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255
+      }>
+    eventType: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100
+      }>
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::processed-webhook.processed-webhook"
+    > &
+      Schema.Attribute.Private
+    metadata: Schema.Attribute.JSON
+    processedAt: Schema.Attribute.DateTime
+    provider: Schema.Attribute.Enumeration<["stripe"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"stripe">
+    publishedAt: Schema.Attribute.DateTime
+    status: Schema.Attribute.Enumeration<["processing", "completed", "failed"]> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<"processing">
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
   }
 }
 
@@ -2084,6 +2131,14 @@ export interface PluginUsersPermissionsUser extends Struct.CollectionTypeSchema 
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6
       }>
+    invitationAcceptedAt: Schema.Attribute.DateTime & Schema.Attribute.Private
+    invitationReminderSentAt: Schema.Attribute.DateTime & Schema.Attribute.Private
+    invitationSentAt: Schema.Attribute.DateTime & Schema.Attribute.Private
+    invitationStatus: Schema.Attribute.Enumeration<
+      ["none", "pending", "sent", "reminded", "accepted"]
+    > &
+      Schema.Attribute.Private &
+      Schema.Attribute.DefaultTo<"none">
     locale: Schema.Attribute.String & Schema.Attribute.Private
     localizations: Schema.Attribute.Relation<"oneToMany", "plugin::users-permissions.user"> &
       Schema.Attribute.Private
@@ -2132,6 +2187,7 @@ declare module "@strapi/strapi" {
       "api::hosting.hosting": ApiHostingHosting
       "api::player-claim.player-claim": ApiPlayerClaimPlayerClaim
       "api::player.player": ApiPlayerPlayer
+      "api::processed-webhook.processed-webhook": ApiProcessedWebhookProcessedWebhook
       "api::sponsor.sponsor": ApiSponsorSponsor
       "api::stripe-account.stripe-account": ApiStripeAccountStripeAccount
       "api::tag.tag": ApiTagTag

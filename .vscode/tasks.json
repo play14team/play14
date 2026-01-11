@@ -4,7 +4,7 @@
     {
       "label": "api",
       "type": "process",
-      "command": "${env:SHELL}",
+      "command": "",
       "isBackground": true,
       "presentation": {
         "reveal": "always",
@@ -19,7 +19,7 @@
     {
       "label": "web",
       "type": "process",
-      "command": "${env:SHELL}",
+      "command": "",
       "isBackground": true,
       "presentation": {
         "reveal": "always",

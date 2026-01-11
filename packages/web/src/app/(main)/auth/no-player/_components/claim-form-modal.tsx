@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
+import DefaultPlayerImage from "@/components/ui/default-player-image"
 
 interface ClaimFormModalProps {
   player: PlayerSuggestion
@@ -55,13 +56,11 @@ export default function ClaimFormModal({
                   unoptimized
                 />
               ) : (
-                <Image
-                  src="/default-player.png"
+                <DefaultPlayerImage
                   alt="default"
                   width={60}
                   height={60}
                   style={{ objectFit: "cover", borderRadius: "50%" }}
-                  unoptimized
                 />
               )}
             </div>
