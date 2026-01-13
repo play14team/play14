@@ -27,13 +27,20 @@ export default async function VenueEditPage({ params }: PageProps) {
     <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <h1>Edit Venue</h1>
-          <p>{venue.name}</p>
+          <div className="admin-page-header-title-with-back">
+            <Link
+              href="/admin/venues"
+              className="admin-btn admin-btn-icon admin-btn-secondary"
+              title="Back to Venues"
+            >
+              <i className="bx bx-arrow-back"></i>
+            </Link>
+            <div>
+              <h1>Edit Venue</h1>
+              <p>{venue.name}</p>
+            </div>
+          </div>
         </div>
-        <Link href="/admin/venues" className="admin-btn admin-btn-secondary">
-          <i className="bx bx-arrow-back"></i>
-          Back to Venues
-        </Link>
       </div>
 
       <VenueEditForm venue={venue} />

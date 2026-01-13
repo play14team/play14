@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, type DragEvent } from "react"
 import {
   createTicketType,
   updateTicketType,
   deleteTicketType,
+  reorderTicketTypes,
   toggleTicketTypeActive,
   type TicketType,
   type TicketTypeData,
 } from "./ticket-type.action"
 import { STRIPE_CURRENCIES, formatPrice } from "@/libs/currencies"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 
 interface Props {
   eventId: string
@@ -23,10 +25,25 @@ interface EditingTicket extends TicketTypeData {
 }
 
 export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Props) {
+  const [orderedTickets, setOrderedTickets] = useState<TicketType[]>(() =>
+    [...ticketTypes].sort((a, b) => a.sortOrder - b.sortOrder)
+  )
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isReordering, setIsReordering] = useState(false)
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const [dragOverId, setDragOverId] = useState<string | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean
+    ticketId: string | null
+    ticketName: string
+  }>({ isOpen: false, ticketId: null, ticketName: "" })
+
+  useEffect(() => {
+    setOrderedTickets([...ticketTypes].sort((a, b) => a.sortOrder - b.sortOrder))
+  }, [ticketTypes])
 
   // Form state for new/edit ticket
   const [formData, setFormData] = useState<EditingTicket>({
@@ -82,7 +99,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
     setIsAdding(true)
     setFormData((prev) => ({
       ...prev,
-      sortOrder: ticketTypes.length,
+      sortOrder: orderedTickets.length,
     }))
   }
 
@@ -119,52 +136,141 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
       result = await createTicketType(eventId, data)
     }
 
-    setIsLoading(false)
-
     if (result.success) {
-      resetForm()
+      // Close form and reset loading state
+      // The form/edit UI is now hidden, so user won't see the state change
+      setIsAdding(false)
+      setEditingId(null)
+      setIsLoading(false)
       onUpdate()
     } else {
       setError(result.error || "Failed to save ticket type")
+      setIsLoading(false)
     }
   }
 
-  const handleDelete = async (ticketId: string) => {
-    if (!confirm("Are you sure you want to delete this ticket type?")) {
-      return
-    }
+  const handleDeleteClick = (ticket: TicketType) => {
+    setDeleteConfirmation({
+      isOpen: true,
+      ticketId: ticket.documentId,
+      ticketName: ticket.name,
+    })
+  }
+
+  const handleDeleteConfirm = async () => {
+    const ticketId = deleteConfirmation.ticketId
+    setDeleteConfirmation({ isOpen: false, ticketId: null, ticketName: "" })
+
+    if (!ticketId) return
 
     setIsLoading(true)
     setError(null)
 
     const result = await deleteTicketType(ticketId)
 
-    setIsLoading(false)
-
     if (result.success) {
+      // Reset loading state before refresh so it doesn't block subsequent operations
+      setIsLoading(false)
       onUpdate()
     } else {
       setError(result.error || "Failed to delete ticket type")
+      setIsLoading(false)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmation({ isOpen: false, ticketId: null, ticketName: "" })
   }
 
   const handleToggleActive = async (ticket: TicketType) => {
     setIsLoading(true)
     const result = await toggleTicketTypeActive(ticket.documentId, !ticket.isActive)
-    setIsLoading(false)
+
+    if (result.success) {
+      // Reset loading state before refresh so it doesn't block subsequent operations
+      setIsLoading(false)
+      onUpdate()
+    } else {
+      setError(result.error || "Failed to update ticket type")
+      setIsLoading(false)
+    }
+  }
+
+  const isDragDisabled = isAdding || editingId !== null || isLoading || isReordering
+
+  const handleDragStart = (event: DragEvent<HTMLButtonElement>, ticketId: string) => {
+    if (isDragDisabled) return
+    setDraggingId(ticketId)
+    setDragOverId(null)
+    event.dataTransfer.effectAllowed = "move"
+    event.dataTransfer.setData("text/plain", ticketId)
+  }
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>, targetId: string) => {
+    if (isDragDisabled) return
+    const activeId = draggingId || event.dataTransfer.getData("text/plain")
+    if (!activeId || activeId === targetId) return
+    event.preventDefault()
+    event.dataTransfer.dropEffect = "move"
+    setDragOverId(targetId)
+  }
+
+  const handleDragEnd = () => {
+    setDraggingId(null)
+    setDragOverId(null)
+  }
+
+  const handleDrop = async (event: DragEvent<HTMLDivElement>, targetId: string) => {
+    if (isDragDisabled) return
+    event.preventDefault()
+
+    const activeId = draggingId || event.dataTransfer.getData("text/plain")
+    if (!activeId || activeId === targetId) {
+      setDragOverId(null)
+      setDraggingId(null)
+      return
+    }
+
+    const fromIndex = orderedTickets.findIndex((ticket) => ticket.documentId === activeId)
+    const toIndex = orderedTickets.findIndex((ticket) => ticket.documentId === targetId)
+
+    if (fromIndex === -1 || toIndex === -1) {
+      setDragOverId(null)
+      setDraggingId(null)
+      return
+    }
+
+    setError(null)
+    const previousOrder = orderedTickets
+    const updated = [...orderedTickets]
+    const [moved] = updated.splice(fromIndex, 1)
+    updated.splice(toIndex, 0, moved)
+    const normalized = updated.map((ticket, index) => ({ ...ticket, sortOrder: index }))
+
+    setOrderedTickets(normalized)
+    setDragOverId(null)
+    setDraggingId(null)
+    setIsReordering(true)
+
+    const result = await reorderTicketTypes(
+      eventId,
+      normalized.map((ticket) => ticket.documentId)
+    )
+
+    setIsReordering(false)
 
     if (result.success) {
       onUpdate()
     } else {
-      setError(result.error || "Failed to update ticket type")
+      setError(result.error || "Failed to reorder ticket types")
+      setOrderedTickets(previousOrder)
+      onUpdate()
     }
   }
 
   const formatTicketPrice = (price: number, currency: string) => {
     return formatPrice(price, currency)
   }
-
-  const sortedTickets = [...ticketTypes].sort((a, b) => a.sortOrder - b.sortOrder)
 
   return (
     <div className="ticket-type-editor">
@@ -177,11 +283,25 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
 
       {/* Existing ticket types */}
       <div className="ticket-type-list">
-        {sortedTickets.map((ticket) => (
-          <div
-            key={ticket.documentId}
-            className={`ticket-type-card ${!ticket.isActive ? "ticket-inactive" : ""}`}
-          >
+        {orderedTickets.map((ticket) => {
+          const isDragging = draggingId === ticket.documentId
+          const isDragOver = dragOverId === ticket.documentId
+          const cardClassName = [
+            "ticket-type-card",
+            !ticket.isActive ? "ticket-inactive" : "",
+            isDragging ? "ticket-dragging" : "",
+            isDragOver ? "ticket-drag-over" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")
+
+          return (
+            <div
+              key={ticket.documentId}
+              className={cardClassName}
+              onDragOver={(event) => handleDragOver(event, ticket.documentId)}
+              onDrop={(event) => handleDrop(event, ticket.documentId)}
+            >
             {editingId === ticket.documentId ? (
               // Editing mode
               <div className="ticket-type-form">
@@ -312,6 +432,18 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
             ) : (
               // View mode
               <>
+                <button
+                  type="button"
+                  className="ticket-type-drag-handle"
+                  title="Drag to reorder"
+                  aria-label="Drag to reorder ticket type"
+                  disabled={isDragDisabled}
+                  draggable={!isDragDisabled}
+                  onDragStart={(event) => handleDragStart(event, ticket.documentId)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <i className="bx bx-menu"></i>
+                </button>
                 <div className="ticket-type-info">
                   <div className="ticket-type-header">
                     <h4 className="ticket-type-name">{ticket.name}</h4>
@@ -351,7 +483,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleDelete(ticket.documentId)}
+                    onClick={() => handleDeleteClick(ticket)}
                     disabled={ticket.soldCount > 0}
                     className="admin-btn admin-btn-icon admin-btn-danger"
                     title={ticket.soldCount > 0 ? "Cannot delete: tickets sold" : "Delete"}
@@ -362,7 +494,8 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
               </>
             )}
           </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* Add new ticket type form */}
@@ -501,6 +634,18 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
           Add Ticket Type
         </button>
       )}
+
+      {/* Delete confirmation dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirmation.isOpen}
+        title="Delete Ticket Type"
+        message={`Are you sure you want to delete "${deleteConfirmation.ticketName}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   )
 }

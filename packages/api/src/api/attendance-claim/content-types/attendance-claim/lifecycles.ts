@@ -4,6 +4,10 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { render } from "@react-email/render"
+import AttendanceClaimNewEmail from "../../../../emails/attendance-claim-new"
+import AttendanceClaimApprovedEmail from "../../../../emails/attendance-claim-approved"
+import AttendanceClaimRejectedEmail from "../../../../emails/attendance-claim-rejected"
 
 const getFrontendUrl = (): string => {
   return process.env.FRONTEND_URL || "https://play14.org"
@@ -86,59 +90,36 @@ export default {
 
     // Send email to organizers
     try {
+      const html = await render(
+        AttendanceClaimNewEmail({
+          eventName: claim.event.name,
+          eventDate,
+          locationName: claim.event.location?.name || "N/A",
+          playerName: claim.player.name,
+          playerPosition: claim.player.position,
+          reason: claim.reason,
+          frontendUrl,
+        })
+      )
+
+      const text = await render(
+        AttendanceClaimNewEmail({
+          eventName: claim.event.name,
+          eventDate,
+          locationName: claim.event.location?.name || "N/A",
+          playerName: claim.player.name,
+          playerPosition: claim.player.position,
+          reason: claim.reason,
+          frontendUrl,
+        }),
+        { plainText: true }
+      )
+
       await strapi.plugin("email").service("email").send({
         to: Array.from(organizerEmails),
         subject: `[#play14] New Attendance Claim for ${claim.event.name}`,
-        html: `
-          <h2>New Attendance Claim Request</h2>
-          <p>A player has submitted a claim to be listed as an attendee for your event.</p>
-
-          <h3>Event Details:</h3>
-          <ul>
-            <li><strong>Event:</strong> ${claim.event.name}</li>
-            <li><strong>Date:</strong> ${eventDate}</li>
-            <li><strong>Location:</strong> ${claim.event.location?.name || "N/A"}</li>
-          </ul>
-
-          <h3>Claiming Player:</h3>
-          <ul>
-            <li><strong>Name:</strong> ${claim.player.name}</li>
-            <li><strong>Position:</strong> ${claim.player.position}</li>
-          </ul>
-
-          <h3>Reason Provided:</h3>
-          <p style="background: #f5f5f5; padding: 10px; border-radius: 5px;">${claim.reason}</p>
-
-          <p>
-            <a href="${frontendUrl}/admin/attendance-claims" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-              Review Attendance Claims
-            </a>
-          </p>
-
-          <hr />
-          <p style="color: #666; font-size: 12px;">
-            This email was sent automatically by the #play14 community platform.
-          </p>
-        `,
-        text: `
-New Attendance Claim Request
-
-A player has submitted a claim to be listed as an attendee for your event.
-
-Event Details:
-- Event: ${claim.event.name}
-- Date: ${eventDate}
-- Location: ${claim.event.location?.name || "N/A"}
-
-Claiming Player:
-- Name: ${claim.player.name}
-- Position: ${claim.player.position}
-
-Reason Provided:
-${claim.reason}
-
-Review attendance claims at: ${frontendUrl}/admin/attendance-claims
-        `.trim(),
+        html,
+        text,
       })
 
       strapi.log.info(
@@ -202,47 +183,32 @@ Review attendance claims at: ${frontendUrl}/admin/attendance-claims
     if (newStatus === "approved") {
       // Send approval email to player
       try {
+        const html = await render(
+          AttendanceClaimApprovedEmail({
+            eventName: claim.event.name,
+            eventDate,
+            locationName: claim.event.location?.name || "N/A",
+            playerSlug: claim.player.slug,
+            frontendUrl,
+          })
+        )
+
+        const text = await render(
+          AttendanceClaimApprovedEmail({
+            eventName: claim.event.name,
+            eventDate,
+            locationName: claim.event.location?.name || "N/A",
+            playerSlug: claim.player.slug,
+            frontendUrl,
+          }),
+          { plainText: true }
+        )
+
         await strapi.plugin("email").service("email").send({
           to: playerEmail,
           subject: `[#play14] Your Attendance Claim Has Been Approved!`,
-          html: `
-            <h2>Attendance Claim Approved!</h2>
-            <p>Great news! Your claim to be listed as an attendee for <strong>${claim.event.name}</strong> has been approved.</p>
-
-            <h3>Event Details:</h3>
-            <ul>
-              <li><strong>Event:</strong> ${claim.event.name}</li>
-              <li><strong>Date:</strong> ${eventDate}</li>
-              <li><strong>Location:</strong> ${claim.event.location?.name || "N/A"}</li>
-            </ul>
-
-            <p>This event is now visible on your player profile.</p>
-
-            <p>
-              <a href="${frontendUrl}/players/${claim.player.slug}" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                View Your Profile
-              </a>
-            </p>
-
-            <hr />
-            <p style="color: #666; font-size: 12px;">
-              This email was sent automatically by the #play14 community platform.
-            </p>
-          `,
-          text: `
-Attendance Claim Approved!
-
-Great news! Your claim to be listed as an attendee for "${claim.event.name}" has been approved.
-
-Event Details:
-- Event: ${claim.event.name}
-- Date: ${eventDate}
-- Location: ${claim.event.location?.name || "N/A"}
-
-This event is now visible on your player profile.
-
-View your profile at: ${frontendUrl}/players/${claim.player.slug}
-          `.trim(),
+          html,
+          text,
         })
 
         strapi.log.info(
@@ -254,54 +220,32 @@ View your profile at: ${frontendUrl}/players/${claim.player.slug}
     } else if (newStatus === "rejected") {
       // Send rejection email to player
       try {
+        const html = await render(
+          AttendanceClaimRejectedEmail({
+            eventName: claim.event.name,
+            eventDate,
+            locationName: claim.event.location?.name || "N/A",
+            adminNotes: result.adminNotes,
+            frontendUrl,
+          })
+        )
+
+        const text = await render(
+          AttendanceClaimRejectedEmail({
+            eventName: claim.event.name,
+            eventDate,
+            locationName: claim.event.location?.name || "N/A",
+            adminNotes: result.adminNotes,
+            frontendUrl,
+          }),
+          { plainText: true }
+        )
+
         await strapi.plugin("email").service("email").send({
           to: playerEmail,
           subject: `[#play14] Attendance Claim Update`,
-          html: `
-            <h2>Attendance Claim Update</h2>
-            <p>Unfortunately, your claim to be listed as an attendee for <strong>${claim.event.name}</strong> could not be approved.</p>
-
-            <h3>Event Details:</h3>
-            <ul>
-              <li><strong>Event:</strong> ${claim.event.name}</li>
-              <li><strong>Date:</strong> ${eventDate}</li>
-              <li><strong>Location:</strong> ${claim.event.location?.name || "N/A"}</li>
-            </ul>
-
-            ${result.adminNotes ? `
-            <h3>Reason:</h3>
-            <p style="background: #f5f5f5; padding: 10px; border-radius: 5px;">${result.adminNotes}</p>
-            ` : ""}
-
-            <p>If you believe this is an error, please contact the event organizers directly.</p>
-
-            <p>
-              <a href="${frontendUrl}/contact" style="background: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                Contact Us
-              </a>
-            </p>
-
-            <hr />
-            <p style="color: #666; font-size: 12px;">
-              This email was sent automatically by the #play14 community platform.
-            </p>
-          `,
-          text: `
-Attendance Claim Update
-
-Unfortunately, your claim to be listed as an attendee for "${claim.event.name}" could not be approved.
-
-Event Details:
-- Event: ${claim.event.name}
-- Date: ${eventDate}
-- Location: ${claim.event.location?.name || "N/A"}
-
-${result.adminNotes ? `Reason: ${result.adminNotes}` : ""}
-
-If you believe this is an error, please contact the event organizers directly.
-
-Contact us at: ${frontendUrl}/contact
-          `.trim(),
+          html,
+          text,
         })
 
         strapi.log.info(

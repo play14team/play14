@@ -1,6 +1,7 @@
 "use server"
 
 import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
+import type { GeoLocation } from "@/models/strapi"
 
 export interface PlayerListItem {
   documentId: string
@@ -33,6 +34,7 @@ export interface PlayerForEdit {
   tagline: string | null
   bio: string | null
   website: string | null
+  location?: GeoLocation | string | null
   avatar: {
     url: string
   } | null
@@ -105,6 +107,7 @@ export interface PlayerUpdateData {
   tagline?: string | null
   bio?: string | null
   website?: string | null
+  location?: GeoLocation | null
   socialNetworks?: Array<{
     id?: string
     type: string

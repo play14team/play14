@@ -32,6 +32,9 @@ describe("processUserInvitations", () => {
 
   it("skips processing when invitations are disabled", async () => {
     process.env.INVITATION_EMAILS_ENABLED = "false"
+    process.env.INVITATION_SEND_DELAY_MS = "0"
+    process.env.INVITATION_SEND_MAX_RETRIES = "0"
+    process.env.INVITATION_SEND_RETRY_DELAY_MS = "0"
     const { strapi, send, findMany, update } = createMockStrapi()
 
     await processUserInvitations(strapi)
@@ -42,11 +45,14 @@ describe("processUserInvitations", () => {
   })
 
   it("sends invites and reminders and updates user statuses", async () => {
-    vi.useFakeTimers()
+    vi.useFakeTimers({ toFake: ["Date"] })
     const now = new Date("2025-03-14T10:00:00Z")
     vi.setSystemTime(now)
     process.env.INVITATION_SEND_LIMIT = "10"
     process.env.INVITATION_REMINDER_DAYS = "7"
+    process.env.INVITATION_SEND_DELAY_MS = "0"
+    process.env.INVITATION_SEND_MAX_RETRIES = "0"
+    process.env.INVITATION_SEND_RETRY_DELAY_MS = "0"
 
     const { strapi, send, findMany, update } = createMockStrapi()
 
@@ -105,12 +111,20 @@ describe("processUserInvitations", () => {
       subject: "Reminder: your #play14 account is ready",
     })
 
-    expect(update).toHaveBeenCalledTimes(2)
+    expect(update).toHaveBeenCalledTimes(4)
     expect(update.mock.calls[0][0]).toMatchObject({
+      documentId: "user-1",
+      data: expect.objectContaining({ resetPasswordToken: expect.any(String) }),
+    })
+    expect(update.mock.calls[1][0]).toMatchObject({
       documentId: "user-1",
       data: expect.objectContaining({ invitationStatus: "sent" }),
     })
-    expect(update.mock.calls[1][0]).toMatchObject({
+    expect(update.mock.calls[2][0]).toMatchObject({
+      documentId: "user-2",
+      data: expect.objectContaining({ resetPasswordToken: expect.any(String) }),
+    })
+    expect(update.mock.calls[3][0]).toMatchObject({
       documentId: "user-2",
       data: expect.objectContaining({ invitationStatus: "reminded" }),
     })

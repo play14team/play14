@@ -40,6 +40,33 @@ export const metadata: Metadata = {
   },
 }
 
+// Avoid the dev-only performance.measure negative timestamp errors for some routes.
+const shouldPatchPerformanceMeasure = process.env.NODE_ENV === "development"
+const performanceMeasurePatch = `
+  (function () {
+    const perf = window.performance
+    if (!perf || typeof perf.measure !== "function") {
+      return
+    }
+
+    const originalMeasure = perf.measure
+    perf.measure = function () {
+      try {
+        return originalMeasure.apply(this, arguments)
+      } catch (error) {
+        if (
+          error &&
+          typeof error.message === "string" &&
+          error.message.includes("cannot have a negative time stamp")
+        ) {
+          return
+        }
+        throw error
+      }
+    }
+  })()
+`
+
 export default function RootLayout({
   children,
 }: {
@@ -47,6 +74,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {shouldPatchPerformanceMeasure && (
+          <script
+            dangerouslySetInnerHTML={{ __html: performanceMeasurePatch }}
+            key="performance-patch"
+          />
+        )}
+      </head>
       <body className={inter.className}>
         <ThemeProvider>
           <ScrollToTop />

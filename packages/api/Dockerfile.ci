@@ -27,6 +27,6 @@ WORKDIR /app/packages/api
 
 USER bun
 
-EXPOSE 1337
+EXPOSE 1337 9000
 
 CMD ["strapi", "start"]

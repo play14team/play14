@@ -9,6 +9,7 @@ import {
   type DiscountCode,
   type DiscountCodeData,
 } from "./discount-code.action"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 
 interface Props {
   eventId: string
@@ -26,6 +27,11 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
   const [editingId, setEditingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean
+    codeId: string | null
+    codeName: string
+  }>({ isOpen: false, codeId: null, codeName: "" })
 
   const [formData, setFormData] = useState<EditingCode>({
     code: "",
@@ -122,44 +128,63 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
       result = await createDiscountCode(eventId, data)
     }
 
-    setIsLoading(false)
-
     if (result.success) {
-      resetForm()
+      // Close form and reset loading state
+      // The form/edit UI is now hidden, so user won't see the state change
+      setIsAdding(false)
+      setEditingId(null)
+      setIsLoading(false)
       onUpdate()
     } else {
       setError(result.error || "Failed to save discount code")
+      setIsLoading(false)
     }
   }
 
-  const handleDelete = async (codeId: string) => {
-    if (!confirm("Are you sure you want to delete this discount code?")) {
-      return
-    }
+  const handleDeleteClick = (code: DiscountCode) => {
+    setDeleteConfirmation({
+      isOpen: true,
+      codeId: code.documentId,
+      codeName: code.code,
+    })
+  }
+
+  const handleDeleteConfirm = async () => {
+    const codeId = deleteConfirmation.codeId
+    setDeleteConfirmation({ isOpen: false, codeId: null, codeName: "" })
+
+    if (!codeId) return
 
     setIsLoading(true)
     setError(null)
 
     const result = await deleteDiscountCode(codeId)
 
-    setIsLoading(false)
-
     if (result.success) {
+      // Reset loading state before refresh so it doesn't block subsequent operations
+      setIsLoading(false)
       onUpdate()
     } else {
       setError(result.error || "Failed to delete discount code")
+      setIsLoading(false)
     }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmation({ isOpen: false, codeId: null, codeName: "" })
   }
 
   const handleToggleActive = async (code: DiscountCode) => {
     setIsLoading(true)
     const result = await toggleDiscountCodeActive(code.documentId, !code.isActive)
-    setIsLoading(false)
 
     if (result.success) {
+      // Reset loading state before refresh so it doesn't block subsequent operations
+      setIsLoading(false)
       onUpdate()
     } else {
       setError(result.error || "Failed to update discount code")
+      setIsLoading(false)
     }
   }
 
@@ -407,7 +432,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleDelete(code.documentId)}
+                    onClick={() => handleDeleteClick(code)}
                     disabled={code.usedCount > 0}
                     className="admin-btn admin-btn-icon admin-btn-danger"
                     title={code.usedCount > 0 ? "Cannot delete: code has been used" : "Delete"}
@@ -605,6 +630,18 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
           Add Discount Code
         </button>
       )}
+
+      {/* Delete confirmation dialog */}
+      <ConfirmationDialog
+        isOpen={deleteConfirmation.isOpen}
+        title="Delete Discount Code"
+        message={`Are you sure you want to delete the discount code "${deleteConfirmation.codeName}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   )
 }

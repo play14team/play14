@@ -27,13 +27,20 @@ export default async function PlayerEditPage({ params }: PageProps) {
     <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <h1>Edit Player</h1>
-          <p>{player.name}</p>
+          <div className="admin-page-header-title-with-back">
+            <Link
+              href="/admin/players"
+              className="admin-btn admin-btn-icon admin-btn-secondary"
+              title="Back to Players"
+            >
+              <i className="bx bx-arrow-back"></i>
+            </Link>
+            <div>
+              <h1>Edit Player</h1>
+              <p>{player.name}</p>
+            </div>
+          </div>
         </div>
-        <Link href="/admin/players" className="admin-btn admin-btn-secondary">
-          <i className="bx bx-arrow-back"></i>
-          Back to Players
-        </Link>
       </div>
 
       <PlayerForm

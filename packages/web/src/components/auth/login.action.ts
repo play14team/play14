@@ -2,6 +2,7 @@
 
 import { setAuthCookie } from "@/libs/auth"
 import { strapiFetch } from "@/libs/strapi-client"
+import { featureFlags } from "@/libs/feature-flags"
 
 interface LoginResult {
   success: boolean
@@ -21,12 +22,61 @@ interface StrapiAuthResponse {
 }
 
 /**
+ * Verify Turnstile token with Cloudflare
+ */
+async function verifyTurnstileToken(token: string): Promise<boolean> {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY
+
+  if (!secretKey) {
+    console.warn("Turnstile secret key not configured")
+    return true // Allow login if Turnstile is not configured
+  }
+
+  try {
+    const response = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secret: secretKey,
+          response: token,
+        }),
+      }
+    )
+
+    const data = await response.json()
+    return data.success === true
+  } catch (error) {
+    console.error("Turnstile verification error:", error)
+    return false
+  }
+}
+
+/**
  * Authenticate user with email/username and password using Strapi local provider
  */
 export async function loginWithCredentials(
   identifier: string,
-  password: string
+  password: string,
+  turnstileToken: string | null = null
 ): Promise<LoginResult> {
+  // Block login if feature is disabled
+  if (!featureFlags.loginEnabled) {
+    return { success: false, error: "Login is currently unavailable" }
+  }
+
+  // Verify Turnstile token if provided
+  if (turnstileToken) {
+    const isValid = await verifyTurnstileToken(turnstileToken)
+    if (!isValid) {
+      return {
+        success: false,
+        error: "CAPTCHA verification failed. Please try again.",
+      }
+    }
+  }
+
   const result = await strapiFetch<StrapiAuthResponse>(
     "/auth/local",
     {},

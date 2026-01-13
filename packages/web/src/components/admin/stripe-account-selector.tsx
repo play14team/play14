@@ -7,6 +7,7 @@ import {
   type StripeAccountStatus,
   type HostStripeAccount,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 
 interface EventStripeAccount {
   documentId: string
@@ -34,6 +35,7 @@ export default function StripeAccountSelector({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedAccountId, setSelectedAccountId] = useState<string>("")
+  const [unlinkConfirmation, setUnlinkConfirmation] = useState(false)
 
   const handleLinkAccount = async (stripeAccountId: string) => {
     setIsLoading(true)
@@ -42,31 +44,36 @@ export default function StripeAccountSelector({
     const result = await linkStripeAccountToEvent(eventId, stripeAccountId)
 
     if (result.success) {
+      // Keep loading state active - page refresh will unmount component
       onUpdate()
     } else {
       setError(result.error || "Failed to link account")
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
-  const handleUnlinkAccount = async () => {
-    if (!confirm("Are you sure you want to disable online payments for this event?")) {
-      return
-    }
+  const handleUnlinkClick = () => {
+    setUnlinkConfirmation(true)
+  }
 
+  const handleUnlinkConfirm = async () => {
+    setUnlinkConfirmation(false)
     setIsLoading(true)
     setError(null)
 
     const result = await unlinkStripeAccountFromEvent(eventId)
 
     if (result.success) {
+      // Keep loading state active - page refresh will unmount component
       onUpdate()
     } else {
       setError(result.error || "Failed to unlink account")
+      setIsLoading(false)
     }
+  }
 
-    setIsLoading(false)
+  const handleUnlinkCancel = () => {
+    setUnlinkConfirmation(false)
   }
 
   // Event already has a Stripe account linked
@@ -117,7 +124,7 @@ export default function StripeAccountSelector({
           </div>
           <button
             type="button"
-            onClick={handleUnlinkAccount}
+            onClick={handleUnlinkClick}
             disabled={isLoading}
             className="admin-btn admin-btn-secondary admin-btn-sm"
           >
@@ -335,6 +342,18 @@ export default function StripeAccountSelector({
           </button>
         </div>
       </div>
+
+      {/* Unlink confirmation dialog */}
+      <ConfirmationDialog
+        isOpen={unlinkConfirmation}
+        title="Disable Online Payments"
+        message="Are you sure you want to disconnect the Stripe account from this event? Attendees will no longer be able to purchase tickets online."
+        confirmLabel="Disconnect"
+        cancelLabel="Cancel"
+        variant="warning"
+        onConfirm={handleUnlinkConfirm}
+        onCancel={handleUnlinkCancel}
+      />
     </div>
   )
 }

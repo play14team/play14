@@ -14,13 +14,20 @@ export default async function VenueCreatePage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <h1>Create Venue</h1>
-          <p>Add a new hosting facility or organization</p>
+          <div className="admin-page-header-title-with-back">
+            <Link
+              href="/admin/venues"
+              className="admin-btn admin-btn-icon admin-btn-secondary"
+              title="Back to Venues"
+            >
+              <i className="bx bx-arrow-back"></i>
+            </Link>
+            <div>
+              <h1>Create Venue</h1>
+              <p>Add a new hosting facility or organization</p>
+            </div>
+          </div>
         </div>
-        <Link href="/admin/venues" className="admin-btn admin-btn-secondary">
-          <i className="bx bx-arrow-back"></i>
-          Back to Venues
-        </Link>
       </div>
 
       <VenueCreateForm />

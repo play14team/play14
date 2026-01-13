@@ -28,7 +28,7 @@ export interface PlayerProfile {
   tagline?: string
   bio?: string
   website?: string
-  location?: GeoLocation
+  location?: GeoLocation | string
   avatar?: UploadFile
   socialNetworks?: SocialNetwork[]
 }

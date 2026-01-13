@@ -38,6 +38,7 @@ services:
       - ./packages/api/public/uploads:/app/packages/api/public/uploads
     ports:
       - "1337:1337"
+      - "9000:9000"
     networks:
       - play14-api
     depends_on:

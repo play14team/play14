@@ -4,6 +4,8 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { render } from "@react-email/render"
+import PlayerClaimNewEmail from "../../../../emails/player-claim-new"
 
 // Get environment variables for email config
 const getAdminRecipients = (): string[] => {
@@ -50,53 +52,36 @@ export default {
 
     // Send email to admins
     try {
+      const html = await render(
+        PlayerClaimNewEmail({
+          userEmail: claim.user.email,
+          username: claim.user.username,
+          provider: claim.user.provider,
+          playerName: claim.player.name,
+          playerPosition: claim.player.position,
+          reason: claim.reason,
+          frontendUrl,
+        })
+      )
+
+      const text = await render(
+        PlayerClaimNewEmail({
+          userEmail: claim.user.email,
+          username: claim.user.username,
+          provider: claim.user.provider,
+          playerName: claim.player.name,
+          playerPosition: claim.player.position,
+          reason: claim.reason,
+          frontendUrl,
+        }),
+        { plainText: true }
+      )
+
       await strapi.plugin("email").service("email").send({
         to: adminRecipients,
         subject: `[#play14] New Player Claim Request`,
-        html: `
-          <h2>New Player Claim Request</h2>
-          <p>A new player claim request has been submitted and requires your review.</p>
-
-          <h3>Details:</h3>
-          <ul>
-            <li><strong>User Email:</strong> ${claim.user.email}</li>
-            <li><strong>User Name:</strong> ${claim.user.username}</li>
-            <li><strong>OAuth Provider:</strong> ${claim.user.provider}</li>
-            <li><strong>Claiming Player:</strong> ${claim.player.name}</li>
-            <li><strong>Player Position:</strong> ${claim.player.position}</li>
-          </ul>
-
-          <h3>Reason Provided:</h3>
-          <p style="background: #f5f5f5; padding: 10px; border-radius: 5px;">${claim.reason}</p>
-
-          <p>
-            <a href="${frontendUrl}/admin/claims" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-              Review Claims
-            </a>
-          </p>
-
-          <hr />
-          <p style="color: #666; font-size: 12px;">
-            This email was sent automatically by the #play14 community platform.
-          </p>
-        `,
-        text: `
-New Player Claim Request
-
-A new player claim request has been submitted and requires your review.
-
-Details:
-- User Email: ${claim.user.email}
-- User Name: ${claim.user.username}
-- OAuth Provider: ${claim.user.provider}
-- Claiming Player: ${claim.player.name}
-- Player Position: ${claim.player.position}
-
-Reason Provided:
-${claim.reason}
-
-Review claims at: ${frontendUrl}/admin/claims
-        `.trim(),
+        html,
+        text,
       })
 
       strapi.log.info(`[PlayerClaim] Sent notification email to admins for claim ${result.documentId}`)
@@ -141,38 +126,28 @@ Review claims at: ${frontendUrl}/admin/claims
     if (newStatus === "approved") {
       // Send approval email to user
       try {
+        const PlayerClaimApprovedEmail = (await import("../../../../emails/player-claim-approved")).default
+
+        const html = await render(
+          PlayerClaimApprovedEmail({
+            playerName: claim.player.name,
+            frontendUrl,
+          })
+        )
+
+        const text = await render(
+          PlayerClaimApprovedEmail({
+            playerName: claim.player.name,
+            frontendUrl,
+          }),
+          { plainText: true }
+        )
+
         await strapi.plugin("email").service("email").send({
           to: claim.user.email,
           subject: `[#play14] Your Player Profile Has Been Linked!`,
-          html: `
-            <h2>Welcome to #play14!</h2>
-            <p>Great news! Your claim to the player profile "<strong>${claim.player.name}</strong>" has been approved.</p>
-
-            <p>You can now access the admin panel and update your profile.</p>
-
-            <p>
-              <a href="${frontendUrl}/admin/profile" style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                View Your Profile
-              </a>
-            </p>
-
-            <p>Welcome to the #play14 community!</p>
-
-            <hr />
-            <p style="color: #666; font-size: 12px;">
-              This email was sent automatically by the #play14 community platform.
-            </p>
-          `,
-          text: `
-Welcome to #play14!
-
-Great news! Your claim to the player profile "${claim.player.name}" has been approved.
-
-You can now access the admin panel and update your profile at:
-${frontendUrl}/admin/profile
-
-Welcome to the #play14 community!
-          `.trim(),
+          html,
+          text,
         })
 
         strapi.log.info(`[PlayerClaim] Sent approval email to ${claim.user.email} for claim ${result.documentId}`)
@@ -182,40 +157,30 @@ Welcome to the #play14 community!
     } else if (newStatus === "rejected") {
       // Send rejection email to user
       try {
+        const PlayerClaimRejectedEmail = (await import("../../../../emails/player-claim-rejected")).default
+
+        const html = await render(
+          PlayerClaimRejectedEmail({
+            playerName: claim.player.name,
+            adminNotes: result.adminNotes,
+            frontendUrl,
+          })
+        )
+
+        const text = await render(
+          PlayerClaimRejectedEmail({
+            playerName: claim.player.name,
+            adminNotes: result.adminNotes,
+            frontendUrl,
+          }),
+          { plainText: true }
+        )
+
         await strapi.plugin("email").service("email").send({
           to: claim.user.email,
           subject: `[#play14] Player Claim Update`,
-          html: `
-            <h2>Player Claim Update</h2>
-            <p>Unfortunately, your claim to the player profile "<strong>${claim.player.name}</strong>" could not be approved.</p>
-
-            ${result.adminNotes ? `
-            <h3>Reason:</h3>
-            <p style="background: #f5f5f5; padding: 10px; border-radius: 5px;">${result.adminNotes}</p>
-            ` : ""}
-
-            <p>If you believe this is an error, please contact us or try claiming a different profile.</p>
-
-            <p>
-              <a href="${frontendUrl}/contact" style="background: #2196F3; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-                Contact Us
-              </a>
-            </p>
-
-            <hr />
-            <p style="color: #666; font-size: 12px;">
-              This email was sent automatically by the #play14 community platform.
-            </p>
-          `,
-          text: `
-Player Claim Update
-
-Unfortunately, your claim to the player profile "${claim.player.name}" could not be approved.
-
-${result.adminNotes ? `Reason: ${result.adminNotes}` : ""}
-
-If you believe this is an error, please contact us at ${frontendUrl}/contact or try claiming a different profile.
-          `.trim(),
+          html,
+          text,
         })
 
         strapi.log.info(`[PlayerClaim] Sent rejection email to ${claim.user.email} for claim ${result.documentId}`)

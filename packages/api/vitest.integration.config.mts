@@ -26,12 +26,8 @@ export default defineConfig({
     // 1. Only one Strapi instance is created (Strapi can't be loaded twice)
     // 2. Module singletons (mock payment state) are shared between checkout and webhook
     pool: "threads",
-    poolOptions: {
-      threads: {
-        singleThread: true,
-        isolate: false,
-      },
-    },
+    maxWorkers: 1,
+    isolate: false,
 
     // Run test files sequentially
     fileParallelism: false,

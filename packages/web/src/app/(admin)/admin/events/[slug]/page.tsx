@@ -1,5 +1,6 @@
 import { requireOrganizer } from "@/libs/auth"
 import { notFound } from "next/navigation"
+import Link from "next/link"
 import EventEditForm from "./event-edit-form"
 import {
   getEventForEdit,
@@ -61,8 +62,21 @@ export default async function EventEditPage({ params }: PageProps) {
   return (
     <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
-        <h1>Edit Event</h1>
-        <p>{event.name}</p>
+        <div className="admin-page-header-content">
+          <div className="admin-page-header-title-with-back">
+            <Link
+              href="/admin/events"
+              className="admin-btn admin-btn-icon admin-btn-secondary"
+              title="Back to Events"
+            >
+              <i className="bx bx-arrow-back"></i>
+            </Link>
+            <div>
+              <h1>Edit Event</h1>
+              <p>{event.name}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <EventEditForm

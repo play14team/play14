@@ -54,6 +54,8 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: AUTH_ACTIONS.CALLBACK, minimumRole: ROLE_TYPES.PUBLIC },
   { action: AUTH_ACTIONS.CONNECT, minimumRole: ROLE_TYPES.PUBLIC },
   { action: AUTH_ACTIONS.REGISTER, minimumRole: ROLE_TYPES.PUBLIC },
+  { action: AUTH_ACTIONS.FORGOT_PASSWORD, minimumRole: ROLE_TYPES.PUBLIC },
+  { action: AUTH_ACTIONS.RESET_PASSWORD, minimumRole: ROLE_TYPES.PUBLIC },
 
   // Content (public)
   { action: EXPECTATION_ACTIONS.FIND, minimumRole: ROLE_TYPES.PUBLIC },

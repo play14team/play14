@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { loginWithCredentials } from "./login.action"
+import Turnstile from "@/components/ui/turnstile"
 
 interface LoginFormProps {
   callbackUrl: string
@@ -12,6 +13,9 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,8 +30,18 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
       return
     }
 
+    // Check Turnstile verification if enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      setError("Please complete the CAPTCHA verification")
+      return
+    }
+
     startTransition(async () => {
-      const result = await loginWithCredentials(identifier, password)
+      const result = await loginWithCredentials(
+        identifier,
+        password,
+        turnstileToken
+      )
 
       if (result.success) {
         router.push(callbackUrl)
@@ -65,6 +79,23 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
           disabled={isPending}
         />
       </div>
+
+      {turnstileSiteKey && (
+        <div className="auth-form-turnstile">
+          <Turnstile
+            siteKey={turnstileSiteKey}
+            onVerify={(token) => setTurnstileToken(token)}
+            onError={() => {
+              setTurnstileToken(null)
+              setError("CAPTCHA verification failed. Please try again.")
+            }}
+            onExpire={() => {
+              setTurnstileToken(null)
+              setError("CAPTCHA expired. Please verify again.")
+            }}
+          />
+        </div>
+      )}
 
       <button
         type="submit"

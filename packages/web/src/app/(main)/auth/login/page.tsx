@@ -1,6 +1,7 @@
-import { redirect } from "next/navigation"
+import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
+import { featureFlags } from "@/libs/feature-flags"
 import LoginButtons from "@/components/auth/login-buttons"
 import LoginForm from "@/components/auth/login-form"
 import Logo from "@/components/layout/logo"
@@ -16,6 +17,11 @@ interface LoginPageProps {
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  // Block access if login feature is disabled
+  if (!featureFlags.loginEnabled) {
+    notFound()
+  }
+
   const params = await searchParams
   const { isAuthenticated } = await getAuthState()
 

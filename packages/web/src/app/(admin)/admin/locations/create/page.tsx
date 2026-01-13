@@ -14,13 +14,20 @@ export default async function LocationCreatePage() {
     <div className="admin-page">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <h1>Create Location</h1>
-          <p>Add a new city or region for events</p>
+          <div className="admin-page-header-title-with-back">
+            <Link
+              href="/admin/locations"
+              className="admin-btn admin-btn-icon admin-btn-secondary"
+              title="Back to Locations"
+            >
+              <i className="bx bx-arrow-back"></i>
+            </Link>
+            <div>
+              <h1>Create Location</h1>
+              <p>Add a new city or region for events</p>
+            </div>
+          </div>
         </div>
-        <Link href="/admin/locations" className="admin-btn admin-btn-secondary">
-          <i className="bx bx-arrow-back"></i>
-          Back to Locations
-        </Link>
       </div>
 
       <LocationCreateForm />

@@ -1,6 +1,7 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
+import type { GeoLocation } from "@/models/strapi"
 
 export interface SocialNetworkInput {
   id?: string
@@ -15,6 +16,7 @@ export interface PlayerUpdateData {
   tagline?: string
   bio?: string
   website?: string
+  location?: GeoLocation | null
   socialNetworks?: SocialNetworkInput[]
 }
 
@@ -38,17 +40,21 @@ export async function updatePlayerProfile(
     url: sn.url,
   }))
 
-  const requestBody = {
-    data: {
-      name: data.name,
-      position: data.position,
-      company: data.company || null,
-      tagline: data.tagline || null,
-      bio: data.bio || null,
-      website: data.website || null,
-      socialNetworks: socialNetworks || [],
-    },
+  const requestData: Record<string, unknown> = {
+    name: data.name,
+    position: data.position,
+    company: data.company || null,
+    tagline: data.tagline || null,
+    bio: data.bio || null,
+    website: data.website || null,
+    socialNetworks: socialNetworks || [],
   }
+
+  if ("location" in data) {
+    requestData.location = data.location ?? null
+  }
+
+  const requestBody = { data: requestData }
 
   const result = await strapiFetch(
     "/players/me",
