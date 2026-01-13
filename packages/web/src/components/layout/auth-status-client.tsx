@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Avatar from "@/components/ui/avatar"
+import { featureFlags } from "@/libs/feature-flags"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +44,11 @@ export default function AuthStatusClient({
   }
 
   if (!user) {
+    // Only show login button if feature flag is enabled
+    if (!featureFlags.loginEnabled) {
+      return null
+    }
+
     return (
       <Link href="/auth/login" className="auth-login-icon" title="Sign In">
         <i className="bx bx-log-in"></i>

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { getAuthState } from "@/libs/auth"
+import { featureFlags } from "@/libs/feature-flags"
 import UserMenu from "./user-menu"
 
 export default async function AuthStatus() {
@@ -7,6 +8,11 @@ export default async function AuthStatus() {
 
   if (isAuthenticated && user) {
     return <UserMenu user={user} />
+  }
+
+  // Only show login button if feature flag is enabled
+  if (!featureFlags.loginEnabled) {
+    return null
   }
 
   return (

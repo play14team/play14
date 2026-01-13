@@ -80,6 +80,6 @@ WORKDIR /app/packages/api
 RUN chown -R bun:bun /app
 USER bun
 
-EXPOSE 1337
+EXPOSE 1337 9000
 
 CMD ["strapi", "start"]

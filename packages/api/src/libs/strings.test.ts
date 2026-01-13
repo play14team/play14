@@ -3,9 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest"
-
-// Import the CommonJS module
-const { toSlug, eventToSlug, capitalize, normalize } = require("./strings")
+import { toSlug, eventToSlug, capitalize, normalize } from "./strings"
 
 describe("toSlug", () => {
   describe("basic slugification", () => {

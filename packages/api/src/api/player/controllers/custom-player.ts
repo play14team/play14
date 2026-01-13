@@ -63,6 +63,7 @@ interface PlayerUpdateData {
   tagline?: string | null
   bio?: string | null
   website?: string | null
+  location?: Record<string, unknown> | string | null
   socialNetworks?: Array<{
     id?: string
     type: string
@@ -140,6 +141,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       "tagline",
       "bio",
       "website",
+      "location",
       "socialNetworks",
     ]
 
@@ -859,6 +861,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       "tagline",
       "bio",
       "website",
+      "location",
       "socialNetworks",
     ]
 

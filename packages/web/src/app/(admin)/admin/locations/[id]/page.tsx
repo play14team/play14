@@ -27,13 +27,20 @@ export default async function LocationEditPage({ params }: PageProps) {
     <div className="admin-page admin-page-wide">
       <div className="admin-page-header">
         <div className="admin-page-header-content">
-          <h1>Edit Location</h1>
-          <p>{location.name}</p>
+          <div className="admin-page-header-title-with-back">
+            <Link
+              href="/admin/locations"
+              className="admin-btn admin-btn-icon admin-btn-secondary"
+              title="Back to Locations"
+            >
+              <i className="bx bx-arrow-back"></i>
+            </Link>
+            <div>
+              <h1>Edit Location</h1>
+              <p>{location.name}</p>
+            </div>
+          </div>
         </div>
-        <Link href="/admin/locations" className="admin-btn admin-btn-secondary">
-          <i className="bx bx-arrow-back"></i>
-          Back to Locations
-        </Link>
       </div>
 
       <LocationEditForm location={location} />

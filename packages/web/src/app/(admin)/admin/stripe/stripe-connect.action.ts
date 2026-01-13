@@ -103,7 +103,8 @@ export async function createStripeAccount(
  */
 export async function getOnboardingUrl(returnPath: string): Promise<OnboardingLinkResult> {
   // Build absolute URLs using the web app's base URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+  // Check both NEXT_PUBLIC_SITE_URL (used in production) and NEXT_PUBLIC_URL (documented in .env.example)
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
   const returnUrl = `${baseUrl}${returnPath}`
   const refreshUrl = `${baseUrl}${returnPath}?refresh=true`
 

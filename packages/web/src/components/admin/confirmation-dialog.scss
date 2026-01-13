@@ -1,0 +1,142 @@
+.confirmation-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.confirmation-dialog {
+  background: var(--admin-card-bg, #1e1e1e);
+  border: 1px solid var(--admin-border, #333);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  animation: slideUp 0.2s ease-out;
+  outline: none;
+
+  &:focus {
+    outline: 2px solid var(--admin-primary, #0066ff);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.confirmation-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1.5rem 1rem;
+
+  i {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+  }
+}
+
+.confirmation-dialog-body {
+  padding: 0 1.5rem 1.5rem;
+  padding-left: 3.25rem; // Align with title (after icon)
+
+  p {
+    margin: 0;
+    color: var(--admin-text-secondary, #aaa);
+    line-height: 1.5;
+  }
+}
+
+.confirmation-dialog-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  border-top: 1px solid var(--admin-border, #333);
+
+  button {
+    min-width: 100px;
+  }
+}
+
+// Variant colors
+.confirmation-dialog-danger {
+  .confirmation-dialog-header i {
+    color: var(--admin-danger, #ff4444);
+  }
+}
+
+.confirmation-dialog-warning {
+  .confirmation-dialog-header i {
+    color: var(--admin-warning, #ffaa00);
+  }
+}
+
+.confirmation-dialog-info {
+  .confirmation-dialog-header i {
+    color: var(--admin-info, #0099ff);
+  }
+}
+
+// Responsive
+@media (max-width: 640px) {
+  .confirmation-dialog {
+    margin: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .confirmation-dialog-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+
+    h3 {
+      font-size: 1.125rem;
+    }
+  }
+
+  .confirmation-dialog-body {
+    padding: 0 1.25rem 1.25rem;
+    padding-left: 3rem;
+  }
+
+  .confirmation-dialog-footer {
+    padding: 0.75rem 1.25rem 1.25rem;
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

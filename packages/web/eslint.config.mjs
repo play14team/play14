@@ -9,7 +9,6 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "public/**",
-      ".codacy/**",
       "src/models/**",
       "coverage/**",
     ],

@@ -3,7 +3,9 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import type { PlayerProfile } from "@/libs/api/players"
+import type { GeoLocation } from "@/models/strapi"
 import SimpleEditor from "@/components/ui/simple-editor"
+import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import PlayerFormActions from "./player-form-actions"
 import PlayerAvatarManager from "./player-avatar-manager"
 import ProfileTabs, { type ProfileTabId } from "./profile-tabs"
@@ -124,6 +126,37 @@ function getDemoteTarget(currentPosition: string, userPosition: string): string 
   return POSITION_HIERARCHY[currentIndex - 1]
 }
 
+function normalizeMapLocation(
+  location?: string | GeoLocation | MapLocation | null
+): MapLocation | null {
+  if (!location || typeof location === "string") return null
+
+  if ("geometry" in location && location.geometry?.coordinates) {
+    return {
+      geometry: {
+        coordinates: location.geometry.coordinates as [number, number],
+        type: location.geometry.type,
+      },
+      place_name: location.place_name,
+    }
+  }
+
+  if ("lat" in location && "lng" in location) {
+    const lat = typeof location.lat === "number" ? location.lat : undefined
+    const lng = typeof location.lng === "number" ? location.lng : undefined
+    if (lat === undefined || lng === undefined) return null
+    return {
+      geometry: {
+        coordinates: [lng, lat],
+        type: "Point",
+      },
+      place_name: location.place_name,
+    }
+  }
+
+  return null
+}
+
 export default function PlayerForm({ player, mode, currentUserPosition = "Player", stripeAccount }: Props) {
   const router = useRouter()
   const toast = useToast()
@@ -148,6 +181,19 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     })) || []
   )
   const [currentAvatar, setCurrentAvatar] = useState(player.avatar)
+  const initialMapLocation = useMemo(
+    () => normalizeMapLocation(player.location),
+    [player.location]
+  )
+  const initialMapLocationRef = useRef<MapLocation | null>(initialMapLocation)
+  useEffect(() => {
+    initialMapLocationRef.current = initialMapLocation
+  }, [initialMapLocation])
+  const [mapLocation, setMapLocation] = useState<MapLocation | null>(
+    initialMapLocation
+  )
+  const [locationTouched, setLocationTouched] = useState(false)
+  const locationCenter = typeof player.location === "string" ? player.location : undefined
 
   // Position state (admin mode only - changes are immediate)
   const [currentPosition, setCurrentPosition] = useState(player.position)
@@ -155,8 +201,8 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
 
   // Track dirty state
   const formValues = useMemo(
-    () => ({ name, company, tagline, bio, website, socialNetworks }),
-    [name, company, tagline, bio, website, socialNetworks]
+    () => ({ name, company, tagline, bio, website, socialNetworks, mapLocation }),
+    [name, company, tagline, bio, website, socialNetworks, mapLocation]
   )
   const { isDirty, resetDirtyState } = useFormDirty(formValues)
 
@@ -236,6 +282,11 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     setSocialNetworks(updated)
   }
 
+  const handleMapLocationChange = useCallback((location: MapLocation | null) => {
+    setMapLocation(location)
+    setLocationTouched(true)
+  }, [])
+
   // ============================================
   // Position handling (admin mode only)
   // ============================================
@@ -276,43 +327,18 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     e.preventDefault()
     setIsSubmitting(true)
 
-    if (mode === "self") {
-      const data: ProfileUpdateData = {
-        name,
-        position: currentPosition as "Player" | "Host" | "Mentor" | "Founder",
-        company: company || undefined,
-        tagline: tagline || undefined,
-        bio: bio || undefined,
-        website: website || undefined,
-        socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
-      }
+    const data = buildFormData()
+    const result = mode === "self"
+      ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
+      : await updatePlayer(player.documentId, data as AdminUpdateData)
 
-      const result = await updatePlayerProfile(player.documentId, data)
-      if (result.success) {
-        toast.success("Profile updated successfully!")
-        resetDirtyState()
-        router.refresh()
-      } else {
-        toast.error(result.error || "Failed to update profile")
-      }
+    if (result.success) {
+      toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
+      resetDirtyState()
+      setLocationTouched(false)
+      router.refresh()
     } else {
-      const data: AdminUpdateData = {
-        name,
-        company: company || undefined,
-        tagline: tagline || undefined,
-        bio: bio || undefined,
-        website: website || undefined,
-        socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
-      }
-
-      const result = await updatePlayer(player.documentId, data)
-      if (result.success) {
-        toast.success("Player profile updated!")
-        resetDirtyState()
-        router.refresh()
-      } else {
-        toast.error(result.error || "Failed to update profile")
-      }
+      toast.error(result.error || "Failed to update profile")
     }
 
     setIsSubmitting(false)
@@ -323,6 +349,8 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
   // ============================================
 
   const buildFormData = useCallback(() => {
+    const locationValue = locationTouched ? normalizeMapLocation(mapLocation) : undefined
+    const locationPayload = locationTouched ? { location: locationValue } : {}
     if (mode === "self") {
       return {
         name,
@@ -332,6 +360,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
         bio: bio || undefined,
         website: website || undefined,
         socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
+        ...locationPayload,
       }
     }
     return {
@@ -341,8 +370,20 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
       bio: bio || undefined,
       website: website || undefined,
       socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
+      ...locationPayload,
     }
-  }, [mode, name, currentPosition, company, tagline, bio, website, socialNetworks])
+  }, [
+    mode,
+    name,
+    currentPosition,
+    company,
+    tagline,
+    bio,
+    website,
+    socialNetworks,
+    mapLocation,
+    locationTouched,
+  ])
 
   const handleSaveAndNavigate = useCallback(async () => {
     setIsSubmitting(true)
@@ -355,6 +396,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     if (result.success) {
       toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
       resetDirtyState()
+      setLocationTouched(false)
       setShowUnsavedDialog(false)
 
       // Navigate after save
@@ -376,6 +418,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
   const handleDiscardAndNavigate = useCallback(() => {
     resetDirtyState()
     setShowUnsavedDialog(false)
+    setLocationTouched(false)
 
     const destination = pendingNavigationRef.current
     pendingNavigationRef.current = null
@@ -399,6 +442,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     const initialTagline = player.tagline || ""
     const initialBio = player.bio || ""
     const initialWebsite = player.website || ""
+    const initialMapLocation = initialMapLocationRef.current
     const initialSocialNetworks = player.socialNetworks?.map((sn) => ({
       id: sn.id,
       type: sn.type,
@@ -410,7 +454,9 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     setTagline(initialTagline)
     setBio(initialBio)
     setWebsite(initialWebsite)
+    setMapLocation(initialMapLocation)
     setSocialNetworks(initialSocialNetworks)
+    setLocationTouched(false)
 
     // Pass the initial values to resetDirtyState to avoid stale closure issue
     resetDirtyState({
@@ -419,6 +465,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
       tagline: initialTagline,
       bio: initialBio,
       website: initialWebsite,
+      mapLocation: initialMapLocation,
       socialNetworks: initialSocialNetworks,
     })
   }, [player, resetDirtyState])
@@ -524,60 +571,75 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
                 </div>
               </div>
 
-              <div className="admin-form-section">
-                <h2>Social Networks</h2>
-                <p className="admin-form-section-description">
-                  Add links to your social media profiles to help others connect with you.
-                </p>
+              <div className="location-social-row">
+                <div className="admin-form-section">
+                  <h2>Location</h2>
+                  <p className="admin-form-section-description">
+                    Search for your city or region to set your location.
+                  </p>
+                  <LocationMapPicker
+                    value={mapLocation}
+                    onChange={handleMapLocationChange}
+                    centerOnLocation={locationCenter}
+                    precision="city"
+                  />
+                </div>
 
-                <div className="admin-social-networks">
-                  {socialNetworks.map((sn, index) => (
-                    <div key={index} className="admin-social-network-row">
-                      <i
-                        className={`${getSocialNetworkIcon(sn.type)} admin-social-network-icon`}
-                        title={sn.type}
-                      ></i>
-                      <select
-                        value={sn.type}
-                        onChange={(e) =>
-                          handleSocialNetworkChange(index, "type", e.target.value)
-                        }
-                        className="admin-select admin-select-sm"
-                      >
-                        {SOCIAL_NETWORK_TYPES.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="url"
-                        value={sn.url}
-                        onChange={(e) =>
-                          handleSocialNetworkChange(index, "url", e.target.value)
-                        }
-                        className="admin-input"
-                        placeholder="https://..."
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSocialNetwork(index)}
-                        className="admin-btn-icon admin-btn-danger"
-                        title="Remove"
-                      >
-                        <i className="bx bx-trash"></i>
-                      </button>
-                    </div>
-                  ))}
+                <div className="admin-form-section">
+                  <h2>Social Networks</h2>
+                  <p className="admin-form-section-description">
+                    Add links to your social media profiles to help others connect with you.
+                  </p>
 
-                  <button
-                    type="button"
-                    onClick={handleAddSocialNetwork}
-                    className="admin-btn admin-btn-secondary"
-                  >
-                    <i className="bx bx-plus"></i>
-                    Add Social Network
-                  </button>
+                  <div className="admin-social-networks">
+                    {socialNetworks.map((sn, index) => (
+                      <div key={index} className="admin-social-network-row">
+                        <i
+                          className={`${getSocialNetworkIcon(sn.type)} admin-social-network-icon`}
+                          title={sn.type}
+                        ></i>
+                        <select
+                          value={sn.type}
+                          onChange={(e) =>
+                            handleSocialNetworkChange(index, "type", e.target.value)
+                          }
+                          className="admin-select admin-select-sm"
+                        >
+                          {SOCIAL_NETWORK_TYPES.map((type) => (
+                            <option key={type} value={type}>
+                              {type}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="url"
+                          value={sn.url}
+                          onChange={(e) =>
+                            handleSocialNetworkChange(index, "url", e.target.value)
+                          }
+                          className="admin-input"
+                          placeholder="https://..."
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSocialNetwork(index)}
+                          className="admin-btn-icon admin-btn-danger"
+                          title="Remove"
+                        >
+                          <i className="bx bx-trash"></i>
+                        </button>
+                      </div>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={handleAddSocialNetwork}
+                      className="admin-btn admin-btn-secondary"
+                    >
+                      <i className="bx bx-plus"></i>
+                      Add Social Network
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

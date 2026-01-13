@@ -374,3 +374,19 @@
     }
   }
 }
+
+// ===========================================
+// Turnstile CAPTCHA Styles
+// ===========================================
+
+.auth-form-turnstile {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  min-height: 65px; // Reserve space for widget
+
+  > div {
+    display: flex;
+    justify-content: center;
+  }
+}

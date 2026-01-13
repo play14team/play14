@@ -7,6 +7,8 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { render } from "@react-email/render"
+import TicketOrderRefundEmail from "../../../../emails/ticket-order-refund"
 
 const getFrontendUrl = (): string => {
   return process.env.FRONTEND_URL || "https://play14.org"
@@ -55,93 +57,48 @@ export default {
 
     const frontendUrl = getFrontendUrl()
     const isPartialRefund = newStatus === "partially_refunded"
-    const refundType = isPartialRefund ? "partial" : "full"
 
     // Build ticket list for email
-    const ticketList = (order.tickets || [])
-      .map((t: any) => `- ${t.ticketType?.name || "Ticket"}: ${t.ticketCode}`)
-      .join("\n")
-
-    const ticketListHtml = (order.tickets || [])
-      .map(
-        (t: any) =>
-          `<li><strong>${t.ticketType?.name || "Ticket"}</strong>: <code>${t.ticketCode}</code></li>`
-      )
-      .join("")
+    const tickets = (order.tickets || []).map((t: any) => ({
+      ticketTypeName: t.ticketType?.name || "Ticket",
+      ticketCode: t.ticketCode,
+    }))
 
     try {
+      const html = await render(
+        TicketOrderRefundEmail({
+          orderNumber: order.orderNumber,
+          eventName: order.event?.name || "Unknown",
+          currency: order.currency,
+          totalAmount: order.totalAmount,
+          refundAmount: order.refundAmount || order.totalAmount,
+          refundReason: order.refundReason,
+          isPartialRefund,
+          tickets,
+          frontendUrl,
+        })
+      )
+
+      const text = await render(
+        TicketOrderRefundEmail({
+          orderNumber: order.orderNumber,
+          eventName: order.event?.name || "Unknown",
+          currency: order.currency,
+          totalAmount: order.totalAmount,
+          refundAmount: order.refundAmount || order.totalAmount,
+          refundReason: order.refundReason,
+          isPartialRefund,
+          tickets,
+          frontendUrl,
+        }),
+        { plainText: true }
+      )
+
       await strapi.plugin("email").service("email").send({
         to: order.purchaserEmail,
         subject: `[#play14] Your order has been ${isPartialRefund ? "partially " : ""}refunded`,
-        text: `
-Your order has been ${refundType}ly refunded.
-
-Order: ${order.orderNumber}
-Event: ${order.event?.name || "Unknown"}
-Original Amount: ${order.currency} ${order.totalAmount}
-Refunded Amount: ${order.currency} ${order.refundAmount || order.totalAmount}
-${order.refundReason ? `Reason: ${order.refundReason}` : ""}
-
-Affected tickets:
-${ticketList}
-
-${isPartialRefund ? "Some of your tickets may still be valid." : "Your tickets have been cancelled and are no longer valid for entry."}
-
-If you have any questions, please contact the event organizers.
-
-The #play14 Team
-        `.trim(),
-        html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #f47920; color: white; padding: 20px; text-align: center; }
-    .content { padding: 20px; background: #f9f9f9; }
-    .tickets { background: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-    code { background: #eee; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
-    .refund-notice { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin: 15px 0; }
-    .btn { display: inline-block; background: #f47920; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-top: 15px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>#play14</h1>
-    </div>
-    <div class="content">
-      <h2>Your order has been ${isPartialRefund ? "partially " : ""}refunded</h2>
-
-      <div class="refund-notice">
-        <p><strong>Order:</strong> ${order.orderNumber}</p>
-        <p><strong>Event:</strong> ${order.event?.name || "Unknown"}</p>
-        <p><strong>Original Amount:</strong> ${order.currency} ${order.totalAmount}</p>
-        <p><strong>Refunded Amount:</strong> ${order.currency} ${order.refundAmount || order.totalAmount}</p>
-        ${order.refundReason ? `<p><strong>Reason:</strong> ${order.refundReason}</p>` : ""}
-      </div>
-
-      <div class="tickets">
-        <h3>Affected Tickets</h3>
-        <ul>
-          ${ticketListHtml || "<li>No tickets found</li>"}
-        </ul>
-      </div>
-
-      <p>${isPartialRefund ? "Some of your tickets may still be valid. Please check your account for details." : "Your tickets have been cancelled and are no longer valid for entry."}</p>
-
-      <a href="${frontendUrl}/admin/tickets" class="btn">View Your Tickets</a>
-    </div>
-    <div class="footer">
-      <p>If you have any questions, please contact the event organizers.</p>
-      <p>The #play14 Team</p>
-    </div>
-  </div>
-</body>
-</html>
-        `.trim(),
+        html,
+        text,
       })
 
       strapi.log.info(`[TicketOrder] Sent refund notification email to ${order.purchaserEmail} for order ${order.orderNumber}`)

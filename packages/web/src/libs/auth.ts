@@ -253,6 +253,7 @@ export function getOAuthConnectUrl(provider: OAuthProvider): string {
  * Get the OAuth callback URL that Strapi will redirect to
  */
 export function getOAuthCallbackUrl(provider: OAuthProvider): string {
-  const frontendUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
+  // Check both NEXT_PUBLIC_SITE_URL (used in production) and NEXT_PUBLIC_URL (documented in .env.example)
+  const frontendUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_URL || "http://localhost:3000"
   return `${frontendUrl}/connect/${provider}/redirect`
 }

@@ -1,14 +1,5 @@
 import React from "react"
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Html,
-  Link,
-  Preview,
-  Text,
-} from "@react-email/components"
+import { Body, Button, Container, Head, Html, Link, Preview, Text } from "@react-email/components"
 
 interface UserInvitationEmailProps {
   name?: string
@@ -26,8 +17,10 @@ const containerStyle = {
   color: "#222222",
 }
 
+const brandOrange = "#ff5200"
+
 const buttonStyle = {
-  backgroundColor: "#0f6fff",
+  backgroundColor: brandOrange,
   color: "#ffffff",
   padding: "12px 20px",
   borderRadius: "6px",
@@ -44,6 +37,10 @@ const lightBodyStyle = {
 const mutedTextStyle = {
   fontSize: "14px",
   color: "#555555",
+}
+
+const linkStyle = {
+  color: brandOrange,
 }
 
 export default function UserInvitationEmail({
@@ -79,22 +76,27 @@ export default function UserInvitationEmail({
         React.createElement(
           Text,
           null,
-          "Use the button below to sign in. You can use LinkedIn, Google, or GitHub, ",
-          "or sign in with your email address."
+          "Use the button below to set your password and sign in. For later sign-in, if you prefer, you can use LinkedIn, Google, ",
+          "GitHub, or Microsoft as long as the provider uses the same email address that received this invite. You can also continue ",
+          "to sign in with your email after setting a password."
         ),
-        React.createElement(Button, { style: buttonStyle, href: inviteUrl }, "Sign in to #play14"),
+        React.createElement(Button, { style: buttonStyle, href: inviteUrl }, "Set your password"),
         React.createElement(
           Text,
           { style: mutedTextStyle },
           "If the button does not work, copy and paste this link:",
           React.createElement("br", null),
-          React.createElement(Link, { href: inviteUrl }, inviteUrl)
+          React.createElement(Link, { href: inviteUrl, style: linkStyle }, inviteUrl)
         ),
         React.createElement(
           Text,
           { style: mutedTextStyle },
           "Need help? Reply to this email or contact ",
-          React.createElement(Link, { href: `mailto:${supportEmail}` }, supportEmail),
+          React.createElement(
+            Link,
+            { href: `mailto:${supportEmail}`, style: linkStyle },
+            supportEmail
+          ),
           "."
         )
       )

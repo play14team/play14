@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { featureFlags } from "@/libs/feature-flags"
 import Logo from "@/components/layout/logo"
 
 const SESSION_STORAGE_KEY = "auth_callback_url"
@@ -23,6 +24,11 @@ export default function AuthCallbackPage() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
+    // Block access if login feature is disabled
+    if (!featureFlags.loginEnabled) {
+      router.replace("/")
+      return
+    }
     // Check for callback URL in sessionStorage (set by AuthGate before OAuth)
     const storedCallbackUrl = sessionStorage.getItem(SESSION_STORAGE_KEY)
 

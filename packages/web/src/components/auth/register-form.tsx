@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { registerWithCredentials } from "./register.action"
+import Turnstile from "@/components/ui/turnstile"
 
 interface RegisterFormProps {
   callbackUrl: string
@@ -13,6 +14,9 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   const validateForm = (
     username: string,
@@ -57,8 +61,19 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
       return
     }
 
+    // Check Turnstile verification if enabled
+    if (turnstileSiteKey && !turnstileToken) {
+      setError("Please complete the CAPTCHA verification")
+      return
+    }
+
     startTransition(async () => {
-      const result = await registerWithCredentials(username, email, password)
+      const result = await registerWithCredentials(
+        username,
+        email,
+        password,
+        turnstileToken
+      )
 
       if (result.success) {
         // After registration, redirect to the callback URL
@@ -134,6 +149,23 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
           <span className="auth-field-error">{fieldErrors.confirmPassword}</span>
         )}
       </div>
+
+      {turnstileSiteKey && (
+        <div className="auth-form-turnstile">
+          <Turnstile
+            siteKey={turnstileSiteKey}
+            onVerify={(token) => setTurnstileToken(token)}
+            onError={() => {
+              setTurnstileToken(null)
+              setError("CAPTCHA verification failed. Please try again.")
+            }}
+            onExpire={() => {
+              setTurnstileToken(null)
+              setError("CAPTCHA expired. Please verify again.")
+            }}
+          />
+        </div>
+      )}
 
       <button
         type="submit"

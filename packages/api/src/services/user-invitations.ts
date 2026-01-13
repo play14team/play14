@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi"
+import { randomBytes } from "node:crypto"
 import { render } from "@react-email/render"
 import UserInvitationEmail from "../emails/user-invitation"
 
@@ -15,23 +16,38 @@ interface InvitationUser {
 
 const DEFAULT_INVITE_LIMIT = 50
 const DEFAULT_REMINDER_DAYS = 7
+const DEFAULT_INVITE_DELAY_MS = 600
+const DEFAULT_INVITE_MAX_RETRIES = 3
+const DEFAULT_INVITE_RETRY_DELAY_MS = 1000
+const DEFAULT_INVITE_CALLBACK_URL = "/admin"
 
-function buildInviteUrl(): string {
-  const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-  const callbackUrl = encodeURIComponent("/admin")
-  return `${frontendUrl}/auth/login?callbackUrl=${callbackUrl}`
+function buildInviteUrl(resetToken: string): string {
+  const frontendUrl = (process.env.FRONTEND_URL || "https://play14.org").replace(/\/$/, "")
+  const callbackUrl = encodeURIComponent(
+    process.env.INVITATION_CALLBACK_URL || DEFAULT_INVITE_CALLBACK_URL
+  )
+  const code = encodeURIComponent(resetToken)
+  return `${frontendUrl}/auth/reset-password?code=${code}&callbackUrl=${callbackUrl}`
 }
 
-function buildEmailPayload(user: InvitationUser, reminder: boolean) {
-  const inviteUrl = buildInviteUrl()
-  const html = render(
+function createResetPasswordToken(): string {
+  return randomBytes(64).toString("hex")
+}
+
+async function buildEmailPayload(
+  user: InvitationUser,
+  reminder: boolean,
+  resetToken: string
+) {
+  const inviteUrl = buildInviteUrl(resetToken)
+  const html = await render(
     UserInvitationEmail({
       name: user.player?.name || user.username,
       inviteUrl,
       reminder,
     })
   )
-  const text = render(
+  const text = await render(
     UserInvitationEmail({
       name: user.player?.name || user.username,
       inviteUrl,
@@ -46,12 +62,148 @@ function buildEmailPayload(user: InvitationUser, reminder: boolean) {
   return { html, text, subject }
 }
 
+function formatErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === "string") {
+    return error
+  }
+  try {
+    return JSON.stringify(error)
+  } catch {
+    return String(error)
+  }
+}
+
+function reportInvitationError(
+  strapi: Core.Strapi,
+  user: InvitationUser,
+  reminder: boolean,
+  error: unknown
+) {
+  const errorMessage = formatErrorMessage(error)
+  const action = reminder ? "reminder" : "invite"
+
+  strapi.log.error(
+    `[Invitations] Failed to send ${action} to ${user.email}: ${errorMessage}`,
+    error
+  )
+
+  const sentryConfig = strapi.config.get("plugin::sentry") as { dsn?: string | null }
+  if (!sentryConfig?.dsn) {
+    return
+  }
+
+  const sentryService = strapi.plugin("sentry")?.service("sentry")
+  if (!sentryService) {
+    return
+  }
+
+  sentryService.sendError(error, (scope: any) => {
+    scope.setTag("module", "user-invitations")
+    scope.setContext("invitation", {
+      action,
+      userId: user.documentId,
+      email: user.email,
+    })
+  })
+}
+
+function getErrorStatusCode(error: unknown): number | undefined {
+  if (!error || typeof error !== "object") {
+    return undefined
+  }
+
+  const statusCode = (error as { statusCode?: number }).statusCode
+  if (typeof statusCode === "number") {
+    return statusCode
+  }
+
+  const responseStatus = (error as { response?: { status?: number } }).response?.status
+  if (typeof responseStatus === "number") {
+    return responseStatus
+  }
+
+  return undefined
+}
+
+function isRateLimitError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false
+  }
+
+  return (
+    getErrorStatusCode(error) === 429 ||
+    (error as { name?: string }).name === "rate_limit_exceeded"
+  )
+}
+
+async function sleep(delayMs: number): Promise<void> {
+  if (delayMs <= 0) {
+    return
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, delayMs))
+}
+
+function createRateLimiter(delayMs: number): () => Promise<void> {
+  let lastSentAt = 0
+
+  return async () => {
+    if (delayMs <= 0) {
+      lastSentAt = Date.now()
+      return
+    }
+
+    const now = Date.now()
+    const waitMs = Math.max(0, delayMs - (now - lastSentAt))
+    await sleep(waitMs)
+    lastSentAt = Date.now()
+  }
+}
+
+async function sendWithRateLimit(
+  strapi: Core.Strapi,
+  user: InvitationUser,
+  reminder: boolean,
+  resetToken: string,
+  rateLimiter: () => Promise<void>,
+  maxRetries: number,
+  retryDelayMs: number
+): Promise<void> {
+  let attempt = 0
+
+  while (true) {
+    await rateLimiter()
+
+    try {
+      await sendInvitationEmail(strapi, user, reminder, resetToken)
+      return
+    } catch (error) {
+      if (isRateLimitError(error) && attempt < maxRetries) {
+        const backoffMs = retryDelayMs * 2 ** attempt
+        strapi.log.warn(
+          `[Invitations] Rate limited sending ${reminder ? "reminder" : "invite"} to ${user.email}. ` +
+            `Retrying in ${backoffMs}ms.`
+        )
+        attempt += 1
+        await sleep(backoffMs)
+        continue
+      }
+
+      throw error
+    }
+  }
+}
+
 async function sendInvitationEmail(
   strapi: Core.Strapi,
   user: InvitationUser,
-  reminder: boolean
+  reminder: boolean,
+  resetToken: string
 ) {
-  const payload = buildEmailPayload(user, reminder)
+  const payload = await buildEmailPayload(user, reminder, resetToken)
   await strapi.plugin("email").service("email").send({
     to: user.email,
     subject: payload.subject,
@@ -69,7 +221,13 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
   const reminderDays = Number(
     process.env.INVITATION_REMINDER_DAYS || DEFAULT_REMINDER_DAYS
   )
+  const sendDelayMs = Number(process.env.INVITATION_SEND_DELAY_MS || DEFAULT_INVITE_DELAY_MS)
+  const maxRetries = Number(process.env.INVITATION_SEND_MAX_RETRIES || DEFAULT_INVITE_MAX_RETRIES)
+  const retryDelayMs = Number(
+    process.env.INVITATION_SEND_RETRY_DELAY_MS || DEFAULT_INVITE_RETRY_DELAY_MS
+  )
   const reminderThreshold = new Date(Date.now() - reminderDays * 24 * 60 * 60 * 1000)
+  const rateLimiter = createRateLimiter(sendDelayMs)
 
   const pendingUsers = await strapi
     .documents("plugin::users-permissions.user")
@@ -87,7 +245,20 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
   for (const user of pendingUsers as InvitationUser[]) {
     if (!user.email) continue
     try {
-      await sendInvitationEmail(strapi, user, false)
+      const resetToken = createResetPasswordToken()
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: user.documentId,
+        data: { resetPasswordToken: resetToken } as any,
+      })
+      await sendWithRateLimit(
+        strapi,
+        user,
+        false,
+        resetToken,
+        rateLimiter,
+        maxRetries,
+        retryDelayMs
+      )
       await strapi.documents("plugin::users-permissions.user").update({
         documentId: user.documentId,
         data: {
@@ -97,7 +268,7 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
       })
       strapi.log.info(`[Invitations] Sent invite to ${user.email}`)
     } catch (error) {
-      strapi.log.error(`[Invitations] Failed to send invite to ${user.email}: ${error}`)
+      reportInvitationError(strapi, user, false, error)
     }
   }
 
@@ -119,7 +290,20 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
   for (const user of reminderUsers as InvitationUser[]) {
     if (!user.email) continue
     try {
-      await sendInvitationEmail(strapi, user, true)
+      const resetToken = createResetPasswordToken()
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: user.documentId,
+        data: { resetPasswordToken: resetToken } as any,
+      })
+      await sendWithRateLimit(
+        strapi,
+        user,
+        true,
+        resetToken,
+        rateLimiter,
+        maxRetries,
+        retryDelayMs
+      )
       await strapi.documents("plugin::users-permissions.user").update({
         documentId: user.documentId,
         data: {
@@ -129,7 +313,7 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
       })
       strapi.log.info(`[Invitations] Sent reminder to ${user.email}`)
     } catch (error) {
-      strapi.log.error(`[Invitations] Failed to send reminder to ${user.email}: ${error}`)
+      reportInvitationError(strapi, user, true, error)
     }
   }
 }

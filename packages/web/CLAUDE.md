@@ -379,13 +379,3 @@ Always use `admin-page-wide` when the page contains:
 </div>
 ```
 
-## Code Quality Rules (Codacy Integration)
-
-When using Codacy MCP Server:
-
-- Provider: `gh`
-- Organization: `play14team`
-- Repository: `play14-web`
-
-**CRITICAL:** After editing files or installing dependencies, run Codacy CLI analysis immediately.
-
