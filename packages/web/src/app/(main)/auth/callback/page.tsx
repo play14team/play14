@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { featureFlags } from "@/libs/feature-flags"
+import { useFeatureFlags } from "@/libs/feature-flags"
 import Logo from "@/components/layout/logo"
 
 const SESSION_STORAGE_KEY = "auth_callback_url"
@@ -22,10 +22,11 @@ const DEFAULT_REDIRECT = "/admin"
 export default function AuthCallbackPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { flags } = useFeatureFlags()
 
   useEffect(() => {
     // Block access if login feature is disabled
-    if (!featureFlags.loginEnabled) {
+    if (!flags?.loginEnabled) {
       router.replace("/")
       return
     }
@@ -49,7 +50,7 @@ export default function AuthCallbackPage() {
 
     // Redirect to the destination
     router.replace(redirectUrl)
-  }, [router, searchParams])
+  }, [router, searchParams, flags?.loginEnabled])
 
   return (
     <div className="auth-error-page">

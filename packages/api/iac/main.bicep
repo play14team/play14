@@ -130,6 +130,46 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
             cpu: json('0.25')
             memory: '0.5Gi'
           }
+          probes: [
+            {
+              type: 'startup'
+              httpGet: {
+                path: '/_health'
+                port: 1337
+                scheme: 'HTTP'
+              }
+              initialDelaySeconds: 5
+              periodSeconds: 3
+              timeoutSeconds: 10
+              failureThreshold: 30
+            }
+            {
+              type: 'readiness'
+              httpGet: {
+                path: '/_health'
+                port: 1337
+                scheme: 'HTTP'
+              }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              timeoutSeconds: 5
+              successThreshold: 1
+              failureThreshold: 3
+            }
+            {
+              type: 'liveness'
+              httpGet: {
+                path: '/_health'
+                port: 1337
+                scheme: 'HTTP'
+              }
+              initialDelaySeconds: 60
+              periodSeconds: 30
+              timeoutSeconds: 5
+              successThreshold: 1
+              failureThreshold: 3
+            }
+          ]
           env: [
             {
               name: 'NODE_ENV'

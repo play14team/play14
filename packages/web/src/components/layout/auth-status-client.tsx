@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import Avatar from "@/components/ui/avatar"
-import { featureFlags } from "@/libs/feature-flags"
+import { useFeatureFlags } from "@/libs/feature-flags"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,7 @@ export default function AuthStatusClient({
 }: AuthStatusClientProps) {
   const router = useRouter()
   const [user, setUser] = useState<AuthUser | null>(initialUser)
+  const { flags, isLoading } = useFeatureFlags()
 
   const handleSignOut = async () => {
     await fetch("/api/auth/signout", { method: "POST" })
@@ -45,7 +46,8 @@ export default function AuthStatusClient({
 
   if (!user) {
     // Only show login button if feature flag is enabled
-    if (!featureFlags.loginEnabled) {
+    // Show nothing while loading flags to avoid flash of login button
+    if (isLoading || !flags?.loginEnabled) {
       return null
     }
 

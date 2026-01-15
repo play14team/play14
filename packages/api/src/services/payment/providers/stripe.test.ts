@@ -20,7 +20,7 @@ import {
 } from "../../../test-utils/factories"
 
 // Mock Stripe SDK
-const mockStripeInstance = vi.hoisted(() => ({
+const mockStripeInstance = {
   checkout: {
     sessions: {
       create: vi.fn(),
@@ -43,20 +43,14 @@ const mockStripeInstance = vi.hoisted(() => ({
   webhooks: {
     constructEvent: vi.fn(),
   },
-}))
-
-const StripeMock = vi.hoisted(
-  () =>
-    class StripeMock {
-      constructor() {
-        return mockStripeInstance
-      }
-    }
-)
+}
 
 vi.mock("stripe", () => ({
-  __esModule: true,
-  default: StripeMock,
+  default: class StripeMock {
+    constructor() {
+      return mockStripeInstance
+    }
+  },
 }))
 
 // Set environment variables before importing the provider
@@ -371,16 +365,19 @@ describe("StripeProvider", () => {
 
     it("throws error when webhook secret is not set", async () => {
       const originalSecret = process.env.STRIPE_WEBHOOK_SECRET
-      process.env.STRIPE_WEBHOOK_SECRET = ""
+      const originalConnectSecret = process.env.STRIPE_WEBHOOK_SECRET_CONNECT
+      delete process.env.STRIPE_WEBHOOK_SECRET
+      delete process.env.STRIPE_WEBHOOK_SECRET_CONNECT
 
-      // Create new provider without webhook secret
+      // Create new provider without webhook secrets
       const providerWithoutSecret = new StripeProvider()
 
       await expect(
         providerWithoutSecret.verifyWebhookSignature("payload", "sig")
-      ).rejects.toThrow("STRIPE_WEBHOOK_SECRET environment variable is not set")
+      ).rejects.toThrow("At least one of STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET_CONNECT must be set")
 
       process.env.STRIPE_WEBHOOK_SECRET = originalSecret
+      process.env.STRIPE_WEBHOOK_SECRET_CONNECT = originalConnectSecret
     })
   })
 
@@ -549,6 +546,10 @@ describe("Currency Validation", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     provider = new StripeProvider()
+  })
+
+  afterEach(() => {
+    vi.resetAllMocks()
   })
 
   const supportedCurrencies = [

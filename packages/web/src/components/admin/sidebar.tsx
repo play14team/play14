@@ -86,14 +86,25 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           organizerOnly: true,
         },
         {
+          href: "/admin/sponsors",
+          icon: "bx-diamond",
+          label: "Sponsors",
+          organizerOnly: true,
+        },
+        {
           href: "/admin/players",
           icon: "bx-group",
           label: "Players",
           organizerOnly: true,
         },
         {
+          href: "/admin/orders",
+          icon: "bx-receipt",
+          label: "Orders",
+        },
+        {
           href: "/admin/tickets",
-          icon: "bx-purchase-tag",
+          icon: "bx-barcode",
           label: "Tickets",
         },
       ],

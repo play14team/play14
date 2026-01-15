@@ -187,12 +187,61 @@ export function getCurrency(code: string): Currency | undefined {
 }
 
 /**
- * Format price with currency symbol
+ * Format price with currency symbol (simple format)
  */
 export function formatPrice(amount: number, currencyCode: string): string {
   const currency = getCurrency(currencyCode)
   const symbol = currency?.symbol || currencyCode
   return `${symbol} ${amount.toFixed(ZERO_DECIMAL_CURRENCIES.includes(currencyCode) ? 0 : 2)}`
+}
+
+/**
+ * Currency to locale mapping for proper Intl.NumberFormat formatting.
+ * Maps currency codes to locales that display the currency symbol in the
+ * culturally appropriate position (e.g., EUR uses de-DE to show "1.234,56 €").
+ */
+const CURRENCY_LOCALES: Record<string, string> = {
+  eur: "de-DE",
+  chf: "de-CH",
+  // Most other currencies work well with en-US or their native locale
+}
+
+export interface FormatCurrencyOptions {
+  /** Minimum fraction digits (default: auto-detected based on currency) */
+  minimumFractionDigits?: number
+  /** Maximum fraction digits (default: auto-detected based on currency) */
+  maximumFractionDigits?: number
+}
+
+/**
+ * Format an amount as currency using Intl.NumberFormat.
+ * Automatically selects the appropriate locale for the currency to ensure
+ * proper symbol placement and number formatting.
+ *
+ * @param amount - The numeric amount to format
+ * @param currencyCode - ISO 4217 currency code (e.g., "EUR", "USD", "eur")
+ * @param options - Optional formatting options
+ * @returns Formatted currency string (e.g., "1.234,56 €" for EUR, "$1,234.56" for USD)
+ */
+export function formatCurrency(
+  amount: number,
+  currencyCode: string,
+  options?: FormatCurrencyOptions
+): string {
+  const code = currencyCode.toLowerCase()
+  const locale = CURRENCY_LOCALES[code] || "en-US"
+  const upperCode = currencyCode.toUpperCase()
+
+  // Zero-decimal currencies should not show decimal places
+  const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.includes(upperCode)
+  const defaultFractionDigits = isZeroDecimal ? 0 : 2
+
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: upperCode,
+    minimumFractionDigits: options?.minimumFractionDigits ?? defaultFractionDigits,
+    maximumFractionDigits: options?.maximumFractionDigits ?? defaultFractionDigits,
+  }).format(amount)
 }
 
 /**

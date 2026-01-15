@@ -13,6 +13,10 @@ jobs:
   cleanup-api:
     name: Cleanup API Images
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
     env:
       REPOSITORY: play14/play14-api
 
@@ -125,6 +129,9 @@ jobs:
   cleanup-web:
     name: Cleanup Web Images
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     env:
       REPOSITORY: play14/play14-web
 

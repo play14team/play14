@@ -31,7 +31,11 @@ import ScheduleTicketsTab from "./tabs/schedule-tickets-tab"
 import TeamSponsorsTab from "./tabs/team-sponsors-tab"
 import ParticipantsTab from "./tabs/participants-tab"
 import MediaTab from "./tabs/media-tab"
+import BudgetTab from "./tabs/budget-tab"
+import ResultsTab from "./tabs/results-tab"
 import FinanceTab from "./tabs/finance-tab"
+import type { BudgetLineItem } from "./budget.types"
+import type { ResultLineItem } from "./results.types"
 
 interface Props {
   event: EventForEdit
@@ -41,6 +45,9 @@ interface Props {
   hostAccounts: HostStripeAccount[]
   playerStripeAccount: StripeAccountStatus | null
   discountCodes: DiscountCode[]
+  budgetItems: BudgetLineItem[]
+  resultItems: ResultLineItem[]
+  ticketRevenue: number
 }
 
 export default function EventEditForm({
@@ -51,6 +58,9 @@ export default function EventEditForm({
   hostAccounts,
   playerStripeAccount,
   discountCodes,
+  budgetItems: initialBudgetItems,
+  resultItems: initialResultItems,
+  ticketRevenue,
 }: Props) {
   const router = useRouter()
   const toast = useToast()
@@ -58,6 +68,15 @@ export default function EventEditForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const [isPublished, setIsPublished] = useState(event.isPublished ?? false)
+
+  // Budget and results state (managed separately, saved immediately via API)
+  const [budgetItems, setBudgetItems] = useState<BudgetLineItem[]>(initialBudgetItems)
+  const [resultItems, setResultItems] = useState<ResultLineItem[]>(initialResultItems)
+
+  // Determine the currency for the event (from stripe account, ticket types, or default to EUR)
+  const eventCurrency = event.stripeAccount?.defaultCurrency ||
+    event.ticketTypes?.[0]?.currency ||
+    "eur"
 
   // Navigation warning state
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
@@ -347,12 +366,28 @@ export default function EventEditForm({
             />
           )}
 
-          {activeTab === "finance" && (
-            <FinanceTab
+          {activeTab === "budget" && (
+            <BudgetTab
               eventDocumentId={event.documentId}
-              financeData={form.financeData}
-              onFinanceChange={form.setFinanceData}
+              budgetItems={budgetItems}
+              onBudgetItemsChange={setBudgetItems}
+              currency={eventCurrency}
             />
+          )}
+
+          {activeTab === "actuals" && (
+            <ResultsTab
+              eventDocumentId={event.documentId}
+              resultItems={resultItems}
+              onResultItemsChange={setResultItems}
+              budgetItems={budgetItems}
+              ticketRevenue={ticketRevenue}
+              currency={eventCurrency}
+            />
+          )}
+
+          {activeTab === "finance" && (
+            <FinanceTab eventDocumentId={event.documentId} />
           )}
         </div>
 
@@ -364,6 +399,11 @@ export default function EventEditForm({
           isDirty={isDirty}
           onPublishToggle={handlePublishToggle}
           onDiscard={handleDiscard}
+          activeTab={activeTab}
+          budgetItems={budgetItems}
+          resultItems={resultItems}
+          ticketRevenue={ticketRevenue}
+          currency={eventCurrency}
         />
       </div>
 

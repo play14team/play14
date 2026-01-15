@@ -8,7 +8,7 @@
  * 2. Updates any existing data to use the new column name
  */
 
-export async function up(knex: any) {
+export async function up(knex) {
   console.log("Starting migration: Rename event status field")
 
   // Check if the events table exists first (for fresh database installations)
@@ -28,7 +28,7 @@ export async function up(knex: any) {
     console.log("Renaming status column to event_status in events table")
 
     // Rename the column from 'status' to 'event_status'
-    await knex.schema.alterTable("events", (table: any) => {
+    await knex.schema.alterTable("events", (table) => {
       table.renameColumn("status", "event_status")
     })
 
@@ -39,7 +39,7 @@ export async function up(knex: any) {
     console.log("Status column not found, creating event_status column")
 
     // Create the event_status column if neither exists
-    await knex.schema.alterTable("events", (table: any) => {
+    await knex.schema.alterTable("events", (table) => {
       table
         .enu("event_status", ["Announced", "Open", "Over", "Cancelled"])
         .notNullable()
@@ -48,7 +48,7 @@ export async function up(knex: any) {
   }
 }
 
-export async function down(knex: any) {
+export async function down(knex) {
   console.log("Rolling back migration: Rename event status field")
 
   // Check if the 'event_status' column exists before renaming back
@@ -59,7 +59,7 @@ export async function down(knex: any) {
     console.log("Renaming event_status column back to status in events table")
 
     // Rename the column back from 'event_status' to 'status'
-    await knex.schema.alterTable("events", (table: any) => {
+    await knex.schema.alterTable("events", (table) => {
       table.renameColumn("event_status", "status")
     })
 

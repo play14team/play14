@@ -34,6 +34,20 @@
           "sortable": true
         }
       },
+      "visible": {
+        "edit": {
+          "label": "visible",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "visible",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "slug": {
         "edit": {
           "label": "slug",
@@ -469,6 +483,10 @@
           {
             "name": "defaultFoodPreferences",
             "size": 6
+          },
+          {
+            "name": "visible",
+            "size": 4
           }
         ]
       ]

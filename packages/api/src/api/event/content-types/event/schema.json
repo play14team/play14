@@ -222,6 +222,18 @@
       "relation": "oneToMany",
       "target": "api::discount-code.discount-code",
       "mappedBy": "event"
+    },
+    "budgetItems": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::budget-line-item.budget-line-item",
+      "mappedBy": "event"
+    },
+    "resultItems": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::result-line-item.result-line-item",
+      "mappedBy": "event"
     }
   }
 }

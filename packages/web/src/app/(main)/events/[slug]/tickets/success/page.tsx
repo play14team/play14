@@ -1,5 +1,7 @@
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { getOrderStatus } from "@/components/tickets/purchase.action"
+import AutoRedirect from "./auto-redirect"
 import styles from "./page.module.scss"
 
 interface SuccessPageProps {
@@ -44,61 +46,57 @@ export default async function TicketSuccessPage({ params, searchParams }: Succes
 
   const isPaid = order.status === "paid"
 
-  return (
-    <div className={styles.container}>
-      <div className={isPaid ? styles.success : styles.pending}>
-        <div className={styles.icon}>{isPaid ? "✓" : "⏳"}</div>
+  // If payment is confirmed, show success message and auto-redirect
+  if (isPaid) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.success}>
+          <div className={styles.icon}>✓</div>
 
-        <h1 className={styles.title}>{isPaid ? "Thank You!" : "Processing Payment"}</h1>
+          <h1 className={styles.title}>Payment Successful!</h1>
 
-        <p className={styles.subtitle}>
-          {isPaid
-            ? "Your ticket purchase was successful."
-            : "Your payment is being processed. Please wait a moment."}
-        </p>
+          <p className={styles.subtitle}>Your ticket purchase has been confirmed.</p>
 
-        <div className={styles.orderDetails}>
-          <h2>Order Details</h2>
-          <dl>
-            <dt>Order Number</dt>
-            <dd>{order.orderNumber}</dd>
-
-            <dt>Event</dt>
-            <dd>{order.event.name}</dd>
-
-            <dt>Total</dt>
-            <dd>
+          <div className={styles.orderInfo}>
+            <p>Order #{order.orderNumber}</p>
+            <p className={styles.eventName}>{order.event.name}</p>
+            <p className={styles.amount}>
               {order.currency} {order.totalAmount.toFixed(2)}
-            </dd>
-
-            <dt>Status</dt>
-            <dd className={styles[order.status]}>{order.status.toUpperCase()}</dd>
-          </dl>
-        </div>
-
-        {isPaid && order.tickets && order.tickets.length > 0 && (
-          <div className={styles.tickets}>
-            <h2>Your Tickets</h2>
-            <ul>
-              {order.tickets.map((ticket) => (
-                <li key={ticket.documentId}>
-                  <span className={styles.ticketType}>{ticket.ticketType}</span>
-                  <code className={styles.ticketCode}>{ticket.ticketCode}</code>
-                </li>
-              ))}
-            </ul>
-            <p className={styles.note}>
-              A confirmation email with your ticket codes has been sent to {order.purchaserEmail}
             </p>
           </div>
-        )}
+
+          <p className={styles.redirectMessage}>Redirecting to your order details...</p>
+
+          <AutoRedirect orderId={order.documentId} />
+
+          <div className={styles.actions}>
+            <Link href={`/orders/${order.documentId}`} className={styles.button}>
+              View Order Details
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Payment is still processing
+  return (
+    <div className={styles.container}>
+      <div className={styles.pending}>
+        <div className={styles.icon}>⏳</div>
+
+        <h1 className={styles.title}>Processing Payment</h1>
+
+        <p className={styles.subtitle}>Your payment is being processed. Please wait a moment.</p>
+
+        <div className={styles.orderInfo}>
+          <p>Order #{order.orderNumber}</p>
+          <p className={styles.eventName}>{order.event.name}</p>
+        </div>
 
         <div className={styles.actions}>
           <Link href={`/events/${resolvedParams.slug}`} className={styles.button}>
             Return to Event
-          </Link>
-          <Link href="/admin/tickets" className={styles.buttonSecondary}>
-            View All My Tickets
           </Link>
         </div>
       </div>

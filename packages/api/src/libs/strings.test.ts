@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest"
-import { toSlug, eventToSlug, capitalize, normalize } from "./strings"
+import { toSlug, eventToSlug, capitalize, normalize, nameToUsername } from "./strings"
 
 describe("toSlug", () => {
   describe("basic slugification", () => {
@@ -207,5 +207,75 @@ describe("normalize", () => {
 
   it("handles empty string", () => {
     expect(normalize("")).toBe("")
+  })
+})
+
+describe("nameToUsername", () => {
+  describe("full name parsing", () => {
+    it("converts full name to username", () => {
+      expect(nameToUsername("Jim Morrison")).toBe("jim.morrison")
+    })
+
+    it("handles multiple word names with dots between each", () => {
+      expect(nameToUsername("Jean Pierre Dupont")).toBe("jean.pierre.dupont")
+    })
+
+    it("handles complex names", () => {
+      expect(nameToUsername("Jose Maria da Silva Goncalves")).toBe(
+        "jose.maria.da.silva.goncalves"
+      )
+    })
+
+    it("handles single name", () => {
+      expect(nameToUsername("Madonna")).toBe("madonna")
+    })
+  })
+
+  describe("first and last name parameters", () => {
+    it("uses firstName and lastName when provided", () => {
+      expect(nameToUsername(undefined, "Janis", "Joplin")).toBe("janis.joplin")
+    })
+
+    it("prefers firstName/lastName over fullName", () => {
+      expect(nameToUsername("Wrong Name", "John", "Lennon")).toBe("john.lennon")
+    })
+
+    it("handles only firstName", () => {
+      expect(nameToUsername(undefined, "Prince", undefined)).toBe("prince")
+    })
+
+    it("handles only lastName", () => {
+      expect(nameToUsername(undefined, undefined, "Cher")).toBe("cher")
+    })
+  })
+
+  describe("accented characters", () => {
+    it("normalizes French accents", () => {
+      expect(nameToUsername("José García")).toBe("jose.garcia")
+    })
+
+    it("normalizes German umlauts", () => {
+      expect(nameToUsername("Müller Hans")).toBe("muller.hans")
+    })
+
+    it("normalizes Scandinavian characters", () => {
+      expect(nameToUsername("Björk Guðmundsdóttir")).toBe("bjork.gudmundsdottir")
+    })
+  })
+
+  describe("edge cases", () => {
+    it("handles extra whitespace", () => {
+      expect(nameToUsername("  Jim   Morrison  ")).toBe("jim.morrison")
+    })
+
+    it("removes special characters", () => {
+      expect(nameToUsername("John O'Connor")).toBe("john.oconnor")
+    })
+
+    it("returns 'player' for empty input", () => {
+      expect(nameToUsername(undefined, undefined, undefined)).toBe("player")
+      expect(nameToUsername("")).toBe("player")
+      expect(nameToUsername("   ")).toBe("player")
+    })
   })
 })

@@ -9,7 +9,7 @@ interface PlayerInvitationEmailProps {
   eventDate: string
   eventTime: string
   eventLocation: string
-  claimUrl: string
+  resetPasswordUrl: string
   googleCalendarUrl?: string
   outlookCalendarUrl?: string
   frontendUrl?: string
@@ -33,11 +33,12 @@ const ticketBoxStyle = {
   margin: "20px 0",
 }
 
-const ticketCodeStyle = {
-  fontSize: "24px",
-  fontWeight: "bold" as const,
+const codeStyle = {
+  background: "#fff3e0",
+  padding: "4px 8px",
+  borderRadius: "4px",
+  fontFamily: "monospace",
   color: "#f47920",
-  letterSpacing: "2px",
 }
 
 const calendarBoxStyle = {
@@ -56,7 +57,7 @@ const calendarButtonStyle = {
   textDecoration: "none",
   borderRadius: "4px",
   fontSize: "13px",
-  margin: "5px",
+  margin: "8px 8px 8px 0",
 }
 
 const featuresList = {
@@ -71,7 +72,7 @@ export default function PlayerInvitationEmail({
   eventDate,
   eventTime,
   eventLocation,
-  claimUrl,
+  resetPasswordUrl,
   googleCalendarUrl,
   outlookCalendarUrl,
   frontendUrl = "https://play14.org",
@@ -87,10 +88,10 @@ export default function PlayerInvitationEmail({
       </Text>
 
       <div style={ticketBoxStyle}>
-        <Text style={{ margin: 0 }}>
-          <strong>Your Ticket</strong>
+        <Heading as="h3">Your Ticket</Heading>
+        <Text style={{ margin: "0" }}>
+          <span style={codeStyle}>{ticketCode}</span>
         </Text>
-        <Text style={ticketCodeStyle}>{ticketCode}</Text>
         <Text style={{ marginTop: "15px", marginBottom: 0 }}>
           <strong>Event:</strong> {eventName}
           <br />
@@ -105,6 +106,11 @@ export default function PlayerInvitationEmail({
           <Heading as="h3" style={{ marginTop: 0, color: "#1976d2" }}>
             Add to Your Calendar
           </Heading>
+          <Text style={{ marginBottom: "15px" }}>
+            <strong>Date:</strong> {eventDate} at {eventTime}
+            <br />
+            <strong>Location:</strong> {eventLocation}
+          </Text>
           <div>
             {googleCalendarUrl && (
               <Link href={googleCalendarUrl} style={calendarButtonStyle}>
@@ -118,7 +124,7 @@ export default function PlayerInvitationEmail({
             )}
           </div>
           <Text style={{ marginTop: "12px", marginBottom: 0, fontSize: "12px", color: "#666" }}>
-            An .ics calendar file is also attached to this email.
+            An .ics calendar file is also attached to this email for other calendar apps.
           </Text>
         </div>
       )}
@@ -139,7 +145,7 @@ export default function PlayerInvitationEmail({
         </li>
       </ul>
 
-      <Button href={claimUrl} style={buttonStyle}>
+      <Button href={resetPasswordUrl} style={buttonStyle}>
         Create Your Account
       </Button>
 

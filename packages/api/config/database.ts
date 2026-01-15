@@ -22,7 +22,5 @@ export default ({ env }: { env: any }) => ({
     debug: env.bool("DATABASE_DEBUG", false),
     acquireConnectionTimeout: 60000,
   },
-  settings: {
-    useTypescriptMigrations: true,
-  },
+  settings: {},
 })

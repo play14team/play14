@@ -1,0 +1,676 @@
+// ===========================================
+// Budget & Actuals Tabs - Financial Planning & Tracking
+// ===========================================
+
+// ===========================================
+// Budget Summary Cards
+// ===========================================
+
+.budget-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.budget-summary-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+
+  .budget-summary-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .budget-summary-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  &.budget-summary-income {
+    border-left: 4px solid #22c55e;
+
+    .budget-summary-value {
+      color: #16a34a;
+    }
+  }
+
+  &.budget-summary-expenses {
+    border-left: 4px solid #ef4444;
+
+    .budget-summary-value {
+      color: #dc2626;
+    }
+  }
+
+  &.budget-summary-margin {
+    &.positive {
+      border-left: 4px solid #22c55e;
+      .budget-summary-value {
+        color: #16a34a;
+      }
+    }
+
+    &.negative {
+      border-left: 4px solid #ef4444;
+      .budget-summary-value {
+        color: #dc2626;
+      }
+    }
+  }
+}
+
+// ===========================================
+// Break-even Calculator
+// ===========================================
+
+.break-even-calculator {
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.break-even-input {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+
+  label {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .input-with-prefix {
+    max-width: 200px;
+  }
+}
+
+.break-even-result {
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.break-even-formula {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+
+  .break-even-total {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+}
+
+.break-even-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+
+  i {
+    font-size: 20px;
+  }
+
+  &.on-track {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+  }
+
+  &.below-target {
+    background: rgba(234, 179, 8, 0.1);
+    color: #ca8a04;
+  }
+}
+
+// ===========================================
+// Category Sections (Budget & Actuals shared)
+// ===========================================
+
+.budget-categories,
+.actuals-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.budget-category-section,
+.actuals-category-section {
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.budget-category-header,
+.actuals-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.budget-category-title,
+.actuals-category-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+
+  i {
+    font-size: 18px;
+    color: var(--color-text-secondary);
+  }
+}
+
+.budget-category-total,
+.actuals-category-actual {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.actuals-category-values {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.actuals-category-budget {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+// ===========================================
+// Line Items List
+// ===========================================
+
+.budget-items-list,
+.actuals-items-list {
+  padding: 8px 0;
+}
+
+.budget-item,
+.actuals-item {
+  padding: 12px 20px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  // Calculated/read-only items (e.g., ticket revenue)
+  &.actuals-item-calculated {
+    background: var(--color-bg-elevated);
+
+    .actuals-item-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-text-secondary);
+
+      i {
+        font-size: 14px;
+      }
+    }
+
+    .actuals-item-amount {
+      color: var(--color-text-secondary);
+    }
+  }
+}
+
+.budget-item-view,
+.actuals-item-view {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.budget-item-info,
+.actuals-item-info {
+  flex: 1;
+  min-width: 0;
+
+  .budget-item-name,
+  .actuals-item-name {
+    font-weight: 500;
+    display: block;
+  }
+
+  .budget-item-description,
+  .actuals-item-description {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-top: 2px;
+  }
+}
+
+.budget-item-values {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-align: right;
+
+  .budget-item-calculation {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .budget-item-total {
+    font-weight: 600;
+    min-width: 80px;
+  }
+}
+
+.actuals-item-amount {
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
+}
+
+.budget-item-actions,
+.actuals-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+  }
+
+  &.admin-btn-icon-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+  }
+}
+
+// ===========================================
+// Line Item Edit Form
+// ===========================================
+
+.budget-item-edit,
+.actuals-item-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.budget-item-edit-fields,
+.actuals-item-edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actuals-item-edit-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  > .admin-input {
+    flex: 1;
+  }
+
+  > .input-with-prefix {
+    flex: 0 0 180px;
+  }
+}
+
+.budget-item-edit-numbers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  .input-with-prefix {
+    flex: 1;
+    min-width: 120px;
+    max-width: 160px;
+  }
+
+  .budget-item-quantity {
+    width: 80px;
+    text-align: center;
+  }
+
+  .budget-item-multiply,
+  .budget-item-equals {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .budget-item-total {
+    font-weight: 600;
+    min-width: 100px;
+    text-align: right;
+  }
+}
+
+.budget-item-edit-actions,
+.actuals-item-edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+// ===========================================
+// Add Item Button
+// ===========================================
+
+.budget-add-item-btn,
+.actuals-add-item-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  i {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+  }
+}
+
+// ===========================================
+// Section Totals
+// ===========================================
+
+.budget-section-total,
+.actuals-section-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  margin-top: 16px;
+  background: var(--color-bg-elevated);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+// ===========================================
+// Actuals Summary Table
+// ===========================================
+
+.actuals-summary-table {
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.actuals-summary-header {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px 100px;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--color-bg-elevated);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-align: right;
+
+  span:first-child {
+    text-align: left;
+  }
+}
+
+.actuals-summary-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px 100px;
+  gap: 16px;
+  padding: 14px 20px;
+  font-size: 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--color-border);
+
+  span:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .actuals-value {
+    font-weight: 600;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.actuals-summary-result {
+    background: var(--color-bg-elevated);
+    font-weight: 600;
+
+    &.profit .actuals-value {
+      color: #16a34a;
+    }
+
+    &.loss .actuals-value {
+      color: #dc2626;
+    }
+  }
+}
+
+// ===========================================
+// Variance Styling
+// ===========================================
+
+.variance {
+  font-size: 13px;
+  font-weight: 500;
+
+  &.positive {
+    color: #16a34a;
+  }
+
+  &.negative {
+    color: #dc2626;
+  }
+}
+
+// ===========================================
+// Actuals Result Card
+// ===========================================
+
+.actuals-result-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-radius: 12px;
+
+  &.profit {
+    background: rgba(34, 197, 94, 0.1);
+
+    .actuals-result-icon {
+      color: #16a34a;
+    }
+
+    .actuals-result-label {
+      color: #16a34a;
+    }
+  }
+
+  &.loss {
+    background: rgba(239, 68, 68, 0.1);
+
+    .actuals-result-icon {
+      color: #dc2626;
+    }
+
+    .actuals-result-label {
+      color: #dc2626;
+    }
+  }
+}
+
+.actuals-result-icon {
+  font-size: 32px;
+}
+
+.actuals-result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.actuals-result-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.actuals-result-amount {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+// ===========================================
+// Input prefix helper
+// ===========================================
+
+.input-with-prefix {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg);
+
+  &:focus-within {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.15);
+  }
+
+  .input-prefix {
+    padding: 10px 12px;
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 600;
+    border-right: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+
+  .admin-input {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}
+
+// ===========================================
+// Responsive
+// ===========================================
+
+@media (max-width: 768px) {
+  .budget-summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .break-even-input {
+    flex-direction: column;
+    align-items: stretch;
+
+    .input-with-prefix {
+      max-width: none;
+    }
+  }
+
+  .break-even-formula {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .budget-item-edit-numbers {
+    flex-direction: column;
+    align-items: stretch;
+
+    .input-with-prefix {
+      max-width: none;
+    }
+
+    .budget-item-quantity {
+      width: 100%;
+    }
+
+    .budget-item-multiply,
+    .budget-item-equals {
+      display: none;
+    }
+  }
+
+  .actuals-item-edit-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    > .input-with-prefix {
+      flex: 1;
+    }
+  }
+
+  .actuals-summary-header,
+  .actuals-summary-row {
+    grid-template-columns: 1fr 80px 80px;
+    font-size: 12px;
+    gap: 8px;
+
+    // Hide budget column on mobile
+    span:nth-child(2) {
+      display: none;
+    }
+  }
+}

@@ -307,7 +307,7 @@
       },
       "finance": {
         "edit": {
-          "label": "finance",
+          "label": "Finance",
           "description": "",
           "placeholder": "",
           "visible": true,
@@ -374,6 +374,36 @@
         },
         "list": {
           "label": "discountCodes",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "budgetItems": {
+        "edit": {
+          "label": "Budget",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "budgetItems",
+          "searchable": false,
+          "sortable": false
+        }
+      },
+      "resultItems": {
+        "edit": {
+          "label": "Results",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true,
+          "mainField": "name"
+        },
+        "list": {
+          "label": "resultItems",
           "searchable": false,
           "sortable": false
         }
@@ -587,6 +617,16 @@
           {
             "name": "registration",
             "size": 12
+          }
+        ],
+        [
+          {
+            "name": "budgetItems",
+            "size": 6
+          },
+          {
+            "name": "resultItems",
+            "size": 6
           }
         ]
       ]

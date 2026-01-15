@@ -66,6 +66,7 @@ export interface EventForEdit {
     accountStatus: string
     chargesEnabled: boolean
     payoutsEnabled: boolean
+    defaultCurrency?: string
   }
   registration?: {
     link?: string

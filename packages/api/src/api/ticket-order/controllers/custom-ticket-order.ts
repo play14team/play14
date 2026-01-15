@@ -4,9 +4,11 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { join } from "path"
 import { sendOrderConfirmationEmail, sendPlayerInvitationEmail } from "../../../services/email-templates"
 import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
-import { validateEmail, validateName } from "../../../libs/validation"
+import { generateInvoicePDF, formatTicketItems, type InvoiceData } from "../../../libs/invoice"
+import { validateEmail, validateName, sanitizeText } from "../../../libs/validation"
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
 import {
@@ -1216,6 +1218,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (attendee.foodPreferences !== undefined && typeof attendee.foodPreferences !== "string") {
         return ctx.badRequest(`Attendee ${i + 1}: Food preferences must be a string`)
       }
+      // Sanitize foodPreferences to strip HTML/script tags (XSS prevention)
+      if (attendee.foodPreferences) {
+        attendee.foodPreferences = sanitizeText(attendee.foodPreferences)
+        if (attendee.foodPreferences.length > 500) {
+          return ctx.badRequest(`Attendee ${i + 1}: Food preferences must be at most 500 characters`)
+        }
+      }
       if (attendee.photoConsent !== undefined && typeof attendee.photoConsent !== "boolean") {
         return ctx.badRequest(`Attendee ${i + 1}: Photo consent must be a boolean`)
       }
@@ -1410,6 +1419,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       discountCodeReserved = true
     }
 
+    // Track what resources have been allocated for cleanup on error
+    let orderUpdatedToPending = false
+    let reservationsCreated = false
+
     try {
       const provider = getPaymentProvider("stripe") as ConnectPaymentProvider
 
@@ -1475,6 +1488,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           providerSessionId: session.sessionId,
         } as any,
       })
+      orderUpdatedToPending = true
 
       // Create reservations for the tickets
       const ticketRequests = ticketDetails.map((detail: any) => ({
@@ -1490,21 +1504,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       )
 
       if (!reservationResult.success) {
-        // Reservation failed - revert order to draft status and release discount code
-        await strapi.documents("api::ticket-order.ticket-order").update({
-          documentId: order.documentId,
-          data: {
-            status: "draft",
-            providerSessionId: null,
-          } as any,
-        })
-        // Release the discount code reservation if we made one
-        if (discountCodeReserved && order.discountCode?.documentId) {
-          await releaseDiscountCode(strapi, order.discountCode.documentId)
-        }
-        strapi.log.warn(`[Ticketing] Reservation failed for order ${order.orderNumber}: ${reservationResult.error}`)
-        return ctx.badRequest(reservationResult.error || "Failed to reserve tickets")
+        // Reservation failed - will be cleaned up in finally-like block below
+        throw new Error(reservationResult.error || "Failed to reserve tickets")
       }
+      reservationsCreated = true
 
       strapi.log.info(
         `[Ticketing] Checkout session created for order ${order.orderNumber}`
@@ -1517,11 +1520,47 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
     } catch (error: any) {
-      // Release the discount code reservation if Stripe session creation fails
-      if (discountCodeReserved && order.discountCode?.documentId) {
-        await releaseDiscountCode(strapi, order.discountCode.documentId)
-      }
+      // Clean up all allocated resources in reverse order
       strapi.log.error(`[Ticketing] Failed to create checkout session: ${error.message}`)
+
+      // Release reservations if they were created
+      if (reservationsCreated) {
+        try {
+          await releaseReservations(strapi, order.documentId)
+          strapi.log.info(`[Ticketing] Released reservations for order ${order.orderNumber} after error`)
+        } catch (releaseError: any) {
+          strapi.log.error(`[Ticketing] Failed to release reservations: ${releaseError.message}`)
+        }
+      }
+
+      // Revert order status if it was updated to pending
+      if (orderUpdatedToPending) {
+        try {
+          await strapi.documents("api::ticket-order.ticket-order").update({
+            documentId: order.documentId,
+            data: {
+              status: "draft",
+              providerSessionId: null,
+            } as any,
+          })
+        } catch (revertError: any) {
+          strapi.log.error(`[Ticketing] Failed to revert order status: ${revertError.message}`)
+        }
+      }
+
+      // Release the discount code reservation
+      if (discountCodeReserved && order.discountCode?.documentId) {
+        try {
+          await releaseDiscountCode(strapi, order.discountCode.documentId)
+        } catch (discountError: any) {
+          strapi.log.error(`[Ticketing] Failed to release discount code: ${discountError.message}`)
+        }
+      }
+
+      // Return appropriate error
+      if (error.message?.includes("Failed to reserve tickets") || error.message?.includes("Not enough")) {
+        return ctx.badRequest(error.message)
+      }
       return ctx.internalServerError("Failed to create payment session")
     }
   },
@@ -1702,6 +1741,147 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    */
   async addPlayerToEvent(playerDocumentId: string, event: any) {
     return addPlayerToEventAttendees(strapi, playerDocumentId, event, "[Ticketing]")
+  },
+
+  /**
+   * Download invoice PDF for a paid order
+   * SECURITY: Requires authentication and ownership (purchaser or event organizer)
+   */
+  async downloadInvoice(ctx) {
+    const { orderId } = ctx.params
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in to download invoices")
+    }
+
+    // Fetch order with all data needed for invoice
+    const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
+      documentId: orderId,
+      populate: {
+        event: {
+          fields: ["documentId", "name", "slug", "start", "end", "contactEmail"],
+          populate: {
+            location: { fields: ["name", "country"] },
+            venue: { fields: ["name"] },
+            hosts: { fields: ["id"] },
+            mentors: { fields: ["id"] },
+          },
+        },
+        player: { fields: ["id", "documentId", "name"] },
+        tickets: {
+          populate: {
+            ticketType: { fields: ["name", "price", "currency"] },
+          },
+        },
+      },
+    })
+
+    if (!order) {
+      return ctx.notFound("Order not found")
+    }
+
+    // Check authorization: owner or event organizer
+    const player = await this.getLinkedPlayer(user.id)
+    const isOwner =
+      order.purchaserEmail === user.email || (player && order.player?.id === player.id)
+
+    let isOrganizer = false
+    if (!isOwner && player) {
+      const event = order.event as any
+      isOrganizer =
+        event?.hosts?.some((h: any) => h.id === player.id) ||
+        event?.mentors?.some((m: any) => m.id === player.id)
+    }
+
+    if (!isOwner && !isOrganizer) {
+      return ctx.forbidden("You are not authorized to download this invoice")
+    }
+
+    // Only paid orders can have invoices
+    if (order.status !== "paid" && order.status !== "refunded") {
+      return ctx.badRequest("Invoice is only available for paid orders")
+    }
+
+    // Build invoice data
+    const event = order.event as any
+    const locationName = event?.location?.name || ""
+    const venueName = event?.venue?.name || ""
+    const eventLocation = [venueName, locationName].filter(Boolean).join(", ") || "TBD"
+
+    // Group tickets by type for invoice line items
+    const ticketsByType = new Map<string, { name: string; price: number; currency: string; quantity: number }>()
+    for (const ticket of (order.tickets || []) as any[]) {
+      const typeName = ticket.ticketType?.name || "Ticket"
+      const existing = ticketsByType.get(typeName)
+      if (existing) {
+        existing.quantity += 1
+      } else {
+        ticketsByType.set(typeName, {
+          name: typeName,
+          price: ticket.ticketType?.price || 0,
+          currency: ticket.ticketType?.currency || order.currency,
+          quantity: 1,
+        })
+      }
+    }
+
+    const ticketItems = Array.from(ticketsByType.values()).map((item) => ({
+      description: item.name,
+      quantity: item.quantity,
+      unitPrice: item.price,
+      totalPrice: item.price * item.quantity,
+    }))
+
+    const subtotal = ticketItems.reduce((sum, item) => sum + item.totalPrice, 0)
+    const discountAmount = subtotal - order.totalAmount
+
+    const invoiceData: InvoiceData = {
+      orderNumber: order.orderNumber,
+      invoiceNumber: order.orderNumber,
+      invoiceDate: order.paidAt || order.createdAt,
+      purchaserName: order.purchaserName,
+      purchaserEmail: order.purchaserEmail,
+      eventName: event?.name || "Event",
+      eventDate: event?.start
+        ? new Date(event.start).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "TBD",
+      eventLocation,
+      tickets: ticketItems,
+      subtotal,
+      discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      totalAmount: order.totalAmount,
+      currency: order.currency,
+      paymentMethod: "Stripe",
+      notes: order.status === "refunded" ? "This order has been refunded." : undefined,
+    }
+
+    // Logo path
+    const logoPath = join(__dirname, "../../../../design/logo/PNG/tinified/play14_white_bg_trans_600x200.png")
+
+    try {
+      const pdfBuffer = await generateInvoicePDF(invoiceData, {
+        organizationName: "#play14",
+        organizationWebsite: "https://play14.org",
+        organizationEmail: event?.contactEmail || "team@play14.org",
+        logoPath,
+      })
+
+      // Set response headers for PDF download
+      ctx.set("Content-Type", "application/pdf")
+      ctx.set("Content-Disposition", `attachment; filename="invoice-${order.orderNumber}.pdf"`)
+      ctx.set("Content-Length", pdfBuffer.length.toString())
+
+      ctx.body = pdfBuffer
+    } catch (error: any) {
+      strapi.log.error(`[Invoice] Failed to generate invoice for order ${order.orderNumber}: ${error.message}`)
+      return ctx.internalServerError("Failed to generate invoice")
+    }
   },
 
 })

@@ -6,7 +6,7 @@
  * so we need to add it manually.
  */
 
-export async function up(knex: any) {
+export async function up(knex) {
   console.log("Starting migration: Add processed_webhooks unique index")
 
   // Check if the table exists (it may not exist on first run before schema sync)
@@ -23,7 +23,7 @@ export async function up(knex: any) {
   const indexExists = await knex("pg_indexes")
     .where("indexname", indexName)
     .first()
-    .then((result: any) => !!result)
+    .then((result) => !!result)
 
   if (!indexExists) {
     console.log("Creating unique index on event_id column")
@@ -36,7 +36,7 @@ export async function up(knex: any) {
   }
 }
 
-export async function down(knex: any) {
+export async function down(knex) {
   console.log("Rolling back migration: Remove processed_webhooks unique index")
 
   const hasTable = await knex.schema.hasTable("processed_webhooks")
@@ -49,7 +49,7 @@ export async function down(knex: any) {
   const indexExists = await knex("pg_indexes")
     .where("indexname", indexName)
     .first()
-    .then((result: any) => !!result)
+    .then((result) => !!result)
 
   if (indexExists) {
     console.log("Dropping unique index on event_id column")

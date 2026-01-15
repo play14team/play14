@@ -104,8 +104,9 @@ function validateCurrency(currency: string | undefined): string {
 export class StripeProvider implements ConnectPaymentProvider {
   private stripe: Stripe
   private webhookSecret: string
+  private webhookSecretConnect: string
 
-  constructor() {
+  constructor(webhookSecret?: string, webhookSecretConnect?: string) {
     const secretKey = process.env.STRIPE_SECRET_KEY
     if (!secretKey) {
       throw new Error("STRIPE_SECRET_KEY environment variable is not set")
@@ -113,7 +114,9 @@ export class StripeProvider implements ConnectPaymentProvider {
 
     this.stripe = new Stripe(secretKey)
 
-    this.webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || ""
+    // Allow passing secrets as parameters for testing, otherwise use env vars
+    this.webhookSecret = webhookSecret || process.env.STRIPE_WEBHOOK_SECRET || ""
+    this.webhookSecretConnect = webhookSecretConnect || process.env.STRIPE_WEBHOOK_SECRET_CONNECT || ""
   }
 
   async createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession> {
@@ -218,11 +221,36 @@ export class StripeProvider implements ConnectPaymentProvider {
   }
 
   async verifyWebhookSignature(payload: string, signature: string): Promise<WebhookEvent> {
-    if (!this.webhookSecret || this.webhookSecret.trim().length === 0) {
-      throw new Error("STRIPE_WEBHOOK_SECRET environment variable is not set or empty")
+    if ((!this.webhookSecret || this.webhookSecret.trim().length === 0) &&
+        (!this.webhookSecretConnect || this.webhookSecretConnect.trim().length === 0)) {
+      throw new Error("At least one of STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET_CONNECT must be set")
     }
 
-    const event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret)
+    let event: Stripe.Event | null = null
+    const errors: string[] = []
+
+    // Try platform webhook secret first
+    if (this.webhookSecret && this.webhookSecret.trim().length > 0) {
+      try {
+        event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret)
+      } catch (error: any) {
+        errors.push(`Platform webhook: ${error.message}`)
+      }
+    }
+
+    // If platform secret failed or not set, try connect webhook secret
+    if (!event && this.webhookSecretConnect && this.webhookSecretConnect.trim().length > 0) {
+      try {
+        event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecretConnect)
+      } catch (error: any) {
+        errors.push(`Connect webhook: ${error.message}`)
+      }
+    }
+
+    // If both failed, throw error with details
+    if (!event) {
+      throw new Error(`Webhook signature verification failed. ${errors.join("; ")}`)
+    }
 
     return {
       id: event.id,

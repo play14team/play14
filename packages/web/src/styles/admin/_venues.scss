@@ -206,6 +206,16 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  // Override delete confirm to stack vertically in narrow sidebar
+  .admin-delete-confirm {
+    flex-direction: column;
+    align-items: stretch;
+
+    span {
+      margin-bottom: 8px;
+    }
+  }
 }
 
 .venue-logo-preview {

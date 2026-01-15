@@ -2,7 +2,7 @@
 
 import { setAuthCookie } from "@/libs/auth"
 import { strapiFetch } from "@/libs/strapi-client"
-import { featureFlags } from "@/libs/feature-flags"
+import { getFeatureFlags } from "@/libs/feature-flags"
 
 interface RegisterResult {
   success: boolean
@@ -63,7 +63,8 @@ export async function registerWithCredentials(
   turnstileToken: string | null = null
 ): Promise<RegisterResult> {
   // Block registration if feature is disabled
-  if (!featureFlags.loginEnabled) {
+  const flags = await getFeatureFlags()
+  if (!flags.loginEnabled) {
     return { success: false, error: "Registration is currently unavailable" }
   }
 

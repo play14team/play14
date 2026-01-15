@@ -1,10 +1,10 @@
 import Link from "next/link"
-import { getMyOrders } from "@/components/tickets/purchase.action"
+import { getMyTickets } from "@/components/tickets/ticket.action"
 import { requireAuth } from "@/libs/auth"
 import styles from "./page.module.scss"
 
 export const metadata = {
-  title: "My Tickets | #play14",
+  title: "Tickets | #play14",
 }
 
 function formatDate(dateString: string): string {
@@ -17,14 +17,14 @@ function formatDate(dateString: string): string {
 
 function getStatusBadgeClass(status: string): string {
   switch (status) {
-    case "paid":
-      return styles.statusPaid
-    case "pending":
-      return styles.statusPending
-    case "refunded":
-      return styles.statusRefunded
+    case "valid":
+      return styles.statusValid
+    case "used":
+      return styles.statusUsed
     case "cancelled":
       return styles.statusCancelled
+    case "refunded":
+      return styles.statusRefunded
     default:
       return ""
   }
@@ -33,57 +33,71 @@ function getStatusBadgeClass(status: string): string {
 export default async function MyTicketsPage() {
   await requireAuth()
 
-  const orders = await getMyOrders()
+  const tickets = await getMyTickets()
 
   return (
     <div className={styles.container}>
-      <h1>My Tickets</h1>
+      <h1>Tickets</h1>
 
-      {orders.length === 0 ? (
+      {tickets.length === 0 ? (
         <div className={styles.empty}>
-          <p>You haven&apos;t purchased any tickets yet.</p>
+          <p>You don&apos;t have any tickets yet.</p>
           <Link href="/events" className={styles.browseLink}>
             Browse Events
           </Link>
         </div>
       ) : (
-        <div className={styles.orders}>
-          {orders.map((order) => (
-            <div key={order.documentId} className={styles.orderCard}>
-              <div className={styles.orderHeader}>
-                <span className={styles.orderNumber}>{order.orderNumber}</span>
-                <span className={`${styles.status} ${getStatusBadgeClass(order.status)}`}>
-                  {order.status.toUpperCase()}
+        <div className={styles.tickets}>
+          {tickets.map((ticket) => (
+            <div key={ticket.documentId} className={styles.ticketCard}>
+              <div className={styles.ticketHeader}>
+                <span className={styles.ticketCode}>{ticket.ticketCode}</span>
+                <span className={`${styles.status} ${getStatusBadgeClass(ticket.ticketStatus)}`}>
+                  {ticket.ticketStatus.toUpperCase()}
                 </span>
               </div>
 
               <div className={styles.eventInfo}>
                 <h3>
-                  <Link href={`/events/${order.event.slug}`}>{order.event.name}</Link>
+                  <Link href={`/events/${ticket.event.slug}`}>{ticket.event.name}</Link>
                 </h3>
                 <p className={styles.eventDate}>
-                  {formatDate(order.event.start)} - {formatDate(order.event.end)}
+                  {formatDate(ticket.event.start)} - {formatDate(ticket.event.end)}
                 </p>
+                {ticket.event.location && (
+                  <p className={styles.eventLocation}>{ticket.event.location.name}</p>
+                )}
               </div>
 
-              <div className={styles.orderMeta}>
-                <span className={styles.ticketCount}>
-                  {order.ticketCount} {order.ticketCount === 1 ? "ticket" : "tickets"}
-                </span>
-                <span className={styles.amount}>
-                  {order.currency} {order.totalAmount.toFixed(2)}
-                </span>
+              <div className={styles.attendeeInfo}>
+                <div className={styles.attendeeField}>
+                  <span className={styles.label}>Attendee:</span>
+                  <span className={styles.value}>{ticket.attendeeName}</span>
+                </div>
+                <div className={styles.attendeeField}>
+                  <span className={styles.label}>Email:</span>
+                  <span className={styles.value}>{ticket.attendeeEmail}</span>
+                </div>
+                {ticket.ticketType && (
+                  <div className={styles.attendeeField}>
+                    <span className={styles.label}>Type:</span>
+                    <span className={styles.value}>{ticket.ticketType.name}</span>
+                  </div>
+                )}
+                {ticket.checkedInAt && (
+                  <div className={styles.attendeeField}>
+                    <span className={styles.label}>Checked In:</span>
+                    <span className={styles.value}>{formatDate(ticket.checkedInAt)}</span>
+                  </div>
+                )}
               </div>
 
-              {order.paidAt && (
-                <p className={styles.purchaseDate}>Purchased on {formatDate(order.paidAt)}</p>
+              {ticket.order && (
+                <p className={styles.orderNumber}>Order: {ticket.order.orderNumber}</p>
               )}
 
-              <Link
-                href={`/events/${order.event.slug}/tickets/success?order=${order.documentId}`}
-                className={styles.viewDetails}
-              >
-                View Details →
+              <Link href={`/tickets/${ticket.documentId}`} className={styles.viewDetails}>
+                View Ticket Details →
               </Link>
             </div>
           ))}

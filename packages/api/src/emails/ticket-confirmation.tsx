@@ -63,7 +63,7 @@ const calendarButtonStyle = {
   textDecoration: "none",
   borderRadius: "4px",
   fontSize: "13px",
-  margin: "5px",
+  margin: "8px 8px 8px 0",
 }
 
 export default function TicketConfirmationEmail({
@@ -146,8 +146,8 @@ export default function TicketConfirmationEmail({
         </Text>
       )}
 
-      <Button href={`${frontendUrl}/admin/tickets`} style={buttonStyle}>
-        View Your Tickets
+      <Button href={`${frontendUrl}/admin/orders`} style={buttonStyle}>
+        View Your Orders
       </Button>
 
       <Text style={{ marginTop: "30px" }}>See you at the event!</Text>

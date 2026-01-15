@@ -5,11 +5,13 @@
 
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
+import { randomBytes } from "node:crypto"
 import {
   generateEventICS,
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
 } from "../libs/calendar"
+import { nameToUsername } from "../libs/strings"
 import TicketConfirmationEmail from "../emails/ticket-confirmation"
 import PlayerInvitationEmail from "../emails/player-invitation"
 
@@ -175,8 +177,66 @@ export async function sendPlayerInvitationEmail(
       ? `${event.location.name}, ${event.location.country}`
       : "Location TBA"
 
-  // Claim URL with player document ID
-  const claimUrl = `${frontendUrl}/auth/register?claim=${player.documentId}`
+  // Generate password reset token for the player's user account
+  const resetToken = randomBytes(64).toString("hex")
+
+  // Find or create the user associated with this player
+  let user = await strapi.documents("plugin::users-permissions.user").findFirst({
+    filters: { player: { documentId: player.documentId } },
+  })
+
+  if (!user) {
+    // No user exists - check if there's a user with this email (not linked to player yet)
+    user = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { email: { $eqi: email } },
+    })
+
+    if (user) {
+      // User exists but not linked to player - link them
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: user.documentId,
+        data: {
+          player: player.id,
+          resetPasswordToken: resetToken,
+        } as any,
+      })
+      strapi.log.info(`[EmailTemplates] Linked existing user ${email} to player ${player.documentId}`)
+    } else {
+      // Create a new user account
+      const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
+        filters: { type: "player" },
+      })
+
+      const password = `${randomBytes(16).toString("hex")}!`
+
+      user = await strapi.documents("plugin::users-permissions.user").create({
+        data: {
+          username: nameToUsername(playerName),
+          email,
+          password,
+          confirmed: true,
+          blocked: false,
+          provider: "local",
+          role: playerRole?.id,
+          player: player.id,
+          invitationStatus: "pending",
+          resetPasswordToken: resetToken,
+        } as any,
+      })
+      strapi.log.info(`[EmailTemplates] Created new user account for ${email} and linked to player ${player.documentId}`)
+    }
+  } else {
+    // User already exists and is linked - just update the reset token
+    await strapi.documents("plugin::users-permissions.user").update({
+      documentId: user.documentId,
+      data: { resetPasswordToken: resetToken } as any,
+    })
+  }
+
+  // Build reset password URL (similar to user-invitations.ts)
+  const callbackUrl = encodeURIComponent("/admin")
+  const code = encodeURIComponent(resetToken)
+  const resetPasswordUrl = `${frontendUrl}/auth/reset-password?code=${code}&callbackUrl=${callbackUrl}`
 
   // Generate calendar data
   let icsContent: string | null = null
@@ -211,7 +271,7 @@ export async function sendPlayerInvitationEmail(
         eventDate,
         eventTime,
         eventLocation,
-        claimUrl,
+        resetPasswordUrl,
         googleCalendarUrl,
         outlookCalendarUrl,
         frontendUrl,
@@ -226,7 +286,7 @@ export async function sendPlayerInvitationEmail(
         eventDate,
         eventTime,
         eventLocation,
-        claimUrl,
+        resetPasswordUrl,
         googleCalendarUrl,
         outlookCalendarUrl,
         frontendUrl,

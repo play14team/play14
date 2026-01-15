@@ -4,436 +4,373 @@
 
 | Field | Value |
 |-------|-------|
-| **Version** | 1.0 |
-| **Date** | 2026-01-10 |
+| **Version** | 2.0 |
+| **Date** | 2026-01-17 |
 | **Branch** | `feat/admin-panel-oauth` |
-| **Status** | Pre-deployment checklist |
+| **Status** | Active deployment documentation |
 
 ---
 
-## 1. Feature Summary
+## 1. Architecture Overview
 
-This branch introduces a complete admin panel and ticketing system for #play14. The following major features are included:
+### 1.1 Infrastructure
 
-### 1.1 Authentication & Authorization
-- OAuth login (GitHub, Google, LinkedIn)
-- Username/password registration and login
-- Role-based permissions (Player < Host < Mentor < Founder)
-- Position-based role auto-assignment
-- Player profile linking flow for new users
+| Component | Technology | Environment |
+|-----------|------------|-------------|
+| **API** | Strapi 5.33.0 | Azure Container Apps |
+| **Web** | Next.js 16 (App Router) | Azure Container Apps |
+| **Database** | PostgreSQL 17.6 | Azure Database for PostgreSQL |
+| **Storage** | Azure Blob Storage | CDN-enabled |
+| **Registry** | Azure Container Registry | `play14containerregistry.azurecr.io` |
+| **Monitoring** | Sentry | Error tracking & performance |
 
-### 1.2 Ticketing & Payments (Stripe)
-- Stripe Connect Express for host payment accounts
-- Ticket types with pricing, availability, and sales periods
-- Checkout flow with Stripe-hosted payments
-- Discount codes with various discount types
-- Webhook handling for payment events
-- Revenue analytics dashboard
+### 1.2 Environments
 
-### 1.3 Admin Panel
-- Event management (create, edit, publish/unpublish)
-- Player management with avatar uploads
-- Venue and location management
-- Schedule editor with templates
-- Media library browser
-- Sponsor management
-- Host and mentor assignment
+| Environment | API Container App | Web Container App | Purpose |
+|-------------|-------------------|-------------------|---------|
+| **Production** | `play14-api` | `play14-ui` | Live site |
+| **Acceptance** | `play14-api-acc` | `play14-ui-acc` | PR testing (auto-start/stop) |
 
-### 1.4 Claims System
-- Player claim system (linking existing player profiles)
-- Event attendance claims
-- Email notifications for claims
+### 1.3 URLs
 
-### 1.5 Email Notifications
-- Purchase confirmation emails
-- Payment failure notifications
-- Claim status notifications
+| Environment | API URL | Web URL |
+|-------------|---------|---------|
+| **Production** | `https://community.play14.org` | `https://play14.org` |
+| **Acceptance** | Auto-assigned Azure URL | Auto-assigned Azure URL |
 
 ---
 
-## 2. Environment Variables Checklist
+## 2. CI/CD Pipeline
 
-### 2.1 API Package (`packages/api`)
+### 2.1 Workflow Overview
 
-#### Required for Production
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          GitHub Actions                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  PR to main (packages/api/**)                                        │
+│  ├── Type check                                                      │
+│  ├── Unit tests                                                      │
+│  ├── Build Strapi admin                                              │
+│  ├── Integration tests (PostgreSQL service container)                │
+│  ├── Build & push Docker image                                       │
+│  ├── Deploy to play14-api-acc (auto-start)                          │
+│  └── PR closed → Stop play14-api-acc                                │
+│                                                                      │
+│  PR to main (packages/web/**)                                        │
+│  ├── Lint & type check                                               │
+│  ├── Unit tests                                                      │
+│  ├── Build Next.js                                                   │
+│  ├── Build & push Docker image                                       │
+│  ├── Deploy to play14-ui-acc (auto-start)                           │
+│  └── PR closed → Stop play14-ui-acc                                 │
+│                                                                      │
+│  Push to main (packages/api/**)                                      │
+│  ├── Type check                                                      │
+│  ├── Build Strapi admin                                              │
+│  ├── Build & push Docker image                                       │
+│  ├── Deploy to play14-api                                           │
+│  └── Health check                                                    │
+│                                                                      │
+│  Push to main (packages/web/**)                                      │
+│  ├── Lint & type check                                               │
+│  ├── Build Next.js                                                   │
+│  ├── Build & push Docker image                                       │
+│  ├── Deploy to play14-ui                                            │
+│  └── Health check                                                    │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `NODE_ENV` | Environment mode | `production` | [ ] |
-| `HOST` | Server host | `0.0.0.0` | [ ] |
-| `PORT` | Server port | `1337` | [ ] |
-| `APP_KEYS` | Session encryption keys (comma-separated) | `key1,key2,key3,key4` | [ ] |
-| `PUBLIC_URL` | Public API URL | `https://community.play14.org` | [ ] |
+### 2.2 Image Tagging Strategy
+
+| Tag | Description |
+|-----|-------------|
+| `prod` / `acc` | Environment marker |
+| `latest` | Most recent production build |
+| `<short-sha>` | 7-character commit hash |
+| `<full-sha>` | Full commit hash |
+| `pr-<number>` | PR-specific tag |
+| `pr-<number>-<sha>` | PR + commit specific |
+
+### 2.3 Deployment Triggers
+
+| Trigger | API Workflow | Web Workflow |
+|---------|--------------|--------------|
+| Push to `main` + `packages/api/**` | Production deploy | - |
+| Push to `main` + `packages/web/**` | - | Production deploy |
+| PR to `main` + `packages/api/**` | Acceptance deploy | - |
+| PR to `main` + `packages/web/**` | - | Acceptance deploy |
+| PR closed | Stop acceptance | Stop acceptance |
+| `workflow_dispatch` | Manual trigger | Manual trigger |
+
+---
+
+## 3. Environment Variables
+
+### 3.1 API Package (`packages/api`)
+
+#### Core Configuration
+
+| Variable | Description | Production Value |
+|----------|-------------|------------------|
+| `NODE_ENV` | Environment mode | `production` |
+| `HOST` | Server host | `0.0.0.0` |
+| `PORT` | Server port | `1337` |
+| `PUBLIC_URL` | Public API URL | `https://community.play14.org` |
+| `CRON_ENABLED` | Enable scheduled tasks | `true` |
 
 #### Database
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `DATABASE_CLIENT` | Database type | `postgres` | [ ] |
-| `DATABASE_HOST` | Database host | `play14-db.postgres.database.azure.com` | [ ] |
-| `DATABASE_PORT` | Database port | `5432` | [ ] |
-| `DATABASE_NAME` | Database name | `play14` | [ ] |
-| `DATABASE_USERNAME` | Database user | `strapi` | [ ] |
-| `DATABASE_PASSWORD` | Database password | `***` | [ ] |
-| `DATABASE_SSL` | Enable SSL | `true` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_CLIENT` | `postgres` |
+| `DATABASE_HOST` | Azure PostgreSQL FQDN |
+| `DATABASE_PORT` | `5432` |
+| `DATABASE_NAME` | Database name |
+| `DATABASE_USERNAME` | Database user |
+| `DATABASE_PASSWORD` | Database password (secret) |
+| `DATABASE_SSL` | `true` |
+| `DATABASE_SSL_SELF` | `false` |
 
 #### Security & Authentication
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `API_TOKEN_SALT` | Salt for API tokens | `random-string` | [ ] |
-| `ADMIN_JWT_SECRET` | Admin panel JWT secret | `random-string` | [ ] |
-| `JWT_SECRET` | User JWT secret | `random-string` | [ ] |
-| `TRANSFER_TOKEN_SALT` | Transfer token salt | `random-string` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `APP_KEYS` | Session encryption keys (comma-separated, secret) |
+| `API_TOKEN_SALT` | Salt for API tokens (secret) |
+| `ADMIN_JWT_SECRET` | Admin panel JWT secret (secret) |
+| `JWT_SECRET` | User JWT secret (secret) |
+| `TRANSFER_TOKEN_SALT` | Transfer token salt (secret) |
 
 #### Azure Storage
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `STORAGE_ACCOUNT` | Azure storage account name | `play14storage` | [ ] |
-| `STORAGE_ACCOUNT_KEY` | Azure storage account key | `***` | [ ] |
-| `STORAGE_CONTAINER_NAME` | Blob container name | `strapi_uploads` | [ ] |
-| `STORAGE_URL` | Storage base URL | `https://play14storage.blob.core.windows.net` | [ ] |
-| `STORAGE_CDN_URL` | CDN URL for assets | `https://cdn.play14.org` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `STORAGE_ACCOUNT` | Azure storage account name |
+| `STORAGE_ACCOUNT_KEY` | Storage account key (secret) |
+| `STORAGE_CONTAINER_NAME` | Blob container name |
+| `STORAGE_URL` | Storage base URL |
+| `STORAGE_CDN_URL` | CDN URL for assets |
 
-#### Stripe (NEW - Critical for Ticketing)
+#### Stripe (Ticketing)
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `STRIPE_SECRET_KEY` | Stripe API secret key | `sk_live_...` | [ ] |
-| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key | `pk_live_...` | [ ] |
-| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret | `whsec_live_...` | [ ] |
-| `STRIPE_PLATFORM_FEE_PERCENT` | Platform fee percentage | `0` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `STRIPE_SECRET_KEY` | Stripe API secret key (secret) |
+| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
+| `STRIPE_WEBHOOK_SECRET` | Platform webhook signing secret (secret) |
+| `STRIPE_WEBHOOK_SECRET_CONNECT` | Connected accounts webhook signing secret (secret) |
+| `STRIPE_PLATFORM_FEE_PERCENT` | Platform fee percentage (`0` for non-profit) |
 
 #### Email (Resend)
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `RESEND_API_KEY` | Resend API key | `re_...` | [ ] |
-| `RESEND_DEFAULT_FROM` | Default sender email | `noreply@play14.org` | [ ] |
-| `RESEND_REPLY_TO` | Reply-to address | `community@play14.org` | [ ] |
-| `EMAIL_ADMIN_RECIPIENTS` | Admin notification emails | `admin@play14.org` | [ ] |
-| `FRONTEND_URL` | Frontend URL for email links | `https://play14.org` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `RESEND_API_KEY` | Resend API key (secret) |
+| `RESEND_DEFAULT_FROM` | Default sender email |
+| `RESEND_REPLY_TO` | Reply-to address |
+| `EMAIL_ADMIN_RECIPIENTS` | Admin notification emails |
+| `FRONTEND_URL` | Frontend URL for email links |
 
 #### GitHub Integration
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `GITHUB_TOKEN` | GitHub PAT for triggering rebuilds | `ghp_...` | [ ] |
-| `GITHUB_OWNER` | GitHub organization | `play14team` | [ ] |
-| `GITHUB_REPO` | GitHub repository | `play14-web` | [ ] |
-| `GITHUB_WORKFLOW_ID` | Workflow ID to trigger | `52506304` | [ ] |
-| `GITHUB_BRANCH` | Branch to trigger | `main` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `GITHUB_TOKEN` | GitHub PAT for triggering rebuilds (secret) |
+| `GITHUB_OWNER` | GitHub organization |
+| `GITHUB_REPO` | GitHub repository |
+| `GITHUB_WORKFLOW_ID` | Workflow ID to trigger |
+| `GITHUB_BRANCH` | Branch to trigger |
 
 #### Mapbox
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN` | Mapbox token for admin panel | `pk.xxx` | [ ] |
+| Variable | Description |
+|----------|-------------|
+| `STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN` | Mapbox token for admin panel (secret) |
 
-#### Cron Jobs
+### 3.2 Web Package (`packages/web`)
 
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `CRON_ENABLED` | Enable scheduled tasks | `true` | [ ] |
+| Variable | Description | Build/Runtime |
+|----------|-------------|---------------|
+| `STRAPI_API_URL` | Backend API URL | Runtime |
+| `STRAPI_API_SECRET` | API authentication token | Runtime (secret) |
+| `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` | Mapbox token (client-side) | Build-time |
+| `NEXT_PUBLIC_SITE_URL` | Frontend URL | Build-time |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile key | Build-time |
+| `FEATURE_LOGIN_ENABLED` | Enable login feature | Build-time |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN | Build-time |
+| `SENTRY_AUTH_TOKEN` | Sentry auth token | Build-time |
+| `SENTRY_ORG` | Sentry organization | Build-time |
 
-### 2.2 Web Package (`packages/web`)
-
-| Variable | Description | Example | Status |
-|----------|-------------|---------|--------|
-| `STRAPI_API_URL` | Backend API URL | `https://community.play14.org` | [ ] |
-| `STRAPI_API_SECRET` | API authentication token | `***` | [ ] |
-| `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` | Mapbox token (client-side) | `pk.xxx` | [ ] |
-| `NEXT_PUBLIC_URL` | Frontend URL | `https://play14.org` | [ ] |
-| `NEXT_PUBLIC_WEB_VITALS` | Enable Web Vitals | `true` | [ ] |
+**Note**: `NEXT_PUBLIC_*` variables are bundled at build time by Next.js and baked into the Docker image.
 
 ---
 
-## 3. Stripe Configuration
+## 4. GitHub Actions Secrets & Variables
 
-### 3.1 Switch to Live Mode
+### 4.1 Repository Secrets
 
-Your current Stripe configuration is in **Test Mode**. For production:
+| Secret | Used By |
+|--------|---------|
+| `AZURE_CLIENT_ID` | Azure OIDC authentication |
+| `AZURE_TENANT_ID` | Azure OIDC authentication |
+| `AZURE_SUBSCRIPTION_ID` | Azure OIDC authentication |
+| `STRAPI_API_SECRET` | Web deployment |
+| `STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN` | API build |
+| `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` | Web build |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Web build (acceptance) |
+| `SENTRY_AUTH_TOKEN` | Sentry source maps |
+| `NEXT_PUBLIC_SENTRY_DSN` | Sentry error tracking |
 
-1. **Log into Stripe Dashboard**: https://dashboard.stripe.com
-2. **Toggle to Live Mode** (switch in top-left corner)
-3. **Get Live API Keys**: Developers → API Keys
-   - Copy `sk_live_...` → `STRIPE_SECRET_KEY`
-   - Copy `pk_live_...` → `STRIPE_PUBLISHABLE_KEY`
+### 4.2 Repository Variables
 
-### 3.2 Create Live Webhook Endpoint
+| Variable | Environment | Value |
+|----------|-------------|-------|
+| `STRAPI_API_URL` | Production | `https://community.play14.org` |
+| `STRAPI_API_URL` | Acceptance | Acceptance API URL |
+| `SENTRY_ENVIRONMENT` | Production | `production` |
+| `SENTRY_ENVIRONMENT` | Acceptance | `acceptance` |
 
-1. Go to **Developers → Webhooks** (in Live mode)
-2. Click **Add endpoint**
-3. Configure:
+---
 
-   | Setting | Value |
-   |---------|-------|
-   | **Endpoint URL** | `https://community.play14.org/api/webhooks/stripe` |
-   | **Events** | See list below |
+## 5. Stripe Configuration
 
-4. **Required Events**:
-   - `checkout.session.completed` - Payment successful
-   - `checkout.session.expired` - Checkout abandoned
-   - `payment_intent.payment_failed` - Payment failed
-   - `charge.refunded` - Refund processed
-   - `account.updated` - Connect account status change
+### 5.1 Dual Webhook Architecture
 
-5. **Copy Signing Secret**: After creation, copy `whsec_live_...` → `STRIPE_WEBHOOK_SECRET`
+The platform uses **two webhook signing secrets** for different event sources:
 
-### 3.3 Webhook Verification Checklist
+| Webhook Type | Secret Variable | Events From |
+|--------------|-----------------|-------------|
+| **Platform** | `STRIPE_WEBHOOK_SECRET` | Your Stripe account |
+| **Connect** | `STRIPE_WEBHOOK_SECRET_CONNECT` | Connected host accounts |
 
-| Check | Status |
-|-------|--------|
-| Live mode webhook created | [ ] |
-| URL matches API endpoint | [ ] |
-| All 5 events subscribed | [ ] |
-| Signing secret copied to env vars | [ ] |
-| Test webhook delivery successful | [ ] |
+Both webhooks point to the same endpoint: `POST /api/webhooks/stripe`
 
-### 3.4 Stripe Connect Setup
+### 5.2 Required Webhook Events
 
-For hosts to receive payments, they'll need to:
+| Event | Purpose |
+|-------|---------|
+| `checkout.session.completed` | Payment successful |
+| `checkout.session.expired` | Checkout abandoned |
+| `payment_intent.payment_failed` | Payment failed |
+| `charge.refunded` | Refund processed |
+| `account.updated` | Connect account status change |
 
-1. Go to Admin Panel → My Profile → Stripe tab
+### 5.3 Stripe Connect Setup
+
+Hosts connect their Stripe Express accounts through:
+1. Admin Panel → My Profile → Stripe tab
 2. Click "Connect with Stripe"
 3. Complete Stripe Express onboarding
 
-**Platform Settings** (Stripe Dashboard → Connect → Settings):
-- Branding: Add #play14 logo and colors
-- Onboarding: Enable Express accounts
-- Country: Ensure supported countries are enabled
+---
+
+## 6. OAuth Providers
+
+OAuth providers are configured in **Strapi Admin UI** (not environment variables):
+
+**Settings → Users & Permissions → Providers**
+
+| Provider | Callback URL |
+|----------|--------------|
+| GitHub | `https://play14.org/connect/github/redirect` |
+| Google | `https://play14.org/connect/google/redirect` |
+| LinkedIn | `https://play14.org/connect/linkedin/redirect` |
+| Microsoft | `https://play14.org/connect/microsoft/redirect` |
 
 ---
 
-## 4. OAuth Providers Configuration
+## 7. Content Types
 
-OAuth providers are configured in Strapi Admin UI, not environment variables.
-
-### 4.1 GitHub OAuth
-
-1. Create OAuth App: https://github.com/settings/developers
-2. Configure:
-   - **Homepage URL**: `https://play14.org`
-   - **Callback URL**: `https://play14.org/connect/github/redirect`
-3. In Strapi Admin → Settings → Users & Permissions → Providers:
-   - Enable GitHub
-   - Add Client ID and Secret
-
-### 4.2 Google OAuth
-
-1. Create OAuth credentials: https://console.cloud.google.com/apis/credentials
-2. Configure:
-   - **Authorized redirect URI**: `https://play14.org/connect/google/redirect`
-3. In Strapi Admin → Settings → Users & Permissions → Providers:
-   - Enable Google
-   - Add Client ID and Secret
-
-### 4.3 LinkedIn OAuth
-
-1. Create App: https://www.linkedin.com/developers/apps
-2. Configure:
-   - **Redirect URL**: `https://play14.org/connect/linkedin/redirect`
-   - **Scopes**: `openid`, `profile`, `email`
-3. In Strapi Admin → Settings → Users & Permissions → Providers:
-   - Enable LinkedIn
-   - Add Client ID and Secret
-
-### 4.4 OAuth Checklist
-
-| Provider | App Created | Callback URL | Strapi Configured | Tested |
-|----------|-------------|--------------|-------------------|--------|
-| GitHub | [ ] | [ ] | [ ] | [ ] |
-| Google | [ ] | [ ] | [ ] | [ ] |
-| LinkedIn | [ ] | [ ] | [ ] | [ ] |
-
----
-
-## 5. Database Migrations
-
-### 5.1 New Content Types
-
-The following content types are new and will be created automatically:
+### 7.1 Core Content Types
 
 | Content Type | Description |
 |--------------|-------------|
-| `stripe-account` | Connected Stripe accounts for hosts |
-| `ticket-type` | Ticket tiers for events |
+| `event` | Community events with scheduling, ticketing, and finance |
+| `player` | Player profiles with positions and visibility |
+| `venue` | Event venues with geolocation |
+| `game` | Agile games catalog |
+| `article` | Blog posts and news |
+
+### 7.2 Ticketing Content Types
+
+| Content Type | Description |
+|--------------|-------------|
+| `ticket-type` | Ticket tiers with pricing and availability |
 | `ticket` | Individual purchased tickets |
 | `ticket-order` | Purchase orders |
-| `discount-code` | Discount/promo codes |
-| `player-claim` | Player profile claims |
-| `attendance-claim` | Event attendance claims |
+| `discount-code` | Promo codes and discounts |
+| `stripe-account` | Connected Stripe accounts for hosts |
+| `processed-webhook` | Webhook idempotency tracking |
 
-### 5.2 Schema Changes
+### 7.3 Claims Content Types
 
-| Content Type | Changes |
-|--------------|---------|
-| `event` | Added: `ticketTypes`, `ticketsEnabled`, `authRequired`, `stripeAccount`, `ticketCurrency`, `schedule` |
-| `player` | Added: `stripeAccount` relation |
-| `venue` | Removed: `shortName` |
+| Content Type | Description |
+|--------------|-------------|
+| `player-claim` | Player profile ownership claims |
+| `attendance-claim` | Event attendance verification claims |
 
-### 5.3 Migration Steps
+### 7.4 Finance Content Types
 
-1. **Backup database** before deployment
-2. Run Strapi build: `bun run build`
-3. Start Strapi: `bun run start`
-4. Strapi will auto-create new tables
-5. Verify in Strapi Admin → Content-Type Builder
+| Content Type | Description |
+|--------------|-------------|
+| `budget-line-item` | Event budget planning items |
+| `result-line-item` | Event financial results |
 
 ---
 
-## 6. Email Configuration (Resend)
+## 8. Docker Images
 
-### 6.1 Resend Setup
+### 8.1 API Dockerfile
 
-1. Create account: https://resend.com
-2. Add and verify domain: `play14.org`
-3. Get API key → `RESEND_API_KEY`
+- **Base**: `oven/bun:1.3.5-alpine`
+- **Runtime deps**: `vips-dev` (image processing), `nodejs`
+- **Port**: 1337
+- **CMD**: `strapi start`
+- **Context**: Project root (needs `node_modules` and `packages/api`)
 
-### 6.2 Email Templates
+### 8.2 Web Dockerfile
 
-The following emails are sent automatically:
-
-| Trigger | Email | Recipient |
-|---------|-------|-----------|
-| Ticket purchase | Confirmation with ticket codes | Purchaser |
-| Payment failure | Retry prompt | Purchaser |
-| Checkout expired | (logged only) | - |
-| Player claim submitted | Notification | Admin recipients |
-| Player claim approved | Confirmation | Claimant |
-| Attendance claim | Notification | Event hosts |
-
-### 6.3 DNS Records Required
-
-Add these DNS records for Resend:
-
-```
-Type: TXT
-Name: _dmarc.play14.org
-Value: v=DMARC1; p=none;
-
-Type: MX
-Name: send.play14.org
-Value: feedback-smtp.us-east-1.amazonses.com
-Priority: 10
-
-Type: TXT
-Name: send.play14.org
-Value: v=spf1 include:amazonses.com ~all
-```
+- **Base**: `oven/bun:1.3.5-alpine`
+- **Output**: Next.js standalone build
+- **Port**: 3000
+- **CMD**: `bun packages/web/server.js`
+- **Context**: `packages/web` (with pre-built `.next` output)
+- **Health check**: Built-in at `/api/health`
 
 ---
 
-## 7. Deployment Checklist
+## 9. Deployment Commands
 
-### 7.1 Pre-Deployment
-
-- [ ] All environment variables configured in Azure Container Apps
-- [ ] Database backup completed
-- [ ] Stripe live mode webhook created
-- [ ] OAuth providers configured in Strapi Admin
-- [ ] Resend domain verified
-- [ ] DNS records updated
-
-### 7.2 Deployment
-
-- [ ] Merge `feat/admin-panel-oauth` to `main`
-- [ ] CI/CD pipeline triggers
-- [ ] Container builds successfully
-- [ ] Deployment completes without errors
-
-### 7.3 Post-Deployment Verification
-
-- [ ] API health check: `https://community.play14.org/api/health`
-- [ ] Admin panel accessible: `https://community.play14.org/admin`
-- [ ] OAuth login works (test each provider)
-- [ ] Create test event with ticketing
-- [ ] Complete test purchase (use Stripe test card first)
-- [ ] Verify webhook received in Stripe Dashboard
-- [ ] Verify confirmation email received
-- [ ] Test Stripe Connect onboarding flow
-
-### 7.4 Rollback Plan
-
-If issues occur:
-
-1. Scale down new container
-2. Restore database from backup
-3. Redeploy previous version
-
----
-
-## 8. Post-Go-Live Tasks
-
-### 8.1 Monitoring
-
-- [ ] Set up Azure Monitor alerts for:
-  - Container health
-  - API response times
-  - Error rates
-  - Database connection pool
-
-- [ ] Monitor Stripe Dashboard for:
-  - Failed payments
-  - Webhook delivery issues
-  - Disputed charges
-
-### 8.2 Documentation
-
-- [ ] Update user documentation for:
-  - Host onboarding guide (Stripe Connect)
-  - Event creation with ticketing
-  - Discount code creation
-
-### 8.3 Communication
-
-- [ ] Announce new features to community
-- [ ] Notify existing hosts about Stripe Connect
-
----
-
-## 9. Security Considerations
-
-### 9.1 Secrets Management
-
-- All secrets stored in Azure Key Vault (referenced by Container Apps)
-- Never commit secrets to repository
-- Rotate secrets periodically
-
-### 9.2 Stripe Security
-
-- Webhook signature verification enabled
-- PCI DSS compliance handled by Stripe Checkout (hosted)
-- No raw card data stored
-
-### 9.3 Authentication
-
-- JWT tokens with secure secrets
-- OAuth tokens not stored (stateless)
-- Session expiry configured
-
----
-
-## 10. Support Contacts
-
-| Issue | Contact |
-|-------|---------|
-| Stripe Support | https://support.stripe.com |
-| Resend Support | https://resend.com/support |
-| Azure Support | Azure Portal → Help + Support |
-
----
-
-## Appendix: Quick Reference
-
-### Stripe CLI Commands
+### 9.1 Manual Azure CLI Commands
 
 ```bash
-# List webhooks
-stripe webhook_endpoints list
+# Check container app status
+az containerapp show --name play14-api --resource-group play14-community
 
-# Test webhook locally
+# View logs
+az containerapp logs show --name play14-api --resource-group play14-community --follow
+
+# Update image manually
+az containerapp update \
+  -n play14-api \
+  -g play14-community \
+  --image play14containerregistry.azurecr.io/play14/play14-api:<tag>
+
+# Start/stop acceptance environment
+az rest --method post \
+  --url "/subscriptions/<sub-id>/resourceGroups/play14-community/providers/Microsoft.App/containerApps/play14-api-acc/start?api-version=2024-03-01"
+
+az rest --method post \
+  --url "/subscriptions/<sub-id>/resourceGroups/play14-community/providers/Microsoft.App/containerApps/play14-api-acc/stop?api-version=2024-03-01"
+```
+
+### 9.2 Stripe CLI (Local Testing)
+
+```bash
+# Forward webhooks to local API
 stripe listen --forward-to localhost:1337/api/webhooks/stripe
 
 # Trigger test events
@@ -443,17 +380,117 @@ stripe trigger payment_intent.payment_failed
 stripe trigger charge.refunded
 ```
 
-### Azure CLI Commands
+---
+
+## 10. Health Checks & Probes
+
+### 10.1 Health Endpoints
+
+| Service | Endpoint | Expected Response |
+|---------|----------|-------------------|
+| API | `/_health` | 200 or 204 |
+| Web | `/api/health` | 200 JSON |
+
+### 10.2 Azure Container Apps Health Probes
+
+Both API and Web container apps have three types of health probes configured:
+
+| Probe | Purpose | Behavior on Failure |
+|-------|---------|---------------------|
+| **Startup** | Allow time for app initialization | Prevents liveness/readiness until app starts |
+| **Readiness** | Check if ready for traffic | Removes from load balancer temporarily |
+| **Liveness** | Detect deadlocked processes | Restarts container |
+
+### 10.3 API Probe Configuration
+
+Configured in `packages/api/iac/main.bicep`:
+
+| Probe | Endpoint | Timing | Purpose |
+|-------|----------|--------|---------|
+| Startup | `/_health` | 90s window (30×3s) | Allow DB migrations |
+| Readiness | `/_health` | 10s interval, 3 failures | Ensure API is ready |
+| Liveness | `/_health` | 30s interval, 3 failures | Restart if stuck |
+
+### 10.4 Web Probe Configuration
+
+Configured via Azure CLI in deployment workflows:
+
+| Probe | Endpoint | Timing | Purpose |
+|-------|----------|--------|---------|
+| Startup | `/api/health` | 60s window (20×3s) | Allow Next.js init |
+| Readiness | `/api/health` | 10s interval, 3 failures | Ensure app is ready |
+| Liveness | `/api/health` | 30s interval, 3 failures | Restart if stuck |
+
+### 10.5 Monitoring Probes
 
 ```bash
-# Check container app env vars
-az containerapp show --name play14-api --resource-group play14-community \
-  --query "properties.template.containers[0].env"
+# Check probe status in Azure Portal
+# Container Apps → <app-name> → Revisions → Health
 
-# Update env var
-az containerapp update --name play14-api --resource-group play14-community \
-  --set-env-vars "STRIPE_SECRET_KEY=sk_live_xxx"
-
-# View logs
-az containerapp logs show --name play14-api --resource-group play14-community --follow
+# View probe-related logs
+az containerapp logs show -n play14-api -g play14-community --follow | grep -i probe
 ```
+
+---
+
+## 11. Monitoring
+
+### 11.1 Sentry
+
+- **Organization**: Configured via `SENTRY_ORG`
+- **Projects**: `play14-web`
+- **Features**: Error tracking, performance monitoring, source maps
+
+### 11.2 Azure
+
+- Container Apps built-in metrics
+- Log Analytics workspace integration
+- Application Insights (if configured)
+
+---
+
+## 12. Rollback Procedure
+
+1. **Identify last working image** from Azure Container Registry
+2. **Update container app** with previous image tag:
+   ```bash
+   az containerapp update \
+     -n play14-api \
+     -g play14-community \
+     --image play14containerregistry.azurecr.io/play14/play14-api:<previous-sha>
+   ```
+3. **Verify health check** passes
+4. **Investigate** the failing deployment
+
+---
+
+## 13. Security Considerations
+
+### 13.1 Authentication
+
+- Azure OIDC for CI/CD (no stored credentials)
+- Workload identity for container registry access
+- JWT tokens with secure secrets for API auth
+
+### 13.2 Secrets Management
+
+- GitHub Secrets for CI/CD
+- Azure Container Apps secrets (referenced by `secretref:`)
+- Never commit secrets to repository
+
+### 13.3 Stripe Security
+
+- Webhook signature verification with dual secrets
+- PCI DSS compliance via Stripe Checkout (hosted)
+- No raw card data stored
+
+---
+
+## 14. Support Contacts
+
+| Issue | Contact |
+|-------|---------|
+| Stripe Support | https://support.stripe.com |
+| Resend Support | https://resend.com/support |
+| Azure Support | Azure Portal → Help + Support |
+| Sentry Support | https://sentry.io/support |

@@ -100,8 +100,8 @@ export default function TicketOrderRefundEmail({
           : "Your tickets have been cancelled and are no longer valid for entry."}
       </Text>
 
-      <Button href={`${frontendUrl}/admin/tickets`} style={buttonStyle}>
-        View Your Tickets
+      <Button href={`${frontendUrl}/admin/orders`} style={buttonStyle}>
+        View Your Orders
       </Button>
 
       <Text style={{ marginTop: "30px" }}>If you have any questions, please contact the event organizers.</Text>

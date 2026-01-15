@@ -3,9 +3,15 @@
  * - Adds population of player relation to /users/me endpoint
  * - Merges OAuth logins by email (allows multiple providers for same user)
  * - Assigns roles based on linked player position at first login
+ * - Implements account lockout after failed login attempts
  */
 
 import { syncUserRoleWithPlayerPosition } from "../../services/user-role-sync"
+import {
+  checkAccountLockout,
+  recordFailedAttempt,
+  clearFailedAttempts,
+} from "../../services/account-lockout"
 
 interface StrapiContext {
   state: {
@@ -13,9 +19,16 @@ interface StrapiContext {
       id: number
     }
   }
+  request: {
+    body?: {
+      identifier?: string
+      password?: string
+    }
+  }
   body: unknown
   unauthorized: () => void
   notFound: () => void
+  badRequest: (message: string) => void
 }
 
 interface UserRecord {
@@ -100,6 +113,101 @@ export default (plugin: StrapiPlugin) => {
 
       ctx.body = sanitizedUser
     },
+  }
+
+  // Extend auth controller to add account lockout
+  // The controller is a factory function ({ strapi }) => controller, so we wrap it
+  const originalAuthControllerFactory = plugin.controllers.auth as (context: {
+    strapi: typeof globalThis.strapi
+  }) => Record<string, (ctx: StrapiContext, next?: () => Promise<void>) => Promise<void>>
+
+  plugin.controllers.auth = (context: { strapi: typeof globalThis.strapi }) => {
+    // Call original factory to get all controller methods
+    const originalController = originalAuthControllerFactory(context)
+
+    return {
+      ...originalController,
+
+      /**
+       * Local login with account lockout protection
+       * Wraps the original callback method for local provider
+       */
+      async callback(ctx: StrapiContext) {
+        const { identifier } = ctx.request.body || {}
+
+        // Only apply lockout to local authentication (username/password)
+        // OAuth providers handle their own security
+        const provider = (ctx as any).params?.provider || "local"
+
+        if (provider === "local" && identifier) {
+          // Check if account is locked
+          const lockStatus = checkAccountLockout(identifier)
+          if (lockStatus.isLocked) {
+            const remainingMinutes = Math.ceil((lockStatus.remainingMs || 0) / 60000)
+            strapi.log.warn(`[Auth] Login blocked for locked account: ${identifier}`)
+            ctx.body = {
+              error: {
+                status: 429,
+                name: "TooManyRequestsError",
+                message: `Account temporarily locked due to too many failed login attempts. Please try again in ${remainingMinutes} minute${remainingMinutes !== 1 ? "s" : ""}.`,
+              },
+            }
+            ;(ctx as any).status = 429
+            return
+          }
+        }
+
+        // Call original callback
+        try {
+          await originalController.callback.call(this, ctx)
+
+          // Check if login was successful (jwt present in response)
+          const response = ctx.body as { jwt?: string; user?: { email?: string } } | undefined
+          if (response?.jwt && identifier) {
+            // Clear failed attempts on successful login
+            clearFailedAttempts(identifier)
+            strapi.log.info(`[Auth] Successful login for: ${identifier}`)
+          }
+        } catch (error) {
+          // Login failed - record the attempt
+          if (provider === "local" && identifier) {
+            const result = recordFailedAttempt(identifier)
+
+            if (result.isNowLocked) {
+              strapi.log.warn(`[Auth] Account locked after failed attempts: ${identifier}`)
+            } else {
+              strapi.log.info(
+                `[Auth] Failed login for ${identifier} (${result.attemptsRemaining} attempts remaining)`
+              )
+            }
+          }
+          throw error
+        }
+
+        // Also check response body for error (Strapi sometimes returns errors in body, not exception)
+        const response = ctx.body as { error?: unknown } | undefined
+        if (response?.error && provider === "local" && identifier) {
+          const result = recordFailedAttempt(identifier)
+
+          if (result.isNowLocked) {
+            strapi.log.warn(`[Auth] Account locked after failed attempts: ${identifier}`)
+            // Update response to show lockout message
+            ctx.body = {
+              error: {
+                status: 429,
+                name: "TooManyRequestsError",
+                message: "Account temporarily locked due to too many failed login attempts. Please try again in 15 minutes.",
+              },
+            }
+            ;(ctx as any).status = 429
+          } else {
+            strapi.log.info(
+              `[Auth] Failed login for ${identifier} (${result.attemptsRemaining} attempts remaining)`
+            )
+          }
+        }
+      },
+    }
   }
 
   // Wrap providers service connect method to merge users by email

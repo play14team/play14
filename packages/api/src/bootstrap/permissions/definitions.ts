@@ -21,6 +21,7 @@ import {
   PLAYER_CLAIM_ACTIONS,
   ATTENDANCE_CLAIM_ACTIONS,
   STRIPE_ACCOUNT_ACTIONS,
+  TICKET_ACTIONS,
   TICKET_ORDER_ACTIONS,
   TICKET_TYPE_ACTIONS,
   DISCOUNT_CODE_ACTIONS,
@@ -44,6 +45,8 @@ import {
   CONTENT_TYPE_BUILDER_ACTIONS,
   MEDIA_FOLDER_ACTIONS,
   MEDIA_FILE_ACTIONS,
+  BUDGET_LINE_ITEM_ACTIONS,
+  RESULT_LINE_ITEM_ACTIONS,
 } from "./actions"
 
 export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
@@ -106,11 +109,14 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: PLAYER_CLAIM_ACTIONS.APPROVE_CLAIM, minimumRole: ROLE_TYPES.PLAYER },
   { action: PLAYER_CLAIM_ACTIONS.REJECT_CLAIM, minimumRole: ROLE_TYPES.PLAYER },
 
+  // Ticket management
+  { action: TICKET_ACTIONS.GET_MY_TICKETS, minimumRole: ROLE_TYPES.PLAYER },
+
   // Ticket ordering
   { action: TICKET_ORDER_ACTIONS.GET_MY_ORDERS, minimumRole: ROLE_TYPES.PLAYER },
-  { action: TICKET_ORDER_ACTIONS.GET_ORDER_STATUS, minimumRole: ROLE_TYPES.PLAYER },
   { action: TICKET_ORDER_ACTIONS.INITIATE_ORDER, minimumRole: ROLE_TYPES.PLAYER },
   { action: TICKET_ORDER_ACTIONS.REQUEST_REFUND, minimumRole: ROLE_TYPES.PLAYER },
+  { action: TICKET_ORDER_ACTIONS.DOWNLOAD_INVOICE, minimumRole: ROLE_TYPES.PLAYER },
 
   // Draft order flow (multi-step checkout with attendee info)
   { action: TICKET_ORDER_ACTIONS.CREATE_DRAFT_ORDER, minimumRole: ROLE_TYPES.PLAYER },
@@ -201,6 +207,30 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: VENUE_ACTIONS.UPLOAD_LOGO, minimumRole: ROLE_TYPES.HOST },
   { action: VENUE_ACTIONS.SET_LOGO_FROM_LIBRARY, minimumRole: ROLE_TYPES.HOST },
   { action: VENUE_ACTIONS.REMOVE_LOGO, minimumRole: ROLE_TYPES.HOST },
+
+  // Sponsor management (admin panel)
+  { action: SPONSOR_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.FIND_ONE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.CREATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.UPDATE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.DELETE_ADMIN, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.UPLOAD_LOGO, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.SET_LOGO_FROM_LIBRARY, minimumRole: ROLE_TYPES.HOST },
+  { action: SPONSOR_ACTIONS.REMOVE_LOGO, minimumRole: ROLE_TYPES.HOST },
+
+  // Budget line items management
+  { action: BUDGET_LINE_ITEM_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
+  { action: BUDGET_LINE_ITEM_ACTIONS.CREATE, minimumRole: ROLE_TYPES.HOST },
+  { action: BUDGET_LINE_ITEM_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.HOST },
+  { action: BUDGET_LINE_ITEM_ACTIONS.DELETE, minimumRole: ROLE_TYPES.HOST },
+  { action: BUDGET_LINE_ITEM_ACTIONS.BULK_UPDATE, minimumRole: ROLE_TYPES.HOST },
+
+  // Result line items management
+  { action: RESULT_LINE_ITEM_ACTIONS.LIST, minimumRole: ROLE_TYPES.HOST },
+  { action: RESULT_LINE_ITEM_ACTIONS.CREATE, minimumRole: ROLE_TYPES.HOST },
+  { action: RESULT_LINE_ITEM_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.HOST },
+  { action: RESULT_LINE_ITEM_ACTIONS.DELETE, minimumRole: ROLE_TYPES.HOST },
+  { action: RESULT_LINE_ITEM_ACTIONS.BULK_UPDATE, minimumRole: ROLE_TYPES.HOST },
 
   // ==================== FOUNDER ROLE ====================
   // Full administrative access - these are founder-only
@@ -339,6 +369,12 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Available tickets (public for event pages to show ticket availability)
   { action: TICKET_ORDER_ACTIONS.GET_AVAILABLE_TICKETS, minimumRole: ROLE_TYPES.PUBLIC },
+
+  // Ticket details (public - needed for QR code scanning and ticket sharing)
+  { action: TICKET_ACTIONS.GET_TICKET_DETAILS, minimumRole: ROLE_TYPES.PUBLIC },
+
+  // Order status (public with limited info for unauthenticated, full info for owners/organizers)
+  { action: TICKET_ORDER_ACTIONS.GET_ORDER_STATUS, minimumRole: ROLE_TYPES.PUBLIC },
 
   // Cancel pending order (player - users can cancel their own pending orders)
   { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.PLAYER },
