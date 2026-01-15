@@ -4,7 +4,7 @@
  * Ensures legacy users assigned to the "authenticated" role are migrated to "player".
  */
 
-export async function up(knex: any) {
+export async function up(knex) {
   console.log("Starting migration: Move authenticated users to player role")
 
   const hasRoles = await knex.schema.hasTable("up_roles")
@@ -29,7 +29,7 @@ export async function up(knex: any) {
     return
   }
 
-  let userColumnNames: string[] = []
+  let userColumnNames = []
   try {
     const columnInfo = await knex("up_users").columnInfo()
     userColumnNames = Object.keys(columnInfo)
@@ -62,7 +62,7 @@ export async function up(knex: any) {
     "up_users_roles_links",
   ]
 
-  let linkTables: string[] = []
+  let linkTables = []
   for (const table of linkTableCandidates) {
     if (await knex.schema.hasTable(table)) {
       linkTables.push(table)
@@ -75,7 +75,7 @@ export async function up(knex: any) {
         .select("table_name")
         .where({ table_schema: "public" })
         .where("table_name", "like", "up_users_role%")
-      linkTables = rows.map((row: { table_name: string }) => row.table_name)
+      linkTables = rows.map((row) => row.table_name)
     } catch (error) {
       console.log("Unable to inspect information_schema tables, skipping link table lookup")
     }
@@ -85,7 +85,7 @@ export async function up(knex: any) {
     const columns = await knex(table).columnInfo()
     const columnNames = Object.keys(columns)
     const roleColumn = columnNames.find(
-      (name: string) => name.includes("role") && name.endsWith("_id")
+      (name) => name.includes("role") && name.endsWith("_id")
     )
     if (!roleColumn) continue
 

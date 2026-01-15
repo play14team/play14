@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
-import { featureFlags } from "@/libs/feature-flags"
+import { getFeatureFlags } from "@/libs/feature-flags"
 import LoginButtons from "@/components/auth/login-buttons"
 import RegisterForm from "@/components/auth/register-form"
 import Logo from "@/components/layout/logo"
@@ -18,7 +18,8 @@ interface RegisterPageProps {
 
 export default async function RegisterPage({ searchParams }: RegisterPageProps) {
   // Block access if login feature is disabled
-  if (!featureFlags.loginEnabled) {
+  const flags = await getFeatureFlags()
+  if (!flags.loginEnabled) {
     notFound()
   }
 

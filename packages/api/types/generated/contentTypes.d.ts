@@ -467,6 +467,59 @@ export interface ApiAttendanceClaimAttendanceClaim extends Struct.CollectionType
   }
 }
 
+export interface ApiBudgetLineItemBudgetLineItem extends Struct.CollectionTypeSchema {
+  collectionName: "budget_line_items"
+  info: {
+    description: "Budget planning line items for events"
+    displayName: "Budget Line Item"
+    pluralName: "budget-line-items"
+    singularName: "budget-line-item"
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      [
+        "tickets",
+        "sponsors",
+        "other_income",
+        "security",
+        "insurance",
+        "food",
+        "goodies",
+        "supplies",
+        "venue",
+        "organizer_expenses",
+        "other_expense",
+      ]
+    > &
+      Schema.Attribute.Required
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    description: Schema.Attribute.Text
+    event: Schema.Attribute.Relation<"manyToOne", "api::event.event">
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::budget-line-item.budget-line-item"
+    > &
+      Schema.Attribute.Private
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    quantity: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>
+    total: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>
+    unitPrice: Schema.Attribute.Decimal & Schema.Attribute.DefaultTo<0>
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+  }
+}
+
 export interface ApiDiscountCodeDiscountCode extends Struct.CollectionTypeSchema {
   collectionName: "discount_codes"
   info: {
@@ -596,6 +649,7 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
     }
   }
   attributes: {
+    budgetItems: Schema.Attribute.Relation<"oneToMany", "api::budget-line-item.budget-line-item">
     contactEmail: Schema.Attribute.Email & Schema.Attribute.DefaultTo<"team@play14.org">
     createdAt: Schema.Attribute.DateTime
     createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
@@ -659,6 +713,7 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
     players: Schema.Attribute.Relation<"manyToMany", "api::player.player">
     publishedAt: Schema.Attribute.DateTime
     registration: Schema.Attribute.Component<"registration.registration", false>
+    resultItems: Schema.Attribute.Relation<"oneToMany", "api::result-line-item.result-line-item">
     slug: Schema.Attribute.UID<"name"> & Schema.Attribute.Required
     sponsorships: Schema.Attribute.Component<"events.sponsorship", true> &
       Schema.Attribute.SetPluginOptions<{
@@ -1252,6 +1307,57 @@ export interface ApiProcessedWebhookProcessedWebhook extends Struct.CollectionTy
     status: Schema.Attribute.Enumeration<["processing", "completed", "failed"]> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<"processing">
+    updatedAt: Schema.Attribute.DateTime
+    updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+  }
+}
+
+export interface ApiResultLineItemResultLineItem extends Struct.CollectionTypeSchema {
+  collectionName: "result_line_items"
+  info: {
+    description: "Result income and expense line items for events"
+    displayName: "Result Line Item"
+    pluralName: "result-line-items"
+    singularName: "result-line-item"
+  }
+  options: {
+    draftAndPublish: false
+  }
+  attributes: {
+    amount: Schema.Attribute.Decimal & Schema.Attribute.Required & Schema.Attribute.DefaultTo<0>
+    category: Schema.Attribute.Enumeration<
+      [
+        "tickets",
+        "sponsors",
+        "other_income",
+        "security",
+        "insurance",
+        "food",
+        "goodies",
+        "supplies",
+        "venue",
+        "organizer_expenses",
+        "other_expense",
+      ]
+    > &
+      Schema.Attribute.Required
+    createdAt: Schema.Attribute.DateTime
+    createdBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
+    description: Schema.Attribute.Text
+    event: Schema.Attribute.Relation<"manyToOne", "api::event.event">
+    locale: Schema.Attribute.String & Schema.Attribute.Private
+    localizations: Schema.Attribute.Relation<
+      "oneToMany",
+      "api::result-line-item.result-line-item"
+    > &
+      Schema.Attribute.Private
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255
+      }>
+    publishedAt: Schema.Attribute.DateTime
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>
     updatedAt: Schema.Attribute.DateTime
     updatedBy: Schema.Attribute.Relation<"oneToOne", "admin::user"> & Schema.Attribute.Private
   }
@@ -2176,6 +2282,7 @@ declare module "@strapi/strapi" {
       "admin::user": AdminUser
       "api::article.article": ApiArticleArticle
       "api::attendance-claim.attendance-claim": ApiAttendanceClaimAttendanceClaim
+      "api::budget-line-item.budget-line-item": ApiBudgetLineItemBudgetLineItem
       "api::discount-code.discount-code": ApiDiscountCodeDiscountCode
       "api::event-location.event-location": ApiEventLocationEventLocation
       "api::event.event": ApiEventEvent
@@ -2188,6 +2295,7 @@ declare module "@strapi/strapi" {
       "api::player-claim.player-claim": ApiPlayerClaimPlayerClaim
       "api::player.player": ApiPlayerPlayer
       "api::processed-webhook.processed-webhook": ApiProcessedWebhookProcessedWebhook
+      "api::result-line-item.result-line-item": ApiResultLineItemResultLineItem
       "api::sponsor.sponsor": ApiSponsorSponsor
       "api::stripe-account.stripe-account": ApiStripeAccountStripeAccount
       "api::tag.tag": ApiTagTag

@@ -68,7 +68,10 @@
       "Bash(wc:*)",
       "Bash(node -e:*)",
       "Bash(gh pr checks:*)",
-      "Bash(gh pr diff:*)"
+      "Bash(gh pr diff:*)",
+      "Bash(podman-compose ps:*)",
+      "Bash(bunx tsc:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

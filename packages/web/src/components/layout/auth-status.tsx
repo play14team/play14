@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { getAuthState } from "@/libs/auth"
-import { featureFlags } from "@/libs/feature-flags"
+import { getFeatureFlags } from "@/libs/feature-flags"
 import UserMenu from "./user-menu"
 
 export default async function AuthStatus() {
@@ -11,7 +11,8 @@ export default async function AuthStatus() {
   }
 
   // Only show login button if feature flag is enabled
-  if (!featureFlags.loginEnabled) {
+  const flags = await getFeatureFlags()
+  if (!flags.loginEnabled) {
     return null
   }
 

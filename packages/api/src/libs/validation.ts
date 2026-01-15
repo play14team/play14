@@ -198,6 +198,72 @@ export function validateName(
 }
 
 /**
+ * Sanitize plain text input by stripping HTML tags and normalizing whitespace.
+ * Use this for free-text fields like food preferences, notes, etc.
+ *
+ * SECURITY: This function strips HTML but does NOT decode entities like &lt; to <.
+ * This is intentional - decoding entities could re-introduce angle brackets that
+ * were originally encoded, creating XSS vectors. The output should still be
+ * HTML-escaped when rendered, but we don't want to undo existing encoding.
+ *
+ * @param text - Input text to sanitize
+ * @returns Sanitized text with HTML stripped and whitespace normalized
+ */
+export function sanitizeText(text: string): string {
+  if (!text || typeof text !== "string") {
+    return ""
+  }
+
+  // SECURITY: Loop the HTML tag removal to handle nested/reconstructed tags.
+  // Example attack: "<scr<script>ipt>" would become "<script>" after one pass.
+  // We loop until no more tags are found to prevent this bypass.
+  const htmlTagPattern = /<[^>]*>/g
+  let result = text
+  let previous: string
+  do {
+    previous = result
+    result = result.replace(htmlTagPattern, "")
+  } while (result !== previous)
+
+  return (
+    result
+      // SECURITY: Do NOT decode HTML entities (&lt;, &gt;, etc.)
+      // Decoding could re-introduce angle brackets that were originally encoded.
+      // Only convert &nbsp; to regular space as it's safe and improves readability.
+      .replace(/&nbsp;/g, " ")
+      // Normalize whitespace (collapse multiple spaces, trim)
+      .replace(/\s+/g, " ")
+      .trim()
+  )
+}
+
+/**
+ * Create a sanitized text schema for free-text fields
+ * Strips HTML and limits length
+ */
+export function createSanitizedTextSchema(options: {
+  maxLength?: number
+  field?: string
+} = {}) {
+  const { maxLength = 500, field = "Text" } = options
+
+  return z
+    .string()
+    .transform(sanitizeText)
+    .refine((text) => text.length <= maxLength, {
+      message: `${field} must be at most ${maxLength} characters`,
+    })
+}
+
+/**
+ * Food preferences schema - sanitized free text
+ */
+export const foodPreferencesSchema = createSanitizedTextSchema({
+  maxLength: 500,
+  field: "Food preferences",
+})
+
+/**
  * T-shirt size enum schema
  */
 export const tshirtSizeSchema = z.enum(["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"])
@@ -225,7 +291,7 @@ export const attendeeSchema = z.object({
   email: emailSchema,
   company: z.string().optional(),
   tshirtSize: tshirtSizeSchema.optional(),
-  foodPreferences: z.string().optional(),
+  foodPreferences: foodPreferencesSchema.optional(),
   photoConsent: z.boolean().optional(),
 })
 

@@ -6,6 +6,7 @@ import { describe, it, expect } from "vitest"
 import {
   getCurrency,
   formatPrice,
+  formatCurrency,
   STRIPE_CURRENCIES,
   ZERO_DECIMAL_CURRENCIES,
   STRIPE_CURRENCY_CODES,
@@ -197,6 +198,89 @@ describe("formatPrice", () => {
 
     it("handles very small decimal amounts", () => {
       expect(formatPrice(0.01, "USD")).toBe("$ 0.01")
+    })
+  })
+})
+
+describe("formatCurrency", () => {
+  describe("locale-aware formatting", () => {
+    it("formats EUR with German locale (symbol after amount)", () => {
+      const result = formatCurrency(1234.56, "EUR")
+      // de-DE locale: "1.234,56 €"
+      expect(result).toContain("€")
+      expect(result).toContain("1.234")
+    })
+
+    it("formats USD with US locale (symbol before amount)", () => {
+      const result = formatCurrency(1234.56, "USD")
+      // en-US locale: "$1,234.56"
+      expect(result).toContain("$")
+      expect(result).toContain("1,234")
+    })
+
+    it("formats CHF with Swiss locale", () => {
+      const result = formatCurrency(1234.56, "CHF")
+      expect(result).toContain("CHF")
+    })
+  })
+
+  describe("case insensitivity", () => {
+    it("handles lowercase currency codes", () => {
+      const result = formatCurrency(100, "eur")
+      expect(result).toContain("€")
+    })
+
+    it("handles mixed case currency codes", () => {
+      const result = formatCurrency(100, "Eur")
+      expect(result).toContain("€")
+    })
+  })
+
+  describe("zero-decimal currencies", () => {
+    it("formats JPY without decimal places", () => {
+      const result = formatCurrency(1000, "JPY")
+      expect(result).toContain("¥")
+      expect(result).not.toContain(".")
+      expect(result).toContain("1,000")
+    })
+
+    it("formats KRW without decimal places", () => {
+      const result = formatCurrency(50000, "KRW")
+      expect(result).toContain("₩")
+      expect(result).not.toContain(".")
+    })
+  })
+
+  describe("custom fraction digits", () => {
+    it("respects minimumFractionDigits option", () => {
+      const result = formatCurrency(100, "EUR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      expect(result).not.toContain(",00")
+    })
+
+    it("allows more fraction digits when specified", () => {
+      const result = formatCurrency(99.999, "USD", { minimumFractionDigits: 3, maximumFractionDigits: 3 })
+      expect(result).toContain("99.999")
+    })
+  })
+
+  describe("edge cases", () => {
+    it("handles zero amount", () => {
+      const result = formatCurrency(0, "EUR")
+      expect(result).toContain("€")
+      expect(result).toContain("0")
+    })
+
+    it("handles negative amounts", () => {
+      const result = formatCurrency(-50, "USD")
+      expect(result).toContain("$")
+      expect(result).toContain("-")
+    })
+
+    it("handles large amounts with thousand separators", () => {
+      const result = formatCurrency(1000000, "EUR")
+      expect(result).toContain("€")
+      // de-DE uses dots for thousands
+      expect(result).toContain("1.000.000")
     })
   })
 })

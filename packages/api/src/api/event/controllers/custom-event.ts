@@ -600,6 +600,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             "accountStatus",
             "chargesEnabled",
             "payoutsEnabled",
+            "defaultCurrency",
           ],
         },
         registration: {

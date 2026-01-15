@@ -109,17 +109,34 @@ The platform uses Stripe Connect for event ticketing, allowing hosts to receive 
 ### Environment Variables (packages/api/.env)
 
 ```bash
-STRIPE_SECRET_KEY=sk_test_xxx      # Stripe API secret key
-STRIPE_WEBHOOK_SECRET=whsec_xxx    # Webhook signature verification
-STRIPE_PUBLISHABLE_KEY=pk_test_xxx # Public key (also in web/.env.local)
-STRIPE_PLATFORM_FEE_PERCENT=0      # Platform fee (0% for non-profit)
+STRIPE_SECRET_KEY=sk_test_xxx                  # Stripe API secret key
+STRIPE_WEBHOOK_SECRET=whsec_xxx                # Platform webhook signing secret
+STRIPE_WEBHOOK_SECRET_CONNECT=whsec_xxx        # Connected accounts webhook signing secret
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx             # Public key (also in web/.env.local)
+STRIPE_PLATFORM_FEE_PERCENT=0                  # Platform fee (0% for non-profit)
 ```
+
+### Dual Webhook Architecture
+
+The platform uses **two separate webhook endpoints** with different signing secrets:
+
+1. **Platform Account Webhook** (`STRIPE_WEBHOOK_SECRET`)
+   - Events from: Your account (platform account)
+   - Handles: Direct platform payments (standard checkout sessions)
+   - Events: `checkout.session.completed`, `checkout.session.expired`, `payment_intent.payment_failed`, `charge.refunded`
+
+2. **Connected Accounts Webhook** (`STRIPE_WEBHOOK_SECRET_CONNECT`)
+   - Events from: Connected accounts
+   - Handles: Stripe Connect events (host payments, account status)
+   - Events: `account.updated`, `checkout.session.completed`, `checkout.session.expired`, `payment_intent.payment_failed`, `charge.refunded`
+
+Both webhooks point to the same endpoint, which automatically verifies signatures against both secrets.
 
 ### Webhook Endpoint
 
 - **Route**: `POST /api/webhooks/stripe`
 - **Handler**: `packages/api/src/api/ticket-order/controllers/webhook.ts`
-- **Auth**: None (uses Stripe signature verification)
+- **Auth**: None (uses Stripe signature verification with dual-secret support)
 
 ### Local Development with Stripe CLI
 

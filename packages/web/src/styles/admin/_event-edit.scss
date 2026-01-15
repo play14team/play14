@@ -141,6 +141,90 @@
   }
 }
 
+// Budget Summary in Action Panel
+.action-budget-summary {
+  padding-top: 4px;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    i {
+      font-size: 16px;
+      color: var(--color-orange);
+    }
+  }
+
+  .budget-summary-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .summary-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+
+    .summary-label {
+      color: var(--color-text-secondary);
+    }
+
+    .summary-value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    &.income .summary-value {
+      color: #16a34a;
+    }
+
+    &.expenses .summary-value {
+      color: var(--color-text);
+    }
+
+    &.margin {
+      padding-top: 8px;
+      margin-top: 4px;
+      border-top: 1px solid var(--color-border);
+
+      .summary-label {
+        font-weight: 600;
+        color: var(--color-text);
+      }
+
+      &.positive .summary-value {
+        color: #16a34a;
+      }
+
+      &.negative .summary-value {
+        color: #dc2626;
+      }
+    }
+  }
+}
+
 .action-buttons {
   display: flex;
   flex-direction: column;
@@ -198,6 +282,10 @@
 
     .action-status {
       display: none; // Hide status on mobile
+    }
+
+    .action-budget-summary {
+      display: none; // Hide budget summary on mobile (fixed bar)
     }
 
     .action-buttons {

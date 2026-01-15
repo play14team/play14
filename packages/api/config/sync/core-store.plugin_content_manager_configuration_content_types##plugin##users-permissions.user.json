@@ -132,6 +132,62 @@
           "sortable": true
         }
       },
+      "invitationStatus": {
+        "edit": {
+          "label": "invitationStatus",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "invitationStatus",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "invitationSentAt": {
+        "edit": {
+          "label": "invitationSentAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "invitationSentAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "invitationReminderSentAt": {
+        "edit": {
+          "label": "invitationReminderSentAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "invitationReminderSentAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
+      "invitationAcceptedAt": {
+        "edit": {
+          "label": "invitationAcceptedAt",
+          "description": "",
+          "placeholder": "",
+          "visible": true,
+          "editable": true
+        },
+        "list": {
+          "label": "invitationAcceptedAt",
+          "searchable": true,
+          "sortable": true
+        }
+      },
       "role": {
         "edit": {
           "label": "role",
@@ -270,6 +326,28 @@
         [
           {
             "name": "player",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "invitationStatus",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "invitationSentAt",
+            "size": 6
+          },
+          {
+            "name": "invitationReminderSentAt",
+            "size": 6
+          }
+        ],
+        [
+          {
+            "name": "invitationAcceptedAt",
             "size": 6
           }
         ]

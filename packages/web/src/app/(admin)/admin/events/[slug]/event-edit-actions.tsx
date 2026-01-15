@@ -1,6 +1,16 @@
 "use client"
 
 import Link from "next/link"
+import { formatCurrency } from "@/libs/currencies"
+import type { BudgetLineItem } from "./budget.types"
+import type { ResultLineItem } from "./results.types"
+import type { TabId } from "./event-edit-tabs"
+
+interface BudgetSummary {
+  totalIncome: number
+  totalExpenses: number
+  margin: number
+}
 
 interface EventEditActionsProps {
   eventSlug: string
@@ -10,6 +20,64 @@ interface EventEditActionsProps {
   isDirty: boolean
   onPublishToggle: () => void
   onDiscard: () => void
+  activeTab?: TabId
+  budgetItems?: BudgetLineItem[]
+  resultItems?: ResultLineItem[]
+  ticketRevenue?: number
+  currency?: string
+}
+
+const INCOME_CATEGORIES = ["tickets", "sponsors", "other_income"] as const
+const EXPENSE_CATEGORIES = [
+  "security",
+  "insurance",
+  "food",
+  "goodies",
+  "supplies",
+  "venue",
+  "organizer_expenses",
+  "other_expense",
+] as const
+
+function calculateBudgetSummary(items: BudgetLineItem[]): BudgetSummary {
+  let totalIncome = 0
+  let totalExpenses = 0
+
+  for (const item of items) {
+    if (INCOME_CATEGORIES.includes(item.category as any)) {
+      totalIncome += item.total || 0
+    } else if (EXPENSE_CATEGORIES.includes(item.category as any)) {
+      totalExpenses += item.total || 0
+    }
+  }
+
+  return {
+    totalIncome,
+    totalExpenses,
+    margin: totalIncome - totalExpenses,
+  }
+}
+
+function calculateResultsSummary(items: ResultLineItem[], ticketRevenue: number = 0): BudgetSummary {
+  let manualIncome = 0
+  let totalExpenses = 0
+
+  for (const item of items) {
+    if (INCOME_CATEGORIES.includes(item.category as any)) {
+      manualIncome += item.amount || 0
+    } else if (EXPENSE_CATEGORIES.includes(item.category as any)) {
+      totalExpenses += item.amount || 0
+    }
+  }
+
+  // Total income includes ticket revenue
+  const totalIncome = ticketRevenue + manualIncome
+
+  return {
+    totalIncome,
+    totalExpenses,
+    margin: totalIncome - totalExpenses,
+  }
 }
 
 export default function EventEditActions({
@@ -20,7 +88,19 @@ export default function EventEditActions({
   isDirty,
   onPublishToggle,
   onDiscard,
+  activeTab,
+  budgetItems = [],
+  resultItems = [],
+  ticketRevenue = 0,
+  currency = "eur",
 }: EventEditActionsProps) {
+  const showBudgetSummary = activeTab === "budget" || activeTab === "actuals"
+  const budgetSummary = calculateBudgetSummary(budgetItems)
+  const resultsSummary = calculateResultsSummary(resultItems, ticketRevenue)
+
+  // Helper to format currency with event's currency (no decimal places for summary)
+  const fmt = (amount: number) => formatCurrency(amount, currency, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+
   return (
     <div className="event-edit-actions">
       {/* Publication Status */}
@@ -122,6 +202,66 @@ export default function EventEditActions({
           </button>
         )}
       </div>
+
+      {/* Budget Summary - shown on budget/actuals tabs */}
+      {showBudgetSummary && (
+        <>
+          <hr />
+          <div className="action-budget-summary">
+          <h4>
+            <i className="bx bx-calculator"></i>
+            {activeTab === "budget" ? "Budget" : "Results"} Summary
+          </h4>
+
+          {activeTab === "budget" ? (
+            <div className="budget-summary-compact">
+              <div className="summary-row income">
+                <span className="summary-label">Income</span>
+                <span className="summary-value">{fmt(budgetSummary.totalIncome)}</span>
+              </div>
+              <div className="summary-row expenses">
+                <span className="summary-label">Expenses</span>
+                <span className="summary-value">{fmt(budgetSummary.totalExpenses)}</span>
+              </div>
+              <div className={`summary-row margin ${budgetSummary.margin >= 0 ? "positive" : "negative"}`}>
+                <span className="summary-label">Margin</span>
+                <span className="summary-value">
+                  {budgetSummary.margin >= 0 ? "+" : ""}
+                  {fmt(budgetSummary.margin)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="budget-summary-compact">
+              <div className="summary-section-label">Budget</div>
+              <div className={`summary-row margin ${budgetSummary.margin >= 0 ? "positive" : "negative"}`}>
+                <span className="summary-label">Projected</span>
+                <span className="summary-value">
+                  {budgetSummary.margin >= 0 ? "+" : ""}
+                  {fmt(budgetSummary.margin)}
+                </span>
+              </div>
+              <div className="summary-section-label">Actuals</div>
+              <div className="summary-row income">
+                <span className="summary-label">Income</span>
+                <span className="summary-value">{fmt(resultsSummary.totalIncome)}</span>
+              </div>
+              <div className="summary-row expenses">
+                <span className="summary-label">Expenses</span>
+                <span className="summary-value">{fmt(resultsSummary.totalExpenses)}</span>
+              </div>
+              <div className={`summary-row margin ${resultsSummary.margin >= 0 ? "positive" : "negative"}`}>
+                <span className="summary-label">Result</span>
+                <span className="summary-value">
+                  {resultsSummary.margin >= 0 ? "+" : ""}
+                  {fmt(resultsSummary.margin)}
+                </span>
+              </div>
+            </div>
+          )}
+          </div>
+        </>
+      )}
 
       {/* Dirty State Indicator - at bottom to avoid layout shift */}
       {isDirty && (

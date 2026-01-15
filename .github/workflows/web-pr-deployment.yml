@@ -31,6 +31,8 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
+    outputs:
+      short_sha: ${{ steps.vars.outputs.short_sha }}
 
     steps:
       - name: Checkout code
@@ -64,13 +66,23 @@ jobs:
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: bun run test
 
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: packages/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('packages/web/**/*.ts', 'packages/web/**/*.tsx', 'packages/web/**/*.js', 'packages/web/**/*.jsx') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-
+
       - name: Build Next.js
         working-directory: ${{ env.WORKING_DIRECTORY }}
         env:
           STRAPI_API_URL: ${{ vars.STRAPI_API_URL }}
           STRAPI_API_SECRET: ${{ secrets.STRAPI_API_SECRET }}
           NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: ${{ secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN }}
-          NEXT_PUBLIC_URL: ${{ vars.NEXT_PUBLIC_URL }}
+          NEXT_PUBLIC_SITE_URL: "http://acc.play14.org"
+          FEATURE_LOGIN_ENABLED: "true"
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: play14-web
@@ -99,14 +111,20 @@ jobs:
         run: |
           az acr login --name play14containerregistry
 
+      - name: Get short commit SHA
+        id: vars
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Build and push container image
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:acc
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
-          file: packages/web/Dockerfile.ci
+          file: packages/web/Dockerfile
           context: packages/web
 
       - name: Comment PR with image tags
@@ -148,12 +166,13 @@ jobs:
             az containerapp update \
               -n "$CONTAINER_APP_ACC" \
               -g "$RESOURCE_GROUP" \
-              --image "$REGISTRY/$IMAGE_NAME:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}" \
+              --image "$REGISTRY/$IMAGE_NAME:${{ needs.build-and-push.outputs.short_sha }}" \
               --set-env-vars \
                 STRAPI_API_URL="${{ vars.STRAPI_API_URL }}" \
                 STRAPI_API_SECRET=secretref:strapi-api-secret \
                 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=secretref:mapbox-token \
-                NEXT_PUBLIC_SITE_URL="https://acc.play14.org"
+                NEXT_PUBLIC_SITE_URL="http://acc.play14.org" \
+                FEATURE_LOGIN_ENABLED="true"
 
       - name: Start Container App
         uses: azure/CLI@v2
@@ -230,7 +249,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `✅ **Web Deployed to Acceptance Environment**\n\n🌐 URL: ${{ steps.get-url.outputs.url }}\n📦 Image: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}\`\n🔗 Backend: ${{ vars.STRAPI_API_URL }}\n\nYou can now test this PR in the acceptance environment.`
+              body: `✅ **Web Deployed to Acceptance Environment**\n\n🌐 URL: ${{ steps.get-url.outputs.url }}\n📦 Image: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.short_sha }}\`\n🔗 Backend: ${{ vars.STRAPI_API_URL }}\n\nYou can now test this PR in the acceptance environment.`
             })
 
   stop-pr:

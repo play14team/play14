@@ -17,6 +17,17 @@ import {
   type DraftOrderResponse,
   type AttendeeInfo,
 } from "./purchase.action"
+import {
+  trackTicketsViewed,
+  trackCheckoutStarted,
+  trackDraftOrderCreated,
+  trackAttendeeInfoSubmitted,
+  trackCheckoutFinalized,
+  trackCheckoutError,
+  trackCheckoutAbandoned,
+  trackAuthRequired,
+  withCheckoutSpan,
+} from "@/libs/sentry-metrics"
 import styles from "./ticket-purchase-flow.module.scss"
 
 const TICKET_SELECTION_KEY = "pending_ticket_selection"
@@ -58,6 +69,11 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
       setTicketData(tickets)
       setAuthStatus(auth)
 
+      // Track tickets viewed
+      if (tickets?.ticketingEnabled && tickets.ticketTypes.length > 0) {
+        trackTicketsViewed(eventId, tickets.ticketTypes.length)
+      }
+
       // Check for saved ticket selection (from before OAuth redirect)
       try {
         const savedState = sessionStorage.getItem(TICKET_SELECTION_KEY)
@@ -98,6 +114,18 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
   const handlePurchase = async (tickets: TicketSelection[], discountCode?: string) => {
     setError(null)
 
+    // Calculate totals for metrics
+    const totalTickets = tickets.reduce((sum, t) => sum + t.quantity, 0)
+    const ticketTypesMap = new Map(ticketData?.ticketTypes.map((t) => [t.documentId, t]) || [])
+    const totalAmount = tickets.reduce((sum, t) => {
+      const ticketType = ticketTypesMap.get(t.ticketTypeId)
+      return sum + (ticketType?.price || 0) * t.quantity
+    }, 0)
+    const currency = ticketData?.ticketTypes[0]?.currency || "EUR"
+
+    // Track checkout started
+    trackCheckoutStarted(eventId, totalTickets, totalAmount, currency, !!discountCode)
+
     // Check if user is authenticated
     if (!authStatus?.isAuthenticated) {
       // This shouldn't happen as onAuthRequired is called first, but handle it anyway
@@ -114,23 +142,39 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
     setFlowStep("processing")
     setIsSubmitting(true)
 
-    // Create draft order
-    const result = await createDraftOrder(eventId, tickets, discountCode)
+    // Create draft order with tracing span
+    const result = await withCheckoutSpan("create-draft-order", eventId, () =>
+      createDraftOrder(eventId, tickets, discountCode)
+    )
 
     if (!result.success) {
+      trackCheckoutError(eventId, "draft_creation", result.error?.message)
       setError(result.error?.message || "Failed to create order")
       setFlowStep("select")
       setIsSubmitting(false)
       return
     }
 
+    // Track draft order created
+    const order = result.data!
+    trackDraftOrderCreated(
+      eventId,
+      order.orderId,
+      order.ticketCount,
+      order.totalAmount,
+      order.discountAmount,
+      order.currency
+    )
+
     // Move to attendee form
-    setDraftOrder(result.data!)
+    setDraftOrder(order)
     setFlowStep("attendees")
     setIsSubmitting(false)
   }
 
   const handleAuthRequired = (quantities: Record<string, number>, discountCode?: string) => {
+    // Track auth required
+    trackAuthRequired(eventId, "checkout")
     // Save the ticket selection before showing auth gate
     saveTicketSelection(quantities, discountCode)
     setShowAuthGate(true)
@@ -151,42 +195,52 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
     setError(null)
     setIsSubmitting(true)
 
-    // Save attendee info
-    const updateResult = await updateAttendeeInfo(
-      draftOrder.orderId,
-      attendees,
-      gdprConsent,
-      termsAccepted
+    // Save attendee info with tracing span
+    const updateResult = await withCheckoutSpan("update-attendee-info", eventId, () =>
+      updateAttendeeInfo(draftOrder.orderId, attendees, gdprConsent, termsAccepted)
     )
 
     if (!updateResult.success) {
+      trackCheckoutError(eventId, "attendee_info", updateResult.error)
       setError(updateResult.error || "Failed to save attendee information")
       setIsSubmitting(false)
       return
     }
 
-    // Finalize checkout
-    const checkoutResult = await finalizeCheckout(draftOrder.orderId)
+    // Track attendee info submitted
+    trackAttendeeInfoSubmitted(eventId, draftOrder.orderId)
+
+    // Finalize checkout with tracing span
+    const checkoutResult = await withCheckoutSpan("finalize-checkout", eventId, () =>
+      finalizeCheckout(draftOrder.orderId)
+    )
 
     if (!checkoutResult.success) {
+      trackCheckoutError(eventId, "finalize", checkoutResult.error)
       setError(checkoutResult.error || "Failed to create checkout session")
       setIsSubmitting(false)
       return
     }
 
+    // Track checkout finalized
+    const isFreeOrder = !checkoutResult.data?.checkoutUrl
+    trackCheckoutFinalized(eventId, draftOrder.orderId, isFreeOrder)
+
     // Handle free orders (no payment needed)
-    if (!checkoutResult.data?.checkoutUrl) {
-      // Free order completed - redirect to confirmation
-      router.push(`/tickets/confirmation?order=${draftOrder.orderNumber}`)
+    if (isFreeOrder) {
+      // Free order completed - redirect to order details
+      router.push(`/orders/${draftOrder.orderId}`)
       return
     }
 
     // Redirect to Stripe checkout
-    window.location.href = checkoutResult.data.checkoutUrl
+    window.location.href = checkoutResult.data!.checkoutUrl!
   }
 
   // Go back to ticket selection
   const handleBackToSelection = () => {
+    // Track abandonment when going back from attendee form
+    trackCheckoutAbandoned(eventId, "attendees")
     setFlowStep("select")
     setDraftOrder(null)
     setError(null)

@@ -47,7 +47,10 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
         router.push(callbackUrl)
         router.refresh()
       } else {
-        setError(result.error || "Login failed")
+        setError(
+          result.error ||
+            "Unable to sign in. Please check your credentials and try again."
+        )
       }
     })
   }

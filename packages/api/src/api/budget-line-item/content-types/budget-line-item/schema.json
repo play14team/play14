@@ -1,0 +1,63 @@
+{
+  "kind": "collectionType",
+  "collectionName": "budget_line_items",
+  "info": {
+    "singularName": "budget-line-item",
+    "pluralName": "budget-line-items",
+    "displayName": "Budget Line Item",
+    "description": "Budget planning line items for events"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "tickets",
+        "sponsors",
+        "other_income",
+        "security",
+        "insurance",
+        "food",
+        "goodies",
+        "supplies",
+        "venue",
+        "organizer_expenses",
+        "other_expense"
+      ],
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text"
+    },
+    "unitPrice": {
+      "type": "decimal",
+      "default": 0
+    },
+    "quantity": {
+      "type": "integer",
+      "default": 1
+    },
+    "total": {
+      "type": "decimal",
+      "default": 0
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "budgetItems"
+    }
+  }
+}

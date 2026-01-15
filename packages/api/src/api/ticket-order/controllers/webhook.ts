@@ -3,12 +3,17 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { join } from "path"
+import { randomBytes } from "node:crypto"
+import { render } from "@react-email/render"
 import {
   generateEventICS,
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
 } from "../../../libs/calendar"
 import { generateTicketCode } from "../../../libs/tickets"
+import { generateInvoicePDF, formatTicketItems, type InvoiceData } from "../../../libs/invoice"
+import { nameToUsername } from "../../../libs/strings"
 import { getPaymentProvider } from "../../../services/payment"
 import {
   confirmReservations,
@@ -24,6 +29,8 @@ import {
   markWebhookFailed,
   releaseWebhookClaim,
 } from "../../../services/webhook"
+import type { WebhookEvent } from "../../../services/payment/types"
+import PlayerInvitationEmail from "../../../emails/player-invitation"
 
 interface AttendeeInfo {
   firstName: string
@@ -61,18 +68,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const payload = unparsedBody
 
-    let event: any
+    let event: WebhookEvent
 
     try {
       const provider = getPaymentProvider("stripe")
       event = await provider.verifyWebhookSignature(payload, signature)
-    } catch (error: any) {
-      strapi.log.error(`[Webhook] Signature verification failed: ${error.message}`)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error"
+      strapi.log.error(`[Webhook] Signature verification failed: ${errorMessage}`)
       return ctx.badRequest("Webhook verification failed")
     }
 
-    const eventId = event.id as string
-    const eventType = event.type as string
+    const eventId = event.id
+    const eventType = event.type
 
     strapi.log.info(`[Webhook] Received Stripe event: ${eventType} (${eventId})`)
 
@@ -380,8 +388,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     event: any
   ) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-    const logoUrl =
-      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
 
     const eventDate = new Date(event.start).toLocaleDateString("en-US", {
       weekday: "long",
@@ -401,8 +407,66 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         ? `${event.location.name}, ${event.location.country}`
         : "Location TBA"
 
-    // Claim URL with player document ID
-    const claimUrl = `${frontendUrl}/auth/register?claim=${player.documentId}`
+    // Generate password reset token for the player's user account
+    const resetToken = randomBytes(64).toString("hex")
+
+    // Find or create the user associated with this player
+    let user = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { player: { documentId: player.documentId } },
+    })
+
+    if (!user) {
+      // No user exists - check if there's a user with this email (not linked to player yet)
+      user = await strapi.documents("plugin::users-permissions.user").findFirst({
+        filters: { email: { $eqi: email } },
+      })
+
+      if (user) {
+        // User exists but not linked to player - link them
+        await strapi.documents("plugin::users-permissions.user").update({
+          documentId: user.documentId,
+          data: {
+            player: player.id,
+            resetPasswordToken: resetToken,
+          } as any,
+        })
+        strapi.log.info(`[Webhook] Linked existing user ${email} to player ${player.documentId}`)
+      } else {
+        // Create a new user account
+        const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
+          filters: { type: "player" },
+        })
+
+        const password = `${randomBytes(16).toString("hex")}!`
+
+        user = await strapi.documents("plugin::users-permissions.user").create({
+          data: {
+            username: nameToUsername(playerName),
+            email,
+            password,
+            confirmed: true,
+            blocked: false,
+            provider: "local",
+            role: playerRole?.id,
+            player: player.id,
+            invitationStatus: "pending",
+            resetPasswordToken: resetToken,
+          } as any,
+        })
+        strapi.log.info(`[Webhook] Created new user account for ${email} and linked to player ${player.documentId}`)
+      }
+    } else {
+      // User already exists and is linked - just update the reset token
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: user.documentId,
+        data: { resetPasswordToken: resetToken } as any,
+      })
+    }
+
+    // Build reset password URL (similar to user-invitations.ts)
+    const callbackUrl = encodeURIComponent("/admin")
+    const code = encodeURIComponent(resetToken)
+    const resetPasswordUrl = `${frontendUrl}/auth/reset-password?code=${code}&callbackUrl=${callbackUrl}`
 
     // Generate calendar data
     let icsContent: string | null = null
@@ -431,109 +495,43 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       strapi.log.warn(`[Webhook] Failed to generate calendar for invitation: ${calError.message}`)
     }
 
-    // Calendar section HTML
-    const calendarSectionHtml = `
-      <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
-        <h3 style="margin-top: 0; color: #1976d2;">Add to Your Calendar</h3>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          ${googleCalendarUrl ? `<a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #4285f4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Google Calendar</a>` : ""}
-          ${outlookCalendarUrl ? `<a href="${outlookCalendarUrl}" target="_blank" style="display: inline-block; background: #0078d4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Outlook</a>` : ""}
-        </div>
-        <p style="margin-top: 12px; margin-bottom: 0; font-size: 12px; color: #666;">
-          An .ics calendar file is also attached to this email.
-        </p>
-      </div>
-    `
-
     try {
+      const html = await render(
+        PlayerInvitationEmail({
+          playerName,
+          ticketCode,
+          eventName: event.name,
+          eventDate,
+          eventTime,
+          eventLocation,
+          resetPasswordUrl,
+          googleCalendarUrl,
+          outlookCalendarUrl,
+          frontendUrl,
+        })
+      )
+
+      const text = await render(
+        PlayerInvitationEmail({
+          playerName,
+          ticketCode,
+          eventName: event.name,
+          eventDate,
+          eventTime,
+          eventLocation,
+          resetPasswordUrl,
+          googleCalendarUrl,
+          outlookCalendarUrl,
+          frontendUrl,
+        }),
+        { plainText: true }
+      )
+
       const emailOptions: any = {
         to: email,
         subject: `[#play14] Your ticket for ${event.name} - Create your profile`,
-        text: `
-Hi ${playerName.split(" ")[0]},
-
-You've been registered for ${event.name}!
-
-Your ticket: ${ticketCode}
-Event: ${event.name}
-Date: ${eventDate} at ${eventTime}
-Location: ${eventLocation}
-
-Add to your calendar:
-- Google Calendar: ${googleCalendarUrl}
-- Outlook: ${outlookCalendarUrl}
-
-Create your #play14 account to:
-- Manage your profile
-- View your tickets
-- Connect with the community
-
-Create your account: ${claimUrl}
-
-See you at the event!
-The #play14 Team
-        `.trim(),
-        html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .header { background: #1a1a1a; padding: 30px 20px; text-align: center; }
-    .header img { max-width: 200px; height: auto; }
-    .content { padding: 30px 20px; background: #ffffff; }
-    .ticket-info { background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .ticket-code { font-size: 24px; font-weight: bold; color: #f47920; letter-spacing: 2px; }
-    .footer { text-align: center; padding: 20px; background: #f5f5f5; color: #666; font-size: 12px; }
-    .btn { display: inline-block; background: #f47920; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
-    h2 { color: #333; margin-top: 0; }
-    .features { margin: 20px 0; padding-left: 20px; }
-    .features li { margin: 8px 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="${logoUrl}" alt="#play14" />
-    </div>
-    <div class="content">
-      <h2>Welcome to #play14!</h2>
-      <p>Hi ${playerName.split(" ")[0]},</p>
-      <p>You've been registered for <strong>${event.name}</strong>!</p>
-
-      <div class="ticket-info">
-        <p><strong>Your Ticket</strong></p>
-        <p class="ticket-code">${ticketCode}</p>
-        <p style="margin-top: 15px; margin-bottom: 0;">
-          <strong>Event:</strong> ${event.name}<br/>
-          <strong>Date:</strong> ${eventDate} at ${eventTime}<br/>
-          <strong>Location:</strong> ${eventLocation}
-        </p>
-      </div>
-
-      ${calendarSectionHtml}
-
-      <p>Create your #play14 account to:</p>
-      <ul class="features">
-        <li>Manage your player profile</li>
-        <li>View all your tickets</li>
-        <li>Connect with the community</li>
-        <li>Get updates about events</li>
-      </ul>
-
-      <a href="${claimUrl}" class="btn">Create Your Account</a>
-
-      <p style="margin-top: 30px;">See you at the event!</p>
-    </div>
-    <div class="footer">
-      <p>The #play14 Team</p>
-      <p><a href="${frontendUrl}" style="color: #f47920;">play14.org</a></p>
-    </div>
-  </div>
-</body>
-</html>
-        `.trim(),
+        html,
+        text,
       }
 
       // Add ICS attachment if generated successfully
@@ -923,7 +921,7 @@ The #play14 Team
   },
 
   /**
-   * Send order confirmation email with calendar attachment
+   * Send order confirmation email with calendar attachment and invoice PDF
    */
   async sendConfirmationEmail(
     order: any,
@@ -1002,6 +1000,58 @@ The #play14 Team
       // NON-CRITICAL FAILURE: Calendar generation failed but email will still be sent.
       // TODO: Integrate with monitoring system to track frequency of these failures
       strapi.log.warn(`[Webhook] Failed to generate calendar data: ${calError.message}`)
+    }
+
+    // Generate invoice PDF
+    let invoicePDF: Buffer | null = null
+
+    try {
+      const invoiceData: InvoiceData = {
+        orderNumber: order.orderNumber,
+        invoiceNumber: order.orderNumber, // Use order number as invoice number
+        invoiceDate: order.paidAt || new Date().toISOString(),
+        purchaserName: order.purchaserName,
+        purchaserEmail: order.purchaserEmail,
+        eventName: order.event.name,
+        eventDate: new Date(order.event.start).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        eventLocation:
+          order.event.venue
+            ? `${order.event.venue.name}${order.event.venue.location?.place_name ? ` - ${order.event.venue.location.place_name}` : ""}`
+            : order.event.location
+              ? `${order.event.location.name}, ${order.event.location.country}`
+              : "Location TBA",
+        tickets: formatTicketItems(order.ticketDetails || []),
+        subtotal: order.originalAmount || order.totalAmount,
+        discountAmount: order.discountAmount || 0,
+        totalAmount: order.totalAmount,
+        currency: order.currency,
+        paymentMethod: "Stripe",
+        notes: order.notes || undefined,
+      }
+
+      // Logo path - use white background transparent version for invoices
+      const logoPath = join(__dirname, "../../../../design/logo/PNG/tinified/play14_white_bg_trans_600x200.png")
+
+      invoicePDF = await generateInvoicePDF(invoiceData, {
+        organizationName: "#play14",
+        organizationWebsite: "https://play14.org",
+        // Use event contact email in invoice, fallback to team@play14.org
+        organizationEmail: order.event.contactEmail || "team@play14.org",
+        logoPath,
+      })
+
+      strapi.log.info(`[Webhook] Invoice PDF generated for order ${order.orderNumber}`)
+    } catch (invoiceError: any) {
+      // NON-CRITICAL FAILURE: Invoice generation failed but email will still be sent.
+      // The customer paid successfully and will receive ticket codes without invoice.
+      strapi.log.warn(`[Webhook] Failed to generate invoice PDF: ${invoiceError.message}`)
     }
 
     // Format event date for display
@@ -1126,15 +1176,27 @@ The #play14 Team
         `.trim(),
       }
 
-      // Add ICS attachment if generated successfully
+      // Add attachments if generated successfully
+      const attachments: any[] = []
+
       if (icsContent) {
-        emailOptions.attachments = [
-          {
-            filename: `${order.event.slug || "play14-event"}.ics`,
-            content: Buffer.from(icsContent),
-            contentType: "text/calendar",
-          },
-        ]
+        attachments.push({
+          filename: `${order.event.slug || "play14-event"}.ics`,
+          content: Buffer.from(icsContent),
+          contentType: "text/calendar",
+        })
+      }
+
+      if (invoicePDF) {
+        attachments.push({
+          filename: `invoice-${order.orderNumber}.pdf`,
+          content: invoicePDF,
+          contentType: "application/pdf",
+        })
+      }
+
+      if (attachments.length > 0) {
+        emailOptions.attachments = attachments
       }
 
       await strapi.plugin("email").service("email").send(emailOptions)

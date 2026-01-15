@@ -6,6 +6,21 @@ const path = require("path")
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  // Explicitly define environment variables to ensure they're inlined in client bundles
+  // This fixes an issue in Next.js 15.3+ where NEXT_PUBLIC_* vars aren't properly embedded
+  // in standalone builds with client components
+  // See: https://github.com/vercel/next.js/issues/80194
+  env: {
+    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN:
+      process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_WEB_VITALS: process.env.NEXT_PUBLIC_WEB_VITALS,
+    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+  },
+  // Empty turbopack config to acknowledge we're using Turbopack
+  turbopack: {},
   images: {
     remotePatterns: [
       {

@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "result_line_items",
+  "info": {
+    "singularName": "result-line-item",
+    "pluralName": "result-line-items",
+    "displayName": "Result Line Item",
+    "description": "Result income and expense line items for events"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "tickets",
+        "sponsors",
+        "other_income",
+        "security",
+        "insurance",
+        "food",
+        "goodies",
+        "supplies",
+        "venue",
+        "organizer_expenses",
+        "other_expense"
+      ],
+      "required": true
+    },
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "description": {
+      "type": "text"
+    },
+    "amount": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event",
+      "inversedBy": "resultItems"
+    }
+  }
+}

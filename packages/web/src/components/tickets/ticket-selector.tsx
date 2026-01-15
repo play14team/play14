@@ -8,6 +8,7 @@ import type {
   DiscountValidationResult,
 } from "./purchase.action"
 import { validateDiscountCode } from "./purchase.action"
+import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
 import DiscountCodeInput from "./discount-code-input"
 import styles from "./ticket-selector.module.scss"
 
@@ -155,6 +156,8 @@ export default function TicketSelector({
   }
 
   const handleDiscountApplied = (result: DiscountValidationResult) => {
+    // Track discount code validation
+    trackDiscountCodeValidation(eventId, result.valid, result.discountType)
     setAppliedDiscount(result)
   }
 

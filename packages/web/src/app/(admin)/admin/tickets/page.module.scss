@@ -37,13 +37,13 @@
   }
 }
 
-.orders {
+.tickets {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.orderCard {
+.ticketCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -55,14 +55,14 @@
   }
 }
 
-.orderHeader {
+.ticketHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
 
-.orderNumber {
+.ticketCode {
   font-family: monospace;
   font-size: 0.9rem;
   color: var(--color-text-secondary);
@@ -75,17 +75,12 @@
   font-weight: 600;
 }
 
-.statusPaid {
+.statusValid {
   background: rgba(var(--color-success-rgb), 0.15);
   color: var(--color-success);
 }
 
-.statusPending {
-  background: rgba(var(--color-warning-rgb), 0.15);
-  color: var(--color-warning);
-}
-
-.statusRefunded {
+.statusUsed {
   background: rgba(var(--color-secondary-rgb), 0.15);
   color: var(--color-secondary);
 }
@@ -93,6 +88,11 @@
 .statusCancelled {
   background: var(--color-bg-elevated);
   color: var(--color-text-muted);
+}
+
+.statusRefunded {
+  background: rgba(var(--color-warning-rgb), 0.15);
+  color: var(--color-warning);
 }
 
 .eventInfo {
@@ -114,35 +114,51 @@
 }
 
 .eventDate {
-  margin: 0;
+  margin: 0 0 0.25rem;
   color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
-.orderMeta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-top: 1px solid var(--color-border-light);
-  border-bottom: 1px solid var(--color-border-light);
+.eventLocation {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.attendeeInfo {
+  background: var(--color-bg-elevated);
+  padding: 1rem;
+  border-radius: 6px;
   margin-bottom: 0.75rem;
 }
 
-.ticketCount {
+.attendeeField {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.label {
   color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.amount {
-  font-size: 1.1rem;
-  font-weight: 600;
+.value {
   color: var(--color-text);
+  font-size: 0.9rem;
 }
 
-.purchaseDate {
+.orderNumber {
   margin: 0 0 0.75rem;
   font-size: 0.85rem;
   color: var(--color-text-muted);
+  font-family: monospace;
 }
 
 .viewDetails {

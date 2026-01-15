@@ -13,6 +13,9 @@ import {
   getEventHostAccounts,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import { getEventDiscountCodes } from "./discount-code.action"
+import { getBudgetItems } from "./budget.action"
+import { getResultItems } from "./results.action"
+import { getRevenueAnalytics } from "./revenue-analytics.action"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -51,13 +54,19 @@ export default async function EventEditPage({ params }: PageProps) {
     notFound()
   }
 
-  // Fetch host accounts and discount codes after we have the event (needs documentId)
-  const [hostAccounts, discountCodesResult] = await Promise.all([
+  // Fetch host accounts, discount codes, budget/result items, and revenue after we have the event (needs documentId)
+  const [hostAccounts, discountCodesResult, budgetItemsResult, resultItemsResult, revenueAnalytics] = await Promise.all([
     getEventHostAccounts(event.documentId),
     getEventDiscountCodes(event.documentId),
+    getBudgetItems(event.documentId),
+    getResultItems(event.documentId),
+    getRevenueAnalytics(event.documentId),
   ])
 
   const discountCodes = discountCodesResult.success ? discountCodesResult.data || [] : []
+  const budgetItems = budgetItemsResult.success ? budgetItemsResult.data || [] : []
+  const resultItems = resultItemsResult.success ? resultItemsResult.data || [] : []
+  const ticketRevenue = revenueAnalytics?.summary?.netRevenue ?? 0
 
   return (
     <div className="admin-page admin-page-wide">
@@ -87,6 +96,9 @@ export default async function EventEditPage({ params }: PageProps) {
         hostAccounts={hostAccounts}
         playerStripeAccount={playerStripeAccount}
         discountCodes={discountCodes}
+        budgetItems={budgetItems}
+        resultItems={resultItems}
+        ticketRevenue={ticketRevenue}
       />
     </div>
   )

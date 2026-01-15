@@ -155,11 +155,18 @@ export const TICKET_ORDER_ACTIONS = {
   INITIATE_ORDER: "api::ticket-order.custom-ticket-order.initiateOrder",
   REQUEST_REFUND: "api::ticket-order.custom-ticket-order.requestRefund",
   CANCEL_ORDER: "api::ticket-order.custom-ticket-order.cancelOrder",
+  DOWNLOAD_INVOICE: "api::ticket-order.custom-ticket-order.downloadInvoice",
   HANDLE_STRIPE_WEBHOOK: "api::ticket-order.webhook.handleStripeWebhook",
   // Draft order flow (multi-step checkout with attendee info)
   CREATE_DRAFT_ORDER: "api::ticket-order.custom-ticket-order.createDraftOrder",
   UPDATE_ATTENDEE_INFO: "api::ticket-order.custom-ticket-order.updateAttendeeInfo",
   FINALIZE_CHECKOUT: "api::ticket-order.custom-ticket-order.finalizeCheckout",
+} as const
+
+// ==================== TICKETS ====================
+export const TICKET_ACTIONS = {
+  GET_TICKET_DETAILS: "api::ticket.custom-ticket.getTicketDetails",
+  GET_MY_TICKETS: "api::ticket.custom-ticket.getMyTickets",
 } as const
 
 // ==================== TICKET TYPES ====================
@@ -250,11 +257,22 @@ export const HOSTING_ACTIONS = {
 } as const
 
 export const SPONSOR_ACTIONS = {
+  // Standard CRUD
   FIND: "api::sponsor.sponsor.find",
   FIND_ONE: "api::sponsor.sponsor.findOne",
   CREATE: "api::sponsor.sponsor.create",
   UPDATE: "api::sponsor.sponsor.update",
   DELETE: "api::sponsor.sponsor.delete",
+
+  // Custom actions for admin panel
+  LIST: "api::sponsor.custom-sponsor.list",
+  FIND_ONE_ADMIN: "api::sponsor.custom-sponsor.findOne",
+  CREATE_ADMIN: "api::sponsor.custom-sponsor.create",
+  UPDATE_ADMIN: "api::sponsor.custom-sponsor.update",
+  DELETE_ADMIN: "api::sponsor.custom-sponsor.delete",
+  UPLOAD_LOGO: "api::sponsor.custom-sponsor.uploadLogo",
+  SET_LOGO_FROM_LIBRARY: "api::sponsor.custom-sponsor.setLogoFromLibrary",
+  REMOVE_LOGO: "api::sponsor.custom-sponsor.removeLogo",
 } as const
 
 export const TAG_ACTIONS = {
@@ -326,4 +344,22 @@ export const MEDIA_FOLDER_ACTIONS = {
 
 export const MEDIA_FILE_ACTIONS = {
   FIND: "api::media-file.media-file.find",
+} as const
+
+// ==================== BUDGET LINE ITEMS ====================
+export const BUDGET_LINE_ITEM_ACTIONS = {
+  LIST: "api::budget-line-item.custom-budget-line-item.list",
+  CREATE: "api::budget-line-item.custom-budget-line-item.create",
+  UPDATE: "api::budget-line-item.custom-budget-line-item.update",
+  DELETE: "api::budget-line-item.custom-budget-line-item.delete",
+  BULK_UPDATE: "api::budget-line-item.custom-budget-line-item.bulkUpdate",
+} as const
+
+// ==================== RESULT LINE ITEMS ====================
+export const RESULT_LINE_ITEM_ACTIONS = {
+  LIST: "api::result-line-item.custom-result-line-item.list",
+  CREATE: "api::result-line-item.custom-result-line-item.create",
+  UPDATE: "api::result-line-item.custom-result-line-item.update",
+  DELETE: "api::result-line-item.custom-result-line-item.delete",
+  BULK_UPDATE: "api::result-line-item.custom-result-line-item.bulkUpdate",
 } as const

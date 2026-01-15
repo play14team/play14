@@ -2,7 +2,7 @@
 
 import { setAuthCookie } from "@/libs/auth"
 import { strapiFetch } from "@/libs/strapi-client"
-import { featureFlags } from "@/libs/feature-flags"
+import { getFeatureFlags } from "@/libs/feature-flags"
 
 interface LoginResult {
   success: boolean
@@ -62,7 +62,8 @@ export async function loginWithCredentials(
   turnstileToken: string | null = null
 ): Promise<LoginResult> {
   // Block login if feature is disabled
-  if (!featureFlags.loginEnabled) {
+  const flags = await getFeatureFlags()
+  if (!flags.loginEnabled) {
     return { success: false, error: "Login is currently unavailable" }
   }
 
@@ -95,21 +96,30 @@ export async function loginWithCredentials(
       errorMessage.includes("Invalid identifier or password") ||
       errorMessage.includes("invalid")
     ) {
-      return { success: false, error: "Invalid email/username or password" }
+      return {
+        success: false,
+        error: "We couldn't sign you in with those credentials. Please check your email/username and password and try again.",
+      }
     }
 
     if (errorMessage.includes("blocked")) {
-      return { success: false, error: "Your account has been blocked" }
+      return {
+        success: false,
+        error: "Your account has been blocked. Please contact support for assistance.",
+      }
     }
 
     if (errorMessage.includes("confirmed")) {
       return {
         success: false,
-        error: "Please confirm your email address before logging in",
+        error: "Please confirm your email address before logging in. Check your inbox for the confirmation link.",
       }
     }
 
-    return { success: false, error: errorMessage }
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again or contact support if the problem persists.",
+    }
   }
 
   if (!result.data?.jwt) {

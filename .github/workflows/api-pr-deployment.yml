@@ -25,6 +25,8 @@ jobs:
       id-token: write
       contents: read
       pull-requests: write
+    outputs:
+      short_sha: ${{ steps.vars.outputs.short_sha }}
 
     services:
       postgres:
@@ -120,14 +122,20 @@ jobs:
         run: |
           az acr login --name play14containerregistry
 
+      - name: Get short commit SHA
+        id: vars
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
       - name: Build and push PR container image
         uses: docker/build-push-action@v6
         with:
           push: true
           tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:acc
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
-          file: packages/api/Dockerfile.ci
+          file: packages/api/Dockerfile
           context: .
 
       - name: Comment PR with image tags
@@ -168,7 +176,7 @@ jobs:
             az containerapp update \
               -n "$CONTAINER_APP_ACC" \
               -g "$RESOURCE_GROUP" \
-              --image "$REGISTRY/$IMAGE_NAME:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}"
+              --image "$REGISTRY/$IMAGE_NAME:${{ needs.build-and-push.outputs.short_sha }}"
 
       - name: Start Container App
         uses: azure/CLI@v2
@@ -245,7 +253,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `✅ **API Deployed to Acceptance Environment**\n\n🌐 URL: ${{ steps.get-url.outputs.url }}\n📦 Image: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}\`\n\nYou can now test this PR in the acceptance environment.`
+              body: `✅ **API Deployed to Acceptance Environment**\n\n🌐 URL: ${{ steps.get-url.outputs.url }}\n📦 Image: \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.short_sha }}\`\n\nYou can now test this PR in the acceptance environment.`
             })
 
   stop-pr:

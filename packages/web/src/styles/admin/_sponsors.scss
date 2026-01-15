@@ -1,0 +1,184 @@
+// ===========================================
+// Admin Sponsors Styles
+// ===========================================
+
+// ===========================================
+// Sponsors List
+// ===========================================
+
+.sponsors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sponsors-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.sponsors-search {
+  width: 100%;
+  max-width: 300px;
+}
+
+.sponsors-count {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-left: auto;
+}
+
+.sponsors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+// ===========================================
+// Sponsor Card
+// ===========================================
+
+.sponsor-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.sponsor-card-logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-bg);
+  border-radius: 8px;
+  overflow: hidden;
+
+  i {
+    font-size: 24px;
+    color: var(--color-text-muted);
+  }
+}
+
+.sponsor-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sponsor-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sponsor-card-url {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sponsor-card-events {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.sponsor-card-action {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+
+  i {
+    font-size: 20px;
+  }
+}
+
+// ===========================================
+// Sponsors Pagination
+// ===========================================
+
+.sponsors-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+// ===========================================
+// Sponsor Edit Form
+// ===========================================
+
+.sponsor-edit-form {
+  max-width: none;
+}
+
+// ===========================================
+// Sponsor Edit Layout (2-column: Details | Actions)
+// No map section, so simpler layout than venues
+// ===========================================
+
+.sponsor-edit-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+
+    .sponsor-edit-actions {
+      grid-column: 1;
+      grid-row: 2;
+    }
+  }
+}
+
+.sponsor-edit-details {
+  min-width: 0;
+}
+
+.sponsor-edit-actions {
+  position: sticky;
+  top: 32px;
+  background: var(--admin-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  // Override delete confirm to stack vertically in narrow sidebar
+  .admin-delete-confirm {
+    flex-direction: column;
+    align-items: stretch;
+
+    span {
+      margin-bottom: 8px;
+    }
+  }
+}

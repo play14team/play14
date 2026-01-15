@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs"
 import { join, resolve } from "path"
 import slugify from "slugify"
 import type { Core } from "@strapi/strapi"
+import { nameToUsername } from "../libs/strings"
 
 type ContactSource = "attendee" | "mailchimp"
 
@@ -730,7 +731,7 @@ export async function runAudienceAttendeeImport(
           actions.createUsers.push({ email, playerName: player?.name || fullName })
           user = {
             email,
-            username: email,
+            username: nameToUsername(fullName, firstName, lastName),
             player,
             planned: true,
           }

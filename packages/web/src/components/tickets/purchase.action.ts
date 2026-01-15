@@ -42,7 +42,7 @@ export interface InitiateOrderResponse {
 export interface OrderTicket {
   documentId: string
   ticketCode: string
-  status: string
+  ticketStatus: string
   attendeeName: string
   attendeeEmail: string
   ticketType?: string

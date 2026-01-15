@@ -88,5 +88,14 @@ export default {
         description: "Finalize a draft order and create payment session",
       },
     },
+    {
+      method: "GET",
+      path: "/ticket-orders/:orderId/invoice",
+      handler: "custom-ticket-order.downloadInvoice",
+      info: { apiName: "ticket-order", type: "content-api" },
+      config: {
+        description: "Download invoice PDF for a paid order",
+      },
+    },
   ],
 }

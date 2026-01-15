@@ -1189,7 +1189,10 @@ export function StripeConnect({ stripeAccount, onConnect, onDashboard }: StripeC
 # Stripe Configuration
 STRIPE_SECRET_KEY=sk_test_... # or sk_live_... for production
 STRIPE_PUBLISHABLE_KEY=pk_test_... # or pk_live_... for production
-STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Webhook Secrets (two separate webhooks for platform and connected accounts)
+STRIPE_WEBHOOK_SECRET=whsec_...         # Platform account webhook signing secret
+STRIPE_WEBHOOK_SECRET_CONNECT=whsec_... # Connected accounts webhook signing secret
 
 # Platform Settings
 STRIPE_PLATFORM_FEE_PERCENT=0 # 0% for non-profit
@@ -1209,33 +1212,100 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 
 ## 8. Webhook Configuration
 
-### 8.1 Required Webhook Events
+### 8.1 Dual Webhook Architecture
 
-Configure these events in the Stripe Dashboard → Webhooks:
+The platform uses **two separate webhook endpoints** to handle different event sources:
 
-**Connect Events** (for connected accounts):
-- `account.updated`
-- `account.application.deauthorized`
+1. **Platform Account Webhook**: Handles events from direct platform payments
+2. **Connected Accounts Webhook**: Handles events from Stripe Connect accounts
 
-**Checkout Events**:
-- `checkout.session.completed`
-- `checkout.session.expired`
+Each webhook has its own signing secret for security.
 
-**Payment Events**:
-- `payment_intent.succeeded`
-- `payment_intent.payment_failed`
+### 8.2 Platform Account Webhook Configuration
 
-**Refund Events**:
-- `charge.refunded`
-- `charge.dispute.created`
-- `charge.dispute.closed`
+**Purpose**: Handle payments made directly to the platform account (standard checkout sessions).
 
-### 8.2 Webhook Endpoint
+**Stripe Dashboard Configuration**:
+- **Endpoint URL**: `https://community-acc.play14.org/api/webhooks/stripe` (production)
+- **Events from**: `Your account` (platform account)
+- **Events to listen for**:
+  - `checkout.session.completed` - Payment successful, create tickets
+  - `checkout.session.expired` - Checkout abandoned, release reservations
+  - `payment_intent.payment_failed` - Payment failed, notify customer
+  - `charge.refunded` - Refund processed, update order status
 
+**Environment Variable**:
+```bash
+STRIPE_WEBHOOK_SECRET=whsec_xxx  # Platform webhook signing secret
 ```
-Production: https://api.play14.org/api/stripe/webhook
-Development: Use Stripe CLI for local testing
+
+### 8.3 Connected Accounts Webhook Configuration
+
+**Purpose**: Handle events from Stripe Connect accounts (host payments and account status).
+
+**Stripe Dashboard Configuration**:
+- **Endpoint URL**: `https://community-acc.play14.org/api/webhooks/stripe` (same endpoint!)
+- **Events from**: `Connected accounts`
+- **Events to listen for**:
+  - `account.updated` - Host account status changed (onboarding, capabilities)
+  - `checkout.session.completed` - Payment to connected account successful
+  - `checkout.session.expired` - Checkout to connected account abandoned
+  - `payment_intent.payment_failed` - Payment to connected account failed
+  - `charge.refunded` - Refund on connected account
+
+**Environment Variable**:
+```bash
+STRIPE_WEBHOOK_SECRET_CONNECT=whsec_yyy  # Connect webhook signing secret
 ```
+
+### 8.4 Webhook Signature Verification
+
+The webhook handler automatically tries both signing secrets:
+
+1. Attempts verification with `STRIPE_WEBHOOK_SECRET` (platform)
+2. If that fails, tries `STRIPE_WEBHOOK_SECRET_CONNECT` (connected accounts)
+3. If both fail, returns 400 Bad Request with detailed error
+
+**Implementation**: [packages/api/src/services/payment/providers/stripe.ts:223-260](packages/api/src/services/payment/providers/stripe.ts#L223-L260)
+
+### 8.5 Local Development with Stripe CLI
+
+For testing webhooks locally:
+
+```bash
+# Start webhook forwarder with Docker Compose
+podman-compose up stripe-webhook
+
+# Or manually with Stripe CLI for platform events
+stripe listen --forward-to localhost:1337/api/webhooks/stripe \
+  --events checkout.session.completed,checkout.session.expired,payment_intent.payment_failed,charge.refunded
+
+# Test specific events
+stripe trigger checkout.session.completed
+stripe events resend evt_xxx --webhook-endpoint we_xxx
+```
+
+### 8.6 Production Webhook URLs
+
+| Environment | URL |
+|-------------|-----|
+| Production | `https://community.play14.org/api/webhooks/stripe` |
+| Acceptance | `https://community-acc.play14.org/api/webhooks/stripe` |
+| Development | `http://localhost:1337/api/webhooks/stripe` |
+
+### 8.7 Monitoring Webhook Deliveries
+
+**In Stripe Dashboard**:
+- Go to Developers → Webhooks
+- Click on each webhook endpoint to view delivery logs
+- Check for failed deliveries (status codes 4xx/5xx)
+- Use "Resend" to retry failed events
+
+**Key Metrics to Monitor**:
+- Webhook success rate (should be >99%)
+- Response time (should be <2s)
+- Failed deliveries by event type
+- Signature verification failures
 
 ---
 

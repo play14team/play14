@@ -12,6 +12,6 @@ export default ({ env }: { env: any }) => ({
     keys: env.array("APP_KEYS"),
   },
   cron: {
-    enabled: env.bool("CRON_ENABLED", false),
+    enabled: env.bool("CRON_ENABLED", true),
   },
 })

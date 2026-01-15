@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { getAuthState } from "@/libs/auth"
-import { featureFlags } from "@/libs/feature-flags"
+import { getFeatureFlags } from "@/libs/feature-flags"
 import ResetPasswordForm from "@/components/auth/reset-password-form"
 import Logo from "@/components/layout/logo"
 import type { Metadata } from "next"
@@ -24,7 +24,8 @@ function normalizeCallbackUrl(callbackUrl?: string): string {
 
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
   // Block access if login feature is disabled
-  if (!featureFlags.loginEnabled) {
+  const flags = await getFeatureFlags()
+  if (!flags.loginEnabled) {
     notFound()
   }
 
