@@ -129,23 +129,80 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
       isActive: formData.isActive,
     }
 
-    let result
-    if (editingId) {
-      result = await updateTicketType(editingId, data)
-    } else {
-      result = await createTicketType(eventId, data)
-    }
+    // Store previous state for rollback on error
+    const previousOrderedTickets = orderedTickets
 
-    if (result.success) {
-      // Close form and reset loading state
-      // The form/edit UI is now hidden, so user won't see the state change
-      setIsAdding(false)
+    if (editingId) {
+      // Optimistic update for editing: update the ticket in the list immediately
+      const optimisticTicket: TicketType = {
+        documentId: editingId,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        currency: data.currency,
+        capacity: data.capacity,
+        soldCount: formData.soldCount || 0,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        sortOrder: data.sortOrder ?? formData.sortOrder ?? 0,
+        isActive: data.isActive ?? true,
+      }
+      setOrderedTickets((prev) =>
+        prev.map((t) => (t.documentId === editingId ? optimisticTicket : t))
+      )
+
+      // Close form immediately for better UX
       setEditingId(null)
       setIsLoading(false)
-      onUpdate()
+
+      const result = await updateTicketType(editingId, data)
+
+      if (result.success && result.data) {
+        // Update with server data (in case there are any differences)
+        setOrderedTickets((prev) =>
+          prev.map((t) => (t.documentId === editingId ? result.data! : t))
+        )
+        onUpdate()
+      } else {
+        // Rollback on error
+        setOrderedTickets(previousOrderedTickets)
+        setError(result.error || "Failed to save ticket type")
+      }
     } else {
-      setError(result.error || "Failed to save ticket type")
+      // Optimistic update for creating: add a temporary ticket to the list
+      const tempId = `temp-${Date.now()}`
+      const optimisticTicket: TicketType = {
+        documentId: tempId,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        currency: data.currency,
+        capacity: data.capacity,
+        soldCount: 0,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        sortOrder: data.sortOrder ?? orderedTickets.length,
+        isActive: data.isActive ?? true,
+      }
+      setOrderedTickets((prev) => [...prev, optimisticTicket])
+
+      // Close form immediately for better UX
+      setIsAdding(false)
       setIsLoading(false)
+
+      const result = await createTicketType(eventId, data)
+
+      if (result.success && result.data) {
+        // Replace temporary ticket with real data from server
+        setOrderedTickets((prev) =>
+          prev.map((t) => (t.documentId === tempId ? result.data! : t))
+        )
+        onUpdate()
+      } else {
+        // Rollback on error: remove the temporary ticket
+        setOrderedTickets(previousOrderedTickets)
+        setError(result.error || "Failed to save ticket type")
+      }
     }
   }
 
@@ -163,18 +220,22 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
 
     if (!ticketId) return
 
-    setIsLoading(true)
     setError(null)
+
+    // Store previous state for rollback on error
+    const previousOrderedTickets = orderedTickets
+
+    // Optimistic delete: remove the ticket immediately
+    setOrderedTickets((prev) => prev.filter((t) => t.documentId !== ticketId))
 
     const result = await deleteTicketType(ticketId)
 
     if (result.success) {
-      // Reset loading state before refresh so it doesn't block subsequent operations
-      setIsLoading(false)
       onUpdate()
     } else {
+      // Rollback on error: restore the ticket
+      setOrderedTickets(previousOrderedTickets)
       setError(result.error || "Failed to delete ticket type")
-      setIsLoading(false)
     }
   }
 
@@ -183,16 +244,29 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
   }
 
   const handleToggleActive = async (ticket: TicketType) => {
-    setIsLoading(true)
-    const result = await toggleTicketTypeActive(ticket.documentId, !ticket.isActive)
+    setError(null)
 
-    if (result.success) {
-      // Reset loading state before refresh so it doesn't block subsequent operations
-      setIsLoading(false)
+    // Store previous state for rollback on error
+    const previousOrderedTickets = orderedTickets
+    const newIsActive = !ticket.isActive
+
+    // Optimistic update: toggle the active status immediately
+    setOrderedTickets((prev) =>
+      prev.map((t) => (t.documentId === ticket.documentId ? { ...t, isActive: newIsActive } : t))
+    )
+
+    const result = await toggleTicketTypeActive(ticket.documentId, newIsActive)
+
+    if (result.success && result.data) {
+      // Update with server data (in case there are any differences)
+      setOrderedTickets((prev) =>
+        prev.map((t) => (t.documentId === ticket.documentId ? result.data! : t))
+      )
       onUpdate()
     } else {
+      // Rollback on error
+      setOrderedTickets(previousOrderedTickets)
       setError(result.error || "Failed to update ticket type")
-      setIsLoading(false)
     }
   }
 

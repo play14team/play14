@@ -197,7 +197,9 @@
   color: white;
 
   &:hover {
-    background: var(--color-primary-hover);
+    background: var(--color-primary);
+    filter: brightness(0.85);
+    color: white;
   }
 }
 
