@@ -44,12 +44,11 @@ export default function StripeAccountSelector({
     const result = await linkStripeAccountToEvent(eventId, stripeAccountId)
 
     if (result.success) {
-      // Keep loading state active - page refresh will unmount component
       onUpdate()
     } else {
       setError(result.error || "Failed to link account")
-      setIsLoading(false)
     }
+    setIsLoading(false)
   }
 
   const handleUnlinkClick = () => {
@@ -64,12 +63,11 @@ export default function StripeAccountSelector({
     const result = await unlinkStripeAccountFromEvent(eventId)
 
     if (result.success) {
-      // Keep loading state active - page refresh will unmount component
       onUpdate()
     } else {
       setError(result.error || "Failed to unlink account")
-      setIsLoading(false)
     }
+    setIsLoading(false)
   }
 
   const handleUnlinkCancel = () => {
