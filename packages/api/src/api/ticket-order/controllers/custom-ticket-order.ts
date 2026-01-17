@@ -1861,8 +1861,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       notes: order.status === "refunded" ? "This order has been refunded." : undefined,
     }
 
-    // Logo path
-    const logoPath = join(__dirname, "../../../../design/logo/PNG/tinified/play14_white_bg_trans_600x200.png")
+    // Logo path - use local copy in public/images (works in production)
+    const logoPath = join(__dirname, "../../../../public/images/play14_white_bg_trans_600x200.png")
 
     try {
       const pdfBuffer = await generateInvoicePDF(invoiceData, {

@@ -1036,8 +1036,8 @@ The #play14 Team
         notes: order.notes || undefined,
       }
 
-      // Logo path - use white background transparent version for invoices
-      const logoPath = join(__dirname, "../../../../design/logo/PNG/tinified/play14_white_bg_trans_600x200.png")
+      // Logo path - use local copy in public/images (works in production)
+      const logoPath = join(__dirname, "../../../../public/images/play14_white_bg_trans_600x200.png")
 
       invoicePDF = await generateInvoicePDF(invoiceData, {
         organizationName: "#play14",

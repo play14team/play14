@@ -48,8 +48,8 @@ async function main() {
       "Thank you for your purchase! This invoice is for your records. If you have any questions about your order, please contact the event organizers.",
   }
 
-  // Use a logo from the design package (white background version for invoices)
-  const logoPath = join(process.cwd(), "../design/logo/PNG/tinified/play14_white_bg_trans_600x200.png")
+  // Use local logo copy in public/images (white background version for invoices)
+  const logoPath = join(process.cwd(), "public/images/play14_white_bg_trans_600x200.png")
 
   const pdfBuffer = await generateInvoicePDF(invoiceData, {
     organizationName: "#play14",
