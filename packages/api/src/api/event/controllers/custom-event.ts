@@ -361,6 +361,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const twoWeeksBefore = new Date(startDate)
     twoWeeksBefore.setDate(twoWeeksBefore.getDate() - 14)
 
+    const oneDayBefore = new Date(startDate)
+    oneDayBefore.setDate(oneDayBefore.getDate() - 1)
+
     // Early Bird ticket
     await strapi.documents("api::ticket-type.ticket-type").create({
       data: {
@@ -388,7 +391,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         capacity: null,
         soldCount: 0,
         validFrom: twoWeeksBefore.toISOString(),
-        validUntil: startDate.toISOString(),
+        validUntil: oneDayBefore.toISOString(),
         sortOrder: 1,
         isActive: true,
         event: eventId,
