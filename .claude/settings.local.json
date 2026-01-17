@@ -75,7 +75,8 @@
       "mcp__plugin_sentry_sentry__get_issue_details",
       "mcp__plugin_sentry_sentry__find_organizations",
       "mcp__plugin_sentry_sentry__get_issue_tag_values",
-      "mcp__plugin_sentry_sentry__search_issue_events"
+      "mcp__plugin_sentry_sentry__search_issue_events",
+      "Bash(npx vitest:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

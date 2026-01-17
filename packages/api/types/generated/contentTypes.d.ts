@@ -714,6 +714,19 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime
     registration: Schema.Attribute.Component<"registration.registration", false>
     resultItems: Schema.Attribute.Relation<"oneToMany", "api::result-line-item.result-line-item">
+    resultsReminderCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }> &
+      Schema.Attribute.DefaultTo<0>
+    resultsReminderLastSentAt: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false
+        }
+      }>
     slug: Schema.Attribute.UID<"name"> & Schema.Attribute.Required
     sponsorships: Schema.Attribute.Component<"events.sponsorship", true> &
       Schema.Attribute.SetPluginOptions<{

@@ -10,6 +10,8 @@ export {
 
 export { updateEventStatus } from "./events"
 
+export { processEventResultsReminders } from "./event-results-reminders"
+
 export { updatePlayerPositions } from "./players"
 
 export {

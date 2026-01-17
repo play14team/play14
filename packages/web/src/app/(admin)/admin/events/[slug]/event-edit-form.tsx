@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   updateEvent,
   publishEvent,
@@ -18,7 +18,7 @@ import type {
   HostStripeAccount,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 
-import EventEditTabs, { type TabId } from "./event-edit-tabs"
+import EventEditTabs, { TAB_IDS, type TabId } from "./event-edit-tabs"
 import EventEditActions from "./event-edit-actions"
 import { useEventForm } from "./hooks/use-event-form"
 import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
@@ -63,8 +63,21 @@ export default function EventEditForm({
   ticketRevenue,
 }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const toast = useToast()
-  const [activeTab, setActiveTab] = useState<TabId>("basics")
+
+  // Get tab from URL params (client-side)
+  const tabParam = searchParams.get("tab") as TabId | null
+  const urlTab: TabId = tabParam && TAB_IDS.includes(tabParam) ? tabParam : "basics"
+  const [activeTab, setActiveTab] = useState<TabId>(urlTab)
+
+  // Sync tab state when URL changes (e.g., direct navigation)
+  useEffect(() => {
+    if (urlTab !== activeTab) {
+      setActiveTab(urlTab)
+    }
+  }, [urlTab]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const [isPublished, setIsPublished] = useState(event.isPublished ?? false)
@@ -255,9 +268,19 @@ export default function EventEditForm({
     resetDirtyState(form.originalFormValues)
   }, [form, resetDirtyState])
 
+  const handleTabChange = useCallback(
+    (tab: TabId) => {
+      setActiveTab(tab)
+      const params = new URLSearchParams(searchParams.toString())
+      params.set("tab", tab)
+      router.replace(`/admin/events/${event.slug}?${params.toString()}`, { scroll: false })
+    },
+    [router, searchParams, event.slug]
+  )
+
   return (
     <form onSubmit={handleSubmit} className="admin-form">
-      <EventEditTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <EventEditTabs activeTab={activeTab} onTabChange={handleTabChange} />
 
       <div className="event-edit-layout">
         <div className="event-edit-content">

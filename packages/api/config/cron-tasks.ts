@@ -26,6 +26,7 @@ import {
   reservationHealthCheck,
   updateEventStatus,
   updatePlayerPositions,
+  processEventResultsReminders,
 } from "../src/services/cron"
 import { acquireLock, releaseLock } from "../src/services/cron/distributed-lock"
 
@@ -197,6 +198,18 @@ const cronTasks = {
       })
     ),
     options: { rule: "0 */5 * * * *" },
+  },
+
+  // Daily at 06:00 - Send event results reminders
+  // Sends up to 3 reminders, 15 days apart, starting 15 days after event ends
+  eventResultsReminders: {
+    task: withLock(
+      "eventResultsReminders",
+      withSentry("eventResultsReminders", async ({ strapi }) => {
+        await processEventResultsReminders(strapi!)
+      })
+    ),
+    options: { rule: "0 0 6 * * *" },
   },
 }
 

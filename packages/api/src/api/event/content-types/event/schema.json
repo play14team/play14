@@ -234,6 +234,23 @@
       "relation": "oneToMany",
       "target": "api::result-line-item.result-line-item",
       "mappedBy": "event"
+    },
+    "resultsReminderCount": {
+      "type": "integer",
+      "default": 0,
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
+    "resultsReminderLastSentAt": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
     }
   }
 }
