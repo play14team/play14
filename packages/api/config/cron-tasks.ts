@@ -66,15 +66,7 @@ const cronTasks = {
     options: { rule: "0 */5 * * * *" },
   },
 
-  // Every hour at :30 - Clean up abandoned draft orders
-  cleanAbandonedDraftOrders: {
-    task: withSentry("cleanAbandonedDraftOrders", async ({ strapi }) => {
-      await cleanAbandonedDraftOrders(strapi!)
-    }),
-    options: { rule: "0 30 * * * *" },
-  },
-
-  // Every hour at :00 - Process user invitations
+  // Every 5 minutes - Process user invitations
   inviteNewUsers: {
     task: withSentry("inviteNewUsers", async ({ strapi }) => {
       if (process.env.INVITATION_EMAILS_ENABLED === "false") {
@@ -84,7 +76,15 @@ const cronTasks = {
       console.log("Running user invitation job")
       await processUserInvitations(strapi)
     }),
-    options: { rule: "0 * * * *" },
+    options: { rule: "0 */5 * * * *" },
+  },
+
+  // Every hour at :30 - Clean up abandoned draft orders
+  cleanAbandonedDraftOrders: {
+    task: withSentry("cleanAbandonedDraftOrders", async ({ strapi }) => {
+      await cleanAbandonedDraftOrders(strapi!)
+    }),
+    options: { rule: "0 30 * * * *" },
   },
 
   // Daily at 01:00 - Check for reservation count drift

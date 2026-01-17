@@ -24,6 +24,7 @@ interface PlayerRecord {
   name: string
   slug?: string
   visible?: boolean
+  position?: string
   userEmail?: string
   socialNetworks?: Array<{ type: string; url: string }>
   defaultTshirtSize?: string
@@ -83,6 +84,14 @@ export interface ImportAudienceAttendeesResult {
 }
 
 const TSHIRT_SIZES = ["XXXL", "XXL", "XL", "XS", "L", "M", "S"]
+
+// Map player positions to role types (matches user-role-sync service)
+const POSITION_TO_ROLE: Record<string, string> = {
+  Player: "player",
+  Host: "host",
+  Mentor: "mentor",
+  Founder: "founder",
+}
 
 function normalizeEmail(email?: string): string | null {
   if (!email) return null
@@ -488,6 +497,7 @@ async function loadExistingPlayers(strapi): Promise<PlayerRecord[]> {
         name: player.name,
         slug: player.slug,
         visible: player.visible,
+        position: player.position,
         userEmail: player.user?.email?.toLowerCase(),
         socialNetworks: player.socialNetworks || [],
         defaultTshirtSize: player.defaultTshirtSize,
@@ -529,6 +539,7 @@ async function loadExistingUsers(strapi): Promise<UserRecord[]> {
               name: user.player.name,
               slug: user.player.slug,
               visible: user.player.visible,
+              position: user.player.position,
               userEmail: user.player.user?.email?.toLowerCase(),
               socialNetworks: user.player.socialNetworks || [],
               defaultTshirtSize: user.player.defaultTshirtSize,
@@ -621,9 +632,15 @@ export async function runAudienceAttendeeImport(
       : loadAttendeeContacts(attendeesDir, attendeeFiles)
   const contacts = mergeContacts(attendeeContacts, mailchimpContacts)
 
-  const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
-    filters: { type: "player" },
-  })
+  // Load all roles for position-based assignment
+  const allRoles = await strapi.documents("plugin::users-permissions.role").findMany({})
+  const rolesByType = new Map<string, { id: number; documentId: string }>()
+  for (const role of allRoles) {
+    if (role.type) {
+      rolesByType.set(role.type, { id: role.id, documentId: role.documentId })
+    }
+  }
+  const playerRole = rolesByType.get("player")
   if (!playerRole) {
     throw new Error("Player role not found")
   }
@@ -898,6 +915,12 @@ export async function runAudienceAttendeeImport(
         const user = usersByEmail.get(action.email)
         if (!user || !user.planned) continue
         const password = `${crypto.randomBytes(16).toString("hex")}!`
+
+        // Determine role based on player's position
+        const playerPosition = user.player?.position || "Player"
+        const roleType = POSITION_TO_ROLE[playerPosition] || "player"
+        const targetRole = rolesByType.get(roleType) || playerRole
+
         const createdUser = await strapi.documents("plugin::users-permissions.user").create({
           data: {
             username: user.username || user.email,
@@ -906,7 +929,7 @@ export async function runAudienceAttendeeImport(
             confirmed: true,
             blocked: false,
             provider: "local",
-            role: playerRole.id,
+            role: targetRole.id,
             ...(user.player?.id ? { player: user.player.id } : {}),
             invitationStatus: "pending",
           } as any,
