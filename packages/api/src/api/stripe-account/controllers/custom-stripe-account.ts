@@ -6,6 +6,7 @@
 import type { Core } from "@strapi/strapi"
 import Stripe from "stripe"
 import { STRIPE_DEFAULTS } from "../../../services/ticketing"
+import { reportSentryError } from "../../../services/observability/sentry-reporter"
 
 export default ({ strapi }: { strapi: Core.Strapi }) => {
   // Initialize Stripe client
@@ -15,6 +16,58 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
       throw new Error("STRIPE_SECRET_KEY environment variable is not set")
     }
     return new Stripe(secretKey)
+  }
+
+  /**
+   * Extract detailed error information from Stripe errors
+   */
+  const getStripeErrorDetails = (error: unknown) => {
+    if (error instanceof Stripe.errors.StripeError) {
+      return {
+        type: error.type,
+        code: error.code,
+        message: error.message,
+        param: error.param,
+        statusCode: error.statusCode,
+        requestId: error.requestId,
+        docUrl: error.doc_url,
+        raw: error.raw,
+      }
+    }
+    return {
+      type: "unknown",
+      message: error instanceof Error ? error.message : String(error),
+    }
+  }
+
+  /**
+   * Log and report Stripe errors to Sentry with full context
+   */
+  const handleStripeError = (
+    operation: string,
+    error: unknown,
+    context: Record<string, unknown> = {}
+  ) => {
+    const errorDetails = getStripeErrorDetails(error)
+
+    strapi.log.error(
+      `[Stripe Connect] ${operation} failed: ${JSON.stringify(errorDetails, null, 2)}`
+    )
+
+    reportSentryError(strapi, error, {
+      tags: {
+        service: "stripe-connect",
+        operation,
+        errorType: errorDetails.type,
+        errorCode: errorDetails.code || "unknown",
+      },
+      extra: {
+        ...errorDetails,
+        ...context,
+      },
+    })
+
+    return errorDetails
   }
 
   return {
@@ -137,9 +190,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
             accountStatus: stripeAccount.accountStatus,
           },
         })
-      } catch (error: any) {
-        strapi.log.error(`[Stripe Connect] Failed to create account: ${error.message}`)
-        return ctx.badRequest(`Failed to create Stripe account: ${error.message}`)
+      } catch (error: unknown) {
+        const errorDetails = handleStripeError("createAccount", error, {
+          userId: user.id,
+          userEmail: user.email,
+          playerId: player.id,
+          playerDocumentId: player.documentId,
+          requestedCountry: country || STRIPE_DEFAULTS.DEFAULT_COUNTRY,
+          requestedBusinessType: businessType || "individual",
+        })
+        return ctx.badRequest(`Failed to create Stripe account: ${errorDetails.message}`)
       }
     },
 
@@ -184,9 +244,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
             expiresAt: new Date(accountLink.expires_at * 1000).toISOString(),
           },
         })
-      } catch (error: any) {
-        strapi.log.error(`[Stripe Connect] Failed to create onboarding link: ${error.message}`)
-        return ctx.badRequest(`Failed to create onboarding link: ${error.message}`)
+      } catch (error: unknown) {
+        const errorDetails = handleStripeError("getOnboardingLink", error, {
+          userId: user.id,
+          playerId: player.id,
+          stripeAccountId: stripeAccount.stripeAccountId,
+        })
+        return ctx.badRequest(`Failed to create onboarding link: ${errorDetails.message}`)
       }
     },
 
@@ -224,9 +288,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
             url: loginLink.url,
           },
         })
-      } catch (error: any) {
-        strapi.log.error(`[Stripe Connect] Failed to create dashboard link: ${error.message}`)
-        return ctx.badRequest(`Failed to create dashboard link: ${error.message}`)
+      } catch (error: unknown) {
+        const errorDetails = handleStripeError("getDashboardLink", error, {
+          userId: user.id,
+          playerId: player.id,
+          stripeAccountId: stripeAccount.stripeAccountId,
+        })
+        return ctx.badRequest(`Failed to create dashboard link: ${errorDetails.message}`)
       }
     },
 
@@ -304,8 +372,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
             onboardingCompletedAt: stripeAccount.onboardingCompletedAt,
           },
         })
-      } catch (error: any) {
-        strapi.log.error(`[Stripe Connect] Failed to get account status: ${error.message}`)
+      } catch (error: unknown) {
+        // Log and report to Sentry, but don't fail - return cached status
+        handleStripeError("getAccountStatus", error, {
+          userId: user.id,
+          playerId: player.id,
+          stripeAccountId: stripeAccount.stripeAccountId,
+        })
         // Return cached status if Stripe API fails
         return ctx.send({
           data: {
