@@ -2427,6 +2427,69 @@ label.admin-btn {
   }
 }
 
+.players-position-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.position-filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background-color: var(--color-bg);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background-color: var(--color-bg-hover);
+  }
+
+  &.active {
+    border-color: currentColor;
+    font-weight: 600;
+  }
+
+  &.position-badge-founder {
+    &.active {
+      background-color: rgba(139, 92, 246, 0.15);
+      color: #8b5cf6;
+      border-color: #8b5cf6;
+    }
+  }
+
+  &.position-badge-mentor {
+    &.active {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border-color: #3b82f6;
+    }
+  }
+
+  &.position-badge-host {
+    &.active {
+      background-color: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border-color: #22c55e;
+    }
+  }
+
+  &.position-badge-player {
+    &.active {
+      background-color: rgba(107, 114, 128, 0.15);
+      color: #6b7280;
+      border-color: #6b7280;
+    }
+  }
+}
+
 .players-count {
   font-size: 14px;
   color: var(--color-text-secondary);
@@ -2441,19 +2504,27 @@ label.admin-btn {
 .player-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
+  gap: 8px;
+  padding: 12px 16px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  text-decoration: none;
-  color: inherit;
   transition: all 0.15s ease;
 
   &:hover {
     border-color: var(--color-primary);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
+}
+
+.player-card-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .player-card-avatar {
@@ -2517,12 +2588,39 @@ label.admin-btn {
   color: #6b7280;
 }
 
-.player-card-action {
+.player-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   flex-shrink: 0;
+}
+
+.player-card-invite-btn,
+.player-card-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   color: var(--color-text-muted);
+  text-decoration: none;
+  transition: all 0.15s ease;
 
   i {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+}
+
+.player-card-invite-btn {
+  &:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
   }
 }
 
@@ -4577,6 +4675,22 @@ label.admin-btn {
   justify-content: center;
   gap: 8px;
   padding: 24px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+
+  i {
+    font-size: 18px;
+  }
+}
+
+.invite-search-loading-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
   color: var(--color-text-secondary);
   font-size: 14px;
 

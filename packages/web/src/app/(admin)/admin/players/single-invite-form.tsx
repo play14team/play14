@@ -4,9 +4,14 @@ import { useState, useEffect, useRef, useTransition } from "react"
 import Avatar from "@/components/ui/avatar"
 import {
   searchPlayersForInvite,
+  getPlayerForInvite,
   sendSingleInvite,
   type PlayerForInvite,
 } from "./invite.action"
+
+interface SingleInviteFormProps {
+  preSelectedPlayerId?: string | null
+}
 
 function getPositionBadgeClass(position: string): string {
   switch (position) {
@@ -25,11 +30,12 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-export default function SingleInviteForm() {
+export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFormProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<PlayerForInvite[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerForInvite | null>(null)
+  const [isLoadingPreSelected, setIsLoadingPreSelected] = useState(false)
   const [email, setEmail] = useState("")
   const [customMessage, setCustomMessage] = useState("")
   const [emailError, setEmailError] = useState<string | null>(null)
@@ -41,6 +47,24 @@ export default function SingleInviteForm() {
   const [isPending, startTransition] = useTransition()
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const preSelectedLoadedRef = useRef<string | null>(null)
+
+  // Load pre-selected player
+  useEffect(() => {
+    if (preSelectedPlayerId && preSelectedPlayerId !== preSelectedLoadedRef.current) {
+      preSelectedLoadedRef.current = preSelectedPlayerId
+      setIsLoadingPreSelected(true)
+      getPlayerForInvite(preSelectedPlayerId).then((player) => {
+        if (player) {
+          setSelectedPlayer(player)
+          if (player.user?.email) {
+            setEmail(player.user.email)
+          }
+        }
+        setIsLoadingPreSelected(false)
+      })
+    }
+  }, [preSelectedPlayerId])
 
   // Debounced search
   useEffect(() => {
@@ -199,7 +223,7 @@ export default function SingleInviteForm() {
   return (
     <form onSubmit={handleSubmit} className="admin-form">
       <div className="admin-form-section">
-        <h2>Send Single Invite</h2>
+        <h2>Send Invite</h2>
         <p className="admin-form-section-description">
           Search for a player and send them an invitation email to create their account.
         </p>
@@ -207,6 +231,12 @@ export default function SingleInviteForm() {
         {/* Player Search */}
         <div className="admin-form-group">
           <label htmlFor="player-search">Select Player</label>
+          {isLoadingPreSelected ? (
+            <div className="invite-search-loading-inline">
+              <i className="bx bx-loader-alt bx-spin"></i>
+              <span>Loading player...</span>
+            </div>
+          ) : (
           <div className="invite-search-wrapper">
             <div className="search-input-wrapper">
               <i className="bx bx-search"></i>
@@ -282,6 +312,7 @@ export default function SingleInviteForm() {
               </div>
             )}
           </div>
+          )}
         </div>
 
         {/* Selected Player Card */}

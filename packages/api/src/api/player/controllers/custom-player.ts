@@ -685,7 +685,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("Only organizers can view the players list")
     }
 
-    const { letter, search, page = 1, pageSize = 50 } = ctx.query
+    const { letter, search, position, page = 1, pageSize = 50 } = ctx.query
 
     try {
       // Helper function to remove accents from a string
@@ -708,6 +708,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           const nameNormalized = removeAccents(player.name.toLowerCase())
           return nameNormalized.includes(searchNormalized)
         })
+      }
+
+      // Apply position filter
+      if (position && typeof position === "string") {
+        filteredPlayers = filteredPlayers.filter((player) => player.position === position)
       }
 
       // Apply letter filter (accent-insensitive)

@@ -47,7 +47,9 @@ export default function PlayersPageContent() {
         <div className="events-page-tab-content">
           {activeTab === "players" && <PlayersList />}
           {activeTab === "imports" && <ImportsForm />}
-          {activeTab === "invite" && <SingleInviteForm />}
+          {activeTab === "invite" && (
+            <SingleInviteForm preSelectedPlayerId={searchParams.get("playerId")} />
+          )}
         </div>
       </div>
 

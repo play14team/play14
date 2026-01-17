@@ -12,7 +12,7 @@ interface Tab {
 const TABS: Tab[] = [
   { id: "players", label: "Players", icon: "bx-group" },
   { id: "imports", label: "Imports", icon: "bx-upload" },
-  { id: "invite", label: "Single Invite", icon: "bx-envelope" },
+  { id: "invite", label: "Invite", icon: "bx-envelope" },
 ]
 
 interface PlayersTabsProps {

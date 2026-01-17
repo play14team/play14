@@ -6,6 +6,8 @@ import Avatar from "@/components/ui/avatar"
 import { getPlayers, type PlayerListItem, type PlayersListResponse } from "./players.action"
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
+const POSITIONS = ["Founder", "Mentor", "Host", "Player"] as const
+type Position = (typeof POSITIONS)[number]
 
 function getPositionBadgeClass(position: string): string {
   switch (position) {
@@ -24,31 +26,41 @@ export default function PlayersList() {
   const [players, setPlayers] = useState<PlayerListItem[]>([])
   const [pagination, setPagination] = useState<PlayersListResponse["meta"]["pagination"]>({
     page: 1,
-    pageSize: 40,
+    pageSize: 30,
     pageCount: 0,
     total: 0,
   })
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null)
+  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const fetchPlayers = useCallback(async (letter: string | null, page = 1, search?: string) => {
-    setIsLoading(true)
-    setError(null)
+  const fetchPlayers = useCallback(
+    async (letter: string | null, page = 1, search?: string, position?: Position | null) => {
+      setIsLoading(true)
+      setError(null)
 
-    try {
-      const result = await getPlayers(letter || undefined, page, 40, search || undefined)
-      setPlayers(result.data)
-      setPagination(result.meta.pagination)
-    } catch {
-      setError("Failed to fetch players")
-    }
+      try {
+        const result = await getPlayers(
+          letter || undefined,
+          page,
+          30,
+          search || undefined,
+          position || undefined
+        )
+        setPlayers(result.data)
+        setPagination(result.meta.pagination)
+      } catch {
+        setError("Failed to fetch players")
+      }
 
-    setIsLoading(false)
-  }, [])
+      setIsLoading(false)
+    },
+    []
+  )
 
   // Debounce search input
   useEffect(() => {
@@ -67,8 +79,8 @@ export default function PlayersList() {
   }, [searchQuery])
 
   useEffect(() => {
-    fetchPlayers(selectedLetter, 1, debouncedSearch)
-  }, [fetchPlayers, selectedLetter, debouncedSearch])
+    fetchPlayers(selectedLetter, 1, debouncedSearch, selectedPosition)
+  }, [fetchPlayers, selectedLetter, debouncedSearch, selectedPosition])
 
   const handleLetterClick = (letter: string) => {
     if (selectedLetter === letter) {
@@ -82,7 +94,16 @@ export default function PlayersList() {
 
   const handleClearFilter = () => {
     setSelectedLetter(null)
+    setSelectedPosition(null)
     setSearchQuery("")
+  }
+
+  const handlePositionClick = (position: Position) => {
+    if (selectedPosition === position) {
+      setSelectedPosition(null)
+    } else {
+      setSelectedPosition(position)
+    }
   }
 
   const handleSearchChange = (value: string) => {
@@ -94,7 +115,7 @@ export default function PlayersList() {
   }
 
   const handlePageChange = (newPage: number) => {
-    fetchPlayers(selectedLetter, newPage, debouncedSearch)
+    fetchPlayers(selectedLetter, newPage, debouncedSearch, selectedPosition)
   }
 
   if (isLoading && players.length === 0) {
@@ -148,6 +169,25 @@ export default function PlayersList() {
             )}
           </div>
         </div>
+        <div className="players-position-filter">
+          <button
+            type="button"
+            className={`position-filter-btn ${selectedPosition === null ? "active" : ""}`}
+            onClick={() => setSelectedPosition(null)}
+          >
+            All
+          </button>
+          {POSITIONS.map((position) => (
+            <button
+              key={position}
+              type="button"
+              className={`position-filter-btn ${getPositionBadgeClass(position)} ${selectedPosition === position ? "active" : ""}`}
+              onClick={() => handlePositionClick(position)}
+            >
+              {position}
+            </button>
+          ))}
+        </div>
         <div className="players-alphabet-filter">
           <button
             type="button"
@@ -169,6 +209,7 @@ export default function PlayersList() {
         </div>
         <div className="players-count">
           {pagination.total} player{pagination.total !== 1 ? "s" : ""}
+          {selectedPosition && ` with position "${selectedPosition}"`}
           {selectedLetter && ` starting with "${selectedLetter}"`}
           {searchQuery && ` matching "${searchQuery}"`}
         </div>
@@ -201,34 +242,48 @@ export default function PlayersList() {
         <>
           <div className="players-grid">
             {players.map((player) => (
-              <Link
-                key={player.documentId}
-                href={`/admin/players/${player.documentId}`}
-                className="player-card"
-              >
-                <div className="player-card-avatar">
-                  <Avatar
-                    src={player.avatar?.url}
-                    alt={player.name}
-                    fallback={player.name}
-                    size="lg"
-                  />
-                </div>
-                <div className="player-card-info">
-                  <h3 className="player-card-name">{player.name}</h3>
-                  {player.company && (
-                    <span className="player-card-company">{player.company}</span>
-                  )}
-                  <span
-                    className={`player-card-position ${getPositionBadgeClass(player.position)}`}
+              <div key={player.documentId} className="player-card">
+                <Link
+                  href={`/admin/players/${player.documentId}`}
+                  className="player-card-link"
+                >
+                  <div className="player-card-avatar">
+                    <Avatar
+                      src={player.avatar?.url}
+                      alt={player.name}
+                      fallback={player.name}
+                      size="lg"
+                    />
+                  </div>
+                  <div className="player-card-info">
+                    <h3 className="player-card-name">{player.name}</h3>
+                    {player.company && (
+                      <span className="player-card-company">{player.company}</span>
+                    )}
+                    <span
+                      className={`player-card-position ${getPositionBadgeClass(player.position)}`}
+                    >
+                      {player.position}
+                    </span>
+                  </div>
+                </Link>
+                <div className="player-card-actions">
+                  <Link
+                    href={`/admin/players?tab=invite&playerId=${player.documentId}`}
+                    className="player-card-invite-btn"
+                    title="Invite player"
                   >
-                    {player.position}
-                  </span>
+                    <i className="bx bx-envelope"></i>
+                  </Link>
+                  <Link
+                    href={`/admin/players/${player.documentId}`}
+                    className="player-card-view-btn"
+                    title="View player"
+                  >
+                    <i className="bx bx-chevron-right"></i>
+                  </Link>
                 </div>
-                <div className="player-card-action">
-                  <i className="bx bx-chevron-right"></i>
-                </div>
-              </Link>
+              </div>
             ))}
           </div>
 

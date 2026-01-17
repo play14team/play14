@@ -51,13 +51,14 @@ const emptyResponse: PlayersListResponse = {
 }
 
 /**
- * Get list of players with optional letter filter or search query
+ * Get list of players with optional letter filter, search query, or position filter
  */
 export async function getPlayers(
   letter?: string,
   page = 1,
   pageSize = 50,
-  search?: string
+  search?: string,
+  position?: string
 ): Promise<PlayersListResponse> {
   const queryParams: Record<string, string> = {
     page: String(page),
@@ -68,6 +69,9 @@ export async function getPlayers(
   }
   if (search) {
     queryParams.search = search
+  }
+  if (position) {
+    queryParams.position = position
   }
 
   const result = await strapiFetchWithQuery<PlayersListResponse>(
