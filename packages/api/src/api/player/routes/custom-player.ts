@@ -159,5 +159,16 @@ export default {
         description: "Get events the current user has attended (via tickets or approved claims)",
       },
     },
+    {
+      method: "POST",
+      path: "/players/:id/send-invite",
+      handler: "custom-player.sendSingleInvite",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Send invitation email to a player (organizers only)",
+      },
+    },
   ],
 }

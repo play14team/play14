@@ -161,6 +161,9 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: PLAYER_ACTIONS.REMOVE_AVATAR, minimumRole: ROLE_TYPES.HOST },
   { action: PLAYER_ACTIONS.UPLOAD_AVATAR_FOR_PLAYER, minimumRole: ROLE_TYPES.HOST },
 
+  // Single invite (organizers can send invites to players)
+  { action: PLAYER_ACTIONS.SEND_SINGLE_INVITE, minimumRole: ROLE_TYPES.HOST },
+
   // Attendance claim management (for own events)
   { action: ATTENDANCE_CLAIM_ACTIONS.GET_PENDING_FOR_MY_EVENTS, minimumRole: ROLE_TYPES.HOST },
   { action: ATTENDANCE_CLAIM_ACTIONS.APPROVE_CLAIM, minimumRole: ROLE_TYPES.HOST },

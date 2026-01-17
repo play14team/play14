@@ -99,10 +99,9 @@ export async function getCurrentUser(): Promise<StrapiUser | null> {
 
     console.log("[Auth] Response status:", response.status)
     if (!response.ok) {
-      // Token expired or invalid - return null
+      // Token expired or invalid - return null (this is expected on pages like reset-password)
       // Cookie clearing is handled by signout or middleware
-      const errorText = await response.text()
-      console.error("[Auth] Token validation failed:", errorText)
+      console.log("[Auth] No valid session (status:", response.status, ")")
       return null
     }
 

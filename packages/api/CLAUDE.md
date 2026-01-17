@@ -532,6 +532,19 @@ players/
 8. **File Watching**: Admin panel ignores `config/sync/**`, `bootstrap/md/**`, `bootstrap/json/**`
 9. **Permissions**: Always add permission definitions when creating custom API endpoints - see "Permission Management" section above
 10. **Reserved Field Names**: In Strapi 5, `status` is a reserved field name used internally for draft/publish state. **NEVER** use `status` as a custom field name in content type schemas. Use alternative names like `ticketStatus`, `orderStatus`, `eventStatus`, etc.
+11. **User Roles Must Match Player Positions**: When creating users linked to players, always assign the role that matches the player's position. Player positions (Founder, Mentor, Host, Player) map 1:1 to user roles (founder, mentor, host, player). **NEVER** use the generic "authenticated" role - always map the position to the correct role type:
+    ```typescript
+    const positionToRoleType: Record<string, string> = {
+      Founder: "founder",
+      Mentor: "mentor",
+      Host: "host",
+      Player: "player",
+    }
+    const roleType = positionToRoleType[player.position] || "player"
+    const role = await strapi.db.query("plugin::users-permissions.role").findOne({
+      where: { type: roleType },
+    })
+    ```
 
 ## Reference Documentation
 

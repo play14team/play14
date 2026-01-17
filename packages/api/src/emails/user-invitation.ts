@@ -6,6 +6,7 @@ interface UserInvitationEmailProps {
   inviteUrl: string
   reminder?: boolean
   supportEmail?: string
+  customMessage?: string
 }
 
 const containerStyle = {
@@ -43,11 +44,21 @@ const linkStyle = {
   color: brandOrange,
 }
 
+const customMessageStyle = {
+  backgroundColor: "#f8f9fa",
+  padding: "16px",
+  borderRadius: "8px",
+  borderLeft: `4px solid ${brandOrange}`,
+  marginBottom: "16px",
+  fontStyle: "italic",
+}
+
 export default function UserInvitationEmail({
   name,
   inviteUrl,
   reminder = false,
   supportEmail = "community@play14.org",
+  customMessage,
 }: UserInvitationEmailProps) {
   const greeting = name ? `Hi ${name},` : "Hi,"
   const previewText = reminder
@@ -66,6 +77,9 @@ export default function UserInvitationEmail({
         Container,
         { style: containerStyle },
         React.createElement(Text, { style: { fontSize: "18px", fontWeight: "bold" } }, greeting),
+        customMessage
+          ? React.createElement(Text, { style: customMessageStyle }, customMessage)
+          : null,
         React.createElement(
           Text,
           null,

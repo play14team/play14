@@ -101,6 +101,9 @@ export const PLAYER_ACTIONS = {
   SET_AVATAR_FROM_LIBRARY: "api::player.custom-player.setAvatarFromLibrary",
   REMOVE_AVATAR: "api::player.custom-player.removeAvatar",
   UPLOAD_AVATAR_FOR_PLAYER: "api::player.custom-player.uploadAvatarForPlayer",
+
+  // Single invite (organizers can send invites to players)
+  SEND_SINGLE_INVITE: "api::player.custom-player.sendSingleInvite",
 } as const
 
 // ==================== PLAYER CLAIMS ====================

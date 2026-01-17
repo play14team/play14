@@ -6,6 +6,7 @@ import Link from "next/link"
 import PlayersTabs, { TAB_IDS, type TabId } from "./players-tabs"
 import PlayersList from "./players-list"
 import ImportsForm from "../imports/imports-form"
+import SingleInviteForm from "./single-invite-form"
 
 export default function PlayersPageContent() {
   const router = useRouter()
@@ -46,6 +47,7 @@ export default function PlayersPageContent() {
         <div className="events-page-tab-content">
           {activeTab === "players" && <PlayersList />}
           {activeTab === "imports" && <ImportsForm />}
+          {activeTab === "invite" && <SingleInviteForm />}
         </div>
       </div>
 

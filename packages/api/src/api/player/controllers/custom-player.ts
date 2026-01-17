@@ -5,9 +5,13 @@
 
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
+import { randomBytes } from "node:crypto"
+import { render } from "@react-email/render"
 import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
-import { isValidUrl } from "../../../libs/validation"
+import { isValidUrl, isValidEmail } from "../../../libs/validation"
+import { nameToUsername } from "../../../libs/strings"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
+import UserInvitationEmail from "../../../emails/user-invitation"
 
 /**
  * Get or create a folder in the media library by name
@@ -1297,6 +1301,210 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     } catch (error) {
       strapi.log.error(`[Player] Failed to get attended events: ${error}`)
       return ctx.internalServerError("Failed to get attended events")
+    }
+  },
+
+  /**
+   * Send invitation email to a player (organizers only)
+   * POST /players/:id/send-invite
+   * Body: { email: string, customMessage?: string }
+   */
+  async sendSingleInvite(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    // Get the current user's player to check their position
+    const userWithPlayer = await strapi
+      .documents("plugin::users-permissions.user")
+      .findFirst({
+        filters: { id: user.id },
+        populate: { player: true },
+      })
+
+    if (!userWithPlayer?.player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    const currentUserPosition = userWithPlayer.player.position
+
+    // Only organizers can send invites
+    if (currentUserPosition === "Player") {
+      return ctx.forbidden("Only organizers can send invitations")
+    }
+
+    const { id: playerId } = ctx.params
+    const { email, customMessage } = ctx.request.body?.data || {}
+
+    if (!playerId) {
+      return ctx.badRequest("Player ID is required")
+    }
+
+    if (!email) {
+      return ctx.badRequest("Email is required")
+    }
+
+    // Validate email format
+    if (!isValidEmail(email)) {
+      return ctx.badRequest("Please enter a valid email address")
+    }
+
+    // Find the target player with user relation
+    const targetPlayer = await strapi.documents("api::player.player").findOne({
+      documentId: playerId,
+      populate: { user: true },
+    })
+
+    if (!targetPlayer) {
+      return ctx.notFound("Player not found")
+    }
+
+    try {
+      let targetUser: any = targetPlayer.user
+      let userStatus: "new" | "invited" | "accepted" = "new"
+
+      // Check if player has a linked user
+      if (targetUser) {
+        // Get full user details
+        const fullUser = await strapi
+          .documents("plugin::users-permissions.user")
+          .findFirst({
+            filters: { id: targetUser.id },
+          })
+
+        if (!fullUser) {
+          return ctx.internalServerError("Failed to retrieve user data")
+        }
+
+        // Check if user is blocked
+        if (fullUser.blocked) {
+          return ctx.badRequest("This user is blocked and cannot receive invitations")
+        }
+
+        // Determine user status
+        if (fullUser.invitationStatus === "accepted") {
+          userStatus = "accepted"
+        } else if (fullUser.invitationStatus === "sent" || fullUser.invitationStatus === "reminded") {
+          userStatus = "invited"
+        }
+
+        // Update email if different
+        if (fullUser.email !== email.toLowerCase()) {
+          await strapi.documents("plugin::users-permissions.user").update({
+            documentId: fullUser.documentId,
+            data: { email: email.toLowerCase() } as any,
+          })
+        }
+
+        targetUser = fullUser
+      } else {
+        // Create a new user and link to player
+        // Generate username from player name (firstname.lastname format)
+        const username = nameToUsername(targetPlayer.name)
+
+        // Map player position to role type
+        const positionToRoleType: Record<string, string> = {
+          Founder: "founder",
+          Mentor: "mentor",
+          Host: "host",
+          Player: "player",
+        }
+        const roleType = positionToRoleType[targetPlayer.position] || "player"
+
+        // Get the role matching the player's position
+        const userRole = await strapi.db.query("plugin::users-permissions.role").findOne({
+          where: { type: roleType },
+        })
+
+        if (!userRole) {
+          strapi.log.error(`[Player] Role '${roleType}' not found for position '${targetPlayer.position}'`)
+          return ctx.internalServerError("Failed to create user")
+        }
+
+        // Create user
+        const newUser = await strapi.documents("plugin::users-permissions.user").create({
+          data: {
+            username,
+            email: email.toLowerCase(),
+            password: randomBytes(32).toString("hex"), // Random password, will be reset
+            confirmed: true, // Pre-confirm since we're sending invite
+            blocked: false,
+            role: userRole.id,
+            player: targetPlayer.id,
+            invitationStatus: "pending",
+          } as any,
+        })
+
+        targetUser = newUser
+        strapi.log.info(
+          `[Player] Created new user ${newUser.documentId} with role '${roleType}' for player ${targetPlayer.name}`
+        )
+      }
+
+      // Generate reset token and send invite
+      const resetToken = randomBytes(64).toString("hex")
+
+      // Update user with reset token
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: targetUser.documentId,
+        data: { resetPasswordToken: resetToken } as any,
+      })
+
+      // Build invite URL
+      const frontendUrl = (process.env.FRONTEND_URL || "https://play14.org").replace(/\/$/, "")
+      const callbackUrl = encodeURIComponent(process.env.INVITATION_CALLBACK_URL || "/admin")
+      const code = encodeURIComponent(resetToken)
+      const inviteUrl = `${frontendUrl}/auth/reset-password?code=${code}&callbackUrl=${callbackUrl}`
+
+      // Build and send email
+      const html = await render(
+        UserInvitationEmail({
+          name: targetPlayer.name,
+          inviteUrl,
+          reminder: false,
+          customMessage: customMessage?.trim() || undefined,
+        })
+      )
+      const text = await render(
+        UserInvitationEmail({
+          name: targetPlayer.name,
+          inviteUrl,
+          reminder: false,
+          customMessage: customMessage?.trim() || undefined,
+        }),
+        { plainText: true }
+      )
+
+      await strapi.plugin("email").service("email").send({
+        to: email.toLowerCase(),
+        subject: "You're invited to #play14",
+        html,
+        text,
+      })
+
+      // Update invitation status to sent
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: targetUser.documentId,
+        data: {
+          invitationStatus: "sent",
+          invitationSentAt: new Date().toISOString(),
+        } as any,
+      })
+
+      strapi.log.info(
+        `[Player] Organizer ${userWithPlayer.player.name} sent invite to ${email} for player ${targetPlayer.name}`
+      )
+
+      return ctx.send({
+        success: true,
+        userStatus,
+        message: `Invitation sent to ${email}`,
+      })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to send invite: ${error}`)
+      return ctx.internalServerError("Failed to send invitation. Please try again.")
     }
   },
 })

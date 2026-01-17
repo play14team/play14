@@ -1,6 +1,6 @@
 "use client"
 
-export const TAB_IDS = ["players", "imports"] as const
+export const TAB_IDS = ["players", "imports", "invite"] as const
 export type TabId = (typeof TAB_IDS)[number]
 
 interface Tab {
@@ -12,6 +12,7 @@ interface Tab {
 const TABS: Tab[] = [
   { id: "players", label: "Players", icon: "bx-group" },
   { id: "imports", label: "Imports", icon: "bx-upload" },
+  { id: "invite", label: "Single Invite", icon: "bx-envelope" },
 ]
 
 interface PlayersTabsProps {
