@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   createDiscountCode,
   updateDiscountCode,
@@ -23,6 +23,8 @@ interface EditingCode extends DiscountCodeData {
 }
 
 export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }: Props) {
+  // Local state for optimistic updates
+  const [localCodes, setLocalCodes] = useState<DiscountCode[]>(discountCodes)
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -45,6 +47,11 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
     isActive: true,
     description: "",
   })
+
+  // Sync local state with props when they change
+  useEffect(() => {
+    setLocalCodes(discountCodes)
+  }, [discountCodes])
 
   const resetForm = () => {
     setFormData({
@@ -121,23 +128,84 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
       description: formData.description?.trim() || undefined,
     }
 
-    let result
-    if (editingId) {
-      result = await updateDiscountCode(editingId, data)
-    } else {
-      result = await createDiscountCode(eventId, data)
-    }
+    // Store previous state for rollback on error
+    const previousLocalCodes = localCodes
 
-    if (result.success) {
-      // Close form and reset loading state
-      // The form/edit UI is now hidden, so user won't see the state change
-      setIsAdding(false)
+    if (editingId) {
+      // Optimistic update for editing: update the code in the list immediately
+      const optimisticCode: DiscountCode = {
+        documentId: editingId,
+        code: data.code,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        maxUses: data.maxUses,
+        usedCount: formData.usedCount || 0,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        minOrderAmount: data.minOrderAmount,
+        maxDiscountAmount: data.maxDiscountAmount,
+        isActive: data.isActive ?? true,
+        description: data.description,
+        createdAt: localCodes.find((c) => c.documentId === editingId)?.createdAt || new Date().toISOString(),
+      }
+      setLocalCodes((prev) =>
+        prev.map((c) => (c.documentId === editingId ? optimisticCode : c))
+      )
+
+      // Close form immediately for better UX
       setEditingId(null)
       setIsLoading(false)
-      onUpdate()
+
+      const result = await updateDiscountCode(editingId, data)
+
+      if (result.success && result.data) {
+        // Update with server data (in case there are any differences)
+        setLocalCodes((prev) =>
+          prev.map((c) => (c.documentId === editingId ? result.data! : c))
+        )
+        onUpdate()
+      } else {
+        // Rollback on error
+        setLocalCodes(previousLocalCodes)
+        setError(result.error || "Failed to save discount code")
+      }
     } else {
-      setError(result.error || "Failed to save discount code")
+      // Optimistic update for creating: add a temporary code to the list
+      const tempId = `temp-${Date.now()}`
+      const optimisticCode: DiscountCode = {
+        documentId: tempId,
+        code: data.code,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        maxUses: data.maxUses,
+        usedCount: 0,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        minOrderAmount: data.minOrderAmount,
+        maxDiscountAmount: data.maxDiscountAmount,
+        isActive: data.isActive ?? true,
+        description: data.description,
+        createdAt: new Date().toISOString(),
+      }
+      setLocalCodes((prev) => [...prev, optimisticCode])
+
+      // Close form immediately for better UX
+      setIsAdding(false)
       setIsLoading(false)
+
+      const result = await createDiscountCode(eventId, data)
+
+      if (result.success && result.data) {
+        // Replace temporary code with real data from server
+        setLocalCodes((prev) =>
+          prev.map((c) => (c.documentId === tempId ? result.data! : c))
+        )
+        onUpdate()
+      } else {
+        // Rollback on error: remove the temporary code
+        setLocalCodes(previousLocalCodes)
+        setError(result.error || "Failed to save discount code")
+      }
     }
   }
 
@@ -155,18 +223,22 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
 
     if (!codeId) return
 
-    setIsLoading(true)
     setError(null)
+
+    // Store previous state for rollback on error
+    const previousLocalCodes = localCodes
+
+    // Optimistic delete: remove the code immediately
+    setLocalCodes((prev) => prev.filter((c) => c.documentId !== codeId))
 
     const result = await deleteDiscountCode(codeId)
 
     if (result.success) {
-      // Reset loading state before refresh so it doesn't block subsequent operations
-      setIsLoading(false)
       onUpdate()
     } else {
+      // Rollback on error: restore the code
+      setLocalCodes(previousLocalCodes)
       setError(result.error || "Failed to delete discount code")
-      setIsLoading(false)
     }
   }
 
@@ -175,16 +247,29 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
   }
 
   const handleToggleActive = async (code: DiscountCode) => {
-    setIsLoading(true)
-    const result = await toggleDiscountCodeActive(code.documentId, !code.isActive)
+    setError(null)
 
-    if (result.success) {
-      // Reset loading state before refresh so it doesn't block subsequent operations
-      setIsLoading(false)
+    // Store previous state for rollback on error
+    const previousLocalCodes = localCodes
+    const newIsActive = !code.isActive
+
+    // Optimistic update: toggle the active status immediately
+    setLocalCodes((prev) =>
+      prev.map((c) => (c.documentId === code.documentId ? { ...c, isActive: newIsActive } : c))
+    )
+
+    const result = await toggleDiscountCodeActive(code.documentId, newIsActive)
+
+    if (result.success && result.data) {
+      // Update with server data (in case there are any differences)
+      setLocalCodes((prev) =>
+        prev.map((c) => (c.documentId === code.documentId ? result.data! : c))
+      )
       onUpdate()
     } else {
+      // Rollback on error
+      setLocalCodes(previousLocalCodes)
       setError(result.error || "Failed to update discount code")
-      setIsLoading(false)
     }
   }
 
@@ -206,7 +291,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
 
       {/* Existing discount codes */}
       <div className="discount-code-list">
-        {discountCodes.map((code) => (
+        {localCodes.map((code) => (
           <div
             key={code.documentId}
             className={`discount-code-card ${!code.isActive ? "discount-inactive" : ""}`}
