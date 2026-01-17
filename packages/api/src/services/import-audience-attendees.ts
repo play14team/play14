@@ -4,6 +4,7 @@ import { join, resolve } from "path"
 import slugify from "slugify"
 import type { Core } from "@strapi/strapi"
 import { nameToUsername } from "../libs/strings"
+import { sendUserInvitationAndUpdateStatus } from "./user-invitations"
 
 type ContactSource = "attendee" | "mailchimp"
 
@@ -961,6 +962,37 @@ export async function runAudienceAttendeeImport(
         })
       }
     })
+
+    // Send invitation emails to newly created users immediately
+    // This is done outside the transaction to avoid blocking database writes
+    // Failed emails will leave users in "pending" status for cron retry
+    let emailsSent = 0
+    let emailsFailed = 0
+    for (const action of actions.createUsers) {
+      const user = usersByEmail.get(action.email)
+      if (!user?.documentId) continue
+
+      const success = await sendUserInvitationAndUpdateStatus(strapi, {
+        documentId: user.documentId,
+        email: user.email,
+        username: user.username || user.email,
+        player: user.player ? { name: user.player.name } : undefined,
+      })
+
+      if (success) {
+        emailsSent++
+      } else {
+        emailsFailed++
+        // User remains in "pending" status - cron job will retry
+      }
+    }
+
+    if (emailsSent > 0 || emailsFailed > 0) {
+      logInfo(`- Invitation emails sent: ${emailsSent}`)
+      if (emailsFailed > 0) {
+        logInfo(`- Invitation emails failed (will retry via cron): ${emailsFailed}`)
+      }
+    }
 
     return {
       dryRun,

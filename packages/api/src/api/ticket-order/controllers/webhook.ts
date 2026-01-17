@@ -547,6 +547,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       await strapi.plugin("email").service("email").send(emailOptions)
 
+      // Update invitation status to prevent duplicate emails from cron job
+      // This is critical for multi-container deployments where cron runs on all instances
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: user.documentId,
+        data: {
+          invitationStatus: "sent",
+          invitationSentAt: new Date().toISOString(),
+        } as any,
+      })
+
       strapi.log.info(`[Webhook] Player invitation email sent to ${email}`)
     } catch (error: any) {
       // NON-CRITICAL FAILURE: Email sending failed but order is still valid.

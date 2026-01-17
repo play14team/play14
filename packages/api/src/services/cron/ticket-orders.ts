@@ -7,11 +7,15 @@ import type { Core } from "@strapi/strapi"
 /**
  * Clean up expired pending ticket orders and release reservations
  * Stripe checkout sessions expire after 30 minutes by default
+ *
+ * This function is safe for multi-container deployments:
+ * - Uses atomic conditional UPDATE to claim orders for processing
+ * - Uses atomic SQL to decrement reservation counts
  */
 export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<void> {
   console.log("Running expired ticket orders cleanup job")
   const apiName = "api::ticket-order.ticket-order"
-  const ticketTypeApi = "api::ticket-type.ticket-type"
+  const knex = strapi.db.connection
 
   const now = new Date()
   // Fallback: Orders older than 30 minutes that are still pending
@@ -37,50 +41,71 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
 
   // Process each order sequentially to properly release reservations
   for (const order of expiredOrders) {
+    // ATOMIC CLAIM: Try to claim this order for processing
+    // This prevents duplicate processing in multi-container deployments
+    const claimResult = await knex("ticket_orders")
+      .where("document_id", order.documentId)
+      .where("status", "pending")
+      .update({
+        status: "expiring",
+        updated_at: new Date(),
+      })
+
+    if (claimResult === 0) {
+      // Another container already claimed this order or status changed
+      console.log(`Order ${order.orderNumber} already being processed, skipping`)
+      continue
+    }
+
     console.log(`Processing expired order ${order.orderNumber}`)
 
-    // Release reservations if order has them
-    if (order.hasReservation) {
-      const ticketDetails = (order.ticketDetails || []) as Array<{
-        ticketTypeId: string
-        quantity: number
-      }>
+    try {
+      // Release reservations if order has them using atomic SQL
+      if (order.hasReservation) {
+        const ticketDetails = (order.ticketDetails || []) as Array<{
+          ticketTypeId: string
+          quantity: number
+        }>
 
-      for (const detail of ticketDetails) {
-        const ticketType = await strapi.documents(ticketTypeApi).findOne({
-          documentId: detail.ticketTypeId,
-        })
-
-        if (ticketType) {
-          const newReservedCount = Math.max(
-            0,
-            ((ticketType as any).reservedCount || 0) - detail.quantity
+        for (const detail of ticketDetails) {
+          // ATOMIC: Decrement reserved_count without read-then-update race condition
+          await knex.raw(
+            `UPDATE ticket_types
+             SET reserved_count = GREATEST(0, COALESCE(reserved_count, 0) - ?),
+                 updated_at = NOW()
+             WHERE document_id = ?`,
+            [detail.quantity, detail.ticketTypeId]
           )
 
-          await strapi.documents(ticketTypeApi).update({
-            documentId: detail.ticketTypeId,
-            data: { reservedCount: newReservedCount } as any,
-          })
-
           console.log(
-            `Released ${detail.quantity} reservations for ticket type ${detail.ticketTypeId} (new reserved: ${newReservedCount})`
+            `Released ${detail.quantity} reservations for ticket type ${detail.ticketTypeId}`
           )
         }
       }
+
+      // Mark order as expired and clear reservation flags
+      await strapi.documents(apiName).update({
+        documentId: order.documentId,
+        data: {
+          status: "expired",
+          hasReservation: false,
+          reservationCreatedAt: null,
+          reservationExpiresAt: null,
+        } as any,
+      })
+
+      console.log(`Order ${order.orderNumber} marked as expired`)
+    } catch (error) {
+      // Processing failed - revert status back to pending for retry
+      console.error(`Failed to process expired order ${order.orderNumber}:`, error)
+      await knex("ticket_orders")
+        .where("document_id", order.documentId)
+        .where("status", "expiring")
+        .update({
+          status: "pending",
+          updated_at: new Date(),
+        })
     }
-
-    // Mark order as expired and clear reservation flags
-    await strapi.documents(apiName).update({
-      documentId: order.documentId,
-      data: {
-        status: "expired",
-        hasReservation: false,
-        reservationCreatedAt: null,
-        reservationExpiresAt: null,
-      } as any,
-    })
-
-    console.log(`Order ${order.orderNumber} marked as expired`)
   }
 }
 

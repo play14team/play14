@@ -23,6 +23,7 @@
 | **Storage** | Azure Blob Storage | CDN-enabled |
 | **Registry** | Azure Container Registry | `play14containerregistry.azurecr.io` |
 | **Monitoring** | Sentry | Error tracking & performance |
+| **Cache** | Azure Cache for Redis | Shared cache across replicas |
 
 ### 1.2 Environments
 
@@ -189,6 +190,12 @@
 | Variable | Description |
 |----------|-------------|
 | `STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN` | Mapbox token for admin panel (secret) |
+
+#### Redis Cache
+
+| Variable | Description |
+|----------|-------------|
+| `REDIS_URL` | Azure Cache for Redis connection string (secret) |
 
 ### 3.2 Web Package (`packages/web`)
 
@@ -486,7 +493,69 @@ az containerapp logs show -n play14-api -g play14-community --follow | grep -i p
 
 ---
 
-## 14. Support Contacts
+## 14. Redis Cache
+
+### 14.1 Overview
+
+Azure Cache for Redis provides a shared cache layer accessible by all API replicas. This enables consistent caching across scaled-out instances.
+
+### 14.2 Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Service** | Azure Cache for Redis |
+| **SKU** | Basic C0 (250 MB) |
+| **Port** | 6380 (SSL) |
+| **Protocol** | `rediss://` (TLS enabled) |
+
+### 14.3 Connection String Format
+
+```
+rediss://:<access-key>@<redis-name>.redis.cache.windows.net:6380
+```
+
+### 14.4 Adding to Container App
+
+```bash
+# Add connection string as a secret
+az containerapp secret set \
+  --name play14-api \
+  --resource-group play14-community \
+  --secrets "redis-url=rediss://:<access-key>@<redis-name>.redis.cache.windows.net:6380"
+
+# Add environment variable referencing the secret
+az containerapp update \
+  --name play14-api \
+  --resource-group play14-community \
+  --set-env-vars "REDIS_URL=secretref:redis-url"
+```
+
+### 14.5 Usage in Code
+
+```typescript
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
+
+// Set with expiration (1 hour)
+await redis.set('key', 'value', 'EX', 3600);
+
+// Get value
+const value = await redis.get('key');
+```
+
+### 14.6 Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| **API Response Caching** | Cache expensive queries across replicas |
+| **Rate Limiting** | Distributed rate limiting counters |
+| **Session Storage** | Shared session state (if needed) |
+| **Job Queues** | Background job coordination |
+
+---
+
+## 15. Support Contacts
 
 | Issue | Contact |
 |-------|---------|

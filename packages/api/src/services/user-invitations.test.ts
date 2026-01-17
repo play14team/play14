@@ -6,16 +6,26 @@ const createMockStrapi = () => {
   const send = vi.fn()
   const findMany = vi.fn()
   const update = vi.fn()
+
+  // Mock knex query builder for atomic claims
+  const knexUpdate = vi.fn().mockResolvedValue(1) // Return 1 to indicate successful claim
+  const knexWhere = vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ update: knexUpdate }) })
+  const knexConnection = vi.fn().mockReturnValue({ where: knexWhere })
+
   const strapi = {
     documents: vi.fn(() => ({ findMany, update })),
     plugin: vi.fn(() => ({ service: vi.fn(() => ({ send })) })),
     log: {
       info: vi.fn(),
       error: vi.fn(),
+      debug: vi.fn(),
+    },
+    db: {
+      connection: knexConnection,
     },
   } as unknown as Core.Strapi
 
-  return { strapi, send, findMany, update }
+  return { strapi, send, findMany, update, knexUpdate }
 }
 
 describe("processUserInvitations", () => {

@@ -11,3 +11,12 @@ export {
 export { updateEventStatus } from "./events"
 
 export { updatePlayerPositions } from "./players"
+
+export {
+  acquireLock,
+  releaseLock,
+  withDistributedLock,
+  closeRedisConnection,
+  isRedisAvailable,
+  getInstanceId,
+} from "./distributed-lock"

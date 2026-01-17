@@ -31,6 +31,7 @@ const COUNTRIES = [
 
 export default function StripeConnect({ account, returnPath = "/admin/stripe", onAccountCreated }: Props) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [country, setCountry] = useState("FR")
@@ -48,12 +49,14 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
       // After creating, get onboarding URL and redirect
       const onboardingResult = await getOnboardingUrl(returnPath)
       if (onboardingResult.success && onboardingResult.url) {
+        // Keep loading state and show redirecting message
+        setIsRedirecting(true)
         window.location.href = onboardingResult.url
+        return
       }
-    } else {
-      setError(result.error || "Failed to create account")
     }
 
+    setError(result.error || "Failed to create account")
     setIsLoading(false)
   }
 
@@ -64,11 +67,13 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
     const result = await getOnboardingUrl(returnPath)
 
     if (result.success && result.url) {
+      // Keep loading state and show redirecting message
+      setIsRedirecting(true)
       window.location.href = result.url
-    } else {
-      setError(result.error || "Failed to get onboarding link")
+      return
     }
 
+    setError(result.error || "Failed to get onboarding link")
     setIsLoading(false)
   }
 
@@ -234,7 +239,12 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
                 disabled={isLoading}
                 className="admin-btn admin-btn-primary"
               >
-                {isLoading ? (
+                {isRedirecting ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin"></i>
+                    Redirecting to Stripe...
+                  </>
+                ) : isLoading ? (
                   <>
                     <i className="bx bx-loader-alt bx-spin"></i>
                     Creating...
@@ -281,7 +291,12 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
             disabled={isLoading}
             className="admin-btn admin-btn-primary"
           >
-            {isLoading ? (
+            {isRedirecting ? (
+              <>
+                <i className="bx bx-loader-alt bx-spin"></i>
+                Redirecting to Stripe...
+              </>
+            ) : isLoading ? (
               <>
                 <i className="bx bx-loader-alt bx-spin"></i>
                 Loading...
@@ -302,7 +317,12 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
             disabled={isLoading}
             className="admin-btn admin-btn-primary"
           >
-            {isLoading ? (
+            {isRedirecting ? (
+              <>
+                <i className="bx bx-loader-alt bx-spin"></i>
+                Redirecting to Stripe...
+              </>
+            ) : isLoading ? (
               <>
                 <i className="bx bx-loader-alt bx-spin"></i>
                 Loading...

@@ -212,6 +212,116 @@ async function sendInvitationEmail(
   })
 }
 
+/**
+ * Send an invitation email to a user and update their invitation status.
+ * This is the primary function for sending user invitations from any context
+ * (import, manual trigger, etc.)
+ *
+ * @returns true if email was sent successfully, false otherwise
+ */
+export async function sendUserInvitationAndUpdateStatus(
+  strapi: Core.Strapi,
+  user: {
+    documentId: string
+    email: string
+    username: string
+    player?: { name?: string }
+  }
+): Promise<boolean> {
+  try {
+    const resetToken = createResetPasswordToken()
+
+    // Update user with reset token
+    await strapi.documents("plugin::users-permissions.user").update({
+      documentId: user.documentId,
+      data: { resetPasswordToken: resetToken } as any,
+    })
+
+    // Build and send email
+    const inviteUrl = buildInviteUrl(resetToken)
+    const html = await render(
+      UserInvitationEmail({
+        name: user.player?.name || user.username,
+        inviteUrl,
+        reminder: false,
+      })
+    )
+    const text = await render(
+      UserInvitationEmail({
+        name: user.player?.name || user.username,
+        inviteUrl,
+        reminder: false,
+      }),
+      { plainText: true }
+    )
+
+    await strapi.plugin("email").service("email").send({
+      to: user.email,
+      subject: "You're invited to #play14",
+      html,
+      text,
+    })
+
+    // Update invitation status to sent
+    await strapi.documents("plugin::users-permissions.user").update({
+      documentId: user.documentId,
+      data: {
+        invitationStatus: "sent",
+        invitationSentAt: new Date().toISOString(),
+      } as any,
+    })
+
+    strapi.log.info(`[Invitations] Sent invite to ${user.email}`)
+    return true
+  } catch (error) {
+    // Log error but don't throw - caller can decide to retry via cron
+    const errorMessage = formatErrorMessage(error)
+    strapi.log.error(`[Invitations] Failed to send invite to ${user.email}: ${errorMessage}`)
+    return false
+  }
+}
+
+/**
+ * Atomically claim a user for processing using conditional UPDATE.
+ * This prevents duplicate processing in multi-container deployments.
+ * Returns true if this container successfully claimed the user.
+ */
+async function claimUserForProcessing(
+  strapi: Core.Strapi,
+  userDocumentId: string,
+  fromStatus: string,
+  toStatus: string
+): Promise<boolean> {
+  const knex = strapi.db.connection
+  const result = await knex("up_users")
+    .where("document_id", userDocumentId)
+    .where("invitation_status", fromStatus)
+    .update({
+      invitation_status: toStatus,
+      updated_at: new Date(),
+    })
+
+  return result > 0
+}
+
+/**
+ * Revert a user's invitation status after a failed processing attempt.
+ * This allows the cron job to retry on the next run.
+ */
+async function revertUserStatus(
+  strapi: Core.Strapi,
+  userDocumentId: string,
+  toStatus: string
+): Promise<void> {
+  const knex = strapi.db.connection
+  await knex("up_users")
+    .where("document_id", userDocumentId)
+    .update({
+      invitation_status: toStatus,
+      updated_at: new Date(),
+    })
+}
+
 export async function processUserInvitations(strapi: Core.Strapi): Promise<void> {
   if (process.env.INVITATION_EMAILS_ENABLED === "false") {
     return
@@ -244,6 +354,22 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
 
   for (const user of pendingUsers as InvitationUser[]) {
     if (!user.email) continue
+
+    // ATOMIC CLAIM: Try to claim this user for processing
+    // Only one container will succeed in multi-container deployments
+    const claimed = await claimUserForProcessing(
+      strapi,
+      user.documentId,
+      "pending",
+      "processing"
+    )
+
+    if (!claimed) {
+      // Another container already claimed this user or status changed
+      strapi.log.debug(`[Invitations] User ${user.email} already being processed, skipping`)
+      continue
+    }
+
     try {
       const resetToken = createResetPasswordToken()
       await strapi.documents("plugin::users-permissions.user").update({
@@ -268,6 +394,8 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
       })
       strapi.log.info(`[Invitations] Sent invite to ${user.email}`)
     } catch (error) {
+      // Revert status to pending so this user can be retried on next cron run
+      await revertUserStatus(strapi, user.documentId, "pending")
       reportInvitationError(strapi, user, false, error)
     }
   }
@@ -289,6 +417,22 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
 
   for (const user of reminderUsers as InvitationUser[]) {
     if (!user.email) continue
+
+    // ATOMIC CLAIM: Try to claim this user for reminder processing
+    // Uses "reminding" as intermediate status to prevent duplicates
+    const claimed = await claimUserForProcessing(
+      strapi,
+      user.documentId,
+      "sent",
+      "reminding"
+    )
+
+    if (!claimed) {
+      // Another container already claimed this user or status changed
+      strapi.log.debug(`[Invitations] User ${user.email} already being processed for reminder, skipping`)
+      continue
+    }
+
     try {
       const resetToken = createResetPasswordToken()
       await strapi.documents("plugin::users-permissions.user").update({
@@ -313,6 +457,8 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
       })
       strapi.log.info(`[Invitations] Sent reminder to ${user.email}`)
     } catch (error) {
+      // Revert status to sent so this user can be retried on next cron run
+      await revertUserStatus(strapi, user.documentId, "sent")
       reportInvitationError(strapi, user, true, error)
     }
   }
