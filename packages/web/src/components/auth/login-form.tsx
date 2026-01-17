@@ -60,28 +60,34 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
       {error && <div className="auth-form-error">{error}</div>}
 
       <div className="auth-form-field">
-        <label htmlFor="identifier">Email or Username</label>
         <input
           type="text"
           id="identifier"
           name="identifier"
-          placeholder="Enter your email or username"
+          placeholder="Email or username"
           autoComplete="username"
           disabled={isPending}
         />
       </div>
 
       <div className="auth-form-field">
-        <label htmlFor="password">Password</label>
         <input
           type="password"
           id="password"
           name="password"
-          placeholder="Enter your password"
+          placeholder="Password"
           autoComplete="current-password"
           disabled={isPending}
         />
       </div>
+
+      <button
+        type="submit"
+        className="auth-login-btn auth-login-btn-submit"
+        disabled={isPending}
+      >
+        {isPending ? "Signing in..." : "Sign in"}
+      </button>
 
       {turnstileSiteKey && (
         <div className="auth-form-turnstile">
@@ -99,14 +105,6 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
           />
         </div>
       )}
-
-      <button
-        type="submit"
-        className="auth-login-btn auth-login-btn-submit"
-        disabled={isPending}
-      >
-        {isPending ? "Signing in..." : "Sign in"}
-      </button>
     </form>
   )
 }

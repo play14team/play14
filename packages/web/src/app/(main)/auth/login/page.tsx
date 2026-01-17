@@ -54,19 +54,27 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </div>
         )}
 
-        <LoginButtons
-          googleUrl={googleUrl}
-          microsoftUrl={microsoftUrl}
-          githubUrl={githubUrl}
-          linkedinUrl={linkedinUrl}
-          callbackUrl={callbackUrl}
-        />
+        <div className="auth-login-content">
+          <div className="auth-login-column auth-login-email">
+            <h2>Email or Username</h2>
+            <LoginForm callbackUrl={callbackUrl} />
+          </div>
 
-        <div className="auth-login-divider">
-          <span>or sign in with email</span>
+          <div className="auth-login-divider">
+            <span>or</span>
+          </div>
+
+          <div className="auth-login-column auth-login-sso">
+            <h2>Single Sign-On</h2>
+            <LoginButtons
+              googleUrl={googleUrl}
+              microsoftUrl={microsoftUrl}
+              githubUrl={githubUrl}
+              linkedinUrl={linkedinUrl}
+              callbackUrl={callbackUrl}
+            />
+          </div>
         </div>
-
-        <LoginForm callbackUrl={callbackUrl} />
 
         <p className="auth-register-link">
           Don&apos;t have an account?{" "}
