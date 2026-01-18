@@ -2633,6 +2633,17 @@ label.admin-btn {
   flex-shrink: 0;
 }
 
+.player-card-status.invite-status-badge {
+  margin-top: 0;
+  padding: 4px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+
+  i {
+    font-size: 12px;
+  }
+}
+
 .player-card-invite-btn,
 .player-card-view-btn {
   display: flex;

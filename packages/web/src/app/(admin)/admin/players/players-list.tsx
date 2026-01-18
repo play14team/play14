@@ -268,13 +268,31 @@ export default function PlayersList() {
                   </div>
                 </Link>
                 <div className="player-card-actions">
-                  <Link
-                    href={`/admin/players?tab=invite&playerId=${player.documentId}`}
-                    className="player-card-invite-btn"
-                    title="Invite player"
-                  >
-                    <i className="bx bx-envelope"></i>
-                  </Link>
+                  {player.inviteStatus === "pending" ? (
+                    <span
+                      className="player-card-status invite-status-badge invite-status-invited"
+                      title="Invite pending"
+                    >
+                      <i className="bx bx-time"></i>
+                      Pending
+                    </span>
+                  ) : player.inviteStatus === "accepted" ? (
+                    <span
+                      className="player-card-status invite-status-badge invite-status-accepted"
+                      title="Invite accepted"
+                    >
+                      <i className="bx bx-check-circle"></i>
+                      Accepted
+                    </span>
+                  ) : (
+                    <Link
+                      href={`/admin/players?tab=invite&playerId=${player.documentId}`}
+                      className="player-card-invite-btn"
+                      title="Invite player"
+                    >
+                      <i className="bx bx-envelope"></i>
+                    </Link>
+                  )}
                   <Link
                     href={`/admin/players/${player.documentId}`}
                     className="player-card-view-btn"

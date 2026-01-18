@@ -693,6 +693,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       }
 
+      const normalizeInviteStatus = (
+        status?: string | null
+      ): "pending" | "accepted" | null => {
+        if (!status || status === "none") return null
+        if (status === "accepted") return "accepted"
+        if (["pending", "sent", "reminded", "processing", "reminding"].includes(status)) {
+          return "pending"
+        }
+        return null
+      }
+
       // Fetch all players (we'll filter and sort in JavaScript for proper locale handling)
       const allPlayers = await strapi.documents("api::player.player").findMany({
         populate: {
@@ -734,6 +745,40 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const startIndex = (Number(page) - 1) * Number(pageSize)
       const paginatedPlayers = filteredPlayers.slice(startIndex, startIndex + Number(pageSize))
 
+      const playerDocumentIds = Array.from(
+        new Set(paginatedPlayers.map((player) => player.documentId).filter(Boolean))
+      )
+      const inviteStatusByPlayerDocumentId = new Map<string, "pending" | "accepted">()
+
+      if (playerDocumentIds.length > 0) {
+        const users = await strapi
+          .documents("plugin::users-permissions.user")
+          .findMany({
+            filters: {
+              player: {
+                documentId: {
+                  $in: playerDocumentIds,
+                },
+              },
+            },
+            populate: {
+              player: {
+                fields: ["documentId"],
+              },
+            },
+          })
+
+        for (const user of users as Array<{
+          invitationStatus?: string | null
+          player?: { documentId?: string | null }
+        }>) {
+          const playerDocumentId = user.player?.documentId
+          if (!playerDocumentId) continue
+          const normalizedStatus = normalizeInviteStatus(user.invitationStatus)
+          inviteStatusByPlayerDocumentId.set(playerDocumentId, normalizedStatus ?? "accepted")
+        }
+      }
+
       // Format response to match expected structure
       const formattedPlayers = paginatedPlayers.map((player) => ({
         documentId: player.documentId,
@@ -741,6 +786,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         position: player.position,
         company: player.company,
         avatar: player.avatar ? { url: player.avatar.url } : null,
+        inviteStatus: inviteStatusByPlayerDocumentId.get(player.documentId) ?? null,
       }))
 
       return ctx.send({

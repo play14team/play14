@@ -11,6 +11,7 @@ export interface PlayerListItem {
   avatar: {
     url: string
   } | null
+  inviteStatus: "pending" | "accepted" | null
 }
 
 export interface PlayersListResponse {
