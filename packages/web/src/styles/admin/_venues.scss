@@ -210,10 +210,10 @@
   // Override delete confirm to stack vertically in narrow sidebar
   .admin-delete-confirm {
     flex-direction: column;
-    align-items: stretch;
+    gap: 12px;
 
-    span {
-      margin-bottom: 8px;
+    .admin-btn {
+      width: 100%;
     }
   }
 }
