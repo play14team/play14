@@ -1,6 +1,7 @@
 import React from "react"
 import { Button, Heading, Link, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
+import { CalendarSection } from "./components/calendar-section"
 
 interface TicketConfirmationEmailProps {
   orderNumber: string
@@ -47,25 +48,6 @@ const codeStyle = {
   color: "#f47920",
 }
 
-const calendarBoxStyle = {
-  background: "#f0f7ff",
-  padding: "20px",
-  borderRadius: "8px",
-  margin: "20px 0",
-  borderLeft: "4px solid #2196f3",
-}
-
-const calendarButtonStyle = {
-  display: "inline-block",
-  background: "#4285f4",
-  color: "#ffffff",
-  padding: "10px 16px",
-  textDecoration: "none",
-  borderRadius: "4px",
-  fontSize: "13px",
-  margin: "8px 8px 8px 0",
-}
-
 export default function TicketConfirmationEmail({
   orderNumber,
   eventName,
@@ -107,33 +89,13 @@ export default function TicketConfirmationEmail({
         ))}
       </div>
 
-      {(googleCalendarUrl || outlookCalendarUrl) && (
-        <div style={calendarBoxStyle}>
-          <Heading as="h3" style={{ marginTop: 0, color: "#1976d2" }}>
-            Add to Your Calendar
-          </Heading>
-          <Text style={{ marginBottom: "15px" }}>
-            <strong>Date:</strong> {eventDate} at {eventTime}
-            <br />
-            <strong>Location:</strong> {eventLocation}
-          </Text>
-          <div>
-            {googleCalendarUrl && (
-              <Link href={googleCalendarUrl} style={calendarButtonStyle}>
-                Google Calendar
-              </Link>
-            )}
-            {outlookCalendarUrl && (
-              <Link href={outlookCalendarUrl} style={{ ...calendarButtonStyle, background: "#0078d4" }}>
-                Outlook
-              </Link>
-            )}
-          </div>
-          <Text style={{ marginTop: "12px", marginBottom: 0, fontSize: "12px", color: "#666" }}>
-            An .ics calendar file is also attached to this email for other calendar apps.
-          </Text>
-        </div>
-      )}
+      <CalendarSection
+        eventDate={eventDate}
+        eventTime={eventTime}
+        eventLocation={eventLocation}
+        googleCalendarUrl={googleCalendarUrl}
+        outlookCalendarUrl={outlookCalendarUrl}
+      />
 
       <Text>Keep these ticket codes safe - you'll need them for check-in at the event.</Text>
 
