@@ -5,7 +5,11 @@
 
 import type { Core } from "@strapi/strapi"
 import { join } from "path"
-import { sendOrderConfirmationEmail, sendPlayerInvitationEmail } from "../../../services/email-templates"
+import {
+  sendOrderConfirmationEmail,
+  sendPlayerInvitationEmail,
+  sendTicketSoldNotificationEmail,
+} from "../../../services/email-templates"
 import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
 import { generateInvoicePDF, formatTicketItems, type InvoiceData } from "../../../libs/invoice"
 import { validateEmail, validateName, sanitizeText } from "../../../libs/validation"
@@ -142,7 +146,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     eventDocumentId: string,
     code: string,
     amount: number
-  ): Promise<{ id: number; documentId: string; code: string; discountAmount: number } | { error: string }> {
+  ): Promise<
+    { id: number; documentId: string; code: string; discountAmount: number } | { error: string }
+  > {
     // Find the discount code (case-insensitive)
     const discountCode = await strapi.documents("api::discount-code.discount-code").findFirst({
       filters: {
@@ -287,7 +293,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Validate tickets and calculate total
     let originalAmount = 0
     let totalQuantity = 0
-    const lineItems: Array<{ name: string; description?: string; unitPrice: number; quantity: number }> = []
+    const lineItems: Array<{
+      name: string
+      description?: string
+      unitPrice: number
+      quantity: number
+    }> = []
     const ticketDetails: Array<{
       ticketTypeId: string
       ticketTypeName: string
@@ -325,7 +336,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const available = ticketType.capacity ? ticketType.capacity - effectiveUsed : Infinity
 
       if (ticketRequest.quantity > available) {
-        return ctx.badRequest(`Not enough tickets available for ${ticketType.name} (${Math.max(0, available)} remaining)`)
+        return ctx.badRequest(
+          `Not enough tickets available for ${ticketType.name} (${Math.max(0, available)} remaining)`
+        )
       }
 
       originalAmount += ticketType.price * ticketRequest.quantity
@@ -354,7 +367,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     if (discountCodeString) {
       // Use atomic reservation to prevent race condition where two users validate
       // the same discount code near its usage limit simultaneously
-      const discountResult = await reserveDiscountCode(strapi, eventId, discountCodeString, originalAmount)
+      const discountResult = await reserveDiscountCode(
+        strapi,
+        eventId,
+        discountCodeString,
+        originalAmount
+      )
 
       if (!discountResult.success) {
         return ctx.badRequest(discountResult.error || "Failed to apply discount code")
@@ -473,7 +491,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         if (appliedDiscountCode) {
           await releaseDiscountCode(strapi, appliedDiscountCode.documentId)
         }
-        strapi.log.warn(`[Ticketing] Reservation failed for order ${orderNumber}: ${reservationResult.error}`)
+        strapi.log.warn(
+          `[Ticketing] Reservation failed for order ${orderNumber}: ${reservationResult.error}`
+        )
         return ctx.badRequest(reservationResult.error || "Failed to reserve tickets")
       }
 
@@ -667,7 +687,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       data: orders.map((o: any) => ({
         documentId: o.documentId,
         orderNumber: o.orderNumber,
-        status: o.status,  // This is order status, not ticket status
+        status: o.status, // This is order status, not ticket status
         totalAmount: o.totalAmount,
         currency: o.currency,
         paidAt: o.paidAt,
@@ -854,7 +874,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Release any discount code reservation
       if (order.discountCode?.documentId) {
         await releaseDiscountCode(strapi, order.discountCode.documentId)
-        strapi.log.info(`[Ticketing] Released discount code reservation for ${order.discountCode.code}`)
+        strapi.log.info(
+          `[Ticketing] Released discount code reservation for ${order.discountCode.code}`
+        )
       }
     }
 
@@ -1031,7 +1053,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const available = ticketType.capacity ? ticketType.capacity - effectiveUsed : Infinity
 
       if (ticketRequest.quantity > available) {
-        return ctx.badRequest(`Not enough tickets available for ${ticketType.name} (${Math.max(0, available)} remaining)`)
+        return ctx.badRequest(
+          `Not enough tickets available for ${ticketType.name} (${Math.max(0, available)} remaining)`
+        )
       }
 
       originalAmount += ticketType.price * ticketRequest.quantity
@@ -1051,7 +1075,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     let appliedDiscountCode: { id: number; documentId: string; code: string } | null = null
 
     if (discountCodeString) {
-      const discountResult = await this.validateAndApplyDiscount(eventId, discountCodeString, originalAmount)
+      const discountResult = await this.validateAndApplyDiscount(
+        eventId,
+        discountCodeString,
+        originalAmount
+      )
 
       if ("error" in discountResult) {
         return ctx.badRequest(discountResult.error)
@@ -1181,7 +1209,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
 
       // Validate field types
-      if (typeof attendee.email !== "string" || typeof attendee.firstName !== "string" || typeof attendee.lastName !== "string") {
+      if (
+        typeof attendee.email !== "string" ||
+        typeof attendee.firstName !== "string" ||
+        typeof attendee.lastName !== "string"
+      ) {
         return ctx.badRequest(`Attendee ${i + 1}: Email, first name, and last name must be strings`)
       }
 
@@ -1222,7 +1254,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (attendee.foodPreferences) {
         attendee.foodPreferences = sanitizeText(attendee.foodPreferences)
         if (attendee.foodPreferences.length > 500) {
-          return ctx.badRequest(`Attendee ${i + 1}: Food preferences must be at most 500 characters`)
+          return ctx.badRequest(
+            `Attendee ${i + 1}: Food preferences must be at most 500 characters`
+          )
         }
       }
       if (attendee.photoConsent !== undefined && typeof attendee.photoConsent !== "boolean") {
@@ -1339,7 +1373,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const available = ticketType.capacity ? ticketType.capacity - effectiveUsed : Infinity
 
       if (detail.quantity > available) {
-        return ctx.badRequest(`Not enough tickets available for ${ticketType.name} (${Math.max(0, available)} remaining)`)
+        return ctx.badRequest(
+          `Not enough tickets available for ${ticketType.name} (${Math.max(0, available)} remaining)`
+        )
       }
     }
 
@@ -1461,9 +1497,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           applicationFeeAmount,
         })
 
-        strapi.log.info(
-          `[Ticketing] Using Stripe Connect for order ${order.orderNumber}`
-        )
+        strapi.log.info(`[Ticketing] Using Stripe Connect for order ${order.orderNumber}`)
       } else {
         // Fallback to platform account
         session = await provider.createCheckoutSession({
@@ -1509,9 +1543,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
       reservationsCreated = true
 
-      strapi.log.info(
-        `[Ticketing] Checkout session created for order ${order.orderNumber}`
-      )
+      strapi.log.info(`[Ticketing] Checkout session created for order ${order.orderNumber}`)
 
       return ctx.send({
         data: {
@@ -1527,7 +1559,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (reservationsCreated) {
         try {
           await releaseReservations(strapi, order.documentId)
-          strapi.log.info(`[Ticketing] Released reservations for order ${order.orderNumber} after error`)
+          strapi.log.info(
+            `[Ticketing] Released reservations for order ${order.orderNumber} after error`
+          )
         } catch (releaseError: any) {
           strapi.log.error(`[Ticketing] Failed to release reservations: ${releaseError.message}`)
         }
@@ -1558,7 +1592,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
 
       // Return appropriate error
-      if (error.message?.includes("Failed to reserve tickets") || error.message?.includes("Not enough")) {
+      if (
+        error.message?.includes("Failed to reserve tickets") ||
+        error.message?.includes("Not enough")
+      ) {
         return ctx.badRequest(error.message)
       }
       return ctx.internalServerError("Failed to create payment session")
@@ -1575,7 +1612,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       documentId: orderInput.documentId,
       populate: {
         event: {
-          fields: ["id", "documentId", "name", "slug", "start", "end", "contactEmail", "description", "eventStatus"],
+          fields: [
+            "id",
+            "documentId",
+            "name",
+            "slug",
+            "start",
+            "end",
+            "contactEmail",
+            "description",
+            "eventStatus",
+          ],
           populate: {
             ticketTypes: true,
             location: { fields: ["name", "country"] },
@@ -1707,7 +1754,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (ticket.isNewPlayer && ticket.player) {
         // Don't send invitation to purchaser (they already got confirmation email)
         if (ticket.attendeeEmail.toLowerCase() !== order.purchaserEmail.toLowerCase()) {
-          await sendPlayerInvitationEmail(strapi, 
+          await sendPlayerInvitationEmail(
+            strapi,
             ticket.attendeeEmail,
             ticket.attendeeName,
             ticket.player,
@@ -1717,6 +1765,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         }
       }
     }
+
+    // Notify event organizers about the sale
+    await sendTicketSoldNotificationEmail(strapi, order, createdTickets)
 
     strapi.log.info(
       `[Ticketing] Order ${order.orderNumber} processed successfully with ${createdTickets.length} tickets`
@@ -1810,7 +1861,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const eventLocation = [venueName, locationName].filter(Boolean).join(", ") || "TBD"
 
     // Group tickets by type for invoice line items
-    const ticketsByType = new Map<string, { name: string; price: number; currency: string; quantity: number }>()
+    const ticketsByType = new Map<
+      string,
+      { name: string; price: number; currency: string; quantity: number }
+    >()
     for (const ticket of (order.tickets || []) as any[]) {
       const typeName = ticket.ticketType?.name || "Ticket"
       const existing = ticketsByType.get(typeName)
@@ -1862,7 +1916,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Logo path - use local copy in public/images (works in production)
-    const logoPath = join(__dirname, "../../../../public/images/play14_white_bg_trans_600x200.png")
+    const logoPath = join(
+      __dirname,
+      "../../../../public/images/play14_600x200_transparent-light.png"
+    )
 
     try {
       const pdfBuffer = await generateInvoicePDF(invoiceData, {
@@ -1879,9 +1936,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       ctx.body = pdfBuffer
     } catch (error: any) {
-      strapi.log.error(`[Invoice] Failed to generate invoice for order ${order.orderNumber}: ${error.message}`)
+      strapi.log.error(
+        `[Invoice] Failed to generate invoice for order ${order.orderNumber}: ${error.message}`
+      )
       return ctx.internalServerError("Failed to generate invoice")
     }
   },
-
 })

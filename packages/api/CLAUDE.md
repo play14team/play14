@@ -105,25 +105,19 @@ src/api/{resource}/
 All content types auto-generate slugs in `lifecycles.js` using `src/libs/strings.js`:
 
 ```javascript
-const { eventToSlug } = require("../../../../libs/strings");
+const { eventToSlug } = require("../../../../libs/strings")
 
 module.exports = {
   beforeCreate(event) {
     // Events use "name-MM" format (name + start month)
-    event.params.data.slug = eventToSlug(
-      event.params.data.name,
-      event.params.data.start
-    );
+    event.params.data.slug = eventToSlug(event.params.data.name, event.params.data.start)
   },
   beforeUpdate(event) {
     if (event.params.data.name || event.params.data.start) {
-      event.params.data.slug = eventToSlug(
-        event.params.data.name,
-        event.params.data.start
-      );
+      event.params.data.slug = eventToSlug(event.params.data.name, event.params.data.start)
     }
   },
-};
+}
 ```
 
 **Important**: Never manually set slugs - lifecycle hooks handle this automatically.
@@ -316,6 +310,11 @@ Critical variables (see `.env.example`):
 - `APP_KEYS` (4 comma-separated keys for session encryption)
 - `ADMIN_JWT_SECRET`, `JWT_SECRET`, `API_TOKEN_SALT`
 
+**URLs**:
+
+- `PUBLIC_URL` (base URL for public assets and OAuth callbacks; used to build the default logo URL `PUBLIC_URL/images/play14_600x200_transparent-light.png`)
+- `LOGO_URL` (optional override for the logo used in HTML emails; defaults to the path above so you can point to `http://localhost:1337/...` in dev)
+
 **Integrations**:
 
 - `GITHUB_TOKEN` (for triggering play14-web rebuilds)
@@ -351,9 +350,36 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
 ```
 
 **Key differences**:
+
 - `findOne({ where })` → `findFirst({ filters })` or `findOne({ documentId })`
 - `update({ where, data })` → `update({ documentId, data })`
 - Use `as any` for custom relations not in Strapi types (e.g., `player` on users-permissions)
+
+**Document Service API Methods**:
+
+```typescript
+// Count entries
+const count = await strapi.documents("api::event.event").count({
+  filters: { eventStatus: "Open" },
+})
+
+// Find with pagination, sorting, and field selection
+const events = await strapi.documents("api::event.event").findMany({
+  filters: { eventStatus: { $in: ["Open", "Announced"] } },
+  fields: ["name", "slug", "start", "end"],
+  populate: { location: { fields: ["name", "city"] } },
+  sort: { start: "asc" },
+  limit: 10,
+  offset: 0,
+  status: "published", // Draft/publish status filter
+})
+
+// Create with publish status
+const event = await strapi.documents("api::event.event").create({
+  data: { name: "New Event", eventStatus: "Announced" },
+  status: "published", // or "draft"
+})
+```
 
 ## Permission Management for Custom API Endpoints
 
@@ -362,6 +388,7 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
 ### Permission Setup Pattern
 
 1. **Define action constants** in `src/bootstrap/permissions/actions.ts`:
+
    ```typescript
    export const EVENT_ACTIONS = {
      // ... existing actions
@@ -370,6 +397,7 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
    ```
 
 2. **Map permissions to roles** in `src/bootstrap/permissions/definitions.ts`:
+
    ```typescript
    { action: EVENT_ACTIONS.UPDATE_SCHEDULE, minimumRole: ROLE_TYPES.HOST },
    ```
@@ -377,11 +405,13 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
 3. **Bootstrap auto-grants permissions** based on position hierarchy (Player < Host < Mentor < Founder)
 
 ### Key Files
+
 - `src/bootstrap/permissions/actions.ts` - Action constant definitions
 - `src/bootstrap/permissions/definitions.ts` - Role-to-permission mapping
 - `src/bootstrap/index.ts` - Bootstrap entry point
 
 ### Common Mistakes
+
 - **403 Forbidden**: Missing permission definition for new endpoint
 - **Permission not applied**: Action name mismatch between route handler and definition
 - **Wrong hierarchy**: Using incorrect `minimumRole` (e.g., `HOST` when should be `MENTOR`)
@@ -391,6 +421,7 @@ const user = await strapi.query("plugin::users-permissions.user").findOne({
 ### Strapi Upload Plugin Architecture
 
 Strapi 5's upload plugin uses these internal tables:
+
 - `plugin::upload.file` - Files with metadata, URLs, and `folder` relation
 - `plugin::upload.folder` - Folder hierarchy with `pathId`, `path`, `parent`, and `name`
 
@@ -401,11 +432,13 @@ Strapi 5's upload plugin uses these internal tables:
 We've implemented custom endpoints because Strapi's Content API doesn't support filtering files by folder:
 
 **`/api/media-files`** (`src/api/media-file/`)
+
 - Lists files with folder filtering: `?filters[folder]=<id>` or `?filters[folder][$null]=true` (root level)
 - Supports `mime`, `name` filtering and pagination
 - Queries `plugin::upload.file` directly via `strapi.db.query()`
 
 **`/api/media-folders`** (`src/api/media-folder/`)
+
 - Lists folders with parent filtering: `?filters[parent]=<id>` or `?filters[parent][$null]=true` (root)
 - Returns folder counts (children, files)
 - Queries `plugin::upload.folder` directly
@@ -487,6 +520,7 @@ export const MEDIA_FILE_ACTIONS = {
 ### Image MIME Types
 
 When validating web-displayable images, use correct MIME types:
+
 - `image/jpeg` (NOT `image/jpg` - that's invalid)
 - `image/png`, `image/gif`, `image/webp`, `image/svg+xml`, `image/avif`
 - `image/heic` is NOT web-displayable (browsers don't support it)
@@ -496,10 +530,12 @@ When validating web-displayable images, use correct MIME types:
 Media files are organized into folders by content type:
 
 **Player Avatars**: `players/`
+
 - Uploaded via `/api/players/me/picture` endpoint
 - Uses `getOrCreateMediaFolder()` in `custom-player.ts`
 
 **Event Images**: `events/{locationSlug}/{eventSlug}/`
+
 - Uploaded via `/api/events/:slug/images` endpoint
 - Creates nested folder hierarchy: events → location → event
 - Uses `getOrCreateEventImageFolder()` in `custom-event.ts`
@@ -508,6 +544,7 @@ Media files are organized into folders by content type:
 - Gallery images have no aspect ratio requirement
 
 Example folder structure:
+
 ```
 events/
 ├── luxembourg/
@@ -547,6 +584,23 @@ players/
     ```
 
 ## Reference Documentation
+
+### Strapi Official Documentation
+
+For Strapi 5 reference, use the official docs at https://docs.strapi.io:
+
+- **AI-Optimized Docs**: Use `https://docs.strapi.io/llms.txt` (summary) or `https://docs.strapi.io/llms-full.txt` (complete) for LLM context
+- **Interactive Project Structure**: Navigate code patterns at the interactive project structure page
+- **Search & AI Assistant**: Use the search bar or "Ask AI" button for natural language queries
+
+**Key Strapi 5 Concepts**:
+
+- **Document Service API**: Primary backend content interaction method (see "API Guidelines" section)
+- **Vite Bundler**: Default admin panel bundler (replaced webpack in Strapi 5)
+- **Draft/Publish Status**: Built-in content workflow with `status` field (reserved - see pitfalls)
+- **Widget API**: `app.widgets.register()` available in Strapi 5.13+ for homepage customization
+
+### Project-Specific Documentation
 
 **Coding Standards & Instructions**: See `.github/instructions/` for:
 

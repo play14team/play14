@@ -49,7 +49,7 @@ async function main() {
   }
 
   // Use local logo copy in public/images (white background version for invoices)
-  const logoPath = join(process.cwd(), "public/images/play14_white_bg_trans_600x200.png")
+  const logoPath = join(process.cwd(), "public/images/play14_600x200_transparent-light.png")
 
   const pdfBuffer = await generateInvoicePDF(invoiceData, {
     organizationName: "#play14",

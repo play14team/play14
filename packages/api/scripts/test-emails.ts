@@ -17,6 +17,7 @@ import TicketConfirmationEmail from "../src/emails/ticket-confirmation"
 import TicketOrderRefundEmail from "../src/emails/ticket-order-refund"
 import PlayerInvitationEmail from "../src/emails/player-invitation"
 import PaymentFailedEmail from "../src/emails/payment-failed"
+import TicketSoldNotificationEmail from "../src/emails/ticket-sold-notification"
 
 const TEST_EMAIL = "cedric.pontet+test@gmail.com"
 const FRONTEND_URL = "https://play14.org"
@@ -56,7 +57,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 1/10] New Player Claim Request",
+      subject: "[TEST 1/11] New Player Claim Request",
       html: html1,
       text: text1,
     })
@@ -79,7 +80,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 2/10] Your Player Profile Has Been Linked!",
+      subject: "[TEST 2/11] Your Player Profile Has Been Linked!",
       html: html2,
       text: text2,
     })
@@ -104,7 +105,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 3/10] Player Claim Update",
+      subject: "[TEST 3/11] Player Claim Update",
       html: html3,
       text: text3,
     })
@@ -137,7 +138,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 4/10] New Attendance Claim for #play14 Luxembourg 2024",
+      subject: "[TEST 4/11] New Attendance Claim for #play14 Luxembourg 2024",
       html: html4,
       text: text4,
     })
@@ -166,7 +167,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 5/10] Your Attendance Claim Has Been Approved!",
+      subject: "[TEST 5/11] Your Attendance Claim Has Been Approved!",
       html: html5,
       text: text5,
     })
@@ -195,7 +196,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 6/10] Attendance Claim Update",
+      subject: "[TEST 6/11] Attendance Claim Update",
       html: html6,
       text: text6,
     })
@@ -260,7 +261,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 7/10] Your tickets for #play14 Luxembourg 2025",
+      subject: "[TEST 7/11] Your tickets for #play14 Luxembourg 2025",
       html: html7,
       text: text7,
     })
@@ -315,7 +316,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 8/10] Your order has been refunded",
+      subject: "[TEST 8/11] Your order has been refunded",
       html: html8,
       text: text8,
     })
@@ -354,7 +355,7 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 9/10] Your ticket for #play14 Luxembourg 2025 - Create your profile",
+      subject: "[TEST 9/11] Your ticket for #play14 Luxembourg 2025 - Create your profile",
       html: html9,
       text: text9,
     })
@@ -383,13 +384,72 @@ async function sendTestEmails() {
     )
     await strapi.plugin("email").service("email").send({
       to: TEST_EMAIL,
-      subject: "[TEST 10/10] Payment failed for #play14 Luxembourg 2025",
+      subject: "[TEST 10/11] Payment failed for #play14 Luxembourg 2025",
       html: html10,
       text: text10,
     })
     console.log("   ✅ Sent!\n")
 
-    console.log("✅ All 10 test emails sent successfully!")
+    // 11. Ticket Sold Notification
+    console.log("11️⃣  Sending: Ticket Sold Notification (Organizer)")
+    const html11 = await render(
+      TicketSoldNotificationEmail({
+        eventName: "#play14 Luxembourg 2025",
+        eventSlug: "play14-luxembourg-2025",
+        orderNumber: "ORD-2024-77777",
+        purchaserName: "Dana Organizer",
+        purchaserEmail: "dana@example.com",
+        currency: "EUR",
+        totalAmount: 100.0,
+        tickets: [
+          {
+            ticketTypeName: "Regular Ticket",
+            attendeeName: "Alice Johnson",
+            attendeeEmail: "alice@example.com",
+          },
+          {
+            ticketTypeName: "Regular Ticket",
+            attendeeName: "Bob Williams",
+            attendeeEmail: "bob@example.com",
+          },
+        ],
+        frontendUrl: FRONTEND_URL,
+      })
+    )
+    const text11 = await render(
+      TicketSoldNotificationEmail({
+        eventName: "#play14 Luxembourg 2025",
+        eventSlug: "play14-luxembourg-2025",
+        orderNumber: "ORD-2024-77777",
+        purchaserName: "Dana Organizer",
+        purchaserEmail: "dana@example.com",
+        currency: "EUR",
+        totalAmount: 100.0,
+        tickets: [
+          {
+            ticketTypeName: "Regular Ticket",
+            attendeeName: "Alice Johnson",
+            attendeeEmail: "alice@example.com",
+          },
+          {
+            ticketTypeName: "Regular Ticket",
+            attendeeName: "Bob Williams",
+            attendeeEmail: "bob@example.com",
+          },
+        ],
+        frontendUrl: FRONTEND_URL,
+      }),
+      { plainText: true }
+    )
+    await strapi.plugin("email").service("email").send({
+      to: TEST_EMAIL,
+      subject: "[TEST 11/11] New ticket order for #play14 Luxembourg 2025",
+      html: html11,
+      text: text11,
+    })
+    console.log("   ✅ Sent!\n")
+
+    console.log("✅ All 11 test emails sent successfully!")
     console.log(`📧 Check your inbox at: ${TEST_EMAIL}`)
     console.log("\n📋 Email Templates Tested:")
     console.log("   1. Player Claim New (Admin)")
@@ -402,6 +462,7 @@ async function sendTestEmails() {
     console.log("   8. Ticket Order Refund")
     console.log("   9. Player Invitation")
     console.log("   10. Payment Failed")
+    console.log("   11. Ticket Sold Notification (Organizer)")
 
   } catch (error) {
     console.error("❌ Error sending test emails:", error)

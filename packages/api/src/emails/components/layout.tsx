@@ -38,8 +38,10 @@ const footerStyle = {
 }
 
 export function Layout({ children, preview }: LayoutProps) {
-  const logoUrl =
-    process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
+  const publicUrl = process.env.PUBLIC_URL || "https://community.play14.org"
+  const baseUrl = publicUrl.endsWith("/") ? publicUrl.slice(0, -1) : publicUrl
+  const defaultLogoUrl = `${baseUrl}/images/play14_600x200_transparent-dark.png`
+  const logoUrl = process.env.LOGO_URL || defaultLogoUrl
 
   return (
     <Html>

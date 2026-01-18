@@ -23,6 +23,7 @@ import {
   findOrCreatePlayerForAttendee,
   addPlayerToEventAttendees,
 } from "../../../services/ticketing"
+import { sendTicketSoldNotificationEmail as sendTicketSoldNotification } from "../../../services/email-templates"
 import {
   claimWebhookEvent,
   markWebhookCompleted,
@@ -40,6 +41,15 @@ interface AttendeeInfo {
   foodPreferences?: string
   photoConsent: boolean
   photoConsentTimestamp?: string
+}
+
+const getLogoUrl = (): string => {
+  if (process.env.LOGO_URL) {
+    return process.env.LOGO_URL
+  }
+  const publicUrl = process.env.PUBLIC_URL || "https://community.play14.org"
+  const baseUrl = publicUrl.endsWith("/") ? publicUrl.slice(0, -1) : publicUrl
+  return `${baseUrl}/images/play14_600x200_transparent-light.png`
 }
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
@@ -163,7 +173,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       filters: { providerSessionId: sessionId },
       populate: {
         event: {
-          fields: ["id", "documentId", "name", "slug", "start", "end", "contactEmail", "description", "eventStatus"],
+          fields: [
+            "id",
+            "documentId",
+            "name",
+            "slug",
+            "start",
+            "end",
+            "contactEmail",
+            "description",
+            "eventStatus",
+          ],
           populate: {
             ticketTypes: true,
             location: { fields: ["name", "country"] },
@@ -198,11 +218,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         fields: ["status"],
       })
       const currentStatus = currentOrder?.status || "unknown"
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} skipped - current status: ${currentStatus} (was not pending)`)
+      strapi.log.info(
+        `[Webhook] Order ${order.orderNumber} skipped - current status: ${currentStatus} (was not pending)`
+      )
       return
     }
 
-    strapi.log.info(`[Webhook] Processing order ${order.orderNumber} (locked with processing status)`)
+    strapi.log.info(
+      `[Webhook] Processing order ${order.orderNumber} (locked with processing status)`
+    )
 
     try {
       const ticketDetails = order.ticketDetails || []
@@ -326,7 +350,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         // hasReservation indicates whether the order had an active reservation at checkout time
         const hadReservation = (order as any).hasReservation
         await confirmDiscountCode(strapi, order.discountCode.documentId, hadReservation)
-        strapi.log.info(`[Webhook] Discount code ${(order.discountCode as any).code} usage confirmed`)
+        strapi.log.info(
+          `[Webhook] Discount code ${(order.discountCode as any).code} usage confirmed`
+        )
       }
 
       // Add all ticket players to event attendees
@@ -360,7 +386,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         }
       }
 
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} completed successfully with ${createdTickets.length} tickets`)
+      // Notify event organizers about the sale
+      await this.sendTicketSoldNotificationEmail(order, createdTickets)
+
+      strapi.log.info(
+        `[Webhook] Order ${order.orderNumber} completed successfully with ${createdTickets.length} tickets`
+      )
     } catch (error: any) {
       // Processing failed - revert status back to pending so webhook can be retried
       strapi.log.error(`[Webhook] Failed to process order ${order.orderNumber}: ${error.message}`)
@@ -453,7 +484,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             resetPasswordToken: resetToken,
           } as any,
         })
-        strapi.log.info(`[Webhook] Created new user account for ${email} and linked to player ${player.documentId}`)
+        strapi.log.info(
+          `[Webhook] Created new user account for ${email} and linked to player ${player.documentId}`
+        )
       }
     } else {
       // User already exists and is linked - just update the reset token
@@ -565,8 +598,27 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // 1. Immediate notification to support team
       // 2. Retry mechanism for failed emails
       // 3. Dashboard to track email delivery rates
-      strapi.log.error(`[Webhook] Failed to send player invitation email to ${email}: ${error.message}`)
+      strapi.log.error(
+        `[Webhook] Failed to send player invitation email to ${email}: ${error.message}`
+      )
     }
+  },
+
+  /**
+   * Notify event organizers when tickets are sold
+   */
+  async sendTicketSoldNotificationEmail(
+    order: any,
+    createdTickets: Array<{
+      ticketCode: string
+      ticketTypeName: string
+      attendeeName: string
+      attendeeEmail: string
+      player: any
+      isNewPlayer: boolean
+    }>
+  ) {
+    await sendTicketSoldNotification(strapi, order, createdTickets)
   },
 
   /**
@@ -595,7 +647,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     if (order.status !== "pending") {
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} not pending (status: ${order.status}), skipping expiration`)
+      strapi.log.info(
+        `[Webhook] Order ${order.orderNumber} not pending (status: ${order.status}), skipping expiration`
+      )
       return
     }
 
@@ -625,8 +679,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async handlePaymentFailed(paymentIntentData: Record<string, unknown>) {
     const paymentIntentId = paymentIntentData.id as string
     const lastPaymentError = paymentIntentData.last_payment_error as Record<string, unknown> | null
-    const errorMessage = lastPaymentError?.message as string || "Payment failed"
-    const errorCode = lastPaymentError?.code as string || "unknown"
+    const errorMessage = (lastPaymentError?.message as string) || "Payment failed"
+    const errorCode = (lastPaymentError?.code as string) || "unknown"
 
     if (!paymentIntentId) {
       strapi.log.warn("[Webhook] Missing payment intent ID in payment_intent.payment_failed")
@@ -689,7 +743,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Release any discount code reservation
       if (order.discountCode?.documentId) {
         await releaseDiscountCode(strapi, order.discountCode.documentId)
-        strapi.log.info(`[Webhook] Released discount code reservation for ${order.discountCode.code}`)
+        strapi.log.info(
+          `[Webhook] Released discount code reservation for ${order.discountCode.code}`
+        )
       }
 
       await strapi.documents("api::ticket-order.ticket-order").update({
@@ -712,14 +768,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    */
   async sendPaymentFailedEmail(order: any, errorMessage: string) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-    const logoUrl =
-      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
+    const logoUrl = getLogoUrl()
 
     try {
-      await strapi.plugin("email").service("email").send({
-        to: order.purchaserEmail,
-        subject: `[#play14] Payment failed for ${order.event?.name || "your order"}`,
-        text: `
+      await strapi
+        .plugin("email")
+        .service("email")
+        .send({
+          to: order.purchaserEmail,
+          subject: `[#play14] Payment failed for ${order.event?.name || "your order"}`,
+          text: `
 Unfortunately, your payment could not be processed.
 
 Order: ${order.orderNumber}
@@ -732,7 +790,7 @@ If you continue to experience issues, please contact us.
 
 The #play14 Team
         `.trim(),
-        html: `
+          html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -777,7 +835,7 @@ The #play14 Team
 </body>
 </html>
         `.trim(),
-      })
+        })
 
       strapi.log.info(`[Webhook] Payment failed email sent to ${order.purchaserEmail}`)
     } catch (error: any) {
@@ -846,7 +904,8 @@ The #play14 Team
 
     // Decrement sold_count for each ticket type
     for (const [ticketTypeDocumentId, count] of ticketTypeCounts) {
-      await strapi.db.connection("ticket_types")
+      await strapi.db
+        .connection("ticket_types")
         .where("document_id", ticketTypeDocumentId)
         .decrement("sold_count", count)
     }
@@ -945,9 +1004,8 @@ The #play14 Team
     }>
   ) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-    // Logo URL must be publicly accessible for email clients (dark variant for dark header background)
-    const logoUrl =
-      process.env.LOGO_URL || "https://play14.org/logo/play14_600x200_transparent-dark.png"
+    // Logo URL must be publicly accessible for email clients
+    const logoUrl = getLogoUrl()
 
     let tickets: any[]
 
@@ -1031,12 +1089,11 @@ The #play14 Team
           hour: "2-digit",
           minute: "2-digit",
         }),
-        eventLocation:
-          order.event.venue
-            ? `${order.event.venue.name}${order.event.venue.location?.place_name ? ` - ${order.event.venue.location.place_name}` : ""}`
-            : order.event.location
-              ? `${order.event.location.name}, ${order.event.location.country}`
-              : "Location TBA",
+        eventLocation: order.event.venue
+          ? `${order.event.venue.name}${order.event.venue.location?.place_name ? ` - ${order.event.venue.location.place_name}` : ""}`
+          : order.event.location
+            ? `${order.event.location.name}, ${order.event.location.country}`
+            : "Location TBA",
         tickets: formatTicketItems(order.ticketDetails || []),
         subtotal: order.originalAmount || order.totalAmount,
         discountAmount: order.discountAmount || 0,
@@ -1047,7 +1104,10 @@ The #play14 Team
       }
 
       // Logo path - use local copy in public/images (works in production)
-      const logoPath = join(__dirname, "../../../../public/images/play14_white_bg_trans_600x200.png")
+      const logoPath = join(
+        __dirname,
+        "../../../../public/images/play14_600x200_transparent-light.png"
+      )
 
       invoicePDF = await generateInvoicePDF(invoiceData, {
         organizationName: "#play14",
@@ -1219,7 +1279,9 @@ The #play14 Team
       // 1. Immediate notification to support team to manually resend
       // 2. Retry mechanism for failed emails
       // 3. Store failed email attempts for later retry
-      strapi.log.error(`[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message}`)
+      strapi.log.error(
+        `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message}`
+      )
     }
   },
 

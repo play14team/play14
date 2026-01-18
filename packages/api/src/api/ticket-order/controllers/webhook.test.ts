@@ -570,6 +570,7 @@ describe("webhook controller", () => {
 
       // Mock sendConfirmationEmail
       controller.sendConfirmationEmail = vi.fn().mockResolvedValue(undefined)
+      controller.sendTicketSoldNotificationEmail = vi.fn().mockResolvedValue(undefined)
       controller.addPlayerToEventAttendees = vi.fn().mockResolvedValue(undefined)
 
       await controller.handleCheckoutCompleted({
@@ -636,6 +637,7 @@ describe("webhook controller", () => {
       })
 
       controller.sendConfirmationEmail = vi.fn().mockResolvedValue(undefined)
+      controller.sendTicketSoldNotificationEmail = vi.fn().mockResolvedValue(undefined)
       controller.addPlayerToEventAttendees = vi.fn().mockResolvedValue(undefined)
 
       await controller.handleCheckoutCompleted({

@@ -1,6 +1,7 @@
 /**
  * Simple test script to send all email templates using Resend directly
  * Run with: RESEND_API_KEY=your_key bun run scripts/test-emails-simple.ts
+ * Filter: bun run scripts/test-emails-simple.ts -- --only=ticket-sold-notification
  *
  * Make sure to set your RESEND_API_KEY environment variable
  */
@@ -19,10 +20,16 @@ import TicketConfirmationEmail from "../src/emails/ticket-confirmation"
 import TicketOrderRefundEmail from "../src/emails/ticket-order-refund"
 import PlayerInvitationEmail from "../src/emails/player-invitation"
 import PaymentFailedEmail from "../src/emails/payment-failed"
+import TicketSoldNotificationEmail from "../src/emails/ticket-sold-notification"
 
 const TEST_EMAIL = "cedric.pontet+test@gmail.com"
 const FRONTEND_URL = "https://play14.org"
 const FROM_EMAIL = process.env.RESEND_DEFAULT_FROM || "onboarding@resend.dev"
+const args = process.argv.slice(2)
+const onlyArg = args.find((arg) => arg.startsWith("--only="))?.split("=")[1]
+const filterArg = onlyArg || args.find((arg) => !arg.startsWith("--"))
+const emailFilter =
+  filterArg || process.env.EMAIL_TEMPLATE || process.env.EMAIL_FILTER || ""
 
 // Check for API key
 if (!process.env.RESEND_API_KEY) {
@@ -35,13 +42,14 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 async function sendTestEmails() {
   console.log("🚀 Starting email template testing...")
-  console.log(`📧 Sending all emails to: ${TEST_EMAIL}`)
+  console.log(`📧 Sending emails to: ${TEST_EMAIL}`)
   console.log(`📤 From: ${FROM_EMAIL}\n`)
 
   const emails = [
     {
+      id: "player-claim-new",
       name: "Player Claim New (Admin Notification)",
-      subject: "[TEST 1/10] New Player Claim Request",
+      subject: "New Player Claim Request",
       component: PlayerClaimNewEmail({
         userEmail: "john.doe@example.com",
         username: "johndoe",
@@ -53,16 +61,18 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "player-claim-approved",
       name: "Player Claim Approved",
-      subject: "[TEST 2/10] Your Player Profile Has Been Linked!",
+      subject: "Your Player Profile Has Been Linked!",
       component: PlayerClaimApprovedEmail({
         playerName: "John Doe",
         frontendUrl: FRONTEND_URL,
       }),
     },
     {
+      id: "player-claim-rejected",
       name: "Player Claim Rejected",
-      subject: "[TEST 3/10] Player Claim Update",
+      subject: "Player Claim Update",
       component: PlayerClaimRejectedEmail({
         playerName: "John Doe",
         adminNotes: "We need more information to verify your identity. Please provide additional details or contact us directly.",
@@ -70,8 +80,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "attendance-claim-new",
       name: "Attendance Claim New (Organizer Notification)",
-      subject: "[TEST 4/10] New Attendance Claim for #play14 Luxembourg 2024",
+      subject: "New Attendance Claim for #play14 Luxembourg 2024",
       component: AttendanceClaimNewEmail({
         eventName: "#play14 Luxembourg 2024",
         eventDate: "October 24, 2024",
@@ -83,8 +94,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "attendance-claim-approved",
       name: "Attendance Claim Approved",
-      subject: "[TEST 5/10] Your Attendance Claim Has Been Approved!",
+      subject: "Your Attendance Claim Has Been Approved!",
       component: AttendanceClaimApprovedEmail({
         eventName: "#play14 Luxembourg 2024",
         eventDate: "October 24, 2024",
@@ -94,8 +106,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "attendance-claim-rejected",
       name: "Attendance Claim Rejected",
-      subject: "[TEST 6/10] Attendance Claim Update",
+      subject: "Attendance Claim Update",
       component: AttendanceClaimRejectedEmail({
         eventName: "#play14 Luxembourg 2024",
         eventDate: "October 24, 2024",
@@ -105,8 +118,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "ticket-confirmation",
       name: "Ticket Confirmation",
-      subject: "[TEST 7/10] Your tickets for #play14 Luxembourg 2025",
+      subject: "Your tickets for #play14 Luxembourg 2025",
       component: TicketConfirmationEmail({
         orderNumber: "ORD-2024-12345",
         eventName: "#play14 Luxembourg 2025",
@@ -134,8 +148,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "ticket-order-refund",
       name: "Ticket Order Refund",
-      subject: "[TEST 8/10] Your order has been refunded",
+      subject: "Your order has been refunded",
       component: TicketOrderRefundEmail({
         orderNumber: "ORD-2024-12345",
         eventName: "#play14 Luxembourg 2025",
@@ -158,8 +173,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "player-invitation",
       name: "Player Invitation",
-      subject: "[TEST 9/10] Your ticket for #play14 Luxembourg 2025 - Create your profile",
+      subject: "Your ticket for #play14 Luxembourg 2025 - Create your profile",
       component: PlayerInvitationEmail({
         playerName: "Charlie Brown",
         ticketCode: "TKT-INV-003-DEF456",
@@ -174,8 +190,9 @@ async function sendTestEmails() {
       }),
     },
     {
+      id: "payment-failed",
       name: "Payment Failed",
-      subject: "[TEST 10/10] Payment failed for #play14 Luxembourg 2025",
+      subject: "Payment failed for #play14 Luxembourg 2025",
       component: PaymentFailedEmail({
         orderNumber: "ORD-2024-67890",
         eventName: "#play14 Luxembourg 2025",
@@ -184,13 +201,64 @@ async function sendTestEmails() {
         frontendUrl: FRONTEND_URL,
       }),
     },
+    {
+      id: "ticket-sold-notification",
+      name: "Ticket Sold Notification (Organizer)",
+      subject: "New ticket order for #play14 Luxembourg 2025",
+      component: TicketSoldNotificationEmail({
+        eventName: "#play14 Luxembourg 2025",
+        eventSlug: "play14-luxembourg-2025",
+        orderNumber: "ORD-2024-77777",
+        purchaserName: "Dana Organizer",
+        purchaserEmail: "dana@example.com",
+        currency: "EUR",
+        totalAmount: 100.0,
+        tickets: [
+          {
+            ticketTypeName: "Regular Ticket",
+            attendeeName: "Alice Johnson",
+            attendeeEmail: "alice@example.com",
+          },
+          {
+            ticketTypeName: "Regular Ticket",
+            attendeeName: "Bob Williams",
+            attendeeEmail: "bob@example.com",
+          },
+        ],
+        frontendUrl: FRONTEND_URL,
+      }),
+    },
   ]
+
+  const normalizedFilter = emailFilter.trim().toLowerCase()
+  const requestedFilters = normalizedFilter
+    ? normalizedFilter.split(",").map((value) => value.trim()).filter(Boolean)
+    : []
+  const emailsToSend = requestedFilters.length
+    ? emails.filter((email) =>
+        requestedFilters.some(
+          (filter) =>
+            email.id === filter || email.name.toLowerCase().includes(filter)
+        )
+      )
+    : emails
+
+  if (requestedFilters.length > 0 && emailsToSend.length === 0) {
+    console.error("❌ Error: No email templates matched the filter.")
+    console.error("Available templates:")
+    emails.forEach((email) => console.error(`- ${email.id}`))
+    process.exit(1)
+  }
+  if (requestedFilters.length > 0) {
+    console.log(`🔎 Filter: ${requestedFilters.join(", ")}`)
+  }
 
   let successCount = 0
   let failedCount = 0
 
-  for (let i = 0; i < emails.length; i++) {
-    const { name, subject, component } = emails[i]
+  for (let i = 0; i < emailsToSend.length; i++) {
+    const { name, subject, component } = emailsToSend[i]
+    const subjectPrefix = `[TEST ${i + 1}/${emailsToSend.length}]`
     console.log(`${i + 1}️⃣  Sending: ${name}`)
 
     try {
@@ -200,7 +268,7 @@ async function sendTestEmails() {
       const result = await resend.emails.send({
         from: FROM_EMAIL,
         to: TEST_EMAIL,
-        subject,
+        subject: `${subjectPrefix} ${subject}`,
         html,
         text,
       })
@@ -218,7 +286,7 @@ async function sendTestEmails() {
     }
 
     // Add a small delay between emails to avoid rate limiting
-    if (i < emails.length - 1) {
+    if (i < emailsToSend.length - 1) {
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
 
@@ -226,22 +294,15 @@ async function sendTestEmails() {
   }
 
   console.log("📊 Summary:")
-  console.log(`   ✅ Successfully sent: ${successCount}/10`)
+  console.log(`   ✅ Successfully sent: ${successCount}/${emailsToSend.length}`)
   if (failedCount > 0) {
-    console.log(`   ❌ Failed: ${failedCount}/10`)
+    console.log(`   ❌ Failed: ${failedCount}/${emailsToSend.length}`)
   }
   console.log(`\n📧 Check your inbox at: ${TEST_EMAIL}`)
   console.log("\n📋 Email Templates Tested:")
-  console.log("   1. Player Claim New (Admin)")
-  console.log("   2. Player Claim Approved")
-  console.log("   3. Player Claim Rejected")
-  console.log("   4. Attendance Claim New (Organizer)")
-  console.log("   5. Attendance Claim Approved")
-  console.log("   6. Attendance Claim Rejected")
-  console.log("   7. Ticket Confirmation")
-  console.log("   8. Ticket Order Refund")
-  console.log("   9. Player Invitation")
-  console.log("   10. Payment Failed")
+  emailsToSend.forEach((email, index) => {
+    console.log(`   ${index + 1}. ${email.name}`)
+  })
 }
 
 // Run the test

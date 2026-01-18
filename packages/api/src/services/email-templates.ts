@@ -14,6 +14,7 @@ import {
 import { nameToUsername } from "../libs/strings"
 import TicketConfirmationEmail from "../emails/ticket-confirmation"
 import PlayerInvitationEmail from "../emails/player-invitation"
+import TicketSoldNotificationEmail from "../emails/ticket-sold-notification"
 
 /**
  * Send order confirmation email with calendar attachment
@@ -142,6 +143,81 @@ export async function sendOrderConfirmationEmail(
   } catch (error: any) {
     strapi.log.error(
       `[EmailTemplates] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message}`
+    )
+  }
+}
+
+/**
+ * Notify event organizers when tickets are sold
+ */
+export async function sendTicketSoldNotificationEmail(
+  strapi: Core.Strapi,
+  order: any,
+  createdTickets: Array<{
+    ticketCode: string
+    ticketTypeName: string
+    attendeeName: string
+    attendeeEmail: string
+  }>
+) {
+  const contactEmail = order.event?.contactEmail
+  if (!contactEmail) {
+    strapi.log.info(
+      `[EmailTemplates] Ticket sale notification skipped for order ${order.orderNumber}: missing event contact email`
+    )
+    return
+  }
+
+  const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
+  const tickets = createdTickets.map((ticket) => ({
+    ticketTypeName: ticket.ticketTypeName,
+    attendeeName: ticket.attendeeName,
+    attendeeEmail: ticket.attendeeEmail,
+  }))
+
+  try {
+    const html = await render(
+      TicketSoldNotificationEmail({
+        eventName: order.event?.name || "Event",
+        eventSlug: order.event?.slug,
+        orderNumber: order.orderNumber,
+        purchaserName: order.purchaserName,
+        purchaserEmail: order.purchaserEmail,
+        currency: order.currency,
+        totalAmount: order.totalAmount,
+        tickets,
+        frontendUrl,
+      })
+    )
+
+    const text = await render(
+      TicketSoldNotificationEmail({
+        eventName: order.event?.name || "Event",
+        eventSlug: order.event?.slug,
+        orderNumber: order.orderNumber,
+        purchaserName: order.purchaserName,
+        purchaserEmail: order.purchaserEmail,
+        currency: order.currency,
+        totalAmount: order.totalAmount,
+        tickets,
+        frontendUrl,
+      }),
+      { plainText: true }
+    )
+
+    await strapi.plugin("email").service("email").send({
+      to: contactEmail,
+      subject: `[#play14] New ticket order for ${order.event?.name || "an event"}`,
+      html,
+      text,
+    })
+
+    strapi.log.info(
+      `[EmailTemplates] Ticket sale notification sent to ${contactEmail} for order ${order.orderNumber}`
+    )
+  } catch (error: any) {
+    strapi.log.error(
+      `[EmailTemplates] Failed to send ticket sale notification for order ${order.orderNumber}: ${error.message}`
     )
   }
 }
