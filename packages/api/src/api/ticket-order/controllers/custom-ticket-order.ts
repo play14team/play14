@@ -1915,10 +1915,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       notes: order.status === "refunded" ? "This order has been refunded." : undefined,
     }
 
-    // Logo path - use local copy in public/images (works in production)
+    // Logo path - anchor to app root so it works in both src and dist builds
     const logoPath = join(
-      __dirname,
-      "../../../../public/images/play14_600x200_transparent-light.png"
+      process.cwd(),
+      "public/images/play14_600x200_transparent-light.png"
     )
 
     try {

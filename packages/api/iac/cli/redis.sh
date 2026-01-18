@@ -14,18 +14,20 @@ az containerapp delete \
 
 echo "Create Redis container $APP with secret"
 az containerapp create \
-  --name $APP \
-  --resource-group $RG \
-  --environment $CONTAINER_ENV \
-  --image redis:8-alpine \
-  --cpu 0.25 \
-  --memory 0.5Gi \
-  --min-replicas 1 \
-  --max-replicas 1 \
-  --ingress internal \
-  --target-port 6379 \
-  --secrets "redis-password=$REDIS_PASSWORD" \
-  --env-vars "REDIS_PASSWORD=secretref:redis-password"
+    --name $APP \
+    --resource-group $RG \
+    --environment $CONTAINER_ENV \
+    --image redis:8-alpine \
+    --cpu 0.25 \
+    --memory 0.5Gi \
+    --min-replicas 1 \
+    --max-replicas 1 \
+    --ingress internal \
+    --transport tcp \
+    --target-port 6379 \
+    --exposed-port 6379 \
+    --secrets "redis-password=$REDIS_PASSWORD" \
+    --env-vars "REDIS_PASSWORD=secretref:redis-password"
 
 echo "Update Redis container $APP to use password from env var"
 YAML_FILE=$(mktemp)
