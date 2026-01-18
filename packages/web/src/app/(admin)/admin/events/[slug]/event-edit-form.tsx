@@ -416,10 +416,12 @@ export default function EventEditForm({
 
         <EventEditActions
           eventSlug={event.slug}
+          eventStatus={form.eventStatus}
           isPublished={isPublished}
           isSubmitting={isSubmitting}
           isPublishing={isPublishing}
           isDirty={isDirty}
+          onEventStatusChange={form.setEventStatus}
           onPublishToggle={handlePublishToggle}
           onDiscard={handleDiscard}
           activeTab={activeTab}
@@ -427,6 +429,9 @@ export default function EventEditForm({
           resultItems={resultItems}
           ticketRevenue={ticketRevenue}
           currency={eventCurrency}
+          ticketTypes={(event.ticketTypes || []) as TicketType[]}
+          registrationLink={form.registrationLink}
+          registrationWidgetCode={form.registrationWidgetCode}
         />
       </div>
 

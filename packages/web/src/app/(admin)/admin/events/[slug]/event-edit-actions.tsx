@@ -5,6 +5,7 @@ import { formatCurrency } from "@/libs/currencies"
 import type { BudgetLineItem } from "./budget.types"
 import type { ResultLineItem } from "./results.types"
 import type { TabId } from "./event-edit-tabs"
+import type { TicketType } from "./ticket-type.action"
 
 interface BudgetSummary {
   totalIncome: number
@@ -14,10 +15,12 @@ interface BudgetSummary {
 
 interface EventEditActionsProps {
   eventSlug: string
+  eventStatus: string
   isPublished: boolean
   isSubmitting: boolean
   isPublishing: boolean
   isDirty: boolean
+  onEventStatusChange: (value: string) => void
   onPublishToggle: () => void
   onDiscard: () => void
   activeTab?: TabId
@@ -25,6 +28,9 @@ interface EventEditActionsProps {
   resultItems?: ResultLineItem[]
   ticketRevenue?: number
   currency?: string
+  ticketTypes?: TicketType[]
+  registrationLink?: string
+  registrationWidgetCode?: string
 }
 
 const INCOME_CATEGORIES = ["tickets", "sponsors", "other_income"] as const
@@ -82,10 +88,12 @@ function calculateResultsSummary(items: ResultLineItem[], ticketRevenue: number 
 
 export default function EventEditActions({
   eventSlug,
+  eventStatus,
   isPublished,
   isSubmitting,
   isPublishing,
   isDirty,
+  onEventStatusChange,
   onPublishToggle,
   onDiscard,
   activeTab,
@@ -93,13 +101,33 @@ export default function EventEditActions({
   resultItems = [],
   ticketRevenue = 0,
   currency = "eur",
+  ticketTypes = [],
+  registrationLink = "",
+  registrationWidgetCode = "",
 }: EventEditActionsProps) {
   const showBudgetSummary = activeTab === "budget" || activeTab === "actuals"
   const budgetSummary = calculateBudgetSummary(budgetItems)
   const resultsSummary = calculateResultsSummary(resultItems, ticketRevenue)
+  const isRegistrationOpen = eventStatus === "Open"
+  const hasInternalTickets = ticketTypes.length > 0
+  const hasExternalRegistration = Boolean(
+    registrationLink.trim() || registrationWidgetCode.trim()
+  )
+  const canOpenRegistration = hasInternalTickets || hasExternalRegistration
+  const openRegistrationHint = isRegistrationOpen
+    ? "Registration is already open."
+    : canOpenRegistration
+    ? "Set the event status to Open."
+    : "Add a ticket type or external registration link/widget to open registration."
 
   // Helper to format currency with event's currency (no decimal places for summary)
   const fmt = (amount: number) => formatCurrency(amount, currency, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+
+  const handleOpenRegistration = () => {
+    if (!isRegistrationOpen && canOpenRegistration) {
+      onEventStatusChange("Open")
+    }
+  }
 
   return (
     <div className="event-edit-actions">
@@ -168,6 +196,17 @@ export default function EventEditActions({
               Publish
             </>
           )}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleOpenRegistration}
+          disabled={isRegistrationOpen || !canOpenRegistration}
+          title={openRegistrationHint}
+          className={`admin-btn admin-btn-block ${isRegistrationOpen ? "admin-btn-secondary" : "admin-btn-success"}`}
+        >
+          <i className="bx bx-door-open"></i>
+          {isRegistrationOpen ? "Registration is open" : "Open registration"}
         </button>
 
         <hr />
