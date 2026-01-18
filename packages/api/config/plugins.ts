@@ -6,7 +6,12 @@ export default ({ env }: { env: any }) => ({
         apiKey: env("RESEND_API_KEY"),
       },
       settings: {
-        defaultFrom: env("RESEND_DEFAULT_FROM", "noreply@play14.org"),
+        defaultFrom: (() => {
+          const rawDefaultFrom = env("RESEND_DEFAULT_FROM", "noreply@play14.org")
+          return rawDefaultFrom.includes("<")
+            ? rawDefaultFrom
+            : `#play14 community <${rawDefaultFrom}>`
+        })(),
         defaultReplyTo: env("RESEND_REPLY_TO", "community@play14.org"),
       },
     },
