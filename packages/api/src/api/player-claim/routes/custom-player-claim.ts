@@ -62,7 +62,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/player-claims/pending",
+      path: "/admin/player-claims/pending",
       handler: "custom-player-claim.getPendingClaims",
       info: { apiName: "player-claim", type: "content-api" },
       config: {
@@ -73,7 +73,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/player-claims/:id/approve",
+      path: "/admin/player-claims/:id/approve",
       handler: "custom-player-claim.approveClaim",
       info: { apiName: "player-claim", type: "content-api" },
       config: {
@@ -84,7 +84,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/player-claims/:id/reject",
+      path: "/admin/player-claims/:id/reject",
       handler: "custom-player-claim.rejectClaim",
       info: { apiName: "player-claim", type: "content-api" },
       config: {

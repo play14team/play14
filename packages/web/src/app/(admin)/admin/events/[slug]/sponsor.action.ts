@@ -150,7 +150,7 @@ export async function updateEventSponsorships(
   sponsorships: Sponsorship[]
 ): Promise<SponsorActionResult<Sponsorship[]>> {
   const result = await strapiFetch<{ data: Sponsorship[] }>(
-    "/events/:slug/sponsorships",
+    "/admin/events/:slug/sponsorships",
     { slug },
     {
       method: "PUT",

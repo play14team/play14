@@ -6,7 +6,7 @@ export default {
   routes: [
     {
       method: "POST",
-      path: "/imports/audience-attendees",
+      path: "/admin/imports/audience-attendees",
       handler: "import.uploadAudienceAttendees",
       info: { apiName: "import", type: "content-api" },
       config: {

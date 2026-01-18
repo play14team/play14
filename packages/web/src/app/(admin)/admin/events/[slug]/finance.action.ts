@@ -36,7 +36,7 @@ export async function updateEventFinance(
   data: FinanceData
 ): Promise<ActionResult<Finance>> {
   const result = await strapiFetch<StrapiDataResponse<Finance>>(
-    "/events/:slug/finance",
+    "/admin/events/:slug/finance",
     { slug },
     {
       method: "PUT",

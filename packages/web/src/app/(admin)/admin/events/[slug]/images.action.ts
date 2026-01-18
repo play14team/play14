@@ -108,7 +108,7 @@ export async function uploadEventImage(
   formData.append("field", field)
 
   const result = await strapiFetchFormData<StrapiDataResponse<EventImage>>(
-    "/events/:slug/images",
+    "/admin/events/:slug/images",
     { slug },
     formData
   )
@@ -138,7 +138,7 @@ export async function setEventImageFromLibrary(
   field: "defaultImage" | "images"
 ): Promise<ImageActionResult<EventImage>> {
   const result = await strapiFetch<StrapiDataResponse<EventImage>>(
-    "/events/:slug/images/:field",
+    "/admin/events/:slug/images/:field",
     { slug, field },
     {
       method: "PUT",
@@ -171,7 +171,7 @@ export async function removeEventImage(
   field: "defaultImage" | "images"
 ): Promise<ImageActionResult> {
   const result = await strapiFetch<void>(
-    "/events/:slug/images/:field/:fileId",
+    "/admin/events/:slug/images/:field/:fileId",
     { slug, field, fileId: String(fileId) },
     { method: "DELETE" }
   )
@@ -225,7 +225,7 @@ export async function listMediaLibraryFiles(
   // Note: This endpoint returns an array directly, not wrapped in { data: ... }
   try {
     const client = await getStrapiClient()
-    const response = await client.fetch(`/media-files?${params}`)
+    const response = await client.fetch(`/admin/media-files?${params}`)
 
     if (!response.ok) {
       const errorData = (await response.json().catch(() => ({}))) as { error?: { message?: string } }
@@ -272,7 +272,7 @@ export async function listMediaLibraryFolders(
 
   // Use custom media-folders endpoint (Strapi upload plugin doesn't expose folders via content-api)
   const result = await strapiFetchWithQuery<StrapiDataResponse<MediaFolder[]>>(
-    "/media-folders",
+    "/admin/media-folders",
     {},
     params
   )

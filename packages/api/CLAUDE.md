@@ -531,12 +531,12 @@ Media files are organized into folders by content type:
 
 **Player Avatars**: `players/`
 
-- Uploaded via `/api/players/me/picture` endpoint
+- Uploaded via `/api/admin/players/me/picture` endpoint
 - Uses `getOrCreateMediaFolder()` in `custom-player.ts`
 
 **Event Images**: `events/{locationSlug}/{eventSlug}/`
 
-- Uploaded via `/api/events/:slug/images` endpoint
+- Uploaded via `/api/admin/events/:slug/images` endpoint
 - Creates nested folder hierarchy: events → location → event
 - Uses `getOrCreateEventImageFolder()` in `custom-event.ts`
 - Falls back to `unknown-location` if event has no location set

@@ -116,7 +116,7 @@ export async function getEventPreview(
   slug: string
 ): Promise<PreviewEvent | null> {
   const result = await strapiFetch<{ data: PreviewEvent }>(
-    "/events/:slug/preview",
+    "/admin/events/:slug/preview",
     { slug },
     { cache: "no-store" }
   )

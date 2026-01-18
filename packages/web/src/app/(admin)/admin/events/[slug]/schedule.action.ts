@@ -14,7 +14,7 @@ export async function updateEventSchedule(
   timetable: TimetableDay[]
 ): Promise<ActionResult<TimetableDay[]>> {
   const result = await strapiFetch<{ data: TimetableDay[] }>(
-    "/events/:slug/schedule",
+    "/admin/events/:slug/schedule",
     { slug },
     {
       method: "PUT",

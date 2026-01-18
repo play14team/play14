@@ -49,7 +49,7 @@ export async function getEventDiscountCodes(
   eventId: string
 ): Promise<ActionResult<DiscountCode[]>> {
   const result = await strapiFetch<StrapiDataResponse<DiscountCode[]>>(
-    "/events/:eventId/discount-codes",
+    "/admin/events/:eventId/discount-codes",
     { eventId },
     { cache: "no-store" }
   )
@@ -75,7 +75,7 @@ export async function createDiscountCode(
   data: DiscountCodeData
 ): Promise<ActionResult<DiscountCode>> {
   const result = await strapiFetch<StrapiDataResponse<DiscountCode>>(
-    "/events/:eventId/discount-codes",
+    "/admin/events/:eventId/discount-codes",
     { eventId },
     {
       method: "POST",
@@ -104,7 +104,7 @@ export async function updateDiscountCode(
   data: Partial<DiscountCodeData>
 ): Promise<ActionResult<DiscountCode>> {
   const result = await strapiFetch<StrapiDataResponse<DiscountCode>>(
-    "/discount-codes/:discountCodeId",
+    "/admin/discount-codes/:discountCodeId",
     { discountCodeId },
     {
       method: "PUT",
@@ -130,7 +130,7 @@ export async function updateDiscountCode(
  */
 export async function deleteDiscountCode(discountCodeId: string): Promise<ActionResult> {
   const result = await strapiFetch<void>(
-    "/discount-codes/:discountCodeId",
+    "/admin/discount-codes/:discountCodeId",
     { discountCodeId },
     { method: "DELETE" }
   )

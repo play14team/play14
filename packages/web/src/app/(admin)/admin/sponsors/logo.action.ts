@@ -77,7 +77,7 @@ export async function uploadSponsorLogo(
   formData.append("files", file)
 
   const result = await strapiFetchFormData<{ data: SponsorLogo }>(
-    "/sponsors/admin/:sponsorId/logo",
+    "/admin/sponsors/:sponsorId/logo",
     { sponsorId },
     formData
   )
@@ -105,7 +105,7 @@ export async function setSponsorLogoFromLibrary(
   fileId: number
 ): Promise<LogoActionResult<SponsorLogo>> {
   const result = await strapiFetch<{ data: SponsorLogo }>(
-    "/sponsors/admin/:sponsorId/logo/library",
+    "/admin/sponsors/:sponsorId/logo/library",
     { sponsorId },
     {
       method: "PUT",
@@ -134,7 +134,7 @@ export async function removeSponsorLogo(
   sponsorId: string
 ): Promise<LogoActionResult> {
   const result = await strapiFetch(
-    "/sponsors/admin/:sponsorId/logo",
+    "/admin/sponsors/:sponsorId/logo",
     { sponsorId },
     { method: "DELETE" }
   )

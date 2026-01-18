@@ -223,7 +223,7 @@ export async function getEventForEdit(
   slug: string
 ): Promise<EventForEdit | null> {
   const result = await strapiFetch<StrapiDataResponse<EventForEdit>>(
-    "/events/:slug/edit",
+    "/admin/events/:slug/edit",
     { slug },
     { cache: "no-store" }
   )
@@ -240,7 +240,7 @@ export async function updateEvent(
   data: EventUpdateData
 ): Promise<UpdateEventResult> {
   const result = await strapiFetch<StrapiDataResponse<{ documentId: string; slug: string; name: string }>>(
-    "/events/:slug/edit",
+    "/admin/events/:slug/edit",
     { slug },
     {
       method: "PUT",
@@ -266,7 +266,7 @@ export async function updateEvent(
  */
 export async function getLocations(): Promise<LocationOption[]> {
   const result = await strapiFetch<StrapiDataResponse<LocationOption[]>>(
-    "/events/locations",
+    "/admin/events/locations",
     {},
     { cache: "no-store" }
   )
@@ -280,7 +280,7 @@ export async function getLocations(): Promise<LocationOption[]> {
  */
 export async function getVenues(): Promise<VenueOption[]> {
   const result = await strapiFetch<StrapiDataResponse<VenueOption[]>>(
-    "/events/venues",
+    "/admin/events/venues",
     {},
     { cache: "no-store" }
   )
@@ -294,7 +294,7 @@ export async function getVenues(): Promise<VenueOption[]> {
  */
 export async function getOrganizers(): Promise<OrganizerOption[]> {
   const result = await strapiFetch<StrapiDataResponse<OrganizerOption[]>>(
-    "/events/organizers",
+    "/admin/events/organizers",
     {},
     { cache: "no-store" }
   )
@@ -318,7 +318,7 @@ export interface PublishResult {
  */
 export async function publishEvent(slug: string): Promise<PublishResult> {
   const result = await strapiFetch<StrapiDataResponse<{ isPublished: boolean }>>(
-    "/events/:slug/publish",
+    "/admin/events/:slug/publish",
     { slug },
     { method: "POST" }
   )
@@ -341,7 +341,7 @@ export async function publishEvent(slug: string): Promise<PublishResult> {
  */
 export async function unpublishEvent(slug: string): Promise<PublishResult> {
   const result = await strapiFetch<StrapiDataResponse<{ isPublished: boolean }>>(
-    "/events/:slug/unpublish",
+    "/admin/events/:slug/unpublish",
     { slug },
     { method: "POST" }
   )
@@ -366,7 +366,7 @@ export async function getEventPublishStatus(
   slug: string
 ): Promise<{ isPublished: boolean } | null> {
   const result = await strapiFetch<StrapiDataResponse<{ isPublished: boolean }>>(
-    "/events/:slug/preview",
+    "/admin/events/:slug/preview",
     { slug },
     { cache: "no-store" }
   )

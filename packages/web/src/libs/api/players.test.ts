@@ -118,7 +118,7 @@ describe("Player API Client", () => {
         player: mockPlayer,
       })
       expect(strapiClient.strapiFetchFormData).toHaveBeenCalledWith(
-        "/players/me/picture",
+        "/admin/players/me/picture",
         {},
         expect.any(FormData)
       )
@@ -181,7 +181,7 @@ describe("Player API Client", () => {
         player: mockPlayer,
       })
       expect(strapiClient.strapiFetch).toHaveBeenCalledWith(
-        "/players/me/picture",
+        "/admin/players/me/picture",
         {},
         { method: "DELETE" }
       )

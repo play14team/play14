@@ -66,9 +66,9 @@ export function validatePathSegments(
  *
  * @example
  * ```typescript
- * // Instead of: `${STRAPI_URL}/api/events/${slug}/edit`
- * // Use: buildApiUrl('/events/:slug/edit', { slug })
- * const url = buildApiUrl('/events/:slug/edit', { slug })
+ * // Instead of: `${STRAPI_URL}/api/admin/events/${slug}/edit`
+ * // Use: buildApiUrl('/admin/events/:slug/edit', { slug })
+ * const url = buildApiUrl('/admin/events/:slug/edit', { slug })
  * ```
  */
 export function buildApiUrl(
@@ -465,7 +465,7 @@ async function getClientForOptions(options: Pick<StrapiFetchOptions, "noAuth" | 
  * Safe fetch using @strapi/client with SSRF-protected path building.
  * Validates all path parameters before making the request.
  *
- * @param pathTemplate - Path template with :param placeholders (e.g., "/events/:slug/edit")
+ * @param pathTemplate - Path template with :param placeholders (e.g., "/admin/events/:slug/edit")
  * @param params - Object mapping param names to values
  * @param options - Fetch options (method, body, headers, noAuth, optionalAuth)
  * @returns Promise with fetch result
@@ -473,10 +473,10 @@ async function getClientForOptions(options: Pick<StrapiFetchOptions, "noAuth" | 
  * @example
  * ```typescript
  * // GET request
- * const result = await strapiFetch<EventData>("/events/:slug/edit", { slug })
+ * const result = await strapiFetch<EventData>("/admin/events/:slug/edit", { slug })
  *
  * // POST request with body
- * const result = await strapiFetch<EventData>("/events/:slug/publish", { slug }, {
+ * const result = await strapiFetch<EventData>("/admin/events/:slug/publish", { slug }, {
  *   method: "POST",
  *   body: { data: { ... } }
  * })

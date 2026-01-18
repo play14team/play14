@@ -44,7 +44,7 @@ export interface CreateEventResult {
  */
 export async function getLocations(): Promise<LocationOption[]> {
   const result = await strapiFetch<{ data: LocationOption[] }>(
-    "/events/locations",
+    "/admin/events/locations",
     {},
     { cache: "no-store" }
   )
@@ -58,7 +58,7 @@ export async function getLocations(): Promise<LocationOption[]> {
  */
 export async function getVenues(): Promise<VenueOption[]> {
   const result = await strapiFetch<{ data: VenueOption[] }>(
-    "/events/venues",
+    "/admin/events/venues",
     {},
     { cache: "no-store" }
   )
@@ -74,7 +74,7 @@ export async function createEvent(
   data: EventCreateData
 ): Promise<CreateEventResult> {
   const result = await strapiFetch<{ data: CreateEventResult["event"] }>(
-    "/events/create",
+    "/admin/events/create",
     {},
     {
       method: "POST",

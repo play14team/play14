@@ -27,7 +27,7 @@ export async function updateEventMediaLinks(
   media: MediaLink[]
 ): Promise<ActionResult<MediaLink[]>> {
   const result = await strapiFetch<StrapiDataResponse<MediaLink[]>>(
-    "/events/:slug/media-links",
+    "/admin/events/:slug/media-links",
     { slug },
     {
       method: "PUT",

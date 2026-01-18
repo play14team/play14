@@ -38,6 +38,7 @@ describe("Event Results Reminders Integration", () => {
   beforeEach(async () => {
     await cleanupTestData(strapi)
     vi.useRealTimers()
+    vi.clearAllMocks()
 
     // Spy on email sending
     emailSendSpy = vi.spyOn(strapi.plugin("email").service("email"), "send")

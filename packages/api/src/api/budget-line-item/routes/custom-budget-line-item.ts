@@ -6,7 +6,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/events/:eventId/budget-items",
+      path: "/admin/events/:eventId/budget-items",
       handler: "custom-budget-line-item.list",
       info: { apiName: "budget-line-item", type: "content-api" },
       config: {
@@ -15,7 +15,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/events/:eventId/budget-items",
+      path: "/admin/events/:eventId/budget-items",
       handler: "custom-budget-line-item.create",
       info: { apiName: "budget-line-item", type: "content-api" },
       config: {
@@ -24,7 +24,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/budget-items/:id",
+      path: "/admin/budget-items/:id",
       handler: "custom-budget-line-item.update",
       info: { apiName: "budget-line-item", type: "content-api" },
       config: {
@@ -33,7 +33,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/budget-items/:id",
+      path: "/admin/budget-items/:id",
       handler: "custom-budget-line-item.delete",
       info: { apiName: "budget-line-item", type: "content-api" },
       config: {
@@ -42,7 +42,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:eventId/budget-items/bulk",
+      path: "/admin/events/:eventId/budget-items/bulk",
       handler: "custom-budget-line-item.bulkUpdate",
       info: { apiName: "budget-line-item", type: "content-api" },
       config: {

@@ -57,7 +57,7 @@ export async function updatePlayerProfile(
   const requestBody = { data: requestData }
 
   const result = await strapiFetch(
-    "/players/me",
+    "/admin/players/me",
     {},
     {
       method: "PUT",

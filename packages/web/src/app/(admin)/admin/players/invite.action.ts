@@ -61,7 +61,7 @@ export async function searchPlayersForInvite(
   }
 
   const result = await strapiFetchWithQuery<PlayersForInviteResponse>(
-    "/players/list",
+    "/admin/players/list",
     {},
     queryParams,
     { cache: "no-store" }
@@ -89,7 +89,7 @@ export async function getPlayerForInvite(
 ): Promise<PlayerForInvite | null> {
   // Use the getPlayerForEdit endpoint but we only need basic info + user relation
   const result = await strapiFetch<{ data: PlayerForInvite }>(
-    "/players/:playerId/edit",
+    "/admin/players/:playerId/edit",
     { playerId },
     { cache: "no-store" }
   )
@@ -120,7 +120,7 @@ export async function sendSingleInvite(
     message?: string
     userStatus?: "new" | "invited" | "accepted"
   }>(
-    "/players/:playerId/send-invite",
+    "/admin/players/:playerId/send-invite",
     { playerId },
     {
       method: "POST",

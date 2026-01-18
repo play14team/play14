@@ -60,6 +60,9 @@ export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
   // Disable cron jobs in tests
   process.env.CRON_ENABLED = "false"
 
+  // Ensure event results reminders are enabled for integration tests
+  process.env.EVENT_RESULTS_REMINDERS_ENABLED = "true"
+
   // Dynamic import of Strapi
   // For TypeScript projects, we need distDir for compiled controllers/routes
   // The global setup ensures Strapi is built before tests run

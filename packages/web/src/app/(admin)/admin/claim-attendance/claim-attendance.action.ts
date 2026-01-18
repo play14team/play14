@@ -68,7 +68,7 @@ interface EventsDataResponse {
 
 export async function getClaimableEvents(): Promise<EventsResponse> {
   const result = await strapiFetch<EventsDataResponse>(
-    "/attendance-claims/events",
+    "/admin/attendance-claims/events",
     {},
     { cache: "no-store" }
   )
@@ -95,7 +95,7 @@ export async function searchClaimableEvents(query: string): Promise<EventsRespon
   // Note: query is validated as a search string, not a path segment
   // It's passed as a query parameter, so encodeURIComponent is sufficient
   const result = await strapiFetchWithQuery<EventsDataResponse>(
-    "/attendance-claims/events/search",
+    "/admin/attendance-claims/events/search",
     {},
     { query },
     { cache: "no-store" }
@@ -121,7 +121,7 @@ export async function searchClaimableEvents(query: string): Promise<EventsRespon
 
 export async function getMyAttendanceClaims(): Promise<ClaimsResponse> {
   const result = await strapiFetch<StrapiDataResponse<AttendanceClaim[]>>(
-    "/attendance-claims/me",
+    "/admin/attendance-claims/me",
     {},
     { cache: "no-store" }
   )
@@ -159,7 +159,7 @@ export async function submitAttendanceClaim(
   }
 
   const result = await strapiFetch<StrapiDataResponse<AttendanceClaim>>(
-    "/attendance-claims",
+    "/admin/attendance-claims",
     {},
     {
       method: "POST",
@@ -192,7 +192,7 @@ export async function submitAttendanceClaim(
 
 export async function cancelAttendanceClaim(claimId: string): Promise<ClaimActionResponse> {
   const result = await strapiFetch<void>(
-    "/attendance-claims/:claimId",
+    "/admin/attendance-claims/:claimId",
     { claimId },
     { method: "DELETE" }
   )

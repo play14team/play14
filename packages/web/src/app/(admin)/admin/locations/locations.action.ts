@@ -70,7 +70,7 @@ export async function getLocations(
   }
 
   const result = await strapiFetchWithQuery<LocationsListResponse>(
-    "/event-locations/admin",
+    "/admin/event-locations",
     {},
     queryParams,
     { cache: "no-store" }
@@ -91,7 +91,7 @@ export async function getLocationForEdit(
   locationId: string
 ): Promise<LocationForEdit | null> {
   const result = await strapiFetch<{ data: LocationForEdit }>(
-    "/event-locations/admin/:locationId",
+    "/admin/event-locations/:locationId",
     { locationId },
     { cache: "no-store" }
   )
@@ -113,7 +113,7 @@ export async function createLocation(
   data: LocationCreateData
 ): Promise<{ success: boolean; error?: string; documentId?: string }> {
   const result = await strapiFetch<{ data: { documentId: string } }>(
-    "/event-locations/admin",
+    "/admin/event-locations",
     {},
     {
       method: "POST",
@@ -145,7 +145,7 @@ export async function updateLocation(
   data: LocationUpdateData
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/event-locations/admin/:locationId",
+    "/admin/event-locations/:locationId",
     { locationId },
     {
       method: "PUT",
@@ -170,7 +170,7 @@ export async function deleteLocation(
   locationId: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/event-locations/admin/:locationId",
+    "/admin/event-locations/:locationId",
     { locationId },
     { method: "DELETE" }
   )

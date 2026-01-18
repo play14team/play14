@@ -7,7 +7,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/sponsors/admin",
+      path: "/admin/sponsors",
       handler: "custom-sponsor.list",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -18,7 +18,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/sponsors/admin/:id",
+      path: "/admin/sponsors/:id",
       handler: "custom-sponsor.findOne",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -29,7 +29,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/sponsors/admin",
+      path: "/admin/sponsors",
       handler: "custom-sponsor.create",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -40,7 +40,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/sponsors/admin/:id",
+      path: "/admin/sponsors/:id",
       handler: "custom-sponsor.update",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -51,7 +51,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/sponsors/admin/:id",
+      path: "/admin/sponsors/:id",
       handler: "custom-sponsor.delete",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -62,7 +62,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/sponsors/admin/:id/logo",
+      path: "/admin/sponsors/:id/logo",
       handler: "custom-sponsor.uploadLogo",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -73,7 +73,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/sponsors/admin/:id/logo/library",
+      path: "/admin/sponsors/:id/logo/library",
       handler: "custom-sponsor.setLogoFromLibrary",
       info: { apiName: "sponsor", type: "content-api" },
       config: {
@@ -84,7 +84,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/sponsors/admin/:id/logo",
+      path: "/admin/sponsors/:id/logo",
       handler: "custom-sponsor.removeLogo",
       info: { apiName: "sponsor", type: "content-api" },
       config: {

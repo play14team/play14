@@ -6,7 +6,7 @@ export default {
   routes: [
     {
       method: "POST",
-      path: "/events/:eventId/ticket-types",
+      path: "/admin/events/:eventId/ticket-types",
       handler: "custom-ticket-type.createTicketType",
       info: { apiName: "ticket-type", type: "content-api" },
       config: {
@@ -15,7 +15,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/ticket-types/:id",
+      path: "/admin/ticket-types/:id",
       handler: "custom-ticket-type.updateTicketType",
       info: { apiName: "ticket-type", type: "content-api" },
       config: {
@@ -24,7 +24,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/ticket-types/:id",
+      path: "/admin/ticket-types/:id",
       handler: "custom-ticket-type.deleteTicketType",
       info: { apiName: "ticket-type", type: "content-api" },
       config: {
@@ -33,7 +33,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/:eventId/orders",
+      path: "/admin/events/:eventId/orders",
       handler: "custom-ticket-type.getEventOrders",
       info: { apiName: "ticket-type", type: "content-api" },
       config: {

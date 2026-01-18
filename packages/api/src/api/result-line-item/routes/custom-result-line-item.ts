@@ -6,7 +6,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/events/:eventId/result-items",
+      path: "/admin/events/:eventId/result-items",
       handler: "custom-result-line-item.list",
       info: { apiName: "result-line-item", type: "content-api" },
       config: {
@@ -15,7 +15,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/events/:eventId/result-items",
+      path: "/admin/events/:eventId/result-items",
       handler: "custom-result-line-item.create",
       info: { apiName: "result-line-item", type: "content-api" },
       config: {
@@ -24,7 +24,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/result-items/:id",
+      path: "/admin/result-items/:id",
       handler: "custom-result-line-item.update",
       info: { apiName: "result-line-item", type: "content-api" },
       config: {
@@ -33,7 +33,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/result-items/:id",
+      path: "/admin/result-items/:id",
       handler: "custom-result-line-item.delete",
       info: { apiName: "result-line-item", type: "content-api" },
       config: {
@@ -42,7 +42,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:eventId/result-items/bulk",
+      path: "/admin/events/:eventId/result-items/bulk",
       handler: "custom-result-line-item.bulkUpdate",
       info: { apiName: "result-line-item", type: "content-api" },
       config: {

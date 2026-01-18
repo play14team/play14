@@ -83,7 +83,7 @@ export async function uploadVenueLogo(
   formData.append("files", file)
 
   const result = await strapiFetchFormData<{ data: VenueLogo }>(
-    "/venues/admin/:venueId/logo",
+    "/admin/venues/:venueId/logo",
     { venueId },
     formData
   )
@@ -111,7 +111,7 @@ export async function setVenueLogoFromLibrary(
   fileId: number
 ): Promise<LogoActionResult<VenueLogo>> {
   const result = await strapiFetch<{ data: VenueLogo }>(
-    "/venues/admin/:venueId/logo/library",
+    "/admin/venues/:venueId/logo/library",
     { venueId },
     {
       method: "PUT",
@@ -138,7 +138,7 @@ export async function setVenueLogoFromLibrary(
  */
 export async function removeVenueLogo(venueId: string): Promise<LogoActionResult> {
   const result = await strapiFetch(
-    "/venues/admin/:venueId/logo",
+    "/admin/venues/:venueId/logo",
     { venueId },
     { method: "DELETE" }
   )

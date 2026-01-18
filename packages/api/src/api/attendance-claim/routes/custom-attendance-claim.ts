@@ -7,7 +7,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/attendance-claims/events",
+      path: "/admin/attendance-claims/events",
       handler: "custom-attendance-claim.getOverEvents",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -18,7 +18,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/attendance-claims/events/search",
+      path: "/admin/attendance-claims/events/search",
       handler: "custom-attendance-claim.searchEvents",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -29,7 +29,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/attendance-claims/me",
+      path: "/admin/attendance-claims/me",
       handler: "custom-attendance-claim.getMyClaims",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -40,7 +40,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/attendance-claims",
+      path: "/admin/attendance-claims",
       handler: "custom-attendance-claim.submitClaim",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -51,7 +51,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/attendance-claims/:id",
+      path: "/admin/attendance-claims/:id",
       handler: "custom-attendance-claim.cancelClaim",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -62,7 +62,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/attendance-claims/for-my-events",
+      path: "/admin/attendance-claims/for-my-events",
       handler: "custom-attendance-claim.getPendingClaimsForMyEvents",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -73,7 +73,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/attendance-claims/:id/approve",
+      path: "/admin/attendance-claims/:id/approve",
       handler: "custom-attendance-claim.approveClaim",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {
@@ -84,7 +84,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/attendance-claims/:id/reject",
+      path: "/admin/attendance-claims/:id/reject",
       handler: "custom-attendance-claim.rejectClaim",
       info: { apiName: "attendance-claim", type: "content-api" },
       config: {

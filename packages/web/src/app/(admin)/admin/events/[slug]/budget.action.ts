@@ -14,7 +14,7 @@ export async function getBudgetItems(
   eventDocumentId: string
 ): Promise<ActionResult<BudgetLineItem[]>> {
   const result = await strapiFetch<StrapiDataResponse<BudgetLineItem[]>>(
-    "/events/:eventId/budget-items",
+    "/admin/events/:eventId/budget-items",
     { eventId: eventDocumentId },
     { method: "GET" }
   )
@@ -40,7 +40,7 @@ export async function createBudgetItem(
   item: Omit<BudgetLineItem, "id" | "documentId">
 ): Promise<ActionResult<BudgetLineItem>> {
   const result = await strapiFetch<StrapiDataResponse<BudgetLineItem>>(
-    "/events/:eventId/budget-items",
+    "/admin/events/:eventId/budget-items",
     { eventId: eventDocumentId },
     {
       method: "POST",
@@ -69,7 +69,7 @@ export async function updateBudgetItem(
   data: Partial<BudgetLineItem>
 ): Promise<ActionResult<BudgetLineItem>> {
   const result = await strapiFetch<StrapiDataResponse<BudgetLineItem>>(
-    "/budget-items/:id",
+    "/admin/budget-items/:id",
     { id: itemDocumentId },
     {
       method: "PUT",
@@ -95,7 +95,7 @@ export async function updateBudgetItem(
  */
 export async function deleteBudgetItem(itemDocumentId: string): Promise<ActionResult> {
   const result = await strapiFetch<StrapiDataResponse<{ success: boolean }>>(
-    "/budget-items/:id",
+    "/admin/budget-items/:id",
     { id: itemDocumentId },
     { method: "DELETE" }
   )
@@ -120,7 +120,7 @@ export async function bulkUpdateBudgetItems(
   items: Array<Partial<BudgetLineItem> & { documentId?: string }>
 ): Promise<ActionResult<BudgetLineItem[]>> {
   const result = await strapiFetch<StrapiDataResponse<BudgetLineItem[]>>(
-    "/events/:eventId/budget-items/bulk",
+    "/admin/events/:eventId/budget-items/bulk",
     { eventId: eventDocumentId },
     {
       method: "PUT",

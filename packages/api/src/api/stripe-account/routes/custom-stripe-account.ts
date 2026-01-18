@@ -6,7 +6,7 @@ export default {
   routes: [
     {
       method: "POST",
-      path: "/stripe/connect/create-account",
+      path: "/admin/stripe/connect/create-account",
       handler: "custom-stripe-account.createAccount",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {
@@ -15,7 +15,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/stripe/connect/onboarding-link",
+      path: "/admin/stripe/connect/onboarding-link",
       handler: "custom-stripe-account.getOnboardingLink",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {
@@ -24,7 +24,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/stripe/connect/dashboard-link",
+      path: "/admin/stripe/connect/dashboard-link",
       handler: "custom-stripe-account.getDashboardLink",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {
@@ -33,7 +33,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/stripe/connect/status",
+      path: "/admin/stripe/connect/status",
       handler: "custom-stripe-account.getAccountStatus",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {
@@ -42,7 +42,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/stripe/connect/link-event/:eventId",
+      path: "/admin/stripe/connect/link-event/:eventId",
       handler: "custom-stripe-account.linkAccountToEvent",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {
@@ -51,7 +51,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/stripe/connect/unlink-event/:eventId",
+      path: "/admin/stripe/connect/unlink-event/:eventId",
       handler: "custom-stripe-account.unlinkAccountFromEvent",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {
@@ -60,7 +60,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/stripe/connect/event/:eventId/accounts",
+      path: "/admin/stripe/connect/event/:eventId/accounts",
       handler: "custom-stripe-account.getEventHostAccounts",
       info: { apiName: "stripe-account", type: "content-api" },
       config: {

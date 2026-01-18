@@ -89,7 +89,7 @@ export async function getVenues(
   }
 
   const result = await strapiFetchWithQuery<VenuesListResponse>(
-    "/venues/admin",
+    "/admin/venues",
     {},
     queryParams,
     { cache: "no-store" }
@@ -110,7 +110,7 @@ export async function getVenueForEdit(
   venueId: string
 ): Promise<VenueForEdit | null> {
   const result = await strapiFetch<{ data: VenueForEdit }>(
-    "/venues/admin/:venueId",
+    "/admin/venues/:venueId",
     { venueId },
     { cache: "no-store" }
   )
@@ -133,7 +133,7 @@ export async function createVenue(
   data: VenueCreateData
 ): Promise<{ success: boolean; error?: string; documentId?: string }> {
   const result = await strapiFetch<{ data: { documentId: string } }>(
-    "/venues/admin",
+    "/admin/venues",
     {},
     {
       method: "POST",
@@ -166,7 +166,7 @@ export async function updateVenue(
   data: VenueUpdateData
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/venues/admin/:venueId",
+    "/admin/venues/:venueId",
     { venueId },
     {
       method: "PUT",
@@ -191,7 +191,7 @@ export async function deleteVenue(
   venueId: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/venues/admin/:venueId",
+    "/admin/venues/:venueId",
     { venueId },
     { method: "DELETE" }
   )

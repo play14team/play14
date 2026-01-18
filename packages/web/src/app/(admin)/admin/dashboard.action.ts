@@ -39,7 +39,7 @@ export async function getDashboardData(): Promise<DashboardData> {
 
   // Fetch stats from the API
   const result = await strapiFetch<{ data: DashboardData }>(
-    "/players/me/dashboard",
+    "/admin/players/me/dashboard",
     {},
     { cache: "no-store" }
   )

@@ -6,7 +6,7 @@ export default {
   routes: [
     {
       method: "POST",
-      path: "/events/:eventId/discount-codes",
+      path: "/admin/events/:eventId/discount-codes",
       handler: "custom-discount-code.createDiscountCode",
       info: { apiName: "discount-code", type: "content-api" },
       config: {
@@ -15,7 +15,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/:eventId/discount-codes",
+      path: "/admin/events/:eventId/discount-codes",
       handler: "custom-discount-code.getEventDiscountCodes",
       info: { apiName: "discount-code", type: "content-api" },
       config: {
@@ -24,7 +24,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/discount-codes/:id",
+      path: "/admin/discount-codes/:id",
       handler: "custom-discount-code.updateDiscountCode",
       info: { apiName: "discount-code", type: "content-api" },
       config: {
@@ -33,7 +33,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/discount-codes/:id",
+      path: "/admin/discount-codes/:id",
       handler: "custom-discount-code.deleteDiscountCode",
       info: { apiName: "discount-code", type: "content-api" },
       config: {

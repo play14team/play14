@@ -60,7 +60,7 @@ export interface HostStripeAccount {
  */
 export async function getStripeAccountStatus(): Promise<StripeAccountStatus | null> {
   const result = await strapiFetch<{ data: StripeAccountStatus }>(
-    "/stripe/connect/status",
+    "/admin/stripe/connect/status",
     {},
     { cache: "no-store" }
   )
@@ -77,7 +77,7 @@ export async function createStripeAccount(
   businessType: "individual" | "company" = "individual"
 ): Promise<CreateAccountResult> {
   const result = await strapiFetch<{ data: CreateAccountResult["data"] }>(
-    "/stripe/connect/create-account",
+    "/admin/stripe/connect/create-account",
     {},
     {
       method: "POST",
@@ -108,7 +108,7 @@ export async function getOnboardingUrl(returnPath: string): Promise<OnboardingLi
   const refreshUrl = `${baseUrl}${returnPath}?refresh=true`
 
   const result = await strapiFetchWithQuery<{ data: { url: string; expiresAt?: string } }>(
-    "/stripe/connect/onboarding-link",
+    "/admin/stripe/connect/onboarding-link",
     {},
     {
       returnUrl: returnUrl,
@@ -135,7 +135,7 @@ export async function getOnboardingUrl(returnPath: string): Promise<OnboardingLi
  */
 export async function getDashboardUrl(): Promise<DashboardLinkResult> {
   const result = await strapiFetch<{ data: { url: string } }>(
-    "/stripe/connect/dashboard-link",
+    "/admin/stripe/connect/dashboard-link",
     {}
   )
 
@@ -157,7 +157,7 @@ export async function getDashboardUrl(): Promise<DashboardLinkResult> {
  */
 export async function getEventHostAccounts(eventId: string): Promise<HostStripeAccount[]> {
   const result = await strapiFetch<{ data: HostStripeAccount[] }>(
-    "/stripe/connect/event/:eventId/accounts",
+    "/admin/stripe/connect/event/:eventId/accounts",
     { eventId },
     { cache: "no-store" }
   )
@@ -176,7 +176,7 @@ export async function linkStripeAccountToEvent(
   stripeAccountId: string
 ): Promise<LinkAccountResult> {
   const result = await strapiFetch(
-    "/stripe/connect/link-event/:eventId",
+    "/admin/stripe/connect/link-event/:eventId",
     { eventId },
     {
       method: "POST",
@@ -199,7 +199,7 @@ export async function linkStripeAccountToEvent(
  */
 export async function unlinkStripeAccountFromEvent(eventId: string): Promise<LinkAccountResult> {
   const result = await strapiFetch(
-    "/stripe/connect/unlink-event/:eventId",
+    "/admin/stripe/connect/unlink-event/:eventId",
     { eventId },
     { method: "POST" }
   )

@@ -43,7 +43,7 @@ export async function createTicketType(
   data: TicketTypeData
 ): Promise<ActionResult<TicketType>> {
   const result = await strapiFetch<{ data: TicketType }>(
-    "/events/:eventId/ticket-types",
+    "/admin/events/:eventId/ticket-types",
     { eventId },
     {
       method: "POST",
@@ -72,7 +72,7 @@ export async function updateTicketType(
   data: Partial<TicketTypeData>
 ): Promise<ActionResult<TicketType>> {
   const result = await strapiFetch<{ data: TicketType }>(
-    "/ticket-types/:ticketTypeId",
+    "/admin/ticket-types/:ticketTypeId",
     { ticketTypeId },
     {
       method: "PUT",
@@ -98,7 +98,7 @@ export async function updateTicketType(
  */
 export async function deleteTicketType(ticketTypeId: string): Promise<ActionResult> {
   const result = await strapiFetch(
-    "/ticket-types/:ticketTypeId",
+    "/admin/ticket-types/:ticketTypeId",
     { ticketTypeId },
     { method: "DELETE" }
   )
@@ -123,7 +123,7 @@ export async function reorderTicketTypes(
   // Update sortOrder for each ticket type
   const updatePromises = orderedIds.map((documentId, index) =>
     strapiFetch(
-      "/ticket-types/:documentId",
+      "/admin/ticket-types/:documentId",
       { documentId },
       {
         method: "PUT",

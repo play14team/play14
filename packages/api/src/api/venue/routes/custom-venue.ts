@@ -7,7 +7,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/venues/admin",
+      path: "/admin/venues",
       handler: "custom-venue.list",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -18,7 +18,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/venues/admin/:id",
+      path: "/admin/venues/:id",
       handler: "custom-venue.findOne",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -29,7 +29,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/venues/admin",
+      path: "/admin/venues",
       handler: "custom-venue.create",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -40,7 +40,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/venues/admin/:id",
+      path: "/admin/venues/:id",
       handler: "custom-venue.update",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -51,7 +51,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/venues/admin/:id",
+      path: "/admin/venues/:id",
       handler: "custom-venue.delete",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -62,7 +62,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/venues/admin/:id/logo",
+      path: "/admin/venues/:id/logo",
       handler: "custom-venue.uploadLogo",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -73,7 +73,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/venues/admin/:id/logo/library",
+      path: "/admin/venues/:id/logo/library",
       handler: "custom-venue.setLogoFromLibrary",
       info: { apiName: "venue", type: "content-api" },
       config: {
@@ -84,7 +84,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/venues/admin/:id/logo",
+      path: "/admin/venues/:id/logo",
       handler: "custom-venue.removeLogo",
       info: { apiName: "venue", type: "content-api" },
       config: {

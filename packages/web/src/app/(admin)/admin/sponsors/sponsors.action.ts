@@ -80,7 +80,7 @@ export async function getSponsors(
   }
 
   const result = await strapiFetchWithQuery<SponsorsListResponse>(
-    "/sponsors/admin",
+    "/admin/sponsors",
     {},
     queryParams,
     { cache: "no-store" }
@@ -101,7 +101,7 @@ export async function getSponsorForEdit(
   sponsorId: string
 ): Promise<SponsorForEdit | null> {
   const result = await strapiFetch<{ data: SponsorForEdit }>(
-    "/sponsors/admin/:sponsorId",
+    "/admin/sponsors/:sponsorId",
     { sponsorId },
     { cache: "no-store" }
   )
@@ -123,7 +123,7 @@ export async function createSponsor(
   data: SponsorCreateData
 ): Promise<{ success: boolean; error?: string; documentId?: string }> {
   const result = await strapiFetch<{ data: { documentId: string } }>(
-    "/sponsors/admin",
+    "/admin/sponsors",
     {},
     {
       method: "POST",
@@ -155,7 +155,7 @@ export async function updateSponsor(
   data: SponsorUpdateData
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/sponsors/admin/:sponsorId",
+    "/admin/sponsors/:sponsorId",
     { sponsorId },
     {
       method: "PUT",
@@ -180,7 +180,7 @@ export async function deleteSponsor(
   sponsorId: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/sponsors/admin/:sponsorId",
+    "/admin/sponsors/:sponsorId",
     { sponsorId },
     { method: "DELETE" }
   )

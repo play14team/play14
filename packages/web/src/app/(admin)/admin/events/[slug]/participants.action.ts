@@ -64,7 +64,7 @@ export async function getEventParticipants(
   pageSize: number = 50
 ): Promise<ActionResult<ParticipantsResponse>> {
   const result = await strapiFetchWithQuery<StrapiDataResponse<ParticipantsResponse>>(
-    "/events/:eventDocumentId/participants",
+    "/admin/events/:eventDocumentId/participants",
     { eventDocumentId },
     { page: String(page), pageSize: String(pageSize) },
     { cache: "no-store" }
@@ -91,7 +91,7 @@ export async function checkInParticipant(
   ticketDocumentId: string
 ): Promise<ActionResult<Participant>> {
   const result = await strapiFetch<StrapiDataResponse<Participant>>(
-    "/events/:eventDocumentId/participants/:ticketDocumentId/check-in",
+    "/admin/events/:eventDocumentId/participants/:ticketDocumentId/check-in",
     { eventDocumentId, ticketDocumentId },
     { method: "PUT" }
   )
@@ -117,7 +117,7 @@ export async function undoCheckIn(
   ticketDocumentId: string
 ): Promise<ActionResult<Participant>> {
   const result = await strapiFetch<StrapiDataResponse<Participant>>(
-    "/events/:eventDocumentId/participants/:ticketDocumentId/undo-check-in",
+    "/admin/events/:eventDocumentId/participants/:ticketDocumentId/undo-check-in",
     { eventDocumentId, ticketDocumentId },
     { method: "PUT" }
   )
@@ -142,7 +142,7 @@ export async function getParticipantStats(
   eventDocumentId: string
 ): Promise<ActionResult<{ total: number; checkedIn: number; pending: number }>> {
   const result = await strapiFetch<StrapiDataResponse<{ total: number; checkedIn: number; pending: number }>>(
-    "/events/:eventDocumentId/participants/stats",
+    "/admin/events/:eventDocumentId/participants/stats",
     { eventDocumentId },
     { cache: "no-store" }
   )

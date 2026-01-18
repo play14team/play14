@@ -233,7 +233,7 @@ describe("Stripe Connect Integration", () => {
 
       // Act
       const response = await request(httpServer)
-        .get("/api/stripe/connect/status")
+        .get("/api/admin/stripe/connect/status")
         .set(getAuthHeader(token))
 
       // Assert

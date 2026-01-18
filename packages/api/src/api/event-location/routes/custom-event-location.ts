@@ -7,7 +7,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/event-locations/admin",
+      path: "/admin/event-locations",
       handler: "custom-event-location.list",
       info: { apiName: "event-location", type: "content-api" },
       config: {
@@ -18,7 +18,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/event-locations/admin/:id",
+      path: "/admin/event-locations/:id",
       handler: "custom-event-location.findOne",
       info: { apiName: "event-location", type: "content-api" },
       config: {
@@ -29,7 +29,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/event-locations/admin",
+      path: "/admin/event-locations",
       handler: "custom-event-location.create",
       info: { apiName: "event-location", type: "content-api" },
       config: {
@@ -40,7 +40,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/event-locations/admin/:id",
+      path: "/admin/event-locations/:id",
       handler: "custom-event-location.update",
       info: { apiName: "event-location", type: "content-api" },
       config: {
@@ -51,7 +51,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/event-locations/admin/:id",
+      path: "/admin/event-locations/:id",
       handler: "custom-event-location.delete",
       info: { apiName: "event-location", type: "content-api" },
       config: {

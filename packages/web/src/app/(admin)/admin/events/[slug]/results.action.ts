@@ -14,7 +14,7 @@ export async function getResultItems(
   eventDocumentId: string
 ): Promise<ActionResult<ResultLineItem[]>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem[]>>(
-    "/events/:eventId/result-items",
+    "/admin/events/:eventId/result-items",
     { eventId: eventDocumentId },
     { method: "GET" }
   )
@@ -40,7 +40,7 @@ export async function createResultItem(
   item: Omit<ResultLineItem, "id" | "documentId">
 ): Promise<ActionResult<ResultLineItem>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem>>(
-    "/events/:eventId/result-items",
+    "/admin/events/:eventId/result-items",
     { eventId: eventDocumentId },
     {
       method: "POST",
@@ -69,7 +69,7 @@ export async function updateResultItem(
   data: Partial<ResultLineItem>
 ): Promise<ActionResult<ResultLineItem>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem>>(
-    "/result-items/:id",
+    "/admin/result-items/:id",
     { id: itemDocumentId },
     {
       method: "PUT",
@@ -95,7 +95,7 @@ export async function updateResultItem(
  */
 export async function deleteResultItem(itemDocumentId: string): Promise<ActionResult> {
   const result = await strapiFetch<StrapiDataResponse<{ success: boolean }>>(
-    "/result-items/:id",
+    "/admin/result-items/:id",
     { id: itemDocumentId },
     { method: "DELETE" }
   )
@@ -120,7 +120,7 @@ export async function bulkUpdateResultItems(
   items: Array<Partial<ResultLineItem> & { documentId?: string }>
 ): Promise<ActionResult<ResultLineItem[]>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem[]>>(
-    "/events/:eventId/result-items/bulk",
+    "/admin/events/:eventId/result-items/bulk",
     { eventId: eventDocumentId },
     {
       method: "PUT",

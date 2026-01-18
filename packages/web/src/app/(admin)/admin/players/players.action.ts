@@ -76,7 +76,7 @@ export async function getPlayers(
   }
 
   const result = await strapiFetchWithQuery<PlayersListResponse>(
-    "/players/list",
+    "/admin/players/list",
     {},
     queryParams,
     { cache: "no-store" }
@@ -97,7 +97,7 @@ export async function getPlayerForEdit(
   playerId: string
 ): Promise<PlayerForEdit | null> {
   const result = await strapiFetch<{ data: PlayerForEdit }>(
-    "/players/:playerId/edit",
+    "/admin/players/:playerId/edit",
     { playerId },
     { cache: "no-store" }
   )
@@ -128,7 +128,7 @@ export async function updatePlayer(
   data: PlayerUpdateData
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/players/:playerId",
+    "/admin/players/:playerId",
     { playerId },
     {
       method: "PUT",
@@ -154,7 +154,7 @@ export async function updatePlayerPosition(
   position: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/players/:playerId/position",
+    "/admin/players/:playerId/position",
     { playerId },
     {
       method: "PUT",
@@ -180,7 +180,7 @@ export async function setPlayerAvatarFromLibrary(
   fileId: number
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/players/:playerId/avatar/library",
+    "/admin/players/:playerId/avatar/library",
     { playerId },
     {
       method: "PUT",
@@ -205,7 +205,7 @@ export async function removePlayerAvatar(
   playerId: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
-    "/players/:playerId/avatar",
+    "/admin/players/:playerId/avatar",
     { playerId },
     { method: "DELETE" }
   )
@@ -228,7 +228,7 @@ export async function uploadPlayerAvatar(
   formData: FormData
 ): Promise<{ success: boolean; error?: string; avatarUrl?: string }> {
   const result = await strapiFetchFormData<{ data: { avatar?: { url: string } } }>(
-    "/players/:playerId/avatar/upload",
+    "/admin/players/:playerId/avatar/upload",
     { playerId },
     formData
   )

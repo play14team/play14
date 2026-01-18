@@ -76,7 +76,7 @@ export interface AttendedEventsResponse {
  */
 export async function getMyEvents(): Promise<MyEvent[]> {
   const result = await strapiFetch<{ data: MyEvent[] }>(
-    "/events/my-events",
+    "/admin/events/my-events",
     {},
     { cache: "no-store" }
   )
@@ -134,7 +134,7 @@ export async function cancelAttendanceClaim(claimId: string) {
  */
 export async function getMyAttendedEvents(): Promise<AttendedEventsResponse> {
   const result = await strapiFetch<{ data: AttendedEvent[] }>(
-    "/players/me/attended-events",
+    "/admin/players/me/attended-events",
     {},
     { cache: "no-store" }
   )

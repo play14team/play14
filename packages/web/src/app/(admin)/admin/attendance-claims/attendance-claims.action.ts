@@ -63,7 +63,7 @@ interface StrapiDataResponse<T> {
 
 export async function getPendingAttendanceClaimsForMyEvents(): Promise<ClaimsResponse> {
   const result = await strapiFetch<StrapiDataResponse<AttendanceClaim[]>>(
-    "/attendance-claims/for-my-events",
+    "/admin/attendance-claims/for-my-events",
     {},
     { cache: "no-store" }
   )
@@ -91,7 +91,7 @@ export async function approveAttendanceClaim(
   adminNotes?: string
 ): Promise<ClaimActionResponse> {
   const result = await strapiFetch<StrapiDataResponse<AttendanceClaim>>(
-    "/attendance-claims/:claimId/approve",
+    "/admin/attendance-claims/:claimId/approve",
     { claimId },
     {
       method: "PUT",
@@ -126,7 +126,7 @@ export async function rejectAttendanceClaim(
   adminNotes?: string
 ): Promise<ClaimActionResponse> {
   const result = await strapiFetch<StrapiDataResponse<AttendanceClaim>>(
-    "/attendance-claims/:claimId/reject",
+    "/admin/attendance-claims/:claimId/reject",
     { claimId },
     {
       method: "PUT",

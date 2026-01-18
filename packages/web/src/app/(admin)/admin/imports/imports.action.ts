@@ -58,7 +58,7 @@ export async function uploadAudienceAttendeeImport(
   }
 
   const result = await strapiFetchFormData<{ data: ImportUploadResponse }>(
-    "/imports/audience-attendees",
+    "/admin/imports/audience-attendees",
     {},
     formData
   )

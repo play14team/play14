@@ -11,7 +11,7 @@ export default {
     // Organizer routes - MUST be before :slug route
     {
       method: "GET",
-      path: "/events/my-events",
+      path: "/admin/events/my-events",
       handler: "custom-event.getMyEvents",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -22,7 +22,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/locations",
+      path: "/admin/events/locations",
       handler: "custom-event.getLocations",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -33,7 +33,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/venues",
+      path: "/admin/events/venues",
       handler: "custom-event.getVenues",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -44,7 +44,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/organizers",
+      path: "/admin/events/organizers",
       handler: "custom-event.getOrganizers",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -55,7 +55,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/events/create",
+      path: "/admin/events/create",
       handler: "custom-event.createEvent",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -67,7 +67,7 @@ export default {
     // Event edit routes - MUST be before :slug catch-all
     {
       method: "GET",
-      path: "/events/:slug/edit",
+      path: "/admin/events/:slug/edit",
       handler: "custom-event.getEventForEdit",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -78,7 +78,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:slug/edit",
+      path: "/admin/events/:slug/edit",
       handler: "custom-event.updateEvent",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -89,7 +89,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/events/:slug/publish",
+      path: "/admin/events/:slug/publish",
       handler: "custom-event.publishEvent",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -100,7 +100,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/events/:slug/unpublish",
+      path: "/admin/events/:slug/unpublish",
       handler: "custom-event.unpublishEvent",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -111,7 +111,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/:slug/preview",
+      path: "/admin/events/:slug/preview",
       handler: "custom-event.previewEvent",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -122,7 +122,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:slug/finance",
+      path: "/admin/events/:slug/finance",
       handler: "custom-event.updateFinance",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -133,7 +133,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:slug/media-links",
+      path: "/admin/events/:slug/media-links",
       handler: "custom-event.updateMediaLinks",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -144,7 +144,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:slug/schedule",
+      path: "/admin/events/:slug/schedule",
       handler: "custom-event.updateSchedule",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -156,7 +156,7 @@ export default {
     // Image management routes
     {
       method: "POST",
-      path: "/events/:slug/images",
+      path: "/admin/events/:slug/images",
       handler: "custom-event.uploadImage",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -167,7 +167,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:slug/images/:field",
+      path: "/admin/events/:slug/images/:field",
       handler: "custom-event.setImageFromLibrary",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -178,7 +178,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/events/:slug/images/:field/:fileId",
+      path: "/admin/events/:slug/images/:field/:fileId",
       handler: "custom-event.removeImage",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -190,7 +190,7 @@ export default {
     // Sponsorship management route
     {
       method: "PUT",
-      path: "/events/:slug/sponsorships",
+      path: "/admin/events/:slug/sponsorships",
       handler: "custom-event.updateSponsorships",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -202,7 +202,7 @@ export default {
     // Revenue analytics route
     {
       method: "GET",
-      path: "/events/:eventId/revenue-analytics",
+      path: "/admin/events/:eventId/revenue-analytics",
       handler: "custom-event.getRevenueAnalytics",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -214,7 +214,7 @@ export default {
     // Participants management routes
     {
       method: "GET",
-      path: "/events/:eventId/participants",
+      path: "/admin/events/:eventId/participants",
       handler: "custom-event.getParticipants",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -225,7 +225,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/events/:eventId/participants/stats",
+      path: "/admin/events/:eventId/participants/stats",
       handler: "custom-event.getParticipantStats",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -236,7 +236,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:eventId/participants/:ticketId/check-in",
+      path: "/admin/events/:eventId/participants/:ticketId/check-in",
       handler: "custom-event.checkInParticipant",
       info: { apiName: "event", type: "content-api" },
       config: {
@@ -247,7 +247,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/events/:eventId/participants/:ticketId/undo-check-in",
+      path: "/admin/events/:eventId/participants/:ticketId/undo-check-in",
       handler: "custom-event.undoCheckIn",
       info: { apiName: "event", type: "content-api" },
       config: {

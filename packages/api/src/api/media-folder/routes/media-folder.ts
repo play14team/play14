@@ -7,7 +7,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/media-folders",
+      path: "/admin/media-folders",
       handler: "media-folder.find",
       config: {
         policies: [],

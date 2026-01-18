@@ -65,7 +65,7 @@ export async function uploadPlayerPicture(
   formData.append("files", file)
 
   const result = await strapiFetchFormData<{ data: PlayerProfile }>(
-    "/players/me/picture",
+    "/admin/players/me/picture",
     {},
     formData
   )
@@ -87,7 +87,7 @@ export async function deletePlayerPicture(): Promise<{
   player?: PlayerProfile
 }> {
   const result = await strapiFetch<{ data: PlayerProfile }>(
-    "/players/me/picture",
+    "/admin/players/me/picture",
     {},
     { method: "DELETE" }
   )

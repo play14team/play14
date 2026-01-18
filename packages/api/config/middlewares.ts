@@ -13,7 +13,7 @@ export default ({ env }: { env: any }) => [
         "^/api/ticket-orders/initiate-checkout$",
         "^/api/ticket-orders/initiate-free-checkout$",
         "^/api/ticket-orders/.+/cancel$", // Ticket cancellation
-        "^/api/players/me$", // Profile updates
+        "^/api/admin/players/me$", // Profile updates
         "^/api/auth/local$", // Login
         "^/api/auth/local/register$", // Registration
         "^/api/auth/forgot-password$", // Password reset

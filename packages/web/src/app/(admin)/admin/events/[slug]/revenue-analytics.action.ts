@@ -63,7 +63,7 @@ export async function getRevenueAnalytics(
   eventId: string
 ): Promise<RevenueAnalytics | null> {
   const result = await strapiFetch<{ data: RevenueAnalytics }>(
-    "/events/:eventId/revenue-analytics",
+    "/admin/events/:eventId/revenue-analytics",
     { eventId },
     { cache: "no-store" }
   )

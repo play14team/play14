@@ -7,7 +7,7 @@ export default {
   routes: [
     {
       method: "PUT",
-      path: "/players/me",
+      path: "/admin/players/me",
       handler: "custom-player.updateMe",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -18,7 +18,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/players/me",
+      path: "/admin/players/me",
       handler: "custom-player.findMe",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -29,7 +29,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/players/me/picture",
+      path: "/admin/players/me/picture",
       handler: "custom-player.uploadPicture",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -40,7 +40,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/players/me/picture",
+      path: "/admin/players/me/picture",
       handler: "custom-player.deletePicture",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -73,7 +73,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/players/:id/position",
+      path: "/admin/players/:id/position",
       handler: "custom-player.updatePlayerPosition",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -84,7 +84,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/players/list",
+      path: "/admin/players/list",
       handler: "custom-player.listPlayers",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -95,7 +95,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/players/:id/edit",
+      path: "/admin/players/:id/edit",
       handler: "custom-player.getPlayerForEdit",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -106,7 +106,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/players/:id",
+      path: "/admin/players/:id",
       handler: "custom-player.updatePlayer",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -117,7 +117,7 @@ export default {
     },
     {
       method: "PUT",
-      path: "/players/:id/avatar/library",
+      path: "/admin/players/:id/avatar/library",
       handler: "custom-player.setAvatarFromLibrary",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -128,7 +128,7 @@ export default {
     },
     {
       method: "DELETE",
-      path: "/players/:id/avatar",
+      path: "/admin/players/:id/avatar",
       handler: "custom-player.removeAvatar",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -139,7 +139,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/players/:id/avatar/upload",
+      path: "/admin/players/:id/avatar/upload",
       handler: "custom-player.uploadAvatarForPlayer",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -150,7 +150,7 @@ export default {
     },
     {
       method: "GET",
-      path: "/players/me/attended-events",
+      path: "/admin/players/me/attended-events",
       handler: "custom-player.getMyAttendedEvents",
       info: { apiName: "player", type: "content-api" },
       config: {
@@ -161,7 +161,7 @@ export default {
     },
     {
       method: "POST",
-      path: "/players/:id/send-invite",
+      path: "/admin/players/:id/send-invite",
       handler: "custom-player.sendSingleInvite",
       info: { apiName: "player", type: "content-api" },
       config: {
