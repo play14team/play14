@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Run lint-staged for Biome checks on staged files
+bunx lint-staged
+
+# Track which packages have staged TypeScript files
+API_HAS_TS=false
+WEB_HAS_TS=false
+
+# Check for staged TypeScript files in each package
+for file in $(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx)$'); do
+  if echo "$file" | grep -q "^packages/api/"; then
+    API_HAS_TS=true
+  fi
+  if echo "$file" | grep -q "^packages/web/"; then
+    WEB_HAS_TS=true
+  fi
+done
+
+# Run TypeScript check on packages with staged TS files
+if [ "$API_HAS_TS" = true ]; then
+  echo "Running TypeScript check on packages/api..."
+  cd packages/api && bunx tsc --noEmit
+  if [ $? -ne 0 ]; then
+    echo "TypeScript errors found in packages/api"
+    exit 1
+  fi
+  echo "✓ TypeScript check passed for packages/api"
+  cd ../..
+fi
+
+if [ "$WEB_HAS_TS" = true ]; then
+  echo "Running TypeScript check on packages/web..."
+  cd packages/web && bunx tsc --noEmit
+  if [ $? -ne 0 ]; then
+    echo "TypeScript errors found in packages/web"
+    exit 1
+  fi
+  echo "✓ TypeScript check passed for packages/web"
+  cd ../..
+fi

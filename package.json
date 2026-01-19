@@ -23,13 +23,19 @@
     "test:web": "bun --filter play14-web test",
     "test:int": "bun --filter play14-api test:integration",
     "test:all": "bun --filter play14-api test && bun --filter play14-api test:integration && bun --filter play14-web test",
-    "clean": "rm -rf node_modules packages/*/node_modules packages/*/.next packages/*/build packages/*/dist"
+    "clean": "rm -rf node_modules packages/*/node_modules packages/*/.next packages/*/build packages/*/dist",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "^1.3.6",
     "@types/node": "^24.10.9",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "typescript": "^5.9.3"
   },
-  "packageManager": "bun@1.3.5"
+  "packageManager": "bun@1.3.5",
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx,mjs,cjs,json,jsonc}": ["bunx biome check --write --no-errors-on-unmatched"]
+  }
 }
