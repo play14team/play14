@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { format, isAfter, isValid } from "date-fns"
+import { TZDate } from "@date-fns/tz"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
 import type {
@@ -17,33 +19,50 @@ import type { MapLocation } from "@/components/admin/location-map-picker"
 // Register English locale for country names
 countries.registerLocale(en)
 
+const isoHasTimezone = /[zZ]|[+-]\d{2}:?\d{2}$/
+
+function normalizeIsoToUtc(value: string): string {
+  if (!value) return value
+  return isoHasTimezone.test(value) ? value : `${value}Z`
+}
+
 // Helper to format ISO date to local date input value (YYYY-MM-DD)
-function formatDateForInput(isoString: string): string {
-  const date = new Date(isoString)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
-  return `${year}-${month}-${day}`
+function formatDateForInput(isoString: string, timezone: string): string {
+  const tz = timezone || "UTC"
+  const normalized = normalizeIsoToUtc(isoString)
+  return format(new TZDate(normalized, tz), "yyyy-MM-dd")
 }
 
 // Helper to format ISO date to local time input value (HH:mm)
-function formatTimeForInput(isoString: string): string {
-  const date = new Date(isoString)
-  const hours = String(date.getHours()).padStart(2, "0")
-  const minutes = String(date.getMinutes()).padStart(2, "0")
-  return `${hours}:${minutes}`
+function formatTimeForInput(isoString: string, timezone: string): string {
+  const tz = timezone || "UTC"
+  const normalized = normalizeIsoToUtc(isoString)
+  return format(new TZDate(normalized, tz), "HH:mm")
+}
+
+function parseDateTimeInput(date: string, time: string, timezone: string) {
+  const tz = timezone || "UTC"
+  if (!date || !time) return new TZDate(NaN, tz)
+  const [year, month, day] = date.split("-").map(Number)
+  const [hour, minute] = time.split(":").map(Number)
+  if ([year, month, day, hour, minute].some(Number.isNaN)) {
+    return new TZDate(NaN, tz)
+  }
+  return new TZDate(year, month - 1, day, hour, minute, 0, 0, tz)
 }
 
 // Get all IANA timezones from the browser's Intl API
 function getTimezones(): { value: string; region: string }[] {
   try {
     const timezones = Intl.supportedValuesOf("timeZone")
-    return timezones.map((tz) => {
+    const supported = timezones.includes("UTC") ? timezones : ["UTC", ...timezones]
+    return supported.map((tz) => {
       const region = tz.split("/")[0]
       return { value: tz, region }
     })
   } catch {
     return [
+      { value: "UTC", region: "UTC" },
       { value: "Europe/Paris", region: "Europe" },
       { value: "Europe/London", region: "Europe" },
       { value: "America/New_York", region: "America" },
@@ -211,6 +230,8 @@ export interface UseEventFormReturn {
 }
 
 export function useEventForm(event: EventForEdit): UseEventFormReturn {
+  const initialTimezone = event.timezone || "UTC"
+
   // Form state - Event Details
   const [name, setName] = useState(event.name)
   const [eventStatus, setEventStatus] = useState(event.eventStatus)
@@ -219,13 +240,15 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   const [contactEmail, setContactEmail] = useState(event.contactEmail || "")
 
   // Form state - Date & Time
-  const [startDate, setStartDate] = useState(formatDateForInput(event.start))
-  const [startTime, setStartTime] = useState(formatTimeForInput(event.start))
-  const [endDate, setEndDate] = useState(formatDateForInput(event.end))
-  const [endTime, setEndTime] = useState(formatTimeForInput(event.end))
-  const [timezone, setTimezone] = useState(
-    event.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+  const [startDate, setStartDate] = useState(
+    formatDateForInput(event.start, initialTimezone)
   )
+  const [startTime, setStartTime] = useState(
+    formatTimeForInput(event.start, initialTimezone)
+  )
+  const [endDate, setEndDate] = useState(formatDateForInput(event.end, initialTimezone))
+  const [endTime, setEndTime] = useState(formatTimeForInput(event.end, initialTimezone))
+  const [timezone, setTimezone] = useState(initialTimezone)
 
   // Form state - Location
   const [locationMode, setLocationMode] = useState<"existing" | "new">(
@@ -314,16 +337,16 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   // Original form values (stable reference for dirty state reset)
   const originalFormValues = useMemo<EventFormValues>(
     () => ({
+      timezone: event.timezone || "UTC",
       name: event.name,
       eventStatus: event.eventStatus,
       tagline: event.tagline || "",
       description: event.description || "",
       contactEmail: event.contactEmail || "",
-      startDate: formatDateForInput(event.start),
-      startTime: formatTimeForInput(event.start),
-      endDate: formatDateForInput(event.end),
-      endTime: formatTimeForInput(event.end),
-      timezone: event.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+      startDate: formatDateForInput(event.start, event.timezone || "UTC"),
+      startTime: formatTimeForInput(event.start, event.timezone || "UTC"),
+      endDate: formatDateForInput(event.end, event.timezone || "UTC"),
+      endTime: formatTimeForInput(event.end, event.timezone || "UTC"),
       locationMode: event.location ? "existing" : "new",
       selectedLocationId: event.location?.documentId || "",
       newLocationName: "",
@@ -371,19 +394,19 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
     error: string | null
   } => {
     // Build the start datetime
-    const startDateTime = new Date(`${startDate}T${startTime}:00`)
-    if (isNaN(startDateTime.getTime())) {
+    const startDateTime = parseDateTimeInput(startDate, startTime, timezone)
+    if (!isValid(startDateTime)) {
       return { data: null, error: "Invalid start date/time" }
     }
 
     // Build the end datetime
-    const endDateTime = new Date(`${endDate}T${endTime}:00`)
-    if (isNaN(endDateTime.getTime())) {
+    const endDateTime = parseDateTimeInput(endDate, endTime, timezone)
+    if (!isValid(endDateTime)) {
       return { data: null, error: "Invalid end date/time" }
     }
 
     // Validate end is after start
-    if (endDateTime <= startDateTime) {
+    if (!isAfter(endDateTime, startDateTime)) {
       return { data: null, error: "End date/time must be after start date/time" }
     }
 
@@ -459,16 +482,17 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
 
   // Reset form to original values from event prop
   const resetForm = () => {
+    const resetTimezone = event.timezone || "UTC"
     setName(event.name)
     setEventStatus(event.eventStatus)
     setTagline(event.tagline || "")
     setDescription(event.description || "")
     setContactEmail(event.contactEmail || "")
-    setStartDate(formatDateForInput(event.start))
-    setStartTime(formatTimeForInput(event.start))
-    setEndDate(formatDateForInput(event.end))
-    setEndTime(formatTimeForInput(event.end))
-    setTimezone(event.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone)
+    setStartDate(formatDateForInput(event.start, resetTimezone))
+    setStartTime(formatTimeForInput(event.start, resetTimezone))
+    setEndDate(formatDateForInput(event.end, resetTimezone))
+    setEndTime(formatTimeForInput(event.end, resetTimezone))
+    setTimezone(resetTimezone)
     setLocationMode(event.location ? "existing" : "new")
     setSelectedLocationId(event.location?.documentId || "")
     setNewLocationName("")
