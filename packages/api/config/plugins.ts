@@ -40,7 +40,6 @@ export default ({ env }: { env: any }) => ({
       // Routes to cache (empty array = cache all /api routes)
       cacheableRoutes: [
         "/api/articles",
-        "/api/events",
         "/api/event-locations",
         "/api/expectations",
         "/api/format",
@@ -58,6 +57,7 @@ export default ({ env }: { env: any }) => ({
       excludeRoutes: [
         "/api/admin",
         "/api/auth",
+        "/api/events",
         "/api/users-permissions",
         "/api/users",
         "/api/attendance-claims",

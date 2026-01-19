@@ -226,6 +226,12 @@ export async function findOrCreatePlayerForAttendee(
 /**
  * Add a player to an event's attendees list.
  *
+ * IMPORTANT: This function adds the player to BOTH draft and published versions
+ * of the event. This is necessary because:
+ * 1. Strapi 5 draft-and-publish creates separate records for draft and published
+ * 2. If we only add to published, the relation would be lost when draft is published
+ * 3. Adding to both ensures the player appears immediately AND survives future publishes
+ *
  * @param strapi - Strapi instance
  * @param playerDocumentId - Document ID of the player
  * @param event - Event object with documentId and id
@@ -237,6 +243,30 @@ export async function addPlayerToEventAttendees(
   event: { documentId: string; id: number },
   logPrefix: string = "[Ticketing]"
 ): Promise<void> {
+  // Fetch BOTH draft and published versions of the event
+  // We need to add the player to both to ensure:
+  // 1. Player appears immediately on the public site (published)
+  // 2. Player relation survives when draft is published later (draft)
+  const [draftEvent, publishedEvent] = await Promise.all([
+    strapi.documents("api::event.event").findOne({
+      documentId: event.documentId,
+      status: "draft",
+      fields: ["id"],
+    }),
+    strapi.documents("api::event.event").findOne({
+      documentId: event.documentId,
+      status: "published",
+      fields: ["id"],
+    }),
+  ])
+
+  if (!publishedEvent && !draftEvent) {
+    strapi.log.warn(
+      `${logPrefix} Cannot add player to event attendees - event ${event.documentId} not found`
+    )
+    return
+  }
+
   const playerDoc = await strapi.documents("api::player.player").findOne({
     documentId: playerDocumentId,
     populate: { attended: { fields: ["id", "documentId"] } },
@@ -250,15 +280,31 @@ export async function addPlayerToEventAttendees(
   )
 
   if (!alreadyAttending) {
+    // Build array with all existing event versions (draft and/or published)
+    // This ensures the player relation survives when draft is published
+    const newAttendedIds = [...currentAttendedIds]
+
+    if (publishedEvent) {
+      newAttendedIds.push(publishedEvent.id)
+    }
+    if (draftEvent && draftEvent.id !== publishedEvent?.id) {
+      newAttendedIds.push(draftEvent.id)
+    }
+
     await strapi.documents("api::player.player").update({
       documentId: playerDocumentId,
       data: {
-        attended: [...currentAttendedIds, event.id],
+        attended: newAttendedIds,
       } as any,
     })
 
+    const versionInfo = publishedEvent
+      ? draftEvent && draftEvent.id !== publishedEvent.id
+        ? "draft + published"
+        : "published"
+      : "draft"
     strapi.log.info(
-      `${logPrefix} Player ${playerDocumentId} added to event ${event.documentId} attendees`
+      `${logPrefix} Added player ${playerDocumentId} to event ${event.documentId} attendees (${versionInfo})`
     )
   }
 }

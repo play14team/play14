@@ -31,6 +31,7 @@ describe("Player Service", () => {
     mockStrapi = {
       log: {
         info: vi.fn(),
+        warn: vi.fn(),
         error: vi.fn(),
       },
       documents: vi.fn((contentType: string) => ({
@@ -333,12 +334,26 @@ describe("Player Service", () => {
     it("should add player to event attendees", async () => {
       const updateMock = vi.fn()
 
-      mockStrapi.documents.mockReturnValue({
-        findOne: vi.fn().mockResolvedValue({
-          documentId: "player-123",
-          attended: [],
-        }),
-        update: updateMock,
+      mockStrapi.documents.mockImplementation((contentType: string) => {
+        if (contentType === "api::event.event") {
+          return {
+            findOne: vi.fn().mockImplementation(({ status }) => {
+              // Return event with id for published, null for draft
+              if (status === "published") {
+                return Promise.resolve({ id: 1, documentId: "event-123" })
+              }
+              return Promise.resolve(null)
+            }),
+          }
+        }
+        // Player content type
+        return {
+          findOne: vi.fn().mockResolvedValue({
+            documentId: "player-123",
+            attended: [],
+          }),
+          update: updateMock,
+        }
       })
 
       await addPlayerToEventAttendees(
@@ -359,12 +374,24 @@ describe("Player Service", () => {
     it("should not add player if already attending", async () => {
       const updateMock = vi.fn()
 
-      mockStrapi.documents.mockReturnValue({
-        findOne: vi.fn().mockResolvedValue({
-          documentId: "player-123",
-          attended: [{ id: 1, documentId: "event-123" }],
-        }),
-        update: updateMock,
+      mockStrapi.documents.mockImplementation((contentType: string) => {
+        if (contentType === "api::event.event") {
+          return {
+            findOne: vi.fn().mockImplementation(({ status }) => {
+              if (status === "published") {
+                return Promise.resolve({ id: 1, documentId: "event-123" })
+              }
+              return Promise.resolve(null)
+            }),
+          }
+        }
+        return {
+          findOne: vi.fn().mockResolvedValue({
+            documentId: "player-123",
+            attended: [{ id: 1, documentId: "event-123" }],
+          }),
+          update: updateMock,
+        }
       })
 
       await addPlayerToEventAttendees(
@@ -378,8 +405,21 @@ describe("Player Service", () => {
     })
 
     it("should handle player not found", async () => {
-      mockStrapi.documents.mockReturnValue({
-        findOne: vi.fn().mockResolvedValue(null),
+      mockStrapi.documents.mockImplementation((contentType: string) => {
+        if (contentType === "api::event.event") {
+          return {
+            findOne: vi.fn().mockImplementation(({ status }) => {
+              if (status === "published") {
+                return Promise.resolve({ id: 1, documentId: "event-123" })
+              }
+              return Promise.resolve(null)
+            }),
+          }
+        }
+        // Player returns null
+        return {
+          findOne: vi.fn().mockResolvedValue(null),
+        }
       })
 
       await addPlayerToEventAttendees(
