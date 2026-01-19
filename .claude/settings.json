@@ -4,20 +4,6 @@
     "pr": ""
   },
   "includeCoAuthoredBy": false,
-  "enabledPlugins": {},
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/biome-hook.mjs"
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(biome check:*)",
@@ -92,9 +78,24 @@
       "mcp__plugin_sentry_sentry__find_organizations",
       "mcp__plugin_sentry_sentry__get_issue_tag_values",
       "mcp__plugin_sentry_sentry__search_issue_events",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(bunx biome check:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["playwright"]
+  "enabledMcpjsonServers": ["playwright"],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/biome-hook.mjs"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {}
 }

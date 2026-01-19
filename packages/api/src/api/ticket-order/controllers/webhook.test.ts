@@ -147,7 +147,9 @@ describe("webhook controller", () => {
       await controller.handleStripeWebhook(ctx)
 
       expect(ctx.badRequest).toHaveBeenCalledWith("Missing signature")
-      expect(mockStrapi.log.warn).toHaveBeenCalledWith("[Webhook] Missing Stripe signature header")
+      expect(mockStrapi.log.warn).toHaveBeenCalledWith(
+        expect.stringContaining("[Webhook] Missing Stripe signature header")
+      )
     })
 
     it("returns bad request when raw body is not available", async () => {
@@ -187,7 +189,10 @@ describe("webhook controller", () => {
         "evt_test_123",
         "checkout.session.completed"
       )
-      expect(controller.handleCheckoutCompleted).toHaveBeenCalledWith(sessionData)
+      expect(controller.handleCheckoutCompleted).toHaveBeenCalledWith(
+        sessionData,
+        expect.any(String)
+      )
       expect(markWebhookCompleted).toHaveBeenCalledWith(mockStrapi, "evt_test_123")
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
     })
@@ -230,7 +235,7 @@ describe("webhook controller", () => {
 
       await controller.handleStripeWebhook(ctx)
 
-      expect(controller.handleCheckoutExpired).toHaveBeenCalledWith(sessionData)
+      expect(controller.handleCheckoutExpired).toHaveBeenCalledWith(sessionData, expect.any(String))
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
     })
 
@@ -248,7 +253,7 @@ describe("webhook controller", () => {
 
       await controller.handleStripeWebhook(ctx)
 
-      expect(controller.handlePaymentFailed).toHaveBeenCalledWith(paymentData)
+      expect(controller.handlePaymentFailed).toHaveBeenCalledWith(paymentData, expect.any(String))
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
     })
 
@@ -266,7 +271,7 @@ describe("webhook controller", () => {
 
       await controller.handleStripeWebhook(ctx)
 
-      expect(controller.handleChargeRefunded).toHaveBeenCalledWith(chargeData)
+      expect(controller.handleChargeRefunded).toHaveBeenCalledWith(chargeData, expect.any(String))
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
     })
 
@@ -284,7 +289,7 @@ describe("webhook controller", () => {
 
       await controller.handleStripeWebhook(ctx)
 
-      expect(controller.handleAccountUpdated).toHaveBeenCalledWith(accountData)
+      expect(controller.handleAccountUpdated).toHaveBeenCalledWith(accountData, expect.any(String))
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
     })
 
@@ -300,7 +305,7 @@ describe("webhook controller", () => {
       await controller.handleStripeWebhook(ctx)
 
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
-        "[Webhook] Unhandled event type: some.unhandled.event"
+        expect.stringContaining("[Webhook] Unhandled event type: some.unhandled.event")
       )
       expect(ctx.send).toHaveBeenCalledWith({ received: true })
     })
@@ -500,7 +505,7 @@ describe("webhook controller", () => {
       await controller.handleCheckoutCompleted({})
 
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Missing session ID in checkout.session.completed"
+        expect.stringContaining("[Webhook] Missing session ID in checkout.session.completed")
       )
     })
 
@@ -512,7 +517,7 @@ describe("webhook controller", () => {
       await controller.handleCheckoutCompleted({ id: "cs_test_123" })
 
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Order not found for session: cs_test_123"
+        expect.stringContaining("[Webhook] Order not found for session: cs_test_123")
       )
     })
 
@@ -648,7 +653,7 @@ describe("webhook controller", () => {
       await controller.handleCheckoutExpired({})
 
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Missing session ID in checkout.session.expired"
+        expect.stringContaining("[Webhook] Missing session ID in checkout.session.expired")
       )
     })
 
@@ -712,7 +717,9 @@ describe("webhook controller", () => {
       await controller.handlePaymentFailed({})
 
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Missing payment intent ID in payment_intent.payment_failed"
+        expect.stringContaining(
+          "[Webhook] Missing payment intent ID in payment_intent.payment_failed"
+        )
       )
     })
 
@@ -796,7 +803,7 @@ describe("webhook controller", () => {
       await controller.handleChargeRefunded({})
 
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Missing payment_intent in charge.refunded"
+        expect.stringContaining("[Webhook] Missing payment_intent in charge.refunded")
       )
     })
 
@@ -899,7 +906,7 @@ describe("webhook controller", () => {
       await controller.handleAccountUpdated({})
 
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Missing account ID in account.updated"
+        expect.stringContaining("[Webhook] Missing account ID in account.updated")
       )
     })
 

@@ -1,5 +1,11 @@
 /**
  * Webhook controller for handling Stripe payment events
+ *
+ * This controller processes Stripe webhooks with comprehensive observability:
+ * - Prometheus metrics for monitoring
+ * - Sentry error reporting
+ * - Structured logging with timing information
+ * - Correlation IDs for request tracing
  */
 
 import { randomBytes } from "node:crypto"
@@ -16,6 +22,14 @@ import { type InvoiceData, formatTicketItems, generateInvoicePDF } from "../../.
 import { nameToUsername } from "../../../libs/strings"
 import { generateTicketCode } from "../../../libs/tickets"
 import { sendTicketSoldNotificationEmail as sendTicketSoldNotification } from "../../../services/email-templates"
+import { generateCorrelationId, startTimer } from "../../../services/observability/logger"
+import {
+  emailSendDuration,
+  emailSendTotal,
+  webhookProcessingDuration,
+  webhookProcessingTotal,
+} from "../../../services/observability/metrics"
+import { reportSentryError } from "../../../services/observability/sentry-reporter"
 import { getPaymentProvider } from "../../../services/payment"
 import type { WebhookEvent } from "../../../services/payment/types"
 import {
@@ -54,13 +68,16 @@ const getLogoUrl = (): string => {
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
-   * Handle Stripe webhook events
+   * Handle Stripe webhook events with comprehensive observability
    */
   async handleStripeWebhook(ctx) {
+    const correlationId = generateCorrelationId()
+    const webhookTimer = startTimer()
     const signature = ctx.request.headers["stripe-signature"]
 
     if (!signature) {
-      strapi.log.warn("[Webhook] Missing Stripe signature header")
+      strapi.log.warn(`[Webhook] Missing Stripe signature header | correlationId=${correlationId}`)
+      webhookProcessingTotal.inc({ event_type: "unknown", status: "rejected" })
       return ctx.badRequest("Missing signature")
     }
 
@@ -71,8 +88,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     if (!unparsedBody || typeof unparsedBody !== "string") {
       strapi.log.error(
-        "[Webhook] Raw body not available for signature verification - check body middleware config (includeUnparsed: true)"
+        `[Webhook] Raw body not available for signature verification - check body middleware config (includeUnparsed: true) | correlationId=${correlationId}`
       )
+      webhookProcessingTotal.inc({ event_type: "unknown", status: "rejected" })
       return ctx.badRequest("Webhook signature verification failed: raw body unavailable")
     }
 
@@ -85,14 +103,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       event = await provider.verifyWebhookSignature(payload, signature)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error"
-      strapi.log.error(`[Webhook] Signature verification failed: ${errorMessage}`)
+      strapi.log.error(
+        `[Webhook] Signature verification failed: ${errorMessage} | correlationId=${correlationId}`
+      )
+      webhookProcessingTotal.inc({ event_type: "unknown", status: "rejected" })
       return ctx.badRequest("Webhook verification failed")
     }
 
     const eventId = event.id
     const eventType = event.type
 
-    strapi.log.info(`[Webhook] Received Stripe event: ${eventType} (${eventId})`)
+    strapi.log.info(
+      `[Webhook] Received Stripe event: ${eventType} (${eventId}) | correlationId=${correlationId}`
+    )
 
     // IDEMPOTENCY: Claim the event for processing
     // Uses atomic INSERT with unique constraint to prevent duplicate processing
@@ -100,43 +123,62 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     if (!idempotencyResult.shouldProcess) {
       strapi.log.info(
-        `[Webhook] Event ${eventId} already processed (status: ${idempotencyResult.status}) - returning success`
+        `[Webhook] Event ${eventId} already processed (status: ${idempotencyResult.status}) - returning success | correlationId=${correlationId}`
       )
+      webhookProcessingTotal.inc({ event_type: eventType, status: "duplicate" })
       return ctx.send({ received: true, duplicate: true })
     }
 
     try {
       switch (eventType) {
         case "checkout.session.completed":
-          await this.handleCheckoutCompleted(event.data)
+          await this.handleCheckoutCompleted(event.data, correlationId)
           break
 
         case "checkout.session.expired":
-          await this.handleCheckoutExpired(event.data)
+          await this.handleCheckoutExpired(event.data, correlationId)
           break
 
         case "payment_intent.payment_failed":
-          await this.handlePaymentFailed(event.data)
+          await this.handlePaymentFailed(event.data, correlationId)
           break
 
         case "charge.refunded":
-          await this.handleChargeRefunded(event.data)
+          await this.handleChargeRefunded(event.data, correlationId)
           break
 
         case "account.updated":
-          await this.handleAccountUpdated(event.data)
+          await this.handleAccountUpdated(event.data, correlationId)
           break
 
         default:
-          strapi.log.info(`[Webhook] Unhandled event type: ${eventType}`)
+          strapi.log.info(
+            `[Webhook] Unhandled event type: ${eventType} | correlationId=${correlationId}`
+          )
       }
 
       // Mark event as successfully processed
       await markWebhookCompleted(strapi, eventId)
 
+      const durationMs = webhookTimer.elapsed()
+      webhookProcessingTotal.inc({ event_type: eventType, status: "success" })
+      webhookProcessingDuration.observe({ event_type: eventType }, durationMs / 1000)
+      strapi.log.info(
+        `[Webhook] Event processed successfully: ${eventType} (${eventId}) | durationMs=${durationMs}, correlationId=${correlationId}`
+      )
+
       return ctx.send({ received: true })
     } catch (error: any) {
-      strapi.log.error(`[Webhook] Error processing event ${eventId}: ${error.message}`)
+      const durationMs = webhookTimer.elapsed()
+      strapi.log.error(
+        `[Webhook] Error processing event ${eventId}: ${error.message} | durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
+      )
+
+      // Report to Sentry
+      reportSentryError(strapi, error, {
+        tags: { event_type: eventType, module: "webhook", correlationId },
+        extra: { eventId, durationMs },
+      })
 
       // For retryable errors, release the claim so Stripe can retry
       // For non-retryable errors, mark as failed to prevent endless retries
@@ -144,28 +186,42 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       if (isRetryable) {
         await releaseWebhookClaim(strapi, eventId)
+        webhookProcessingTotal.inc({ event_type: eventType, status: "retry" })
+        webhookProcessingDuration.observe({ event_type: eventType }, durationMs / 1000)
         // Return 500 to signal Stripe should retry
         ctx.status = 500
         return ctx.send({ error: "Processing failed, will retry" })
       }
       await markWebhookFailed(strapi, eventId, error.message)
+      webhookProcessingTotal.inc({ event_type: eventType, status: "failed" })
+      webhookProcessingDuration.observe({ event_type: eventType }, durationMs / 1000)
       // Return 200 to prevent Stripe from retrying non-retryable errors
       return ctx.send({ received: true, error: error.message })
     }
   },
 
   /**
-   * Handle successful checkout session
+   * Handle successful checkout session with enhanced logging
    */
-  async handleCheckoutCompleted(sessionData: Record<string, unknown>) {
+  async handleCheckoutCompleted(
+    sessionData: Record<string, unknown>,
+    correlationId: string = generateCorrelationId()
+  ) {
+    const handlerTimer = startTimer()
     const sessionId = sessionData.id as string
     const paymentIntent = sessionData.payment_intent as string
     const _metadata = sessionData.metadata as Record<string, string>
 
     if (!sessionId) {
-      strapi.log.warn("[Webhook] Missing session ID in checkout.session.completed")
+      strapi.log.warn(
+        `[Webhook] Missing session ID in checkout.session.completed | correlationId=${correlationId}`
+      )
       return
     }
+
+    strapi.log.info(
+      `[Webhook] Processing checkout.session.completed | sessionId=${sessionId}, correlationId=${correlationId}`
+    )
 
     // Find the order by session ID
     const order = await strapi.documents("api::ticket-order.ticket-order").findFirst({
@@ -197,9 +253,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     })
 
     if (!order) {
-      strapi.log.warn(`[Webhook] Order not found for session: ${sessionId}`)
+      strapi.log.warn(
+        `[Webhook] Order not found for session: ${sessionId} | correlationId=${correlationId}`
+      )
       return
     }
+
+    const orderNumber = order.orderNumber
+    const eventName = order.event?.name || "unknown"
 
     // IDEMPOTENCY: Use atomic conditional update to prevent duplicate processing
     // If two webhooks arrive simultaneously, only one will succeed in changing status
@@ -218,13 +279,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       })
       const currentStatus = currentOrder?.status || "unknown"
       strapi.log.info(
-        `[Webhook] Order ${order.orderNumber} skipped - current status: ${currentStatus} (was not pending)`
+        `[Webhook] Order ${orderNumber} skipped - current status: ${currentStatus} (was not pending) | event=${eventName}, correlationId=${correlationId}`
       )
       return
     }
 
     strapi.log.info(
-      `[Webhook] Processing order ${order.orderNumber} (locked with processing status)`
+      `[Webhook] Processing order ${orderNumber} (locked with processing status) | event=${eventName}, correlationId=${correlationId}`
     )
 
     try {
@@ -350,7 +411,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         const hadReservation = (order as any).hasReservation
         await confirmDiscountCode(strapi, order.discountCode.documentId, hadReservation)
         strapi.log.info(
-          `[Webhook] Discount code ${(order.discountCode as any).code} usage confirmed`
+          `[Webhook] Discount code ${(order.discountCode as any).code} usage confirmed | order=${orderNumber}, correlationId=${correlationId}`
         )
       }
 
@@ -388,19 +449,31 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Notify event organizers about the sale
       await this.sendTicketSoldNotificationEmail(order, createdTickets)
 
+      const handlerDurationMs = handlerTimer.elapsed()
       strapi.log.info(
-        `[Webhook] Order ${order.orderNumber} completed successfully with ${createdTickets.length} tickets`
+        `[Webhook] Order ${orderNumber} completed successfully | ticketCount=${createdTickets.length}, event=${eventName}, durationMs=${handlerDurationMs}, correlationId=${correlationId}`
       )
     } catch (error: any) {
       // Processing failed - revert status back to pending so webhook can be retried
-      strapi.log.error(`[Webhook] Failed to process order ${order.orderNumber}: ${error.message}`)
+      const handlerDurationMs = handlerTimer.elapsed()
+      strapi.log.error(
+        `[Webhook] Failed to process order ${orderNumber}: ${error.message} | event=${eventName}, durationMs=${handlerDurationMs}, correlationId=${correlationId}, stack=${error.stack}`
+      )
+
+      // Report to Sentry
+      reportSentryError(strapi, error, {
+        tags: { handler: "checkout_completed", module: "webhook", correlationId },
+        extra: { orderNumber, eventName, sessionId, handlerDurationMs },
+      })
 
       await knex("ticket_orders")
         .where("document_id", order.documentId)
         .where("status", "processing")
         .update({ status: "pending" })
 
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} status reverted to pending for retry`)
+      strapi.log.info(
+        `[Webhook] Order ${orderNumber} status reverted to pending for retry | correlationId=${correlationId}`
+      )
 
       // Re-throw to signal failure to Stripe (will retry webhook)
       throw error
@@ -623,11 +696,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
    * Handle expired checkout session (user abandoned checkout)
    */
-  async handleCheckoutExpired(sessionData: Record<string, unknown>) {
+  async handleCheckoutExpired(
+    sessionData: Record<string, unknown>,
+    correlationId: string = generateCorrelationId()
+  ) {
     const sessionId = sessionData.id as string
 
     if (!sessionId) {
-      strapi.log.warn("[Webhook] Missing session ID in checkout.session.expired")
+      strapi.log.warn(
+        `[Webhook] Missing session ID in checkout.session.expired | correlationId=${correlationId}`
+      )
       return
     }
 
@@ -641,13 +719,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     })
 
     if (!order) {
-      strapi.log.info(`[Webhook] No order found for expired session: ${sessionId}`)
+      strapi.log.info(
+        `[Webhook] No order found for expired session: ${sessionId} | correlationId=${correlationId}`
+      )
       return
     }
 
+    const orderNumber = order.orderNumber
+    const eventName = order.event?.name || "unknown"
+
     if (order.status !== "pending") {
       strapi.log.info(
-        `[Webhook] Order ${order.orderNumber} not pending (status: ${order.status}), skipping expiration`
+        `[Webhook] Order ${orderNumber} not pending (status: ${order.status}), skipping expiration | event=${eventName}, correlationId=${correlationId}`
       )
       return
     }
@@ -658,7 +741,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Release any discount code reservation
     if (order.discountCode?.documentId) {
       await releaseDiscountCode(strapi, order.discountCode.documentId)
-      strapi.log.info(`[Webhook] Released discount code reservation for ${order.discountCode.code}`)
+      strapi.log.info(
+        `[Webhook] Released discount code reservation for ${order.discountCode.code} | order=${orderNumber}, correlationId=${correlationId}`
+      )
     }
 
     // Update order status to expired
@@ -669,20 +754,27 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       } as any,
     })
 
-    strapi.log.info(`[Webhook] Order ${order.orderNumber} marked as expired (checkout abandoned)`)
+    strapi.log.info(
+      `[Webhook] Order ${orderNumber} marked as expired (checkout abandoned) | event=${eventName}, correlationId=${correlationId}`
+    )
   },
 
   /**
    * Handle failed payment intent
    */
-  async handlePaymentFailed(paymentIntentData: Record<string, unknown>) {
+  async handlePaymentFailed(
+    paymentIntentData: Record<string, unknown>,
+    correlationId: string = generateCorrelationId()
+  ) {
     const paymentIntentId = paymentIntentData.id as string
     const lastPaymentError = paymentIntentData.last_payment_error as Record<string, unknown> | null
     const errorMessage = (lastPaymentError?.message as string) || "Payment failed"
     const errorCode = (lastPaymentError?.code as string) || "unknown"
 
     if (!paymentIntentId) {
-      strapi.log.warn("[Webhook] Missing payment intent ID in payment_intent.payment_failed")
+      strapi.log.warn(
+        `[Webhook] Missing payment intent ID in payment_intent.payment_failed | correlationId=${correlationId}`
+      )
       return
     }
 
@@ -725,13 +817,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     if (!order) {
-      strapi.log.info(`[Webhook] No order found for failed payment intent: ${paymentIntentId}`)
+      strapi.log.info(
+        `[Webhook] No order found for failed payment intent: ${paymentIntentId} | correlationId=${correlationId}`
+      )
       return
     }
 
+    const orderNumber = order.orderNumber
+    const eventName = order.event?.name || "unknown"
+
     // Log the failure details
     strapi.log.warn(
-      `[Webhook] Payment failed for order ${order.orderNumber}: ${errorCode} - ${errorMessage}`
+      `[Webhook] Payment failed for order ${orderNumber}: ${errorCode} - ${errorMessage} | event=${eventName}, paymentIntentId=${paymentIntentId}, correlationId=${correlationId}`
     )
 
     // Update order with failure info if still pending
@@ -743,7 +840,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (order.discountCode?.documentId) {
         await releaseDiscountCode(strapi, order.discountCode.documentId)
         strapi.log.info(
-          `[Webhook] Released discount code reservation for ${order.discountCode.code}`
+          `[Webhook] Released discount code reservation for ${order.discountCode.code} | order=${orderNumber}, correlationId=${correlationId}`
         )
       }
 
@@ -755,19 +852,26 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         } as any,
       })
 
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} marked as failed`)
+      strapi.log.info(
+        `[Webhook] Order ${orderNumber} marked as failed | event=${eventName}, errorCode=${errorCode}, correlationId=${correlationId}`
+      )
 
       // Optionally send failure notification email
-      await this.sendPaymentFailedEmail(order, errorMessage)
+      await this.sendPaymentFailedEmail(order, errorMessage, correlationId)
     }
   },
 
   /**
-   * Send payment failure notification email
+   * Send payment failure notification email with metrics tracking
    */
-  async sendPaymentFailedEmail(order: any, errorMessage: string) {
+  async sendPaymentFailedEmail(
+    order: any,
+    errorMessage: string,
+    correlationId: string = generateCorrelationId()
+  ) {
     const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
     const logoUrl = getLogoUrl()
+    const emailTimer = startTimer()
 
     try {
       await strapi
@@ -836,21 +940,40 @@ The #play14 Team
         `.trim(),
         })
 
-      strapi.log.info(`[Webhook] Payment failed email sent to ${order.purchaserEmail}`)
+      const durationMs = emailTimer.elapsed()
+      emailSendTotal.inc({ email_type: "payment_failed", status: "success" })
+      emailSendDuration.observe({ email_type: "payment_failed" }, durationMs / 1000)
+      strapi.log.info(
+        `[Webhook] Payment failed email sent to ${order.purchaserEmail} | order=${order.orderNumber}, durationMs=${durationMs}, correlationId=${correlationId}`
+      )
     } catch (error: any) {
-      strapi.log.error(`[Webhook] Failed to send payment failed email: ${error.message}`)
+      const durationMs = emailTimer.elapsed()
+      emailSendTotal.inc({ email_type: "payment_failed", status: "error" })
+      emailSendDuration.observe({ email_type: "payment_failed" }, durationMs / 1000)
+      strapi.log.error(
+        `[Webhook] Failed to send payment failed email: ${error.message} | order=${order.orderNumber}, to=${order.purchaserEmail}, durationMs=${durationMs}, correlationId=${correlationId}`
+      )
+      reportSentryError(strapi, error, {
+        tags: { email_type: "payment_failed", module: "webhook", correlationId },
+        extra: { orderNumber: order.orderNumber, recipientEmail: order.purchaserEmail },
+      })
     }
   },
 
   /**
    * Handle charge refund (initiated from Stripe dashboard)
    */
-  async handleChargeRefunded(chargeData: Record<string, unknown>) {
+  async handleChargeRefunded(
+    chargeData: Record<string, unknown>,
+    correlationId: string = generateCorrelationId()
+  ) {
     const paymentIntent = chargeData.payment_intent as string
     const amountRefunded = (chargeData.amount_refunded as number) / 100
 
     if (!paymentIntent) {
-      strapi.log.warn("[Webhook] Missing payment_intent in charge.refunded")
+      strapi.log.warn(
+        `[Webhook] Missing payment_intent in charge.refunded | correlationId=${correlationId}`
+      )
       return
     }
 
@@ -867,12 +990,20 @@ The #play14 Team
     })
 
     if (!order) {
-      strapi.log.warn(`[Webhook] Order not found for payment intent: ${paymentIntent}`)
+      strapi.log.warn(
+        `[Webhook] Order not found for payment intent: ${paymentIntent} | correlationId=${correlationId}`
+      )
       return
     }
 
+    const orderNumber = order.orderNumber
+    const eventName = order.event?.name || "unknown"
+    const ticketCount = order.tickets?.length || 0
+
     if (order.status === "refunded") {
-      strapi.log.info(`[Webhook] Order ${order.orderNumber} already refunded`)
+      strapi.log.info(
+        `[Webhook] Order ${orderNumber} already refunded | event=${eventName}, correlationId=${correlationId}`
+      )
       return
     }
 
@@ -930,20 +1061,27 @@ The #play14 Team
       }
     }
 
-    strapi.log.info(`[Webhook] Order ${order.orderNumber} refunded via Stripe dashboard`)
+    strapi.log.info(
+      `[Webhook] Order ${orderNumber} refunded via Stripe dashboard | event=${eventName}, ticketCount=${ticketCount}, refundedAmount=${amountRefunded}, correlationId=${correlationId}`
+    )
   },
 
   /**
    * Handle Stripe Connect account updates
    */
-  async handleAccountUpdated(accountData: Record<string, unknown>) {
+  async handleAccountUpdated(
+    accountData: Record<string, unknown>,
+    correlationId: string = generateCorrelationId()
+  ) {
     const stripeAccountId = accountData.id as string
     const chargesEnabled = accountData.charges_enabled as boolean
     const payoutsEnabled = accountData.payouts_enabled as boolean
     const detailsSubmitted = accountData.details_submitted as boolean
 
     if (!stripeAccountId) {
-      strapi.log.warn("[Webhook] Missing account ID in account.updated")
+      strapi.log.warn(
+        `[Webhook] Missing account ID in account.updated | correlationId=${correlationId}`
+      )
       return
     }
 
@@ -953,7 +1091,9 @@ The #play14 Team
     })
 
     if (!stripeAccount) {
-      strapi.log.warn(`[Webhook] Stripe account not found: ${stripeAccountId}`)
+      strapi.log.warn(
+        `[Webhook] Stripe account not found: ${stripeAccountId} | correlationId=${correlationId}`
+      )
       return
     }
 
@@ -984,7 +1124,7 @@ The #play14 Team
     })
 
     strapi.log.info(
-      `[Webhook] Stripe account ${stripeAccountId} updated - status: ${accountStatus}, charges: ${chargesEnabled}, payouts: ${payoutsEnabled}`
+      `[Webhook] Stripe account ${stripeAccountId} updated | status=${accountStatus}, chargesEnabled=${chargesEnabled}, payoutsEnabled=${payoutsEnabled}, correlationId=${correlationId}`
     )
   },
 
@@ -1265,19 +1405,28 @@ The #play14 Team
         emailOptions.attachments = attachments
       }
 
+      const emailStartTime = Date.now()
       await strapi.plugin("email").service("email").send(emailOptions)
+      const emailDuration = Date.now() - emailStartTime
 
-      strapi.log.info(`[Webhook] Confirmation email sent to ${order.purchaserEmail}`)
+      emailSendTotal.inc({ email_type: "confirmation", status: "success" })
+      emailSendDuration.observe({ email_type: "confirmation" }, emailDuration / 1000)
+      strapi.log.info(
+        `[Webhook] Confirmation email sent to ${order.purchaserEmail} | order=${order.orderNumber}, durationMs=${emailDuration}`
+      )
     } catch (error: any) {
       // NON-CRITICAL FAILURE: Email sending failed but order is still valid and tickets created.
       // This is a serious issue as the customer paid but won't receive confirmation.
-      // TODO: Integrate with monitoring/alerting system for:
-      // 1. Immediate notification to support team to manually resend
-      // 2. Retry mechanism for failed emails
-      // 3. Store failed email attempts for later retry
+      emailSendTotal.inc({ email_type: "confirmation", status: "error" })
       strapi.log.error(
-        `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message}`
+        `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message} | order=${order.orderNumber}`
       )
+
+      // Report to Sentry for immediate alerting
+      reportSentryError(strapi, error, {
+        tags: { email_type: "confirmation", module: "webhook", severity: "critical" },
+        extra: { orderNumber: order.orderNumber, recipientEmail: order.purchaserEmail },
+      })
     }
   },
 

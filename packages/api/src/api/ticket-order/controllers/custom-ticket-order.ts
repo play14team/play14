@@ -1,6 +1,12 @@
 /**
  * Custom controller for ticket order management
  * Handles ticket purchase flow, order status, and refunds
+ *
+ * Enhanced with comprehensive observability:
+ * - Prometheus metrics for monitoring
+ * - Sentry error reporting
+ * - Structured logging with timing
+ * - Correlation IDs for request tracing
  */
 
 import { join } from "node:path"
@@ -13,6 +19,12 @@ import {
   sendPlayerInvitationEmail,
   sendTicketSoldNotificationEmail,
 } from "../../../services/email-templates"
+import { generateCorrelationId, startTimer } from "../../../services/observability/logger"
+import {
+  ticketOrderOperationDuration,
+  ticketOrderOperationsTotal,
+} from "../../../services/observability/metrics"
+import { reportSentryError } from "../../../services/observability/sentry-reporter"
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
 import {
@@ -903,20 +915,29 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * Does NOT create Stripe session yet - that happens in finalizeCheckout
    */
   async createDraftOrder(ctx) {
+    const correlationId = generateCorrelationId()
+    const operationTimer = startTimer()
+    const operation = "createDraftOrder"
     const user = ctx.state.user
 
     // Require authentication
     if (!user) {
+      ticketOrderOperationsTotal.inc({ operation, status: "unauthorized" })
       return ctx.unauthorized("You must be logged in to purchase tickets")
     }
 
     // Require linked player profile
     const player = await this.getLinkedPlayer(user.id)
     if (!player) {
+      ticketOrderOperationsTotal.inc({ operation, status: "forbidden" })
       return ctx.forbidden("You must have a player profile to purchase tickets", {
         details: { code: "PLAYER_REQUIRED" },
       })
     }
+
+    strapi.log.info(
+      `[Ticketing] Creating draft order | userId=${user.id}, playerId=${player.documentId}, correlationId=${correlationId}`
+    )
 
     // RATE LIMITING: Limit draft orders per user to prevent abuse
     // Uses a time-based window (last hour) to prevent rapid-fire creation
@@ -1128,8 +1149,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const firstName = nameParts[0] || ""
     const lastName = nameParts.slice(1).join(" ") || ""
 
+    const durationMs = operationTimer.elapsed()
+    ticketOrderOperationsTotal.inc({ operation, status: "success" })
+    ticketOrderOperationDuration.observe({ operation }, durationMs / 1000)
+
     strapi.log.info(
-      `[Ticketing] Draft order ${orderNumber} created for event ${event.name} - ${totalQuantity} tickets`
+      `[Ticketing] Draft order ${orderNumber} created | event=${event.name}, ticketCount=${totalQuantity}, totalAmount=${totalAmount} ${currency}, durationMs=${durationMs}, correlationId=${correlationId}`
     )
 
     return ctx.send({
@@ -1301,17 +1326,26 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * Finalize a draft order and create Stripe checkout session
    */
   async finalizeCheckout(ctx) {
+    const correlationId = generateCorrelationId()
+    const operationTimer = startTimer()
+    const operation = "finalizeCheckout"
     const user = ctx.state.user
     const { orderId } = ctx.params
 
     if (!user) {
+      ticketOrderOperationsTotal.inc({ operation, status: "unauthorized" })
       return ctx.unauthorized("You must be logged in")
     }
 
     const player = await this.getLinkedPlayer(user.id)
     if (!player) {
+      ticketOrderOperationsTotal.inc({ operation, status: "forbidden" })
       return ctx.forbidden("You must have a player profile")
     }
+
+    strapi.log.info(
+      `[Ticketing] Finalizing checkout | orderId=${orderId}, userId=${user.id}, correlationId=${correlationId}`
+    )
 
     const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
       documentId: orderId,
@@ -1548,7 +1582,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
       reservationsCreated = true
 
-      strapi.log.info(`[Ticketing] Checkout session created for order ${order.orderNumber}`)
+      const durationMs = operationTimer.elapsed()
+      ticketOrderOperationsTotal.inc({ operation, status: "success" })
+      ticketOrderOperationDuration.observe({ operation }, durationMs / 1000)
+
+      strapi.log.info(
+        `[Ticketing] Checkout session created for order ${order.orderNumber} | event=${event.name}, sessionId=${session.sessionId}, durationMs=${durationMs}, correlationId=${correlationId}`
+      )
 
       return ctx.send({
         data: {
@@ -1557,8 +1597,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
     } catch (error: any) {
+      const durationMs = operationTimer.elapsed()
+      ticketOrderOperationsTotal.inc({ operation, status: "error" })
+      ticketOrderOperationDuration.observe({ operation }, durationMs / 1000)
+
       // Clean up all allocated resources in reverse order
-      strapi.log.error(`[Ticketing] Failed to create checkout session: ${error.message}`)
+      strapi.log.error(
+        `[Ticketing] Failed to create checkout session: ${error.message} | orderId=${orderId}, durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
+      )
+
+      // Report to Sentry
+      reportSentryError(strapi, error, {
+        tags: { operation, module: "ticketing", correlationId },
+        extra: { orderId, durationMs },
+      })
 
       // Release reservations if they were created
       if (reservationsCreated) {

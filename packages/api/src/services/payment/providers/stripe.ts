@@ -1,8 +1,13 @@
 /**
  * Stripe payment provider implementation with Connect support
+ *
+ * This provider handles all Stripe API interactions with comprehensive
+ * logging and metrics for observability.
  */
 
 import Stripe from "stripe"
+import { type LogContext, createLogger, startTimer } from "../../observability/logger"
+import { stripeApiCallsTotal, stripeApiDuration } from "../../observability/metrics"
 import type {
   AccountLink,
   CheckoutSession,
@@ -15,6 +20,8 @@ import type {
   RefundResult,
   WebhookEvent,
 } from "../types"
+
+const log = createLogger("[Stripe]")
 
 /**
  * ISO 4217 currency codes supported by this platform.
@@ -101,6 +108,14 @@ function validateCurrency(currency: string | undefined): string {
   return normalized
 }
 
+/**
+ * Record metrics for a Stripe API call
+ */
+function recordMetrics(operation: string, status: "success" | "error", durationMs: number): void {
+  stripeApiCallsTotal.inc({ operation, status })
+  stripeApiDuration.observe({ operation }, durationMs / 1000)
+}
+
 export class StripeProvider implements ConnectPaymentProvider {
   private stripe: Stripe
   private webhookSecret: string
@@ -115,41 +130,82 @@ export class StripeProvider implements ConnectPaymentProvider {
     this.stripe = new Stripe(secretKey)
 
     // Allow passing secrets as parameters for testing, otherwise use env vars
-    this.webhookSecret = webhookSecret || process.env.STRIPE_WEBHOOK_SECRET || ""
+    // Use ?? for nullish coalescing so empty strings are preserved (for testing)
+    this.webhookSecret = webhookSecret ?? process.env.STRIPE_WEBHOOK_SECRET ?? ""
     this.webhookSecretConnect =
-      webhookSecretConnect || process.env.STRIPE_WEBHOOK_SECRET_CONNECT || ""
+      webhookSecretConnect ?? process.env.STRIPE_WEBHOOK_SECRET_CONNECT ?? ""
   }
 
   async createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession> {
+    const operation = "createCheckoutSession"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      orderId: params.orderId,
+      currency: params.currency,
+      lineItemCount: params.lineItems.length,
+      totalAmount: params.lineItems.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0),
+    }
+
+    log.info("Creating checkout session", context)
+
     const currency = validateCurrency(params.currency)
 
-    const session = await this.stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: params.lineItems.map((item) => ({
-        price_data: {
-          currency,
-          product_data: {
-            name: item.name,
-            description: item.description,
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: params.lineItems.map((item) => ({
+          price_data: {
+            currency,
+            product_data: {
+              name: item.name,
+              description: item.description,
+            },
+            unit_amount: Math.round(item.unitPrice * 100), // Convert to cents
           },
-          unit_amount: Math.round(item.unitPrice * 100), // Convert to cents
+          quantity: item.quantity,
+        })),
+        mode: "payment",
+        customer_email: params.customerEmail,
+        success_url: params.successUrl,
+        cancel_url: params.cancelUrl,
+        metadata: {
+          orderId: params.orderId,
+          ...params.metadata,
         },
-        quantity: item.quantity,
-      })),
-      mode: "payment",
-      customer_email: params.customerEmail,
-      success_url: params.successUrl,
-      cancel_url: params.cancelUrl,
-      metadata: {
-        orderId: params.orderId,
-        ...params.metadata,
-      },
-    })
+      })
 
-    return {
-      sessionId: session.id,
-      sessionUrl: session.url!,
-      expiresAt: new Date(session.expires_at * 1000),
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.info("Checkout session created successfully", {
+        ...context,
+        sessionId: session.id,
+        durationMs,
+        expiresAt: new Date(session.expires_at * 1000).toISOString(),
+      })
+
+      return {
+        sessionId: session.id,
+        sessionUrl: session.url!,
+        expiresAt: new Date(session.expires_at * 1000),
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to create checkout session",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+          stripeErrorType: error.type,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
@@ -160,72 +216,156 @@ export class StripeProvider implements ConnectPaymentProvider {
   async createCheckoutSessionWithConnect(
     params: CreateCheckoutWithConnectParams
   ): Promise<CheckoutSession> {
-    const currency = validateCurrency(params.currency)
-
-    const _totalAmount = params.lineItems.reduce(
+    const operation = "createCheckoutSessionWithConnect"
+    const timer = startTimer()
+    const totalAmount = params.lineItems.reduce(
       (sum, item) => sum + Math.round(item.unitPrice * 100) * item.quantity,
       0
     )
+    const context: LogContext = {
+      operation,
+      orderId: params.orderId,
+      currency: params.currency,
+      lineItemCount: params.lineItems.length,
+      totalAmount: totalAmount / 100,
+      connectedAccountId: params.connectedAccountId,
+      applicationFeeAmount: params.applicationFeeAmount,
+    }
 
-    const session = await this.stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: params.lineItems.map((item) => ({
-        price_data: {
-          currency,
-          product_data: {
-            name: item.name,
-            description: item.description,
+    log.info("Creating Connect checkout session", context)
+
+    const currency = validateCurrency(params.currency)
+
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: params.lineItems.map((item) => ({
+          price_data: {
+            currency,
+            product_data: {
+              name: item.name,
+              description: item.description,
+            },
+            unit_amount: Math.round(item.unitPrice * 100),
           },
-          unit_amount: Math.round(item.unitPrice * 100),
-        },
-        quantity: item.quantity,
-      })),
-      mode: "payment",
-      customer_email: params.customerEmail,
-      success_url: params.successUrl,
-      cancel_url: params.cancelUrl,
-      metadata: {
-        orderId: params.orderId,
-        ...params.metadata,
-      },
-      payment_intent_data: {
-        application_fee_amount: params.applicationFeeAmount || 0,
-        transfer_data: {
-          destination: params.connectedAccountId,
-        },
+          quantity: item.quantity,
+        })),
+        mode: "payment",
+        customer_email: params.customerEmail,
+        success_url: params.successUrl,
+        cancel_url: params.cancelUrl,
         metadata: {
           orderId: params.orderId,
           ...params.metadata,
         },
-      },
-    })
+        payment_intent_data: {
+          application_fee_amount: params.applicationFeeAmount || 0,
+          transfer_data: {
+            destination: params.connectedAccountId,
+          },
+          metadata: {
+            orderId: params.orderId,
+            ...params.metadata,
+          },
+        },
+      })
 
-    return {
-      sessionId: session.id,
-      sessionUrl: session.url!,
-      expiresAt: new Date(session.expires_at * 1000),
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.info("Connect checkout session created successfully", {
+        ...context,
+        sessionId: session.id,
+        durationMs,
+        expiresAt: new Date(session.expires_at * 1000).toISOString(),
+      })
+
+      return {
+        sessionId: session.id,
+        sessionUrl: session.url!,
+        expiresAt: new Date(session.expires_at * 1000),
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to create Connect checkout session",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+          stripeErrorType: error.type,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
   async processRefund(params: RefundParams): Promise<RefundResult> {
-    const refund = await this.stripe.refunds.create({
-      payment_intent: params.providerOrderId,
-      amount: params.amount ? Math.round(params.amount * 100) : undefined,
-      reason: "requested_by_customer",
-    })
+    const operation = "processRefund"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      paymentIntentId: params.providerOrderId,
+      refundAmount: params.amount,
+    }
 
-    return {
-      refundId: refund.id,
-      amount: refund.amount / 100,
-      status: refund.status === "succeeded" ? "succeeded" : "pending",
+    log.info("Processing refund", context)
+
+    try {
+      const refund = await this.stripe.refunds.create({
+        payment_intent: params.providerOrderId,
+        amount: params.amount ? Math.round(params.amount * 100) : undefined,
+        reason: "requested_by_customer",
+      })
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.info("Refund processed successfully", {
+        ...context,
+        refundId: refund.id,
+        refundedAmount: refund.amount / 100,
+        refundStatus: refund.status,
+        durationMs,
+      })
+
+      return {
+        refundId: refund.id,
+        amount: refund.amount / 100,
+        status: refund.status === "succeeded" ? "succeeded" : "pending",
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to process refund",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+          stripeErrorType: error.type,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
   async verifyWebhookSignature(payload: string, signature: string): Promise<WebhookEvent> {
+    const operation = "verifyWebhookSignature"
+    const timer = startTimer()
+
     if (
       (!this.webhookSecret || this.webhookSecret.trim().length === 0) &&
       (!this.webhookSecretConnect || this.webhookSecretConnect.trim().length === 0)
     ) {
+      log.error("No webhook secrets configured", { operation })
       throw new Error(
         "At least one of STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET_CONNECT must be set"
       )
@@ -233,11 +373,13 @@ export class StripeProvider implements ConnectPaymentProvider {
 
     let event: Stripe.Event | null = null
     const errors: string[] = []
+    let verifiedWith: "platform" | "connect" | null = null
 
     // Try platform webhook secret first
     if (this.webhookSecret && this.webhookSecret.trim().length > 0) {
       try {
         event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret)
+        verifiedWith = "platform"
       } catch (error: any) {
         errors.push(`Platform webhook: ${error.message}`)
       }
@@ -247,15 +389,33 @@ export class StripeProvider implements ConnectPaymentProvider {
     if (!event && this.webhookSecretConnect && this.webhookSecretConnect.trim().length > 0) {
       try {
         event = this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecretConnect)
+        verifiedWith = "connect"
       } catch (error: any) {
         errors.push(`Connect webhook: ${error.message}`)
       }
     }
 
+    const durationMs = timer.elapsed()
+
     // If both failed, throw error with details
     if (!event) {
+      recordMetrics(operation, "error", durationMs)
+      log.error("Webhook signature verification failed", {
+        operation,
+        durationMs,
+        errors: errors.join("; "),
+      })
       throw new Error(`Webhook signature verification failed. ${errors.join("; ")}`)
     }
+
+    recordMetrics(operation, "success", durationMs)
+    log.info("Webhook signature verified", {
+      operation,
+      stripeEventId: event.id,
+      eventType: event.type,
+      verifiedWith,
+      durationMs,
+    })
 
     return {
       id: event.id,
@@ -265,18 +425,59 @@ export class StripeProvider implements ConnectPaymentProvider {
   }
 
   async getOrderStatus(providerOrderId: string): Promise<"paid" | "pending" | "failed"> {
-    const paymentIntent = await this.stripe.paymentIntents.retrieve(providerOrderId)
+    const operation = "getOrderStatus"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      paymentIntentId: providerOrderId,
+    }
 
-    switch (paymentIntent.status) {
-      case "succeeded":
-        return "paid"
-      case "processing":
-      case "requires_payment_method":
-      case "requires_confirmation":
-      case "requires_action":
-        return "pending"
-      default:
-        return "failed"
+    log.debug("Retrieving payment intent status", context)
+
+    try {
+      const paymentIntent = await this.stripe.paymentIntents.retrieve(providerOrderId)
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      let status: "paid" | "pending" | "failed"
+      switch (paymentIntent.status) {
+        case "succeeded":
+          status = "paid"
+          break
+        case "processing":
+        case "requires_payment_method":
+        case "requires_confirmation":
+        case "requires_action":
+          status = "pending"
+          break
+        default:
+          status = "failed"
+      }
+
+      log.debug("Payment intent status retrieved", {
+        ...context,
+        stripeStatus: paymentIntent.status,
+        mappedStatus: status,
+        durationMs,
+      })
+
+      return status
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to retrieve payment intent status",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
@@ -285,21 +486,61 @@ export class StripeProvider implements ConnectPaymentProvider {
     orderId?: string
     metadata: Record<string, string>
   } | null> {
-    // Search for checkout sessions with this payment intent
-    const sessions = await this.stripe.checkout.sessions.list({
-      payment_intent: paymentIntentId,
-      limit: 1,
-    })
-
-    if (sessions.data.length === 0) {
-      return null
+    const operation = "getSessionByPaymentIntent"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      paymentIntentId,
     }
 
-    const session = sessions.data[0]
-    return {
-      sessionId: session.id,
-      orderId: session.metadata?.orderId,
-      metadata: (session.metadata as Record<string, string>) || {},
+    log.debug("Looking up session by payment intent", context)
+
+    try {
+      // Search for checkout sessions with this payment intent
+      const sessions = await this.stripe.checkout.sessions.list({
+        payment_intent: paymentIntentId,
+        limit: 1,
+      })
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      if (sessions.data.length === 0) {
+        log.debug("No session found for payment intent", {
+          ...context,
+          durationMs,
+        })
+        return null
+      }
+
+      const session = sessions.data[0]
+      log.debug("Session found for payment intent", {
+        ...context,
+        sessionId: session.id,
+        orderId: session.metadata?.orderId,
+        durationMs,
+      })
+
+      return {
+        sessionId: session.id,
+        orderId: session.metadata?.orderId,
+        metadata: (session.metadata as Record<string, string>) || {},
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to lookup session by payment intent",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
@@ -311,28 +552,68 @@ export class StripeProvider implements ConnectPaymentProvider {
    * Create a Stripe Express connected account
    */
   async createExpressAccount(params: CreateConnectAccountParams): Promise<ConnectAccount> {
-    const account = await this.stripe.accounts.create({
-      type: "express",
-      country: params.country || "FR",
+    const operation = "createExpressAccount"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
       email: params.email,
-      capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true },
-      },
-      business_type: params.businessType || "individual",
-      metadata: {
-        platform: "play14",
-        ...params.metadata,
-      },
-    })
+      country: params.country || "FR",
+      businessType: params.businessType || "individual",
+    }
 
-    return {
-      accountId: account.id,
-      chargesEnabled: account.charges_enabled,
-      payoutsEnabled: account.payouts_enabled,
-      detailsSubmitted: account.details_submitted,
-      country: account.country || undefined,
-      defaultCurrency: account.default_currency || undefined,
+    log.info("Creating Express connected account", context)
+
+    try {
+      const account = await this.stripe.accounts.create({
+        type: "express",
+        country: params.country || "FR",
+        email: params.email,
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+        business_type: params.businessType || "individual",
+        metadata: {
+          platform: "play14",
+          ...params.metadata,
+        },
+      })
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.info("Express connected account created", {
+        ...context,
+        stripeAccountId: account.id,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        durationMs,
+      })
+
+      return {
+        accountId: account.id,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        detailsSubmitted: account.details_submitted,
+        country: account.country || undefined,
+        defaultCurrency: account.default_currency || undefined,
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to create Express connected account",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+          stripeErrorType: error.type,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
@@ -344,16 +625,51 @@ export class StripeProvider implements ConnectPaymentProvider {
     returnUrl: string,
     refreshUrl: string
   ): Promise<AccountLink> {
-    const accountLink = await this.stripe.accountLinks.create({
-      account: accountId,
-      refresh_url: refreshUrl,
-      return_url: returnUrl,
-      type: "account_onboarding",
-    })
+    const operation = "createAccountLink"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      stripeAccountId: accountId,
+    }
 
-    return {
-      url: accountLink.url,
-      expiresAt: new Date(accountLink.expires_at * 1000),
+    log.info("Creating account link for onboarding", context)
+
+    try {
+      const accountLink = await this.stripe.accountLinks.create({
+        account: accountId,
+        refresh_url: refreshUrl,
+        return_url: returnUrl,
+        type: "account_onboarding",
+      })
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.info("Account link created", {
+        ...context,
+        expiresAt: new Date(accountLink.expires_at * 1000).toISOString(),
+        durationMs,
+      })
+
+      return {
+        url: accountLink.url,
+        expiresAt: new Date(accountLink.expires_at * 1000),
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to create account link",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
@@ -361,10 +677,44 @@ export class StripeProvider implements ConnectPaymentProvider {
    * Create a login link for the Express dashboard
    */
   async createLoginLink(accountId: string): Promise<{ url: string }> {
-    const loginLink = await this.stripe.accounts.createLoginLink(accountId)
+    const operation = "createLoginLink"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      stripeAccountId: accountId,
+    }
 
-    return {
-      url: loginLink.url,
+    log.debug("Creating login link for Express dashboard", context)
+
+    try {
+      const loginLink = await this.stripe.accounts.createLoginLink(accountId)
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.debug("Login link created", {
+        ...context,
+        durationMs,
+      })
+
+      return {
+        url: loginLink.url,
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to create login link",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+        },
+        error
+      )
+
+      throw error
     }
   }
 
@@ -372,15 +722,52 @@ export class StripeProvider implements ConnectPaymentProvider {
    * Get account details from Stripe
    */
   async getAccount(accountId: string): Promise<ConnectAccount> {
-    const account = await this.stripe.accounts.retrieve(accountId)
+    const operation = "getAccount"
+    const timer = startTimer()
+    const context: LogContext = {
+      operation,
+      stripeAccountId: accountId,
+    }
 
-    return {
-      accountId: account.id,
-      chargesEnabled: account.charges_enabled,
-      payoutsEnabled: account.payouts_enabled,
-      detailsSubmitted: account.details_submitted,
-      country: account.country || undefined,
-      defaultCurrency: account.default_currency || undefined,
+    log.debug("Retrieving account details", context)
+
+    try {
+      const account = await this.stripe.accounts.retrieve(accountId)
+
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "success", durationMs)
+
+      log.debug("Account details retrieved", {
+        ...context,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        detailsSubmitted: account.details_submitted,
+        durationMs,
+      })
+
+      return {
+        accountId: account.id,
+        chargesEnabled: account.charges_enabled,
+        payoutsEnabled: account.payouts_enabled,
+        detailsSubmitted: account.details_submitted,
+        country: account.country || undefined,
+        defaultCurrency: account.default_currency || undefined,
+      }
+    } catch (error: any) {
+      const durationMs = timer.elapsed()
+      recordMetrics(operation, "error", durationMs)
+
+      log.error(
+        "Failed to retrieve account details",
+        {
+          ...context,
+          durationMs,
+          stripeErrorCode: error.code,
+        },
+        error
+      )
+
+      throw error
     }
   }
 }

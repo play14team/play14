@@ -79,13 +79,16 @@ describe("StripeProvider", () => {
   describe("constructor", () => {
     it("throws error when STRIPE_SECRET_KEY is not set", () => {
       const originalKey = process.env.STRIPE_SECRET_KEY
-      process.env.STRIPE_SECRET_KEY = undefined
+      // biome-ignore lint/performance/noDelete: delete is required to unset env vars (setting to undefined converts to string "undefined")
+      delete process.env.STRIPE_SECRET_KEY
 
-      expect(() => new StripeProvider()).toThrow(
-        "STRIPE_SECRET_KEY environment variable is not set"
-      )
-
-      process.env.STRIPE_SECRET_KEY = originalKey
+      try {
+        expect(() => new StripeProvider()).toThrow(
+          "STRIPE_SECRET_KEY environment variable is not set"
+        )
+      } finally {
+        process.env.STRIPE_SECRET_KEY = originalKey
+      }
     })
   })
 
@@ -364,20 +367,13 @@ describe("StripeProvider", () => {
     })
 
     it("throws error when webhook secret is not set", async () => {
-      const originalSecret = process.env.STRIPE_WEBHOOK_SECRET
-      const originalConnectSecret = process.env.STRIPE_WEBHOOK_SECRET_CONNECT
-      process.env.STRIPE_WEBHOOK_SECRET = undefined
-      process.env.STRIPE_WEBHOOK_SECRET_CONNECT = undefined
-
-      // Create new provider without webhook secrets
-      const providerWithoutSecret = new StripeProvider()
+      // Create new provider with empty webhook secrets explicitly
+      // (passing empty strings overrides env vars for testing)
+      const providerWithoutSecret = new StripeProvider("", "")
 
       await expect(providerWithoutSecret.verifyWebhookSignature("payload", "sig")).rejects.toThrow(
         "At least one of STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET_CONNECT must be set"
       )
-
-      process.env.STRIPE_WEBHOOK_SECRET = originalSecret
-      process.env.STRIPE_WEBHOOK_SECRET_CONNECT = originalConnectSecret
     })
   })
 
