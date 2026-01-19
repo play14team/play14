@@ -10,8 +10,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
 
   return (
     <article
-      id={player.name}
-      key={player.name}
+      id={player.documentId || player.slug || player.name}
       className="col-lg-3 col-sm-6 col-md-6"
     >
       <div className="single-scientist-box">

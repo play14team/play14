@@ -1,4 +1,4 @@
-import { deduplicate } from "@/libs/arrays"
+import { deduplicateBy } from "@/libs/arrays"
 import clm from "country-locale-map"
 import Image from "next/image"
 import Link from "next/link"
@@ -29,7 +29,12 @@ export default function EventDetails({ event }: { event: Event }) {
   const players = (event.players || []) as Player[]
   const hosts = (event.hosts || []) as Player[]
   const mentors = (event.mentors || []) as Player[]
-  const participants = deduplicate(players, hosts, mentors)
+  const participants = deduplicateBy(
+    (player) => player.documentId || player.slug || player.name,
+    players,
+    hosts,
+    mentors,
+  )
 
   // Helper functions for event status checks
   function isOpen() {

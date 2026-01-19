@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
-import { deduplicate, shuffleArray } from "./arrays"
+import { deduplicate, deduplicateBy, shuffleArray } from "./arrays"
 
 describe("deduplicate", () => {
   describe("single array", () => {
@@ -94,6 +94,33 @@ describe("deduplicate", () => {
 
       expect(result).toEqual([3, 1, 2])
     })
+  })
+})
+
+describe("deduplicateBy", () => {
+  it("deduplicates by key across arrays", () => {
+    const result = deduplicateBy(
+      (item) => item.id,
+      [{ id: "a", value: 1 }, { id: "b", value: 2 }],
+      [{ id: "a", value: 3 }],
+    )
+
+    expect(result).toEqual([{ id: "a", value: 1 }, { id: "b", value: 2 }])
+  })
+
+  it("keeps items with missing keys", () => {
+    const result = deduplicateBy(
+      (item) => item.id,
+      [{ id: "a" }, { id: null }, { id: "b" }, { id: undefined }],
+      [{ id: "a" }],
+    )
+
+    expect(result).toEqual([
+      { id: "a" },
+      { id: null },
+      { id: "b" },
+      { id: undefined },
+    ])
   })
 })
 

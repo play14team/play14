@@ -18,8 +18,11 @@ const PlayerGrid = ({
         )}
         <div className="row">
           {players &&
-            players.map((player) => (
-              <PlayerCard key={player.documentId} player={player} />
+            players.map((player, index) => (
+              <PlayerCard
+                key={player.documentId || player.slug || player.name || `player-${index}`}
+                player={player}
+              />
             ))}
         </div>
       </div>
