@@ -1,5 +1,5 @@
+import type { Maybe, SocialNetwork } from "@/models/strapi"
 import Link from "next/link"
-import { SocialNetwork, Maybe } from "@/models/strapi"
 
 function mapIcon(type: string) {
   if (type === "Email") return "bx bx-envelope"
@@ -18,17 +18,12 @@ const SocialNetworks = (props: {
           socialNetwork && (
             <li key={socialNetwork.id}>
               {socialNetwork?.url && (
-                <Link
-                  href={socialNetwork.url}
-                  className="d-block"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <i className={mapIcon(socialNetwork.type as string)}></i>
+                <Link href={socialNetwork.url} className="d-block" target="_blank" rel="noreferrer">
+                  <i className={mapIcon(socialNetwork.type as string)} />
                 </Link>
               )}
             </li>
-          ),
+          )
       )}
     </ul>
   )

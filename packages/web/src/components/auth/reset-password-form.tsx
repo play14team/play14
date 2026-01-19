@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { useState, useTransition } from "react"
 import { resetPasswordWithCode } from "./reset-password.action"
 
 interface ResetPasswordFormProps {
@@ -9,10 +9,7 @@ interface ResetPasswordFormProps {
   callbackUrl: string
 }
 
-export default function ResetPasswordForm({
-  code,
-  callbackUrl,
-}: ResetPasswordFormProps) {
+export default function ResetPasswordForm({ code, callbackUrl }: ResetPasswordFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -80,11 +77,7 @@ export default function ResetPasswordForm({
         />
       </div>
 
-      <button
-        type="submit"
-        className="auth-login-btn auth-login-btn-submit"
-        disabled={isPending}
-      >
+      <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
         {isPending ? "Setting password..." : "Set password"}
       </button>
     </form>

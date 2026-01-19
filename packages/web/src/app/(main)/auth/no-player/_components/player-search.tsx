@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import Image from "next/image"
-import Logo from "@/components/layout/logo"
-import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
 import { searchPlayers } from "@/components/auth/player-linking/player-linking.action"
+import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
+import Logo from "@/components/layout/logo"
 import DefaultPlayerImage from "@/components/ui/default-player-image"
+import Image from "next/image"
+import { useCallback, useState } from "react"
 
 interface PlayerSearchProps {
   onClaim: (player: PlayerSuggestion) => void
@@ -13,11 +13,7 @@ interface PlayerSearchProps {
   onBack: () => void
 }
 
-export default function PlayerSearch({
-  onClaim,
-  onCreate,
-  onBack,
-}: PlayerSearchProps) {
+export default function PlayerSearch({ onClaim, onCreate, onBack }: PlayerSearchProps) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<PlayerSuggestion[]>([])
   const [isSearching, setIsSearching] = useState(false)
@@ -58,7 +54,6 @@ export default function PlayerSearch({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Enter your name..."
-          autoFocus
         />
         <button
           className="btn btn-primary"
@@ -66,9 +61,9 @@ export default function PlayerSearch({
           disabled={query.length < 2 || isSearching}
         >
           {isSearching ? (
-            <i className="bx bx-loader-alt bx-spin"></i>
+            <i className="bx bx-loader-alt bx-spin" />
           ) : (
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
           )}
         </button>
       </div>
@@ -103,10 +98,7 @@ export default function PlayerSearch({
                   <span className="position">{player.position}</span>
                   {player.company && <span className="company">{player.company}</span>}
                 </div>
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => onClaim(player)}
-                >
+                <button className="btn btn-primary btn-sm" onClick={() => onClaim(player)}>
                   Claim
                 </button>
               </div>
@@ -124,7 +116,7 @@ export default function PlayerSearch({
 
       <div className="player-linking-actions">
         <button className="btn btn-outline" onClick={onBack}>
-          <i className="bx bx-arrow-back"></i> Back
+          <i className="bx bx-arrow-back" /> Back
         </button>
         <button className="btn btn-secondary" onClick={onCreate}>
           Create New Profile

@@ -9,7 +9,7 @@ export default function Filters({ name }: { name: string }) {
         <div className="article-footer">
           <div className="article-tags">
             <span>
-              <i className="bx bx-user-pin"></i>
+              <i className="bx bx-user-pin" />
             </span>
             <Link href="/players/positions">Position</Link>
           </div>

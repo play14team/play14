@@ -6,7 +6,7 @@
  */
 
 import type { Core } from "@strapi/strapi"
-import { seedTestUser, seedTestPlayer, linkUserToPlayer } from "../../test-utils/seed-database"
+import { linkUserToPlayer, seedTestPlayer, seedTestUser } from "../../test-utils/seed-database"
 
 /**
  * Generate a JWT token for a user
@@ -23,7 +23,7 @@ export async function generateAuthToken(strapi: Core.Strapi, userId: number): Pr
  */
 export async function createAuthenticatedUser(
   strapi: Core.Strapi,
- options: {
+  options: {
     email?: string
     username?: string
     playerName?: string

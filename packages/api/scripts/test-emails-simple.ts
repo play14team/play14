@@ -9,17 +9,17 @@
 import { render } from "@react-email/render"
 import { Resend } from "resend"
 
+import AttendanceClaimApprovedEmail from "../src/emails/attendance-claim-approved"
+import AttendanceClaimNewEmail from "../src/emails/attendance-claim-new"
+import AttendanceClaimRejectedEmail from "../src/emails/attendance-claim-rejected"
+import PaymentFailedEmail from "../src/emails/payment-failed"
+import PlayerClaimApprovedEmail from "../src/emails/player-claim-approved"
 // Import all email templates
 import PlayerClaimNewEmail from "../src/emails/player-claim-new"
-import PlayerClaimApprovedEmail from "../src/emails/player-claim-approved"
 import PlayerClaimRejectedEmail from "../src/emails/player-claim-rejected"
-import AttendanceClaimNewEmail from "../src/emails/attendance-claim-new"
-import AttendanceClaimApprovedEmail from "../src/emails/attendance-claim-approved"
-import AttendanceClaimRejectedEmail from "../src/emails/attendance-claim-rejected"
+import PlayerInvitationEmail from "../src/emails/player-invitation"
 import TicketConfirmationEmail from "../src/emails/ticket-confirmation"
 import TicketOrderRefundEmail from "../src/emails/ticket-order-refund"
-import PlayerInvitationEmail from "../src/emails/player-invitation"
-import PaymentFailedEmail from "../src/emails/payment-failed"
 import TicketSoldNotificationEmail from "../src/emails/ticket-sold-notification"
 
 const TEST_EMAIL = "cedric.pontet+test@gmail.com"
@@ -28,8 +28,7 @@ const FROM_EMAIL = process.env.RESEND_DEFAULT_FROM || "onboarding@resend.dev"
 const args = process.argv.slice(2)
 const onlyArg = args.find((arg) => arg.startsWith("--only="))?.split("=")[1]
 const filterArg = onlyArg || args.find((arg) => !arg.startsWith("--"))
-const emailFilter =
-  filterArg || process.env.EMAIL_TEMPLATE || process.env.EMAIL_FILTER || ""
+const emailFilter = filterArg || process.env.EMAIL_TEMPLATE || process.env.EMAIL_FILTER || ""
 
 // Check for API key
 if (!process.env.RESEND_API_KEY) {
@@ -56,7 +55,8 @@ async function sendTestEmails() {
         provider: "google",
         playerName: "John Doe",
         playerPosition: "Facilitator",
-        reason: "I am the same person as this player profile. I facilitated at #play14 Luxembourg in 2023.",
+        reason:
+          "I am the same person as this player profile. I facilitated at #play14 Luxembourg in 2023.",
         frontendUrl: FRONTEND_URL,
       }),
     },
@@ -75,7 +75,8 @@ async function sendTestEmails() {
       subject: "Player Claim Update",
       component: PlayerClaimRejectedEmail({
         playerName: "John Doe",
-        adminNotes: "We need more information to verify your identity. Please provide additional details or contact us directly.",
+        adminNotes:
+          "We need more information to verify your identity. Please provide additional details or contact us directly.",
         frontendUrl: FRONTEND_URL,
       }),
     },
@@ -89,7 +90,8 @@ async function sendTestEmails() {
         locationName: "Luxembourg City",
         playerName: "Jane Smith",
         playerPosition: "Player",
-        reason: "I attended this event and participated in several game sessions. I would like this to be reflected on my profile.",
+        reason:
+          "I attended this event and participated in several game sessions. I would like this to be reflected on my profile.",
         frontendUrl: FRONTEND_URL,
       }),
     },
@@ -113,7 +115,8 @@ async function sendTestEmails() {
         eventName: "#play14 Luxembourg 2024",
         eventDate: "October 24, 2024",
         locationName: "Luxembourg City",
-        adminNotes: "We don't have a record of your attendance at this event. Please contact the organizers directly if you believe this is an error.",
+        adminNotes:
+          "We don't have a record of your attendance at this event. Please contact the organizers directly if you believe this is an error.",
         frontendUrl: FRONTEND_URL,
       }),
     },
@@ -142,8 +145,10 @@ async function sendTestEmails() {
             attendeeName: "Bob Williams",
           },
         ],
-        googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
-        outlookCalendarUrl: "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
+        googleCalendarUrl:
+          "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
+        outlookCalendarUrl:
+          "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
         frontendUrl: FRONTEND_URL,
       }),
     },
@@ -184,8 +189,10 @@ async function sendTestEmails() {
         eventTime: "09:00 AM",
         eventLocation: "Innovation Hub, Luxembourg City",
         resetPasswordUrl: `${FRONTEND_URL}/auth/reset-password?code=abc123def456&callbackUrl=${encodeURIComponent("/admin")}`,
-        googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
-        outlookCalendarUrl: "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
+        googleCalendarUrl:
+          "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
+        outlookCalendarUrl:
+          "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
         frontendUrl: FRONTEND_URL,
       }),
     },
@@ -232,13 +239,15 @@ async function sendTestEmails() {
 
   const normalizedFilter = emailFilter.trim().toLowerCase()
   const requestedFilters = normalizedFilter
-    ? normalizedFilter.split(",").map((value) => value.trim()).filter(Boolean)
+    ? normalizedFilter
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
     : []
   const emailsToSend = requestedFilters.length
     ? emails.filter((email) =>
         requestedFilters.some(
-          (filter) =>
-            email.id === filter || email.name.toLowerCase().includes(filter)
+          (filter) => email.id === filter || email.name.toLowerCase().includes(filter)
         )
       )
     : emails

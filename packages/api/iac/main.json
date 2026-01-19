@@ -291,9 +291,7 @@
         "principalId": "[reference(resourceId('Microsoft.App/containerApps', parameters('appName')), '2024-03-01', 'full').identity.principalId]",
         "principalType": "ServicePrincipal"
       },
-      "dependsOn": [
-        "[resourceId('Microsoft.App/containerApps', parameters('appName'))]"
-      ]
+      "dependsOn": ["[resourceId('Microsoft.App/containerApps', parameters('appName'))]"]
     }
   ],
   "outputs": {

@@ -1,29 +1,29 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import type { PlayerProfile } from "@/libs/api/players"
-import type { GeoLocation } from "@/models/strapi"
-import SimpleEditor from "@/components/ui/simple-editor"
-import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
-import PlayerFormActions from "./player-form-actions"
-import PlayerAvatarManager from "./player-avatar-manager"
-import ProfileTabs, { type ProfileTabId } from "./profile-tabs"
-import StripeTab from "./stripe-tab"
-import { useToast } from "../toast"
-import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
-import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import {
-  updatePlayerProfile,
-  type PlayerUpdateData as ProfileUpdateData,
-} from "../player-profile.action"
-import {
+  type PlayerUpdateData as AdminUpdateData,
+  type PlayerForEdit,
   updatePlayer,
   updatePlayerPosition,
-  type PlayerForEdit,
-  type PlayerUpdateData as AdminUpdateData,
 } from "@/app/(admin)/admin/players/players.action"
 import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
+import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
+import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
+import SimpleEditor from "@/components/ui/simple-editor"
+import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
+import type { PlayerProfile } from "@/libs/api/players"
+import type { GeoLocation } from "@/models/strapi"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import {
+  type PlayerUpdateData as ProfileUpdateData,
+  updatePlayerProfile,
+} from "../player-profile.action"
+import { useToast } from "../toast"
+import PlayerAvatarManager from "./player-avatar-manager"
+import PlayerFormActions from "./player-form-actions"
+import ProfileTabs, { type ProfileTabId } from "./profile-tabs"
+import StripeTab from "./stripe-tab"
 
 const SOCIAL_NETWORK_TYPES = [
   "Twitter",
@@ -157,7 +157,12 @@ function normalizeMapLocation(
   return null
 }
 
-export default function PlayerForm({ player, mode, currentUserPosition = "Player", stripeAccount }: Props) {
+export default function PlayerForm({
+  player,
+  mode,
+  currentUserPosition = "Player",
+  stripeAccount,
+}: Props) {
   const router = useRouter()
   const toast = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -181,17 +186,12 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     })) || []
   )
   const [currentAvatar, setCurrentAvatar] = useState(player.avatar)
-  const initialMapLocation = useMemo(
-    () => normalizeMapLocation(player.location),
-    [player.location]
-  )
+  const initialMapLocation = useMemo(() => normalizeMapLocation(player.location), [player.location])
   const initialMapLocationRef = useRef<MapLocation | null>(initialMapLocation)
   useEffect(() => {
     initialMapLocationRef.current = initialMapLocation
   }, [initialMapLocation])
-  const [mapLocation, setMapLocation] = useState<MapLocation | null>(
-    initialMapLocation
-  )
+  const [mapLocation, setMapLocation] = useState<MapLocation | null>(initialMapLocation)
   const [locationTouched, setLocationTouched] = useState(false)
   const locationCenter = typeof player.location === "string" ? player.location : undefined
 
@@ -257,12 +257,13 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
   }, [isDirty])
 
   // Position action calculations (admin mode only)
-  const promoteTarget = mode === "admin" ? getPromoteTarget(currentPosition, currentUserPosition) : null
-  const demoteTarget = mode === "admin" ? getDemoteTarget(currentPosition, currentUserPosition) : null
+  const promoteTarget =
+    mode === "admin" ? getPromoteTarget(currentPosition, currentUserPosition) : null
+  const demoteTarget =
+    mode === "admin" ? getDemoteTarget(currentPosition, currentUserPosition) : null
   // In self mode, check the player's own position; in admin mode, check the current user's position
-  const isOrganizer = mode === "self"
-    ? player.position !== "Player"
-    : currentUserPosition !== "Player"
+  const isOrganizer =
+    mode === "self" ? player.position !== "Player" : currentUserPosition !== "Player"
 
   const handleAddSocialNetwork = () => {
     setSocialNetworks([...socialNetworks, { type: "LinkedIn", url: "" }])
@@ -272,11 +273,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     setSocialNetworks(socialNetworks.filter((_, i) => i !== index))
   }
 
-  const handleSocialNetworkChange = (
-    index: number,
-    field: "type" | "url",
-    value: string
-  ) => {
+  const handleSocialNetworkChange = (index: number, field: "type" | "url", value: string) => {
     const updated = [...socialNetworks]
     updated[index] = { ...updated[index], [field]: value }
     setSocialNetworks(updated)
@@ -328,9 +325,10 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     setIsSubmitting(true)
 
     const data = buildFormData()
-    const result = mode === "self"
-      ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
-      : await updatePlayer(player.documentId, data as AdminUpdateData)
+    const result =
+      mode === "self"
+        ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
+        : await updatePlayer(player.documentId, data as AdminUpdateData)
 
     if (result.success) {
       toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
@@ -389,9 +387,10 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     setIsSubmitting(true)
 
     const data = buildFormData()
-    const result = mode === "self"
-      ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
-      : await updatePlayer(player.documentId, data as AdminUpdateData)
+    const result =
+      mode === "self"
+        ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
+        : await updatePlayer(player.documentId, data as AdminUpdateData)
 
     if (result.success) {
       toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
@@ -443,11 +442,12 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
     const initialBio = player.bio || ""
     const initialWebsite = player.website || ""
     const initialMapLocation = initialMapLocationRef.current
-    const initialSocialNetworks = player.socialNetworks?.map((sn) => ({
-      id: sn.id,
-      type: sn.type,
-      url: sn.url,
-    })) || []
+    const initialSocialNetworks =
+      player.socialNetworks?.map((sn) => ({
+        id: sn.id,
+        type: sn.type,
+        url: sn.url,
+      })) || []
 
     setName(initialName)
     setCompany(initialCompany)
@@ -597,12 +597,10 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
                         <i
                           className={`${getSocialNetworkIcon(sn.type)} admin-social-network-icon`}
                           title={sn.type}
-                        ></i>
+                        />
                         <select
                           value={sn.type}
-                          onChange={(e) =>
-                            handleSocialNetworkChange(index, "type", e.target.value)
-                          }
+                          onChange={(e) => handleSocialNetworkChange(index, "type", e.target.value)}
                           className="admin-select admin-select-sm"
                         >
                           {SOCIAL_NETWORK_TYPES.map((type) => (
@@ -614,9 +612,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
                         <input
                           type="url"
                           value={sn.url}
-                          onChange={(e) =>
-                            handleSocialNetworkChange(index, "url", e.target.value)
-                          }
+                          onChange={(e) => handleSocialNetworkChange(index, "url", e.target.value)}
                           className="admin-input"
                           placeholder="https://..."
                         />
@@ -626,7 +622,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
                           className="admin-btn-icon admin-btn-danger"
                           title="Remove"
                         >
-                          <i className="bx bx-trash"></i>
+                          <i className="bx bx-trash" />
                         </button>
                       </div>
                     ))}
@@ -636,7 +632,7 @@ export default function PlayerForm({ player, mode, currentUserPosition = "Player
                       onClick={handleAddSocialNetwork}
                       className="admin-btn admin-btn-secondary"
                     >
-                      <i className="bx bx-plus"></i>
+                      <i className="bx bx-plus" />
                       Add Social Network
                     </button>
                   </div>

@@ -1,23 +1,23 @@
 import { deduplicateBy } from "@/libs/arrays"
+import {
+  Enum_Event_Eventstatus,
+  type Event,
+  type EventLocation,
+  type Player,
+  type UploadFile,
+  type Venue,
+} from "@/models/strapi"
 import clm from "country-locale-map"
 import Image from "next/image"
 import Link from "next/link"
 import ReactCountryFlag from "react-country-flag"
-import {
-  Enum_Event_Eventstatus,
-  Event,
-  EventLocation,
-  Player,
-  UploadFile,
-  Venue,
-} from "@/models/strapi"
 import Map from "../map"
 import EventDate from "./date"
 import EventsNavigator from "./nav"
+import EventRegistration from "./registration"
 import EventSidebar from "./sidebar"
 import EventTabs from "./tabs"
 import UpcomingEventTimer from "./timer"
-import EventRegistration from "./registration"
 
 export default function EventDetails({ event }: { event: Event }) {
   const defaultImage = event.defaultImage as UploadFile
@@ -33,7 +33,7 @@ export default function EventDetails({ event }: { event: Event }) {
     (player) => player.documentId || player.slug || player.name,
     players,
     hosts,
-    mentors,
+    mentors
   )
 
   // Helper functions for event status checks
@@ -66,11 +66,7 @@ export default function EventDetails({ event }: { event: Event }) {
             )}
           </li>
           <li>
-            <EventDate
-              start={event.start}
-              end={event.end}
-              timezone={event.timezone!}
-            />
+            <EventDate start={event.start} end={event.end} timezone={event.timezone!} />
           </li>
         </ul>
       </h1>
@@ -108,13 +104,13 @@ export default function EventDetails({ event }: { event: Event }) {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <i className="bx bx-home"></i>
+                          <i className="bx bx-home" />
                           {venue.name}
                         </Link>
                       )}
                       {!venue.website && (
                         <>
-                          <i className="bx bx-home"></i>
+                          <i className="bx bx-home" />
                           {venue.name}
                         </>
                       )}
@@ -124,27 +120,27 @@ export default function EventDetails({ event }: { event: Event }) {
                 {!venue && (
                   <li>
                     <b>
-                      <i className="bx bx-home"></i>
+                      <i className="bx bx-home" />
                       No venue yet
                     </b>
                   </li>
                 )}
 
-                {venue && venue.addressDetails && (
+                {venue?.addressDetails && (
                   <li>
-                    <i className="bx bx-detail"></i>
+                    <i className="bx bx-detail" />
                     {venue.addressDetails}
                   </li>
                 )}
-                {venue && venue.location && (
+                {venue?.location && (
                   <li>
-                    <i className="bx bx-map"></i>
+                    <i className="bx bx-map" />
                     {venue.location.place_name}
                   </li>
                 )}
-                {eventLocation && eventLocation.country && (
+                {eventLocation?.country && (
                   <li>
-                    <i className="bx bx-globe"></i>
+                    <i className="bx bx-globe" />
                     {country}
                   </li>
                 )}
@@ -156,14 +152,9 @@ export default function EventDetails({ event }: { event: Event }) {
         <div className="row event-map-sidebar-row">
           <div className="col-lg-8 col-md-12">
             <div className="events-details-location">
-              {venue && venue.location && (
-                <Map location={venue.location} popup />
-              )}
+              {venue?.location && <Map location={venue.location} popup />}
               {!venue && eventLocation.location && (
-                <Map
-                  location={eventLocation.location}
-                  zoom={12}
-                />
+                <Map location={eventLocation.location} zoom={12} />
               )}
             </div>
           </div>

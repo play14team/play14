@@ -15,20 +15,20 @@
  */
 
 import type { Core } from "@strapi/strapi"
-import { collectBusinessMetrics } from "../src/services/observability/metrics-collector"
-import { cleanupOldWebhookRecords } from "../src/services/webhook"
-import { processUserInvitations } from "../src/services/user-invitations"
-import { reportSentryError } from "../src/services/observability/sentry-reporter"
 import { cleanupLockoutStore, getLockoutStoreSize } from "../src/services/account-lockout"
 import {
-  cleanExpiredTicketOrders,
   cleanAbandonedDraftOrders,
+  cleanExpiredTicketOrders,
+  processEventResultsReminders,
   reservationHealthCheck,
   updateEventStatus,
   updatePlayerPositions,
-  processEventResultsReminders,
 } from "../src/services/cron"
 import { acquireLock, releaseLock } from "../src/services/cron/distributed-lock"
+import { collectBusinessMetrics } from "../src/services/observability/metrics-collector"
+import { reportSentryError } from "../src/services/observability/sentry-reporter"
+import { processUserInvitations } from "../src/services/user-invitations"
+import { cleanupOldWebhookRecords } from "../src/services/webhook"
 
 type TaskContext = { strapi?: Core.Strapi }
 type TaskFn = (context: TaskContext) => Promise<void> | void

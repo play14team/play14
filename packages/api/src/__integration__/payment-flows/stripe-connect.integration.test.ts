@@ -8,21 +8,17 @@
  * - Strapi built: `bun --filter play14-api build`
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
-import request from "supertest"
 import type { Core } from "@strapi/strapi"
+import request from "supertest"
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { resetMockPaymentState } from "../../services/payment"
+import { cleanupTestData, seedStripeAccount, seedTestEvent } from "../../test-utils/seed-database"
 import {
+  getHttpServer,
   setupStrapiTestInstance,
   teardownStrapiTestInstance,
-  getHttpServer,
 } from "../../test-utils/strapi-test-instance"
-import {
-  cleanupTestData,
-  seedTestEvent,
-  seedStripeAccount,
-} from "../../test-utils/seed-database"
 import { createAuthenticatedUser, createEventHost, getAuthHeader } from "../helpers/auth"
-import { resetMockPaymentState } from "../../services/payment"
 import { sendAccountUpdated } from "../helpers/webhook-simulator"
 
 describe("Stripe Connect Integration", () => {
@@ -46,7 +42,7 @@ describe("Stripe Connect Integration", () => {
   describe("Event with Connected Account", () => {
     it("creates checkout with destination charges for active account", async () => {
       // Arrange
-      const { token, player } = await createAuthenticatedUser(strapi)
+      const { token } = await createAuthenticatedUser(strapi)
       const host = await createEventHost(strapi)
 
       // Create active Stripe account
@@ -62,9 +58,7 @@ describe("Stripe Connect Integration", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
         hosts: [host.player.id],
       })
 
@@ -81,9 +75,7 @@ describe("Stripe Connect Integration", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -94,7 +86,7 @@ describe("Stripe Connect Integration", () => {
 
     it("falls back to platform account when host account is pending", async () => {
       // Arrange
-      const { token, player } = await createAuthenticatedUser(strapi)
+      const { token } = await createAuthenticatedUser(strapi)
       const host = await createEventHost(strapi)
 
       // Create pending Stripe account (not yet active)
@@ -109,9 +101,7 @@ describe("Stripe Connect Integration", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
         hosts: [host.player.id],
       })
 
@@ -127,9 +117,7 @@ describe("Stripe Connect Integration", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -144,7 +132,7 @@ describe("Stripe Connect Integration", () => {
       const host = await createEventHost(strapi)
 
       // Create pending account
-      const stripeAccount = await seedStripeAccount(strapi, {
+      const _stripeAccount = await seedStripeAccount(strapi, {
         stripeAccountId: "acct_test_activate",
         accountStatus: "pending",
         chargesEnabled: false,
@@ -154,23 +142,21 @@ describe("Stripe Connect Integration", () => {
       })
 
       // Act - simulate account activation via webhook
-      const response = await sendAccountUpdated(
-        httpServer,
-        "acct_test_activate",
-        {
-          charges_enabled: true,
-          payouts_enabled: true,
-          details_submitted: true,
-        }
-      )
+      const response = await sendAccountUpdated(httpServer, "acct_test_activate", {
+        charges_enabled: true,
+        payouts_enabled: true,
+        details_submitted: true,
+      })
 
       // Assert
       expect(response.status).toBe(200)
 
       // Verify account updated in database
-      const updatedAccount = await strapi.documents("api::stripe-account.stripe-account").findFirst({
-        filters: { stripeAccountId: "acct_test_activate" },
-      })
+      const updatedAccount = await strapi
+        .documents("api::stripe-account.stripe-account")
+        .findFirst({
+          filters: { stripeAccountId: "acct_test_activate" },
+        })
 
       expect(updatedAccount.accountStatus).toBe("active")
       expect(updatedAccount.chargesEnabled).toBe(true)
@@ -190,22 +176,20 @@ describe("Stripe Connect Integration", () => {
       })
 
       // Act - simulate partial completion
-      const response = await sendAccountUpdated(
-        httpServer,
-        "acct_test_restrict",
-        {
-          charges_enabled: true,
-          payouts_enabled: false, // Not fully enabled
-          details_submitted: true,
-        }
-      )
+      const response = await sendAccountUpdated(httpServer, "acct_test_restrict", {
+        charges_enabled: true,
+        payouts_enabled: false, // Not fully enabled
+        details_submitted: true,
+      })
 
       // Assert
       expect(response.status).toBe(200)
 
-      const updatedAccount = await strapi.documents("api::stripe-account.stripe-account").findFirst({
-        filters: { stripeAccountId: "acct_test_restrict" },
-      })
+      const updatedAccount = await strapi
+        .documents("api::stripe-account.stripe-account")
+        .findFirst({
+          filters: { stripeAccountId: "acct_test_restrict" },
+        })
 
       expect(updatedAccount.accountStatus).toBe("restricted")
     })

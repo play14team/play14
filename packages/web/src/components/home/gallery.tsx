@@ -1,5 +1,5 @@
-import { getHome } from "./get.action"
 import Gallery from "../layout/gallery"
+import { getHome } from "./get.action"
 
 const HomeGallery = async () => {
   const home = await getHome()

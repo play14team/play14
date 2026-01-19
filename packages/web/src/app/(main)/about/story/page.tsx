@@ -3,12 +3,8 @@ import HistoryItem from "@/components/about/historyitem"
 import HtmlContent from "@/components/layout/html-content"
 import Page from "@/components/layout/page"
 import PlayerGrid from "@/components/players/grid"
-import {
-  Enum_Componentdefaulthistoryitem_Dateformat,
-  History,
-  Player,
-} from "@/models/strapi"
-import { Metadata } from "next"
+import type { Enum_Componentdefaulthistoryitem_Dateformat, History, Player } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "About | Our story",
@@ -31,32 +27,26 @@ export default async function Story() {
               <HtmlContent>{history.intro!}</HtmlContent>
             </div>
           )}
-          <div className="pt-5">
-            {founders && <PlayerGrid players={founders} />}
-          </div>
+          <div className="pt-5">{founders && <PlayerGrid players={founders} />}</div>
 
           <div className="section-title pt-70">
             {history && <h3>{history.keyMoments || "Key moments"}</h3>}
           </div>
 
           <ol className="timeline history-timeline">
-            {history &&
-              history.items &&
-              history.items.map((item) => (
-                <HistoryItem
-                  key={item?.id}
-                  date={item?.date}
-                  dateFormat={
-                    item?.dateFormat as Enum_Componentdefaulthistoryitem_Dateformat
-                  }
-                  additionalText={item?.additionalText || ""}
-                  title={item?.title || ""}
-                  image={item?.image?.url || ""}
-                  imageAlt={item?.image?.name || ""}
-                >
-                  <HtmlContent>{item?.description || ""}</HtmlContent>
-                </HistoryItem>
-              ))}
+            {history?.items?.map((item) => (
+              <HistoryItem
+                key={item?.id}
+                date={item?.date}
+                dateFormat={item?.dateFormat as Enum_Componentdefaulthistoryitem_Dateformat}
+                additionalText={item?.additionalText || ""}
+                title={item?.title || ""}
+                image={item?.image?.url || ""}
+                imageAlt={item?.image?.name || ""}
+              >
+                <HtmlContent>{item?.description || ""}</HtmlContent>
+              </HistoryItem>
+            ))}
           </ol>
         </div>
       </section>

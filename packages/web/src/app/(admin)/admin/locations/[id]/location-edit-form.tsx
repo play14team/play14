@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/admin/toast"
-import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
-import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
-import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import CountrySelector from "@/components/admin/country-selector"
-import { updateLocation, deleteLocation, type LocationForEdit } from "../locations.action"
+import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
+import { useToast } from "@/components/admin/toast"
+import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
+import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { type LocationForEdit, deleteLocation, updateLocation } from "../locations.action"
 
 interface Props {
   location: LocationForEdit
@@ -259,9 +259,9 @@ export default function LocationEditForm({ location }: Props) {
                     href={`/admin/events/${event.slug}`}
                     className="location-event-link"
                   >
-                    <i className="bx bx-calendar-event"></i>
+                    <i className="bx bx-calendar-event" />
                     <span>{event.name}</span>
-                    <i className="bx bx-link-external"></i>
+                    <i className="bx bx-link-external" />
                   </a>
                 ))}
               </div>
@@ -297,12 +297,12 @@ export default function LocationEditForm({ location }: Props) {
             >
               {isSubmitting ? (
                 <>
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <i className="bx bx-save"></i>
+                  <i className="bx bx-save" />
                   Save changes
                 </>
               )}
@@ -314,7 +314,7 @@ export default function LocationEditForm({ location }: Props) {
                 onClick={handleDiscard}
                 className="admin-btn admin-btn-danger-outline admin-btn-block"
               >
-                <i className="bx bx-undo"></i>
+                <i className="bx bx-undo" />
                 Discard changes
               </button>
             )}
@@ -325,14 +325,14 @@ export default function LocationEditForm({ location }: Props) {
                 className="admin-btn admin-btn-danger admin-btn-block"
                 onClick={() => setShowDeleteConfirm(true)}
               >
-                <i className="bx bx-trash"></i>
+                <i className="bx bx-trash" />
                 Delete location
               </button>
             )}
 
             {!canDelete && (
               <p className="admin-form-help">
-                <i className="bx bx-info-circle"></i>
+                <i className="bx bx-info-circle" />
                 Cannot delete: this location has {location.eventsCount} event
                 {location.eventsCount !== 1 ? "s" : ""} attached.
               </p>
@@ -349,7 +349,7 @@ export default function LocationEditForm({ location }: Props) {
                 >
                   {isDeleting ? (
                     <>
-                      <i className="bx bx-loader-alt bx-spin"></i>
+                      <i className="bx bx-loader-alt bx-spin" />
                       Deleting...
                     </>
                   ) : (
@@ -371,7 +371,7 @@ export default function LocationEditForm({ location }: Props) {
           {/* Dirty State Indicator */}
           {isDirty && (
             <div className="dirty-indicator">
-              <i className="bx bx-edit-alt"></i>
+              <i className="bx bx-edit-alt" />
               <span>You have unsaved changes</span>
             </div>
           )}

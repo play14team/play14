@@ -1,7 +1,7 @@
-import moment from "moment"
+import type { Article } from "@/models/strapi"
+import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import { Article } from "@/models/strapi"
 import { getArticleSidebar } from "./get.action"
 
 const ArticleSidebar = async () => {
@@ -17,7 +17,7 @@ const ArticleSidebar = async () => {
       }
       return groups
     },
-    {} as { [key: string]: number },
+    {} as { [key: string]: number }
   )
 
   const tags = (response.tags || []) as Article[]
@@ -25,13 +25,13 @@ const ArticleSidebar = async () => {
     (groups, item) => {
       const articleTags = item.tags
       articleTags?.forEach((tag) => {
-        if (tag && tag.value) {
+        if (tag?.value) {
           groups[tag.value] = groups[tag.value] + 1 || 1
         }
       })
       return groups
     },
-    {} as { [key: string]: number },
+    {} as { [key: string]: number }
   )
 
   return (
@@ -39,41 +39,36 @@ const ArticleSidebar = async () => {
       <div className="widget widget_tracer_posts_thumb">
         <h3 className="widget-title">Latest Articles</h3>
 
-        {latest &&
-          latest.map((article) => (
-            <article key={article.documentId} className="item">
-              <Link href={`/articles/${article.slug}`} className="thumb">
-                <div
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    height: "100px",
-                  }}
-                >
-                  <Image
-                    src={article.defaultImage?.url || "#"}
-                    alt={article.defaultImage?.name || ""}
-                    sizes="100vw"
-                    fill
-                    style={{ objectFit: "cover" }}
-                    unoptimized
-                  />
-                </div>
-              </Link>
-              <div className="info">
-                <span>
-                  {moment(article.publishedAt).format("MMM Do, YYYY")}{" "}
-                </span>
-                <h4 className="title usmall">
-                  <Link href={`/articles/${article.slug}`}>
-                    {article.title}
-                  </Link>
-                </h4>
+        {latest?.map((article) => (
+          <article key={article.documentId} className="item">
+            <Link href={`/articles/${article.slug}`} className="thumb">
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "100px",
+                }}
+              >
+                <Image
+                  src={article.defaultImage?.url || "#"}
+                  alt={article.defaultImage?.name || ""}
+                  sizes="100vw"
+                  fill
+                  style={{ objectFit: "cover" }}
+                  unoptimized
+                />
               </div>
+            </Link>
+            <div className="info">
+              <span>{format(parseISO(article.publishedAt), "MMM do, yyyy")} </span>
+              <h4 className="title usmall">
+                <Link href={`/articles/${article.slug}`}>{article.title}</Link>
+              </h4>
+            </div>
 
-              <div className="clear"></div>
-            </article>
-          ))}
+            <div className="clear" />
+          </article>
+        ))}
       </div>
 
       <div className="widget widget_categories">
@@ -85,9 +80,7 @@ const ArticleSidebar = async () => {
               <li key={category}>
                 <Link href={`/articles/categories/${category.toLowerCase()}`}>
                   {category}
-                  <span className="post-count">
-                    ({categoryCount[category]})
-                  </span>
+                  <span className="post-count">({categoryCount[category]})</span>
                 </Link>
               </li>
             ))}

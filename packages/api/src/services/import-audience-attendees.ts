@@ -1,8 +1,8 @@
-import crypto from "crypto"
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "fs"
-import { join, resolve } from "path"
-import slugify from "slugify"
+import crypto from "node:crypto"
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs"
+import { join, resolve } from "node:path"
 import type { Core } from "@strapi/strapi"
+import slugify from "slugify"
 import { nameToUsername } from "../libs/strings"
 import { sendUserInvitationAndUpdateStatus } from "./user-invitations"
 
@@ -101,7 +101,11 @@ function normalizeEmail(email?: string): string | null {
 }
 
 function normalizeHeader(header: string): string {
-  return header.replace(/^\uFEFF/, "").trim().replace(/\s+/g, " ").toLowerCase()
+  return header
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase()
 }
 
 function normalizeName(value: string): string {
@@ -144,9 +148,7 @@ function parseTshirtSize(value?: string): string | undefined {
   return undefined
 }
 
-export function parseLinkedInField(
-  value?: string
-): { linkedinUrl?: string; visible?: boolean } {
+export function parseLinkedInField(value?: string): { linkedinUrl?: string; visible?: boolean } {
   if (!value) return {}
   const trimmed = value.trim()
   if (!trimmed) return {}
@@ -328,11 +330,7 @@ export function loadAttendeeContactsFromText(text: string): ContactRecord[] {
         "Attendee's Email address",
         "Attendee's email address",
         "Email",
-      ]) ||
-      getFirstValue(row, headerMap, [
-        "Purchaser's Email",
-        "Purchaser's email",
-      ])
+      ]) || getFirstValue(row, headerMap, ["Purchaser's Email", "Purchaser's email"])
     const firstName = getFirstValue(row, headerMap, [
       "Attendee's first name",
       "First name",
@@ -372,10 +370,7 @@ export function loadAttendeeContactsFromText(text: string): ContactRecord[] {
   return contacts
 }
 
-export function loadAttendeeContacts(
-  directory: string,
-  files?: string[]
-): ContactRecord[] {
+export function loadAttendeeContacts(directory: string, files?: string[]): ContactRecord[] {
   const targets =
     files && files.length > 0
       ? files
@@ -383,9 +378,7 @@ export function loadAttendeeContacts(
           .filter((file) => file.endsWith(".csv"))
           .map((file) => join(directory, file))
 
-  return targets.flatMap((filePath) =>
-    loadAttendeeContactsFromText(readFileSync(filePath, "utf8"))
-  )
+  return targets.flatMap((filePath) => loadAttendeeContactsFromText(readFileSync(filePath, "utf8")))
 }
 
 export function mergeContacts(
@@ -557,14 +550,8 @@ async function loadExistingUsers(strapi): Promise<UserRecord[]> {
   return users
 }
 
-function resolveInputFiles(
-  paths: string[],
-  repoRoot: string,
-  label: string
-): string[] {
-  const resolved = paths.map((entry) =>
-    entry.startsWith("/") ? entry : resolve(repoRoot, entry)
-  )
+function resolveInputFiles(paths: string[], repoRoot: string, label: string): string[] {
+  const resolved = paths.map((entry) => (entry.startsWith("/") ? entry : resolve(repoRoot, entry)))
   for (const filePath of resolved) {
     if (!existsSync(filePath)) {
       throw new Error(`${label} file not found: ${filePath}`)
@@ -646,354 +633,237 @@ export async function runAudienceAttendeeImport(
     throw new Error("Player role not found")
   }
 
-    const existingPlayers = await loadExistingPlayers(strapi)
-    const existingUsers = await loadExistingUsers(strapi)
+  const existingPlayers = await loadExistingPlayers(strapi)
+  const existingUsers = await loadExistingUsers(strapi)
 
-    const usersByEmail = new Map<string, UserRecord>()
-    existingUsers.forEach((user) => {
-      if (user.email) usersByEmail.set(user.email, user)
-    })
+  const usersByEmail = new Map<string, UserRecord>()
+  existingUsers.forEach((user) => {
+    if (user.email) usersByEmail.set(user.email, user)
+  })
 
-    const { playersByName, playersByLinkedIn } = buildPlayerMaps(existingPlayers)
-    const reservedNames = new Set(existingPlayers.map((player) => normalizeName(player.name)))
-    const reservedSlugs = new Set(existingPlayers.map((player) => player.slug).filter(Boolean))
+  const { playersByName, playersByLinkedIn } = buildPlayerMaps(existingPlayers)
+  const reservedNames = new Set(existingPlayers.map((player) => normalizeName(player.name)))
+  const reservedSlugs = new Set(existingPlayers.map((player) => player.slug).filter(Boolean))
 
-    const actions = {
-      createPlayers: [] as Array<{ name: string; email: string }>,
-      createUsers: [] as Array<{ email: string; playerName: string }>,
-      linkUsers: [] as Array<{ email: string; playerName: string }>,
-      updatePlayers: [] as Array<{
-        name: string
-        documentId?: string
-        updates: Record<string, unknown>
-      }>,
-      updateUsers: [] as Array<{ email: string; updates: Record<string, unknown> }>,
-      skipped: [] as Array<{ reason: string; email?: string }>,
-      ambiguousMatches: [] as Array<{ email: string; name: string }>,
+  const actions = {
+    createPlayers: [] as Array<{ name: string; email: string }>,
+    createUsers: [] as Array<{ email: string; playerName: string }>,
+    linkUsers: [] as Array<{ email: string; playerName: string }>,
+    updatePlayers: [] as Array<{
+      name: string
+      documentId?: string
+      updates: Record<string, unknown>
+    }>,
+    updateUsers: [] as Array<{ email: string; updates: Record<string, unknown> }>,
+    skipped: [] as Array<{ reason: string; email?: string }>,
+    ambiguousMatches: [] as Array<{ email: string; name: string }>,
+  }
+  const reportRows: ImportReportRow[] = []
+
+  for (const contact of contacts) {
+    const email = normalizeEmail(contact.email)
+    if (!email) {
+      actions.skipped.push({ reason: "missing_email" })
+      continue
     }
-    const reportRows: ImportReportRow[] = []
 
-    for (const contact of contacts) {
-      const email = normalizeEmail(contact.email)
-      if (!email) {
-        actions.skipped.push({ reason: "missing_email" })
-        continue
+    const firstName = contact.firstName?.trim()
+    const lastName = contact.lastName?.trim()
+    const fullName = buildFullName(firstName, lastName, email)
+    const normalizedName = normalizeName(fullName)
+    const normalizedLinkedIn = normalizeLinkedIn(contact.linkedinUrl)
+    const desiredVisible = contact.visible !== false
+    const desiredTshirt = contact.tshirtSize
+    const desiredFood = contact.foodPreferences
+
+    const existingUser = usersByEmail.get(email)
+    let user = existingUser
+    let player: PlayerRecord | null = user?.player || null
+    let matchedExistingPlayer = false
+    let createdPlayer = false
+    let createdUser = false
+    const notes: string[] = []
+
+    if (!player) {
+      let matchedPlayer: PlayerRecord | null = null
+      if (normalizedLinkedIn) {
+        const linkedPlayers = playersByLinkedIn.get(normalizedLinkedIn) || []
+        matchedPlayer = selectUnlinkedPlayer(linkedPlayers)
+      }
+      if (!matchedPlayer && normalizedName) {
+        const candidates = playersByName.get(normalizedName) || []
+        if (candidates.length > 1 && !selectUnlinkedPlayer(candidates)) {
+          actions.ambiguousMatches.push({ email, name: fullName })
+          notes.push("ambiguous_name_match")
+        }
+        matchedPlayer = selectUnlinkedPlayer(candidates)
       }
 
-      const firstName = contact.firstName?.trim()
-      const lastName = contact.lastName?.trim()
-      const fullName = buildFullName(firstName, lastName, email)
-      const normalizedName = normalizeName(fullName)
-      const normalizedLinkedIn = normalizeLinkedIn(contact.linkedinUrl)
-      const desiredVisible = contact.visible !== false
-      const desiredTshirt = contact.tshirtSize
-      const desiredFood = contact.foodPreferences
+      if (matchedPlayer) {
+        player = matchedPlayer
+        matchedExistingPlayer = true
+      }
+    }
 
-      const existingUser = usersByEmail.get(email)
-      let user = existingUser
-      let player: PlayerRecord | null = user?.player || null
-      let matchedExistingPlayer = false
-      let createdPlayer = false
-      let createdUser = false
-      const notes: string[] = []
-
+    if (!user || !player) {
       if (!player) {
-        let matchedPlayer: PlayerRecord | null = null
+        const uniqueName = ensureUniqueName(fullName, reservedNames)
+        const uniqueSlug = ensureUniqueSlug(uniqueName, reservedSlugs)
+        player = {
+          name: uniqueName,
+          slug: uniqueSlug,
+          visible: desiredVisible,
+          socialNetworks: normalizedLinkedIn
+            ? [{ type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn }]
+            : [],
+          defaultTshirtSize: desiredTshirt || "none",
+          defaultFoodPreferences: desiredFood,
+          planned: true,
+        }
+        createdPlayer = true
+        actions.createPlayers.push({ name: uniqueName, email })
+        const nameList = playersByName.get(normalizeName(uniqueName)) || []
+        nameList.push(player)
+        playersByName.set(normalizeName(uniqueName), nameList)
         if (normalizedLinkedIn) {
-          const linkedPlayers = playersByLinkedIn.get(normalizedLinkedIn) || []
-          matchedPlayer = selectUnlinkedPlayer(linkedPlayers)
-        }
-        if (!matchedPlayer && normalizedName) {
-          const candidates = playersByName.get(normalizedName) || []
-          if (candidates.length > 1 && !selectUnlinkedPlayer(candidates)) {
-            actions.ambiguousMatches.push({ email, name: fullName })
-            notes.push("ambiguous_name_match")
-          }
-          matchedPlayer = selectUnlinkedPlayer(candidates)
-        }
-
-        if (matchedPlayer) {
-          player = matchedPlayer
-          matchedExistingPlayer = true
+          const linkedList = playersByLinkedIn.get(normalizedLinkedIn) || []
+          linkedList.push(player)
+          playersByLinkedIn.set(normalizedLinkedIn, linkedList)
         }
       }
 
-      if (!user || !player) {
-        if (!player) {
-          const uniqueName = ensureUniqueName(fullName, reservedNames)
-          const uniqueSlug = ensureUniqueSlug(uniqueName, reservedSlugs)
-          player = {
-            name: uniqueName,
-            slug: uniqueSlug,
-            visible: desiredVisible,
-            socialNetworks: normalizedLinkedIn
-              ? [{ type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn }]
-              : [],
-            defaultTshirtSize: desiredTshirt || "none",
-            defaultFoodPreferences: desiredFood,
-            planned: true,
-          }
-          createdPlayer = true
-          actions.createPlayers.push({ name: uniqueName, email })
-          const nameList = playersByName.get(normalizeName(uniqueName)) || []
-          nameList.push(player)
-          playersByName.set(normalizeName(uniqueName), nameList)
-          if (normalizedLinkedIn) {
-            const linkedList = playersByLinkedIn.get(normalizedLinkedIn) || []
-            linkedList.push(player)
-            playersByLinkedIn.set(normalizedLinkedIn, linkedList)
-          }
+      if (!user) {
+        actions.createUsers.push({ email, playerName: player?.name || fullName })
+        user = {
+          email,
+          username: nameToUsername(fullName, firstName, lastName),
+          player,
+          planned: true,
         }
-
-        if (!user) {
-          actions.createUsers.push({ email, playerName: player?.name || fullName })
-          user = {
-            email,
-            username: nameToUsername(fullName, firstName, lastName),
-            player,
-            planned: true,
-          }
-          createdUser = true
-          usersByEmail.set(email, user)
-        }
-
-        if (player && (!user.player || user.planned)) {
-          actions.linkUsers.push({ email, playerName: player.name })
-          user.player = player
-        }
+        createdUser = true
+        usersByEmail.set(email, user)
       }
 
-      const playerUpdates: Record<string, unknown> = {}
-      const canInspectPlayerPrefs =
-        player?.defaultTshirtSize !== undefined || player?.defaultFoodPreferences !== undefined
-      if (player) {
-        if (!desiredVisible && player.visible !== false) {
-          playerUpdates.visible = false
-        }
+      if (player && (!user.player || user.planned)) {
+        actions.linkUsers.push({ email, playerName: player.name })
+        user.player = player
+      }
+    }
 
-        if (normalizedLinkedIn) {
-          const hasLinkedIn = (player.socialNetworks || []).some((network) => {
-            const normalized = normalizeLinkedIn(network.url)
-            return normalized === normalizedLinkedIn
-          })
-          if (!hasLinkedIn) {
-            playerUpdates.socialNetworks = [
-              ...(player.socialNetworks || []),
-              { type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn },
-            ]
-          }
-        }
-
-        if (canInspectPlayerPrefs) {
-          if (
-            desiredTshirt &&
-            (!player.defaultTshirtSize || player.defaultTshirtSize === "none")
-          ) {
-            playerUpdates.defaultTshirtSize = desiredTshirt
-          }
-          if (desiredFood && !player.defaultFoodPreferences) {
-            playerUpdates.defaultFoodPreferences = desiredFood
-          }
-        }
+    const playerUpdates: Record<string, unknown> = {}
+    const canInspectPlayerPrefs =
+      player?.defaultTshirtSize !== undefined || player?.defaultFoodPreferences !== undefined
+    if (player) {
+      if (!desiredVisible && player.visible !== false) {
+        playerUpdates.visible = false
       }
 
-      if (player && Object.keys(playerUpdates).length > 0 && !player.planned) {
-        actions.updatePlayers.push({
-          name: player.name,
-          documentId: player.documentId,
-          updates: playerUpdates,
+      if (normalizedLinkedIn) {
+        const hasLinkedIn = (player.socialNetworks || []).some((network) => {
+          const normalized = normalizeLinkedIn(network.url)
+          return normalized === normalizedLinkedIn
         })
+        if (!hasLinkedIn) {
+          playerUpdates.socialNetworks = [
+            ...(player.socialNetworks || []),
+            { type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn },
+          ]
+        }
       }
 
-      const userStatus = existingUser && !createdUser ? "existing" : "created"
-      const playerStatus = matchedExistingPlayer && !createdPlayer ? "matched" : "created"
-      reportRows.push({
-        email,
-        name: player?.name || fullName,
-        sources: contact.sources.join(","),
-        userStatus,
-        playerStatus,
-        linkedIn: contact.linkedinUrl || "",
-        visible: desiredVisible ? "true" : "false",
-        notes: notes.join(","),
+      if (canInspectPlayerPrefs) {
+        if (desiredTshirt && (!player.defaultTshirtSize || player.defaultTshirtSize === "none")) {
+          playerUpdates.defaultTshirtSize = desiredTshirt
+        }
+        if (desiredFood && !player.defaultFoodPreferences) {
+          playerUpdates.defaultFoodPreferences = desiredFood
+        }
+      }
+    }
+
+    if (player && Object.keys(playerUpdates).length > 0 && !player.planned) {
+      actions.updatePlayers.push({
+        name: player.name,
+        documentId: player.documentId,
+        updates: playerUpdates,
       })
-
-      if (verbose) {
-        logInfo(`[Import] ${email}: ${player?.name || fullName}`)
-      }
     }
 
-    logInfo("Import summary")
-    logInfo(`- Contacts processed: ${contacts.length}`)
-    logInfo(`- Create players: ${actions.createPlayers.length}`)
-    logInfo(`- Create users: ${actions.createUsers.length}`)
-    logInfo(`- Link users: ${actions.linkUsers.length}`)
-    logInfo(`- Update players: ${actions.updatePlayers.length}`)
-    logInfo(`- Update users: ${actions.updateUsers.length}`)
-    logInfo(`- Skipped: ${actions.skipped.length}`)
-    logInfo(`- Ambiguous matches: ${actions.ambiguousMatches.length}`)
-
-    let reportPath: string | undefined
-    let csvPath: string | undefined
-    if (writeReports) {
-      reportPath = resolve(reportDir, "import-report.json")
-      writeFileSync(reportPath, JSON.stringify(reportRows, null, 2), "utf8")
-      csvPath = resolve(reportDir, "import-report.csv")
-      const csvHeader = [
-        "email",
-        "name",
-        "sources",
-        "userStatus",
-        "playerStatus",
-        "linkedIn",
-        "visible",
-        "notes",
-      ]
-      const csvLines = [csvHeader.join(",")].concat(
-        reportRows.map((row) =>
-          csvHeader
-            .map((key) => {
-              const value = String(row[key as keyof typeof row] ?? "")
-              if (value.includes(",") || value.includes("\"") || value.includes("\n")) {
-                return `"${value.replace(/\"/g, "\"\"")}"`
-              }
-              return value
-            })
-            .join(",")
-        )
-      )
-      writeFileSync(csvPath, `${csvLines.join("\n")}\n`, "utf8")
-      logInfo(`- Report JSON: ${reportPath}`)
-      logInfo(`- Report CSV: ${csvPath}`)
-    }
-
-    const summary = {
-      contacts: contacts.length,
-      createPlayers: actions.createPlayers.length,
-      createUsers: actions.createUsers.length,
-      linkUsers: actions.linkUsers.length,
-      updatePlayers: actions.updatePlayers.length,
-      updateUsers: actions.updateUsers.length,
-      skipped: actions.skipped.length,
-      ambiguousMatches: actions.ambiguousMatches.length,
-    }
-
-    if (dryRun) {
-      logInfo("Dry-run mode enabled. No changes were applied.")
-      return {
-        dryRun,
-        reportPath,
-        reportCsvPath: csvPath,
-        reportRows,
-        summary,
-      }
-    }
-
-    await strapi.db.transaction(async () => {
-      for (const action of actions.createPlayers) {
-        const playerName = action.name
-        const playerRecord = playersByName.get(normalizeName(playerName))?.find(
-          (player) => player.name === playerName
-        )
-        if (!playerRecord?.planned) continue
-        const createdPlayer = await strapi.documents("api::player.player").create({
-          data: {
-            name: playerRecord.name,
-            slug: playerRecord.slug,
-            position: "Player",
-            visible: playerRecord.visible ?? true,
-            socialNetworks: playerRecord.socialNetworks || [],
-            defaultTshirtSize: playerRecord.defaultTshirtSize || "none",
-            defaultFoodPreferences: playerRecord.defaultFoodPreferences || null,
-          } as any,
-        })
-        playerRecord.id = createdPlayer.id
-        playerRecord.documentId = createdPlayer.documentId
-        playerRecord.planned = false
-      }
-
-      for (const action of actions.createUsers) {
-        const user = usersByEmail.get(action.email)
-        if (!user || !user.planned) continue
-        const password = `${crypto.randomBytes(16).toString("hex")}!`
-
-        // Determine role based on player's position
-        const playerPosition = user.player?.position || "Player"
-        const roleType = POSITION_TO_ROLE[playerPosition] || "player"
-        const targetRole = rolesByType.get(roleType) || playerRole
-
-        const createdUser = await strapi.documents("plugin::users-permissions.user").create({
-          data: {
-            username: user.username || user.email,
-            email: user.email,
-            password,
-            confirmed: true,
-            blocked: false,
-            provider: "local",
-            role: targetRole.id,
-            ...(user.player?.id ? { player: user.player.id } : {}),
-            invitationStatus: "pending",
-          } as any,
-        })
-        user.id = createdUser.id
-        user.documentId = createdUser.documentId
-        user.planned = false
-      }
-
-      for (const action of actions.linkUsers) {
-        const user = usersByEmail.get(action.email)
-        if (!user || !user.player || !user.documentId || !user.player.id) continue
-        await strapi.documents("plugin::users-permissions.user").update({
-          documentId: user.documentId,
-          data: { player: user.player.id } as any,
-        })
-      }
-
-      for (const action of actions.updatePlayers) {
-        const targetDocumentId =
-          action.documentId ||
-          existingPlayers.find((p) => p.name === action.name)?.documentId ||
-          playersByName.get(normalizeName(action.name))?.find((p) => p.name === action.name)
-            ?.documentId
-        if (!targetDocumentId) continue
-        await strapi.documents("api::player.player").update({
-          documentId: targetDocumentId,
-          data: action.updates as any,
-        })
-      }
+    const userStatus = existingUser && !createdUser ? "existing" : "created"
+    const playerStatus = matchedExistingPlayer && !createdPlayer ? "matched" : "created"
+    reportRows.push({
+      email,
+      name: player?.name || fullName,
+      sources: contact.sources.join(","),
+      userStatus,
+      playerStatus,
+      linkedIn: contact.linkedinUrl || "",
+      visible: desiredVisible ? "true" : "false",
+      notes: notes.join(","),
     })
 
-    // Send invitation emails to newly created users immediately
-    // This is done outside the transaction to avoid blocking database writes
-    // Failed emails will leave users in "pending" status for cron retry
-    let emailsSent = 0
-    let emailsFailed = 0
-    for (const action of actions.createUsers) {
-      const user = usersByEmail.get(action.email)
-      if (!user?.documentId) continue
-
-      const success = await sendUserInvitationAndUpdateStatus(strapi, {
-        documentId: user.documentId,
-        email: user.email,
-        username: user.username || user.email,
-        player: user.player ? { name: user.player.name } : undefined,
-      })
-
-      if (success) {
-        emailsSent++
-      } else {
-        emailsFailed++
-        // User remains in "pending" status - cron job will retry
-      }
+    if (verbose) {
+      logInfo(`[Import] ${email}: ${player?.name || fullName}`)
     }
+  }
 
-    if (emailsSent > 0 || emailsFailed > 0) {
-      logInfo(`- Invitation emails sent: ${emailsSent}`)
-      if (emailsFailed > 0) {
-        logInfo(`- Invitation emails failed (will retry via cron): ${emailsFailed}`)
-      }
-    }
+  logInfo("Import summary")
+  logInfo(`- Contacts processed: ${contacts.length}`)
+  logInfo(`- Create players: ${actions.createPlayers.length}`)
+  logInfo(`- Create users: ${actions.createUsers.length}`)
+  logInfo(`- Link users: ${actions.linkUsers.length}`)
+  logInfo(`- Update players: ${actions.updatePlayers.length}`)
+  logInfo(`- Update users: ${actions.updateUsers.length}`)
+  logInfo(`- Skipped: ${actions.skipped.length}`)
+  logInfo(`- Ambiguous matches: ${actions.ambiguousMatches.length}`)
 
+  let reportPath: string | undefined
+  let csvPath: string | undefined
+  if (writeReports) {
+    reportPath = resolve(reportDir, "import-report.json")
+    writeFileSync(reportPath, JSON.stringify(reportRows, null, 2), "utf8")
+    csvPath = resolve(reportDir, "import-report.csv")
+    const csvHeader = [
+      "email",
+      "name",
+      "sources",
+      "userStatus",
+      "playerStatus",
+      "linkedIn",
+      "visible",
+      "notes",
+    ]
+    const csvLines = [csvHeader.join(",")].concat(
+      reportRows.map((row) =>
+        csvHeader
+          .map((key) => {
+            const value = String(row[key as keyof typeof row] ?? "")
+            if (value.includes(",") || value.includes('"') || value.includes("\n")) {
+              return `"${value.replace(/\"/g, '""')}"`
+            }
+            return value
+          })
+          .join(",")
+      )
+    )
+    writeFileSync(csvPath, `${csvLines.join("\n")}\n`, "utf8")
+    logInfo(`- Report JSON: ${reportPath}`)
+    logInfo(`- Report CSV: ${csvPath}`)
+  }
+
+  const summary = {
+    contacts: contacts.length,
+    createPlayers: actions.createPlayers.length,
+    createUsers: actions.createUsers.length,
+    linkUsers: actions.linkUsers.length,
+    updatePlayers: actions.updatePlayers.length,
+    updateUsers: actions.updateUsers.length,
+    skipped: actions.skipped.length,
+    ambiguousMatches: actions.ambiguousMatches.length,
+  }
+
+  if (dryRun) {
+    logInfo("Dry-run mode enabled. No changes were applied.")
     return {
       dryRun,
       reportPath,
@@ -1002,3 +872,117 @@ export async function runAudienceAttendeeImport(
       summary,
     }
   }
+
+  await strapi.db.transaction(async () => {
+    for (const action of actions.createPlayers) {
+      const playerName = action.name
+      const playerRecord = playersByName
+        .get(normalizeName(playerName))
+        ?.find((player) => player.name === playerName)
+      if (!playerRecord?.planned) continue
+      const createdPlayer = await strapi.documents("api::player.player").create({
+        data: {
+          name: playerRecord.name,
+          slug: playerRecord.slug,
+          position: "Player",
+          visible: playerRecord.visible ?? true,
+          socialNetworks: playerRecord.socialNetworks || [],
+          defaultTshirtSize: playerRecord.defaultTshirtSize || "none",
+          defaultFoodPreferences: playerRecord.defaultFoodPreferences || null,
+        } as any,
+      })
+      playerRecord.id = createdPlayer.id
+      playerRecord.documentId = createdPlayer.documentId
+      playerRecord.planned = false
+    }
+
+    for (const action of actions.createUsers) {
+      const user = usersByEmail.get(action.email)
+      if (!user || !user.planned) continue
+      const password = `${crypto.randomBytes(16).toString("hex")}!`
+
+      // Determine role based on player's position
+      const playerPosition = user.player?.position || "Player"
+      const roleType = POSITION_TO_ROLE[playerPosition] || "player"
+      const targetRole = rolesByType.get(roleType) || playerRole
+
+      const createdUser = await strapi.documents("plugin::users-permissions.user").create({
+        data: {
+          username: user.username || user.email,
+          email: user.email,
+          password,
+          confirmed: true,
+          blocked: false,
+          provider: "local",
+          role: targetRole.id,
+          ...(user.player?.id ? { player: user.player.id } : {}),
+          invitationStatus: "pending",
+        } as any,
+      })
+      user.id = createdUser.id
+      user.documentId = createdUser.documentId
+      user.planned = false
+    }
+
+    for (const action of actions.linkUsers) {
+      const user = usersByEmail.get(action.email)
+      if (!user || !user.player || !user.documentId || !user.player.id) continue
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: user.documentId,
+        data: { player: user.player.id } as any,
+      })
+    }
+
+    for (const action of actions.updatePlayers) {
+      const targetDocumentId =
+        action.documentId ||
+        existingPlayers.find((p) => p.name === action.name)?.documentId ||
+        playersByName.get(normalizeName(action.name))?.find((p) => p.name === action.name)
+          ?.documentId
+      if (!targetDocumentId) continue
+      await strapi.documents("api::player.player").update({
+        documentId: targetDocumentId,
+        data: action.updates as any,
+      })
+    }
+  })
+
+  // Send invitation emails to newly created users immediately
+  // This is done outside the transaction to avoid blocking database writes
+  // Failed emails will leave users in "pending" status for cron retry
+  let emailsSent = 0
+  let emailsFailed = 0
+  for (const action of actions.createUsers) {
+    const user = usersByEmail.get(action.email)
+    if (!user?.documentId) continue
+
+    const success = await sendUserInvitationAndUpdateStatus(strapi, {
+      documentId: user.documentId,
+      email: user.email,
+      username: user.username || user.email,
+      player: user.player ? { name: user.player.name } : undefined,
+    })
+
+    if (success) {
+      emailsSent++
+    } else {
+      emailsFailed++
+      // User remains in "pending" status - cron job will retry
+    }
+  }
+
+  if (emailsSent > 0 || emailsFailed > 0) {
+    logInfo(`- Invitation emails sent: ${emailsSent}`)
+    if (emailsFailed > 0) {
+      logInfo(`- Invitation emails failed (will retry via cron): ${emailsFailed}`)
+    }
+  }
+
+  return {
+    dryRun,
+    reportPath,
+    reportCsvPath: csvPath,
+    reportRows,
+    summary,
+  }
+}

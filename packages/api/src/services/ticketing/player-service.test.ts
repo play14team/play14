@@ -2,11 +2,11 @@
  * Tests for Player Service
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
-  findOrCreatePlayerForAttendee,
-  addPlayerToEventAttendees,
   type AttendeeInfo,
+  addPlayerToEventAttendees,
+  findOrCreatePlayerForAttendee,
 } from "./player-service"
 
 // Mock crypto for predictable slug generation
@@ -34,7 +34,7 @@ describe("Player Service", () => {
         warn: vi.fn(),
         error: vi.fn(),
       },
-      documents: vi.fn((contentType: string) => ({
+      documents: vi.fn((_contentType: string) => ({
         findOne: vi.fn(),
         findFirst: vi.fn(),
         create: vi.fn(),

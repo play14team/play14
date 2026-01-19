@@ -38,7 +38,7 @@ export interface SendInviteResult {
   userStatus?: "new" | "invited" | "accepted"
 }
 
-const emptyResponse: PlayersForInviteResponse = {
+const _emptyResponse: PlayersForInviteResponse = {
   data: [],
   meta: { pagination: { page: 1, pageSize: 20, pageCount: 0, total: 0 } },
 }
@@ -47,9 +47,7 @@ const emptyResponse: PlayersForInviteResponse = {
  * Search players for invite form
  * Uses the existing /players/list endpoint with search query
  */
-export async function searchPlayersForInvite(
-  query: string
-): Promise<PlayerForInvite[]> {
+export async function searchPlayersForInvite(query: string): Promise<PlayerForInvite[]> {
   if (!query || query.length < 2) {
     return []
   }
@@ -84,9 +82,7 @@ export async function searchPlayersForInvite(
 /**
  * Get a single player with user info for the invite form
  */
-export async function getPlayerForInvite(
-  playerId: string
-): Promise<PlayerForInvite | null> {
+export async function getPlayerForInvite(playerId: string): Promise<PlayerForInvite | null> {
   // Use the getPlayerForEdit endpoint but we only need basic info + user relation
   const result = await strapiFetch<{ data: PlayerForInvite }>(
     "/admin/players/:playerId/edit",

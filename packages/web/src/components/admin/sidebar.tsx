@@ -1,12 +1,12 @@
 "use client"
 
+import Logo from "@/components/layout/logo"
+import Avatar from "@/components/ui/avatar"
+import type { StrapiUser } from "@/libs/auth"
+import { useTheme } from "next-themes"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
-import { useTheme } from "next-themes"
-import Avatar from "@/components/ui/avatar"
-import Logo from "@/components/layout/logo"
-import type { StrapiUser } from "@/libs/auth"
+import { useEffect, useState } from "react"
 
 interface AdminSidebarProps {
   user: StrapiUser
@@ -161,7 +161,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           onClick={() => setCollapsed(!collapsed)}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          <i className={`bx ${collapsed ? "bx-chevron-right" : "bx-chevron-left"}`}></i>
+          <i className={`bx ${collapsed ? "bx-chevron-right" : "bx-chevron-left"}`} />
         </button>
       </div>
 
@@ -183,9 +183,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       <nav className="admin-sidebar-nav">
         {visibleSections.map((section) => (
           <div key={section.title} className="admin-sidebar-section">
-            {!collapsed && (
-              <h3 className="admin-sidebar-section-title">{section.title}</h3>
-            )}
+            {!collapsed && <h3 className="admin-sidebar-section-title">{section.title}</h3>}
             <ul>
               {section.items.map((item) => (
                 <li key={item.href}>
@@ -194,7 +192,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                     className={`admin-sidebar-link ${isActive(item.href, item.exact) ? "active" : ""}`}
                     title={collapsed ? item.label : undefined}
                   >
-                    <i className={`bx ${item.icon}`}></i>
+                    <i className={`bx ${item.icon}`} />
                     {!collapsed && <span>{item.label}</span>}
                   </Link>
                 </li>
@@ -209,18 +207,24 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           type="button"
           className="admin-sidebar-link"
           onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-          title={collapsed ? `Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode` : undefined}
+          title={
+            collapsed
+              ? `Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`
+              : undefined
+          }
           aria-label={`Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`}
         >
-          <i className={`bx ${mounted && resolvedTheme === "dark" ? "bx-sun" : "bx-moon"}`}></i>
-          {!collapsed && <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
+          <i className={`bx ${mounted && resolvedTheme === "dark" ? "bx-sun" : "bx-moon"}`} />
+          {!collapsed && (
+            <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+          )}
         </button>
         <Link
           href="/"
           className="admin-sidebar-link"
           title={collapsed ? "Back to Site" : undefined}
         >
-          <i className="bx bx-home"></i>
+          <i className="bx bx-home" />
           {!collapsed && <span>Back to Site</span>}
         </Link>
         <button
@@ -229,7 +233,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           onClick={handleSignOut}
           title={collapsed ? "Sign Out" : undefined}
         >
-          <i className="bx bx-log-out"></i>
+          <i className="bx bx-log-out" />
           {!collapsed && <span>Sign Out</span>}
         </button>
       </div>

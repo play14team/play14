@@ -20,7 +20,7 @@ export default async function SponsorCreatePage() {
               className="admin-btn admin-btn-icon admin-btn-secondary"
               title="Back to Sponsors"
             >
-              <i className="bx bx-arrow-back"></i>
+              <i className="bx bx-arrow-back" />
             </Link>
             <div>
               <h1>Create Sponsor</h1>

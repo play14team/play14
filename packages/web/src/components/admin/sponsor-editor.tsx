@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { createPortal } from "react-dom"
-import Image from "next/image"
 import {
-  getAvailableSponsors,
-  createSponsor,
   type Sponsor,
   type Sponsorship,
+  createSponsor,
+  getAvailableSponsors,
 } from "@/app/(admin)/admin/events/[slug]/sponsor.action"
+import Image from "next/image"
+import { useCallback, useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 
 const DEFAULT_CATEGORIES = ["Gold", "Silver", "Bronze", "Partner"]
 
@@ -19,7 +19,7 @@ interface Props {
 
 export default function SponsorEditor({ sponsorships, onChange }: Props) {
   const [availableSponsors, setAvailableSponsors] = useState<Sponsor[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [_isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForCategory, setCreateForCategory] = useState<string | null>(null)
@@ -96,17 +96,14 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
       setShowCreateModal(false)
       setCreateForCategory(null)
       return result.data
-    } else {
-      setError(result.error || "Failed to create sponsor")
-      return null
     }
+    setError(result.error || "Failed to create sponsor")
+    return null
   }
 
   // Get sponsors not already in any category
   const getUnusedSponsors = useCallback(() => {
-    const usedIds = new Set(
-      sponsorships.flatMap((s) => s.sponsors.map((sp) => sp.documentId))
-    )
+    const usedIds = new Set(sponsorships.flatMap((s) => s.sponsors.map((sp) => sp.documentId)))
     return availableSponsors.filter((s) => !usedIds.has(s.documentId))
   }, [availableSponsors, sponsorships])
 
@@ -114,7 +111,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
     <div className="sponsor-editor">
       {error && (
         <div className="admin-alert admin-alert-error admin-alert-sm">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -131,7 +128,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 onClick={() => removeCategory(sponsorship.category)}
                 title={`Remove ${sponsorship.category} category`}
               >
-                <i className="bx bx-trash"></i>
+                <i className="bx bx-trash" />
               </button>
             </div>
 
@@ -156,7 +153,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                     }
                     title="Remove sponsor"
                   >
-                    <i className="bx bx-x"></i>
+                    <i className="bx bx-x" />
                   </button>
                 </div>
               ))}
@@ -168,9 +165,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 value=""
                 onChange={(e) => {
                   if (e.target.value) {
-                    const sponsor = availableSponsors.find(
-                      (s) => s.documentId === e.target.value
-                    )
+                    const sponsor = availableSponsors.find((s) => s.documentId === e.target.value)
                     if (sponsor) {
                       addSponsorToCategory(sponsorship.category, sponsor)
                     }
@@ -192,7 +187,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                   setShowCreateModal(true)
                 }}
               >
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 New
               </button>
             </div>
@@ -209,7 +204,6 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 placeholder="Enter category name..."
                 value={customCategoryName}
                 onChange={(e) => setCustomCategoryName(e.target.value)}
-                autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && customCategoryName.trim()) {
                     addCategory(customCategoryName.trim())
@@ -330,14 +324,14 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
         <div className="admin-modal-header">
           <h3>Create New Sponsor</h3>
           <button type="button" className="admin-modal-close" onClick={onClose}>
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
           </button>
         </div>
 
         <div className="admin-modal-body">
           {error && (
             <div className="admin-alert admin-alert-error admin-alert-sm">
-              <i className="bx bx-error-circle"></i>
+              <i className="bx bx-error-circle" />
               {error}
             </div>
           )}
@@ -351,7 +345,6 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
               onChange={(e) => setName(e.target.value)}
               className="admin-input"
               placeholder="Sponsor name"
-              autoFocus
             />
           </div>
 
@@ -385,12 +378,12 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
           >
             {isCreating ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Creating...
               </>
             ) : (
               <>
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 Create Sponsor
               </>
             )}

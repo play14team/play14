@@ -38,10 +38,7 @@ test.describe("Articles List Page", () => {
   test("should have clickable article cards", async ({ page }) => {
     // Wait for article links to load
     await page.waitForSelector("a[href^='/articles/']", { timeout: 15000 })
-    const validLinks = await getDetailLinks(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const validLinks = await getDetailLinks(page, "/articles/", ["categories", "tags"])
     if (validLinks.length > 0) {
       const link = page.locator(`a[href='${validLinks[0]}']`).first()
       await link.waitFor({ state: "visible", timeout: 10000 })
@@ -51,10 +48,7 @@ test.describe("Articles List Page", () => {
   })
 
   test("should navigate to article details on card click", async ({ page }) => {
-    const clicked = await clickFirstDetailLink(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/articles/", ["categories", "tags"])
     if (clicked) {
       expect(page.url()).toMatch(/\/articles/)
     }
@@ -107,17 +101,11 @@ test.describe("Articles Categories Page", () => {
 })
 
 test.describe("Articles Category Detail Page", () => {
-  test("should load category articles from categories list", async ({
-    page,
-  }) => {
+  test("should load category articles from categories list", async ({ page }) => {
     await page.goto("/articles/categories")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(
-      page,
-      "/articles/categories/",
-      [],
-    )
+    const clicked = await clickFirstDetailLink(page, "/articles/categories/", [])
     if (clicked) {
       expect(page.url()).toMatch(/\/articles\/categories\//)
       await verifyPageLayout(page)
@@ -128,11 +116,7 @@ test.describe("Articles Category Detail Page", () => {
     await page.goto("/articles/categories")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(
-      page,
-      "/articles/categories/",
-      [],
-    )
+    const clicked = await clickFirstDetailLink(page, "/articles/categories/", [])
     if (clicked) {
       const main = page.locator("main")
       await expect(main).toBeVisible()
@@ -188,10 +172,7 @@ test.describe("Article Details Page", () => {
     // Wait for article links to load
     await page.waitForSelector("a[href^='/articles/']", { timeout: 15000 })
 
-    const validLinks = await getDetailLinks(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const validLinks = await getDetailLinks(page, "/articles/", ["categories", "tags"])
 
     if (validLinks.length > 0) {
       await page.goto(validLinks[0])
@@ -204,10 +185,7 @@ test.describe("Article Details Page", () => {
     await page.goto("/articles")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/articles/", ["categories", "tags"])
     if (clicked) {
       const main = page.locator("main")
       await expect(main).toBeVisible()
@@ -218,10 +196,7 @@ test.describe("Article Details Page", () => {
     await page.goto("/articles")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/articles/", ["categories", "tags"])
     if (clicked) {
       await verifyPageLayout(page)
     }
@@ -231,10 +206,7 @@ test.describe("Article Details Page", () => {
     await page.goto("/articles")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/articles/", ["categories", "tags"])
     if (clicked) {
       const main = page.locator("main")
       await expect(main).toBeVisible()
@@ -245,10 +217,7 @@ test.describe("Article Details Page", () => {
     await page.goto("/articles")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/articles/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/articles/", ["categories", "tags"])
     if (clicked) {
       const main = page.locator("main")
       await expect(main).toBeVisible()

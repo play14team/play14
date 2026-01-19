@@ -26,9 +26,7 @@ export default function EventsError({
   return (
     <Page name="Events">
       <ErrorMessage
-        title={
-          isConnectionError ? "Unable to load events" : "Error loading events"
-        }
+        title={isConnectionError ? "Unable to load events" : "Error loading events"}
         message={
           isConnectionError
             ? "We couldn't connect to the #play14 events server. Please check that your backend is running or try again later."

@@ -24,9 +24,7 @@ let ticketTypeCounter = 0
 /**
  * Create a ticket type fixture with sensible defaults
  */
-export function createTicketType(
-  overrides: Partial<TicketTypeFixture> = {}
-): TicketTypeFixture {
+export function createTicketType(overrides: Partial<TicketTypeFixture> = {}): TicketTypeFixture {
   ticketTypeCounter++
   const now = new Date().toISOString()
 

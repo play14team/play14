@@ -114,12 +114,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "date",
-        "additionalText",
-        "title"
-      ],
+      "list": ["id", "date", "additionalText", "title"],
       "edit": [
         [
           {

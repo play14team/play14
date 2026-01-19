@@ -1,4 +1,4 @@
-import { ComponentEventsSponsorship, Sponsor } from "@/models/strapi"
+import type { ComponentEventsSponsorship, Sponsor } from "@/models/strapi"
 import EventSponsor from "./sponsor"
 
 interface GroupedSponsorship {
@@ -12,20 +12,19 @@ const EventSponsorships = (props: {
   const { sponsorships } = props
 
   // Group sponsors by category name
-  const groupedByCategory = sponsorships?.reduce<
-    Record<string, GroupedSponsorship>
-  >((acc, item) => {
-    if (!item?.sponsors || item.sponsors.length === 0) return acc
+  const groupedByCategory = sponsorships?.reduce<Record<string, GroupedSponsorship>>(
+    (acc, item) => {
+      if (!item?.sponsors || item.sponsors.length === 0) return acc
 
-    const category = item.category || "Sponsors"
-    if (!acc[category]) {
-      acc[category] = { category, sponsors: [] }
-    }
-    acc[category].sponsors.push(
-      ...item.sponsors.filter((s): s is Sponsor => s !== undefined),
-    )
-    return acc
-  }, {})
+      const category = item.category || "Sponsors"
+      if (!acc[category]) {
+        acc[category] = { category, sponsors: [] }
+      }
+      acc[category].sponsors.push(...item.sponsors.filter((s): s is Sponsor => s !== undefined))
+      return acc
+    },
+    {}
+  )
 
   const categoryGroups = Object.values(groupedByCategory || {})
 
@@ -43,10 +42,7 @@ const EventSponsorships = (props: {
           <h4 className="sponsor-category-title">{group.category}</h4>
           <div className="row">
             {group.sponsors.map((sponsor, index) => (
-              <EventSponsor
-                key={`${group.category}-${sponsor.name}-${index}`}
-                sponsor={sponsor}
-              />
+              <EventSponsor key={`${group.category}-${sponsor.name}-${index}`} sponsor={sponsor} />
             ))}
           </div>
         </div>

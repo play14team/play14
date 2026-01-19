@@ -1,4 +1,3 @@
-import React from "react"
 import { Button, Heading, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 
@@ -104,7 +103,9 @@ export default function TicketOrderRefundEmail({
         View Your Orders
       </Button>
 
-      <Text style={{ marginTop: "30px" }}>If you have any questions, please contact the event organizers.</Text>
+      <Text style={{ marginTop: "30px" }}>
+        If you have any questions, please contact the event organizers.
+      </Text>
     </Layout>
   )
 }

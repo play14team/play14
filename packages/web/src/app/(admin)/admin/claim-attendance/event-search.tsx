@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Image from "next/image"
-import { searchClaimableEvents, type ClaimableEvent } from "./claim-attendance.action"
+import { useEffect, useState } from "react"
+import { type ClaimableEvent, searchClaimableEvents } from "./claim-attendance.action"
 
 interface EventSearchProps {
   events: ClaimableEvent[]
@@ -59,14 +59,14 @@ export default function EventSearch({ events, onSelectEvent }: EventSearchProps)
         </div>
         {isSearching && (
           <button type="button" className="admin-btn admin-btn-secondary" disabled>
-            <i className="bx bx-loader-alt bx-spin"></i>
+            <i className="bx bx-loader-alt bx-spin" />
           </button>
         )}
       </div>
 
       {!searchQuery && events.length > 0 && (
         <div className="event-search-hint">
-          <i className="bx bx-info-circle"></i>
+          <i className="bx bx-info-circle" />
           <span>Showing {events.length} events you can claim attendance for</span>
         </div>
       )}
@@ -75,12 +75,12 @@ export default function EventSearch({ events, onSelectEvent }: EventSearchProps)
         <div className="event-search-empty">
           {searchQuery.length >= 2 ? (
             <>
-              <i className="bx bx-search-alt"></i>
+              <i className="bx bx-search-alt" />
               <p>No events found matching &ldquo;{searchQuery}&rdquo;</p>
             </>
           ) : (
             <>
-              <i className="bx bx-check-circle"></i>
+              <i className="bx bx-check-circle" />
               <p>No events available to claim</p>
               <span>You may have already attended or claimed all available events</span>
             </>
@@ -102,7 +102,7 @@ export default function EventSearch({ events, onSelectEvent }: EventSearchProps)
                   />
                 ) : (
                   <div className="event-search-item-image-placeholder">
-                    <i className="bx bx-calendar-event"></i>
+                    <i className="bx bx-calendar-event" />
                   </div>
                 )}
               </div>
@@ -110,12 +110,12 @@ export default function EventSearch({ events, onSelectEvent }: EventSearchProps)
                 <h4 className="event-search-item-name">{event.name}</h4>
                 <div className="event-search-item-meta">
                   <span>
-                    <i className="bx bx-calendar"></i>
+                    <i className="bx bx-calendar" />
                     {formatDate(event.start)}
                   </span>
                   {event.location?.name && (
                     <span>
-                      <i className="bx bx-map"></i>
+                      <i className="bx bx-map" />
                       {event.location.name}
                     </span>
                   )}
@@ -126,7 +126,7 @@ export default function EventSearch({ events, onSelectEvent }: EventSearchProps)
                     className="admin-btn admin-btn-primary admin-btn-sm"
                     onClick={() => onSelectEvent(event)}
                   >
-                    <i className="bx bx-plus"></i>
+                    <i className="bx bx-plus" />
                     Claim Attendance
                   </button>
                 </div>

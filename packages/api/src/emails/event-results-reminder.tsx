@@ -1,5 +1,4 @@
-import React from "react"
-import { Button, Heading, Link, Text } from "@react-email/components"
+import { Button, Heading, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 
 interface EventResultsReminderEmailProps {
@@ -65,15 +64,11 @@ export default function EventResultsReminderEmail({
     <Layout preview={`Please enter your results for ${eventName}`}>
       <Heading as="h2">Event Results Needed</Heading>
 
-      {contactName && (
-        <Text>
-          Hi {contactName},
-        </Text>
-      )}
+      {contactName && <Text>Hi {contactName},</Text>}
 
       <Text>
-        {getReminderText(reminderNumber)} Now that <strong>{eventName}</strong> is over,
-        please take a moment to enter your event results.
+        {getReminderText(reminderNumber)} Now that <strong>{eventName}</strong> is over, please take
+        a moment to enter your event results.
       </Text>
 
       <div style={infoBoxStyle}>
@@ -81,14 +76,12 @@ export default function EventResultsReminderEmail({
           Why is this important?
         </Heading>
         <Text style={{ marginBottom: 0 }}>
-          Recording your results helps the #play14 community track the success of events,
-          share learnings, and improve future gatherings. It only takes a few minutes!
+          Recording your results helps the #play14 community track the success of events, share
+          learnings, and improve future gatherings. It only takes a few minutes!
         </Text>
       </div>
 
-      <Text>
-        Please record your financial results in the Results tab:
-      </Text>
+      <Text>Please record your financial results in the Results tab:</Text>
       <ul>
         <li>Actual income (sponsorships, donations, etc.)</li>
         <li>Actual expenses (venue, catering, materials, etc.)</li>
@@ -102,9 +95,7 @@ export default function EventResultsReminderEmail({
         If you have any questions or need help, feel free to reach out to the #play14 team.
       </Text>
 
-      <Text style={{ marginTop: "20px" }}>
-        Thank you for being part of the #play14 community!
-      </Text>
+      <Text style={{ marginTop: "20px" }}>Thank you for being part of the #play14 community!</Text>
     </Layout>
   )
 }

@@ -1,8 +1,8 @@
+import type { Article } from "@/models/strapi"
 import defaultArticle from "@/styles/images/gallery/gallery5.jpg"
-import moment from "moment"
+import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import { Article } from "@/models/strapi"
 
 const ArticleCard = ({ article }: { article: Article }) => {
   const url = `/articles/${encodeURIComponent(article.slug!)}`
@@ -11,11 +11,7 @@ const ArticleCard = ({ article }: { article: Article }) => {
   const avatar = author?.avatar
 
   return (
-    <article
-      id={article.title}
-      key={article.title}
-      className="col-lg-4 col-md-6"
-    >
+    <article id={article.title} key={article.title} className="col-lg-4 col-md-6">
       <div className="single-blog-post shadow">
         <div className="post-image">
           <Link href={url} className="d-block image">
@@ -26,8 +22,7 @@ const ArticleCard = ({ article }: { article: Article }) => {
                 width={image.width || 400}
                 height={image.height || 400}
                 blurDataURL={
-                  (image as { blurhash?: string }).blurhash ??
-                  process.env.DEFAULT_BLURHASH
+                  (image as { blurhash?: string }).blurhash ?? process.env.DEFAULT_BLURHASH
                 }
                 placeholder="blur"
                 sizes="100vw"
@@ -76,8 +71,8 @@ const ArticleCard = ({ article }: { article: Article }) => {
               </div>
             </li>
             <li>
-              <i className="flaticon-calendar"></i>
-              {moment(article.publishedAt).format("MMM Do, YYYY")}
+              <i className="flaticon-calendar" />
+              {format(parseISO(article.publishedAt), "MMM do, yyyy")}
             </li>
           </ul>
           <h3>
@@ -85,9 +80,7 @@ const ArticleCard = ({ article }: { article: Article }) => {
           </h3>
           <p>
             {article.summary && article.summary.length > 200
-              ? article.summary
-                  .substring(0, article.summary.indexOf(" ", 200))
-                  .concat("...")
+              ? article.summary.substring(0, article.summary.indexOf(" ", 200)).concat("...")
               : article.summary}
           </p>
         </div>

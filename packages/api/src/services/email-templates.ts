@@ -3,18 +3,18 @@
  * Provides helper functions for rendering and sending emails
  */
 
+import { randomBytes } from "node:crypto"
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
-import { randomBytes } from "node:crypto"
+import PlayerInvitationEmail from "../emails/player-invitation"
+import TicketConfirmationEmail from "../emails/ticket-confirmation"
+import TicketSoldNotificationEmail from "../emails/ticket-sold-notification"
 import {
   generateEventICS,
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
 } from "../libs/calendar"
 import { nameToUsername } from "../libs/strings"
-import TicketConfirmationEmail from "../emails/ticket-confirmation"
-import PlayerInvitationEmail from "../emails/player-invitation"
-import TicketSoldNotificationEmail from "../emails/ticket-sold-notification"
 
 /**
  * Send order confirmation email with calendar attachment
@@ -205,12 +205,15 @@ export async function sendTicketSoldNotificationEmail(
       { plainText: true }
     )
 
-    await strapi.plugin("email").service("email").send({
-      to: contactEmail,
-      subject: `[#play14] New ticket order for ${order.event?.name || "an event"}`,
-      html,
-      text,
-    })
+    await strapi
+      .plugin("email")
+      .service("email")
+      .send({
+        to: contactEmail,
+        subject: `[#play14] New ticket order for ${order.event?.name || "an event"}`,
+        html,
+        text,
+      })
 
     strapi.log.info(
       `[EmailTemplates] Ticket sale notification sent to ${contactEmail} for order ${order.orderNumber}`
@@ -276,7 +279,9 @@ export async function sendPlayerInvitationEmail(
           resetPasswordToken: resetToken,
         } as any,
       })
-      strapi.log.info(`[EmailTemplates] Linked existing user ${email} to player ${player.documentId}`)
+      strapi.log.info(
+        `[EmailTemplates] Linked existing user ${email} to player ${player.documentId}`
+      )
     } else {
       // Create a new user account
       const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
@@ -299,7 +304,9 @@ export async function sendPlayerInvitationEmail(
           resetPasswordToken: resetToken,
         } as any,
       })
-      strapi.log.info(`[EmailTemplates] Created new user account for ${email} and linked to player ${player.documentId}`)
+      strapi.log.info(
+        `[EmailTemplates] Created new user account for ${email} and linked to player ${player.documentId}`
+      )
     }
   } else {
     // User already exists and is linked - just update the reset token
@@ -335,7 +342,9 @@ export async function sendPlayerInvitationEmail(
     googleCalendarUrl = generateGoogleCalendarUrl(eventData)
     outlookCalendarUrl = generateOutlookCalendarUrl(eventData)
   } catch (calError: any) {
-    strapi.log.warn(`[EmailTemplates] Failed to generate calendar for invitation: ${calError.message}`)
+    strapi.log.warn(
+      `[EmailTemplates] Failed to generate calendar for invitation: ${calError.message}`
+    )
   }
 
   try {
@@ -392,6 +401,8 @@ export async function sendPlayerInvitationEmail(
 
     strapi.log.info(`[EmailTemplates] Player invitation email sent to ${email}`)
   } catch (error: any) {
-    strapi.log.error(`[EmailTemplates] Failed to send player invitation email to ${email}: ${error.message}`)
+    strapi.log.error(
+      `[EmailTemplates] Failed to send player invitation email to ${email}: ${error.message}`
+    )
   }
 }

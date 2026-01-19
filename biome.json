@@ -1,0 +1,92 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignore": [
+      "node_modules/",
+      "packages/design/",
+      "packages/agents/",
+      "packages/web/.next/",
+      "packages/web/out/",
+      "packages/web/build/",
+      "packages/web/coverage/",
+      "packages/web/public/",
+      "packages/web/src/models/",
+      "packages/web/src/styles/css/",
+      "packages/web/src/styles/font-awesome/",
+      "packages/api/build/",
+      "packages/api/.cache/",
+      "packages/api/.strapi/",
+      "packages/api/dist/",
+      "packages/api/types/",
+      "packages/api/public/",
+      "packages/api/database/migrations/",
+      "packages/api/src/extensions/documentation/",
+      "bun.lock",
+      "**/*.min.js"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "recommended": false
+      },
+      "complexity": {
+        "noForEach": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "warn",
+        "noConstructorReturn": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "noParameterAssign": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noImplicitAnyLet": "off",
+        "noArrayIndexKey": "off",
+        "noMisleadingCharacterClass": "off",
+        "noShadowRestrictedNames": "off",
+        "noControlCharactersInRegex": "off",
+        "noRedeclare": "off",
+        "noAssignInExpressions": "off",
+        "noThenProperty": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      }
+    }
+  },
+  "organizeImports": {
+    "enabled": true
+  }
+}

@@ -111,11 +111,7 @@ export async function getTicketDetails(ticketId: string): Promise<TicketDetails 
  * Get current user's tickets
  */
 export async function getMyTickets(): Promise<MyTicket[]> {
-  const result = await strapiFetch<{ data: MyTicket[] }>(
-    "/tickets/me",
-    {},
-    { cache: "no-store" }
-  )
+  const result = await strapiFetch<{ data: MyTicket[] }>("/tickets/me", {}, { cache: "no-store" })
 
   if (!result.ok) {
     console.error("[Tickets] Failed to fetch tickets:", result.status)

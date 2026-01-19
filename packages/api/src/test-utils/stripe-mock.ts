@@ -5,18 +5,16 @@
  * simulating various payment scenarios without making real API calls.
  */
 
-import { vi, type Mock } from "vitest"
+import { type Mock, vi } from "vitest"
 import {
-  createMockCheckoutSession,
-  createCompletedCheckoutSession,
-  createExpiredCheckoutSession,
-  createMockPaymentIntent,
-  createMockAccount,
-  createMockRefund,
+  type MockAccount,
   type MockCheckoutSession,
   type MockPaymentIntent,
-  type MockAccount,
   type MockRefund,
+  createMockAccount,
+  createMockCheckoutSession,
+  createMockPaymentIntent,
+  createMockRefund,
 } from "./factories/stripe"
 
 export interface StripeMockState {
@@ -187,7 +185,7 @@ export function createStripeMock(): StripeMock {
     },
 
     webhooks: {
-      constructEvent: vi.fn((payload: string, signature: string, secret: string) => {
+      constructEvent: vi.fn((payload: string, _signature: string, secret: string) => {
         // Verify secret matches expected test secret
         if (secret !== "whsec_test_secret_for_testing") {
           const error = new Error("Invalid signature") as Error & { type: string }
@@ -275,8 +273,8 @@ export function simulateCheckoutExpired(
 export function simulatePaymentFailed(
   state: StripeMockState,
   sessionId: string,
-  errorCode: string = "card_declined",
-  errorMessage: string = "Your card was declined"
+  errorCode = "card_declined",
+  errorMessage = "Your card was declined"
 ): { type: string; data: { object: any } } {
   const session = state.sessions.get(sessionId)
   if (!session || !session.payment_intent) {
@@ -352,10 +350,7 @@ export function simulateAccountUpdated(
 /**
  * Create a webhook payload with proper structure for testing
  */
-export function createWebhookPayload(
-  eventType: string,
-  data: Record<string, unknown>
-): string {
+export function createWebhookPayload(eventType: string, data: Record<string, unknown>): string {
   return JSON.stringify({
     id: `evt_test_${Date.now()}`,
     object: "event",

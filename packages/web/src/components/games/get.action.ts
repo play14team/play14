@@ -1,12 +1,8 @@
 "use server"
 
-import { SlugParamsProps } from "@/libs/slug-params"
-import { restQuery, normalizeConnection } from "@/libs/strapi-client"
-import {
-  gameItemPopulate,
-  gameDetailsPopulate,
-  gameNavPopulate,
-} from "@/libs/strapi-populate"
+import type { SlugParamsProps } from "@/libs/slug-params"
+import { normalizeConnection, restQuery } from "@/libs/strapi-client"
+import { gameDetailsPopulate, gameItemPopulate, gameNavPopulate } from "@/libs/strapi-populate"
 
 // Types - will be replaced by OpenAPI generated types when available
 interface UploadFile {
@@ -55,12 +51,7 @@ interface Game {
  * Get paginated games list
  * REST equivalent of: games/grid.graphql
  */
-export async function getGames(
-  page: number,
-  pageSize: number,
-  category?: string,
-  tag?: string,
-) {
+export async function getGames(page: number, pageSize: number, category?: string, tag?: string) {
   const filters: Record<string, unknown> = {}
   if (category) {
     filters.category = { $eqi: category }

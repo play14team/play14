@@ -59,8 +59,8 @@ export function trackCheckoutStarted(
  */
 export function trackDraftOrderCreated(
   eventId: string,
-  orderId: string,
-  ticketCount: number,
+  _orderId: string,
+  _ticketCount: number,
   totalAmount: number,
   discountAmount: number,
   currency: string
@@ -84,7 +84,7 @@ export function trackDraftOrderCreated(
 /**
  * Track when attendee information is submitted
  */
-export function trackAttendeeInfoSubmitted(eventId: string, orderId: string): void {
+export function trackAttendeeInfoSubmitted(eventId: string, _orderId: string): void {
   Sentry.metrics.count("checkout.attendee_info_submitted", 1, {
     attributes: { event_id: eventId },
   })
@@ -95,7 +95,7 @@ export function trackAttendeeInfoSubmitted(eventId: string, orderId: string): vo
  */
 export function trackCheckoutFinalized(
   eventId: string,
-  orderId: string,
+  _orderId: string,
   isFreeOrder: boolean
 ): void {
   Sentry.metrics.count("checkout.finalized", 1, {
@@ -272,10 +272,7 @@ export async function withApiSpan<T>(
 /**
  * Create a span for form validation
  */
-export async function withValidationSpan<T>(
-  formName: string,
-  fn: () => Promise<T>
-): Promise<T> {
+export async function withValidationSpan<T>(formName: string, fn: () => Promise<T>): Promise<T> {
   return Sentry.startSpan(
     {
       name: `validation.${formName}`,

@@ -9,13 +9,7 @@
       "action": "plugin::content-manager.explorer.create",
       "subject": "api::event-location.event-location",
       "properties": {
-        "fields": [
-          "name",
-          "slug",
-          "country",
-          "events",
-          "location"
-        ]
+        "fields": ["name", "slug", "country", "events", "location"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -26,9 +20,7 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::event-location.event-location",
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "i4cywd7fhtk1avmlmyok2ris",
       "locale": null
@@ -37,13 +29,7 @@
       "action": "plugin::content-manager.explorer.read",
       "subject": "api::event-location.event-location",
       "properties": {
-        "fields": [
-          "name",
-          "slug",
-          "country",
-          "events",
-          "location"
-        ]
+        "fields": ["name", "slug", "country", "events", "location"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -54,13 +40,7 @@
       "action": "plugin::content-manager.explorer.update",
       "subject": "api::event-location.event-location",
       "properties": {
-        "fields": [
-          "name",
-          "slug",
-          "country",
-          "events",
-          "location"
-        ]
+        "fields": ["name", "slug", "country", "events", "location"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -104,10 +84,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -118,14 +95,9 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::event.event",
       "properties": {
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "wj7flimo94sn0uz0pzx0c7dh",
       "locale": null
@@ -134,10 +106,7 @@
       "action": "plugin::content-manager.explorer.publish",
       "subject": "api::event.event",
       "properties": {
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -181,10 +150,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -228,10 +194,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -271,10 +234,7 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::player.player",
       "properties": {},
-      "conditions": [
-        "admin::is-creator",
-        "admin::has-same-role-as-creator"
-      ],
+      "conditions": ["admin::is-creator", "admin::has-same-role-as-creator"],
       "actionParameters": {},
       "documentId": "h1wk2yzz2qznejvq9rvqlb58",
       "locale": null
@@ -341,13 +301,7 @@
       "action": "plugin::content-manager.explorer.create",
       "subject": "api::sponsor.sponsor",
       "properties": {
-        "fields": [
-          "name",
-          "url",
-          "logo",
-          "socialNetworks.url",
-          "socialNetworks.type"
-        ]
+        "fields": ["name", "url", "logo", "socialNetworks.url", "socialNetworks.type"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -358,9 +312,7 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::sponsor.sponsor",
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "olssj08uvlese94m6wy5s5n5",
       "locale": null
@@ -369,13 +321,7 @@
       "action": "plugin::content-manager.explorer.read",
       "subject": "api::sponsor.sponsor",
       "properties": {
-        "fields": [
-          "name",
-          "url",
-          "logo",
-          "socialNetworks.url",
-          "socialNetworks.type"
-        ]
+        "fields": ["name", "url", "logo", "socialNetworks.url", "socialNetworks.type"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -386,13 +332,7 @@
       "action": "plugin::content-manager.explorer.update",
       "subject": "api::sponsor.sponsor",
       "properties": {
-        "fields": [
-          "name",
-          "url",
-          "logo",
-          "socialNetworks.url",
-          "socialNetworks.type"
-        ]
+        "fields": ["name", "url", "logo", "socialNetworks.url", "socialNetworks.type"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -403,12 +343,7 @@
       "action": "plugin::content-manager.explorer.create",
       "subject": "api::testimonial.testimonial",
       "properties": {
-        "fields": [
-          "content",
-          "audio",
-          "author",
-          "url"
-        ]
+        "fields": ["content", "audio", "author", "url"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -419,9 +354,7 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::testimonial.testimonial",
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "r58smb5jvqu47vodre25wgsy",
       "locale": null
@@ -430,12 +363,7 @@
       "action": "plugin::content-manager.explorer.read",
       "subject": "api::testimonial.testimonial",
       "properties": {
-        "fields": [
-          "content",
-          "audio",
-          "author",
-          "url"
-        ]
+        "fields": ["content", "audio", "author", "url"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -446,12 +374,7 @@
       "action": "plugin::content-manager.explorer.update",
       "subject": "api::testimonial.testimonial",
       "properties": {
-        "fields": [
-          "content",
-          "audio",
-          "author",
-          "url"
-        ]
+        "fields": ["content", "audio", "author", "url"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -549,9 +472,7 @@
       "action": "plugin::upload.assets.update",
       "subject": null,
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "fd9mbo59tg0u8rjkhzgj8hqi",
       "locale": null

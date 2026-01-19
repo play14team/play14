@@ -3,12 +3,7 @@
 import "mapbox-gl/dist/mapbox-gl.css"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
-import Map, {
-  FullscreenControl,
-  Marker,
-  NavigationControl,
-  Popup,
-} from "react-map-gl/mapbox"
+import Map, { FullscreenControl, Marker, NavigationControl, Popup } from "react-map-gl/mapbox"
 
 interface MapboxLocation {
   geometry: {
@@ -88,13 +83,7 @@ const MapView = ({ location, height, zoom, popup }: MapViewProps) => {
         <FullscreenControl />
         <NavigationControl />
 
-        {location && (
-          <Marker
-            longitude={longitude}
-            latitude={latitude}
-            color={markerColor}
-          />
-        )}
+        {location && <Marker longitude={longitude} latitude={latitude} color={markerColor} />}
 
         {popup && (
           <Popup

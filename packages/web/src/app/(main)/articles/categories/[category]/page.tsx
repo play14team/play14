@@ -11,9 +11,7 @@ export default async function ArticleCategory(props: {
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <Filters
-          name={`Found ${articles.length} articles with category "${params.category}"`}
-        />
+        <Filters name={`Found ${articles.length} articles with category "${params.category}"`} />
       </div>
       <div className="pt-70">
         <ArticleGrid articles={articles} />

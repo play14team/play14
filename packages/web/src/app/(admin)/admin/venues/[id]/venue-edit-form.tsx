@@ -1,14 +1,14 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/components/admin/toast"
-import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
-import VenueMapPicker, { type MapLocation } from "@/components/admin/venue-map-picker"
 import VenueLogoManager from "@/components/admin/venue-logo-manager"
-import { updateVenue, deleteVenue, type VenueForEdit } from "../venues.action"
-import { type VenueLogo } from "../logo.action"
+import VenueMapPicker, { type MapLocation } from "@/components/admin/venue-map-picker"
+import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { VenueLogo } from "../logo.action"
+import { type VenueForEdit, deleteVenue, updateVenue } from "../venues.action"
 
 interface Props {
   venue: VenueForEdit
@@ -319,9 +319,9 @@ export default function VenueEditForm({ venue }: Props) {
                         href={`/admin/events/${event.slug}`}
                         className="venue-event-link"
                       >
-                        <i className="bx bx-calendar-event"></i>
+                        <i className="bx bx-calendar-event" />
                         <span>{event.name}</span>
-                        <i className="bx bx-link-external"></i>
+                        <i className="bx bx-link-external" />
                       </a>
                     ))}
                   </div>
@@ -352,12 +352,12 @@ export default function VenueEditForm({ venue }: Props) {
             >
               {isSubmitting ? (
                 <>
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <i className="bx bx-save"></i>
+                  <i className="bx bx-save" />
                   Save changes
                 </>
               )}
@@ -369,7 +369,7 @@ export default function VenueEditForm({ venue }: Props) {
                 onClick={handleDiscard}
                 className="admin-btn admin-btn-danger-outline admin-btn-block"
               >
-                <i className="bx bx-undo"></i>
+                <i className="bx bx-undo" />
                 Discard changes
               </button>
             )}
@@ -380,14 +380,14 @@ export default function VenueEditForm({ venue }: Props) {
                 className="admin-btn admin-btn-danger admin-btn-block"
                 onClick={() => setShowDeleteConfirm(true)}
               >
-                <i className="bx bx-trash"></i>
+                <i className="bx bx-trash" />
                 Delete venue
               </button>
             )}
 
             {!canDelete && (
               <p className="admin-form-help">
-                <i className="bx bx-info-circle"></i>
+                <i className="bx bx-info-circle" />
                 Cannot delete: this venue has {venue.eventsCount} event
                 {venue.eventsCount !== 1 ? "s" : ""} attached.
               </p>
@@ -404,7 +404,7 @@ export default function VenueEditForm({ venue }: Props) {
                 >
                   {isDeleting ? (
                     <>
-                      <i className="bx bx-loader-alt bx-spin"></i>
+                      <i className="bx bx-loader-alt bx-spin" />
                       Deleting...
                     </>
                   ) : (
@@ -426,7 +426,7 @@ export default function VenueEditForm({ venue }: Props) {
           {/* Dirty State Indicator */}
           {isDirty && (
             <div className="dirty-indicator">
-              <i className="bx bx-edit-alt"></i>
+              <i className="bx bx-edit-alt" />
               <span>You have unsaved changes</span>
             </div>
           )}

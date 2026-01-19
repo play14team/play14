@@ -30,7 +30,7 @@ export default async function VenuesPage() {
                 href="/admin/venues/create"
                 className="admin-btn admin-btn-primary admin-btn-block"
               >
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 Create Venue
               </Link>
             </div>

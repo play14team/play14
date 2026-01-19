@@ -145,12 +145,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "name",
-        "stages",
-        "stageRequiredToPublish"
-      ],
+      "list": ["id", "name", "stages", "stageRequiredToPublish"],
       "edit": [
         [
           {

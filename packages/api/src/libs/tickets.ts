@@ -2,7 +2,7 @@
  * Utility functions for ticket management
  */
 
-import { randomBytes } from "crypto"
+import { randomBytes } from "node:crypto"
 
 /**
  * Generate a unique order number

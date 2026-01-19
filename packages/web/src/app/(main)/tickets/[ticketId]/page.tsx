@@ -1,6 +1,6 @@
+import { getTicketDetails } from "@/components/tickets/ticket.action"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { getTicketDetails } from "@/components/tickets/ticket.action"
 import styles from "./page.module.scss"
 
 interface TicketPageProps {

@@ -127,12 +127,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "firstName",
-        "lastName",
-        "email"
-      ],
+      "list": ["id", "firstName", "lastName", "email"],
       "edit": [
         [
           {

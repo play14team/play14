@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import Link from "next/link"
 import Image from "next/image"
-import { getVenues, type VenueListItem, type VenuesListResponse } from "./venues.action"
+import Link from "next/link"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { type VenueListItem, type VenuesListResponse, getVenues } from "./venues.action"
 
 export default function VenuesList() {
   const [venues, setVenues] = useState<VenueListItem[]>([])
@@ -70,14 +70,15 @@ export default function VenuesList() {
     if (!venue.logo) return null
     const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
     // Prefer thumbnail or small format
-    const url = venue.logo.formats?.thumbnail?.url || venue.logo.formats?.small?.url || venue.logo.url
+    const url =
+      venue.logo.formats?.thumbnail?.url || venue.logo.formats?.small?.url || venue.logo.url
     return url.startsWith("http") ? url : `${baseUrl}${url}`
   }
 
   if (isLoading && venues.length === 0) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading venues...</span>
       </div>
     )
@@ -86,14 +87,14 @@ export default function VenuesList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
         <button
           type="button"
           className="admin-btn admin-btn-secondary"
           onClick={() => fetchVenues(1, debouncedSearch)}
         >
-          <i className="bx bx-refresh"></i>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -105,7 +106,7 @@ export default function VenuesList() {
       <div className="venues-toolbar">
         <div className="venues-search">
           <div className="search-input-wrapper">
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
             <input
               type="text"
               placeholder="Search venues..."
@@ -120,7 +121,7 @@ export default function VenuesList() {
                 onClick={() => handleSearchChange("")}
                 aria-label="Clear search"
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             )}
           </div>
@@ -132,7 +133,7 @@ export default function VenuesList() {
             className="admin-btn admin-btn-secondary admin-btn-sm"
             onClick={handleClearFilters}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Clear filters
           </button>
         )}
@@ -145,17 +146,15 @@ export default function VenuesList() {
 
       {isLoading ? (
         <div className="claims-loading">
-          <i className="bx bx-loader-alt bx-spin"></i>
+          <i className="bx bx-loader-alt bx-spin" />
           <span>Loading...</span>
         </div>
       ) : venues.length === 0 ? (
         <div className="claims-empty">
-          <i className="bx bx-building-house"></i>
+          <i className="bx bx-building-house" />
           <h3>No venues found</h3>
           <p>
-            {searchQuery
-              ? "Try adjusting your search"
-              : "Create your first venue to get started"}
+            {searchQuery ? "Try adjusting your search" : "Create your first venue to get started"}
           </p>
           {searchQuery && (
             <button
@@ -188,7 +187,7 @@ export default function VenuesList() {
                         style={{ objectFit: "contain" }}
                       />
                     ) : (
-                      <i className="bx bx-building-house"></i>
+                      <i className="bx bx-building-house" />
                     )}
                   </div>
                   <div className="venue-card-info">
@@ -201,7 +200,7 @@ export default function VenuesList() {
                     </span>
                   </div>
                   <div className="venue-card-action">
-                    <i className="bx bx-chevron-right"></i>
+                    <i className="bx bx-chevron-right" />
                   </div>
                 </Link>
               )
@@ -216,7 +215,7 @@ export default function VenuesList() {
                 disabled={pagination.page <= 1}
                 onClick={() => handlePageChange(pagination.page - 1)}
               >
-                <i className="bx bx-chevron-left"></i>
+                <i className="bx bx-chevron-left" />
                 Previous
               </button>
               <span className="pagination-info">
@@ -229,7 +228,7 @@ export default function VenuesList() {
                 onClick={() => handlePageChange(pagination.page + 1)}
               >
                 Next
-                <i className="bx bx-chevron-right"></i>
+                <i className="bx bx-chevron-right" />
               </button>
             </div>
           )}

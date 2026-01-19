@@ -1,4 +1,3 @@
-import React from "react"
 import { Button, Heading, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 
@@ -46,7 +45,9 @@ export default function PlayerClaimRejectedEmail({
         </>
       )}
 
-      <Text>If you believe this is an error, please contact us or try claiming a different profile.</Text>
+      <Text>
+        If you believe this is an error, please contact us or try claiming a different profile.
+      </Text>
 
       <Button href={`${frontendUrl}/contact`} style={buttonStyle}>
         Contact Us

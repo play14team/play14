@@ -4,16 +4,16 @@
 
 import Stripe from "stripe"
 import type {
+  AccountLink,
+  CheckoutSession,
+  ConnectAccount,
   ConnectPaymentProvider,
   CreateCheckoutSessionParams,
   CreateCheckoutWithConnectParams,
   CreateConnectAccountParams,
-  CheckoutSession,
   RefundParams,
   RefundResult,
   WebhookEvent,
-  ConnectAccount,
-  AccountLink,
 } from "../types"
 
 /**
@@ -116,7 +116,8 @@ export class StripeProvider implements ConnectPaymentProvider {
 
     // Allow passing secrets as parameters for testing, otherwise use env vars
     this.webhookSecret = webhookSecret || process.env.STRIPE_WEBHOOK_SECRET || ""
-    this.webhookSecretConnect = webhookSecretConnect || process.env.STRIPE_WEBHOOK_SECRET_CONNECT || ""
+    this.webhookSecretConnect =
+      webhookSecretConnect || process.env.STRIPE_WEBHOOK_SECRET_CONNECT || ""
   }
 
   async createCheckoutSession(params: CreateCheckoutSessionParams): Promise<CheckoutSession> {
@@ -161,7 +162,7 @@ export class StripeProvider implements ConnectPaymentProvider {
   ): Promise<CheckoutSession> {
     const currency = validateCurrency(params.currency)
 
-    const totalAmount = params.lineItems.reduce(
+    const _totalAmount = params.lineItems.reduce(
       (sum, item) => sum + Math.round(item.unitPrice * 100) * item.quantity,
       0
     )
@@ -221,9 +222,13 @@ export class StripeProvider implements ConnectPaymentProvider {
   }
 
   async verifyWebhookSignature(payload: string, signature: string): Promise<WebhookEvent> {
-    if ((!this.webhookSecret || this.webhookSecret.trim().length === 0) &&
-        (!this.webhookSecretConnect || this.webhookSecretConnect.trim().length === 0)) {
-      throw new Error("At least one of STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET_CONNECT must be set")
+    if (
+      (!this.webhookSecret || this.webhookSecret.trim().length === 0) &&
+      (!this.webhookSecretConnect || this.webhookSecretConnect.trim().length === 0)
+    ) {
+      throw new Error(
+        "At least one of STRIPE_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET_CONNECT must be set"
+      )
     }
 
     let event: Stripe.Event | null = null

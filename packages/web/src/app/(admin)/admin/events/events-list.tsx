@@ -1,12 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
 import Link from "next/link"
-import { getMyEvents, type MyEvent } from "./events.action"
-import {
-  publishEvent,
-  unpublishEvent,
-} from "./[slug]/event-edit.action"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { publishEvent, unpublishEvent } from "./[slug]/event-edit.action"
+import { type MyEvent, getMyEvents } from "./events.action"
 
 type StatusFilter = "active" | "all" | "drafts" | "over" | "cancelled"
 
@@ -79,10 +76,7 @@ export default function EventsList() {
     setIsLoading(false)
   }, [])
 
-  const handlePublishToggle = async (
-    e: React.MouseEvent,
-    event: MyEvent
-  ) => {
+  const handlePublishToggle = async (e: React.MouseEvent, event: MyEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -95,11 +89,7 @@ export default function EventsList() {
     if (result.success) {
       // Update local state
       setEvents((prev) =>
-        prev.map((ev) =>
-          ev.slug === event.slug
-            ? { ...ev, isPublished: !ev.isPublished }
-            : ev
-        )
+        prev.map((ev) => (ev.slug === event.slug ? { ...ev, isPublished: !ev.isPublished } : ev))
       )
     }
 
@@ -114,31 +104,25 @@ export default function EventsList() {
   const filteredEvents = useMemo(() => {
     switch (statusFilter) {
       case "active":
-        return events.filter(
-          (e) => e.eventStatus === "Announced" || e.eventStatus === "Open"
-        )
+        return events.filter((e) => e.eventStatus === "Announced" || e.eventStatus === "Open")
       case "drafts":
         return events.filter((e) => !e.isPublished)
       case "over":
         return events.filter((e) => e.eventStatus === "Over")
       case "cancelled":
         return events.filter((e) => e.eventStatus === "Cancelled")
-      case "all":
       default:
         return events
     }
   }, [events, statusFilter])
 
   // Count drafts for badge
-  const draftCount = useMemo(
-    () => events.filter((e) => !e.isPublished).length,
-    [events]
-  )
+  const draftCount = useMemo(() => events.filter((e) => !e.isPublished).length, [events])
 
   if (isLoading) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading events...</span>
       </div>
     )
@@ -147,14 +131,10 @@ export default function EventsList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
-        <button
-          type="button"
-          className="admin-btn admin-btn-secondary"
-          onClick={fetchEvents}
-        >
-          <i className="bx bx-refresh"></i>
+        <button type="button" className="admin-btn admin-btn-secondary" onClick={fetchEvents}>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -165,12 +145,12 @@ export default function EventsList() {
     return (
       <div className="claims-empty">
         <div className="claims-empty-icon">
-          <i className="bx bx-calendar-event"></i>
+          <i className="bx bx-calendar-event" />
         </div>
         <h3>No Events Yet</h3>
         <p>You haven&apos;t created any events yet.</p>
         <Link href="/admin/events/create" className="admin-btn admin-btn-primary">
-          <i className="bx bx-plus"></i>
+          <i className="bx bx-plus" />
           Create Your First Event
         </Link>
       </div>
@@ -203,7 +183,7 @@ export default function EventsList() {
 
       {filteredEvents.length === 0 ? (
         <div className="events-empty-filter">
-          <i className="bx bx-filter-alt"></i>
+          <i className="bx bx-filter-alt" />
           <p>No {statusFilter === "active" ? "active" : statusFilter} events found.</p>
           {statusFilter !== "all" && (
             <button
@@ -218,69 +198,66 @@ export default function EventsList() {
       ) : (
         <div className="events-grid">
           {filteredEvents.map((event) => (
-          <div key={event.documentId} className="event-card-wrapper">
-            <Link
-              href={`/admin/events/${event.slug}`}
-              className="event-card"
-            >
-              <div className="event-card-header">
-                <h3 className="event-card-name">{event.name}</h3>
-                <div className="event-card-badges">
-                  {!event.isPublished && (
-                    <span className="event-badge event-badge-draft">Draft</span>
+            <div key={event.documentId} className="event-card-wrapper">
+              <Link href={`/admin/events/${event.slug}`} className="event-card">
+                <div className="event-card-header">
+                  <h3 className="event-card-name">{event.name}</h3>
+                  <div className="event-card-badges">
+                    {!event.isPublished && (
+                      <span className="event-badge event-badge-draft">Draft</span>
+                    )}
+                    <span
+                      className={`event-badge event-badge-status ${getStatusColor(event.eventStatus)}`}
+                    >
+                      {event.eventStatus}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="event-card-meta">
+                  {event.location && (
+                    <span className="event-card-location">
+                      <i className="bx bx-map" />
+                      {event.location.name}, {event.location.country}
+                    </span>
                   )}
-                  <span
-                    className={`event-badge event-badge-status ${getStatusColor(event.eventStatus)}`}
-                  >
-                    {event.eventStatus}
+                  <span className="event-card-dates">
+                    <i className="bx bx-calendar" />
+                    {formatEventDate(event.start, event.end)}
                   </span>
                 </div>
-              </div>
 
-              <div className="event-card-meta">
-                {event.location && (
-                  <span className="event-card-location">
-                    <i className="bx bx-map"></i>
-                    {event.location.name}, {event.location.country}
-                  </span>
-                )}
-                <span className="event-card-dates">
-                  <i className="bx bx-calendar"></i>
-                  {formatEventDate(event.start, event.end)}
-                </span>
-              </div>
-
-              <div className="event-card-action">
-                <span>Edit Event</span>
-                <i className="bx bx-chevron-right"></i>
-              </div>
-            </Link>
-
-            <div className="event-card-quick-actions">
-              <Link
-                href={`/admin/events/${event.slug}/preview`}
-                className="event-quick-btn"
-                title="Preview event"
-              >
-                <i className="bx bx-show"></i>
+                <div className="event-card-action">
+                  <span>Edit Event</span>
+                  <i className="bx bx-chevron-right" />
+                </div>
               </Link>
-              <button
-                type="button"
-                className={`event-quick-btn ${event.isPublished ? "published" : "draft"}`}
-                onClick={(e) => handlePublishToggle(e, event)}
-                disabled={publishingSlug === event.slug}
-                title={event.isPublished ? "Unpublish event" : "Publish event"}
-              >
-                {publishingSlug === event.slug ? (
-                  <i className="bx bx-loader-alt bx-spin"></i>
-                ) : event.isPublished ? (
-                  <i className="bx bx-hide"></i>
-                ) : (
-                  <i className="bx bx-globe"></i>
-                )}
-              </button>
+
+              <div className="event-card-quick-actions">
+                <Link
+                  href={`/admin/events/${event.slug}/preview`}
+                  className="event-quick-btn"
+                  title="Preview event"
+                >
+                  <i className="bx bx-show" />
+                </Link>
+                <button
+                  type="button"
+                  className={`event-quick-btn ${event.isPublished ? "published" : "draft"}`}
+                  onClick={(e) => handlePublishToggle(e, event)}
+                  disabled={publishingSlug === event.slug}
+                  title={event.isPublished ? "Unpublish event" : "Publish event"}
+                >
+                  {publishingSlug === event.slug ? (
+                    <i className="bx bx-loader-alt bx-spin" />
+                  ) : event.isPublished ? (
+                    <i className="bx bx-hide" />
+                  ) : (
+                    <i className="bx bx-globe" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
           ))}
         </div>
       )}

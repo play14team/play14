@@ -1,13 +1,13 @@
 "use client"
 
+import CreateLocationModal from "@/components/admin/create-location-modal"
+import CreateVenueModal from "@/components/admin/create-venue-modal"
+import type { MapLocation } from "@/components/admin/location-map-picker"
+import LocationSelector from "@/components/admin/location-selector"
+import VenueSelector from "@/components/admin/venue-selector"
 import { useState } from "react"
 import type { LocationOption, VenueOption } from "../event-edit.action"
 import { EVENT_STATUSES } from "../hooks/use-event-form"
-import type { MapLocation } from "@/components/admin/location-map-picker"
-import LocationSelector from "@/components/admin/location-selector"
-import CreateLocationModal from "@/components/admin/create-location-modal"
-import VenueSelector from "@/components/admin/venue-selector"
-import CreateVenueModal from "@/components/admin/create-venue-modal"
 
 interface BasicsTabProps {
   // Event Details
@@ -87,14 +87,9 @@ export default function BasicsTab({
   setLocationMode,
   locations,
   onLocationAdded,
-  venueMode,
   setVenueMode,
   selectedVenueId,
   setSelectedVenueId,
-  newVenueName,
-  setNewVenueName,
-  newVenueAddress,
-  setNewVenueAddress,
   venues,
   onVenueAdded,
 }: BasicsTabProps) {
@@ -114,14 +109,20 @@ export default function BasicsTab({
     setIsCreateLocationModalOpen(true)
   }
 
-  const handleLocationCreated = (newLocation: { documentId: string; name: string; country: string }) => {
+  const handleLocationCreated = (newLocation: {
+    documentId: string
+    name: string
+    country: string
+  }) => {
     // Add the new location to the local list
     const locationOption: LocationOption = {
       documentId: newLocation.documentId,
       name: newLocation.name,
       country: newLocation.country,
     }
-    setLocalLocations((prev) => [...prev, locationOption].sort((a, b) => a.name.localeCompare(b.name)))
+    setLocalLocations((prev) =>
+      [...prev, locationOption].sort((a, b) => a.name.localeCompare(b.name))
+    )
 
     // Select the newly created location
     setSelectedLocationId(newLocation.documentId)
@@ -137,7 +138,11 @@ export default function BasicsTab({
     setIsCreateVenueModalOpen(true)
   }
 
-  const handleVenueCreated = (newVenue: { documentId: string; name: string; addressDetails?: string }) => {
+  const handleVenueCreated = (newVenue: {
+    documentId: string
+    name: string
+    addressDetails?: string
+  }) => {
     // Add the new venue to the local list
     const venueOption: VenueOption = {
       documentId: newVenue.documentId,
@@ -317,7 +322,7 @@ export default function BasicsTab({
               className="admin-btn admin-btn-secondary location-create-btn"
               onClick={handleCreateNewLocation}
             >
-              <i className="bx bx-plus"></i>
+              <i className="bx bx-plus" />
               Create new
             </button>
           </div>
@@ -352,7 +357,7 @@ export default function BasicsTab({
               className="admin-btn admin-btn-secondary venue-create-btn"
               onClick={handleCreateNewVenue}
             >
-              <i className="bx bx-plus"></i>
+              <i className="bx bx-plus" />
               Create new
             </button>
           </div>
@@ -366,7 +371,7 @@ export default function BasicsTab({
                 setVenueMode("none")
               }}
             >
-              <i className="bx bx-x"></i>
+              <i className="bx bx-x" />
               Clear venue selection
             </button>
           )}

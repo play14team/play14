@@ -97,9 +97,7 @@ export async function getSponsors(
 /**
  * Get a sponsor for editing
  */
-export async function getSponsorForEdit(
-  sponsorId: string
-): Promise<SponsorForEdit | null> {
+export async function getSponsorForEdit(sponsorId: string): Promise<SponsorForEdit | null> {
   const result = await strapiFetch<{ data: SponsorForEdit }>(
     "/admin/sponsors/:sponsorId",
     { sponsorId },

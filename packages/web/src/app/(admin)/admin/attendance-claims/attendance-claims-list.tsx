@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import AttendanceClaimCard from "./attendance-claim-card"
 import {
-  getPendingAttendanceClaimsForMyEvents,
   type AttendanceClaim,
+  getPendingAttendanceClaimsForMyEvents,
 } from "./attendance-claims.action"
 
 export default function AttendanceClaimsList() {
@@ -41,7 +41,7 @@ export default function AttendanceClaimsList() {
   if (isLoading) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading claims...</span>
       </div>
     )
@@ -50,14 +50,10 @@ export default function AttendanceClaimsList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
-        <button
-          type="button"
-          className="admin-btn admin-btn-secondary"
-          onClick={fetchClaims}
-        >
-          <i className="bx bx-refresh"></i>
+        <button type="button" className="admin-btn admin-btn-secondary" onClick={fetchClaims}>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -68,7 +64,7 @@ export default function AttendanceClaimsList() {
     return (
       <div className="claims-empty">
         <div className="claims-empty-icon">
-          <i className="bx bx-check-circle"></i>
+          <i className="bx bx-check-circle" />
         </div>
         <h3>No Pending Claims</h3>
         <p>All attendance claims for your events have been processed.</p>
@@ -77,17 +73,20 @@ export default function AttendanceClaimsList() {
   }
 
   // Group claims by event
-  const claimsByEvent = claims.reduce((acc, claim) => {
-    const eventId = claim.event?.documentId || "unknown"
-    if (!acc[eventId]) {
-      acc[eventId] = {
-        event: claim.event,
-        claims: [],
+  const claimsByEvent = claims.reduce(
+    (acc, claim) => {
+      const eventId = claim.event?.documentId || "unknown"
+      if (!acc[eventId]) {
+        acc[eventId] = {
+          event: claim.event,
+          claims: [],
+        }
       }
-    }
-    acc[eventId].claims.push(claim)
-    return acc
-  }, {} as Record<string, { event: AttendanceClaim["event"]; claims: AttendanceClaim[] }>)
+      acc[eventId].claims.push(claim)
+      return acc
+    },
+    {} as Record<string, { event: AttendanceClaim["event"]; claims: AttendanceClaim[] }>
+  )
 
   return (
     <div className="attendance-claims-list">

@@ -51,7 +51,7 @@ export default function EventEditTabs({
           className={`event-edit-tab ${activeTab === tab.id ? "active" : ""} ${tabErrors[tab.id] ? "has-error" : ""}`}
           onClick={() => onTabChange(tab.id)}
         >
-          <i className={`bx ${tab.icon}`}></i>
+          <i className={`bx ${tab.icon}`} />
           <span>{tab.label}</span>
         </button>
       ))}

@@ -187,12 +187,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "website",
-        "logo",
-        "events"
-      ],
+      "list": ["name", "website", "logo", "events"],
       "edit": [
         [
           {

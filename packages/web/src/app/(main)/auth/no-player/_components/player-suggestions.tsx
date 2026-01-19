@@ -1,9 +1,9 @@
 "use client"
 
-import Image from "next/image"
-import Logo from "@/components/layout/logo"
 import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
+import Logo from "@/components/layout/logo"
 import DefaultPlayerImage from "@/components/ui/default-player-image"
+import Image from "next/image"
 
 interface PlayerSuggestionsProps {
   suggestions: PlayerSuggestion[]
@@ -49,10 +49,7 @@ export default function PlayerSuggestions({
               <span className="position">{player.position}</span>
               {player.company && <span className="company">{player.company}</span>}
             </div>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => onClaim(player)}
-            >
+            <button className="btn btn-primary btn-sm" onClick={() => onClaim(player)}>
               This is me
             </button>
           </div>

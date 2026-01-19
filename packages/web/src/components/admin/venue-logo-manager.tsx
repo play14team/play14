@@ -1,13 +1,13 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/admin/toast"
 import {
-  uploadVenueLogo,
+  type VenueLogo,
   removeVenueLogo,
   setVenueLogoFromLibrary,
-  type VenueLogo,
+  uploadVenueLogo,
 } from "@/app/(admin)/admin/venues/logo.action"
+import { useToast } from "@/components/admin/toast"
+import { useRouter } from "next/navigation"
 import ImageManager from "./image-manager"
 
 const LOGO_OUTPUT_SIZE = 200
@@ -60,7 +60,7 @@ export default function VenueLogoManager({ venueId, venueName, logo, onUpdate }:
     }
   }
 
-  const handleLibrarySelect = async (imageId: number, imageUrl: string) => {
+  const handleLibrarySelect = async (imageId: number, _imageUrl: string) => {
     const result = await setVenueLogoFromLibrary(venueId, imageId)
 
     if (result.success) {

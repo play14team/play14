@@ -1,9 +1,5 @@
 import { expect, test } from "@playwright/test"
-import {
-  verifyPageLayout,
-  verifyPageTitle,
-  waitForPageLoad,
-} from "./utils/test-helpers"
+import { verifyPageLayout, verifyPageTitle, waitForPageLoad } from "./utils/test-helpers"
 
 test.describe("Contact Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -29,7 +25,7 @@ test.describe("Contact Page", () => {
   test("should display social links or contact info", async ({ page }) => {
     // Contact page should have ways to reach out
     const socialLinks = page.locator(
-      'a[href*="twitter"], a[href*="linkedin"], a[href*="facebook"], a[href*="mailto"], a[href*="github"]',
+      'a[href*="twitter"], a[href*="linkedin"], a[href*="facebook"], a[href*="mailto"], a[href*="github"]'
     )
     if ((await socialLinks.count()) > 0) {
       await expect(socialLinks.first()).toBeVisible()
@@ -83,7 +79,7 @@ test.describe("Privacy Page", () => {
       text?.toLowerCase().includes("privacy") ||
         text?.toLowerCase().includes("data") ||
         text?.toLowerCase().includes("personal") ||
-        text?.toLowerCase().includes("information"),
+        text?.toLowerCase().includes("information")
     ).toBeTruthy()
   })
 })
@@ -116,7 +112,7 @@ test.describe("Terms Page", () => {
       text?.toLowerCase().includes("terms") ||
         text?.toLowerCase().includes("conditions") ||
         text?.toLowerCase().includes("use") ||
-        text?.toLowerCase().includes("agreement"),
+        text?.toLowerCase().includes("agreement")
     ).toBeTruthy()
   })
 })
@@ -137,7 +133,7 @@ test.describe("Search Page", () => {
 
   test("should display search input", async ({ page }) => {
     const searchInput = page.locator(
-      'input[type="search"], input[type="text"], input[placeholder*="search" i]',
+      'input[type="search"], input[type="text"], input[placeholder*="search" i]'
     )
     if ((await searchInput.count()) > 0) {
       await expect(searchInput.first()).toBeVisible()
@@ -146,7 +142,7 @@ test.describe("Search Page", () => {
 
   test("should perform search", async ({ page }) => {
     const searchInput = page.locator(
-      'input[type="search"], input[type="text"], input[placeholder*="search" i]',
+      'input[type="search"], input[type="text"], input[placeholder*="search" i]'
     )
     if ((await searchInput.count()) > 0) {
       await searchInput.first().fill("play")
@@ -161,7 +157,7 @@ test.describe("Search Page", () => {
 
   test("should show results for valid search term", async ({ page }) => {
     const searchInput = page.locator(
-      'input[type="search"], input[type="text"], input[placeholder*="search" i]',
+      'input[type="search"], input[type="text"], input[placeholder*="search" i]'
     )
     if ((await searchInput.count()) > 0) {
       await searchInput.first().fill("event")
@@ -177,7 +173,7 @@ test.describe("Search Page", () => {
 
   test("should handle empty search gracefully", async ({ page }) => {
     const searchInput = page.locator(
-      'input[type="search"], input[type="text"], input[placeholder*="search" i]',
+      'input[type="search"], input[type="text"], input[placeholder*="search" i]'
     )
     if ((await searchInput.count()) > 0) {
       await searchInput.first().fill("")
@@ -192,7 +188,7 @@ test.describe("Search Page", () => {
 
   test("should handle special characters in search", async ({ page }) => {
     const searchInput = page.locator(
-      'input[type="search"], input[type="text"], input[placeholder*="search" i]',
+      'input[type="search"], input[type="text"], input[placeholder*="search" i]'
     )
     if ((await searchInput.count()) > 0) {
       await searchInput.first().fill("#play14")
@@ -242,7 +238,7 @@ test.describe("Footer Links", () => {
 
     const footer = page.locator("footer")
     const socialLinks = footer.locator(
-      'a[href*="twitter"], a[href*="linkedin"], a[href*="facebook"], a[href*="github"], a[href*="youtube"]',
+      'a[href*="twitter"], a[href*="linkedin"], a[href*="facebook"], a[href*="github"], a[href*="youtube"]'
     )
 
     if ((await socialLinks.count()) > 0) {

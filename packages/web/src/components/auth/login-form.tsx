@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
-import { loginWithCredentials } from "./login.action"
 import Turnstile from "@/components/ui/turnstile"
+import { useRouter } from "next/navigation"
+import { useState, useTransition } from "react"
+import { loginWithCredentials } from "./login.action"
 
 interface LoginFormProps {
   callbackUrl: string
@@ -37,20 +37,13 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
     }
 
     startTransition(async () => {
-      const result = await loginWithCredentials(
-        identifier,
-        password,
-        turnstileToken
-      )
+      const result = await loginWithCredentials(identifier, password, turnstileToken)
 
       if (result.success) {
         router.push(callbackUrl)
         router.refresh()
       } else {
-        setError(
-          result.error ||
-            "Unable to sign in. Please check your credentials and try again."
-        )
+        setError(result.error || "Unable to sign in. Please check your credentials and try again.")
       }
     })
   }
@@ -81,11 +74,7 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
         />
       </div>
 
-      <button
-        type="submit"
-        className="auth-login-btn auth-login-btn-submit"
-        disabled={isPending}
-      >
+      <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
         {isPending ? "Signing in..." : "Sign in"}
       </button>
 

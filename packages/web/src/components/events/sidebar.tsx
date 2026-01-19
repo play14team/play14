@@ -1,9 +1,9 @@
+import { Enum_Componenteventsmedia_Type, Enum_Event_Eventstatus, type Event } from "@/models/strapi"
 import Link from "next/link"
-import { Enum_Componenteventsmedia_Type, Enum_Event_Eventstatus, Event } from "@/models/strapi"
 import SocialLinks from "../layout/social-links"
+import ICalendar from "./ical"
 import EventStatus from "./status"
 import EventTime from "./time"
-import ICalendar from "./ical"
 
 const EventSidebar = ({ event }: { event: Event }) => {
   const eventName = encodeURI(event.name!)
@@ -19,8 +19,7 @@ const EventSidebar = ({ event }: { event: Event }) => {
   const hasExternalLink = !!event.registration?.link
   const shouldScrollToRegistration =
     ticketingMode === "internal" || (ticketingMode === "external" && hasWidget)
-  const shouldOpenExternalLink =
-    ticketingMode === "external" && !hasWidget && hasExternalLink
+  const shouldOpenExternalLink = ticketingMode === "external" && !hasWidget && hasExternalLink
 
   // Find photos album URL from media
   const photosAlbum = event.media?.find(
@@ -65,34 +64,34 @@ const EventSidebar = ({ event }: { event: Event }) => {
           </div>
         </li> */}
 
-        {event.media &&
-          event.media.map(
-            (medium) =>
-              medium &&
-              medium.type !== Enum_Componenteventsmedia_Type.Photos &&
-              medium.type !== Enum_Componenteventsmedia_Type.Videos && (
-                <li key={medium.id}>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <span>{medium.type}</span>
-                    <Link href={medium.url || "#"} target="_blank" rel="noopener noreferrer">
-                      {medium.url || "Link"}
-                    </Link>
-                  </div>
-                </li>
-              )
-          )}
+        {event.media?.map(
+          (medium) =>
+            medium &&
+            medium.type !== Enum_Componenteventsmedia_Type.Photos &&
+            medium.type !== Enum_Componenteventsmedia_Type.Videos && (
+              <li key={medium.id}>
+                <div className="d-flex justify-content-between align-items-center">
+                  <span>{medium.type}</span>
+                  <Link href={medium.url || "#"} target="_blank" rel="noopener noreferrer">
+                    {medium.url || "Link"}
+                  </Link>
+                </div>
+              </li>
+            )
+        )}
       </ul>
 
       {/* Registration button - scrolls to section for internal/widget, opens link for external link only */}
-      {event.eventStatus == Enum_Event_Eventstatus.Open && shouldScrollToRegistration && (
+      {event.eventStatus === Enum_Event_Eventstatus.Open && shouldScrollToRegistration && (
         <div className="btn-box">
           <a href="#registration-heading" className="default-btn">
-            <i className="flaticon-price-tag"></i>Get Tickets
+            <i className="flaticon-price-tag" />
+            Get Tickets
           </a>
         </div>
       )}
 
-      {event.eventStatus == Enum_Event_Eventstatus.Open && shouldOpenExternalLink && (
+      {event.eventStatus === Enum_Event_Eventstatus.Open && shouldOpenExternalLink && (
         <div className="btn-box">
           <Link
             href={event.registration!.link!}
@@ -100,7 +99,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
             rel="noopener noreferrer"
             className="default-btn"
           >
-            <i className="flaticon-user"></i>Book Now
+            <i className="flaticon-user" />
+            Book Now
           </Link>
         </div>
       )}
@@ -112,7 +112,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
             className="default-btn btn-gray"
             aria-label="Send email to event team"
           >
-            <i className="flaticon-team"></i>Contact Team
+            <i className="flaticon-team" />
+            Contact Team
           </Link>
         </div>
       )}
@@ -133,7 +134,8 @@ const EventSidebar = ({ event }: { event: Event }) => {
             className="default-btn btn-green"
             aria-label="View event photos album"
           >
-            <i className="flaticon-view"></i>View Photos
+            <i className="flaticon-view" />
+            View Photos
           </Link>
         </div>
       )}
@@ -147,17 +149,18 @@ const EventSidebar = ({ event }: { event: Event }) => {
             className="default-btn btn-blue"
             aria-label="View event videos library"
           >
-            <i className="flaticon-google-play"></i>View Videos
+            <i className="flaticon-google-play" />
+            View Videos
           </Link>
         </div>
       )}
 
-      {(event.eventStatus == Enum_Event_Eventstatus.Open ||
-        event.eventStatus == Enum_Event_Eventstatus.Announced) && (
+      {(event.eventStatus === Enum_Event_Eventstatus.Open ||
+        event.eventStatus === Enum_Event_Eventstatus.Announced) && (
         <div className="events-share">
           <div className="share-info">
             <span>
-              Share this event <i className="flaticon-share"></i>
+              Share this event <i className="flaticon-share" />
             </span>
             <SocialLinks text={text} className="social-link" />
           </div>

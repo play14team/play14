@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import type { DiscountValidationResult } from "./purchase.action"
+import { useEffect, useRef, useState } from "react"
 import styles from "./discount-code-input.module.scss"
+import type { DiscountValidationResult } from "./purchase.action"
 
 interface DiscountCodeInputProps {
   eventId: string

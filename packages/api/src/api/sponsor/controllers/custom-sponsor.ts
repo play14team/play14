@@ -3,10 +3,10 @@
  * Allows organizers to manage sponsors
  */
 
+import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
-import slugify from "slugify"
 import { imageSize } from "image-size"
-import * as fs from "fs"
+import slugify from "slugify"
 
 // Logo dimensions: 1:1 square, 200x200 output
 const LOGO_ASPECT_RATIO = 1
@@ -67,12 +67,10 @@ async function getOrCreateFolder(
   }
 
   // Get the next pathId for creating a new folder
-  const maxPathIdResult = await strapi.db
-    .query("plugin::upload.folder")
-    .findMany({
-      orderBy: { pathId: "desc" },
-      limit: 1,
-    })
+  const maxPathIdResult = await strapi.db.query("plugin::upload.folder").findMany({
+    orderBy: { pathId: "desc" },
+    limit: 1,
+  })
 
   const nextPathId = maxPathIdResult.length > 0 ? maxPathIdResult[0].pathId + 1 : 1
 
@@ -142,12 +140,10 @@ async function requireOrganizer(strapi: Core.Strapi, ctx: any): Promise<boolean>
     return false
   }
 
-  const userWithPlayer = await strapi
-    .documents("plugin::users-permissions.user")
-    .findFirst({
-      filters: { id: user.id },
-      populate: { player: true },
-    })
+  const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+    filters: { id: user.id },
+    populate: { player: true },
+  })
 
   if (!userWithPlayer?.player) {
     ctx.forbidden("You must have a linked player profile")
@@ -580,8 +576,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         if (!isValidLogoRatio(dimensions.width, dimensions.height)) {
           const currentRatio = (dimensions.width / dimensions.height).toFixed(2)
           return ctx.badRequest(
-            `Logo must have a 1:1 aspect ratio (square). ` +
-            `Your image is ${dimensions.width}x${dimensions.height} (ratio: ${currentRatio}).`
+            `Logo must have a 1:1 aspect ratio (square). Your image is ${dimensions.width}x${dimensions.height} (ratio: ${currentRatio}).`
           )
         }
       }
@@ -673,7 +668,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         } as any,
       })
 
-      strapi.log.info(`[Sponsor] Logo set from library for "${sponsor.name}" (${sponsorId}): file ${fileId}`)
+      strapi.log.info(
+        `[Sponsor] Logo set from library for "${sponsor.name}" (${sponsorId}): file ${fileId}`
+      )
 
       return ctx.send({
         data: {

@@ -1,5 +1,5 @@
+import { readFile, unlink } from "node:fs/promises"
 import type { Core } from "@strapi/strapi"
-import { readFile, unlink } from "fs/promises"
 import { runAudienceAttendeeImport } from "../../../services/import-audience-attendees"
 
 type UploadedFile = {
@@ -42,12 +42,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.unauthorized("You must be logged in")
     }
 
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: { fields: ["position"] } },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: { fields: ["position"] } },
+    })
 
     const position = userWithPlayer?.player?.position
     if (!position || !ORGANIZER_POSITIONS.has(position)) {

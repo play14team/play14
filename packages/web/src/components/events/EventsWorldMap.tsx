@@ -1,15 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { createPortal } from "react-dom"
-import { useRouter } from "next/navigation"
+import WorldMap from "@/components/map/WorldMap"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
-import WorldMap from "@/components/map/WorldMap"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import { getCountriesWithEvents } from "./get-countries-with-events.action"
 import {
-  getEventsGroupedByCountry,
   type EventsByCountry,
+  getEventsGroupedByCountry,
 } from "./get-events-grouped-by-country.action"
 import "./EventsWorldMap.scss"
 
@@ -97,9 +97,7 @@ export default function EventsWorldMap({
     const query = searchQuery.toLowerCase().trim()
     const matches = selectedCountries.filter((countryCode) => {
       const countryName = getCountryName(countryCode).toLowerCase()
-      return (
-        countryName.includes(query) || countryCode.toLowerCase().includes(query)
-      )
+      return countryName.includes(query) || countryCode.toLowerCase().includes(query)
     })
 
     setFilteredCountries(matches)
@@ -265,8 +263,7 @@ export default function EventsWorldMap({
   }
 
   // Determine which countries to display on the map
-  const displayedCountries =
-    filteredCountries.length > 0 ? filteredCountries : selectedCountries
+  const displayedCountries = filteredCountries.length > 0 ? filteredCountries : selectedCountries
 
   // Render tooltip content
   const tooltipContent = hoveredCountry && (
@@ -296,13 +293,9 @@ export default function EventsWorldMap({
                   <div className="event-name">{event.name}</div>
                   <div className="event-details">
                     <div className="event-location">{event.locationName}</div>
-                    <div className="event-date">
-                      {formatDateRange(event.start, event.end)}
-                    </div>
+                    <div className="event-date">{formatDateRange(event.start, event.end)}</div>
                   </div>
-                  <span
-                    className={`event-status status-${event.status.toLowerCase()}`}
-                  >
+                  <span className={`event-status status-${event.status.toLowerCase()}`}>
                     {event.status}
                   </span>
                 </div>
@@ -372,7 +365,6 @@ export default function EventsWorldMap({
                         value={searchQuery}
                         onChange={handleSearchChange}
                         aria-label="Search countries with events"
-                        autoFocus
                       />
                       {searchQuery && (
                         <button
@@ -418,31 +410,19 @@ export default function EventsWorldMap({
 
       <div className="map-legend">
         <span className="legend-item">
-          <span
-            className="legend-color"
-            style={{ backgroundColor: "#7ac143" }}
-          ></span>
+          <span className="legend-color" style={{ backgroundColor: "#7ac143" }} />
           Over
         </span>
         <span className="legend-item">
-          <span
-            className="legend-color"
-            style={{ backgroundColor: "#ffc20e" }}
-          ></span>
+          <span className="legend-color" style={{ backgroundColor: "#ffc20e" }} />
           Announced
         </span>
         <span className="legend-item">
-          <span
-            className="legend-color"
-            style={{ backgroundColor: "#f47920" }}
-          ></span>
+          <span className="legend-color" style={{ backgroundColor: "#f47920" }} />
           Open
         </span>
         <span className="legend-item">
-          <span
-            className="legend-color"
-            style={{ backgroundColor: "#ed1c24" }}
-          ></span>
+          <span className="legend-color" style={{ backgroundColor: "#ed1c24" }} />
           Cancelled
         </span>
       </div>

@@ -2,8 +2,8 @@
  * Unit tests for string utilities
  */
 
-import { describe, it, expect } from "vitest"
-import { toSlug, eventToSlug, capitalize, normalize, nameToUsername } from "./strings"
+import { describe, expect, it } from "vitest"
+import { capitalize, eventToSlug, nameToUsername, normalize, toSlug } from "./strings"
 
 describe("toSlug", () => {
   describe("basic slugification", () => {
@@ -144,9 +144,7 @@ describe("eventToSlug", () => {
 
   it("combines name slugification with month", () => {
     expect(eventToSlug("São Paulo", "2025-03-15T09:00:00Z")).toBe("sao-paulo-03")
-    expect(eventToSlug("New York City", "2025-06-20T09:00:00Z")).toBe(
-      "new-york-city-06"
-    )
+    expect(eventToSlug("New York City", "2025-06-20T09:00:00Z")).toBe("new-york-city-06")
   })
 
   it("handles ISO date strings", () => {
@@ -221,9 +219,7 @@ describe("nameToUsername", () => {
     })
 
     it("handles complex names", () => {
-      expect(nameToUsername("Jose Maria da Silva Goncalves")).toBe(
-        "jose.maria.da.silva.goncalves"
-      )
+      expect(nameToUsername("Jose Maria da Silva Goncalves")).toBe("jose.maria.da.silva.goncalves")
     })
 
     it("handles single name", () => {

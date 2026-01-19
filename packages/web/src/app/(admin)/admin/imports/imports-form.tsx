@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState, useTransition } from "react"
-import { uploadAudienceAttendeeImport, type ImportUploadResponse } from "./imports.action"
+import { type ImportUploadResponse, uploadAudienceAttendeeImport } from "./imports.action"
 
 const ATTENDEE_SAMPLE = `Attendee's Email address,Attendee's first name,Attendee's name,"What is your T-shirt size and shape","I want to appear on the #play14 website, and here is my LinkedIn profile url","Please notify us of any specific food diet (vegetarian, vegan, gluten-free, lactose-free, ...)"
 jane.doe@example.com,Jane,Doe,Unisex M,https://www.linkedin.com/in/janedoe,vegetarian
@@ -100,7 +100,7 @@ export default function ImportsForm() {
                 href="/import-samples/attendee-sample.csv"
                 download
               >
-                <i className="bx bx-download"></i>
+                <i className="bx bx-download" />
                 Download attendee sample
               </a>
               <pre className="admin-sample-preview">{ATTENDEE_SAMPLE}</pre>
@@ -117,7 +117,7 @@ export default function ImportsForm() {
                 href="/import-samples/audience-sample.csv"
                 download
               >
-                <i className="bx bx-download"></i>
+                <i className="bx bx-download" />
                 Download audience sample
               </a>
               <pre className="admin-sample-preview">{AUDIENCE_SAMPLE}</pre>

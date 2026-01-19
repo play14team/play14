@@ -1,7 +1,7 @@
 import { getHosting } from "@/components/events/get.action"
 import HtmlContent from "@/components/layout/html-content"
 import Page from "@/components/layout/page"
-import { Metadata } from "next"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Events | Hosting",

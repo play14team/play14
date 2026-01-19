@@ -1,5 +1,5 @@
 import Page from "@/components/layout/page"
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -14,8 +14,7 @@ export default function Contact() {
         <h2>Non-profit organization</h2>
         <div className="container pt-5">
           <p>
-            <strong>#play14 a.s.b.l.</strong> is a non-profit with headquarters
-            in Luxembourg.
+            <strong>#play14 a.s.b.l.</strong> is a non-profit with headquarters in Luxembourg.
           </p>
           <p>
             It is registered with the

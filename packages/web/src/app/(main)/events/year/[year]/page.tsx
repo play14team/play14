@@ -1,22 +1,17 @@
 import Filters from "@/components/events/filters"
-import {
-  getEventsByYear,
-  getEventYearCounts,
-} from "@/components/events/get.action"
+import { getEventYearCounts, getEventsByYear } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import LoadMoreYear from "@/components/events/load-more-year"
 import YearNav from "@/components/events/year-nav"
-import { Event } from "@/models/strapi"
-import { Metadata } from "next"
+import type { Event } from "@/models/strapi"
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 interface YearEventsPageProps {
   params: Promise<{ year: string }>
 }
 
-export async function generateMetadata({
-  params,
-}: YearEventsPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: YearEventsPageProps): Promise<Metadata> {
   const { year } = await params
   return {
     title: `Events ${year}`,
@@ -27,9 +22,9 @@ export const revalidate = 3600
 
 export default async function YearEventsPage({ params }: YearEventsPageProps) {
   const { year: yearParam } = await params
-  const year = parseInt(yearParam, 10)
+  const year = Number.parseInt(yearParam, 10)
 
-  if (isNaN(year) || year < 2014 || year > new Date().getFullYear() + 5) {
+  if (Number.isNaN(year) || year < 2014 || year > new Date().getFullYear() + 5) {
     notFound()
   }
 

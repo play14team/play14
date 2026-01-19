@@ -1,10 +1,9 @@
 "use server"
 
-import { restQuery, normalizeEntity } from "@/libs/strapi-client"
-import { homePopulate, eventItemPopulate } from "@/libs/strapi-populate"
 import { getTestimonials } from "@/components/events/get.action"
-import { Testimonial } from "@/models/strapi"
 import { shuffleArray } from "@/libs/arrays"
+import { normalizeEntity, restQuery } from "@/libs/strapi-client"
+import { eventItemPopulate, homePopulate } from "@/libs/strapi-populate"
 import { HOME_TESTIMONIALS_COUNT } from "./constants"
 
 // Types - will be replaced by OpenAPI generated types when available
@@ -90,9 +89,7 @@ export async function getExpectations(type: string) {
  * Shuffles server-side on each render (respects page revalidate cache)
  * Filters to only text testimonials with named authors (excludes audio and anonymous)
  */
-export async function getRandomTestimonials(
-  count: number = HOME_TESTIMONIALS_COUNT,
-) {
+export async function getRandomTestimonials(count: number = HOME_TESTIMONIALS_COUNT) {
   try {
     const allTestimonials = await getTestimonials()
 
@@ -102,7 +99,7 @@ export async function getRandomTestimonials(
 
     // Filter to only text testimonials (no audio) with named authors
     const textTestimonials = allTestimonials.filter(
-      (testimonial) => !testimonial.audio && testimonial.author,
+      (testimonial) => !testimonial.audio && testimonial.author
     )
 
     if (textTestimonials.length === 0) {
@@ -139,7 +136,7 @@ export interface Play14Statistics {
 async function fetchAllPaginated<T>(
   endpoint: string,
   fields: string[],
-  populate?: Record<string, unknown>,
+  populate?: Record<string, unknown>
 ): Promise<T[]> {
   const allItems: T[] = []
   let page = 1
@@ -191,9 +188,7 @@ export async function getStatistics(): Promise<Play14Statistics> {
     ])
 
     // Filter out cancelled events
-    const nonCancelledEvents = allEvents.filter(
-      (event) => event.eventStatus !== "Cancelled",
-    )
+    const nonCancelledEvents = allEvents.filter((event) => event.eventStatus !== "Cancelled")
 
     // Get unique countries from non-cancelled events
     const uniqueCountries = new Set<string>()
@@ -206,9 +201,7 @@ export async function getStatistics(): Promise<Play14Statistics> {
     // Count hosts (players with position Host, Mentor, or Founder)
     const hosts = allPlayers.filter(
       (player) =>
-        player.position === "Host" ||
-        player.position === "Mentor" ||
-        player.position === "Founder",
+        player.position === "Host" || player.position === "Mentor" || player.position === "Founder"
     )
 
     return {

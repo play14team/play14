@@ -1,7 +1,4 @@
-const openTabSection = (
-  evt: React.MouseEvent<HTMLLIElement, MouseEvent>,
-  tabName: string,
-) => {
+const openTabSection = (evt: React.MouseEvent<HTMLLIElement, MouseEvent>, tabName: string) => {
   const tabcontent = document.getElementsByClassName("tabs_item")
   for (let i = 0; i < tabcontent.length; i++) {
     const styledElement = tabcontent[i] as HTMLElement

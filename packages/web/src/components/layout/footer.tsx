@@ -39,12 +39,7 @@ const Footer = () => {
                 {socialLinks.map((action, index) => {
                   return (
                     <li key={index}>
-                      <Link
-                        href={action.url}
-                        className="d-block"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <Link href={action.url} className="d-block" target="_blank" rel="noreferrer">
                         <i className={`bx bxl-${action.icon}`} />
                       </Link>
                     </li>
@@ -99,7 +94,7 @@ const Footer = () => {
 
               <ul className="footer-contact-info">
                 <li>
-                  <i className="bx bx-building"></i>
+                  <i className="bx bx-building" />
                   #play14 a.s.b.l.
                   <br />
                   46 boulevard Jules Salentiny
@@ -109,7 +104,7 @@ const Footer = () => {
                   LUXEMBOUG
                 </li>
                 <li>
-                  <i className="bx bx-envelope"></i>
+                  <i className="bx bx-envelope" />
                   <a href="mailto:team@play14.org">team@play14.org</a>
                 </li>
               </ul>
@@ -121,8 +116,7 @@ const Footer = () => {
           <div className="row align-items-center">
             <div className="col-lg-6 col-md-6">
               <p>
-                &copy; 2014 - {currentYear} <strong>#play14</strong> developed
-                by{" "}
+                &copy; 2014 - {currentYear} <strong>#play14</strong> developed by{" "}
                 <Link
                   href="https://www.linkedin.com/in/c%C3%A9dric-pontet/"
                   target="_blank"

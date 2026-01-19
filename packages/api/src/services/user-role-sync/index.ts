@@ -62,9 +62,7 @@ export async function syncUserRoleFromPlayer(
   // Check if user already has the correct role
   const currentRoleType = user.role?.type
   if (currentRoleType === expectedRoleType) {
-    strapi.log.debug(
-      `[RoleSync] User ${user.email} already has correct role "${currentRoleType}"`
-    )
+    strapi.log.debug(`[RoleSync] User ${user.email} already has correct role "${currentRoleType}"`)
     return false
   }
 

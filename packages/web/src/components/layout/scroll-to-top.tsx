@@ -36,7 +36,7 @@ export default function ScrollToTop() {
       aria-label="Back to top"
       title="Back to top"
     >
-      <i className="bx bx-chevron-up"></i>
+      <i className="bx bx-chevron-up" />
     </button>
   )
 }

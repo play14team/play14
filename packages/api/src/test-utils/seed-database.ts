@@ -192,7 +192,8 @@ export async function seedTestEvent(
   const id = generateId()
   const now = new Date()
   const start = data.start || new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString()
-  const end = data.end || new Date(new Date(start).getTime() + 2 * 24 * 60 * 60 * 1000).toISOString()
+  const end =
+    data.end || new Date(new Date(start).getTime() + 2 * 24 * 60 * 60 * 1000).toISOString()
 
   const event = await strapi.documents("api::event.event").create({
     data: {

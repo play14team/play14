@@ -59,12 +59,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "category",
-        "sponsors",
-        "documentId"
-      ],
+      "list": ["id", "category", "sponsors", "documentId"],
       "edit": [
         [
           {

@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { createPortal } from "react-dom"
 import {
-  listMediaLibraryFiles,
-  listMediaLibraryFolders,
   type EventImage,
   type MediaFolder,
+  listMediaLibraryFiles,
+  listMediaLibraryFolders,
 } from "@/app/(admin)/admin/events/[slug]/images.action"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 
 interface MediaLibraryBrowserProps {
   isOpen: boolean
@@ -124,20 +124,23 @@ export default function MediaLibraryBrowser({
   }, [search])
 
   // Load folders when entering a directory
-  const loadFolders = useCallback(async (parentId: number | null | undefined) => {
-    // Don't load folders when searching or showing all files
-    if (searchDebounced || parentId === undefined) {
-      setFolders([])
-      return
-    }
+  const loadFolders = useCallback(
+    async (parentId: number | null | undefined) => {
+      // Don't load folders when searching or showing all files
+      if (searchDebounced || parentId === undefined) {
+        setFolders([])
+        return
+      }
 
-    const result = await listMediaLibraryFolders(parentId)
-    if (result.success && result.data) {
-      setFolders(result.data.folders)
-    } else {
-      setFolders([])
-    }
-  }, [searchDebounced])
+      const result = await listMediaLibraryFolders(parentId)
+      if (result.success && result.data) {
+        setFolders(result.data.folders)
+      } else {
+        setFolders([])
+      }
+    },
+    [searchDebounced]
+  )
 
   // Load files when modal opens, search changes, or folder changes
   const loadFiles = useCallback(
@@ -264,21 +267,18 @@ export default function MediaLibraryBrowser({
 
   const modalContent = (
     <div className="admin-modal-overlay" onClick={onClose}>
-      <div
-        className="admin-modal media-library-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="admin-modal media-library-modal" onClick={(e) => e.stopPropagation()}>
         <div className="admin-modal-header">
           <h3>{title}</h3>
           <button type="button" className="admin-modal-close" onClick={onClose}>
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
           </button>
         </div>
 
         <div className="media-library-toolbar">
           <div className="media-library-toolbar-row">
             <div className="search-input-wrapper">
-              <i className="bx bx-search"></i>
+              <i className="bx bx-search" />
               <input
                 type="text"
                 className="search-input"
@@ -287,12 +287,8 @@ export default function MediaLibraryBrowser({
                 onChange={(e) => setSearch(e.target.value)}
               />
               {search && (
-                <button
-                  type="button"
-                  className="search-clear"
-                  onClick={() => setSearch("")}
-                >
-                  <i className="bx bx-x"></i>
+                <button type="button" className="search-clear" onClick={() => setSearch("")}>
+                  <i className="bx bx-x" />
                 </button>
               )}
             </div>
@@ -303,7 +299,7 @@ export default function MediaLibraryBrowser({
                 onClick={showAllFiles}
                 title="Show all images"
               >
-                <i className="bx bx-grid-alt"></i>
+                <i className="bx bx-grid-alt" />
                 All
               </button>
               <button
@@ -312,7 +308,7 @@ export default function MediaLibraryBrowser({
                 onClick={navigateToRoot}
                 title="Browse folders"
               >
-                <i className="bx bx-folder"></i>
+                <i className="bx bx-folder" />
                 Folders
               </button>
             </div>
@@ -328,20 +324,16 @@ export default function MediaLibraryBrowser({
                   onClick={navigateUp}
                   title="Go back"
                 >
-                  <i className="bx bx-arrow-back"></i>
+                  <i className="bx bx-arrow-back" />
                 </button>
               )}
-              <button
-                type="button"
-                className="breadcrumb-item"
-                onClick={navigateToRoot}
-              >
-                <i className="bx bx-home"></i>
+              <button type="button" className="breadcrumb-item" onClick={navigateToRoot}>
+                <i className="bx bx-home" />
                 Root
               </button>
               {folderPath.map((folder, index) => (
                 <span key={folder.id} className="breadcrumb-segment">
-                  <i className="bx bx-chevron-right"></i>
+                  <i className="bx bx-chevron-right" />
                   <button
                     type="button"
                     className="breadcrumb-item"
@@ -365,7 +357,7 @@ export default function MediaLibraryBrowser({
         <div ref={modalBodyRef} className="admin-modal-body">
           {error && (
             <div className="admin-alert admin-alert-error admin-alert-sm">
-              <i className="bx bx-error-circle"></i>
+              <i className="bx bx-error-circle" />
               {error}
             </div>
           )}
@@ -380,18 +372,18 @@ export default function MediaLibraryBrowser({
                   className="media-library-folder"
                   onClick={() => navigateToFolder(folder)}
                 >
-                  <i className="bx bx-folder"></i>
+                  <i className="bx bx-folder" />
                   <span className="folder-name">{folder.name}</span>
                   <div className="folder-counts">
                     {folder.children?.count !== undefined && folder.children.count > 0 && (
                       <span className="folder-count" title="Subfolders">
-                        <i className="bx bx-folder"></i>
+                        <i className="bx bx-folder" />
                         {folder.children.count}
                       </span>
                     )}
                     {folder.files?.count !== undefined && (
                       <span className="folder-count" title="Images">
-                        <i className="bx bx-image"></i>
+                        <i className="bx bx-image" />
                         {folder.files.count}
                       </span>
                     )}
@@ -403,7 +395,7 @@ export default function MediaLibraryBrowser({
 
           {files.length === 0 && folders.length === 0 && !isLoading && (
             <div className="media-library-empty">
-              <i className="bx bx-image"></i>
+              <i className="bx bx-image" />
               <p>
                 {searchDebounced
                   ? "No images found matching your search"
@@ -432,20 +424,16 @@ export default function MediaLibraryBrowser({
                   {isDisplayable ? (
                     // Use native img to avoid Next.js Image optimization issues with various formats
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={thumbnailUrl}
-                      alt={file.name}
-                      loading="lazy"
-                    />
+                    <img src={thumbnailUrl} alt={file.name} loading="lazy" />
                   ) : (
                     <div className="media-library-item-placeholder">
-                      <i className="bx bx-image"></i>
+                      <i className="bx bx-image" />
                       <span>{file.ext || file.mime?.split("/")[1] || "image"}</span>
                     </div>
                   )}
                   {selectedImage?.id === file.id && (
                     <div className="media-library-item-check">
-                      <i className="bx bx-check"></i>
+                      <i className="bx bx-check" />
                     </div>
                   )}
                   <div className="media-library-item-name">{file.name}</div>
@@ -459,7 +447,7 @@ export default function MediaLibraryBrowser({
             <div ref={loadMoreRef} className="media-library-load-more">
               {isLoading ? (
                 <div className="media-library-loading">
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                   <span>Loading more...</span>
                 </div>
               ) : (
@@ -477,18 +465,14 @@ export default function MediaLibraryBrowser({
           {/* Initial loading state */}
           {isLoading && files.length === 0 && (
             <div className="media-library-loading">
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               <span>Loading...</span>
             </div>
           )}
         </div>
 
         <div className="admin-modal-footer">
-          <button
-            type="button"
-            className="admin-btn admin-btn-secondary"
-            onClick={onClose}
-          >
+          <button type="button" className="admin-btn admin-btn-secondary" onClick={onClose}>
             Cancel
           </button>
           <button
@@ -497,7 +481,7 @@ export default function MediaLibraryBrowser({
             onClick={handleSelect}
             disabled={!selectedImage}
           >
-            <i className="bx bx-check"></i>
+            <i className="bx bx-check" />
             Select Image
           </button>
         </div>

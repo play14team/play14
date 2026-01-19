@@ -86,12 +86,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "street",
-        "postalCode",
-        "city"
-      ],
+      "list": ["id", "street", "postalCode", "city"],
       "edit": [
         [
           {

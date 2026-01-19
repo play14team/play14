@@ -1,21 +1,21 @@
 "use client"
 
-import Image from "next/image"
-import Logo from "@/components/layout/logo"
 import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
+import Logo from "@/components/layout/logo"
 import DefaultPlayerImage from "@/components/ui/default-player-image"
+import Image from "next/image"
 
 interface AutoLinkSuccessProps {
   player: PlayerSuggestion
   onComplete: () => void
 }
 
-export default function AutoLinkSuccess({ player, onComplete }: AutoLinkSuccessProps) {
+export default function AutoLinkSuccess({ player }: AutoLinkSuccessProps) {
   return (
     <div className="player-linking-success">
       <Logo width={120} height={40} />
       <div className="player-linking-icon success">
-        <i className="bx bx-check-circle"></i>
+        <i className="bx bx-check-circle" />
       </div>
       <h1>Profile Found!</h1>
       <p>We found a player profile that matches your name.</p>
@@ -49,7 +49,7 @@ export default function AutoLinkSuccess({ player, onComplete }: AutoLinkSuccessP
 
       <p>Linking your account...</p>
       <div className="player-linking-spinner">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
       </div>
     </div>
   )

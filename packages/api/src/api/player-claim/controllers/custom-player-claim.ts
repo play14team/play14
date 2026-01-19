@@ -19,15 +19,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user already has a player linked
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (userWithPlayer?.player) {
-      strapi.log.info(`[PlayerClaim] checkMatch: User ${user.id} already linked to player ${userWithPlayer.player.id}`)
+      strapi.log.info(
+        `[PlayerClaim] checkMatch: User ${user.id} already linked to player ${userWithPlayer.player.id}`
+      )
       return ctx.send({
         data: {
           hasExactMatch: false,
@@ -222,12 +222,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user already has a player linked
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (userWithPlayer?.player) {
       return ctx.badRequest("You already have a player profile linked")
@@ -342,12 +340,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user is a founder (admin)
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (userWithPlayer?.player?.position !== "Founder") {
       return ctx.forbidden("Only founders can view pending claims")
@@ -392,12 +388,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user is a founder (admin)
-    const adminWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const adminWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (adminWithPlayer?.player?.position !== "Founder") {
       return ctx.forbidden("Only founders can approve claims")
@@ -431,7 +425,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Link the user to the player (User owns the relation via 'player' field)
-    strapi.log.info(`[PlayerClaim] Linking user ${claim.user.id} to player id=${player.id}, documentId=${player.documentId}`)
+    strapi.log.info(
+      `[PlayerClaim] Linking user ${claim.user.id} to player id=${player.id}, documentId=${player.documentId}`
+    )
     const claimUser = await strapi.documents("plugin::users-permissions.user").findFirst({
       filters: { id: claim.user.id },
     })
@@ -449,12 +445,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       filters: { id: claim.user.id },
       populate: { player: true },
     })
-    strapi.log.info(`[PlayerClaim] Verification - User ${claim.user.id} now has player: ${verifyUser?.player?.id || "NONE"}`)
+    strapi.log.info(
+      `[PlayerClaim] Verification - User ${claim.user.id} now has player: ${verifyUser?.player?.id || "NONE"}`
+    )
 
     // Sync user role based on the linked player's position
     try {
       await syncUserRoleWithPlayerPosition(strapi, claim.user.id)
-      strapi.log.info(`[PlayerClaim] User role synced with player position for user ${claim.user.id}`)
+      strapi.log.info(
+        `[PlayerClaim] User role synced with player position for user ${claim.user.id}`
+      )
     } catch (syncError) {
       strapi.log.error(`[PlayerClaim] Failed to sync user role: ${syncError}`)
       // Don't fail claim approval if role sync fails
@@ -463,7 +463,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Update the claim status
     // Note: Type cast needed until types are regenerated after schema creation
     const now = new Date().toISOString()
-    strapi.log.info(`[PlayerClaim] Updating claim ${id} with claimStatus=approved, processedAt=${now}`)
+    strapi.log.info(
+      `[PlayerClaim] Updating claim ${id} with claimStatus=approved, processedAt=${now}`
+    )
     const updatedClaim = await strapi.documents("api::player-claim.player-claim").update({
       documentId: id,
       data: {
@@ -472,13 +474,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         processedAt: now,
       } as any,
     })
-    strapi.log.info(`[PlayerClaim] Update result: claimStatus=${updatedClaim.claimStatus}, processedAt=${updatedClaim.processedAt}`)
+    strapi.log.info(
+      `[PlayerClaim] Update result: claimStatus=${updatedClaim.claimStatus}, processedAt=${updatedClaim.processedAt}`
+    )
 
     // Verify the claim was updated correctly
     const verifyClaim = await strapi.documents("api::player-claim.player-claim").findOne({
       documentId: id,
     })
-    strapi.log.info(`[PlayerClaim] Verification - Claim ${id}: claimStatus=${verifyClaim?.claimStatus}, processedAt=${verifyClaim?.processedAt}`)
+    strapi.log.info(
+      `[PlayerClaim] Verification - Claim ${id}: claimStatus=${verifyClaim?.claimStatus}, processedAt=${verifyClaim?.processedAt}`
+    )
 
     strapi.log.info(
       `[PlayerClaim] Claim ${id} approved by founder ${user.id}. User ${claim.user.id} linked to player ${claim.player.documentId}`
@@ -502,12 +508,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user is a founder (admin)
-    const adminWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const adminWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (adminWithPlayer?.player?.position !== "Founder") {
       return ctx.forbidden("Only founders can reject claims")
@@ -539,7 +543,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       } as any,
     })
 
-    strapi.log.info(`[PlayerClaim] Claim ${id} rejected by founder ${user.id}. ProcessedAt: ${updatedClaim.processedAt}`)
+    strapi.log.info(
+      `[PlayerClaim] Claim ${id} rejected by founder ${user.id}. ProcessedAt: ${updatedClaim.processedAt}`
+    )
 
     return ctx.send({
       data: updatedClaim,

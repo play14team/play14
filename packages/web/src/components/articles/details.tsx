@@ -1,7 +1,7 @@
-import moment from "moment"
+import type { Article, UploadFile } from "@/models/strapi"
+import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import { Article, UploadFile } from "@/models/strapi"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
 import SocialLinks from "../layout/social-links"
@@ -29,8 +29,7 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                   priority
                   placeholder="blur"
                   blurDataURL={
-                    (image as { blurhash?: string }).blurhash ||
-                    process.env.DEFAULT_BLURHASH
+                    (image as { blurhash?: string }).blurhash || process.env.DEFAULT_BLURHASH
                   }
                   className="shadow"
                   style={{
@@ -46,18 +45,16 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                 <div className="entry-meta">
                   <ul>
                     <li>
-                      <i className="bx bx-folder-open"></i>
+                      <i className="bx bx-folder-open" />
                       <span>Category</span>
                       <Link href={`/articles/categories/${article.category}`}>
                         {article.category}
                       </Link>
                     </li>
                     <li>
-                      <i className="bx bx-calendar"></i>
+                      <i className="bx bx-calendar" />
                       <span>Last Updated</span>
-                      <Link href="#">
-                        {moment(article.updatedAt).format("MMM Do, YYYY")}
-                      </Link>
+                      <Link href="#">{format(parseISO(article.updatedAt), "MMM do, yyyy")}</Link>
                     </li>
                   </ul>
                 </div>
@@ -65,7 +62,7 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                 <div className="article-footer">
                   <div className="article-tags">
                     <span>
-                      <i className="bx bx-purchase-tag"></i>
+                      <i className="bx bx-purchase-tag" />
                     </span>
 
                     {article.tags?.filter(Boolean)?.map((tag) => {
@@ -90,7 +87,7 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                 {author && (
                   <div className=" pt-70">
                     <div className="article-author">
-                      <div className="author-profile-header"></div>
+                      <div className="author-profile-header" />
                       <div className="author-profile">
                         <div className="author-profile-title">
                           <Image
@@ -102,12 +99,10 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                             unoptimized
                           />
                           <Link href={`/players/${author.slug}`}>
-                            <h4>{author && author.name}</h4>
+                            <h4>{author?.name}</h4>
                           </Link>
-                          <span className="d-block">
-                            {author && author.position}
-                          </span>
-                          <p>{author && author.tagline}</p>
+                          <span className="d-block">{author?.position}</span>
+                          <p>{author?.tagline}</p>
                         </div>
                       </div>
                     </div>

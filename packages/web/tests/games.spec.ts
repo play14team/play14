@@ -36,10 +36,7 @@ test.describe("Games List Page", () => {
   })
 
   test("should have clickable game cards", async ({ page }) => {
-    const validLinks = await getDetailLinks(page, "/games/", [
-      "categories",
-      "tags",
-    ])
+    const validLinks = await getDetailLinks(page, "/games/", ["categories", "tags"])
     if (validLinks.length > 0) {
       const link = page.locator(`a[href='${validLinks[0]}']`).first()
       await expect(link).toBeVisible({ timeout: 10000 })
@@ -48,10 +45,7 @@ test.describe("Games List Page", () => {
   })
 
   test("should navigate to game details on card click", async ({ page }) => {
-    const clicked = await clickFirstDetailLink(page, "/games/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
       expect(page.url()).toMatch(/\/games/)
     }
@@ -181,10 +175,7 @@ test.describe("Game Details Page", () => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
-    const validLinks = await getDetailLinks(page, "/games/", [
-      "categories",
-      "tags",
-    ])
+    const validLinks = await getDetailLinks(page, "/games/", ["categories", "tags"])
 
     if (validLinks.length > 0) {
       await page.goto(validLinks[0])
@@ -197,10 +188,7 @@ test.describe("Game Details Page", () => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/games/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
       const main = page.locator("main")
       await expect(main).toBeVisible()
@@ -211,10 +199,7 @@ test.describe("Game Details Page", () => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/games/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
       await verifyPageLayout(page)
     }
@@ -224,10 +209,7 @@ test.describe("Game Details Page", () => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
-    const clicked = await clickFirstDetailLink(page, "/games/", [
-      "categories",
-      "tags",
-    ])
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
       const main = page.locator("main")
       await expect(main).toBeVisible()

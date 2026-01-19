@@ -11,9 +11,7 @@ export default async function PlayerPosition(props: {
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <Filters
-          name={`Found ${players.length} players with position "${params.position}"`}
-        />
+        <Filters name={`Found ${players.length} players with position "${params.position}"`} />
       </div>
       <div className="pt-70">
         <PlayerGrid players={players} />

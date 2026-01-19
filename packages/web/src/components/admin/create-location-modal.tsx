@@ -1,10 +1,10 @@
 "use client"
 
+import { createLocation } from "@/app/(admin)/admin/locations/locations.action"
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import LocationMapPicker, { type MapLocation } from "./location-map-picker"
 import CountrySelector from "./country-selector"
-import { createLocation } from "@/app/(admin)/admin/locations/locations.action"
+import LocationMapPicker, { type MapLocation } from "./location-map-picker"
 import { useToast } from "./toast"
 
 interface CreateLocationModalProps {
@@ -134,15 +134,11 @@ export default function CreateLocationModal({
   if (!mounted) return null
 
   const modalContent = (
-    <dialog
-      ref={dialogRef}
-      className="create-location-modal"
-      onClick={handleBackdropClick}
-    >
+    <dialog ref={dialogRef} className="create-location-modal" onClick={handleBackdropClick}>
       <div className="create-location-modal-content">
         <div className="create-location-modal-header">
           <h2>
-            <i className="bx bx-map-pin"></i>
+            <i className="bx bx-map-pin" />
             Create New Location
           </h2>
           <button
@@ -151,7 +147,7 @@ export default function CreateLocationModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
           </button>
         </div>
 
@@ -168,11 +164,8 @@ export default function CreateLocationModal({
                 minLength={2}
                 className="admin-input"
                 placeholder="e.g., Paris, Luxembourg, Berlin"
-                autoFocus
               />
-              <p className="admin-form-help">
-                The city or region name where events take place
-              </p>
+              <p className="admin-form-help">The city or region name where events take place</p>
             </div>
 
             <div className="admin-form-group">
@@ -218,12 +211,12 @@ export default function CreateLocationModal({
             >
               {isSubmitting ? (
                 <>
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                   Creating...
                 </>
               ) : (
                 <>
-                  <i className="bx bx-plus"></i>
+                  <i className="bx bx-plus" />
                   Create Location
                 </>
               )}

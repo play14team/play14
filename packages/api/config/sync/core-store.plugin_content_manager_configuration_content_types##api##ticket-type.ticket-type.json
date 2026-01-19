@@ -256,13 +256,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "name",
-        "description",
-        "price",
-        "currency"
-      ],
+      "list": ["id", "name", "description", "price", "currency"],
       "edit": [
         [
           {

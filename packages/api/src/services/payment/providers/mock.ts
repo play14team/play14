@@ -6,17 +6,16 @@
  */
 
 import type {
-  PaymentProvider,
+  AccountLink,
+  CheckoutSession,
+  ConnectAccount,
   ConnectPaymentProvider,
   CreateCheckoutSessionParams,
   CreateCheckoutWithConnectParams,
-  CheckoutSession,
+  CreateConnectAccountParams,
   RefundParams,
   RefundResult,
   WebhookEvent,
-  CreateConnectAccountParams,
-  ConnectAccount,
-  AccountLink,
 } from "../types"
 
 interface MockCheckoutSession {
@@ -87,10 +86,6 @@ export function getMockPaymentState(): MockPaymentState {
     }
   }
   return globalThis.__mockPaymentState
-}
-
-function getSessionCounter(): number {
-  return globalThis.__mockSessionCounter || 0
 }
 
 function incrementSessionCounter(): number {
@@ -398,8 +393,8 @@ export class MockPaymentProvider implements ConnectPaymentProvider {
 
   async createAccountLink(
     accountId: string,
-    returnUrl: string,
-    refreshUrl: string
+    _returnUrl: string,
+    _refreshUrl: string
   ): Promise<AccountLink> {
     return {
       url: `https://connect.stripe.com/setup/e/${accountId}/test`,

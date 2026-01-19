@@ -1,10 +1,10 @@
 "use server"
 
-import { SlugParamsProps } from "@/libs/slug-params"
-import { restQuery, normalizeConnection } from "@/libs/strapi-client"
+import type { SlugParamsProps } from "@/libs/slug-params"
+import { normalizeConnection, restQuery } from "@/libs/strapi-client"
 import {
-  playerItemPopulate,
   playerDetailsPopulate,
+  playerItemPopulate,
   playerNavPopulate,
 } from "@/libs/strapi-populate"
 
@@ -61,10 +61,7 @@ const visibleFilter = {
 /**
  * Build filter object for player queries
  */
-function buildPlayerFilters(
-  position?: string,
-  letter?: string,
-): Record<string, unknown> {
+function buildPlayerFilters(position?: string, letter?: string): Record<string, unknown> {
   const filters: Record<string, unknown> = { ...visibleFilter }
   if (position) {
     filters.position = { $eqi: position }
@@ -83,7 +80,7 @@ export async function getPlayers(
   page: number,
   pageSize: number,
   position?: string,
-  letter?: string,
+  letter?: string
 ) {
   const filters = buildPlayerFilters(position, letter)
 
@@ -265,9 +262,7 @@ export async function getPendingAttendanceClaims(
   )
 
   if (!result.ok) {
-    console.error(
-      `[Players] Failed to fetch pending claims: ${result.status}`
-    )
+    console.error(`[Players] Failed to fetch pending claims: ${result.status}`)
     return []
   }
 

@@ -1,6 +1,6 @@
-import Link from "next/link"
 import Logo from "@/components/layout/logo"
 import type { Metadata } from "next"
+import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Authentication Error",
@@ -14,8 +14,7 @@ interface ErrorPageProps {
 const errorMessages: Record<string, { title: string; message: string }> = {
   no_token: {
     title: "Authentication Failed",
-    message:
-      "No authentication token was received. Please try signing in again.",
+    message: "No authentication token was received. Please try signing in again.",
   },
   session_expired: {
     title: "Session Expired",
@@ -37,13 +36,11 @@ const errorMessages: Record<string, { title: string; message: string }> = {
   },
   token_exchange_failed: {
     title: "Authentication Failed",
-    message:
-      "Failed to complete authentication with the provider. Please try again.",
+    message: "Failed to complete authentication with the provider. Please try again.",
   },
   default: {
     title: "Something Went Wrong",
-    message:
-      "An unexpected error occurred during authentication. Please try again.",
+    message: "An unexpected error occurred during authentication. Please try again.",
   },
 }
 
@@ -61,7 +58,7 @@ export default async function AuthErrorPage({ searchParams }: ErrorPageProps) {
 
         <div className="auth-error-content">
           <div className="auth-error-icon">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
           </div>
           <h1>{errorInfo.title}</h1>
           <p>{errorInfo.message}</p>
@@ -79,8 +76,7 @@ export default async function AuthErrorPage({ searchParams }: ErrorPageProps) {
         {errorCode === "no_player" && (
           <div className="auth-error-contact">
             <p>
-              Need help?{" "}
-              <Link href="/contact">Contact the #play14 community</Link>
+              Need help? <Link href="/contact">Contact the #play14 community</Link>
             </p>
           </div>
         )}

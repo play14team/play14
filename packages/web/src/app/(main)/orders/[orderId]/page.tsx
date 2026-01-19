@@ -1,10 +1,10 @@
-import Link from "next/link"
-import { notFound } from "next/navigation"
 import { getOrderStatus } from "@/components/tickets/purchase.action"
 import { requireAuth } from "@/libs/auth"
-import RefundButton from "./refund-button"
+import Link from "next/link"
+import { notFound } from "next/navigation"
 import DownloadInvoiceButton from "./download-invoice-button"
 import styles from "./page.module.scss"
+import RefundButton from "./refund-button"
 
 interface OrderPageProps {
   params: Promise<{ orderId: string }>
@@ -138,9 +138,7 @@ export default async function OrderPage({ params }: OrderPageProps) {
                     <span className={getStatusBadgeClass(ticket.ticketStatus)}>
                       {ticket.ticketStatus}
                     </span>
-                    {ticket.checkedInAt && (
-                      <span className={styles.checkedIn}>✓ Checked in</span>
-                    )}
+                    {ticket.checkedInAt && <span className={styles.checkedIn}>✓ Checked in</span>}
                   </div>
                 </Link>
               ))}

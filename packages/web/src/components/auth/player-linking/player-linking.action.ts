@@ -2,14 +2,14 @@
 
 import { strapiFetch, strapiFetchWithQuery } from "@/libs/strapi-client"
 import type {
-  ExactMatchResult,
-  PlayerSuggestion,
-  PendingClaim,
   ActionResult,
   AutoLinkResult,
-  CreatePlayerResult,
   ClaimResult,
   CreatePlayerData,
+  CreatePlayerResult,
+  ExactMatchResult,
+  PendingClaim,
+  PlayerSuggestion,
 } from "./types"
 
 const defaultMatchResult: ExactMatchResult = {
@@ -90,10 +90,7 @@ export async function getMyClaims(): Promise<PendingClaim[]> {
 /**
  * Submit a claim request for a player profile
  */
-export async function submitClaim(
-  playerId: string,
-  reason: string
-): Promise<ClaimResult> {
+export async function submitClaim(playerId: string, reason: string): Promise<ClaimResult> {
   const result = await strapiFetch<{ data: PendingClaim }>(
     "/player-claims",
     {},
@@ -120,11 +117,7 @@ export async function submitClaim(
  * Cancel a pending claim
  */
 export async function cancelClaim(claimId: string): Promise<ActionResult> {
-  const result = await strapiFetch(
-    "/player-claims/:claimId",
-    { claimId },
-    { method: "DELETE" }
-  )
+  const result = await strapiFetch("/player-claims/:claimId", { claimId }, { method: "DELETE" })
 
   if (!result.ok) {
     console.error("[PlayerLinking] Cancel claim failed:", result.error)
@@ -162,9 +155,7 @@ export async function autoLinkPlayer(playerId: string): Promise<AutoLinkResult> 
 /**
  * Create a new player profile and link to the current user
  */
-export async function createPlayerForUser(
-  data: CreatePlayerData
-): Promise<CreatePlayerResult> {
+export async function createPlayerForUser(data: CreatePlayerData): Promise<CreatePlayerResult> {
   const result = await strapiFetch<{ data: CreatePlayerResult["player"] }>(
     "/players/create-for-user",
     {},

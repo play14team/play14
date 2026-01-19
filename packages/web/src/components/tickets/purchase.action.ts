@@ -90,9 +90,7 @@ export interface MyOrderSummary {
  * Get available ticket types for an event
  * @param eventId - The event document ID
  */
-export async function getAvailableTickets(
-  eventId: string
-): Promise<EventTicketsResponse | null> {
+export async function getAvailableTickets(eventId: string): Promise<EventTicketsResponse | null> {
   const result = await strapiFetch<{ data: EventTicketsResponse }>(
     "/events/:eventId/tickets",
     { eventId },
@@ -235,12 +233,7 @@ export async function checkAuthStatus(): Promise<AuthStatus> {
     email: string
     username: string
     player?: { documentId: string; name: string }
-  }>(
-    "/users/me",
-    {},
-    { populate: "player" },
-    { cache: "no-store", optionalAuth: true }
-  )
+  }>("/users/me", {}, { populate: "player" }, { cache: "no-store", optionalAuth: true })
 
   if (!result.ok || !result.data) {
     return { isAuthenticated: false, hasPlayer: false }

@@ -204,7 +204,7 @@ All list pages use the `load-more.tsx` pattern:
 
 ### Date Handling
 
-- Use `moment` + `moment-timezone` (configured globally)
+- Use `date-fns` + `@date-fns/tz`
 - Helper: `formatDate()` from `@/libs/dates`
 - All events include `timezone` field from Strapi
 

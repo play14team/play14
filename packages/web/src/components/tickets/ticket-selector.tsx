@@ -1,15 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
+import { useEffect, useState } from "react"
+import DiscountCodeInput from "./discount-code-input"
 import type {
-  TicketTypeInfo,
-  TicketSelection,
   AuthStatus,
   DiscountValidationResult,
+  TicketSelection,
+  TicketTypeInfo,
 } from "./purchase.action"
 import { validateDiscountCode } from "./purchase.action"
-import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
-import DiscountCodeInput from "./discount-code-input"
 import styles from "./ticket-selector.module.scss"
 
 interface TicketSelectorProps {
@@ -38,7 +38,6 @@ function formatDate(dateString: string): string {
 
 export default function TicketSelector({
   eventId,
-  eventName,
   ticketTypes,
   hasPaymentProvider,
   authStatus,
@@ -51,7 +50,9 @@ export default function TicketSelector({
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountValidationResult | null>(null)
-  const [pendingDiscountCode, setPendingDiscountCode] = useState<string | undefined>(initialDiscountCode)
+  const [pendingDiscountCode, setPendingDiscountCode] = useState<string | undefined>(
+    initialDiscountCode
+  )
 
   // Update quantities if initialQuantities changes (after OAuth redirect)
   useEffect(() => {
@@ -180,21 +181,13 @@ export default function TicketSelector({
       return <span className={styles.statusBadge}>Sold out</span>
     }
     if (tt.notYetAvailable && tt.validFrom) {
-      return (
-        <span className={styles.statusBadge}>
-          Available from {formatDate(tt.validFrom)}
-        </span>
-      )
+      return <span className={styles.statusBadge}>Available from {formatDate(tt.validFrom)}</span>
     }
     if (tt.expired) {
       return <span className={styles.statusBadge}>Sales ended</span>
     }
     if (tt.available !== null) {
-      return (
-        <span className={styles.availability}>
-          {tt.available} remaining
-        </span>
-      )
+      return <span className={styles.availability}>{tt.available} remaining</span>
     }
     return null
   }
@@ -252,7 +245,10 @@ export default function TicketSelector({
                 <button
                   type="button"
                   onClick={() => handleQuantityChange(tt.documentId, 1)}
-                  disabled={disabled || (tt.available !== null && (quantities[tt.documentId] || 0) >= tt.available)}
+                  disabled={
+                    disabled ||
+                    (tt.available !== null && (quantities[tt.documentId] || 0) >= tt.available)
+                  }
                   aria-label="Increase quantity"
                 >
                   +
@@ -283,12 +279,18 @@ export default function TicketSelector({
         {appliedDiscount?.valid && finalDiscountAmount > 0 && (
           <>
             <div className={styles.subtotalRow}>
-              <span>Subtotal ({totalQuantity} {totalQuantity === 1 ? "ticket" : "tickets"}):</span>
-              <span>{currency} {subtotal.toFixed(2)}</span>
+              <span>
+                Subtotal ({totalQuantity} {totalQuantity === 1 ? "ticket" : "tickets"}):
+              </span>
+              <span>
+                {currency} {subtotal.toFixed(2)}
+              </span>
             </div>
             <div className={styles.discountRow}>
               <span>Discount ({appliedDiscount.code}):</span>
-              <span className={styles.discountAmount}>-{currency} {finalDiscountAmount.toFixed(2)}</span>
+              <span className={styles.discountAmount}>
+                -{currency} {finalDiscountAmount.toFixed(2)}
+              </span>
             </div>
           </>
         )}
@@ -317,9 +319,7 @@ export default function TicketSelector({
             </p>
           )}
           {authStatus?.isAuthenticated && authStatus.hasPlayer && (
-            <p className={styles.authReady}>
-              Purchasing as {authStatus.player?.name}
-            </p>
+            <p className={styles.authReady}>Purchasing as {authStatus.player?.name}</p>
           )}
         </div>
 

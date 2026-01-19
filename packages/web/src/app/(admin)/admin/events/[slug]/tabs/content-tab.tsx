@@ -1,8 +1,8 @@
 "use client"
 
-import SimpleEditor from "@/components/ui/simple-editor"
 import EventImageManager from "@/components/admin/event-image-manager"
 import ScheduleEditor from "@/components/admin/schedule-editor"
+import SimpleEditor from "@/components/ui/simple-editor"
 import type { EventForEdit } from "../event-edit.action"
 import type { TimetableDay } from "../schedule.types"
 
@@ -48,8 +48,8 @@ export default function ContentTab({
       <div className="admin-form-section">
         <h2>Event Images</h2>
         <p className="admin-form-section-description">
-          Upload or select images for the event. The default image appears on
-          event cards and listings.
+          Upload or select images for the event. The default image appears on event cards and
+          listings.
         </p>
         <EventImageManager
           eventSlug={eventSlug}
@@ -64,13 +64,9 @@ export default function ContentTab({
       <div className="admin-form-section">
         <h2>Event Schedule</h2>
         <p className="admin-form-section-description">
-          Define the timetable for each day of the event with activities and
-          timeslots.
+          Define the timetable for each day of the event with activities and timeslots.
         </p>
-        <ScheduleEditor
-          schedule={schedule}
-          onChange={onScheduleChange}
-        />
+        <ScheduleEditor schedule={schedule} onChange={onScheduleChange} />
       </div>
     </>
   )

@@ -37,9 +37,7 @@ export default function GlobalError({
             color: "#333",
           }}
         >
-          <h1 style={{ marginBottom: "1rem", fontSize: "2rem" }}>
-            Something went wrong
-          </h1>
+          <h1 style={{ marginBottom: "1rem", fontSize: "2rem" }}>Something went wrong</h1>
           <p
             style={{
               marginBottom: "2rem",
@@ -48,8 +46,7 @@ export default function GlobalError({
               maxWidth: "400px",
             }}
           >
-            An unexpected error occurred. Our team has been notified and is
-            working to fix it.
+            An unexpected error occurred. Our team has been notified and is working to fix it.
           </p>
           <button
             onClick={reset}
@@ -63,12 +60,8 @@ export default function GlobalError({
               cursor: "pointer",
               transition: "background-color 0.2s",
             }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor = "#0060df")
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor = "#0070f3")
-            }
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#0060df")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0070f3")}
           >
             Try again
           </button>

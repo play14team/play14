@@ -28,7 +28,7 @@ export default function SocialLinks({
           rel="noopener"
           className="d-block"
         >
-          <i className="bx bxl-facebook"></i>
+          <i className="bx bxl-facebook" />
         </Link>
       </li>
       <li key="twitter">
@@ -38,7 +38,7 @@ export default function SocialLinks({
           rel="noopener"
           className="d-block"
         >
-          <i className="bx bxl-twitter"></i>
+          <i className="bx bxl-twitter" />
         </Link>
       </li>
       <li key="pinterest">
@@ -48,7 +48,7 @@ export default function SocialLinks({
           rel="noopener"
           className="d-block"
         >
-          <i className="bx bxl-pinterest"></i>
+          <i className="bx bxl-pinterest" />
         </Link>
       </li>
       <li key="linkedin">
@@ -58,7 +58,7 @@ export default function SocialLinks({
           rel="noopener"
           className="d-block"
         >
-          <i className="bx bxl-linkedin"></i>
+          <i className="bx bxl-linkedin" />
         </Link>
       </li>
     </ul>

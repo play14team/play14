@@ -1,10 +1,10 @@
 "use server"
 
 import {
+  getStrapiClient,
   strapiFetch,
   strapiFetchFormData,
   strapiFetchWithQuery,
-  getStrapiClient,
 } from "@/libs/strapi-client"
 
 // STRAPI_URL kept for URL normalization (converting relative URLs to absolute)
@@ -194,8 +194,8 @@ export async function removeEventImage(
  * @param folderId Optional folder ID to filter by (null for root level)
  */
 export async function listMediaLibraryFiles(
-  page: number = 1,
-  pageSize: number = 24,
+  page = 1,
+  pageSize = 24,
   search?: string,
   folderId?: number | null
 ): Promise<ImageActionResult<{ files: EventImage[]; total: number }>> {
@@ -228,7 +228,9 @@ export async function listMediaLibraryFiles(
     const response = await client.fetch(`/admin/media-files?${params}`)
 
     if (!response.ok) {
-      const errorData = (await response.json().catch(() => ({}))) as { error?: { message?: string } }
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string }
+      }
       return {
         success: false,
         error: errorData?.error?.message || `Failed to list files (${response.status})`,

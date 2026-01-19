@@ -6,7 +6,7 @@
  * to ensure consistent behavior.
  */
 
-import crypto from "crypto"
+import crypto from "node:crypto"
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 import { validateEmail, validateName } from "../../libs/validation"
@@ -50,7 +50,7 @@ export async function findOrCreatePlayerForAttendee(
   strapi: Core.Strapi,
   attendee: AttendeeInfo,
   purchaserPlayer: any,
-  logPrefix: string = "[Ticketing]"
+  logPrefix = "[Ticketing]"
 ): Promise<FindOrCreatePlayerResult> {
   // Validate first name using the validation library
   const firstNameResult = validateName(attendee.firstName, {
@@ -203,7 +203,9 @@ export async function findOrCreatePlayerForAttendee(
     // Player with same name exists but is linked to a user - create with unique name
     const timestamp = Date.now().toString(36).slice(-4)
     playerName = `${attendeeName} (${timestamp})`
-    strapi.log.info(`${logPrefix} Creating player with unique name: ${playerName} (original name taken)`)
+    strapi.log.info(
+      `${logPrefix} Creating player with unique name: ${playerName} (original name taken)`
+    )
   }
 
   const newPlayer = await strapi.documents("api::player.player").create({
@@ -241,7 +243,7 @@ export async function addPlayerToEventAttendees(
   strapi: Core.Strapi,
   playerDocumentId: string,
   event: { documentId: string; id: number },
-  logPrefix: string = "[Ticketing]"
+  logPrefix = "[Ticketing]"
 ): Promise<void> {
   // Fetch BOTH draft and published versions of the event
   // We need to add the player to both to ensure:
@@ -275,9 +277,7 @@ export async function addPlayerToEventAttendees(
   if (!playerDoc) return
 
   const currentAttendedIds = playerDoc.attended?.map((e: any) => e.id) || []
-  const alreadyAttending = playerDoc.attended?.some(
-    (e: any) => e.documentId === event.documentId
-  )
+  const alreadyAttending = playerDoc.attended?.some((e: any) => e.documentId === event.documentId)
 
   if (!alreadyAttending) {
     // Build array with all existing event versions (draft and/or published)

@@ -13,10 +13,7 @@ interface YearNavProps {
 
 function getYears(yearCounts: Record<number, number>): number[] {
   const years: number[] = []
-  const maxYearWithEvents = Math.max(
-    CURRENT_YEAR,
-    ...Object.keys(yearCounts).map(Number),
-  )
+  const maxYearWithEvents = Math.max(CURRENT_YEAR, ...Object.keys(yearCounts).map(Number))
 
   for (let year = maxYearWithEvents; year >= START_YEAR; year--) {
     years.push(year)
@@ -31,10 +28,7 @@ export default function YearNav({ currentYear, yearCounts }: YearNavProps) {
   return (
     <div className="year-nav centered">
       <div className="year-buttons">
-        <Link
-          href="/events"
-          className={`year-btn ${!currentYear ? "active" : ""}`}
-        >
+        <Link href="/events" className={`year-btn ${!currentYear ? "active" : ""}`}>
           All
         </Link>
         {years.map((year) => {

@@ -171,12 +171,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "eventId",
-        "eventType",
-        "provider"
-      ],
+      "list": ["id", "eventId", "eventType", "provider"],
       "edit": [
         [
           {

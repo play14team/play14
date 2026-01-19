@@ -1,10 +1,6 @@
 "use server"
 
-import {
-  strapiFetch,
-  strapiFetchFormData,
-  strapiFetchWithQuery,
-} from "@/libs/strapi-client"
+import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
 
 // Types for sponsor management
 export interface SponsorLogo {
@@ -46,8 +42,8 @@ export async function getAvailableSponsors(): Promise<SponsorActionResult<Sponso
     "/sponsors",
     {},
     {
-      "sort": "name:asc",
-      "populate": "logo",
+      sort: "name:asc",
+      populate: "logo",
       "pagination[pageSize]": "1000",
     }
   )
@@ -110,17 +106,15 @@ export async function uploadSponsorLogo(
 
   // Note: /upload doesn't have user input in the path, so it's safe
   // The sponsorId is in the form body, validated by Strapi server-side
-  const result = await strapiFetchFormData<Array<{
-    id: number
-    url: string
-    width?: number
-    height?: number
-    formats?: SponsorLogo["formats"]
-  }>>(
-    "/upload",
-    {},
-    formData
-  )
+  const result = await strapiFetchFormData<
+    Array<{
+      id: number
+      url: string
+      width?: number
+      height?: number
+      formats?: SponsorLogo["formats"]
+    }>
+  >("/upload", {}, formData)
 
   if (!result.ok || !result.data || result.data.length === 0) {
     return {

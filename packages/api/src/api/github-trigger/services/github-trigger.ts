@@ -29,9 +29,7 @@ export default ({ strapi }: GitHubTriggerParams) => ({
     }
 
     if (!config.githubToken) {
-      strapi.log.warn(
-        "[GitHub Trigger] GITHUB_TOKEN not configured, skipping workflow trigger"
-      )
+      strapi.log.warn("[GitHub Trigger] GITHUB_TOKEN not configured, skipping workflow trigger")
       return false
     }
 
@@ -91,9 +89,11 @@ export default ({ strapi }: GitHubTriggerParams) => ({
             : `Multiple updates: ${Array.from(pendingReasons).join(", ")}`
 
         pendingReasons.clear()
-        await (strapi.service("api::github-trigger.github-trigger") as {
-          triggerWorkflow: TriggerWorkflow
-        }).triggerWorkflow(combinedReason)
+        await (
+          strapi.service("api::github-trigger.github-trigger") as {
+            triggerWorkflow: TriggerWorkflow
+          }
+        ).triggerWorkflow(combinedReason)
       }, 5000) // 5 second debounce
     }
   })() as DebouncedTrigger,

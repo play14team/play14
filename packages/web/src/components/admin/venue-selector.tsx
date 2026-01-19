@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
 import Image from "next/image"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 export interface VenueOption {
   documentId: string
@@ -37,10 +37,7 @@ export default function VenueSelector({
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Find the selected venue
-  const selectedVenue = useMemo(
-    () => venues.find((v) => v.documentId === value),
-    [venues, value]
-  )
+  const selectedVenue = useMemo(() => venues.find((v) => v.documentId === value), [venues, value])
 
   // Filter venues based on search
   const filteredVenues = useMemo(() => {
@@ -90,7 +87,8 @@ export default function VenueSelector({
   const getLogoUrl = (venue: VenueOption): string | null => {
     if (!venue.logo) return null
     const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
-    const url = venue.logo.formats?.thumbnail?.url || venue.logo.formats?.small?.url || venue.logo.url
+    const url =
+      venue.logo.formats?.thumbnail?.url || venue.logo.formats?.small?.url || venue.logo.url
     return url.startsWith("http") ? url : `${baseUrl}${url}`
   }
 
@@ -116,21 +114,17 @@ export default function VenueSelector({
                     style={{ objectFit: "contain" }}
                   />
                 ) : (
-                  <i className="bx bx-building-house"></i>
+                  <i className="bx bx-building-house" />
                 )}
               </span>
-              <span className="venue-selector-text">
-                {selectedVenue.name}
-              </span>
+              <span className="venue-selector-text">{selectedVenue.name}</span>
             </>
           ) : (
-            <span className="venue-selector-text venue-selector-placeholder">
-              {placeholder}
-            </span>
+            <span className="venue-selector-text venue-selector-placeholder">{placeholder}</span>
           )}
         </div>
         <span className="venue-selector-arrow">
-          <i className="bx bx-chevron-down"></i>
+          <i className="bx bx-chevron-down" />
         </span>
       </button>
 
@@ -170,31 +164,23 @@ export default function VenueSelector({
                           style={{ objectFit: "contain" }}
                         />
                       ) : (
-                        <i className="bx bx-building-house"></i>
+                        <i className="bx bx-building-house" />
                       )}
                     </span>
                     <span className="venue-selector-option-name">{v.name}</span>
                     {v.addressDetails && (
-                      <span className="venue-selector-option-address">
-                        {v.addressDetails}
-                      </span>
+                      <span className="venue-selector-option-address">{v.addressDetails}</span>
                     )}
                   </button>
                 )
               })
             ) : (
-              <div className="venue-selector-empty">
-                No venues found
-              </div>
+              <div className="venue-selector-empty">No venues found</div>
             )}
           </div>
 
-          <button
-            type="button"
-            className="venue-selector-create"
-            onClick={handleCreateNew}
-          >
-            <i className="bx bx-plus"></i>
+          <button type="button" className="venue-selector-create" onClick={handleCreateNew}>
+            <i className="bx bx-plus" />
             Create new venue
           </button>
         </div>

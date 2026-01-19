@@ -1,7 +1,7 @@
 "use client" // Error components must be Client Components
 
-import * as Sentry from "@sentry/nextjs"
 import ErrorMessage from "@/components/layout/error-message"
+import * as Sentry from "@sentry/nextjs"
 import { useEffect } from "react"
 
 export default function Error({
@@ -28,11 +28,7 @@ export default function Error({
   return (
     <div className="pt-70">
       <ErrorMessage
-        title={
-          isConnectionError
-            ? "Unable to connect to server"
-            : "Something went wrong"
-        }
+        title={isConnectionError ? "Unable to connect to server" : "Something went wrong"}
         message={
           isConnectionError
             ? "The content server is currently unavailable. This usually means your Strapi backend is not running or not reachable."

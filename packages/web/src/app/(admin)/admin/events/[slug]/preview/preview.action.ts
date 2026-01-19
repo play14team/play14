@@ -112,9 +112,7 @@ export interface PreviewEvent {
  * Get event preview data (for draft events)
  * Returns the full event data for preview purposes
  */
-export async function getEventPreview(
-  slug: string
-): Promise<PreviewEvent | null> {
+export async function getEventPreview(slug: string): Promise<PreviewEvent | null> {
   const result = await strapiFetch<{ data: PreviewEvent }>(
     "/admin/events/:slug/preview",
     { slug },

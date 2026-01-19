@@ -1,7 +1,7 @@
 "use client"
 
+import type { Event } from "@/models/strapi"
 import Link from "next/link"
-import { Event } from "@/models/strapi"
 import HtmlContent from "../layout/html-content"
 import { TicketPurchaseFlow } from "../tickets"
 
@@ -72,7 +72,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 rel="noopener noreferrer"
                 className="default-btn"
               >
-                <i className="flaticon-user"></i>
+                <i className="flaticon-user" />
                 Register Now
               </Link>
             </div>

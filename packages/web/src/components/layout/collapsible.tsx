@@ -1,6 +1,6 @@
 "use client"
 
-import { PropsWithChildren, ReactNode } from "react"
+import type { PropsWithChildren, ReactNode } from "react"
 import { useCollapse } from "react-collapsed"
 import "./collapsible.module.scss"
 
@@ -15,11 +15,7 @@ export default function Collapsible({ name, children }: CollapsibleProps) {
       <div className="header" {...getToggleProps()}>
         <h1 style={{ display: "inline" }}>{name}</h1>
         <h4 style={{ display: "inline", paddingLeft: "10px" }}>
-          {isExpanded ? (
-            <i className="bx bx-filter"></i>
-          ) : (
-            <i className="bx bx-filter-alt"></i>
-          )}
+          {isExpanded ? <i className="bx bx-filter" /> : <i className="bx bx-filter-alt" />}
         </h4>
       </div>
       <div {...getCollapseProps()}>

@@ -117,12 +117,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "value",
-        "articles",
-        "createdBy",
-        "updatedBy"
-      ],
+      "list": ["value", "articles", "createdBy", "updatedBy"],
       "edit": [
         [
           {

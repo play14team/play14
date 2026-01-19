@@ -1,8 +1,8 @@
-import { Event as EventType, Player } from "@/models/strapi"
+import type { Event as EventType, Player } from "@/models/strapi"
 import EventGrid from "../events/grid"
 import HtmlContent from "../layout/html-content"
-import TabHeaders from "./tab-headers"
 import { getPendingAttendanceClaims } from "./get.action"
+import TabHeaders from "./tab-headers"
 
 interface EventWithPending extends EventType {
   isPending?: boolean
@@ -14,9 +14,7 @@ export default async function PlayerTabs({ player }: { player: Player }) {
   const rawAttended = player.attended || []
 
   // Fetch pending attendance claims for this player
-  const pendingClaims = player.documentId
-    ? await getPendingAttendanceClaims(player.documentId)
-    : []
+  const pendingClaims = player.documentId ? await getPendingAttendanceClaims(player.documentId) : []
 
   // Convert pending claims to events with isPending flag
   const pendingEvents: EventWithPending[] = pendingClaims

@@ -2,7 +2,7 @@
  * Unit tests for webhook controller
  */
 
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest"
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest"
 import webhookFactory from "./webhook"
 
 // Mock dependencies
@@ -25,7 +25,9 @@ vi.mock("../../../services/ticketing", () => ({
   releaseReservations: vi.fn().mockResolvedValue(undefined),
   confirmDiscountCode: vi.fn().mockResolvedValue(undefined),
   releaseDiscountCode: vi.fn().mockResolvedValue(undefined),
-  findOrCreatePlayerForAttendee: vi.fn().mockResolvedValue({ player: { id: 1, documentId: "test-player-123" }, isNew: false }),
+  findOrCreatePlayerForAttendee: vi
+    .fn()
+    .mockResolvedValue({ player: { id: 1, documentId: "test-player-123" }, isNew: false }),
   addPlayerToEventAttendees: vi.fn().mockResolvedValue(undefined),
 }))
 
@@ -40,14 +42,12 @@ vi.mock("slugify", () => ({
   default: vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, "-")),
 }))
 
+import { generateTicketCode } from "../../../libs/tickets"
 import { getPaymentProvider } from "../../../services/payment"
 import {
+  confirmDiscountCode,
   confirmReservations,
   releaseReservations,
-  confirmDiscountCode,
-  releaseDiscountCode,
-  findOrCreatePlayerForAttendee,
-  addPlayerToEventAttendees,
 } from "../../../services/ticketing"
 import {
   claimWebhookEvent,
@@ -55,7 +55,6 @@ import {
   markWebhookFailed,
   releaseWebhookClaim,
 } from "../../../services/webhook"
-import { generateTicketCode } from "../../../libs/tickets"
 
 // Helper to create mock Knex query builder
 function createMockKnexQueryBuilder(resolveValue: any = [{ id: 1 }]) {
@@ -148,9 +147,7 @@ describe("webhook controller", () => {
       await controller.handleStripeWebhook(ctx)
 
       expect(ctx.badRequest).toHaveBeenCalledWith("Missing signature")
-      expect(mockStrapi.log.warn).toHaveBeenCalledWith(
-        "[Webhook] Missing Stripe signature header"
-      )
+      expect(mockStrapi.log.warn).toHaveBeenCalledWith("[Webhook] Missing Stripe signature header")
     })
 
     it("returns bad request when raw body is not available", async () => {
@@ -311,9 +308,7 @@ describe("webhook controller", () => {
     it("returns bad request when signature verification fails", async () => {
       const ctx = createMockContext()
 
-      mockProvider.verifyWebhookSignature.mockRejectedValue(
-        new Error("Invalid signature")
-      )
+      mockProvider.verifyWebhookSignature.mockRejectedValue(new Error("Invalid signature"))
 
       await controller.handleStripeWebhook(ctx)
 
@@ -439,9 +434,7 @@ describe("webhook controller", () => {
       start: "2025-03-14T09:00:00Z",
       end: "2025-03-16T17:00:00Z",
       contactEmail: "test@play14.org",
-      ticketTypes: [
-        { id: 1, documentId: "tt-123", name: "Standard" },
-      ],
+      ticketTypes: [{ id: 1, documentId: "tt-123", name: "Standard" }],
     }
 
     const mockOrder = {
@@ -646,11 +639,7 @@ describe("webhook controller", () => {
       })
 
       // Should call confirmDiscountCode with the discount code documentId and hasReservation flag
-      expect(confirmDiscountCode).toHaveBeenCalledWith(
-        mockStrapi,
-        "dc-123",
-        true
-      )
+      expect(confirmDiscountCode).toHaveBeenCalledWith(mockStrapi, "dc-123", true)
     })
   })
 
@@ -685,9 +674,7 @@ describe("webhook controller", () => {
 
       await controller.handleCheckoutExpired({ id: "cs_expired_123" })
 
-      expect(mockStrapi.log.info).toHaveBeenCalledWith(
-        expect.stringContaining("not pending")
-      )
+      expect(mockStrapi.log.info).toHaveBeenCalledWith(expect.stringContaining("not pending"))
     })
 
     it("releases reservations and marks order as expired", async () => {
@@ -707,10 +694,7 @@ describe("webhook controller", () => {
 
       await controller.handleCheckoutExpired({ id: "cs_expired_123" })
 
-      expect(releaseReservations).toHaveBeenCalledWith(
-        mockStrapi,
-        mockOrder.documentId
-      )
+      expect(releaseReservations).toHaveBeenCalledWith(mockStrapi, mockOrder.documentId)
 
       expect(orderDocs.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -719,9 +703,7 @@ describe("webhook controller", () => {
         })
       )
 
-      expect(mockStrapi.log.info).toHaveBeenCalledWith(
-        expect.stringContaining("marked as expired")
-      )
+      expect(mockStrapi.log.info).toHaveBeenCalledWith(expect.stringContaining("marked as expired"))
     })
   })
 
@@ -772,10 +754,7 @@ describe("webhook controller", () => {
         },
       })
 
-      expect(releaseReservations).toHaveBeenCalledWith(
-        mockStrapi,
-        mockOrder.documentId
-      )
+      expect(releaseReservations).toHaveBeenCalledWith(mockStrapi, mockOrder.documentId)
 
       expect(orderDocs.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -843,9 +822,7 @@ describe("webhook controller", () => {
 
       await controller.handleChargeRefunded({ payment_intent: "pi_test" })
 
-      expect(mockStrapi.log.info).toHaveBeenCalledWith(
-        expect.stringContaining("already refunded")
-      )
+      expect(mockStrapi.log.info).toHaveBeenCalledWith(expect.stringContaining("already refunded"))
     })
 
     it("updates order and tickets to refunded status", async () => {
@@ -853,10 +830,7 @@ describe("webhook controller", () => {
         documentId: "order-doc-123",
         orderNumber: "ORD-001",
         status: "paid",
-        tickets: [
-          { documentId: "ticket-1" },
-          { documentId: "ticket-2" },
-        ],
+        tickets: [{ documentId: "ticket-1" }, { documentId: "ticket-2" }],
         player: { documentId: "player-doc-123" },
         event: { documentId: "event-doc-123" },
       }

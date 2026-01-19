@@ -70,9 +70,7 @@ export async function getVenues(): Promise<VenueOption[]> {
 /**
  * Create a new event with default schedule and tickets
  */
-export async function createEvent(
-  data: EventCreateData
-): Promise<CreateEventResult> {
+export async function createEvent(data: EventCreateData): Promise<CreateEventResult> {
   const result = await strapiFetch<{ data: CreateEventResult["event"] }>(
     "/admin/events/create",
     {},

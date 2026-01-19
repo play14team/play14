@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getStatistics, Play14Statistics } from "./get.action"
+import { type Play14Statistics, getStatistics } from "./get.action"
 
 interface StatItem {
   value: number
@@ -18,7 +18,7 @@ function StatCard({ item }: { item: StatItem }) {
   const content = (
     <div className="single-funfacts-box">
       <div className="icon">
-        <i className={`${item.icon} ${item.color}`}></i>
+        <i className={`${item.icon} ${item.color}`} />
       </div>
       <h3>
         {formatNumber(item.value)}
@@ -96,8 +96,8 @@ export default async function Statistics() {
             Our global <span>impact</span>
           </h2>
           <p>
-            Since 2014, #play14 has grown into a worldwide movement connecting
-            people through the power of play.
+            Since 2014, #play14 has grown into a worldwide movement connecting people through the
+            power of play.
           </p>
         </div>
         <div className="row justify-content-center">

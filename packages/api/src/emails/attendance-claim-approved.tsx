@@ -1,4 +1,3 @@
-import React from "react"
 import { Button, Heading, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 

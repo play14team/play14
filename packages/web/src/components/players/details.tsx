@@ -1,24 +1,20 @@
+import type { GeoLocation, Player, UploadFile } from "@/models/strapi"
 import Image from "next/image"
-import { GeoLocation, Player, UploadFile } from "@/models/strapi"
 import SocialNetworks from "../layout/socialnetworks"
 import Map from "../map"
+import DefaultPlayerImage from "../ui/default-player-image"
 import PlayersNavigator from "./nav"
 import PlayerSidebar from "./sidebar"
 import PlayerTabs from "./tabs"
-import DefaultPlayerImage from "../ui/default-player-image"
 
 // Helper to check if location is a GeoLocation object (has coordinates)
-function isGeoLocation(
-  location: string | GeoLocation | undefined,
-): location is GeoLocation {
+function isGeoLocation(location: string | GeoLocation | undefined): location is GeoLocation {
   if (!location || typeof location === "string") return false
   return "geometry" in location || ("lat" in location && "lng" in location)
 }
 
 // Helper to get location display name from string or GeoLocation
-function getLocationName(
-  location: string | GeoLocation | undefined,
-): string | null {
+function getLocationName(location: string | GeoLocation | undefined): string | null {
   if (!location) return null
   if (typeof location === "string") return location
   // GeoLocation object - extract place_name
@@ -74,9 +70,7 @@ const PlayerDetails = ({ player }: { player: Player }) => {
                 />
               )}
               <div className="content">
-                {player.socialNetworks && (
-                  <SocialNetworks socialNetworks={player.socialNetworks} />
-                )}
+                {player.socialNetworks && <SocialNetworks socialNetworks={player.socialNetworks} />}
               </div>
             </div>
           </div>
@@ -84,15 +78,13 @@ const PlayerDetails = ({ player }: { player: Player }) => {
           <div className="col-lg-4 col-md-12 px-4">
             <div className="events-details-location">
               <Map
-                location={
-                  hasGeoLocation ? (player.location as GeoLocation) : undefined
-                }
+                location={hasGeoLocation ? (player.location as GeoLocation) : undefined}
                 height={"450px"}
                 zoom={hasGeoLocation ? 10 : undefined}
               />
               {locationName && !hasGeoLocation && (
                 <p className="pt-2">
-                  <i className="bx bx-map"></i> {locationName}
+                  <i className="bx bx-map" /> {locationName}
                 </p>
               )}
             </div>

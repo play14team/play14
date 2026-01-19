@@ -1,18 +1,19 @@
-import moment from "moment-timezone"
+import { TZDate } from "@date-fns/tz"
+import { format } from "date-fns"
 
 const EventTime = ({
   time,
   timezone,
 }: {
   time: Date | string
-  timezone: string
+  timezone?: string
 }) => {
-  const mommentInTime = moment(time)
-  const format = "ddd, MMM Do - HH:mm"
+  const formatPattern = "EEE, MMM do - HH:mm"
+  const base = time instanceof Date ? time.getTime() : time
+  const zone = timezone || "UTC"
+  const date = new TZDate(base, zone)
 
-  if (timezone) return mommentInTime.tz(timezone).format(format)
-
-  return mommentInTime.format(format)
+  return format(date, formatPattern)
 }
 
 export default EventTime

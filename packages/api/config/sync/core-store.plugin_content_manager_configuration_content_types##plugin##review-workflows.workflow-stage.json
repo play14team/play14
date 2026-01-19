@@ -145,12 +145,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "name",
-        "color",
-        "workflow"
-      ],
+      "list": ["id", "name", "color", "workflow"],
       "edit": [
         [
           {

@@ -1,5 +1,5 @@
-import { Player, UploadFile } from "@/models/strapi"
-import DetailsNavigator, { NavLink } from "../layout/detailsnav"
+import type { Player, UploadFile } from "@/models/strapi"
+import DetailsNavigator, { type NavLink } from "../layout/detailsnav"
 import { getPlayerNav } from "./get.action"
 
 export default async function PlayersNavigator({

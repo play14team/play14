@@ -3,10 +3,10 @@
  * Handles email notifications on claim events
  */
 
-import type { Core } from "@strapi/strapi"
 import { render } from "@react-email/render"
-import AttendanceClaimNewEmail from "../../../../emails/attendance-claim-new"
+import type { Core } from "@strapi/strapi"
 import AttendanceClaimApprovedEmail from "../../../../emails/attendance-claim-approved"
+import AttendanceClaimNewEmail from "../../../../emails/attendance-claim-new"
 import AttendanceClaimRejectedEmail from "../../../../emails/attendance-claim-rejected"
 
 const getFrontendUrl = (): string => {
@@ -52,7 +52,7 @@ export default {
     })
 
     if (!claim || !claim.player || !claim.event) {
-      strapi.log.warn(`[AttendanceClaim] Could not send email: claim data incomplete`)
+      strapi.log.warn("[AttendanceClaim] Could not send email: claim data incomplete")
       return
     }
 
@@ -115,12 +115,15 @@ export default {
         { plainText: true }
       )
 
-      await strapi.plugin("email").service("email").send({
-        to: Array.from(organizerEmails),
-        subject: `[#play14] New Attendance Claim for ${claim.event.name}`,
-        html,
-        text,
-      })
+      await strapi
+        .plugin("email")
+        .service("email")
+        .send({
+          to: Array.from(organizerEmails),
+          subject: `[#play14] New Attendance Claim for ${claim.event.name}`,
+          html,
+          text,
+        })
 
       strapi.log.info(
         `[AttendanceClaim] Sent notification email to organizers for claim ${result.documentId}`
@@ -162,7 +165,7 @@ export default {
     })
 
     if (!claim || !claim.player || !claim.event) {
-      strapi.log.warn(`[AttendanceClaim] Could not send email: data incomplete`)
+      strapi.log.warn("[AttendanceClaim] Could not send email: data incomplete")
       return
     }
 
@@ -206,7 +209,7 @@ export default {
 
         await strapi.plugin("email").service("email").send({
           to: playerEmail,
-          subject: `[#play14] Your Attendance Claim Has Been Approved!`,
+          subject: "[#play14] Your Attendance Claim Has Been Approved!",
           html,
           text,
         })
@@ -243,7 +246,7 @@ export default {
 
         await strapi.plugin("email").service("email").send({
           to: playerEmail,
-          subject: `[#play14] Attendance Claim Update`,
+          subject: "[#play14] Attendance Claim Update",
           html,
           text,
         })

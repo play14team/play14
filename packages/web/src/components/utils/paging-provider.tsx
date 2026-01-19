@@ -1,17 +1,14 @@
 "use client"
 
-import { Pagination } from "@/models/strapi"
-import { PropsWithChildren } from "react"
+import type { Pagination } from "@/models/strapi"
+import type { PropsWithChildren } from "react"
 import Paging from "../layout/paging"
 
 interface PaginationProps extends PropsWithChildren {
   pagination: Pagination
 }
 
-export default function PagingProvider({
-  pagination,
-  children,
-}: PaginationProps) {
+export default function PagingProvider({ pagination, children }: PaginationProps) {
   return (
     <>
       <Paging pagination={pagination} onNextPage={() => {}} />

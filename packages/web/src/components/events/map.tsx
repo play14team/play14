@@ -1,14 +1,10 @@
 "use client"
 
-import { Event } from "@/models/strapi"
+import type { Event } from "@/models/strapi"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 
-import Map, {
-  FullscreenControl,
-  GeolocateControl,
-  NavigationControl,
-} from "react-map-gl/mapbox"
+import Map, { FullscreenControl, GeolocateControl, NavigationControl } from "react-map-gl/mapbox"
 import GeocoderControl from "../map/geocoder"
 
 import "mapbox-gl/dist/mapbox-gl.css"
@@ -27,9 +23,8 @@ export default function EventMap({ events }: { events: Event[] }) {
   if (!TOKEN) {
     return (
       <span className="error">
-        Mapbox access token not found. Please add a
-        NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN environment variable and set it with a
-        valid Mapbox api token.
+        Mapbox access token not found. Please add a NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN environment
+        variable and set it with a valid Mapbox api token.
       </span>
     )
   }
@@ -37,9 +32,7 @@ export default function EventMap({ events }: { events: Event[] }) {
   // Theme-aware map style
   // Use dark-v11 instead of navigation-night-v1 to maintain globe projection
   const isDark = mounted && resolvedTheme === "dark"
-  const mapStyle = isDark
-    ? "mapbox://styles/mapbox/dark-v11"
-    : "mapbox://styles/mapbox/streets-v12"
+  const mapStyle = isDark ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12"
 
   return (
     <>

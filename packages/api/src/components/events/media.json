@@ -12,10 +12,7 @@
     },
     "type": {
       "type": "enumeration",
-      "enum": [
-        "Photos",
-        "Videos"
-      ],
+      "enum": ["Photos", "Videos"],
       "required": true
     }
   }

@@ -1,8 +1,8 @@
 import GameDetails from "@/components/games/details"
-import Page from "@/components/layout/page"
-import { SlugParamsProps } from "@/libs/slug-params"
-import type { Game } from "@/models/strapi"
 import { getGame, getGameSlugs } from "@/components/games/get.action"
+import Page from "@/components/layout/page"
+import type { SlugParamsProps } from "@/libs/slug-params"
+import type { Game } from "@/models/strapi"
 import { notFound } from "next/navigation"
 
 export const revalidate = 3600
@@ -21,7 +21,7 @@ export async function generateStaticParams() {
   } catch (error) {
     console.warn(
       "[Build] Failed to generate static params for games:",
-      error instanceof Error ? error.message : String(error),
+      error instanceof Error ? error.message : String(error)
     )
     console.warn("[Build] Games will be generated on-demand at runtime")
     return []
@@ -38,9 +38,7 @@ export async function generateMetadata(props: SlugParamsProps) {
     }
   }
 
-  const images = game.images
-    ?.filter(Boolean)
-    ?.map((i) => (i as { url: string }).url) as string[]
+  const images = game.images?.filter(Boolean)?.map((i) => (i as { url: string }).url) as string[]
 
   return {
     title: `Games | ${game.name}`,
@@ -50,9 +48,7 @@ export async function generateMetadata(props: SlugParamsProps) {
       description: game.summary,
       type: "article",
       publishedTime: game.publishedAt,
-      authors: game.documentedBy?.length
-        ? game.documentedBy.map((p) => p.name)
-        : undefined,
+      authors: game.documentedBy?.length ? game.documentedBy.map((p) => p.name) : undefined,
       images: [game.defaultImage?.url].concat(images),
     },
   }

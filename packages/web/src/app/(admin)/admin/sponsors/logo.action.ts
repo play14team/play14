@@ -130,9 +130,7 @@ export async function setSponsorLogoFromLibrary(
  * Remove logo from sponsor
  * @param sponsorId Sponsor document ID
  */
-export async function removeSponsorLogo(
-  sponsorId: string
-): Promise<LogoActionResult> {
+export async function removeSponsorLogo(sponsorId: string): Promise<LogoActionResult> {
   const result = await strapiFetch(
     "/admin/sponsors/:sponsorId/logo",
     { sponsorId },

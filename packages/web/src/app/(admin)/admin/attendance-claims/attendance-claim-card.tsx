@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
 import Avatar from "@/components/ui/avatar"
+import Link from "next/link"
+import { useState } from "react"
 import type { AttendanceClaim } from "./attendance-claims.action"
 import { approveAttendanceClaim, rejectAttendanceClaim } from "./attendance-claims.action"
 
@@ -11,10 +11,7 @@ interface AttendanceClaimCardProps {
   onActionComplete: () => void
 }
 
-export default function AttendanceClaimCard({
-  claim,
-  onActionComplete,
-}: AttendanceClaimCardProps) {
+export default function AttendanceClaimCard({ claim, onActionComplete }: AttendanceClaimCardProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [adminNotes, setAdminNotes] = useState("")
@@ -88,35 +85,30 @@ export default function AttendanceClaimCard({
                 target="_blank"
               >
                 {claim.player.name}
-                <i className="bx bx-link-external"></i>
+                <i className="bx bx-link-external" />
               </Link>
               {claim.player.position && (
-                <span className="claim-card-player-position">
-                  {claim.player.position}
-                </span>
+                <span className="claim-card-player-position">{claim.player.position}</span>
               )}
             </div>
           </div>
           <div className="claim-card-date">
-            <i className="bx bx-time"></i>
+            <i className="bx bx-time" />
             {formatDateTime(claim.createdAt)}
           </div>
         </div>
 
         <div className="claim-card-event-info">
-          <i className="bx bx-calendar-event"></i>{" "}
-          <span>Wants to be listed as attendee for:{" "}</span>
+          <i className="bx bx-calendar-event" /> <span>Wants to be listed as attendee for: </span>
           <Link
             href={`/events/${claim.event.slug}`}
             className="claim-card-event-link"
             target="_blank"
           >
             {claim.event.name}
-            <i className="bx bx-link-external"></i>
+            <i className="bx bx-link-external" />
           </Link>
-          <span className="claim-card-event-date">
-            {" "}({formatDate(claim.event.start)})
-          </span>
+          <span className="claim-card-event-date"> ({formatDate(claim.event.start)})</span>
         </div>
 
         <div className="claim-card-reason">
@@ -126,7 +118,7 @@ export default function AttendanceClaimCard({
 
         {error && (
           <div className="claim-card-error">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -140,12 +132,12 @@ export default function AttendanceClaimCard({
           >
             {isProcessing ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Processing...
               </>
             ) : (
               <>
-                <i className="bx bx-check"></i>
+                <i className="bx bx-check" />
                 Approve
               </>
             )}
@@ -156,7 +148,7 @@ export default function AttendanceClaimCard({
             onClick={() => setShowRejectModal(true)}
             disabled={isProcessing}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Reject
           </button>
         </div>
@@ -173,13 +165,13 @@ export default function AttendanceClaimCard({
                 onClick={() => setShowRejectModal(false)}
                 disabled={isProcessing}
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             </div>
             <div className="claim-modal-body">
               <p>
-                Are you sure you want to reject <strong>{claim.player.name}</strong>&apos;s
-                claim to be listed as an attendee for <strong>{claim.event.name}</strong>?
+                Are you sure you want to reject <strong>{claim.player.name}</strong>&apos;s claim to
+                be listed as an attendee for <strong>{claim.event.name}</strong>?
               </p>
               <div className="form-group">
                 <label htmlFor="adminNotes">
@@ -196,7 +188,7 @@ export default function AttendanceClaimCard({
               </div>
               {error && (
                 <div className="claim-card-error">
-                  <i className="bx bx-error-circle"></i>
+                  <i className="bx bx-error-circle" />
                   {error}
                 </div>
               )}
@@ -218,12 +210,12 @@ export default function AttendanceClaimCard({
               >
                 {isProcessing ? (
                   <>
-                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <i className="bx bx-loader-alt bx-spin" />
                     Rejecting...
                   </>
                 ) : (
                   <>
-                    <i className="bx bx-x"></i>
+                    <i className="bx bx-x" />
                     Reject Claim
                   </>
                 )}

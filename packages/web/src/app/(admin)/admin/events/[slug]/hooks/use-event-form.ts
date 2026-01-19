@@ -1,20 +1,16 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { format, isAfter, isValid } from "date-fns"
+import type { MapLocation } from "@/components/admin/location-map-picker"
 import { TZDate } from "@date-fns/tz"
+import { format, isAfter, isValid } from "date-fns"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
-import type {
-  EventForEdit,
-  EventUpdateData,
-  TicketingMode,
-} from "../event-edit.action"
-import type { Sponsorship } from "../sponsor.action"
-import type { TimetableDay } from "../schedule.types"
-import type { MediaLink } from "../media-links.action"
+import { useMemo, useState } from "react"
+import type { EventForEdit, EventUpdateData, TicketingMode } from "../event-edit.action"
 import type { FinanceData } from "../finance.action"
-import type { MapLocation } from "@/components/admin/location-map-picker"
+import type { MediaLink } from "../media-links.action"
+import type { TimetableDay } from "../schedule.types"
+import type { Sponsorship } from "../sponsor.action"
 
 // Register English locale for country names
 countries.registerLocale(en)
@@ -42,11 +38,11 @@ function formatTimeForInput(isoString: string, timezone: string): string {
 
 function parseDateTimeInput(date: string, time: string, timezone: string) {
   const tz = timezone || "UTC"
-  if (!date || !time) return new TZDate(NaN, tz)
+  if (!date || !time) return new TZDate(Number.NaN, tz)
   const [year, month, day] = date.split("-").map(Number)
   const [hour, minute] = time.split(":").map(Number)
   if ([year, month, day, hour, minute].some(Number.isNaN)) {
-    return new TZDate(NaN, tz)
+    return new TZDate(Number.NaN, tz)
   }
   return new TZDate(year, month - 1, day, hour, minute, 0, 0, tz)
 }
@@ -71,9 +67,7 @@ function getTimezones(): { value: string; region: string }[] {
   }
 }
 
-function getTimezoneRegions(
-  timezones: { value: string; region: string }[]
-): string[] {
+function getTimezoneRegions(timezones: { value: string; region: string }[]): string[] {
   const regions = [...new Set(timezones.map((tz) => tz.region))]
   return regions.sort()
 }
@@ -240,12 +234,8 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   const [contactEmail, setContactEmail] = useState(event.contactEmail || "")
 
   // Form state - Date & Time
-  const [startDate, setStartDate] = useState(
-    formatDateForInput(event.start, initialTimezone)
-  )
-  const [startTime, setStartTime] = useState(
-    formatTimeForInput(event.start, initialTimezone)
-  )
+  const [startDate, setStartDate] = useState(formatDateForInput(event.start, initialTimezone))
+  const [startTime, setStartTime] = useState(formatTimeForInput(event.start, initialTimezone))
   const [endDate, setEndDate] = useState(formatDateForInput(event.end, initialTimezone))
   const [endTime, setEndTime] = useState(formatTimeForInput(event.end, initialTimezone))
   const [timezone, setTimezone] = useState(initialTimezone)
@@ -254,9 +244,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   const [locationMode, setLocationMode] = useState<"existing" | "new">(
     event.location ? "existing" : "new"
   )
-  const [selectedLocationId, setSelectedLocationId] = useState(
-    event.location?.documentId || ""
-  )
+  const [selectedLocationId, setSelectedLocationId] = useState(event.location?.documentId || "")
   const [newLocationName, setNewLocationName] = useState("")
   const [newLocationCountry, setNewLocationCountry] = useState("")
   const [newLocationMapLocation, setNewLocationMapLocation] = useState<MapLocation | null>(null)
@@ -265,9 +253,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   const [venueMode, setVenueMode] = useState<"existing" | "new" | "none">(
     event.venue ? "existing" : "none"
   )
-  const [selectedVenueId, setSelectedVenueId] = useState(
-    event.venue?.documentId || ""
-  )
+  const [selectedVenueId, setSelectedVenueId] = useState(event.venue?.documentId || "")
   const [newVenueName, setNewVenueName] = useState("")
   const [newVenueAddress, setNewVenueAddress] = useState("")
 
@@ -283,9 +269,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
   const [ticketingMode, setTicketingMode] = useState<TicketingMode>(
     getTicketingModeFromEvent(event)
   )
-  const [registrationLink, setRegistrationLink] = useState(
-    event.registration?.link || ""
-  )
+  const [registrationLink, setRegistrationLink] = useState(event.registration?.link || "")
   const [registrationWidgetCode, setRegistrationWidgetCode] = useState(
     event.registration?.widgetCode || ""
   )
@@ -329,10 +313,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
 
   // Timezone helpers
   const allTimezones = useMemo(() => getTimezones(), [])
-  const timezoneRegions = useMemo(
-    () => getTimezoneRegions(allTimezones),
-    [allTimezones]
-  )
+  const timezoneRegions = useMemo(() => getTimezoneRegions(allTimezones), [allTimezones])
 
   // Original form values (stable reference for dirty state reset)
   const originalFormValues = useMemo<EventFormValues>(

@@ -1,9 +1,9 @@
 import Filters from "@/components/articles/filters"
+import { getArticles } from "@/components/articles/get.action"
 import ArticleGrid from "@/components/articles/grid"
 import LoadMore from "@/components/articles/load-more"
-import { Article } from "@/models/strapi"
-import { Metadata } from "next"
-import { getArticles } from "@/components/articles/get.action"
+import type { Article } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Articles",

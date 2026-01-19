@@ -1,4 +1,4 @@
-import { Article } from "@/models/strapi"
+import type { Article } from "@/models/strapi"
 import ArticleCard from "./card"
 
 const ArticleGrid = ({ articles }: { articles: Article[] }) => {
@@ -6,10 +6,9 @@ const ArticleGrid = ({ articles }: { articles: Article[] }) => {
     <div className="blog-area ptb-70">
       <div className="container">
         <div className="row">
-          {articles &&
-            articles.map((article) => (
-              <ArticleCard key={article.documentId} article={article} />
-            ))}
+          {articles?.map((article) => (
+            <ArticleCard key={article.documentId} article={article} />
+          ))}
         </div>
       </div>
     </div>

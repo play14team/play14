@@ -1,12 +1,12 @@
 "use server"
 
-import { SlugParamsProps } from "@/libs/slug-params"
-import { restQuery, normalizeConnection } from "@/libs/strapi-client"
+import type { SlugParamsProps } from "@/libs/slug-params"
+import { normalizeConnection, restQuery } from "@/libs/strapi-client"
 import {
-  articleItemPopulate,
   articleDetailsPopulate,
-  articleSidebarLatestPopulate,
+  articleItemPopulate,
   articleNavPopulate,
+  articleSidebarLatestPopulate,
 } from "@/libs/strapi-populate"
 
 // Types - will be replaced by OpenAPI generated types when available
@@ -49,12 +49,7 @@ interface Article {
  * Get paginated articles list
  * REST equivalent of: articles/grid.graphql
  */
-export async function getArticles(
-  page: number,
-  pageSize: number,
-  category?: string,
-  tag?: string,
-) {
+export async function getArticles(page: number, pageSize: number, category?: string, tag?: string) {
   const filters: Record<string, unknown> = {}
   if (category) {
     filters.category = { $eqi: category }

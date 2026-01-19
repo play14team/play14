@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import {
   DAYS_OF_WEEK,
   type DayOfWeek,
-  type TimetableDay,
   type Timeslot,
+  type TimetableDay,
 } from "@/app/(admin)/admin/events/[slug]/schedule.types"
+import { useState } from "react"
 
 interface Props {
   schedule: TimetableDay[]
@@ -164,7 +164,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
     <div className="schedule-editor">
       {error && (
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -227,7 +227,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                         title="Remove timeslot"
                         disabled={editing.timeslots.length <= 1}
                       >
-                        <i className="bx bx-x"></i>
+                        <i className="bx bx-x" />
                       </button>
                     </div>
                   ))}
@@ -236,7 +236,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     onClick={addTimeslot}
                     className="admin-btn admin-btn-secondary admin-btn-sm"
                   >
-                    <i className="bx bx-plus"></i>
+                    <i className="bx bx-plus" />
                     Add Timeslot
                   </button>
                 </div>
@@ -274,7 +274,9 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     </span>
                   </div>
                   <div className="schedule-day-toggle">
-                    <i className={`bx ${expandedDays.has(index) ? "bx-chevron-up" : "bx-chevron-down"}`}></i>
+                    <i
+                      className={`bx ${expandedDays.has(index) ? "bx-chevron-up" : "bx-chevron-down"}`}
+                    />
                   </div>
                 </div>
 
@@ -295,7 +297,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                         className="admin-btn admin-btn-secondary admin-btn-sm"
                         disabled={editing !== null}
                       >
-                        <i className="bx bx-edit"></i>
+                        <i className="bx bx-edit" />
                         Edit
                       </button>
                       <button
@@ -304,7 +306,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                         className="admin-btn admin-btn-danger admin-btn-sm"
                         disabled={editing !== null}
                       >
-                        <i className="bx bx-trash"></i>
+                        <i className="bx bx-trash" />
                         Remove
                       </button>
                     </div>
@@ -372,7 +374,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     title="Remove timeslot"
                     disabled={editing.timeslots.length <= 1}
                   >
-                    <i className="bx bx-x"></i>
+                    <i className="bx bx-x" />
                   </button>
                 </div>
               ))}
@@ -381,7 +383,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                 onClick={addTimeslot}
                 className="admin-btn admin-btn-secondary admin-btn-sm"
               >
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 Add Timeslot
               </button>
             </div>
@@ -409,7 +411,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
       {/* Add button */}
       {!editing && availableDays.length > 0 && (
         <button type="button" onClick={startAdding} className="admin-btn admin-btn-secondary">
-          <i className="bx bx-plus"></i>
+          <i className="bx bx-plus" />
           Add Day to Schedule
         </button>
       )}

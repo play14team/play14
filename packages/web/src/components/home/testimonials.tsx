@@ -1,6 +1,6 @@
+import Link from "next/link"
 import { getRandomTestimonials } from "./get.action"
 import TestimonialsRefresh from "./testimonials-refresh"
-import Link from "next/link"
 
 const HomeTestimonials = async () => {
   const testimonials = await getRandomTestimonials(4)

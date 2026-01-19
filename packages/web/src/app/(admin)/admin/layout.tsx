@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation"
-import { requireAuth } from "@/libs/auth"
-import AdminSidebar from "@/components/admin/sidebar"
 import { AdminProviders } from "@/components/admin/admin-providers"
+import AdminSidebar from "@/components/admin/sidebar"
+import { requireAuth } from "@/libs/auth"
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Admin",

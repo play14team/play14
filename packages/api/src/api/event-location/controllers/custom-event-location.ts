@@ -29,12 +29,10 @@ async function requireOrganizer(strapi: Core.Strapi, ctx: any): Promise<boolean>
     return false
   }
 
-  const userWithPlayer = await strapi
-    .documents("plugin::users-permissions.user")
-    .findFirst({
-      filters: { id: user.id },
-      populate: { player: true },
-    })
+  const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+    filters: { id: user.id },
+    populate: { player: true },
+  })
 
   if (!userWithPlayer?.player) {
     ctx.forbidden("You must have a linked player profile")
@@ -83,9 +81,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Country filter
       if (country && typeof country === "string" && country.length > 0) {
-        filteredLocations = filteredLocations.filter(
-          (location) => location.country === country
-        )
+        filteredLocations = filteredLocations.filter((location) => location.country === country)
       }
 
       // Sort by name
@@ -206,7 +202,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
 
-      strapi.log.info(`[EventLocation] Created location: ${newLocation.name} (${newLocation.documentId})`)
+      strapi.log.info(
+        `[EventLocation] Created location: ${newLocation.name} (${newLocation.documentId})`
+      )
 
       return ctx.send({
         data: {
@@ -239,9 +237,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     try {
       // Find existing location
-      const existingLocation = await strapi.documents("api::event-location.event-location").findOne({
-        documentId: locationId,
-      })
+      const existingLocation = await strapi
+        .documents("api::event-location.event-location")
+        .findOne({
+          documentId: locationId,
+        })
 
       if (!existingLocation) {
         return ctx.notFound("Event location not found")

@@ -476,14 +476,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "start",
-        "end",
-        "location",
-        "venue",
-        "defaultImage"
-      ],
+      "list": ["name", "start", "end", "location", "venue", "defaultImage"],
       "edit": [
         [
           {

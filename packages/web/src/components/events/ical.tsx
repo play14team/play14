@@ -1,7 +1,7 @@
 "use client"
 
-import { Enum_Event_Eventstatus, Event } from "@/models/strapi"
-import { EventAttributes, createEvent } from "ics"
+import { Enum_Event_Eventstatus, type Event } from "@/models/strapi"
+import { type EventAttributes, createEvent } from "ics"
 import Link from "next/link"
 
 const ICalendar = ({
@@ -23,13 +23,7 @@ const ICalendar = ({
       start.getMinutes(),
     ],
     startInputType: "utc",
-    end: [
-      end.getFullYear(),
-      end.getMonth() + 1,
-      end.getDate(),
-      end.getHours(),
-      end.getMinutes(),
-    ],
+    end: [end.getFullYear(), end.getMonth() + 1, end.getDate(), end.getHours(), end.getMinutes()],
     endInputType: "utc",
     title: `#play14 - ${event.name!}`,
     htmlContent: event.description!,
@@ -72,9 +66,9 @@ const ICalendar = ({
   }
 
   function getStatus(event: Event) {
-    return event.eventStatus == Enum_Event_Eventstatus.Cancelled
+    return event.eventStatus === Enum_Event_Eventstatus.Cancelled
       ? "CANCELLED"
-      : event.eventStatus == Enum_Event_Eventstatus.Announced
+      : event.eventStatus === Enum_Event_Eventstatus.Announced
         ? "TENTATIVE"
         : "CONFIRMED"
   }
@@ -109,7 +103,7 @@ const ICalendar = ({
     } catch (error) {
       console.error("Failed to download calendar event:", error)
       alert(
-        "Failed to download calendar event. Please try again or contact support if the problem persists.",
+        "Failed to download calendar event. Please try again or contact support if the problem persists."
       )
     }
   }
@@ -122,18 +116,15 @@ const ICalendar = ({
         className="default-btn btn-gray"
         aria-label="Add event to your calendar"
       >
-        <i className="flaticon-calendar"></i>Add to Calendar
+        <i className="flaticon-calendar" />
+        Add to Calendar
       </Link>
     )
   }
 
   return (
     <Link href="#" onClick={handleDownload}>
-      <i
-        className="bx bx-calendar"
-        title="Add to your calendar"
-        style={{ fontSize: "25px" }}
-      ></i>
+      <i className="bx bx-calendar" title="Add to your calendar" style={{ fontSize: "25px" }} />
     </Link>
   )
 }

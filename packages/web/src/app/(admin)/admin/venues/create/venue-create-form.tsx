@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/components/admin/toast"
 import VenueMapPicker, { type MapLocation } from "@/components/admin/venue-map-picker"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { createVenue } from "../venues.action"
 
 export default function VenueCreateForm() {
@@ -62,9 +62,7 @@ export default function VenueCreateForm() {
               className="admin-input"
               placeholder="e.g., Hilton Conference Center"
             />
-            <p className="admin-form-help">
-              The full name of the venue
-            </p>
+            <p className="admin-form-help">The full name of the venue</p>
           </div>
         </div>
 
@@ -93,9 +91,7 @@ export default function VenueCreateForm() {
               className="admin-input"
               placeholder="e.g., 123 Main Street, Suite 100"
             />
-            <p className="admin-form-help">
-              The physical address of the venue
-            </p>
+            <p className="admin-form-help">The physical address of the venue</p>
           </div>
         </div>
       </div>
@@ -103,7 +99,8 @@ export default function VenueCreateForm() {
       <div className="admin-form-section">
         <h2>Map Location</h2>
         <p className="admin-form-section-description">
-          Set the coordinates for this venue on the map. This is used for displaying the venue location.
+          Set the coordinates for this venue on the map. This is used for displaying the venue
+          location.
         </p>
 
         <div className="admin-form-row">
@@ -128,12 +125,12 @@ export default function VenueCreateForm() {
         >
           {isSubmitting ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Creating...
             </>
           ) : (
             <>
-              <i className="bx bx-plus"></i>
+              <i className="bx bx-plus" />
               Create Venue
             </>
           )}

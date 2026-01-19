@@ -47,12 +47,10 @@ export default async function Search({ input }: { input: string | undefined }) {
           <ArticleGrid articles={articles} />
         </div>
       )}
-      {events.length == 0 &&
-        players.length == 0 &&
-        games.length == 0 &&
-        articles.length == 0 && (
-          <h5 className="pb-70">No search result found</h5>
-        )}
+      {events.length === 0 &&
+        players.length === 0 &&
+        games.length === 0 &&
+        articles.length === 0 && <h5 className="pb-70">No search result found</h5>}
     </div>
   )
 }

@@ -7,7 +7,7 @@ export default function LoadingState() {
     <div className="player-linking-loading">
       <Logo width={120} height={40} />
       <div className="player-linking-spinner">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
       </div>
       <p>Checking for matching player profile...</p>
     </div>

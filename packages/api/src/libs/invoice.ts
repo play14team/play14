@@ -4,7 +4,6 @@
  */
 
 import PDFDocument from "pdfkit"
-import { Readable } from "stream"
 
 export interface InvoiceData {
   orderNumber: string
@@ -105,12 +104,20 @@ export async function generateInvoicePDF(
         } catch (logoError) {
           // Fallback to text if logo fails to load
           strapi.log.error(`[Invoice] Failed to load logo: ${logoError.message}`)
-          doc.fontSize(24).fillColor(darkColor).font("Helvetica-Bold").text(options.organizationName || "#play14", margin, currentY)
+          doc
+            .fontSize(24)
+            .fillColor(darkColor)
+            .font("Helvetica-Bold")
+            .text(options.organizationName || "#play14", margin, currentY)
           currentY += 30
         }
       } else {
         // No logo provided, use text
-        doc.fontSize(24).fillColor(darkColor).font("Helvetica-Bold").text(options.organizationName || "#play14", margin, currentY)
+        doc
+          .fontSize(24)
+          .fillColor(darkColor)
+          .font("Helvetica-Bold")
+          .text(options.organizationName || "#play14", margin, currentY)
         currentY += 30
       }
 
@@ -157,10 +164,15 @@ export async function generateInvoicePDF(
       doc
         .fontSize(9)
         .fillColor(grayColor)
-        .text(`Date: ${new Date(data.invoiceDate).toLocaleDateString()}`, pageWidth - margin - 200, margin + 62, {
-          width: 200,
-          align: "right",
-        })
+        .text(
+          `Date: ${new Date(data.invoiceDate).toLocaleDateString()}`,
+          pageWidth - margin - 200,
+          margin + 62,
+          {
+            width: 200,
+            align: "right",
+          }
+        )
 
       doc.text(`Order #: ${data.orderNumber}`, pageWidth - margin - 200, margin + 77, {
         width: 200,
@@ -172,22 +184,38 @@ export async function generateInvoicePDF(
       currentY += 30
 
       // Bill To Section
-      doc.fontSize(10).fillColor(grayColor).font("Helvetica-Bold").text("BILL TO:", margin, currentY)
+      doc
+        .fontSize(10)
+        .fillColor(grayColor)
+        .font("Helvetica-Bold")
+        .text("BILL TO:", margin, currentY)
 
       currentY += 18
 
-      doc.fontSize(11).fillColor(darkColor).font("Helvetica-Bold").text(data.purchaserName, margin, currentY)
+      doc
+        .fontSize(11)
+        .fillColor(darkColor)
+        .font("Helvetica-Bold")
+        .text(data.purchaserName, margin, currentY)
 
       currentY += 16
 
-      doc.fontSize(9).fillColor(grayColor).font("Helvetica").text(data.purchaserEmail, margin, currentY)
+      doc
+        .fontSize(9)
+        .fillColor(grayColor)
+        .font("Helvetica")
+        .text(data.purchaserEmail, margin, currentY)
 
       currentY += 30
 
       // Event Details Box
       drawBox(margin, currentY, contentWidth, 60, lightGray)
 
-      doc.fontSize(9).fillColor(grayColor).font("Helvetica-Bold").text("EVENT DETAILS", margin + 15, currentY + 12)
+      doc
+        .fontSize(9)
+        .fillColor(grayColor)
+        .font("Helvetica-Bold")
+        .text("EVENT DETAILS", margin + 15, currentY + 12)
 
       doc
         .fontSize(11)
@@ -195,7 +223,11 @@ export async function generateInvoicePDF(
         .font("Helvetica-Bold")
         .text(data.eventName, margin + 15, currentY + 26, { width: contentWidth - 30 })
 
-      doc.fontSize(9).fillColor(grayColor).font("Helvetica").text(`Date: ${data.eventDate}`, margin + 15, currentY + 41)
+      doc
+        .fontSize(9)
+        .fillColor(grayColor)
+        .font("Helvetica")
+        .text(`Date: ${data.eventDate}`, margin + 15, currentY + 41)
 
       doc.text(`Location: ${data.eventLocation}`, margin + 15, currentY + 53)
 
@@ -306,10 +338,13 @@ export async function generateInvoicePDF(
         .font("Helvetica")
         .text(`Payment Method: ${data.paymentMethod}`, margin, currentY)
 
-      doc.fillColor(primaryColor).font("Helvetica-Bold").text("PAID", totalsX + 80, currentY, {
-        width: 120,
-        align: "right",
-      })
+      doc
+        .fillColor(primaryColor)
+        .font("Helvetica-Bold")
+        .text("PAID", totalsX + 80, currentY, {
+          width: 120,
+          align: "right",
+        })
 
       currentY += 30
 
@@ -345,10 +380,15 @@ export async function generateInvoicePDF(
           align: "center",
         })
 
-      doc.text(`This is an automated invoice generated on ${new Date().toLocaleString()}`, margin, footerY + 12, {
-        width: contentWidth,
-        align: "center",
-      })
+      doc.text(
+        `This is an automated invoice generated on ${new Date().toLocaleString()}`,
+        margin,
+        footerY + 12,
+        {
+          width: contentWidth,
+          align: "center",
+        }
+      )
 
       // Finalize PDF
       doc.end()

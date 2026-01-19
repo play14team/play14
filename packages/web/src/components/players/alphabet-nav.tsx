@@ -10,17 +10,11 @@ interface AlphabetNavProps {
   letterCounts: Record<string, number>
 }
 
-export default function AlphabetNav({
-  currentLetter,
-  letterCounts,
-}: AlphabetNavProps) {
+export default function AlphabetNav({ currentLetter, letterCounts }: AlphabetNavProps) {
   return (
     <div className="alphabet-nav centered">
       <div className="alphabet-buttons">
-        <Link
-          href="/players"
-          className={`alphabet-btn ${!currentLetter ? "active" : ""}`}
-        >
+        <Link href="/players" className={`alphabet-btn ${!currentLetter ? "active" : ""}`}>
           All
         </Link>
         {ALPHABET.map((letter) => {

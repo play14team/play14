@@ -1,16 +1,14 @@
 import { camelPad } from "@/libs/camelPad"
+import type { Game } from "@/models/strapi"
 import defaultGame from "@/styles/images/gallery/gallery5.jpg"
 import Image from "next/image"
 import Link from "next/link"
-import { Game } from "@/models/strapi"
 
 const GameCard = ({ game }: { game: Game }) => {
   const url = `/games/${encodeURIComponent(game.slug)}`
   const image = game.defaultImage
   // Take first proposer if array, handle both array and single object for backwards compatibility
-  const proposedby = Array.isArray(game.proposedBy)
-    ? game.proposedBy[0]
-    : game.proposedBy
+  const proposedby = Array.isArray(game.proposedBy) ? game.proposedBy[0] : game.proposedBy
 
   return (
     <article id={game.name} key={game.name} className="col-lg-4 col-md-6">
@@ -82,10 +80,10 @@ const GameCard = ({ game }: { game: Game }) => {
           </p>
           <ul className="courses-box-footer d-flex justify-content-between align-items-center">
             <li>
-              <i className="bx bx-time"></i> {game.timebox}
+              <i className="bx bx-time" /> {game.timebox}
             </li>
             <li>
-              <i className="flaticon-team"></i>{" "}
+              <i className="flaticon-team" />{" "}
               {game.scale && game.scale?.length > 20
                 ? game.scale?.substring(0, 17).concat("...")
                 : game.scale}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 /**
  * Serializes form values to a stable format for comparison.
@@ -56,9 +56,7 @@ export function useFormDirty<T extends object>(
   const { onDirtyChange } = options
 
   // Lazy initialization: compute the initial value only once
-  const [initialSerialized] = useState<string>(() =>
-    serializeFormValues(currentValues)
-  )
+  const [initialSerialized] = useState<string>(() => serializeFormValues(currentValues))
 
   // Use a ref to store the baseline for comparison (can be reset)
   const baselineRef = useRef<string>(initialSerialized)
@@ -79,11 +77,14 @@ export function useFormDirty<T extends object>(
   }, [isDirty, onDirtyChange])
 
   // Reset to current values as the new baseline, or to specific values if provided
-  const resetDirtyState = useCallback((newBaseline?: unknown) => {
-    const serialized = serializeFormValues(newBaseline ?? currentValues)
-    baselineRef.current = serialized
-    setIsDirty(false)
-  }, [currentValues])
+  const resetDirtyState = useCallback(
+    (newBaseline?: unknown) => {
+      const serialized = serializeFormValues(newBaseline ?? currentValues)
+      baselineRef.current = serialized
+      setIsDirty(false)
+    },
+    [currentValues]
+  )
 
   // Mark form as clean without changing initial values
   const markClean = useCallback(() => {

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import type { FinanceData } from "@/app/(admin)/admin/events/[slug]/finance.action"
+import { useEffect, useState } from "react"
 
 interface Props {
   financeData: FinanceData | null
@@ -91,7 +91,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
     <div className="finance-editor">
       {error && (
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -109,7 +109,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
                   min="0"
                   step="0.01"
                   value={revenue}
-                  onChange={(e) => setRevenue(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setRevenue(Number.parseFloat(e.target.value) || 0)}
                   className="admin-input"
                   placeholder="0.00"
                 />
@@ -126,7 +126,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
                   min="0"
                   step="0.01"
                   value={expenses}
-                  onChange={(e) => setExpenses(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setExpenses(Number.parseFloat(e.target.value) || 0)}
                   className="admin-input"
                   placeholder="0.00"
                 />
@@ -136,9 +136,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
           </div>
 
           <div className="admin-form-group">
-            <label>
-              Destination {result === "Profit" && <span className="required">*</span>}
-            </label>
+            <label>Destination {result === "Profit" && <span className="required">*</span>}</label>
             <input
               type="text"
               value={destination}
@@ -154,7 +152,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
           {/* Auto-calculated result preview */}
           <div className={`finance-result-preview ${result.toLowerCase()}`}>
             <div className="finance-result-icon">
-              <i className={`bx ${result === "Profit" ? "bx-trending-up" : "bx-trending-down"}`}></i>
+              <i className={`bx ${result === "Profit" ? "bx-trending-up" : "bx-trending-down"}`} />
             </div>
             <div className="finance-result-info">
               <span className="finance-result-label">{result}</span>
@@ -215,7 +213,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
               onClick={handleStartEditing}
               className="admin-btn admin-btn-secondary"
             >
-              <i className="bx bx-edit"></i>
+              <i className="bx bx-edit" />
               {financeData ? "Edit Finance Data" : "Add Finance Data"}
             </button>
             {financeData && (
@@ -224,7 +222,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
                 onClick={handleClear}
                 className="admin-btn admin-btn-danger admin-btn-sm"
               >
-                <i className="bx bx-trash"></i>
+                <i className="bx bx-trash" />
                 Clear
               </button>
             )}

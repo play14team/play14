@@ -1,8 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { ToastProvider, ToastContainer } from "./toast"
 import AdminSaveShortcut from "./admin-save-shortcut"
+import { ToastContainer, ToastProvider } from "./toast"
 
 interface AdminProvidersProps {
   children: ReactNode

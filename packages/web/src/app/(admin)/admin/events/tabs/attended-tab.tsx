@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { getMyAttendedEvents, type AttendedEvent } from "../events.action"
-import { EventCard, EventFilterBar, EventsEmptyState, type BadgeType } from "../components"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { type BadgeType, EventCard, EventFilterBar, EventsEmptyState } from "../components"
+import { type AttendedEvent, getMyAttendedEvents } from "../events.action"
 
 interface AttendedTabProps {
   onCountChange?: (count: number) => void
@@ -55,7 +55,7 @@ export default function AttendedTab({ onCountChange }: AttendedTabProps) {
   if (isLoading) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading attended events...</span>
       </div>
     )
@@ -64,14 +64,10 @@ export default function AttendedTab({ onCountChange }: AttendedTabProps) {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
-        <button
-          type="button"
-          className="admin-btn admin-btn-secondary"
-          onClick={fetchEvents}
-        >
-          <i className="bx bx-refresh"></i>
+        <button type="button" className="admin-btn admin-btn-secondary" onClick={fetchEvents}>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>

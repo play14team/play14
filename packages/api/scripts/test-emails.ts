@@ -6,17 +6,17 @@
 import { render } from "@react-email/render"
 import { createStrapi } from "@strapi/strapi"
 
+import AttendanceClaimApprovedEmail from "../src/emails/attendance-claim-approved"
+import AttendanceClaimNewEmail from "../src/emails/attendance-claim-new"
+import AttendanceClaimRejectedEmail from "../src/emails/attendance-claim-rejected"
+import PaymentFailedEmail from "../src/emails/payment-failed"
+import PlayerClaimApprovedEmail from "../src/emails/player-claim-approved"
 // Import all email templates
 import PlayerClaimNewEmail from "../src/emails/player-claim-new"
-import PlayerClaimApprovedEmail from "../src/emails/player-claim-approved"
 import PlayerClaimRejectedEmail from "../src/emails/player-claim-rejected"
-import AttendanceClaimNewEmail from "../src/emails/attendance-claim-new"
-import AttendanceClaimApprovedEmail from "../src/emails/attendance-claim-approved"
-import AttendanceClaimRejectedEmail from "../src/emails/attendance-claim-rejected"
+import PlayerInvitationEmail from "../src/emails/player-invitation"
 import TicketConfirmationEmail from "../src/emails/ticket-confirmation"
 import TicketOrderRefundEmail from "../src/emails/ticket-order-refund"
-import PlayerInvitationEmail from "../src/emails/player-invitation"
-import PaymentFailedEmail from "../src/emails/payment-failed"
 import TicketSoldNotificationEmail from "../src/emails/ticket-sold-notification"
 
 const TEST_EMAIL = "cedric.pontet+test@gmail.com"
@@ -39,7 +39,8 @@ async function sendTestEmails() {
         provider: "google",
         playerName: "John Doe",
         playerPosition: "Facilitator",
-        reason: "I am the same person as this player profile. I facilitated at #play14 Luxembourg in 2023.",
+        reason:
+          "I am the same person as this player profile. I facilitated at #play14 Luxembourg in 2023.",
         frontendUrl: FRONTEND_URL,
       })
     )
@@ -50,7 +51,8 @@ async function sendTestEmails() {
         provider: "google",
         playerName: "John Doe",
         playerPosition: "Facilitator",
-        reason: "I am the same person as this player profile. I facilitated at #play14 Luxembourg in 2023.",
+        reason:
+          "I am the same person as this player profile. I facilitated at #play14 Luxembourg in 2023.",
         frontendUrl: FRONTEND_URL,
       }),
       { plainText: true }
@@ -91,14 +93,16 @@ async function sendTestEmails() {
     const html3 = await render(
       PlayerClaimRejectedEmail({
         playerName: "John Doe",
-        adminNotes: "We need more information to verify your identity. Please provide additional details or contact us directly.",
+        adminNotes:
+          "We need more information to verify your identity. Please provide additional details or contact us directly.",
         frontendUrl: FRONTEND_URL,
       })
     )
     const text3 = await render(
       PlayerClaimRejectedEmail({
         playerName: "John Doe",
-        adminNotes: "We need more information to verify your identity. Please provide additional details or contact us directly.",
+        adminNotes:
+          "We need more information to verify your identity. Please provide additional details or contact us directly.",
         frontendUrl: FRONTEND_URL,
       }),
       { plainText: true }
@@ -120,7 +124,8 @@ async function sendTestEmails() {
         locationName: "Luxembourg City",
         playerName: "Jane Smith",
         playerPosition: "Player",
-        reason: "I attended this event and participated in several game sessions. I would like this to be reflected on my profile.",
+        reason:
+          "I attended this event and participated in several game sessions. I would like this to be reflected on my profile.",
         frontendUrl: FRONTEND_URL,
       })
     )
@@ -131,7 +136,8 @@ async function sendTestEmails() {
         locationName: "Luxembourg City",
         playerName: "Jane Smith",
         playerPosition: "Player",
-        reason: "I attended this event and participated in several game sessions. I would like this to be reflected on my profile.",
+        reason:
+          "I attended this event and participated in several game sessions. I would like this to be reflected on my profile.",
         frontendUrl: FRONTEND_URL,
       }),
       { plainText: true }
@@ -180,7 +186,8 @@ async function sendTestEmails() {
         eventName: "#play14 Luxembourg 2024",
         eventDate: "October 24, 2024",
         locationName: "Luxembourg City",
-        adminNotes: "We don't have a record of your attendance at this event. Please contact the organizers directly if you believe this is an error.",
+        adminNotes:
+          "We don't have a record of your attendance at this event. Please contact the organizers directly if you believe this is an error.",
         frontendUrl: FRONTEND_URL,
       })
     )
@@ -189,7 +196,8 @@ async function sendTestEmails() {
         eventName: "#play14 Luxembourg 2024",
         eventDate: "October 24, 2024",
         locationName: "Luxembourg City",
-        adminNotes: "We don't have a record of your attendance at this event. Please contact the organizers directly if you believe this is an error.",
+        adminNotes:
+          "We don't have a record of your attendance at this event. Please contact the organizers directly if you believe this is an error.",
         frontendUrl: FRONTEND_URL,
       }),
       { plainText: true }
@@ -226,8 +234,10 @@ async function sendTestEmails() {
             attendeeName: "Bob Williams",
           },
         ],
-        googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
-        outlookCalendarUrl: "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
+        googleCalendarUrl:
+          "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
+        outlookCalendarUrl:
+          "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
         frontendUrl: FRONTEND_URL,
       })
     )
@@ -253,8 +263,10 @@ async function sendTestEmails() {
             attendeeName: "Bob Williams",
           },
         ],
-        googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
-        outlookCalendarUrl: "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
+        googleCalendarUrl:
+          "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
+        outlookCalendarUrl:
+          "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
         frontendUrl: FRONTEND_URL,
       }),
       { plainText: true }
@@ -333,8 +345,10 @@ async function sendTestEmails() {
         eventTime: "09:00 AM",
         eventLocation: "Innovation Hub, Luxembourg City",
         resetPasswordUrl: `${FRONTEND_URL}/auth/reset-password?code=abc123def456&callbackUrl=${encodeURIComponent("/admin")}`,
-        googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
-        outlookCalendarUrl: "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
+        googleCalendarUrl:
+          "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
+        outlookCalendarUrl:
+          "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
         frontendUrl: FRONTEND_URL,
       })
     )
@@ -347,8 +361,10 @@ async function sendTestEmails() {
         eventTime: "09:00 AM",
         eventLocation: "Innovation Hub, Luxembourg City",
         resetPasswordUrl: `${FRONTEND_URL}/auth/reset-password?code=abc123def456&callbackUrl=${encodeURIComponent("/admin")}`,
-        googleCalendarUrl: "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
-        outlookCalendarUrl: "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
+        googleCalendarUrl:
+          "https://calendar.google.com/calendar/render?action=TEMPLATE&text=%23play14+Luxembourg+2025",
+        outlookCalendarUrl:
+          "https://outlook.live.com/calendar/0/deeplink/compose?subject=%23play14+Luxembourg+2025",
         frontendUrl: FRONTEND_URL,
       }),
       { plainText: true }
@@ -463,7 +479,6 @@ async function sendTestEmails() {
     console.log("   9. Player Invitation")
     console.log("   10. Payment Failed")
     console.log("   11. Ticket Sold Notification (Organizer)")
-
   } catch (error) {
     console.error("❌ Error sending test emails:", error)
     throw error

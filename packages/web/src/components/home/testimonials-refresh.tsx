@@ -1,27 +1,23 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { Testimonial } from "@/models/strapi"
 import TestimonialItem from "@/components/events/testimonial"
-import { getRandomTestimonials } from "./get.action"
+import type { Testimonial } from "@/models/strapi"
+import { useState, useTransition } from "react"
 import { HOME_TESTIMONIALS_COUNT } from "./constants"
+import { getRandomTestimonials } from "./get.action"
 
 interface TestimonialsRefreshProps {
   initialTestimonials: Testimonial[]
 }
 
-const TestimonialsRefresh = ({
-  initialTestimonials,
-}: TestimonialsRefreshProps) => {
+const TestimonialsRefresh = ({ initialTestimonials }: TestimonialsRefreshProps) => {
   const [testimonials, setTestimonials] = useState(initialTestimonials)
   const [isPending, startTransition] = useTransition()
 
   const handleRefresh = () => {
     startTransition(async () => {
       try {
-        const newTestimonials = await getRandomTestimonials(
-          HOME_TESTIMONIALS_COUNT,
-        )
+        const newTestimonials = await getRandomTestimonials(HOME_TESTIMONIALS_COUNT)
         if (newTestimonials.length > 0) {
           setTestimonials(newTestimonials)
         }
@@ -34,10 +30,7 @@ const TestimonialsRefresh = ({
 
   return (
     <>
-      <div
-        className="testimonials-area pt-70 pb-70 bg-f1f8fb"
-        style={{ position: "relative" }}
-      >
+      <div className="testimonials-area pt-70 pb-70 bg-f1f8fb" style={{ position: "relative" }}>
         <button
           onClick={handleRefresh}
           disabled={isPending}
@@ -67,10 +60,7 @@ const TestimonialsRefresh = ({
         <div className="container">
           <div className="row">
             {testimonials.map((testimonial) => (
-              <TestimonialItem
-                key={testimonial.documentId}
-                testimonial={testimonial}
-              />
+              <TestimonialItem key={testimonial.documentId} testimonial={testimonial} />
             ))}
           </div>
         </div>

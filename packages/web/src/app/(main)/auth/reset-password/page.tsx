@@ -1,10 +1,10 @@
-import { redirect, notFound } from "next/navigation"
-import Link from "next/link"
-import { getAuthState } from "@/libs/auth"
-import { getFeatureFlags } from "@/libs/feature-flags"
 import ResetPasswordForm from "@/components/auth/reset-password-form"
 import Logo from "@/components/layout/logo"
+import { getAuthState } from "@/libs/auth"
+import { getFeatureFlags } from "@/libs/feature-flags"
 import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Set Password",
@@ -16,7 +16,7 @@ interface ResetPasswordPageProps {
 }
 
 function normalizeCallbackUrl(callbackUrl?: string): string {
-  if (callbackUrl && callbackUrl.startsWith("/")) {
+  if (callbackUrl?.startsWith("/")) {
     return callbackUrl
   }
   return "/admin"

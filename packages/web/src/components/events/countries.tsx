@@ -1,5 +1,5 @@
 import { deduplicate } from "@/libs/arrays"
-import { Event } from "@/models/strapi"
+import type { Event } from "@/models/strapi"
 import Link from "next/link"
 import Country from "../layout/country"
 import { getEventNav } from "./get.action"
@@ -8,7 +8,7 @@ export default async function Countries() {
   const events = (await getEventNav()) as Event[]
 
   const countryCodes = deduplicate(
-    events.map((c) => c.location?.country || "").filter((c) => c !== ""),
+    events.map((c) => c.location?.country || "").filter((c) => c !== "")
   )
 
   return (

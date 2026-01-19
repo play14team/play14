@@ -1,8 +1,8 @@
 "use server"
 
 import { setAuthCookie } from "@/libs/auth"
-import { strapiFetch } from "@/libs/strapi-client"
 import { getFeatureFlags } from "@/libs/feature-flags"
+import { strapiFetch } from "@/libs/strapi-client"
 
 interface LoginResult {
   success: boolean
@@ -33,17 +33,14 @@ async function verifyTurnstileToken(token: string): Promise<boolean> {
   }
 
   try {
-    const response = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          secret: secretKey,
-          response: token,
-        }),
-      }
-    )
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        secret: secretKey,
+        response: token,
+      }),
+    })
 
     const data = await response.json()
     return data.success === true
@@ -98,7 +95,8 @@ export async function loginWithCredentials(
     ) {
       return {
         success: false,
-        error: "We couldn't sign you in with those credentials. Please check your email/username and password and try again.",
+        error:
+          "We couldn't sign you in with those credentials. Please check your email/username and password and try again.",
       }
     }
 
@@ -112,13 +110,15 @@ export async function loginWithCredentials(
     if (errorMessage.includes("confirmed")) {
       return {
         success: false,
-        error: "Please confirm your email address before logging in. Check your inbox for the confirmation link.",
+        error:
+          "Please confirm your email address before logging in. Check your inbox for the confirmation link.",
       }
     }
 
     return {
       success: false,
-      error: "An unexpected error occurred. Please try again or contact support if the problem persists.",
+      error:
+        "An unexpected error occurred. Please try again or contact support if the problem persists.",
     }
   }
 

@@ -1,9 +1,9 @@
 import Filters from "@/components/games/filters"
+import { getGames } from "@/components/games/get.action"
 import GameGrid from "@/components/games/grid"
 import LoadMore from "@/components/games/load-more"
-import { Game } from "@/models/strapi"
-import { Metadata } from "next"
-import { getGames } from "@/components/games/get.action"
+import type { Game } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Games",

@@ -1,41 +1,41 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect } from "react"
+import type {
+  HostStripeAccount,
+  StripeAccountStatus,
+} from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useRef, useState } from "react"
+import type { DiscountCode } from "./discount-code.action"
 import {
-  updateEvent,
-  publishEvent,
-  unpublishEvent,
   type EventForEdit,
   type LocationOption,
-  type VenueOption,
   type OrganizerOption,
+  type VenueOption,
+  publishEvent,
+  unpublishEvent,
+  updateEvent,
 } from "./event-edit.action"
 import type { TicketType } from "./ticket-type.action"
-import type { DiscountCode } from "./discount-code.action"
-import type {
-  StripeAccountStatus,
-  HostStripeAccount,
-} from "@/app/(admin)/admin/stripe/stripe-connect.action"
 
-import EventEditTabs, { TAB_IDS, type TabId } from "./event-edit-tabs"
-import EventEditActions from "./event-edit-actions"
-import { useEventForm } from "./hooks/use-event-form"
-import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
 import { useToast } from "@/components/admin/toast"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
+import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
+import EventEditActions from "./event-edit-actions"
+import EventEditTabs, { TAB_IDS, type TabId } from "./event-edit-tabs"
+import { useEventForm } from "./hooks/use-event-form"
 
-import BasicsTab from "./tabs/basics-tab"
-import ContentTab from "./tabs/content-tab"
-import ScheduleTicketsTab from "./tabs/schedule-tickets-tab"
-import TeamSponsorsTab from "./tabs/team-sponsors-tab"
-import ParticipantsTab from "./tabs/participants-tab"
-import MediaTab from "./tabs/media-tab"
-import BudgetTab from "./tabs/budget-tab"
-import ResultsTab from "./tabs/results-tab"
-import FinanceTab from "./tabs/finance-tab"
 import type { BudgetLineItem } from "./budget.types"
 import type { ResultLineItem } from "./results.types"
+import BasicsTab from "./tabs/basics-tab"
+import BudgetTab from "./tabs/budget-tab"
+import ContentTab from "./tabs/content-tab"
+import FinanceTab from "./tabs/finance-tab"
+import MediaTab from "./tabs/media-tab"
+import ParticipantsTab from "./tabs/participants-tab"
+import ResultsTab from "./tabs/results-tab"
+import ScheduleTicketsTab from "./tabs/schedule-tickets-tab"
+import TeamSponsorsTab from "./tabs/team-sponsors-tab"
 
 interface Props {
   event: EventForEdit
@@ -87,9 +87,8 @@ export default function EventEditForm({
   const [resultItems, setResultItems] = useState<ResultLineItem[]>(initialResultItems)
 
   // Determine the currency for the event (from stripe account, ticket types, or default to EUR)
-  const eventCurrency = event.stripeAccount?.defaultCurrency ||
-    event.ticketTypes?.[0]?.currency ||
-    "eur"
+  const eventCurrency =
+    event.stripeAccount?.defaultCurrency || event.ticketTypes?.[0]?.currency || "eur"
 
   // Navigation warning state
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
@@ -243,18 +242,14 @@ export default function EventEditForm({
   const handlePublishToggle = async () => {
     setIsPublishing(true)
 
-    const result = isPublished
-      ? await unpublishEvent(event.slug)
-      : await publishEvent(event.slug)
+    const result = isPublished ? await unpublishEvent(event.slug) : await publishEvent(event.slug)
 
     if (result.success) {
       setIsPublished(!isPublished)
       toast.success(isPublished ? "Event unpublished" : "Event published!")
       router.refresh()
     } else {
-      toast.error(
-        result.error || `Failed to ${isPublished ? "unpublish" : "publish"} event`
-      )
+      toast.error(result.error || `Failed to ${isPublished ? "unpublish" : "publish"} event`)
     }
 
     setIsPublishing(false)
@@ -376,17 +371,11 @@ export default function EventEditForm({
           )}
 
           {activeTab === "participants" && (
-            <ParticipantsTab
-              eventDocumentId={event.documentId}
-              onUpdate={handleUpdate}
-            />
+            <ParticipantsTab eventDocumentId={event.documentId} onUpdate={handleUpdate} />
           )}
 
           {activeTab === "media" && (
-            <MediaTab
-              mediaLinks={form.mediaLinks}
-              onMediaLinksChange={form.setMediaLinks}
-            />
+            <MediaTab mediaLinks={form.mediaLinks} onMediaLinksChange={form.setMediaLinks} />
           )}
 
           {activeTab === "budget" && (
@@ -409,9 +398,7 @@ export default function EventEditForm({
             />
           )}
 
-          {activeTab === "finance" && (
-            <FinanceTab eventDocumentId={event.documentId} />
-          )}
+          {activeTab === "finance" && <FinanceTab eventDocumentId={event.documentId} />}
         </div>
 
         <EventEditActions

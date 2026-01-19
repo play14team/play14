@@ -1,9 +1,5 @@
-import { describe, it, expect, vi } from "vitest"
-import {
-  getOAuthConnectUrl,
-  getOAuthCallbackUrl,
-  type OAuthProvider,
-} from "./auth"
+import { describe, expect, it, vi } from "vitest"
+import { type OAuthProvider, getOAuthCallbackUrl, getOAuthConnectUrl } from "./auth"
 
 // Mock next/headers
 vi.mock("next/headers", () => ({

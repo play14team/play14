@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import Link from "next/link"
 import Avatar from "@/components/ui/avatar"
-import { getPlayers, type PlayerListItem, type PlayersListResponse } from "./players.action"
+import Link from "next/link"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { type PlayerListItem, type PlayersListResponse, getPlayers } from "./players.action"
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 const POSITIONS = ["Founder", "Mentor", "Host", "Player"] as const
@@ -121,7 +121,7 @@ export default function PlayersList() {
   if (isLoading && players.length === 0) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading players...</span>
       </div>
     )
@@ -130,14 +130,14 @@ export default function PlayersList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
         <button
           type="button"
           className="admin-btn admin-btn-secondary"
           onClick={() => fetchPlayers(selectedLetter)}
         >
-          <i className="bx bx-refresh"></i>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -149,7 +149,7 @@ export default function PlayersList() {
       <div className="players-toolbar">
         <div className="players-search">
           <div className="search-input-wrapper">
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
             <input
               type="text"
               placeholder="Search players..."
@@ -164,7 +164,7 @@ export default function PlayersList() {
                 onClick={() => handleSearchChange("")}
                 aria-label="Clear search"
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             )}
           </div>
@@ -217,12 +217,12 @@ export default function PlayersList() {
 
       {isLoading ? (
         <div className="claims-loading">
-          <i className="bx bx-loader-alt bx-spin"></i>
+          <i className="bx bx-loader-alt bx-spin" />
           <span>Loading...</span>
         </div>
       ) : players.length === 0 ? (
         <div className="players-empty">
-          <i className="bx bx-user-x"></i>
+          <i className="bx bx-user-x" />
           <p>
             {selectedLetter
               ? `No players found starting with "${selectedLetter}"`
@@ -243,10 +243,7 @@ export default function PlayersList() {
           <div className="players-grid">
             {players.map((player) => (
               <div key={player.documentId} className="player-card">
-                <Link
-                  href={`/admin/players/${player.documentId}`}
-                  className="player-card-link"
-                >
+                <Link href={`/admin/players/${player.documentId}`} className="player-card-link">
                   <div className="player-card-avatar">
                     <Avatar
                       src={player.avatar?.url}
@@ -273,7 +270,7 @@ export default function PlayersList() {
                       className="player-card-status invite-status-badge invite-status-invited"
                       title="Invite pending"
                     >
-                      <i className="bx bx-time"></i>
+                      <i className="bx bx-time" />
                       Pending
                     </span>
                   ) : player.inviteStatus === "accepted" ? (
@@ -281,7 +278,7 @@ export default function PlayersList() {
                       className="player-card-status invite-status-badge invite-status-accepted"
                       title="Invite accepted"
                     >
-                      <i className="bx bx-check-circle"></i>
+                      <i className="bx bx-check-circle" />
                       Accepted
                     </span>
                   ) : (
@@ -290,7 +287,7 @@ export default function PlayersList() {
                       className="player-card-invite-btn"
                       title="Invite player"
                     >
-                      <i className="bx bx-envelope"></i>
+                      <i className="bx bx-envelope" />
                     </Link>
                   )}
                   <Link
@@ -298,7 +295,7 @@ export default function PlayersList() {
                     className="player-card-view-btn"
                     title="View player"
                   >
-                    <i className="bx bx-chevron-right"></i>
+                    <i className="bx bx-chevron-right" />
                   </Link>
                 </div>
               </div>
@@ -313,7 +310,7 @@ export default function PlayersList() {
                 disabled={pagination.page <= 1}
                 onClick={() => handlePageChange(pagination.page - 1)}
               >
-                <i className="bx bx-chevron-left"></i>
+                <i className="bx bx-chevron-left" />
                 Previous
               </button>
               <span className="pagination-info">
@@ -326,7 +323,7 @@ export default function PlayersList() {
                 onClick={() => handlePageChange(pagination.page + 1)}
               >
                 Next
-                <i className="bx bx-chevron-right"></i>
+                <i className="bx bx-chevron-right" />
               </button>
             </div>
           )}

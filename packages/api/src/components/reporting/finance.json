@@ -21,10 +21,7 @@
     },
     "result": {
       "type": "enumeration",
-      "enum": [
-        "Profit",
-        "Loss"
-      ],
+      "enum": ["Profit", "Loss"],
       "required": true
     },
     "resultAmount": {

@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
-import ReactCountryFlag from "react-country-flag"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
+import { useEffect, useMemo, useRef, useState } from "react"
+import ReactCountryFlag from "react-country-flag"
 
 // Register English locale for country names
 countries.registerLocale(en)
@@ -30,7 +30,6 @@ export default function CountrySelector({
   value,
   onChange,
   placeholder = "Select a country...",
-  required = false,
 }: CountrySelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
@@ -45,8 +44,7 @@ export default function CountrySelector({
     const searchLower = search.toLowerCase()
     return allCountries.filter(
       (c) =>
-        c.name.toLowerCase().includes(searchLower) ||
-        c.code.toLowerCase().includes(searchLower)
+        c.name.toLowerCase().includes(searchLower) || c.code.toLowerCase().includes(searchLower)
     )
   }, [allCountries, search])
 
@@ -98,9 +96,7 @@ export default function CountrySelector({
                   title={getCountryName(value)}
                 />
               </span>
-              <span className="country-selector-text">
-                {getCountryName(value)}
-              </span>
+              <span className="country-selector-text">{getCountryName(value)}</span>
             </>
           ) : (
             <span className="country-selector-text country-selector-placeholder">
@@ -109,7 +105,7 @@ export default function CountrySelector({
           )}
         </div>
         <span className="country-selector-arrow">
-          <i className="bx bx-chevron-down"></i>
+          <i className="bx bx-chevron-down" />
         </span>
       </button>
 
@@ -149,9 +145,7 @@ export default function CountrySelector({
                 </button>
               ))
             ) : (
-              <div className="country-selector-empty">
-                No countries found
-              </div>
+              <div className="country-selector-empty">No countries found</div>
             )}
           </div>
         </div>

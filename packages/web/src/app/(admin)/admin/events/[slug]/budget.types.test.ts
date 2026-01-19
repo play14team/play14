@@ -2,22 +2,22 @@
  * Unit tests for budget calculation utilities
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
-  type BudgetLineItem,
   type BudgetCategory,
-  INCOME_CATEGORIES,
+  type BudgetLineItem,
   EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
   calculateBudgetSummary,
-  groupBudgetItemsByCategory,
   calculateCategoryTotal,
+  groupBudgetItemsByCategory,
 } from "./budget.types"
 
 // Helper to create a budget line item
 function createBudgetItem(
   category: BudgetCategory,
   total: number,
-  name: string = "Test Item"
+  name = "Test Item"
 ): BudgetLineItem {
   return {
     id: Math.random(),

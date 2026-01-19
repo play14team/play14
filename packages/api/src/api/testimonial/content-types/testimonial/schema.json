@@ -20,9 +20,7 @@
       "type": "media",
       "multiple": false,
       "required": false,
-      "allowedTypes": [
-        "audios"
-      ]
+      "allowedTypes": ["audios"]
     },
     "author": {
       "type": "relation",

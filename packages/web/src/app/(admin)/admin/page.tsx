@@ -1,10 +1,9 @@
-import Link from "next/link"
-import { requirePlayer } from "@/libs/auth"
-import Avatar from "@/components/ui/avatar"
-import { getDashboardData } from "./dashboard.action"
-import { getMyEvents, getMyAttendedEvents } from "./events/events.action"
 import { getMyOrders } from "@/components/tickets/purchase.action"
+import Avatar from "@/components/ui/avatar"
+import { requirePlayer } from "@/libs/auth"
 import type { Metadata } from "next"
+import Link from "next/link"
+import { getMyAttendedEvents, getMyEvents } from "./events/events.action"
 import styles from "./page.module.scss"
 
 export const metadata: Metadata = {
@@ -47,20 +46,13 @@ export default async function AdminDashboardPage() {
   return (
     <div className="admin-dashboard">
       <div className="admin-welcome">
-        <Avatar
-          src={player.avatar?.url}
-          alt={player.name}
-          fallback={player.name}
-          size="xl"
-        />
+        <Avatar src={player.avatar?.url} alt={player.name} fallback={player.name} size="xl" />
         <div className="admin-welcome-text">
           <h1>Welcome back, {player.name}!</h1>
           <p>
             You are logged in as <strong>{user.email}</strong>
           </p>
-          {player.position && (
-            <span className="admin-position-badge">{player.position}</span>
-          )}
+          {player.position && <span className="admin-position-badge">{player.position}</span>}
         </div>
       </div>
 
@@ -69,15 +61,13 @@ export default async function AdminDashboardPage() {
         {isOrganizer && (
           <div className={styles.statCard}>
             <div className={styles.statIcon}>
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-calendar" />
             </div>
             <div className={styles.statContent}>
               <div className={styles.statValue}>{myEvents.length}</div>
               <div className={styles.statLabel}>Events Organized</div>
               {upcomingEvents.length > 0 && (
-                <div className={styles.statSubtext}>
-                  {upcomingEvents.length} upcoming
-                </div>
+                <div className={styles.statSubtext}>{upcomingEvents.length} upcoming</div>
               )}
             </div>
           </div>
@@ -85,7 +75,7 @@ export default async function AdminDashboardPage() {
 
         <div className={styles.statCard}>
           <div className={styles.statIcon}>
-            <i className="bx bx-map-pin"></i>
+            <i className="bx bx-map-pin" />
           </div>
           <div className={styles.statContent}>
             <div className={styles.statValue}>{pastAttendedEvents.length}</div>
@@ -100,15 +90,13 @@ export default async function AdminDashboardPage() {
 
         <div className={styles.statCard}>
           <div className={styles.statIcon}>
-            <i className="bx bx-purchase-tag"></i>
+            <i className="bx bx-purchase-tag" />
           </div>
           <div className={styles.statContent}>
             <div className={styles.statValue}>{paidOrders.length}</div>
             <div className={styles.statLabel}>Tickets Purchased</div>
             {orders.length > paidOrders.length && (
-              <div className={styles.statSubtext}>
-                {orders.length - paidOrders.length} pending
-              </div>
+              <div className={styles.statSubtext}>{orders.length - paidOrders.length} pending</div>
             )}
           </div>
         </div>
@@ -130,9 +118,7 @@ export default async function AdminDashboardPage() {
                 href={`/admin/events/${event.slug}`}
                 className={styles.eventCard}
               >
-                <div className={styles.eventDate}>
-                  {formatDate(event.start)}
-                </div>
+                <div className={styles.eventDate}>{formatDate(event.start)}</div>
                 <div className={styles.eventInfo}>
                   <h3>{event.name}</h3>
                   {event.location && (
@@ -158,7 +144,7 @@ export default async function AdminDashboardPage() {
           {isOrganizer && (
             <Link href="/admin/events/create" className="admin-card">
               <div className="admin-card-icon">
-                <i className="bx bx-plus-circle"></i>
+                <i className="bx bx-plus-circle" />
               </div>
               <div className="admin-card-content">
                 <h3>Create Event</h3>
@@ -169,7 +155,7 @@ export default async function AdminDashboardPage() {
 
           <Link href="/admin/profile" className="admin-card">
             <div className="admin-card-icon">
-              <i className="bx bx-edit"></i>
+              <i className="bx bx-edit" />
             </div>
             <div className="admin-card-content">
               <h3>Edit Profile</h3>
@@ -179,7 +165,7 @@ export default async function AdminDashboardPage() {
 
           <Link href="/admin/orders" className="admin-card">
             <div className="admin-card-icon">
-              <i className="bx bx-receipt"></i>
+              <i className="bx bx-receipt" />
             </div>
             <div className="admin-card-content">
               <h3>Orders</h3>
@@ -189,7 +175,7 @@ export default async function AdminDashboardPage() {
 
           <Link href="/events" className="admin-card">
             <div className="admin-card-icon">
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-calendar" />
             </div>
             <div className="admin-card-content">
               <h3>Browse Events</h3>
@@ -199,7 +185,7 @@ export default async function AdminDashboardPage() {
 
           <Link href={`/players/${player.slug}`} className="admin-card">
             <div className="admin-card-icon">
-              <i className="bx bx-user"></i>
+              <i className="bx bx-user" />
             </div>
             <div className="admin-card-content">
               <h3>View Profile</h3>
@@ -209,7 +195,7 @@ export default async function AdminDashboardPage() {
 
           <Link href="/players" className="admin-card">
             <div className="admin-card-icon">
-              <i className="bx bx-group"></i>
+              <i className="bx bx-group" />
             </div>
             <div className="admin-card-content">
               <h3>Community</h3>

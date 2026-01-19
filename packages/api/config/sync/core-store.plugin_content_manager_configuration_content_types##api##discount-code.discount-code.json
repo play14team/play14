@@ -285,12 +285,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "code",
-        "discountType",
-        "discountValue"
-      ],
+      "list": ["id", "code", "discountType", "discountValue"],
       "edit": [
         [
           {

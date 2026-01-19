@@ -9,13 +9,13 @@ export default function Filters({ name }: { name: string }) {
         <div className="article-footer">
           <div className="article-tags">
             <span>
-              <i className="bx bx-folder-open"></i>
+              <i className="bx bx-folder-open" />
             </span>
             <Link href="/games/categories">Category</Link>
           </div>
           <div className="article-tags">
             <span>
-              <i className="bx bx-purchase-tag"></i>
+              <i className="bx bx-purchase-tag" />
             </span>
             <Link href="/games/tags">Tags</Link>
           </div>

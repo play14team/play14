@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
-import { cancelAttendanceClaim, type AttendanceClaim } from "./claim-attendance.action"
+import { useState } from "react"
+import { type AttendanceClaim, cancelAttendanceClaim } from "./claim-attendance.action"
 
 interface MyClaimsProps {
   claims: AttendanceClaim[]
@@ -46,21 +46,21 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
       case "pending":
         return (
           <span className="claim-status-badge claim-status-pending">
-            <i className="bx bx-time-five"></i>
+            <i className="bx bx-time-five" />
             Pending
           </span>
         )
       case "approved":
         return (
           <span className="claim-status-badge claim-status-approved">
-            <i className="bx bx-check"></i>
+            <i className="bx bx-check" />
             Approved
           </span>
         )
       case "rejected":
         return (
           <span className="claim-status-badge claim-status-rejected">
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Rejected
           </span>
         )
@@ -76,7 +76,7 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
           <h3>My Attendance Claims</h3>
         </div>
         <div className="my-claims-empty">
-          <i className="bx bx-calendar-check"></i>
+          <i className="bx bx-calendar-check" />
           <p>You have not submitted any attendance claims yet</p>
         </div>
       </div>
@@ -94,7 +94,7 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
 
       {error && (
         <div className="claim-card-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -116,7 +116,7 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                   />
                 ) : (
                   <div className="my-claim-item-image-placeholder">
-                    <i className="bx bx-calendar-event"></i>
+                    <i className="bx bx-calendar-event" />
                   </div>
                 )}
               </div>
@@ -124,20 +124,18 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                 <h4 className="my-claim-item-name">{claim.event?.name || "Unknown Event"}</h4>
                 <div className="my-claim-item-meta">
                   <span>
-                    <i className="bx bx-calendar"></i>
+                    <i className="bx bx-calendar" />
                     {claim.event?.start ? formatDate(claim.event.start) : ""}
                   </span>
                   {claim.event?.location?.name && (
                     <span>
-                      <i className="bx bx-map"></i>
+                      <i className="bx bx-map" />
                       {claim.event.location.name}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="my-claim-item-status">
-                {getStatusBadge(claim.claimStatus)}
-              </div>
+              <div className="my-claim-item-status">{getStatusBadge(claim.claimStatus)}</div>
               <div className="my-claim-item-actions">
                 <button
                   type="button"
@@ -147,10 +145,10 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                   title="Cancel claim"
                 >
                   {cancellingId === claim.documentId ? (
-                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <i className="bx bx-loader-alt bx-spin" />
                   ) : (
                     <>
-                      <i className="bx bx-x"></i>
+                      <i className="bx bx-x" />
                       Cancel
                     </>
                   )}
@@ -181,7 +179,7 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                   />
                 ) : (
                   <div className="my-claim-item-image-placeholder">
-                    <i className="bx bx-calendar-event"></i>
+                    <i className="bx bx-calendar-event" />
                   </div>
                 )}
               </div>
@@ -189,22 +187,20 @@ export default function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                 <h4 className="my-claim-item-name">{claim.event?.name || "Unknown Event"}</h4>
                 <div className="my-claim-item-meta">
                   <span>
-                    <i className="bx bx-calendar"></i>
+                    <i className="bx bx-calendar" />
                     {claim.event?.start ? formatDate(claim.event.start) : ""}
                   </span>
                   {claim.adminNotes && (
                     <span title={claim.adminNotes}>
-                      <i className="bx bx-message-detail"></i>
+                      <i className="bx bx-message-detail" />
                       {claim.adminNotes.length > 30
-                        ? claim.adminNotes.substring(0, 30) + "..."
+                        ? `${claim.adminNotes.substring(0, 30)}...`
                         : claim.adminNotes}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="my-claim-item-status">
-                {getStatusBadge(claim.claimStatus)}
-              </div>
+              <div className="my-claim-item-status">{getStatusBadge(claim.claimStatus)}</div>
             </div>
           ))}
         </div>

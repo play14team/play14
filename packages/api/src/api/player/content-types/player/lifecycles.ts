@@ -34,9 +34,7 @@ export default {
     // Check if user relation was modified and player has a linked user
     if (params.data?.user !== undefined && result.user) {
       try {
-        const { syncUserRoleFromPlayer } = await import(
-          "../../../../services/user-role-sync"
-        )
+        const { syncUserRoleFromPlayer } = await import("../../../../services/user-role-sync")
         const updated = await syncUserRoleFromPlayer(strapi, result.documentId)
         if (updated) {
           strapi.log.info(

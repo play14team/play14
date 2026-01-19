@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
 import Image from "next/image"
+import { useCallback, useRef, useState } from "react"
 import ImageCropper from "./image-cropper"
 import MediaLibraryBrowser from "./media-library-browser"
 
@@ -178,16 +178,14 @@ export default function ImageManager({
 
       {error && (
         <div className="admin-alert admin-alert-error admin-alert-sm">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
 
       <div className="image-section">
         <h4>{title}</h4>
-        {description && (
-          <p className="section-description">{description}</p>
-        )}
+        {description && <p className="section-description">{description}</p>}
 
         <input
           ref={fileInputRef}
@@ -214,7 +212,7 @@ export default function ImageManager({
             </div>
             {isLoading && (
               <div className="image-manager-loading">
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Processing...
               </div>
             )}
@@ -226,7 +224,7 @@ export default function ImageManager({
                 disabled={disabled || isLoading}
                 title="Upload new image"
               >
-                <i className="bx bx-upload"></i>
+                <i className="bx bx-upload" />
               </button>
               {canShowLibrary && (
                 <button
@@ -236,7 +234,7 @@ export default function ImageManager({
                   disabled={disabled || isLoading}
                   title="Select from media library"
                 >
-                  <i className="bx bx-images"></i>
+                  <i className="bx bx-images" />
                 </button>
               )}
               <button
@@ -246,7 +244,7 @@ export default function ImageManager({
                 disabled={disabled || isLoading}
                 title="Remove image"
               >
-                <i className="bx bx-trash"></i>
+                <i className="bx bx-trash" />
               </button>
             </div>
           </div>
@@ -262,17 +260,20 @@ export default function ImageManager({
             >
               {isLoading ? (
                 <div className="dropzone-uploading">
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                   <span>Uploading...</span>
                 </div>
               ) : (
                 <>
-                  <i className="bx bx-image-add"></i>
+                  <i className="bx bx-image-add" />
                   <p>
                     <strong>Click to upload</strong> or drag and drop
                   </p>
                   <span className="dropzone-hint">
-                    {aspectRatio === 1 ? "Square image" : `${Math.round(aspectRatio * 100) / 100}:1 aspect ratio`}, PNG/JPG up to 10MB
+                    {aspectRatio === 1
+                      ? "Square image"
+                      : `${Math.round(aspectRatio * 100) / 100}:1 aspect ratio`}
+                    , PNG/JPG up to 10MB
                   </span>
                 </>
               )}
@@ -288,7 +289,7 @@ export default function ImageManager({
                   onClick={() => setShowMediaLibrary(true)}
                   disabled={disabled || isLoading}
                 >
-                  <i className="bx bx-images"></i>
+                  <i className="bx bx-images" />
                   Browse Media Library
                 </button>
               </>

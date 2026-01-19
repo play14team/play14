@@ -93,24 +93,14 @@ export const friSunSchedule: TimetableDay[] = [
 /**
  * Get schedule template by name
  */
-export function getScheduleTemplate(
-  template: "thu-sat" | "fri-sun"
-): TimetableDay[] {
+export function getScheduleTemplate(template: "thu-sat" | "fri-sun"): TimetableDay[] {
   return template === "fri-sun" ? friSunSchedule : thuSatSchedule
 }
 
 /**
  * Day name map for timetable component
  */
-const dayNames = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-]
+const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 /**
  * Generate timetable dynamically based on actual start and end dates
@@ -118,10 +108,7 @@ const dayNames = [
  * - Middle days: Full day schedule (main day 1)
  * - Last day: Closing day schedule (main day 2)
  */
-export function generateTimetable(
-  startDate: Date,
-  endDate: Date
-): TimetableDay[] {
+export function generateTimetable(startDate: Date, endDate: Date): TimetableDay[] {
   const timetable: TimetableDay[] = []
 
   // Normalize dates to start of day for comparison

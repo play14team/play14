@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest"
-import { mkdtempSync, rmSync, writeFileSync } from "fs"
-import { tmpdir } from "os"
-import { join } from "path"
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { describe, expect, it } from "vitest"
 import {
   loadAttendeeContacts,
   mergeContacts,
@@ -24,7 +24,7 @@ describe("import-audience-attendees helpers", () => {
 
   it("loads attendee contacts and preserves visibility/tshirt/food fields", () => {
     const csv = [
-      "Attendee's Email address,Attendee's first name,Attendee's name,\"I want to appear on the #play14 website, and here is my LinkedIn profile url\",What is your T-shirt size and shape,\"Please notify us of any specific food diet (vegetarian, vegan, gluten-free, lactose-free, ...)\"",
+      'Attendee\'s Email address,Attendee\'s first name,Attendee\'s name,"I want to appear on the #play14 website, and here is my LinkedIn profile url",What is your T-shirt size and shape,"Please notify us of any specific food diet (vegetarian, vegan, gluten-free, lactose-free, ...)"',
       "a@example.com,Ann,Able,No,XL,vegan",
       "b@example.com,Bob,Baker,https://linkedin.com/in/bob,M,gluten-free",
     ].join("\n")

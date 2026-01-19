@@ -11,9 +11,7 @@ export default async function EventLocation(props: {
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <Filters
-          name={`Found ${events.length} events in ${events[0]?.location?.name}`}
-        />
+        <Filters name={`Found ${events.length} events in ${events[0]?.location?.name}`} />
       </div>
       <div className="pt-70">
         <EventGrid events={events} />

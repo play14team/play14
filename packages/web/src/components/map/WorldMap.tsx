@@ -185,8 +185,7 @@ export default function WorldMap({
   // Handle mouse move for tooltip
   const handleMouseMove = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement
-    const isOverCountry =
-      target.tagName === "path" && target.hasAttribute("data-country-code")
+    const isOverCountry = target.tagName === "path" && target.hasAttribute("data-country-code")
 
     if (!isOverCountry && onMouseLeave) {
       onMouseLeave()
@@ -202,9 +201,7 @@ export default function WorldMap({
         onMouseMove={handleMouseMove}
       />
       <div className="map-controls">
-        {searchContent && (
-          <div className="map-search-content">{searchContent}</div>
-        )}
+        {searchContent && <div className="map-search-content">{searchContent}</div>}
         {onSearchToggle && (
           <button
             onClick={onSearchToggle}

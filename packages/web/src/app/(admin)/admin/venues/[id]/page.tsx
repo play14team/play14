@@ -1,7 +1,7 @@
 import { requireOrganizer } from "@/libs/auth"
-import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getVenueForEdit } from "../venues.action"
 import VenueEditForm from "./venue-edit-form"
 
@@ -33,7 +33,7 @@ export default async function VenueEditPage({ params }: PageProps) {
               className="admin-btn admin-btn-icon admin-btn-secondary"
               title="Back to Venues"
             >
-              <i className="bx bx-arrow-back"></i>
+              <i className="bx bx-arrow-back" />
             </Link>
             <div>
               <h1>Edit Venue</h1>

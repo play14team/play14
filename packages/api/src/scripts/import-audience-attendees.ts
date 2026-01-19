@@ -1,5 +1,5 @@
-import { existsSync } from "fs"
-import { resolve } from "path"
+import { existsSync } from "node:fs"
+import { resolve } from "node:path"
 import { createStrapi } from "@strapi/strapi"
 import { runAudienceAttendeeImport } from "../services/import-audience-attendees"
 
@@ -27,9 +27,7 @@ function collectArgValues(args: string[], flag: string): string[] {
 }
 
 function resolveInputFiles(paths: string[], repoRoot: string, label: string): string[] {
-  const resolved = paths.map((entry) =>
-    entry.startsWith("/") ? entry : resolve(repoRoot, entry)
-  )
+  const resolved = paths.map((entry) => (entry.startsWith("/") ? entry : resolve(repoRoot, entry)))
   for (const filePath of resolved) {
     if (!existsSync(filePath)) {
       throw new Error(`${label} file not found: ${filePath}`)

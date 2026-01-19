@@ -2,7 +2,7 @@ import EventDetails from "@/components/events/details"
 import { getEvent } from "@/components/events/get.action"
 import Page from "@/components/layout/page"
 import { formatDate } from "@/libs/dates"
-import { SlugParamsProps } from "@/libs/slug-params"
+import type { SlugParamsProps } from "@/libs/slug-params"
 import { notFound } from "next/navigation"
 
 export const revalidate = 3600
@@ -29,7 +29,7 @@ export async function generateMetadata(props: SlugParamsProps) {
 
   const images = event.images?.filter(Boolean)?.map((i) => (i as { url: string }).url) as string[]
   let description = formatDate(event.start, event.end, event.timezone || "", true)
-  if (event.venue && event.venue?.location) {
+  if (event.venue?.location) {
     description += ` | ${event.venue?.name} | ${event.venue?.location?.place_name}`
   }
 

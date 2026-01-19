@@ -6,8 +6,8 @@
  * in src/api/ticket-order/controllers/webhook.ts
  */
 
-import type { Core } from "@strapi/strapi"
 import { render } from "@react-email/render"
+import type { Core } from "@strapi/strapi"
 import TicketOrderRefundEmail from "../../../../emails/ticket-order-refund"
 
 const getFrontendUrl = (): string => {
@@ -51,7 +51,7 @@ export default {
     })
 
     if (!order || !order.purchaserEmail) {
-      strapi.log.warn(`[TicketOrder] Could not send refund email: order data incomplete`)
+      strapi.log.warn("[TicketOrder] Could not send refund email: order data incomplete")
       return
     }
 
@@ -94,14 +94,19 @@ export default {
         { plainText: true }
       )
 
-      await strapi.plugin("email").service("email").send({
-        to: order.purchaserEmail,
-        subject: `[#play14] Your order has been ${isPartialRefund ? "partially " : ""}refunded`,
-        html,
-        text,
-      })
+      await strapi
+        .plugin("email")
+        .service("email")
+        .send({
+          to: order.purchaserEmail,
+          subject: `[#play14] Your order has been ${isPartialRefund ? "partially " : ""}refunded`,
+          html,
+          text,
+        })
 
-      strapi.log.info(`[TicketOrder] Sent refund notification email to ${order.purchaserEmail} for order ${order.orderNumber}`)
+      strapi.log.info(
+        `[TicketOrder] Sent refund notification email to ${order.purchaserEmail} for order ${order.orderNumber}`
+      )
     } catch (error) {
       strapi.log.error(`[TicketOrder] Failed to send refund notification email: ${error}`)
     }

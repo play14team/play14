@@ -1,4 +1,3 @@
-import React from "react"
 import { Heading, Link, Text } from "@react-email/components"
 
 interface CalendarSectionProps {

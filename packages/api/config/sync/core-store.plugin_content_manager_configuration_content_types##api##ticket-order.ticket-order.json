@@ -497,14 +497,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "orderNumber",
-        "status",
-        "totalAmount",
-        "currency",
-        "purchaserEmail"
-      ],
+      "list": ["id", "orderNumber", "status", "totalAmount", "currency", "purchaserEmail"],
       "edit": [
         [
           {

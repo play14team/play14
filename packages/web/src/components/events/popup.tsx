@@ -1,16 +1,14 @@
 "use client"
 
-import Link from "next/link"
+import { Enum_Event_Eventstatus, type Event, type GeoLocation } from "@/models/strapi"
 import { useTheme } from "next-themes"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 import { Popup } from "react-map-gl/mapbox"
-import { Enum_Event_Eventstatus, Event, GeoLocation } from "@/models/strapi"
 import EventDate from "./date"
 
 // Helper to extract coordinates from either location format
-function getCoordinates(
-  location: GeoLocation | undefined,
-): [number, number] | null {
+function getCoordinates(location: GeoLocation | undefined): [number, number] | null {
   if (!location) return null
 
   // Handle Mapbox format (geometry.coordinates)
@@ -57,9 +55,7 @@ const EventPopup = ({
   const isDark = mounted && resolvedTheme === "dark"
   const themeColors = getThemeColors(isDark)
 
-  const mapColorForStatus = (
-    status: Enum_Event_Eventstatus | string | undefined,
-  ) => {
+  const mapColorForStatus = (status: Enum_Event_Eventstatus | string | undefined) => {
     switch (status) {
       case Enum_Event_Eventstatus.Announced:
       case "Announced":
@@ -126,16 +122,15 @@ const EventPopup = ({
                   {name}
                 </Link>
               </b>
-              {status == Enum_Event_Eventstatus.Open &&
-                event.registration?.link && (
-                  <Link
-                    href={event.registration.link}
-                    target="_blank"
-                    style={{ color: themeColors.open }}
-                  >
-                    <b>Register now</b>
-                  </Link>
-                )}
+              {status === Enum_Event_Eventstatus.Open && event.registration?.link && (
+                <Link
+                  href={event.registration.link}
+                  target="_blank"
+                  style={{ color: themeColors.open }}
+                >
+                  <b>Register now</b>
+                </Link>
+              )}
             </div>
             <div className="d-flex justify-content-between pb-2">
               <span>
@@ -151,10 +146,7 @@ const EventPopup = ({
 }
 
 // Keep the original mapColor export for backward compatibility
-export const mapColor = (
-  status: Enum_Event_Eventstatus | string | undefined,
-  isDark?: boolean,
-) => {
+export const mapColor = (status: Enum_Event_Eventstatus | string | undefined, isDark?: boolean) => {
   // Use theme-aware colors if isDark is provided
   if (isDark !== undefined) {
     const themeColors = getThemeColors(isDark)

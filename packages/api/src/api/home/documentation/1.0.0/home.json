@@ -63,9 +63,7 @@
           }
         }
       },
-      "tags": [
-        "Home"
-      ],
+      "tags": ["Home"],
       "parameters": [
         {
           "name": "sort",
@@ -234,9 +232,7 @@
           }
         }
       },
-      "tags": [
-        "Home"
-      ],
+      "tags": ["Home"],
       "parameters": [],
       "operationId": "put/home",
       "requestBody": {
@@ -314,9 +310,7 @@
           }
         }
       },
-      "tags": [
-        "Home"
-      ],
+      "tags": ["Home"],
       "parameters": [],
       "operationId": "delete/home"
     }
@@ -385,9 +379,7 @@
           }
         }
       },
-      "tags": [
-        "Home"
-      ],
+      "tags": ["Home"],
       "parameters": [],
       "operationId": "post/home/localizations",
       "requestBody": {

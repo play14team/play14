@@ -1,4 +1,3 @@
-import React from "react"
 import { Button, Heading, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 
@@ -54,8 +53,8 @@ export default function PaymentFailedEmail({
       </div>
 
       <Text>
-        This can happen for various reasons, such as insufficient funds, incorrect card details, or a
-        temporary issue with your bank.
+        This can happen for various reasons, such as insufficient funds, incorrect card details, or
+        a temporary issue with your bank.
       </Text>
 
       <Button href={`${frontendUrl}/events/${eventSlug}`} style={buttonStyle}>

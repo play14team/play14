@@ -1,8 +1,8 @@
 import { getTestimonials } from "@/components/events/get.action"
 import TestimonialItem from "@/components/events/testimonial"
 import Page from "@/components/layout/page"
-import { Testimonial } from "@/models/strapi"
-import { Metadata } from "next"
+import type { Testimonial } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Events | Testimonials",
@@ -17,10 +17,7 @@ export default async function Testimonials() {
         <div className="container">
           <div className="row">
             {testimonials.map((testimonial) => (
-              <TestimonialItem
-                key={testimonial.documentId}
-                testimonial={testimonial}
-              />
+              <TestimonialItem key={testimonial.documentId} testimonial={testimonial} />
             ))}
           </div>
         </div>

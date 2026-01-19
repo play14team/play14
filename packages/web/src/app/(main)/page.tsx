@@ -26,42 +26,32 @@ export default function Home() {
             <h2>
               Discover the power of <span>play</span>
             </h2>
-            <p>
-              Play engages both mind and body, making learning an active,
-              immersive experience.
-            </p>
+            <p>Play engages both mind and body, making learning an active, immersive experience.</p>
           </div>
           <p>
             Welcome to #play14, a global movement that believes in the{" "}
-            <strong>transformative power of play</strong>! We are a worldwide
-            gathering of like-minded people who believe that{" "}
-            <strong>
-              playing is the best way to learn, share and get creative!
-            </strong>
+            <strong>transformative power of play</strong>! We are a worldwide gathering of
+            like-minded people who believe that{" "}
+            <strong>playing is the best way to learn, share and get creative!</strong>
           </p>
           <p>
-            Through play, individuals explore, experiment, and discover concepts
-            in a hands-on way, which enhances understanding and retention. It
-            encourages creativity, problem-solving, and collaboration, helping
-            learners develop critical thinking skills.
+            Through play, individuals explore, experiment, and discover concepts in a hands-on way,
+            which enhances understanding and retention. It encourages creativity, problem-solving,
+            and collaboration, helping learners develop critical thinking skills.
           </p>
           <div className="d-flex justify-content-center">
             <blockquote>
-              Tell me and I forget, teach me and I may remember, involve me and
-              I learn
+              Tell me and I forget, teach me and I may remember, involve me and I learn
               <br />
               <strong>
-                <em className="d-flex justify-content-end pt-4">
-                  Benjamin Franklin
-                </em>
+                <em className="d-flex justify-content-end pt-4">Benjamin Franklin</em>
               </strong>
             </blockquote>
           </div>
           <p>
-            Play also reduces stress and increases motivation, making the
-            learning process enjoyable and effective. By creating a safe space
-            for trial and error, play fosters a deeper, more meaningful
-            connection to the material being learned.
+            Play also reduces stress and increases motivation, making the learning process enjoyable
+            and effective. By creating a safe space for trial and error, play fosters a deeper, more
+            meaningful connection to the material being learned.
           </p>
         </div>
       </section>
@@ -72,36 +62,30 @@ export default function Home() {
             <h2>
               Join the <span>movement</span>
             </h2>
-            <p>
-              Join us in cities worldwide to connect with like-minded
-              individuals.
-            </p>
+            <p>Join us in cities worldwide to connect with like-minded individuals.</p>
           </div>
           <p>
-            Whether you are a facilitator, educator, or curious mind, our events
-            are designed to spark creativity, foster collaboration, and ignite
-            new ideas. Dive into a world of playful experimentation.
+            Whether you are a facilitator, educator, or curious mind, our events are designed to
+            spark creativity, foster collaboration, and ignite new ideas. Dive into a world of
+            playful experimentation.
           </p>
           <ul>
             <li>
-              <strong>Global community:</strong> Connect with a diverse network
-              of innovators.
+              <strong>Global community:</strong> Connect with a diverse network of innovators.
             </li>
             <li>
-              <strong>Endless fun:</strong> Engage in hands-on, playful
-              activities.
+              <strong>Endless fun:</strong> Engage in hands-on, playful activities.
             </li>
             <li>
-              <strong>Inspire & be inspired:</strong> Share and discover new
-              games, tools, and techniques.
+              <strong>Inspire & be inspired:</strong> Share and discover new games, tools, and
+              techniques.
             </li>
           </ul>
           <p>
-            #play14 is an <Link href="/about/schedule">unconference</Link>,
-            where <strong>all attendees are also contributors</strong>. Just
-            show up with an open mind, and you&apos;ll have the chance to propose
-            your own games or dive into the games suggested by others. It&apos;s
-            all about participation, creativity, and shared fun!
+            #play14 is an <Link href="/about/schedule">unconference</Link>, where{" "}
+            <strong>all attendees are also contributors</strong>. Just show up with an open mind,
+            and you&apos;ll have the chance to propose your own games or dive into the games
+            suggested by others. It&apos;s all about participation, creativity, and shared fun!
           </p>
         </div>
       </section>
@@ -127,24 +111,21 @@ export default function Home() {
             </h2>
             <p>
               For two and a half days,{" "}
-              <Link href="/players">people with many different profiles</Link>{" "}
-              share <Link href="/games">games and activities</Link>, knowledge,
-              and laughs. <strong>Everyone is welcome</strong>.
+              <Link href="/players">people with many different profiles</Link> share{" "}
+              <Link href="/games">games and activities</Link>, knowledge, and laughs.{" "}
+              <strong>Everyone is welcome</strong>.
             </p>
           </div>
           <div className="d-flex justify-content-center">
             <blockquote>
-              You can discover more about a person in an hour of play than a
-              year of conversation
+              You can discover more about a person in an hour of play than a year of conversation
               <br />
               <strong>
                 <em className="d-flex justify-content-end pt-4">Plato</em>
               </strong>
             </blockquote>
           </div>
-          <p className="pt-5">
-            Here are some examples of activities we engage in:
-          </p>
+          <p className="pt-5">Here are some examples of activities we engage in:</p>
           <ul>
             <li>
               A{" "}
@@ -171,9 +152,7 @@ export default function Home() {
               </Link>{" "}
               that you can use to raise the level of awareness and energy
             </li>
-            <li>
-              A facilitation technique that you can use in your daily work
-            </li>
+            <li>A facilitation technique that you can use in your daily work</li>
             <li>
               A{" "}
               <Link href="/games/cupcake-design-factory" target="_blank">
@@ -189,17 +168,13 @@ export default function Home() {
               session where you invent a new game to teach something new
             </li>
             <li>
-              A soul searching, deep-dive introspection session where you learn
-              about yourself
+              A soul searching, deep-dive introspection session where you learn about yourself
             </li>
             <li>
-              A one-on-one coaching session where you will find some answers
-              with the help of a friend
+              A one-on-one coaching session where you will find some answers with the help of a
+              friend
             </li>
-            <li>
-              A brainstorming session on a question or problem that wakes you up
-              at night
-            </li>
+            <li>A brainstorming session on a question or problem that wakes you up at night</li>
             <li>
               A{" "}
               <Link href="/games/doodling-together" target="_blank">
@@ -223,19 +198,16 @@ export default function Home() {
               <Link href="https://youtu.be/T7HPg2-xowc" target="_blank">
                 improv theater
               </Link>{" "}
-              session where you can work on your confidence and ability to speak
-              publicly
+              session where you can work on your confidence and ability to speak publicly
             </li>
             <li>
-              A more esoteric session on a practice/hobby you want to share like
-              yoga, laughter yoga, Tai Chi, Qigong, meditation, mindfulness,
-              aikido, ...
+              A more esoteric session on a practice/hobby you want to share like yoga, laughter
+              yoga, Tai Chi, Qigong, meditation, mindfulness, aikido, ...
             </li>
           </ul>
 
           <p>
-            Join us in order to develop your{" "}
-            <strong>facilitation skills</strong>, increase your{" "}
+            Join us in order to develop your <strong>facilitation skills</strong>, increase your{" "}
             <strong>ability to accompany change</strong> in your organization,{" "}
             <strong>foster your creativity</strong> and improve your{" "}
             <strong>capacity to innovate</strong>.
@@ -250,8 +222,7 @@ export default function Home() {
               What we <span>stand for</span>
             </h2>
             <p>
-              A game or activity at #play14 could be pretty much anything as
-              long as it respects our{" "}
+              A game or activity at #play14 could be pretty much anything as long as it respects our{" "}
               <Link href="/about/values">Manifesto and Code of Conduct</Link>.
             </p>
           </div>
@@ -273,9 +244,8 @@ export default function Home() {
               What our community <span>says</span>
             </h2>
             <p>
-              Hear from members of the #play14 community about their experiences.
-              These testimonials capture the spirit, impact, and joy of our events
-              around the world.
+              Hear from members of the #play14 community about their experiences. These testimonials
+              capture the spirit, impact, and joy of our events around the world.
             </p>
           </div>
         </div>
@@ -289,8 +259,8 @@ export default function Home() {
               Photo <span>gallery</span>
             </h2>
             <p>
-              #play14 is first and foremost a community of people, a family, and
-              an incredible human adventure.
+              #play14 is first and foremost a community of people, a family, and an incredible human
+              adventure.
             </p>
           </div>
         </div>
@@ -304,9 +274,8 @@ export default function Home() {
               What&apos;s in it <span>for you</span>
             </h2>
             <p>
-              Here are some of the things that you can expect when attending a
-              #play14 event. However, be ready to &quot;Expect the
-              unexpected!&quot;
+              Here are some of the things that you can expect when attending a #play14 event.
+              However, be ready to &quot;Expect the unexpected!&quot;
             </p>
           </div>
         </div>
@@ -320,8 +289,8 @@ export default function Home() {
               Frequently asked <span>questions</span>
             </h2>
             <p>
-              Find answers to the most common questions about #play14 events,
-              how they work, and what to expect when you join us.
+              Find answers to the most common questions about #play14 events, how they work, and
+              what to expect when you join us.
             </p>
           </div>
           <div className="row justify-content-center">

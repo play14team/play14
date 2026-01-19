@@ -6,11 +6,9 @@
  * with 15 days between each reminder.
  */
 
-import type { Core } from "@strapi/strapi"
 import { render } from "@react-email/render"
-import EventResultsReminderEmail, {
-  getSubject,
-} from "../../emails/event-results-reminder"
+import type { Core } from "@strapi/strapi"
+import EventResultsReminderEmail, { getSubject } from "../../emails/event-results-reminder"
 
 interface EventForReminder {
   documentId: string
@@ -145,7 +143,7 @@ export async function processEventResultsReminders(strapi: Core.Strapi): Promise
   // - Ended at least 15 days ago
   // - Ended AFTER the feature launch date (to exclude historical events)
   // - Have sent fewer than 3 reminders
-  const events = await strapi.documents("api::event.event").findMany({
+  const events = (await strapi.documents("api::event.event").findMany({
     fields: [
       "documentId",
       "name",
@@ -169,7 +167,7 @@ export async function processEventResultsReminders(strapi: Core.Strapi): Promise
     populate: {
       hosts: { fields: ["name"] },
     },
-  }) as unknown as EventForReminder[]
+  })) as unknown as EventForReminder[]
 
   console.log(`[EventResultsReminders] Found ${events.length} potential events for reminders`)
 
@@ -205,10 +203,7 @@ export async function processEventResultsReminders(strapi: Core.Strapi): Promise
       )
       sentCount++
     } catch (error) {
-      console.error(
-        `[EventResultsReminders] Failed to send reminder for "${event.name}":`,
-        error
-      )
+      console.error(`[EventResultsReminders] Failed to send reminder for "${event.name}":`, error)
       // Continue processing other events even if one fails
     }
   }

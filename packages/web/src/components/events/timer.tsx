@@ -36,28 +36,16 @@ const UpcomingEventTimer = ({ date }: TimerProps) => {
 
   return (
     <div id="timer" className="flex-wrap d-flex justify-content-center">
-      <div
-        id="days"
-        className="align-items-center flex-column d-flex justify-content-center"
-      >
+      <div id="days" className="align-items-center flex-column d-flex justify-content-center">
         {days} <span>Days</span>
       </div>
-      <div
-        id="hours"
-        className="align-items-center flex-column d-flex justify-content-center"
-      >
+      <div id="hours" className="align-items-center flex-column d-flex justify-content-center">
         {hours} <span>Hours</span>
       </div>
-      <div
-        id="minutes"
-        className="align-items-center flex-column d-flex justify-content-center"
-      >
+      <div id="minutes" className="align-items-center flex-column d-flex justify-content-center">
         {minutes} <span>Minutes</span>
       </div>
-      <div
-        id="seconds"
-        className="align-items-center flex-column d-flex justify-content-center"
-      >
+      <div id="seconds" className="align-items-center flex-column d-flex justify-content-center">
         {seconds} <span>Seconds</span>
       </div>
     </div>

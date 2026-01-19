@@ -2,8 +2,8 @@
 
 import { restQuery } from "@/libs/strapi-client"
 import {
-  searchEventPopulate,
   searchArticlePopulate,
+  searchEventPopulate,
   searchGamePopulate,
   searchPlayerPopulate,
 } from "@/libs/strapi-populate"
@@ -77,10 +77,7 @@ export async function search(input: string) {
     // Search events
     restQuery<Event[]>("events", {
       filters: {
-        $or: [
-          { name: { $containsi: input } },
-          { description: { $containsi: input } },
-        ],
+        $or: [{ name: { $containsi: input } }, { description: { $containsi: input } }],
       },
       sort: ["start:desc"],
       pagination: { page: 1, pageSize: 100 },

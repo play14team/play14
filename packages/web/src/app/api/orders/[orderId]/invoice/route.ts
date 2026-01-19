@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server"
 import { getAuthCookie } from "@/libs/auth"
+import { type NextRequest, NextResponse } from "next/server"
 
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
   const { orderId } = await params
@@ -31,10 +31,7 @@ export async function GET(
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`[Invoice] Failed to fetch invoice: ${response.status} - ${errorText}`)
-      return NextResponse.json(
-        { error: "Failed to download invoice" },
-        { status: response.status }
-      )
+      return NextResponse.json({ error: "Failed to download invoice" }, { status: response.status })
     }
 
     // Get the PDF buffer
@@ -44,7 +41,9 @@ export async function GET(
     return new NextResponse(pdfBuffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": response.headers.get("Content-Disposition") || `attachment; filename="invoice-${orderId}.pdf"`,
+        "Content-Disposition":
+          response.headers.get("Content-Disposition") ||
+          `attachment; filename="invoice-${orderId}.pdf"`,
         "Content-Length": pdfBuffer.byteLength.toString(),
       },
     })

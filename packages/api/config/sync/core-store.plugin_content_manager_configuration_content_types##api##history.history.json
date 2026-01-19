@@ -144,12 +144,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "items",
-        "createdAt",
-        "updatedAt"
-      ],
+      "list": ["id", "items", "createdAt", "updatedAt"],
       "edit": [
         [
           {

@@ -1,5 +1,5 @@
-import React from "react"
 import { Body, Container, Head, Html, Img } from "@react-email/components"
+import type React from "react"
 
 interface LayoutProps {
   children?: React.ReactNode

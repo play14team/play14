@@ -1,6 +1,6 @@
+import type { Game } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
-import { Game } from "@/models/strapi"
 import Ratings from "../layout/ratings"
 
 const GameSidebar = (props: { game: Game }) => {
@@ -12,32 +12,32 @@ const GameSidebar = (props: { game: Game }) => {
         <ul>
           <li>
             <div className="icon">
-              <i className="bx bx-time"></i>
+              <i className="bx bx-time" />
             </div>
             <span>Timebox</span>
             {game.timebox}
           </li>
           <li>
             <div className="icon">
-              <i className="bx bx-user-circle"></i>
+              <i className="bx bx-user-circle" />
             </div>
             <span>Scale</span>
             {game.scale}
           </li>
 
-          {game.ratings && game.ratings.energy && (
+          {game.ratings?.energy && (
             <li>
               <div className="icon">
-                <i className="bx bx-star"></i>
+                <i className="bx bx-star" />
               </div>
               <span>Ratings</span>
-              {game.ratings.energy != undefined && (
+              {game.ratings.energy !== undefined && (
                 <Ratings name="Energy" value={game.ratings.energy} />
               )}
-              {game.ratings.connection != undefined && (
+              {game.ratings.connection !== undefined && (
                 <Ratings name="Connection" value={game.ratings.connection} />
               )}
-              {game.ratings.silliness != undefined && (
+              {game.ratings.silliness !== undefined && (
                 <Ratings name="Silliness" value={game.ratings.silliness} />
               )}
             </li>
@@ -46,19 +46,17 @@ const GameSidebar = (props: { game: Game }) => {
           {game.firstPlayedAt && (
             <li>
               <div className="icon">
-                <i className="bx bx-map"></i>
+                <i className="bx bx-map" />
               </div>
               <span>First played</span>
-              <Link href={`/events/${game.firstPlayedAt?.slug}`}>
-                {game.firstPlayedAt.name}
-              </Link>
+              <Link href={`/events/${game.firstPlayedAt?.slug}`}>{game.firstPlayedAt.name}</Link>
             </li>
           )}
 
           {game.credits && (
             <li>
               <div className="icon">
-                <i className="bx bx-award"></i>
+                <i className="bx bx-award" />
               </div>
               <span>Credits</span>
               {game.credits}
@@ -68,15 +66,11 @@ const GameSidebar = (props: { game: Game }) => {
           {game.proposedBy && game.proposedBy.length > 0 && (
             <li>
               <div className="icon">
-                <i className="bx bx-bulb"></i>
+                <i className="bx bx-bulb" />
               </div>
               <span>Proposed by</span>
               {game.proposedBy.map((player) => (
-                <Link
-                  key={player.slug}
-                  href={`/players/${player.slug}`}
-                  className="centered pt-3"
-                >
+                <Link key={player.slug} href={`/players/${player.slug}`} className="centered pt-3">
                   {player.avatar?.url && (
                     <Image
                       src={player.avatar.url}
@@ -96,15 +90,11 @@ const GameSidebar = (props: { game: Game }) => {
           {game.documentedBy && game.documentedBy.length > 0 && (
             <li>
               <div className="icon">
-                <i className="bx bx-edit"></i>
+                <i className="bx bx-edit" />
               </div>
               <span>Documented by</span>
               {game.documentedBy.map((player) => (
-                <Link
-                  key={player.slug}
-                  href={`/players/${player.slug}`}
-                  className="centered pt-3"
-                >
+                <Link key={player.slug} href={`/players/${player.slug}`} className="centered pt-3">
                   {player.avatar?.url && (
                     <Image
                       src={player.avatar.url}
@@ -134,7 +124,7 @@ const GameSidebar = (props: { game: Game }) => {
               return (
                 <li key={r.id}>
                   <a href={r.url} target="_blank" rel="noreferrer">
-                    {r.name} <i className={icon}></i>
+                    {r.name} <i className={icon} />
                   </a>
                 </li>
               )

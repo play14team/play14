@@ -2,14 +2,14 @@
  * Unit tests for currency utilities
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
-  getCurrency,
-  formatPrice,
-  formatCurrency,
   STRIPE_CURRENCIES,
-  ZERO_DECIMAL_CURRENCIES,
   STRIPE_CURRENCY_CODES,
+  ZERO_DECIMAL_CURRENCIES,
+  formatCurrency,
+  formatPrice,
+  getCurrency,
 } from "./currencies"
 
 describe("STRIPE_CURRENCIES", () => {
@@ -253,12 +253,18 @@ describe("formatCurrency", () => {
 
   describe("custom fraction digits", () => {
     it("respects minimumFractionDigits option", () => {
-      const result = formatCurrency(100, "EUR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+      const result = formatCurrency(100, "EUR", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      })
       expect(result).not.toContain(",00")
     })
 
     it("allows more fraction digits when specified", () => {
-      const result = formatCurrency(99.999, "USD", { minimumFractionDigits: 3, maximumFractionDigits: 3 })
+      const result = formatCurrency(99.999, "USD", {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      })
       expect(result).toContain("99.999")
     })
   })

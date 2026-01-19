@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test"
 import {
   clickFirstDetailLink,
   getDetailLinks,
-  verifyGridItems,
   verifyPageLayout,
   verifyPageTitle,
   waitForPageLoad,
@@ -319,7 +318,7 @@ test.describe("Event Details Page", () => {
     // Filter out navigation links
     const eventLinks = page.locator("a[href^='/events/']").filter({
       hasNot: page.locator(
-        '[href*="countries"], [href*="locations"], [href*="statuses"], [href*="calendar"], [href*="map"], [href*="hosting"], [href*="testimonials"]',
+        '[href*="countries"], [href*="locations"], [href*="statuses"], [href*="calendar"], [href*="map"], [href*="hosting"], [href*="testimonials"]'
       ),
     })
 

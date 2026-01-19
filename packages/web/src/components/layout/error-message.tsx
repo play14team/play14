@@ -35,12 +35,8 @@ export default function ErrorMessage({
           border: "1px solid var(--color-red)",
         }}
       >
-        <h4 style={{ color: "var(--color-red)", marginBottom: "0.75rem" }}>
-          {title}
-        </h4>
-        <p style={{ color: "var(--color-text)", marginBottom: "1rem" }}>
-          {message}
-        </p>
+        <h4 style={{ color: "var(--color-red)", marginBottom: "0.75rem" }}>{title}</h4>
+        <p style={{ color: "var(--color-text)", marginBottom: "1rem" }}>{message}</p>
         {details && (
           <div style={{ color: "var(--color-text-secondary)" }}>
             <pre
@@ -57,11 +53,7 @@ export default function ErrorMessage({
         )}
         {showReload && (
           <div style={{ marginTop: "1.5rem" }}>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={handleRetry}
-            >
+            <button type="button" className="btn btn-primary" onClick={handleRetry}>
               Retry
             </button>
           </div>

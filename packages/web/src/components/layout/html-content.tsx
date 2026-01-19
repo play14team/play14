@@ -1,5 +1,5 @@
-import DOMPurify from "isomorphic-dompurify"
 import parse from "html-react-parser"
+import DOMPurify from "isomorphic-dompurify"
 
 /**
  * Allowed HTML tags for user-generated content
@@ -55,7 +55,7 @@ function sanitizeHtml(html: string): string {
   })
 
   // Post-process: ensure all links have safe attributes
-  return sanitized.replace(/<a\s+([^>]*href=["'][^"']*["'][^>]*)>/gi, (match, attrs) => {
+  return sanitized.replace(/<a\s+([^>]*href=["'][^"']*["'][^>]*)>/gi, (_match, attrs) => {
     // Add target="_blank" if not present
     if (!attrs.includes("target=")) {
       attrs += ' target="_blank"'

@@ -77,19 +77,14 @@ export default function ConfirmationDialog({
         tabIndex={-1}
       >
         <div className="confirmation-dialog-header">
-          <i className={`bx ${getIcon()}`}></i>
+          <i className={`bx ${getIcon()}`} />
           <h3 id="dialog-title">{title}</h3>
         </div>
         <div className="confirmation-dialog-body">
           <p id="dialog-message">{message}</p>
         </div>
         <div className="confirmation-dialog-footer">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="admin-btn admin-btn-secondary"
-            autoFocus
-          >
+          <button type="button" onClick={onCancel} className="admin-btn admin-btn-secondary">
             {cancelLabel}
           </button>
           <button

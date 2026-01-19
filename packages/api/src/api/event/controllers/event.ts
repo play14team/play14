@@ -43,7 +43,7 @@ function addTicketingMode(event: any): any {
   }
 }
 
-export default factories.createCoreController("api::event.event", ({ strapi }) => ({
+export default factories.createCoreController("api::event.event", () => ({
   async find(ctx) {
     const { data, meta } = await super.find(ctx)
     return {

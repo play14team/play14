@@ -108,7 +108,9 @@ export interface ConnectPaymentProvider extends PaymentProvider {
   createAccountLink(accountId: string, returnUrl: string, refreshUrl: string): Promise<AccountLink>
   createLoginLink(accountId: string): Promise<{ url: string }>
   getAccount(accountId: string): Promise<ConnectAccount>
-  createCheckoutSessionWithConnect(params: CreateCheckoutWithConnectParams): Promise<CheckoutSession>
+  createCheckoutSessionWithConnect(
+    params: CreateCheckoutWithConnectParams
+  ): Promise<CheckoutSession>
 }
 
 export type PaymentProviderType = "stripe" | "manual"

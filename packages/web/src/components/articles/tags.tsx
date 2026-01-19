@@ -5,9 +5,7 @@ import { getArticleNav } from "./get.action"
 export default async function Tags() {
   const articles = await getArticleNav()
 
-  const tags = deduplicate(
-    articles.flatMap((a) => a.tags?.map((t) => t?.value.toLowerCase())),
-  )
+  const tags = deduplicate(articles.flatMap((a) => a.tags?.map((t) => t?.value.toLowerCase())))
 
   return (
     <div className="blog-details-desc pb-70">
@@ -15,7 +13,7 @@ export default async function Tags() {
         {tags.sort().map((tag, index) => (
           <div key={index} className="article-tags">
             <span>
-              <i className="bx bx-purchase-tag"></i>
+              <i className="bx bx-purchase-tag" />
             </span>
 
             <Link href={`/articles/tags/${tag}`}>{tag}</Link>

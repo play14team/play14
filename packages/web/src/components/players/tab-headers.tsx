@@ -22,11 +22,7 @@ export default function TabHeaders({
 
   return (
     <ul className="nav nav-tabs" id="myTab" role="tablist">
-      <li
-        onClick={(e) => openTabSection(e, "tab1")}
-        className="current"
-        aria-hidden="true"
-      >
+      <li onClick={(e) => openTabSection(e, "tab1")} className="current" aria-hidden="true">
         Biography
       </li>
       <li onClick={(e) => openTabSection(e, "tab2")} aria-hidden="true">
@@ -36,8 +32,7 @@ export default function TabHeaders({
         Hosted {hostedCount && hostedCount > 0 ? `(${hostedCount})` : ""}
       </li>
       <li onClick={(e) => openTabSection(e, "tab4")} aria-hidden="true">
-        Mentored{" "}
-        {mentoredCount && mentoredCount > 0 ? `(${mentoredCount})` : ""}
+        Mentored {mentoredCount && mentoredCount > 0 ? `(${mentoredCount})` : ""}
       </li>
     </ul>
   )

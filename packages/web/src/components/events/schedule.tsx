@@ -1,6 +1,6 @@
 "use client"
 
-import { ComponentEventsTimetable, Maybe } from "@/models/strapi"
+import type { ComponentEventsTimetable, Maybe } from "@/models/strapi"
 import styles from "./schedule.module.scss"
 
 const EventSchedule = ({
@@ -29,9 +29,7 @@ const EventSchedule = ({
             </div>
 
             {/* Day Description */}
-            {day.description && (
-              <p className={styles.dayDescription}>{day.description}</p>
-            )}
+            {day.description && <p className={styles.dayDescription}>{day.description}</p>}
 
             {/* Timeline */}
             {day.timeslots && day.timeslots.length > 0 && (

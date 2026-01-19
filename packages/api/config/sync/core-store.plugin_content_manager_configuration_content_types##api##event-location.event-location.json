@@ -159,12 +159,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "events",
-        "slug",
-        "country"
-      ],
+      "list": ["name", "events", "slug", "country"],
       "edit": [
         [
           {

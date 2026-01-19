@@ -2,7 +2,7 @@
  * Ticket Order test data factory
  */
 
-import crypto from "crypto"
+import crypto from "node:crypto"
 
 export interface TicketDetail {
   ticketTypeId: string
@@ -69,9 +69,7 @@ export function createOrder(overrides: Partial<OrderFixture> = {}): OrderFixture
 /**
  * Create an order with active reservation
  */
-export function createOrderWithReservation(
-  overrides: Partial<OrderFixture> = {}
-): OrderFixture {
+export function createOrderWithReservation(overrides: Partial<OrderFixture> = {}): OrderFixture {
   const now = new Date()
   const expiresAt = new Date(now.getTime() + 30 * 60 * 1000) // 30 minutes from now
 
@@ -104,9 +102,7 @@ export function createPaidOrder(overrides: Partial<OrderFixture> = {}): OrderFix
 /**
  * Create a cancelled order
  */
-export function createCancelledOrder(
-  overrides: Partial<OrderFixture> = {}
-): OrderFixture {
+export function createCancelledOrder(overrides: Partial<OrderFixture> = {}): OrderFixture {
   return createOrder({
     status: "cancelled",
     hasReservation: false,

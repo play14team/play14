@@ -1,7 +1,6 @@
-import React from "react"
 import { Button, Heading, Text } from "@react-email/components"
-import { Layout } from "./components/layout"
 import { CalendarSection } from "./components/calendar-section"
+import { Layout } from "./components/layout"
 
 interface PlayerInvitationEmailProps {
   playerName: string
@@ -57,7 +56,6 @@ export default function PlayerInvitationEmail({
   resetPasswordUrl,
   googleCalendarUrl,
   outlookCalendarUrl,
-  frontendUrl = "https://play14.org",
 }: PlayerInvitationEmailProps) {
   const firstName = playerName.split(" ")[0]
 

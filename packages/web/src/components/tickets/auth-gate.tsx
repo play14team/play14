@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
 import LoginButtons from "@/components/auth/login-buttons"
 import { loginWithCredentials } from "@/components/auth/login.action"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useEffect, useState, useTransition } from "react"
 import styles from "./auth-gate.module.scss"
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
@@ -70,12 +70,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
   return (
     <div className={styles.backdrop} onClick={handleBackdropClick}>
       <div className={styles.modal}>
-        <button
-          type="button"
-          className={styles.closeButton}
-          onClick={onDismiss}
-          aria-label="Close"
-        >
+        <button type="button" className={styles.closeButton} onClick={onDismiss} aria-label="Close">
           ×
         </button>
 

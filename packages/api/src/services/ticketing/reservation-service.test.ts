@@ -9,14 +9,14 @@
  * - getReservationExpiry: Calculate expiry time
  */
 
-import { describe, it, expect, beforeEach, vi, type Mock } from "vitest"
 import type { Core } from "@strapi/strapi"
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest"
 import {
-  createReservations,
   confirmReservations,
+  createReservations,
+  getReservationExpiry,
   releaseReservations,
   rollbackReservations,
-  getReservationExpiry,
 } from "./reservation-service"
 
 // ============================================================================
@@ -115,7 +115,7 @@ function createMockKnex(db: MockDatabase) {
       const available =
         ticketType.capacity !== null
           ? ticketType.capacity - (ticketType.soldCount || 0) - (ticketType.reservedCount || 0)
-          : Infinity
+          : Number.POSITIVE_INFINITY
 
       if (available < quantity) {
         return { rows: [] }
@@ -193,7 +193,7 @@ function createMockKnex(db: MockDatabase) {
 
   // Query builder for table lookups (used in error path)
   const queryBuilder = (table: string) => ({
-    where: (column: string, value: string) => ({
+    where: (_column: string, value: string) => ({
       first: async () => {
         if (table === "ticket_types") {
           const ticketType = db.ticketTypes.get(value)

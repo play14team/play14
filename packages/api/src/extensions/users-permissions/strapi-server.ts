@@ -6,12 +6,12 @@
  * - Implements account lockout after failed login attempts
  */
 
-import { syncUserRoleWithPlayerPosition } from "../../services/user-role-sync"
 import {
   checkAccountLockout,
-  recordFailedAttempt,
   clearFailedAttempts,
+  recordFailedAttempt,
 } from "../../services/account-lockout"
+import { syncUserRoleWithPlayerPosition } from "../../services/user-role-sync"
 
 interface StrapiContext {
   state: {
@@ -68,19 +68,17 @@ export default (plugin: StrapiPlugin) => {
       }
 
       // Fetch user with player relation populated
-      const userWithPlayer = await strapi
-        .documents("plugin::users-permissions.user")
-        .findFirst({
-          filters: { id: user.id },
-          populate: {
-            role: true,
-            player: {
-              populate: {
-                avatar: true,
-              },
+      const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+        filters: { id: user.id },
+        populate: {
+          role: true,
+          player: {
+            populate: {
+              avatar: true,
             },
           },
-        })
+        },
+      })
 
       if (!userWithPlayer) {
         return ctx.notFound()
@@ -196,7 +194,8 @@ export default (plugin: StrapiPlugin) => {
               error: {
                 status: 429,
                 name: "TooManyRequestsError",
-                message: "Account temporarily locked due to too many failed login attempts. Please try again in 15 minutes.",
+                message:
+                  "Account temporarily locked due to too many failed login attempts. Please try again in 15 minutes.",
               },
             }
             ;(ctx as any).status = 429
@@ -221,10 +220,10 @@ export default (plugin: StrapiPlugin) => {
     const originalConnect = service.connect.bind(service)
 
     // Wrap the connect method
-    service.connect = async function (
+    service.connect = async (
       provider: string,
       query: Record<string, unknown>
-    ): Promise<UserRecord> {
+    ): Promise<UserRecord> => {
       let user: UserRecord
 
       try {
@@ -235,9 +234,7 @@ export default (plugin: StrapiPlugin) => {
         // Check if error is "Email is already taken"
         if (err.message?.includes("Email is already taken")) {
           // Get user profile from the OAuth provider to find the email
-          const providersRegistry = strapi
-            .plugin("users-permissions")
-            .service("providers-registry")
+          const providersRegistry = strapi.plugin("users-permissions").service("providers-registry")
 
           const profile = await providersRegistry.run({
             provider,

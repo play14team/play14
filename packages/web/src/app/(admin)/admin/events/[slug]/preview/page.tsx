@@ -1,10 +1,10 @@
-import { requireOrganizer } from "@/libs/auth"
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { getEventPreview } from "./preview.action"
 import EventDetails from "@/components/events/details"
+import { requireOrganizer } from "@/libs/auth"
 import type { Event } from "@/models/strapi"
 import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound } from "next/navigation"
+import { getEventPreview } from "./preview.action"
 
 export const metadata: Metadata = {
   title: "Preview Event | #play14",
@@ -43,7 +43,7 @@ export default async function EventPreviewPage({ params }: PageProps) {
       <div className="admin-preview-banner">
         <div className="admin-preview-banner-content">
           <div className="admin-preview-banner-info">
-            <i className="bx bx-show"></i>
+            <i className="bx bx-show" />
             <span>
               <strong>Preview Mode</strong> - This is how the event will appear to the public
               {event.isDraft && " (currently draft)"}
@@ -54,7 +54,7 @@ export default async function EventPreviewPage({ params }: PageProps) {
               href={`/admin/events/${slug}`}
               className="admin-btn admin-btn-secondary admin-btn-sm"
             >
-              <i className="bx bx-edit"></i>
+              <i className="bx bx-edit" />
               Back to Edit
             </Link>
             {event.isPublished && (
@@ -63,7 +63,7 @@ export default async function EventPreviewPage({ params }: PageProps) {
                 className="admin-btn admin-btn-primary admin-btn-sm"
                 target="_blank"
               >
-                <i className="bx bx-link-external"></i>
+                <i className="bx bx-link-external" />
                 View Live
               </Link>
             )}

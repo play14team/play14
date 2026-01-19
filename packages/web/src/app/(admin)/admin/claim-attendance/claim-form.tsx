@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
-import { submitAttendanceClaim, type ClaimableEvent } from "./claim-attendance.action"
+import { useState } from "react"
+import { type ClaimableEvent, submitAttendanceClaim } from "./claim-attendance.action"
 
 interface ClaimFormProps {
   event: ClaimableEvent
@@ -53,7 +53,7 @@ export default function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps
         disabled={isSubmitting}
         style={{ alignSelf: "flex-start", marginBottom: "16px" }}
       >
-        <i className="bx bx-arrow-back"></i>
+        <i className="bx bx-arrow-back" />
         Back to Events
       </button>
 
@@ -70,7 +70,7 @@ export default function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps
             />
           ) : (
             <div className="claim-form-event-image-placeholder">
-              <i className="bx bx-calendar-event"></i>
+              <i className="bx bx-calendar-event" />
             </div>
           )}
         </div>
@@ -78,12 +78,12 @@ export default function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps
           <h3 className="claim-form-event-name">{event.name}</h3>
           <div className="claim-form-event-meta">
             <span>
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-calendar" />
               {formatDate(event.start)}
             </span>
             {event.location?.name && (
               <span>
-                <i className="bx bx-map"></i>
+                <i className="bx bx-map" />
                 {event.location.name}
               </span>
             )}
@@ -104,15 +104,25 @@ export default function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps
             minLength={20}
             required
           />
-          <span style={{ fontSize: "12px", color: reason.length >= 20 ? "var(--color-green, #22c55e)" : "var(--color-text-muted)", display: "flex", alignItems: "center", gap: "4px", marginTop: "4px" }}>
+          <span
+            style={{
+              fontSize: "12px",
+              color:
+                reason.length >= 20 ? "var(--color-green, #22c55e)" : "var(--color-text-muted)",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              marginTop: "4px",
+            }}
+          >
             {reason.length}/20 characters minimum
-            {reason.length >= 20 && <i className="bx bx-check"></i>}
+            {reason.length >= 20 && <i className="bx bx-check" />}
           </span>
         </div>
 
         {error && (
           <div className="claim-card-error">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -133,12 +143,12 @@ export default function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps
           >
             {isSubmitting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Submitting...
               </>
             ) : (
               <>
-                <i className="bx bx-send"></i>
+                <i className="bx bx-send" />
                 Submit Claim
               </>
             )}
@@ -146,8 +156,11 @@ export default function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps
         </div>
 
         <div className="event-search-hint" style={{ marginTop: "8px" }}>
-          <i className="bx bx-info-circle"></i>
-          <span>Your claim will be reviewed by the event organizers. You will receive an email when your claim is approved or rejected.</span>
+          <i className="bx bx-info-circle" />
+          <span>
+            Your claim will be reviewed by the event organizers. You will receive an email when your
+            claim is approved or rejected.
+          </span>
         </div>
       </form>
     </div>

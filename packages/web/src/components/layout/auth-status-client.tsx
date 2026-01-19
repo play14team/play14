@@ -1,10 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
 import Avatar from "@/components/ui/avatar"
-import { useFeatureFlags } from "@/libs/feature-flags"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +9,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useFeatureFlags } from "@/libs/feature-flags"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface AuthUser {
   id: number
@@ -30,9 +30,7 @@ interface AuthStatusClientProps {
   initialUser: AuthUser | null
 }
 
-export default function AuthStatusClient({
-  initialUser,
-}: AuthStatusClientProps) {
+export default function AuthStatusClient({ initialUser }: AuthStatusClientProps) {
   const router = useRouter()
   const [user, setUser] = useState<AuthUser | null>(initialUser)
   const { flags, isLoading } = useFeatureFlags()
@@ -53,7 +51,7 @@ export default function AuthStatusClient({
 
     return (
       <Link href="/auth/login" className="auth-login-icon" title="Sign In">
-        <i className="bx bx-log-in"></i>
+        <i className="bx bx-log-in" />
       </Link>
     )
   }
@@ -64,13 +62,8 @@ export default function AuthStatusClient({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="user-menu-trigger">
-        <Avatar
-          src={avatarUrl}
-          alt={user.username}
-          fallback={user.username}
-          size="sm"
-        />
-        <i className="bx bx-chevron-down ui-dropdown-chevron"></i>
+        <Avatar src={avatarUrl} alt={user.username} fallback={user.username} size="sm" />
+        <i className="bx bx-chevron-down ui-dropdown-chevron" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
@@ -85,7 +78,7 @@ export default function AuthStatusClient({
 
         <DropdownMenuItem asChild>
           <Link href="/admin">
-            <i className="bx bx-grid-alt"></i>
+            <i className="bx bx-grid-alt" />
             Admin Dashboard
           </Link>
         </DropdownMenuItem>
@@ -93,7 +86,7 @@ export default function AuthStatusClient({
         {playerSlug && (
           <DropdownMenuItem asChild>
             <Link href={`/players/${playerSlug}`}>
-              <i className="bx bx-user"></i>
+              <i className="bx bx-user" />
               My Profile
             </Link>
           </DropdownMenuItem>
@@ -102,7 +95,7 @@ export default function AuthStatusClient({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem destructive onClick={handleSignOut}>
-          <i className="bx bx-log-out"></i>
+          <i className="bx bx-log-out" />
           Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>

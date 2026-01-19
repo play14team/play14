@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import type { Core } from "@strapi/strapi"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { processUserInvitations } from "./user-invitations"
 
 const createMockStrapi = () => {
@@ -9,7 +9,9 @@ const createMockStrapi = () => {
 
   // Mock knex query builder for atomic claims
   const knexUpdate = vi.fn().mockResolvedValue(1) // Return 1 to indicate successful claim
-  const knexWhere = vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ update: knexUpdate }) })
+  const knexWhere = vi
+    .fn()
+    .mockReturnValue({ where: vi.fn().mockReturnValue({ update: knexUpdate }) })
   const knexConnection = vi.fn().mockReturnValue({ where: knexWhere })
 
   const strapi = {
@@ -96,9 +98,7 @@ describe("processUserInvitations", () => {
       })
     )
 
-    const reminderThreshold = new Date(
-      now.getTime() - 7 * 24 * 60 * 60 * 1000
-    ).toISOString()
+    const reminderThreshold = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
     expect(findMany).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({

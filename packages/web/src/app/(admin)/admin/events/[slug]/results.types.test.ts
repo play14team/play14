@@ -2,22 +2,22 @@
  * Unit tests for results calculation utilities
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
-  type ResultLineItem,
-  type ResultCategory,
-  INCOME_CATEGORIES,
   EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
+  type ResultCategory,
+  type ResultLineItem,
+  calculateResultCategoryTotal,
   calculateResultsSummary,
   groupResultItemsByCategory,
-  calculateResultCategoryTotal,
 } from "./results.types"
 
 // Helper to create a result line item
 function createResultItem(
   category: ResultCategory,
   amount: number,
-  name: string = "Test Item"
+  name = "Test Item"
 ): ResultLineItem {
   return {
     id: Math.random(),

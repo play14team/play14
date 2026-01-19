@@ -1,7 +1,5 @@
 "use client"
 
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import Avatar from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -12,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { StrapiUser } from "@/libs/auth"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface UserMenuProps {
   user: StrapiUser
@@ -33,13 +33,8 @@ export default function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="user-menu-trigger">
-        <Avatar
-          src={avatarUrl}
-          alt={user.username}
-          fallback={user.username}
-          size="sm"
-        />
-        <i className="bx bx-chevron-down ui-dropdown-chevron"></i>
+        <Avatar src={avatarUrl} alt={user.username} fallback={user.username} size="sm" />
+        <i className="bx bx-chevron-down ui-dropdown-chevron" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
@@ -54,7 +49,7 @@ export default function UserMenu({ user }: UserMenuProps) {
 
         <DropdownMenuItem asChild>
           <Link href="/admin">
-            <i className="bx bx-grid-alt"></i>
+            <i className="bx bx-grid-alt" />
             Admin Dashboard
           </Link>
         </DropdownMenuItem>
@@ -62,7 +57,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         {playerSlug && (
           <DropdownMenuItem asChild>
             <Link href={`/players/${playerSlug}`}>
-              <i className="bx bx-user"></i>
+              <i className="bx bx-user" />
               My Profile
             </Link>
           </DropdownMenuItem>
@@ -71,7 +66,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem destructive onClick={handleSignOut}>
-          <i className="bx bx-log-out"></i>
+          <i className="bx bx-log-out" />
           Sign Out
         </DropdownMenuItem>
       </DropdownMenuContent>

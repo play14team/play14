@@ -1,6 +1,6 @@
 import { requireFounder } from "@/libs/auth"
-import ClaimsList from "./claims-list"
 import type { Metadata } from "next"
+import ClaimsList from "./claims-list"
 
 export const metadata: Metadata = {
   title: "Manage Claims",

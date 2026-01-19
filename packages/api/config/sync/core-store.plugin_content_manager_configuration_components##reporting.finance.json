@@ -99,12 +99,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "revenue",
-        "expenses",
-        "destination"
-      ],
+      "list": ["id", "revenue", "expenses", "destination"],
       "edit": [
         [
           {

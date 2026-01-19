@@ -231,12 +231,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "ticketCode",
-        "attendeeName",
-        "ticketStatus"
-      ],
+      "list": ["id", "ticketCode", "attendeeName", "ticketStatus"],
       "edit": [
         [
           {

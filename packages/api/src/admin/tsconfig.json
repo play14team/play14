@@ -3,15 +3,6 @@
   "compilerOptions": {
     "allowJs": true
   },
-  "include": [
-    "../plugins/**/admin/src/**/*",
-    "./"
-  ],
-  "exclude": [
-    "node_modules/",
-    "build/",
-    "dist/",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+  "include": ["../plugins/**/admin/src/**/*", "./"],
+  "exclude": ["node_modules/", "build/", "dist/", "**/*.test.ts", "**/*.test.tsx"]
 }

@@ -4,8 +4,10 @@
       "command": "bunx",
       "args": [
         "@playwright/mcp@latest",
-        "--browser", "chromium",
-        "--executable-path", "/snap/bin/chromium",
+        "--browser",
+        "chromium",
+        "--executable-path",
+        "/snap/bin/chromium",
         "--headless"
       ]
     }

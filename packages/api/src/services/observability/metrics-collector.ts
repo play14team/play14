@@ -8,23 +8,23 @@
 
 import type { Core } from "@strapi/strapi"
 import {
-  eventsTotal,
-  eventsTicketingMode,
-  ticketOrdersTotal,
-  ticketOrdersAmountTotal,
-  ticketsTotal,
-  ticketsCheckedInTotal,
-  ticketTypesCapacity,
-  ticketTypesSold,
-  ticketTypesAvailable,
+  articlesTotal,
+  attendanceClaimsTotal,
+  discountAmountTotal,
   discountCodesTotal,
   discountCodesUsageTotal,
-  discountAmountTotal,
+  eventsTicketingMode,
+  eventsTotal,
+  gamesTotal,
   playersTotal,
   stripeAccountsTotal,
-  attendanceClaimsTotal,
-  gamesTotal,
-  articlesTotal,
+  ticketOrdersAmountTotal,
+  ticketOrdersTotal,
+  ticketTypesAvailable,
+  ticketTypesCapacity,
+  ticketTypesSold,
+  ticketsCheckedInTotal,
+  ticketsTotal,
 } from "./metrics"
 import { reportSentryError } from "./sentry-reporter"
 
@@ -46,9 +46,7 @@ export async function collectBusinessMetrics(strapi: Core.Strapi): Promise<void>
     ])
 
     const duration = Date.now() - startTime
-    strapi.log.debug(
-      `[MetricsCollector] Business metrics collection completed in ${duration}ms`
-    )
+    strapi.log.debug(`[MetricsCollector] Business metrics collection completed in ${duration}ms`)
   } catch (error) {
     strapi.log.error(`[MetricsCollector] Failed to collect metrics: ${error}`)
     reportSentryError(strapi, error, {
@@ -118,8 +116,7 @@ async function collectTicketingMetrics(strapi: Core.Strapi): Promise<void> {
   const amountByCurrency: Record<string, number> = {}
   for (const order of paidOrders) {
     const currency = order.currency || "EUR"
-    amountByCurrency[currency] =
-      (amountByCurrency[currency] || 0) + (order.totalAmount || 0)
+    amountByCurrency[currency] = (amountByCurrency[currency] || 0) + (order.totalAmount || 0)
   }
   for (const [currency, amount] of Object.entries(amountByCurrency)) {
     ticketOrdersAmountTotal.set({ currency, status: "paid" }, amount)
@@ -175,11 +172,9 @@ async function collectDiscountMetrics(strapi: Core.Strapi): Promise<void> {
   const activeCount = await db.query("api::discount-code.discount-code").count({
     where: { isActive: true },
   })
-  const inactiveCount = await db
-    .query("api::discount-code.discount-code")
-    .count({
-      where: { isActive: false },
-    })
+  const inactiveCount = await db.query("api::discount-code.discount-code").count({
+    where: { isActive: false },
+  })
   discountCodesTotal.set({ active: "true" }, activeCount)
   discountCodesTotal.set({ active: "false" }, inactiveCount)
 
@@ -194,21 +189,18 @@ async function collectDiscountMetrics(strapi: Core.Strapi): Promise<void> {
   discountCodesUsageTotal.set(totalUsage)
 
   // Total discount amounts from orders
-  const ordersWithDiscount = await db
-    .query("api::ticket-order.ticket-order")
-    .findMany({
-      where: {
-        discountAmount: { $gt: 0 },
-        status: "paid",
-      },
-      select: ["discountAmount", "currency"],
-    })
+  const ordersWithDiscount = await db.query("api::ticket-order.ticket-order").findMany({
+    where: {
+      discountAmount: { $gt: 0 },
+      status: "paid",
+    },
+    select: ["discountAmount", "currency"],
+  })
 
   const discountByCurrency: Record<string, number> = {}
   for (const order of ordersWithDiscount) {
     const currency = order.currency || "EUR"
-    discountByCurrency[currency] =
-      (discountByCurrency[currency] || 0) + (order.discountAmount || 0)
+    discountByCurrency[currency] = (discountByCurrency[currency] || 0) + (order.discountAmount || 0)
   }
   for (const [currency, amount] of Object.entries(discountByCurrency)) {
     discountAmountTotal.set({ currency }, amount)
@@ -242,11 +234,9 @@ async function collectCommunityMetrics(strapi: Core.Strapi): Promise<void> {
   // Attendance claim counts by status
   const claimStatuses = ["pending", "approved", "rejected"]
   for (const status of claimStatuses) {
-    const count = await db
-      .query("api::attendance-claim.attendance-claim")
-      .count({
-        where: { claimStatus: status },
-      })
+    const count = await db.query("api::attendance-claim.attendance-claim").count({
+      where: { claimStatus: status },
+    })
     attendanceClaimsTotal.set({ status }, count)
   }
 }
@@ -274,13 +264,7 @@ async function collectContentMetrics(strapi: Core.Strapi): Promise<void> {
   }
 
   // Article counts by category
-  const articleCategories = [
-    "Announcement",
-    "Article",
-    "Event",
-    "Interview",
-    "Meetup",
-  ]
+  const articleCategories = ["Announcement", "Article", "Event", "Interview", "Meetup"]
   for (const category of articleCategories) {
     const count = await db.query("api::article.article").count({
       where: { category },

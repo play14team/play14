@@ -1,23 +1,22 @@
 "use client"
 
+import {
+  type RevenueAnalytics,
+  getRevenueAnalytics,
+} from "@/app/(admin)/admin/events/[slug]/revenue-analytics.action"
 import { useEffect, useState } from "react"
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
 } from "recharts"
-import {
-  getRevenueAnalytics,
-  type RevenueAnalytics,
-} from "@/app/(admin)/admin/events/[slug]/revenue-analytics.action"
 import styles from "./revenue-dashboard.module.scss"
 
 interface Props {
@@ -81,7 +80,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
     return (
       <div className={styles.dashboard}>
         <div className={styles.loading}>
-          <i className="bx bx-loader-alt bx-spin"></i>
+          <i className="bx bx-loader-alt bx-spin" />
           Loading revenue analytics...
         </div>
       </div>
@@ -92,7 +91,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
     return (
       <div className={styles.dashboard}>
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       </div>
@@ -125,7 +124,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
       <div className={styles.summaryGrid}>
         <div className={styles.summaryCard}>
           <div className={styles.summaryIcon}>
-            <i className="bx bx-dollar-circle"></i>
+            <i className="bx bx-dollar-circle" />
           </div>
           <div className={styles.summaryContent}>
             <span className={styles.summaryLabel}>Total Revenue</span>
@@ -137,7 +136,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
 
         <div className={styles.summaryCard}>
           <div className={`${styles.summaryIcon} ${styles.netRevenue}`}>
-            <i className="bx bx-trending-up"></i>
+            <i className="bx bx-trending-up" />
           </div>
           <div className={styles.summaryContent}>
             <span className={styles.summaryLabel}>Net Revenue</span>
@@ -154,7 +153,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
 
         <div className={styles.summaryCard}>
           <div className={`${styles.summaryIcon} ${styles.orders}`}>
-            <i className="bx bx-receipt"></i>
+            <i className="bx bx-receipt" />
           </div>
           <div className={styles.summaryContent}>
             <span className={styles.summaryLabel}>Paid Orders</span>
@@ -169,7 +168,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
 
         <div className={styles.summaryCard}>
           <div className={`${styles.summaryIcon} ${styles.tickets}`}>
-            <i className="bx bxs-coupon"></i>
+            <i className="bx bxs-coupon" />
           </div>
           <div className={styles.summaryContent}>
             <span className={styles.summaryLabel}>Tickets Sold</span>
@@ -180,7 +179,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
 
       {!hasOrders ? (
         <div className={styles.emptyState}>
-          <i className="bx bx-chart"></i>
+          <i className="bx bx-chart" />
           <p>No ticket sales yet. Charts will appear once orders are placed.</p>
         </div>
       ) : (
@@ -206,9 +205,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
                       fontSize={12}
                     />
                     <YAxis
-                      tickFormatter={(value) =>
-                        formatCurrency(value, summary.currency)
-                      }
+                      tickFormatter={(value) => formatCurrency(value, summary.currency)}
                       stroke="var(--color-text-secondary)"
                       fontSize={12}
                       width={80}

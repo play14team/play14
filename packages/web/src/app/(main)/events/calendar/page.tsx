@@ -1,8 +1,8 @@
-import EventCalendar, { CalendarEvent } from "@/components/events/calendar"
+import EventCalendar, { type CalendarEvent } from "@/components/events/calendar"
 import { getEventCalendar } from "@/components/events/get.action"
 import Page from "@/components/layout/page"
-import { Event } from "@/models/strapi"
-import { Metadata } from "next"
+import type { Event } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Events | Calendar",

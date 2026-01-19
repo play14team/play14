@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from "react"
+import { type ReactNode, createContext, useCallback, useContext, useState } from "react"
 
 export type ToastType = "success" | "error" | "info" | "warning"
 
@@ -41,7 +35,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   }, [])
 
   const addToast = useCallback(
-    (message: string, type: ToastType = "info", duration: number = 4000) => {
+    (message: string, type: ToastType = "info", duration = 4000) => {
       const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
       const toast: Toast = { id, message, type, duration }
 
@@ -80,9 +74,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
   )
 
   return (
-    <ToastContext.Provider
-      value={{ toasts, addToast, removeToast, success, error, info, warning }}
-    >
+    <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, info, warning }}>
       {children}
     </ToastContext.Provider>
   )

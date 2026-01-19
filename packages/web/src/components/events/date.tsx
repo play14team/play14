@@ -1,5 +1,5 @@
 import { formatDate } from "@/libs/dates"
-import { Maybe } from "@/models/strapi"
+import type { Maybe } from "@/models/strapi"
 
 interface EventDatesProps {
   start: Date | string

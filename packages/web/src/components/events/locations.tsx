@@ -1,5 +1,5 @@
 import { deduplicate } from "@/libs/arrays"
-import { Event } from "@/models/strapi"
+import type { Event } from "@/models/strapi"
 import Link from "next/link"
 import { getEventNav } from "./get.action"
 
@@ -13,11 +13,11 @@ export default async function Locations() {
         {locations.sort().map((item, index) => (
           <div key={index} className="article-tags">
             <span>
-              <i className="bx bx-map-pin"></i>
+              <i className="bx bx-map-pin" />
             </span>
 
             <Link href={`/events/locations/${item}`}>
-              {events.find((e) => e.location?.slug == item)?.location?.name}
+              {events.find((e) => e.location?.slug === item)?.location?.name}
             </Link>
           </div>
         ))}

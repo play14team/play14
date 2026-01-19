@@ -1,10 +1,5 @@
 import { expect, test } from "@playwright/test"
-import {
-  navigateViaDropdown,
-  verifyPageLayout,
-  verifyPageTitle,
-  waitForPageLoad,
-} from "./utils/test-helpers"
+import { verifyPageLayout, verifyPageTitle, waitForPageLoad } from "./utils/test-helpers"
 
 test.describe("About Story Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -29,9 +24,7 @@ test.describe("About Story Page", () => {
 
   test("should display history timeline if available", async ({ page }) => {
     // Story page may have a timeline of history
-    const timeline = page.locator(
-      '[class*="timeline"], [class*="history"], .historyitem',
-    )
+    const timeline = page.locator('[class*="timeline"], [class*="history"], .historyitem')
     if ((await timeline.count()) > 0) {
       await expect(timeline.first()).toBeVisible()
     }
@@ -100,7 +93,7 @@ test.describe("About Format Page", () => {
       text?.toLowerCase().includes("unconference") ||
         text?.toLowerCase().includes("open space") ||
         text?.toLowerCase().includes("format") ||
-        text?.toLowerCase().includes("schedule"),
+        text?.toLowerCase().includes("schedule")
     ).toBeTruthy()
   })
 })
@@ -123,10 +116,7 @@ test.describe("About Navigation", () => {
 
     // Hover over About dropdown
     const navbar = page.locator("#navbar")
-    const aboutNav = navbar
-      .locator(".nav-item")
-      .filter({ hasText: "About" })
-      .first()
+    const aboutNav = navbar.locator(".nav-item").filter({ hasText: "About" }).first()
     await aboutNav.waitFor({ state: "visible", timeout: 10000 })
     await aboutNav.hover()
     await page.waitForTimeout(500)

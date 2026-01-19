@@ -1,34 +1,34 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import TicketSelector from "./ticket-selector"
-import AuthGate from "./auth-gate"
-import AttendeeForm from "./attendee-form"
 import {
-  getAvailableTickets,
-  checkAuthStatus,
-  createDraftOrder,
-  updateAttendeeInfo,
-  finalizeCheckout,
-  type EventTicketsResponse,
-  type TicketSelection,
-  type AuthStatus,
-  type DraftOrderResponse,
-  type AttendeeInfo,
-} from "./purchase.action"
-import {
-  trackTicketsViewed,
+  trackAttendeeInfoSubmitted,
+  trackAuthRequired,
+  trackCheckoutAbandoned,
+  trackCheckoutError,
+  trackCheckoutFinalized,
   trackCheckoutStarted,
   trackDraftOrderCreated,
-  trackAttendeeInfoSubmitted,
-  trackCheckoutFinalized,
-  trackCheckoutError,
-  trackCheckoutAbandoned,
-  trackAuthRequired,
+  trackTicketsViewed,
   withCheckoutSpan,
 } from "@/libs/sentry-metrics"
+import { usePathname, useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
+import AttendeeForm from "./attendee-form"
+import AuthGate from "./auth-gate"
+import {
+  type AttendeeInfo,
+  type AuthStatus,
+  type DraftOrderResponse,
+  type EventTicketsResponse,
+  type TicketSelection,
+  checkAuthStatus,
+  createDraftOrder,
+  finalizeCheckout,
+  getAvailableTickets,
+  updateAttendeeInfo,
+} from "./purchase.action"
 import styles from "./ticket-purchase-flow.module.scss"
+import TicketSelector from "./ticket-selector"
 
 const TICKET_SELECTION_KEY = "pending_ticket_selection"
 

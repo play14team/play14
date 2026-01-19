@@ -1,18 +1,18 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
-import { useRouter } from "next/navigation"
 import Image from "next/image"
-import {
-  getClaimableEvents,
-  searchClaimableEvents,
-  getMyAttendanceClaims,
-  submitAttendanceClaim,
-  cancelAttendanceClaim,
-  type ClaimableEvent,
-  type AttendanceClaim,
-} from "../events.action"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { EventCard, EventFilterBar, EventsEmptyState } from "../components"
+import {
+  type AttendanceClaim,
+  type ClaimableEvent,
+  cancelAttendanceClaim,
+  getClaimableEvents,
+  getMyAttendanceClaims,
+  searchClaimableEvents,
+  submitAttendanceClaim,
+} from "../events.action"
 
 type View = "search" | "claim"
 
@@ -52,9 +52,7 @@ export default function ClaimsTab({ onPendingCountChange }: ClaimsTabProps) {
       setClaims(nonApprovedClaims)
 
       // Count only pending claims for the badge
-      const pendingCount = nonApprovedClaims.filter(
-        (c) => c.claimStatus === "pending"
-      ).length
+      const pendingCount = nonApprovedClaims.filter((c) => c.claimStatus === "pending").length
       onPendingCountChange?.(pendingCount)
     }
 
@@ -90,7 +88,7 @@ export default function ClaimsTab({ onPendingCountChange }: ClaimsTabProps) {
   if (isLoading) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading...</span>
       </div>
     )
@@ -99,14 +97,10 @@ export default function ClaimsTab({ onPendingCountChange }: ClaimsTabProps) {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
-        <button
-          type="button"
-          className="admin-btn admin-btn-secondary"
-          onClick={fetchData}
-        >
-          <i className="bx bx-refresh"></i>
+        <button type="button" className="admin-btn admin-btn-secondary" onClick={fetchData}>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -116,14 +110,10 @@ export default function ClaimsTab({ onPendingCountChange }: ClaimsTabProps) {
   return (
     <div className="claim-attendance-content">
       {/* My Claims Section - only show pending/rejected */}
-      {claims.length > 0 && (
-        <MyClaims claims={claims} onClaimCancelled={handleClaimCancelled} />
-      )}
+      {claims.length > 0 && <MyClaims claims={claims} onClaimCancelled={handleClaimCancelled} />}
 
       {/* Main Content */}
-      {view === "search" && (
-        <EventSearch events={events} onSelectEvent={handleSelectEvent} />
-      )}
+      {view === "search" && <EventSearch events={events} onSelectEvent={handleSelectEvent} />}
 
       {view === "claim" && selectedEvent && (
         <ClaimForm
@@ -182,14 +172,14 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
       case "pending":
         return (
           <span className="claim-status-badge claim-status-pending">
-            <i className="bx bx-time-five"></i>
+            <i className="bx bx-time-five" />
             Pending
           </span>
         )
       case "rejected":
         return (
           <span className="claim-status-badge claim-status-rejected">
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Rejected
           </span>
         )
@@ -213,7 +203,7 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
 
       {error && (
         <div className="claim-card-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -235,7 +225,7 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                   />
                 ) : (
                   <div className="my-claim-item-image-placeholder">
-                    <i className="bx bx-calendar-event"></i>
+                    <i className="bx bx-calendar-event" />
                   </div>
                 )}
               </div>
@@ -243,20 +233,18 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                 <h4 className="my-claim-item-name">{claim.event?.name || "Unknown Event"}</h4>
                 <div className="my-claim-item-meta">
                   <span>
-                    <i className="bx bx-calendar"></i>
+                    <i className="bx bx-calendar" />
                     {claim.event?.start ? formatDate(claim.event.start) : ""}
                   </span>
                   {claim.event?.location?.name && (
                     <span>
-                      <i className="bx bx-map"></i>
+                      <i className="bx bx-map" />
                       {claim.event.location.name}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="my-claim-item-status">
-                {getStatusBadge(claim.claimStatus)}
-              </div>
+              <div className="my-claim-item-status">{getStatusBadge(claim.claimStatus)}</div>
               <div className="my-claim-item-actions">
                 <button
                   type="button"
@@ -266,10 +254,10 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                   title="Cancel claim"
                 >
                   {cancellingId === claim.documentId ? (
-                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <i className="bx bx-loader-alt bx-spin" />
                   ) : (
                     <>
-                      <i className="bx bx-x"></i>
+                      <i className="bx bx-x" />
                       Cancel
                     </>
                   )}
@@ -284,10 +272,7 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
       {rejectedClaims.length > 0 && (
         <div className="my-claims-list">
           {rejectedClaims.map((claim) => (
-            <div
-              key={claim.documentId}
-              className="my-claim-item my-claim-item-rejected"
-            >
+            <div key={claim.documentId} className="my-claim-item my-claim-item-rejected">
               <div className="my-claim-item-image">
                 {claim.event?.defaultImage?.url ? (
                   <Image
@@ -300,7 +285,7 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                   />
                 ) : (
                   <div className="my-claim-item-image-placeholder">
-                    <i className="bx bx-calendar-event"></i>
+                    <i className="bx bx-calendar-event" />
                   </div>
                 )}
               </div>
@@ -308,22 +293,20 @@ function MyClaims({ claims, onClaimCancelled }: MyClaimsProps) {
                 <h4 className="my-claim-item-name">{claim.event?.name || "Unknown Event"}</h4>
                 <div className="my-claim-item-meta">
                   <span>
-                    <i className="bx bx-calendar"></i>
+                    <i className="bx bx-calendar" />
                     {claim.event?.start ? formatDate(claim.event.start) : ""}
                   </span>
                   {claim.adminNotes && (
                     <span title={claim.adminNotes}>
-                      <i className="bx bx-message-detail"></i>
+                      <i className="bx bx-message-detail" />
                       {claim.adminNotes.length > 30
-                        ? claim.adminNotes.substring(0, 30) + "..."
+                        ? `${claim.adminNotes.substring(0, 30)}...`
                         : claim.adminNotes}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="my-claim-item-status">
-                {getStatusBadge(claim.claimStatus)}
-              </div>
+              <div className="my-claim-item-status">{getStatusBadge(claim.claimStatus)}</div>
             </div>
           ))}
         </div>
@@ -356,9 +339,7 @@ function EventSearch({ events, onSelectEvent }: EventSearchProps) {
     // Local filter fallback
     const query = searchQuery.toLowerCase()
     return events.filter(
-      (e) =>
-        e.name.toLowerCase().includes(query) ||
-        e.location?.name.toLowerCase().includes(query)
+      (e) => e.name.toLowerCase().includes(query) || e.location?.name.toLowerCase().includes(query)
     )
   }, [events, searchQuery, searchResults, isSearching])
 
@@ -508,7 +489,7 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
         disabled={isSubmitting}
         style={{ alignSelf: "flex-start", marginBottom: "16px" }}
       >
-        <i className="bx bx-arrow-back"></i>
+        <i className="bx bx-arrow-back" />
         Back to Events
       </button>
 
@@ -525,7 +506,7 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
             />
           ) : (
             <div className="claim-form-event-image-placeholder">
-              <i className="bx bx-calendar-event"></i>
+              <i className="bx bx-calendar-event" />
             </div>
           )}
         </div>
@@ -533,12 +514,12 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
           <h3 className="claim-form-event-name">{event.name}</h3>
           <div className="claim-form-event-meta">
             <span>
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-calendar" />
               {formatDate(event.start)}
             </span>
             {event.location?.name && (
               <span>
-                <i className="bx bx-map"></i>
+                <i className="bx bx-map" />
                 {event.location.name}
               </span>
             )}
@@ -563,9 +544,7 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
             style={{
               fontSize: "12px",
               color:
-                reason.length >= 20
-                  ? "var(--color-green, #22c55e)"
-                  : "var(--color-text-muted)",
+                reason.length >= 20 ? "var(--color-green, #22c55e)" : "var(--color-text-muted)",
               display: "flex",
               alignItems: "center",
               gap: "4px",
@@ -573,13 +552,13 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
             }}
           >
             {reason.length}/20 characters minimum
-            {reason.length >= 20 && <i className="bx bx-check"></i>}
+            {reason.length >= 20 && <i className="bx bx-check" />}
           </span>
         </div>
 
         {error && (
           <div className="claim-card-error">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -600,12 +579,12 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
           >
             {isSubmitting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Submitting...
               </>
             ) : (
               <>
-                <i className="bx bx-send"></i>
+                <i className="bx bx-send" />
                 Submit Claim
               </>
             )}
@@ -613,10 +592,10 @@ function ClaimForm({ event, onBack, onSubmitted }: ClaimFormProps) {
         </div>
 
         <div className="event-search-hint" style={{ marginTop: "8px" }}>
-          <i className="bx bx-info-circle"></i>
+          <i className="bx bx-info-circle" />
           <span>
-            Your claim will be reviewed by the event organizers. You will receive
-            an email when your claim is approved or rejected.
+            Your claim will be reviewed by the event organizers. You will receive an email when your
+            claim is approved or rejected.
           </span>
         </div>
       </form>

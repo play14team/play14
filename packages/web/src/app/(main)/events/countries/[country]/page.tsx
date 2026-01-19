@@ -1,7 +1,7 @@
 import Filters from "@/components/events/filters"
 import { getAllEvents } from "@/components/events/get.action"
-import Country from "@/components/layout/country"
 import EventGrid from "@/components/events/grid"
+import Country from "@/components/layout/country"
 
 export default async function EventCountry(props: {
   params: Promise<{ country: string }>

@@ -44,9 +44,7 @@ export function createPlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixt
 /**
  * Create a private player (not publicly visible)
  */
-export function createPrivatePlayer(
-  overrides: Partial<PlayerFixture> = {}
-): PlayerFixture {
+export function createPrivatePlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixture {
   return createPlayer({
     isPublic: false,
     ...overrides,
@@ -56,9 +54,7 @@ export function createPrivatePlayer(
 /**
  * Create a minimal player (only required fields)
  */
-export function createMinimalPlayer(
-  overrides: Partial<PlayerFixture> = {}
-): PlayerFixture {
+export function createMinimalPlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixture {
   return createPlayer({
     tagline: null,
     position: null,

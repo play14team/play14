@@ -1,5 +1,5 @@
-import { Article, UploadFile } from "@/models/strapi"
-import DetailsNavigator, { NavLink } from "../layout/detailsnav"
+import type { Article, UploadFile } from "@/models/strapi"
+import DetailsNavigator, { type NavLink } from "../layout/detailsnav"
 import { getArticleNav } from "./get.action"
 
 export default async function ArticlesNavigator({
@@ -8,7 +8,7 @@ export default async function ArticlesNavigator({
   current: string
 }) {
   const articles = (await getArticleNav()) as Article[]
-  const index = articles.findIndex((a) => a.slug == current)
+  const index = articles.findIndex((a) => a.slug === current)
 
   // If article not found in list, show no navigation
   if (index === -1) {

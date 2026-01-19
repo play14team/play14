@@ -7,9 +7,9 @@
  * - Logger spies for assertion
  */
 
-import crypto from "crypto"
-import { vi, type Mock } from "vitest"
+import crypto from "node:crypto"
 import type { Core } from "@strapi/strapi"
+import { type Mock, vi } from "vitest"
 
 // ============================================================================
 // Types
@@ -169,7 +169,7 @@ export function createMockStrapi(initialData?: MockDatabase): {
       error: vi.fn(),
     },
     config: {
-      get: vi.fn((key: string, defaultValue?: unknown) => defaultValue),
+      get: vi.fn((_key: string, defaultValue?: unknown) => defaultValue),
     },
   }
 

@@ -1,5 +1,4 @@
-import React from "react"
-import { Button, Heading, Link, Text } from "@react-email/components"
+import { Button, Heading, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 
 interface PlayerClaimNewEmailProps {
@@ -12,7 +11,7 @@ interface PlayerClaimNewEmailProps {
   frontendUrl?: string
 }
 
-const brandOrange = "#ff5200"
+const _brandOrange = "#ff5200"
 
 const buttonStyle = {
   backgroundColor: "#4CAF50",

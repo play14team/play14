@@ -94,7 +94,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest("Name is required")
     }
 
-    if (price === undefined || price === null || isNaN(Number(price)) || Number(price) < 0) {
+    if (price === undefined || price === null || Number.isNaN(Number(price)) || Number(price) < 0) {
       return ctx.badRequest("Valid price is required (must be 0 or greater)")
     }
 
@@ -184,7 +184,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     if (price !== undefined) {
-      if (isNaN(Number(price)) || Number(price) < 0) {
+      if (Number.isNaN(Number(price)) || Number(price) < 0) {
         return ctx.badRequest("Price must be 0 or greater")
       }
       updateData.price = Number(price)

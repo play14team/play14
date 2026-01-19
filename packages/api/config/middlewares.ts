@@ -4,8 +4,8 @@ export default ({ env }: { env: any }) => [
   {
     name: "global::rate-limit",
     config: {
-      max: parseInt(env("RATE_LIMIT_MAX", "30"), 10),
-      windowMs: parseInt(env("RATE_LIMIT_WINDOW_MS", "60000"), 10), // 1 minute
+      max: Number.parseInt(env("RATE_LIMIT_MAX", "30"), 10),
+      windowMs: Number.parseInt(env("RATE_LIMIT_WINDOW_MS", "60000"), 10), // 1 minute
       message: "Too many requests, please try again later.",
       // Only apply rate limiting to these critical paths
       onlyPaths: [

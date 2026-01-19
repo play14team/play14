@@ -2,6 +2,8 @@
 
 import "mapbox-gl/dist/mapbox-gl.css"
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
+import mapboxgl from "mapbox-gl"
 import { useTheme } from "next-themes"
 import { useCallback, useEffect, useRef, useState } from "react"
 import Map, {
@@ -10,8 +12,6 @@ import Map, {
   Marker,
   NavigationControl,
 } from "react-map-gl/mapbox"
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
-import mapboxgl from "mapbox-gl"
 import { useControl } from "react-map-gl/mapbox"
 
 export interface MapLocation {
@@ -45,21 +45,26 @@ interface GeocoderControlProps {
   precision?: "city" | "address"
 }
 
-function GeocoderControl({ mapboxAccessToken, onResult, position = "top-left", precision = "city" }: GeocoderControlProps) {
+function GeocoderControl({
+  mapboxAccessToken,
+  onResult,
+  position = "top-left",
+  precision = "city",
+}: GeocoderControlProps) {
   useControl(
     () => {
       // Set types based on precision level
       // "city" = place, locality, region, country (city-level, good for Event Locations)
       // "address" = address, poi, place, locality (precise addresses, good for Venues)
-      const types = precision === "address"
-        ? "address,poi,place,locality"
-        : "place,locality,region,country"
+      const types =
+        precision === "address" ? "address,poi,place,locality" : "place,locality,region,country"
 
       const ctrl = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
         mapboxgl: mapboxgl as any,
         marker: false,
-        placeholder: precision === "address" ? "Search for an address..." : "Search for a location...",
+        placeholder:
+          precision === "address" ? "Search for an address..." : "Search for a location...",
         types,
       })
       ctrl.on("result", (evt: { result: any }) => {
@@ -100,14 +105,14 @@ function extractCountryCode(feature: any): string | null {
 // Address: higher zoom to show the precise location
 const ZOOM_LEVELS = {
   city: {
-    initial: 10,      // When coordinates exist
-    geocode: 8,       // After geocoding from centerOnLocation
-    search: 12,       // After using search box
+    initial: 10, // When coordinates exist
+    geocode: 8, // After geocoding from centerOnLocation
+    search: 12, // After using search box
   },
   address: {
-    initial: 16,      // When coordinates exist - street level
-    geocode: 14,      // After geocoding from centerOnLocation
-    search: 17,       // After using search box - building level
+    initial: 16, // When coordinates exist - street level
+    geocode: 14, // After geocoding from centerOnLocation
+    search: 17, // After using search box - building level
   },
 }
 
@@ -152,9 +157,8 @@ export default function LocationMapPicker({
     const geocodeLocation = async () => {
       try {
         // Use appropriate types based on precision level
-        const types = precision === "address"
-          ? "address,poi,place,locality"
-          : "place,locality,region,country"
+        const types =
+          precision === "address" ? "address,poi,place,locality" : "place,locality,region,country"
         const response = await fetch(
           `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(centerOnLocation)}.json?access_token=${token}&limit=1&types=${types}`
         )
@@ -317,12 +321,13 @@ export default function LocationMapPicker({
           <>
             <div className="location-map-picker-details">
               <div className="location-map-picker-place">
-                <i className="bx bx-map-pin"></i>
+                <i className="bx bx-map-pin" />
                 <span>{value.place_name || "Location selected"}</span>
               </div>
               <div className="location-map-picker-coords">
                 <span>
-                  {value.geometry!.coordinates![1].toFixed(6)}, {value.geometry!.coordinates![0].toFixed(6)}
+                  {value.geometry!.coordinates![1].toFixed(6)},{" "}
+                  {value.geometry!.coordinates![0].toFixed(6)}
                 </span>
               </div>
             </div>
@@ -331,13 +336,13 @@ export default function LocationMapPicker({
               className="admin-btn admin-btn-secondary admin-btn-sm"
               onClick={handleClearLocation}
             >
-              <i className="bx bx-x"></i>
+              <i className="bx bx-x" />
               Clear
             </button>
           </>
         ) : (
           <div className="location-map-picker-hint">
-            <i className="bx bx-info-circle"></i>
+            <i className="bx bx-info-circle" />
             <span>Search for a location or click on the map to set coordinates</span>
           </div>
         )}

@@ -2,13 +2,13 @@
  * Unit tests for webhook idempotency service
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   claimWebhookEvent,
+  cleanupOldWebhookRecords,
   markWebhookCompleted,
   markWebhookFailed,
   releaseWebhookClaim,
-  cleanupOldWebhookRecords,
 } from "./idempotency-service"
 
 // Helper to create mock Knex query builder
@@ -132,10 +132,7 @@ describe("idempotency-service", () => {
     it("updates event status to completed", async () => {
       await markWebhookCompleted(mockStrapi, "evt_test_123", { orderId: "123" })
 
-      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith(
-        "event_id",
-        "evt_test_123"
-      )
+      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("event_id", "evt_test_123")
       expect(mockStrapi._mockKnexBuilder.update).toHaveBeenCalledWith(
         expect.objectContaining({
           status: "completed",
@@ -163,10 +160,7 @@ describe("idempotency-service", () => {
     it("updates event status to failed with error message", async () => {
       await markWebhookFailed(mockStrapi, "evt_test_123", "Processing timeout")
 
-      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith(
-        "event_id",
-        "evt_test_123"
-      )
+      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("event_id", "evt_test_123")
       expect(mockStrapi._mockKnexBuilder.update).toHaveBeenCalledWith(
         expect.objectContaining({
           status: "failed",
@@ -183,10 +177,7 @@ describe("idempotency-service", () => {
     it("deletes the event record to allow retry", async () => {
       await releaseWebhookClaim(mockStrapi, "evt_test_123")
 
-      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith(
-        "event_id",
-        "evt_test_123"
-      )
+      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("event_id", "evt_test_123")
       expect(mockStrapi._mockKnexBuilder.delete).toHaveBeenCalled()
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
         "[Idempotency] Event evt_test_123 claim released for retry"
@@ -201,10 +192,7 @@ describe("idempotency-service", () => {
       const deletedCount = await cleanupOldWebhookRecords(mockStrapi, 7)
 
       expect(deletedCount).toBe(5)
-      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith(
-        "status",
-        "completed"
-      )
+      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("status", "completed")
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
         "[Idempotency] Cleaned up 5 old webhook records"
       )

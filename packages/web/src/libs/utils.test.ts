@@ -2,7 +2,7 @@
  * Unit tests for general utilities
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { capitalizeFirstLetter } from "./utils"
 
 describe("capitalizeFirstLetter", () => {

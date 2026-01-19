@@ -1,10 +1,10 @@
-import { Game, UploadFile } from "@/models/strapi"
-import DetailsNavigator, { NavLink } from "../layout/detailsnav"
+import type { Game, UploadFile } from "@/models/strapi"
+import DetailsNavigator, { type NavLink } from "../layout/detailsnav"
 import { getGameNav } from "./get.action"
 
 export default async function GamesNavigator({ current }: { current: string }) {
   const games = (await getGameNav()) as Game[]
-  const index = games.findIndex((a) => a.slug == current)
+  const index = games.findIndex((a) => a.slug === current)
 
   // If game not found in list, show no navigation
   if (index === -1) {

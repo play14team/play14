@@ -63,9 +63,7 @@
           }
         }
       },
-      "tags": [
-        "History"
-      ],
+      "tags": ["History"],
       "parameters": [
         {
           "name": "sort",
@@ -234,9 +232,7 @@
           }
         }
       },
-      "tags": [
-        "History"
-      ],
+      "tags": ["History"],
       "parameters": [],
       "operationId": "put/history",
       "requestBody": {
@@ -314,9 +310,7 @@
           }
         }
       },
-      "tags": [
-        "History"
-      ],
+      "tags": ["History"],
       "parameters": [],
       "operationId": "delete/history"
     }
@@ -385,9 +379,7 @@
           }
         }
       },
-      "tags": [
-        "History"
-      ],
+      "tags": ["History"],
       "parameters": [],
       "operationId": "post/history/localizations",
       "requestBody": {

@@ -1,7 +1,7 @@
 "use server"
 
-import { restQuery, normalizeEntity } from "@/libs/strapi-client"
-import { storyPopulate, playerItemPopulate } from "@/libs/strapi-populate"
+import { normalizeEntity, restQuery } from "@/libs/strapi-client"
+import { playerItemPopulate, storyPopulate } from "@/libs/strapi-populate"
 
 // Types - will be replaced by OpenAPI generated types when available
 interface UploadFile {

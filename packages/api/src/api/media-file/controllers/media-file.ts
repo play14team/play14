@@ -28,7 +28,7 @@ const controller = ({ strapi }: { strapi: Core.Strapi }): MediaFileController =>
       if (query.filters.folder.$null === "true") {
         filters.folder = null
       } else {
-        filters.folder = parseInt(query.filters.folder, 10)
+        filters.folder = Number.parseInt(query.filters.folder, 10)
       }
     }
 
@@ -47,8 +47,8 @@ const controller = ({ strapi }: { strapi: Core.Strapi }): MediaFileController =>
     }
 
     // Pagination
-    const start = parseInt(query.start || "0", 10)
-    const limit = parseInt(query.limit || "24", 10)
+    const start = Number.parseInt(query.start || "0", 10)
+    const limit = Number.parseInt(query.limit || "24", 10)
 
     // Sorting
     const sort = query.sort || "createdAt:desc"

@@ -93,9 +93,7 @@ export async function getPlayers(
 /**
  * Get a player for editing
  */
-export async function getPlayerForEdit(
-  playerId: string
-): Promise<PlayerForEdit | null> {
+export async function getPlayerForEdit(playerId: string): Promise<PlayerForEdit | null> {
   const result = await strapiFetch<{ data: PlayerForEdit }>(
     "/admin/players/:playerId/edit",
     { playerId },

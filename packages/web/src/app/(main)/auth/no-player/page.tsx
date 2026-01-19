@@ -12,10 +12,7 @@ export default async function NoPlayerPage() {
   return (
     <div className="admin-no-player">
       <div className="admin-no-player-card">
-        <PlayerLinkingFlow
-          userEmail={session.user.email}
-          userName={session.user.username}
-        />
+        <PlayerLinkingFlow userEmail={session.user.email} userName={session.user.username} />
       </div>
     </div>
   )

@@ -82,9 +82,7 @@ export function createOngoingEvent(overrides: Partial<EventFixture> = {}): Event
 /**
  * Create a cancelled event
  */
-export function createCancelledEvent(
-  overrides: Partial<EventFixture> = {}
-): EventFixture {
+export function createCancelledEvent(overrides: Partial<EventFixture> = {}): EventFixture {
   return createEvent({
     status: "Cancelled",
     ...overrides,
@@ -94,9 +92,7 @@ export function createCancelledEvent(
 /**
  * Create an announced (not yet open) event
  */
-export function createAnnouncedEvent(
-  overrides: Partial<EventFixture> = {}
-): EventFixture {
+export function createAnnouncedEvent(overrides: Partial<EventFixture> = {}): EventFixture {
   return createEvent({
     status: "Announced",
     ...overrides,

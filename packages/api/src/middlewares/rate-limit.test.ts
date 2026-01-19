@@ -2,7 +2,7 @@
  * Rate limit middleware tests
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import rateLimitMiddleware from "./rate-limit"
 
 describe("Rate Limit Middleware", () => {
@@ -121,9 +121,6 @@ describe("Rate Limit Middleware", () => {
     await middleware(ctx1, next)
     await middleware(ctx2, next)
 
-    expect(ctx2.set).toHaveBeenCalledWith(
-      "Retry-After",
-      expect.stringMatching(/^\d+$/)
-    )
+    expect(ctx2.set).toHaveBeenCalledWith("Retry-After", expect.stringMatching(/^\d+$/))
   })
 })

@@ -1,8 +1,8 @@
 "use client"
 
-import Link from "next/link"
-import Image from "next/image"
 import type { UploadFile } from "@/models/strapi"
+import Image from "next/image"
+import Link from "next/link"
 
 // ============================================================================
 // TYPES
@@ -122,16 +122,20 @@ function Badge({ badge }: { badge: BadgeType }) {
     case "source": {
       const { label, icon } = getSourceInfo(badge.value)
       return (
-        <span className={`event-card-badge event-card-badge-source event-card-badge-source-${badge.value}`}>
-          <i className={`bx ${icon}`}></i>
+        <span
+          className={`event-card-badge event-card-badge-source event-card-badge-source-${badge.value}`}
+        >
+          <i className={`bx ${icon}`} />
           {label}
         </span>
       )
     }
     case "custom":
       return (
-        <span className={`event-card-badge ${badge.variant ? `event-card-badge-${badge.variant}` : ""}`}>
-          {badge.icon && <i className={`bx ${badge.icon}`}></i>}
+        <span
+          className={`event-card-badge ${badge.variant ? `event-card-badge-${badge.variant}` : ""}`}
+        >
+          {badge.icon && <i className={`bx ${badge.icon}`} />}
           {badge.label}
         </span>
       )
@@ -163,7 +167,7 @@ export default function EventCard({
           />
         ) : (
           <div className="event-card-placeholder">
-            <i className="bx bx-calendar-event"></i>
+            <i className="bx bx-calendar-event" />
           </div>
         )}
         {badges.length > 0 && (
@@ -182,13 +186,13 @@ export default function EventCard({
         <div className="event-card-meta">
           {event.location && (
             <span className="event-card-location">
-              <i className="bx bx-map"></i>
+              <i className="bx bx-map" />
               {event.location.name}
               {event.location.country && `, ${event.location.country}`}
             </span>
           )}
           <span className="event-card-dates">
-            <i className="bx bx-calendar"></i>
+            <i className="bx bx-calendar" />
             {formatEventDate(event.start, event.end)}
           </span>
         </div>
@@ -197,7 +201,7 @@ export default function EventCard({
         {action.type === "link" ? (
           <div className="event-card-action">
             <span>{action.label}</span>
-            <i className="bx bx-chevron-right"></i>
+            <i className="bx bx-chevron-right" />
           </div>
         ) : (
           <div className="event-card-action-button">
@@ -211,11 +215,7 @@ export default function EventCard({
               }}
               disabled={action.disabled || action.loading}
             >
-              {action.loading ? (
-                <i className="bx bx-loader-alt bx-spin"></i>
-              ) : (
-                action.label
-              )}
+              {action.loading ? <i className="bx bx-loader-alt bx-spin" /> : action.label}
             </button>
           </div>
         )}
@@ -247,7 +247,7 @@ export default function EventCard({
                 className={`event-quick-btn ${qa.variant || ""}`}
                 title={qa.title}
               >
-                <i className={`bx ${qa.icon}`}></i>
+                <i className={`bx ${qa.icon}`} />
               </Link>
             ) : (
               <button
@@ -259,9 +259,9 @@ export default function EventCard({
                 title={qa.title}
               >
                 {qa.loading ? (
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                 ) : (
-                  <i className={`bx ${qa.icon}`}></i>
+                  <i className={`bx ${qa.icon}`} />
                 )}
               </button>
             )

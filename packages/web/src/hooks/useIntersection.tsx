@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react"
 
-export const useIntersection = (
-  element: React.RefObject<Element>,
-  rootMargin: string,
-): boolean => {
+export const useIntersection = (element: React.RefObject<Element>, rootMargin: string): boolean => {
   const [isVisible, setState] = useState(false)
 
   useEffect(() => {
@@ -12,7 +9,7 @@ export const useIntersection = (
       ([entry]) => {
         setState(entry.isIntersecting)
       },
-      { rootMargin },
+      { rootMargin }
     )
     if (current) {
       observer?.observe(current)

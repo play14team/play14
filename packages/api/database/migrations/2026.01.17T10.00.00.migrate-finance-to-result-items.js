@@ -139,7 +139,7 @@ export async function up(knex) {
     let sortOrder = 0
 
     // Create revenue item if revenue > 0
-    if (finance.revenue && parseFloat(finance.revenue) > 0) {
+    if (finance.revenue && Number.parseFloat(finance.revenue) > 0) {
       // Insert the result line item
       const [revenueItem] = await knex("result_line_items")
         .insert({
@@ -168,7 +168,7 @@ export async function up(knex) {
     }
 
     // Create expenses item if expenses > 0
-    if (finance.expenses && parseFloat(finance.expenses) > 0) {
+    if (finance.expenses && Number.parseFloat(finance.expenses) > 0) {
       // Insert the result line item
       const [expenseItem] = await knex("result_line_items")
         .insert({

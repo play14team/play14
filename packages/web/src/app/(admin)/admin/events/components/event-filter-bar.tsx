@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 // ============================================================================
 // TYPES
@@ -125,7 +125,7 @@ export default function EventFilterBar({
         {hasSearch && (
           <div className="event-filter-search">
             <div className="event-filter-search-input-wrapper">
-              <i className="bx bx-search event-filter-search-icon"></i>
+              <i className="bx bx-search event-filter-search-icon" />
               <input
                 type="text"
                 className="event-filter-search-input"
@@ -134,7 +134,7 @@ export default function EventFilterBar({
                 onChange={handleSearchInput}
               />
               {isSearching && (
-                <i className="bx bx-loader-alt bx-spin event-filter-search-loading"></i>
+                <i className="bx bx-loader-alt bx-spin event-filter-search-loading" />
               )}
               {localSearch && !isSearching && (
                 <button
@@ -143,7 +143,7 @@ export default function EventFilterBar({
                   onClick={clearSearch}
                   title="Clear search"
                 >
-                  <i className="bx bx-x"></i>
+                  <i className="bx bx-x" />
                 </button>
               )}
             </div>
@@ -188,9 +188,7 @@ export default function EventFilterBar({
       </div>
 
       {/* Count Display */}
-      {countDisplay && (
-        <div className="event-filter-count">{countDisplay}</div>
-      )}
+      {countDisplay && <div className="event-filter-count">{countDisplay}</div>}
     </div>
   )
 }

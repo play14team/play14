@@ -1,10 +1,8 @@
+import type { GeoLocation, Player } from "@/models/strapi"
 import Link from "next/link"
-import { GeoLocation, Player } from "@/models/strapi"
 
 // Helper to get location display name from string or GeoLocation
-function getLocationName(
-  location: string | GeoLocation | undefined,
-): string | null {
+function getLocationName(location: string | GeoLocation | undefined): string | null {
   if (!location) return null
   if (typeof location === "string") return location
   // GeoLocation object - extract place_name
@@ -24,14 +22,14 @@ const PlayerSidebar = (props: { player: Player }) => {
         <ul>
           <li>
             <div className="icon">
-              <i className="bx bx-message"></i>
+              <i className="bx bx-message" />
             </div>
             <span>Occupation</span>
             {player.tagline}
           </li>
           <li>
             <div className="icon">
-              <i className="bx bx-user-pin"></i>
+              <i className="bx bx-user-pin" />
             </div>
             <span>Position</span>
             {player.position}
@@ -39,7 +37,7 @@ const PlayerSidebar = (props: { player: Player }) => {
           {player.company && (
             <li>
               <div className="icon">
-                <i className="bx bx-building"></i>
+                <i className="bx bx-building" />
               </div>
               <span>Company</span>
               {player.company}
@@ -49,14 +47,10 @@ const PlayerSidebar = (props: { player: Player }) => {
           {player.website && (
             <li>
               <div className="icon">
-                <i className="bx bx-globe"></i>
+                <i className="bx bx-globe" />
               </div>
               <span>Website:</span>
-              <Link
-                href={player.website || "#"}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <Link href={player.website || "#"} target="_blank" rel="noreferrer">
                 {player.website}
               </Link>
             </li>
@@ -65,7 +59,7 @@ const PlayerSidebar = (props: { player: Player }) => {
           {locationName && (
             <li>
               <div className="icon">
-                <i className="bx bx-map"></i>
+                <i className="bx bx-map" />
               </div>
               <span>Location</span>
               {locationName}

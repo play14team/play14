@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
+  type Participant,
+  checkInParticipant,
   getEventParticipants,
   getParticipantStats,
-  checkInParticipant,
   undoCheckIn,
-  type Participant,
 } from "../participants.action"
 import styles from "./participants-tab.module.scss"
 
@@ -15,12 +15,11 @@ interface ParticipantsTabProps {
   onUpdate: () => void
 }
 
-export default function ParticipantsTab({
-  eventDocumentId,
-  onUpdate,
-}: ParticipantsTabProps) {
+export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProps) {
   const [participants, setParticipants] = useState<Participant[]>([])
-  const [stats, setStats] = useState<{ total: number; checkedIn: number; pending: number } | null>(null)
+  const [stats, setStats] = useState<{ total: number; checkedIn: number; pending: number } | null>(
+    null
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
@@ -58,9 +57,10 @@ export default function ParticipantsTab({
   const handleCheckIn = async (participant: Participant) => {
     setCheckingIn(participant.documentId)
 
-    const result = participant.ticketStatus === "used"
-      ? await undoCheckIn(eventDocumentId, participant.documentId)
-      : await checkInParticipant(eventDocumentId, participant.documentId)
+    const result =
+      participant.ticketStatus === "used"
+        ? await undoCheckIn(eventDocumentId, participant.documentId)
+        : await checkInParticipant(eventDocumentId, participant.documentId)
 
     if (result.success) {
       // Update local state
@@ -70,7 +70,8 @@ export default function ParticipantsTab({
             ? {
                 ...p,
                 ticketStatus: participant.ticketStatus === "used" ? "valid" : "used",
-                checkedInAt: participant.ticketStatus === "used" ? undefined : new Date().toISOString(),
+                checkedInAt:
+                  participant.ticketStatus === "used" ? undefined : new Date().toISOString(),
               }
             : p
         )
@@ -80,7 +81,8 @@ export default function ParticipantsTab({
       if (stats) {
         setStats({
           ...stats,
-          checkedIn: participant.ticketStatus === "used" ? stats.checkedIn - 1 : stats.checkedIn + 1,
+          checkedIn:
+            participant.ticketStatus === "used" ? stats.checkedIn - 1 : stats.checkedIn + 1,
           pending: participant.ticketStatus === "used" ? stats.pending + 1 : stats.pending - 1,
         })
       }
@@ -154,7 +156,7 @@ export default function ParticipantsTab({
     return (
       <div className="admin-form-section">
         <div className={styles.loading}>
-          <i className="bx bx-loader-alt bx-spin"></i>
+          <i className="bx bx-loader-alt bx-spin" />
           Loading participants...
         </div>
       </div>
@@ -165,7 +167,7 @@ export default function ParticipantsTab({
     return (
       <div className="admin-form-section">
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       </div>
@@ -185,7 +187,7 @@ export default function ParticipantsTab({
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <div className={styles.statIcon}>
-                <i className="bx bx-user-check"></i>
+                <i className="bx bx-user-check" />
               </div>
               <div className={styles.statContent}>
                 <span className={styles.statValue}>{stats.total}</span>
@@ -195,7 +197,7 @@ export default function ParticipantsTab({
 
             <div className={`${styles.statCard} ${styles.checkedIn}`}>
               <div className={styles.statIcon}>
-                <i className="bx bx-check-circle"></i>
+                <i className="bx bx-check-circle" />
               </div>
               <div className={styles.statContent}>
                 <span className={styles.statValue}>{stats.checkedIn}</span>
@@ -205,7 +207,7 @@ export default function ParticipantsTab({
 
             <div className={`${styles.statCard} ${styles.pending}`}>
               <div className={styles.statIcon}>
-                <i className="bx bx-time-five"></i>
+                <i className="bx bx-time-five" />
               </div>
               <div className={styles.statContent}>
                 <span className={styles.statValue}>{stats.pending}</span>
@@ -215,7 +217,7 @@ export default function ParticipantsTab({
 
             <div className={styles.statCard}>
               <div className={styles.statIcon}>
-                <i className="bx bx-pie-chart-alt-2"></i>
+                <i className="bx bx-pie-chart-alt-2" />
               </div>
               <div className={styles.statContent}>
                 <span className={styles.statValue}>
@@ -238,7 +240,7 @@ export default function ParticipantsTab({
         {/* Filters */}
         <div className={styles.filters}>
           <div className={styles.searchBox}>
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
             <input
               type="text"
               placeholder="Search by name, email, or ticket code..."
@@ -276,7 +278,7 @@ export default function ParticipantsTab({
         {/* Participants Table */}
         {filteredParticipants.length === 0 ? (
           <div className={styles.emptyState}>
-            <i className="bx bx-user-x"></i>
+            <i className="bx bx-user-x" />
             <p>
               {participants.length === 0
                 ? "No participants registered yet."
@@ -319,7 +321,7 @@ export default function ParticipantsTab({
                     <td>
                       {participant.ticketStatus === "used" ? (
                         <span className={`${styles.statusBadge} ${styles.checkedIn}`}>
-                          <i className="bx bx-check"></i>
+                          <i className="bx bx-check" />
                           Checked In
                           {participant.checkedInAt && (
                             <span className={styles.checkedInTime}>
@@ -329,7 +331,7 @@ export default function ParticipantsTab({
                         </span>
                       ) : (
                         <span className={`${styles.statusBadge} ${styles.pending}`}>
-                          <i className="bx bx-time-five"></i>
+                          <i className="bx bx-time-five" />
                           Awaiting
                         </span>
                       )}
@@ -344,15 +346,15 @@ export default function ParticipantsTab({
                         disabled={checkingIn === participant.documentId}
                       >
                         {checkingIn === participant.documentId ? (
-                          <i className="bx bx-loader-alt bx-spin"></i>
+                          <i className="bx bx-loader-alt bx-spin" />
                         ) : participant.ticketStatus === "used" ? (
                           <>
-                            <i className="bx bx-undo"></i>
+                            <i className="bx bx-undo" />
                             Undo
                           </>
                         ) : (
                           <>
-                            <i className="bx bx-check"></i>
+                            <i className="bx bx-check" />
                             Check In
                           </>
                         )}

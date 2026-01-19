@@ -3,9 +3,9 @@
  * Run with: bun run src/scripts/generate-sample-invoice.ts
  */
 
-import { generateInvoicePDF, type InvoiceData } from "../libs/invoice"
-import { writeFileSync } from "fs"
-import { join } from "path"
+import { writeFileSync } from "node:fs"
+import { join } from "node:path"
+import { type InvoiceData, generateInvoicePDF } from "../libs/invoice"
 
 async function main() {
   console.log("Generating sample invoice...")
@@ -62,7 +62,7 @@ async function main() {
   const outputPath = join(process.cwd(), "sample-invoice.pdf")
   writeFileSync(outputPath, pdfBuffer)
 
-  console.log(`✓ Sample invoice generated successfully!`)
+  console.log("✓ Sample invoice generated successfully!")
   console.log(`  Location: ${outputPath}`)
   console.log(`  Size: ${(pdfBuffer.length / 1024).toFixed(2)} KB`)
 }

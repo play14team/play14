@@ -1,4 +1,4 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -9,9 +9,7 @@ export const metadata: Metadata = {
 const NotFoundPage = () => (
   <div className="pt-70" style={{ textAlign: "center" }}>
     <h1>404: Not Found</h1>
-    <p style={{ marginBottom: "2rem" }}>
-      You just hit a page that doesn&#39;t exist...
-    </p>
+    <p style={{ marginBottom: "2rem" }}>You just hit a page that doesn&#39;t exist...</p>
     <Image
       src="/play14_broken.png"
       alt="#play14 404"

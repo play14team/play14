@@ -1,9 +1,9 @@
+import type { Event } from "@/models/strapi"
 import defaultEvent from "@/styles/images/events/event1.jpg"
 import clm from "country-locale-map"
 import Image from "next/image"
 import Link from "next/link"
 import ReactCountryFlag from "react-country-flag"
-import { Event } from "@/models/strapi"
 import EventDate from "./date"
 import EventStatus from "./status"
 
@@ -19,19 +19,9 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
   const countryName = clm.getCountryNameByAlpha2(countryCode)
 
   return (
-    <article
-      id={event.name}
-      key={event.name}
-      className="col-lg-4 col-sm-6 col-md-6"
-    >
-      <div
-        className="single-events-box shadow"
-        style={{ borderRadius: "10px" }}
-      >
-        <div
-          className="image"
-          style={{ position: "relative", height: "300px" }}
-        >
+    <article id={event.name} key={event.name} className="col-lg-4 col-sm-6 col-md-6">
+      <div className="single-events-box shadow" style={{ borderRadius: "10px" }}>
+        <div className="image" style={{ position: "relative", height: "300px" }}>
           <Link href={url} className="d-block">
             {typeof image === "object" && image.url && (
               <Image
@@ -65,12 +55,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
             )}
           </Link>
           <span className="date">
-            <EventDate
-              start={event.start}
-              end={event.end}
-              timezone={event.timezone}
-              displayYear
-            />
+            <EventDate start={event.start} end={event.end} timezone={event.timezone} displayYear />
           </span>
         </div>
 
@@ -98,7 +83,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
               )}
               {!countryName && (
                 <span className="location">
-                  <i className="bx bx-world"></i> {event.location?.name}
+                  <i className="bx bx-world" /> {event.location?.name}
                 </span>
               )}
             </li>
@@ -106,7 +91,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
               <span className="location">
                 {isPending ? (
                   <span className="event-status event-status-pending">
-                    <i className="bx bx-time-five"></i> Pending
+                    <i className="bx bx-time-five" /> Pending
                   </span>
                 ) : (
                   <EventStatus status={event.eventStatus} />

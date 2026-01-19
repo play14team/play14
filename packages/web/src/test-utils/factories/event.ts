@@ -86,9 +86,7 @@ export function createPastEvent(overrides: Partial<EventFixture> = {}): EventFix
 /**
  * Create an event without an image
  */
-export function createEventWithoutImage(
-  overrides: Partial<EventFixture> = {}
-): EventFixture {
+export function createEventWithoutImage(overrides: Partial<EventFixture> = {}): EventFixture {
   return createEvent({
     defaultImage: null,
     ...overrides,

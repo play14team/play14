@@ -1,5 +1,5 @@
+import { getContentType, getMetrics } from "@/libs/metrics"
 import { NextResponse } from "next/server"
-import { getMetrics, getContentType } from "@/libs/metrics"
 
 /**
  * GET /api/metrics
@@ -30,10 +30,7 @@ export async function GET(request: Request) {
     // Allow if internal OR if valid token provided
     if (!isInternal && (!expectedToken || metricsToken !== expectedToken)) {
       console.warn(`[Metrics] Unauthorized access attempt from ${ip}`)
-      return NextResponse.json(
-        { error: "Metrics endpoint is internal only" },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: "Metrics endpoint is internal only" }, { status: 403 })
     }
   }
 
@@ -46,9 +43,6 @@ export async function GET(request: Request) {
     })
   } catch (error) {
     console.error("[Metrics] Failed to collect metrics:", error)
-    return NextResponse.json(
-      { error: "Failed to collect metrics" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to collect metrics" }, { status: 500 })
   }
 }

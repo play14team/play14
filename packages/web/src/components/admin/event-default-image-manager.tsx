@@ -1,13 +1,13 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/admin/toast"
 import {
-  uploadEventImage,
+  type EventImage,
   removeEventImage,
   setEventImageFromLibrary,
-  type EventImage,
+  uploadEventImage,
 } from "@/app/(admin)/admin/events/[slug]/images.action"
+import { useToast } from "@/components/admin/toast"
+import { useRouter } from "next/navigation"
 import ImageManager from "./image-manager"
 
 // Default image aspect ratio: 6:5 (e.g., 600x500)
@@ -69,7 +69,7 @@ export default function EventDefaultImageManager({
     }
   }
 
-  const handleLibrarySelect = async (imageId: number, imageUrl: string) => {
+  const handleLibrarySelect = async (imageId: number, _imageUrl: string) => {
     const result = await setEventImageFromLibrary(eventSlug, imageId, "defaultImage")
 
     if (result.success) {

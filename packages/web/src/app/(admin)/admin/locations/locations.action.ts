@@ -87,9 +87,7 @@ export async function getLocations(
 /**
  * Get a location for editing
  */
-export async function getLocationForEdit(
-  locationId: string
-): Promise<LocationForEdit | null> {
+export async function getLocationForEdit(locationId: string): Promise<LocationForEdit | null> {
   const result = await strapiFetch<{ data: LocationForEdit }>(
     "/admin/event-locations/:locationId",
     { locationId },

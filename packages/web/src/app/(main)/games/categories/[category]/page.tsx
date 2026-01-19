@@ -1,7 +1,7 @@
 import Filters from "@/components/games/filters"
 import { getAllGames } from "@/components/games/get.action"
-import { camelPad } from "@/libs/camelPad"
 import GameGrid from "@/components/games/grid"
+import { camelPad } from "@/libs/camelPad"
 
 export default async function GameCategory(props: {
   params: Promise<{ category: string }>
@@ -10,9 +10,7 @@ export default async function GameCategory(props: {
   const games = await getAllGames(params.category)
 
   const cat =
-    games.length > 0
-      ? camelPad(games[0].category ?? params.category)
-      : camelPad(params.category)
+    games.length > 0 ? camelPad(games[0].category ?? params.category) : camelPad(params.category)
 
   return (
     <>

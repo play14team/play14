@@ -102,12 +102,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "createdAt",
-        "updatedAt",
-        "createdBy"
-      ],
+      "list": ["id", "createdAt", "updatedAt", "createdBy"],
       "edit": [
         [
           {

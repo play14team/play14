@@ -30,22 +30,15 @@ test.describe("Navbar", () => {
 
   test("should display main navigation links", async ({ page }) => {
     const navbar = page.locator("#navbar")
-    await expect(
-      navbar.getByRole("link", { name: "Home" }).first(),
-    ).toBeVisible()
+    await expect(navbar.getByRole("link", { name: "Home" }).first()).toBeVisible()
     await expect(navbar.getByText("Events").first()).toBeVisible()
     await expect(navbar.getByText("Community").first()).toBeVisible()
     await expect(navbar.getByText("About").first()).toBeVisible()
-    await expect(
-      navbar.getByRole("link", { name: "Contact" }).first(),
-    ).toBeVisible()
+    await expect(navbar.getByRole("link", { name: "Contact" }).first()).toBeVisible()
   })
 
   test("should show Events dropdown on hover", async ({ page }) => {
-    const eventsNav = page
-      .locator(".nav-item")
-      .filter({ hasText: "Events" })
-      .first()
+    const eventsNav = page.locator(".nav-item").filter({ hasText: "Events" }).first()
     await eventsNav.hover()
     await page.waitForTimeout(300)
 
@@ -54,10 +47,7 @@ test.describe("Navbar", () => {
   })
 
   test("should show Community dropdown on hover", async ({ page }) => {
-    const communityNav = page
-      .locator(".nav-item")
-      .filter({ hasText: "Community" })
-      .first()
+    const communityNav = page.locator(".nav-item").filter({ hasText: "Community" }).first()
     await communityNav.hover()
     await page.waitForTimeout(500)
 
@@ -66,10 +56,7 @@ test.describe("Navbar", () => {
   })
 
   test("should show About dropdown on hover", async ({ page }) => {
-    const aboutNav = page
-      .locator(".nav-item")
-      .filter({ hasText: "About" })
-      .first()
+    const aboutNav = page.locator(".nav-item").filter({ hasText: "About" }).first()
     await aboutNav.hover()
     await page.waitForTimeout(500)
 
@@ -85,15 +72,13 @@ test.describe("Navbar", () => {
     await page.waitForTimeout(300)
 
     // Check if sticky class is added
-    const hasSticky = await navbar.evaluate((el) =>
-      el.classList.contains("is-sticky"),
-    )
+    const hasSticky = await navbar.evaluate((el) => el.classList.contains("is-sticky"))
     expect(hasSticky).toBe(true)
   })
 
   test("should display search box", async ({ page }) => {
     const searchBox = page.locator(
-      'input[type="search"], input[placeholder*="search" i], .searchbox',
+      'input[type="search"], input[placeholder*="search" i], .searchbox'
     )
     if ((await searchBox.count()) > 0) {
       await expect(searchBox.first()).toBeVisible()
@@ -102,7 +87,7 @@ test.describe("Navbar", () => {
 
   test("should display theme toggle", async ({ page }) => {
     const themeToggle = page.locator(
-      '.theme-toggle, [class*="theme"], button[aria-label*="theme" i]',
+      '.theme-toggle, [class*="theme"], button[aria-label*="theme" i]'
     )
     if ((await themeToggle.count()) > 0) {
       await expect(themeToggle.first()).toBeVisible()
@@ -130,9 +115,7 @@ test.describe("Mobile Navigation", () => {
 
     // Menu should expand
     const navCollapse = page.locator(".navbar-collapse")
-    const hasShow = await navCollapse.evaluate((el) =>
-      el.classList.contains("show"),
-    )
+    const hasShow = await navCollapse.evaluate((el) => el.classList.contains("show"))
     expect(hasShow).toBe(true)
   })
 
@@ -142,22 +125,15 @@ test.describe("Mobile Navigation", () => {
     await page.waitForTimeout(300)
 
     // Click a link - use first() to avoid multiple matches
-    const homeLink = page
-      .locator("#navbar")
-      .getByRole("link", { name: "Home" })
-      .first()
+    const homeLink = page.locator("#navbar").getByRole("link", { name: "Home" }).first()
     await homeLink.click()
     await page.waitForTimeout(500)
 
     // Menu should collapse or page should navigate
     const navCollapse = page.locator(".navbar-collapse")
-    const hasShow = await navCollapse.evaluate((el) =>
-      el.classList.contains("show"),
-    )
+    const hasShow = await navCollapse.evaluate((el) => el.classList.contains("show"))
     // Either menu collapsed or we navigated away
-    expect(
-      hasShow === false || page.url().includes("localhost:3000"),
-    ).toBeTruthy()
+    expect(hasShow === false || page.url().includes("localhost:3000")).toBeTruthy()
   })
 })
 
@@ -169,7 +145,7 @@ test.describe("Theme Toggle", () => {
 
   test("should toggle theme on click", async ({ page }) => {
     const themeToggle = page.locator(
-      '.theme-toggle, [class*="theme-toggle"], button[aria-label*="theme" i]',
+      '.theme-toggle, [class*="theme-toggle"], button[aria-label*="theme" i]'
     )
 
     if ((await themeToggle.count()) > 0) {
@@ -187,9 +163,7 @@ test.describe("Theme Toggle", () => {
       const newDataTheme = await html.getAttribute("data-theme")
 
       // Either class or data-theme should change
-      expect(
-        initialClass !== newClass || initialDataTheme !== newDataTheme,
-      ).toBeTruthy()
+      expect(initialClass !== newClass || initialDataTheme !== newDataTheme).toBeTruthy()
     }
   })
 })
@@ -215,14 +189,14 @@ test.describe("Footer", () => {
       text?.includes("play14") ||
         text?.includes("copyright") ||
         text?.includes("©") ||
-        text?.length! > 10,
+        text?.length! > 10
     ).toBeTruthy()
   })
 
   test("should display social links", async ({ page }) => {
     const footer = page.locator("footer")
     const socialLinks = footer.locator(
-      'a[href*="twitter"], a[href*="linkedin"], a[href*="facebook"], a[href*="github"], a[href*="youtube"], a[href*="x.com"]',
+      'a[href*="twitter"], a[href*="linkedin"], a[href*="facebook"], a[href*="github"], a[href*="youtube"], a[href*="x.com"]'
     )
 
     if ((await socialLinks.count()) > 0) {
@@ -276,9 +250,7 @@ test.describe("Loading States", () => {
     await page.goto("/events")
 
     // Loader might appear briefly
-    const loader = page.locator(
-      ".loader, [class*='loader'], [class*='spinner']",
-    )
+    const _loader = page.locator(".loader, [class*='loader'], [class*='spinner']")
     // We can't reliably test this due to fast loading, but ensure page eventually loads
     await waitForPageLoad(page)
     const main = page.locator("main")

@@ -10,10 +10,10 @@
  */
 export const ORDER_LIMITS = {
   /** Maximum number of pending draft orders per user */
-  MAX_PENDING_DRAFTS: parseInt(process.env.TICKETING_MAX_PENDING_DRAFTS || "5", 10),
+  MAX_PENDING_DRAFTS: Number.parseInt(process.env.TICKETING_MAX_PENDING_DRAFTS || "5", 10),
 
   /** Maximum number of orders a user can create per hour */
-  MAX_DRAFTS_PER_HOUR: parseInt(process.env.TICKETING_MAX_DRAFTS_PER_HOUR || "10", 10),
+  MAX_DRAFTS_PER_HOUR: Number.parseInt(process.env.TICKETING_MAX_DRAFTS_PER_HOUR || "10", 10),
 } as const
 
 /**

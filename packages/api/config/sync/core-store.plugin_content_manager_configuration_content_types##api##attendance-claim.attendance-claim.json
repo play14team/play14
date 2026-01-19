@@ -188,12 +188,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "claimStatus",
-        "player",
-        "event"
-      ],
+      "list": ["id", "claimStatus", "player", "event"],
       "edit": [
         [
           {

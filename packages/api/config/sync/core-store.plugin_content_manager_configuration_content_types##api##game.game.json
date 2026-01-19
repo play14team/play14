@@ -357,13 +357,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "category",
-        "defaultImage",
-        "scale",
-        "timebox"
-      ],
+      "list": ["name", "category", "defaultImage", "scale", "timebox"],
       "edit": [
         [
           {

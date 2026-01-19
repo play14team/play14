@@ -1,4 +1,4 @@
-import { Event } from "@/models/strapi"
+import type { Event } from "@/models/strapi"
 import EventCard from "./card"
 
 interface EventWithPending extends Event {

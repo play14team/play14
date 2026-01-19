@@ -41,7 +41,7 @@ export function createPlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixt
     documentId: `player-${playerCounter}`,
     name: `Test Player ${playerCounter}`,
     slug: `test-player-${playerCounter}`,
-    tagline: `Passionate about agile games`,
+    tagline: "Passionate about agile games",
     position: "Software Developer",
     company: "Test Company",
     bio: `<p>Bio for test player ${playerCounter}</p>`,
@@ -70,9 +70,7 @@ export function createPlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixt
 /**
  * Create a minimal player (no optional fields)
  */
-export function createMinimalPlayer(
-  overrides: Partial<PlayerFixture> = {}
-): PlayerFixture {
+export function createMinimalPlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixture {
   return createPlayer({
     tagline: null,
     position: null,
@@ -87,9 +85,7 @@ export function createMinimalPlayer(
 /**
  * Create a player without avatar
  */
-export function createPlayerWithoutAvatar(
-  overrides: Partial<PlayerFixture> = {}
-): PlayerFixture {
+export function createPlayerWithoutAvatar(overrides: Partial<PlayerFixture> = {}): PlayerFixture {
   return createPlayer({
     avatar: null,
     ...overrides,

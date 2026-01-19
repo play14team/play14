@@ -6,7 +6,7 @@ import { getGameNav } from "./get.action"
 export default async function Categories() {
   const games = await getGameNav()
   const categories = deduplicate(
-    games.filter((g) => g.category).map((g) => g.category!.toLowerCase()),
+    games.filter((g) => g.category).map((g) => g.category!.toLowerCase())
   )
 
   return (
@@ -15,12 +15,10 @@ export default async function Categories() {
         {categories.sort().map((category, index) => (
           <div key={index} className="article-tags">
             <span>
-              <i className="bx bx-folder"></i>
+              <i className="bx bx-folder" />
             </span>
 
-            <Link href={`/games/categories/${category}`}>
-              {capitalizeFirstLetter(category)}
-            </Link>
+            <Link href={`/games/categories/${category}`}>{capitalizeFirstLetter(category)}</Link>
           </div>
         ))}
       </div>

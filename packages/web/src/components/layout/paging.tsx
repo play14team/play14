@@ -1,5 +1,5 @@
+import type { Pagination } from "@/models/strapi"
 import Link from "next/link"
-import { Pagination } from "@/models/strapi"
 
 interface PagingProps {
   pagination: Pagination
@@ -12,11 +12,7 @@ const Paging = ({ pagination, onNextPage }: PagingProps) => {
   for (let index = 1; index < pagination.pageCount + 1; index++) {
     items.push(
       isCurrentPage(pagination, index) ? (
-        <span
-          id={`page-${index}`}
-          className="page-numbers current"
-          aria-current="page"
-        >
+        <span id={`page-${index}`} className="page-numbers current" aria-current="page">
           {index}
         </span>
       ) : (
@@ -28,13 +24,13 @@ const Paging = ({ pagination, onNextPage }: PagingProps) => {
         >
           {index}
         </Link>
-      ),
+      )
     )
   }
 
   const itemMin = (pagination.page - 1) * pagination.pageSize + 1
   const itemMax =
-    pagination.page == pagination.pageCount
+    pagination.page === pagination.pageCount
       ? pagination.total
       : pagination.page * pagination.pageSize
 
@@ -42,13 +38,9 @@ const Paging = ({ pagination, onNextPage }: PagingProps) => {
     <div className="row">
       <div className="col-lg-12 col-sm-12 col-md-12">
         <div className="pagination-area text-center">
-          {pagination.page == 1 ? (
-            <span
-              id="prev"
-              className="page-numbers isDisabled"
-              aria-current="page"
-            >
-              <i className="bx bx-chevrons-left"></i>
+          {pagination.page === 1 ? (
+            <span id="prev" className="page-numbers isDisabled" aria-current="page">
+              <i className="bx bx-chevrons-left" />
             </span>
           ) : (
             <Link
@@ -59,19 +51,15 @@ const Paging = ({ pagination, onNextPage }: PagingProps) => {
                 onNextPage(pagination.page - 1)
               }}
             >
-              <i className="bx bx-chevrons-left"></i>
+              <i className="bx bx-chevrons-left" />
             </Link>
           )}
 
           {items}
 
-          {pagination.page == pagination.pageCount ? (
-            <span
-              id="next"
-              className="page-numbers isDisabled"
-              aria-current="page"
-            >
-              <i className="bx bx-chevrons-right"></i>
+          {pagination.page === pagination.pageCount ? (
+            <span id="next" className="page-numbers isDisabled" aria-current="page">
+              <i className="bx bx-chevrons-right" />
             </span>
           ) : (
             <Link
@@ -82,7 +70,7 @@ const Paging = ({ pagination, onNextPage }: PagingProps) => {
                 onNextPage(pagination.page + 1)
               }}
             >
-              <i className="bx bx-chevrons-right"></i>
+              <i className="bx bx-chevrons-right" />
             </Link>
           )}
         </div>
@@ -97,5 +85,5 @@ const Paging = ({ pagination, onNextPage }: PagingProps) => {
 export default Paging
 
 function isCurrentPage(pagination: Pagination, index: number) {
-  return pagination.page == index
+  return pagination.page === index
 }

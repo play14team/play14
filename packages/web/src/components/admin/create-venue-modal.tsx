@@ -1,8 +1,8 @@
 "use client"
 
+import { createVenue } from "@/app/(admin)/admin/venues/venues.action"
 import { useEffect, useRef, useState } from "react"
 import LocationMapPicker, { type MapLocation } from "./location-map-picker"
-import { createVenue } from "@/app/(admin)/admin/venues/venues.action"
 import { useToast } from "./toast"
 
 interface CreateVenueModalProps {
@@ -119,15 +119,11 @@ export default function CreateVenueModal({
   }
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="create-venue-modal"
-      onClick={handleBackdropClick}
-    >
+    <dialog ref={dialogRef} className="create-venue-modal" onClick={handleBackdropClick}>
       <div className="create-venue-modal-content">
         <div className="create-venue-modal-header">
           <h2>
-            <i className="bx bx-building-house"></i>
+            <i className="bx bx-building-house" />
             Create New Venue
           </h2>
           <button
@@ -136,7 +132,7 @@ export default function CreateVenueModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
           </button>
         </div>
 
@@ -150,11 +146,8 @@ export default function CreateVenueModal({
               onChange={(e) => setName(e.target.value)}
               className="admin-input"
               placeholder="e.g., Hilton Conference Center"
-              autoFocus
             />
-            <p className="admin-form-help">
-              The name of the hosting facility or organization
-            </p>
+            <p className="admin-form-help">The name of the hosting facility or organization</p>
           </div>
 
           <div className="admin-form-group">
@@ -214,12 +207,12 @@ export default function CreateVenueModal({
           >
             {isSubmitting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Creating...
               </>
             ) : (
               <>
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 Create Venue
               </>
             )}

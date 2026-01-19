@@ -20,7 +20,7 @@ export default async function VenueCreatePage() {
               className="admin-btn admin-btn-icon admin-btn-secondary"
               title="Back to Venues"
             >
-              <i className="bx bx-arrow-back"></i>
+              <i className="bx bx-arrow-back" />
             </Link>
             <div>
               <h1>Create Venue</h1>

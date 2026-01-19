@@ -74,7 +74,7 @@ export default function UnsavedChangesDialog({
     <dialog ref={dialogRef} className="unsaved-changes-dialog" onClick={handleBackdropClick}>
       <div className="unsaved-changes-content">
         <div className="unsaved-changes-icon">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
         </div>
 
         <h2>Unsaved Changes</h2>
@@ -93,12 +93,12 @@ export default function UnsavedChangesDialog({
           >
             {isSaving ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <i className="bx bx-save"></i>
+                <i className="bx bx-save" />
                 Save changes
               </>
             )}
@@ -110,7 +110,7 @@ export default function UnsavedChangesDialog({
             onClick={onDiscard}
             disabled={isSaving}
           >
-            <i className="bx bx-trash"></i>
+            <i className="bx bx-trash" />
             Discard changes
           </button>
 
@@ -120,7 +120,7 @@ export default function UnsavedChangesDialog({
             onClick={onCancel}
             disabled={isSaving}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Cancel
           </button>
         </div>

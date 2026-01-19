@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import EventSearch from "./event-search"
-import MyClaims from "./my-claims"
-import ClaimForm from "./claim-form"
+import { useCallback, useEffect, useState } from "react"
 import {
+  type AttendanceClaim,
+  type ClaimableEvent,
   getClaimableEvents,
   getMyAttendanceClaims,
-  type ClaimableEvent,
-  type AttendanceClaim,
 } from "./claim-attendance.action"
+import ClaimForm from "./claim-form"
+import EventSearch from "./event-search"
+import MyClaims from "./my-claims"
 
 type View = "search" | "claim"
 
@@ -74,7 +74,7 @@ export default function ClaimAttendanceContent() {
   if (isLoading) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading...</span>
       </div>
     )
@@ -83,14 +83,10 @@ export default function ClaimAttendanceContent() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
-        <button
-          type="button"
-          className="admin-btn admin-btn-secondary"
-          onClick={fetchData}
-        >
-          <i className="bx bx-refresh"></i>
+        <button type="button" className="admin-btn admin-btn-secondary" onClick={fetchData}>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -100,17 +96,10 @@ export default function ClaimAttendanceContent() {
   return (
     <div className="claim-attendance-content">
       {/* My Claims Section */}
-      {claims.length > 0 && (
-        <MyClaims claims={claims} onClaimCancelled={handleClaimCancelled} />
-      )}
+      {claims.length > 0 && <MyClaims claims={claims} onClaimCancelled={handleClaimCancelled} />}
 
       {/* Main Content */}
-      {view === "search" && (
-        <EventSearch
-          events={events}
-          onSelectEvent={handleSelectEvent}
-        />
-      )}
+      {view === "search" && <EventSearch events={events} onSelectEvent={handleSelectEvent} />}
 
       {view === "claim" && selectedEvent && (
         <ClaimForm

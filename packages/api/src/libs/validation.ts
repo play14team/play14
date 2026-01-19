@@ -4,7 +4,7 @@
  * Provides type-safe validation schemas for user input.
  */
 
-import { z, type ZodError, type ZodSchema } from "zod"
+import { type ZodError, type ZodSchema, z } from "zod"
 
 /**
  * Extract the first error message from a ZodError
@@ -93,11 +93,13 @@ export const urlSchema = z
  * Name validation schema factory
  * Creates a name validation schema with configurable options
  */
-export function createNameSchema(options: {
-  field?: string
-  minLength?: number
-  maxLength?: number
-} = {}) {
+export function createNameSchema(
+  options: {
+    field?: string
+    minLength?: number
+    maxLength?: number
+  } = {}
+) {
   const { field = "Name", minLength = 1, maxLength = 100 } = options
 
   return z
@@ -241,10 +243,12 @@ export function sanitizeText(text: string): string {
  * Create a sanitized text schema for free-text fields
  * Strips HTML and limits length
  */
-export function createSanitizedTextSchema(options: {
-  maxLength?: number
-  field?: string
-} = {}) {
+export function createSanitizedTextSchema(
+  options: {
+    maxLength?: number
+    field?: string
+  } = {}
+) {
   const { maxLength = 500, field = "Text" } = options
 
   return z
@@ -313,10 +317,18 @@ export const playerUpdateSchema = z.object({
  */
 export const ticketOrderSchema = z.object({
   eventId: z.string().min(1, "Event ID is required"),
-  tickets: z.array(z.object({
-    ticketTypeId: z.string().min(1, "Ticket type ID is required"),
-    quantity: z.number().int().min(1, "Quantity must be at least 1").max(10, "Maximum 10 tickets per type"),
-  })).min(1, "At least one ticket is required"),
+  tickets: z
+    .array(
+      z.object({
+        ticketTypeId: z.string().min(1, "Ticket type ID is required"),
+        quantity: z
+          .number()
+          .int()
+          .min(1, "Quantity must be at least 1")
+          .max(10, "Maximum 10 tickets per type"),
+      })
+    )
+    .min(1, "At least one ticket is required"),
   attendees: z.array(attendeeSchema).optional(),
   discountCode: z.string().optional(),
 })

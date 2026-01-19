@@ -35,7 +35,7 @@ export interface DashboardData {
  * Get dashboard data for the current user
  */
 export async function getDashboardData(): Promise<DashboardData> {
-  const { player } = await requirePlayer("/admin")
+  await requirePlayer("/admin")
 
   // Fetch stats from the API
   const result = await strapiFetch<{ data: DashboardData }>(

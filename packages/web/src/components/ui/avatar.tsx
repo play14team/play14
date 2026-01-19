@@ -23,26 +23,12 @@ function getInitials(name?: string): string {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
 }
 
-export default function Avatar({
-  src,
-  alt,
-  fallback,
-  size = "md",
-  className,
-}: AvatarProps) {
+export default function Avatar({ src, alt, fallback, size = "md", className }: AvatarProps) {
   const initials = getInitials(fallback || alt)
 
   return (
-    <AvatarPrimitive.Root
-      className={clsx("ui-avatar", `ui-avatar-${size}`, className)}
-    >
-      {src && (
-        <AvatarPrimitive.Image
-          className="ui-avatar-image"
-          src={src}
-          alt={alt || ""}
-        />
-      )}
+    <AvatarPrimitive.Root className={clsx("ui-avatar", `ui-avatar-${size}`, className)}>
+      {src && <AvatarPrimitive.Image className="ui-avatar-image" src={src} alt={alt || ""} />}
       <AvatarPrimitive.Fallback className="ui-avatar-fallback" delayMs={600}>
         {initials}
       </AvatarPrimitive.Fallback>

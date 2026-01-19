@@ -1,5 +1,5 @@
-import React from "react"
 import { Body, Button, Container, Head, Html, Link, Preview, Text } from "@react-email/components"
+import React from "react"
 
 interface UserInvitationEmailProps {
   name?: string

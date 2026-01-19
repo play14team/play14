@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
 import {
+  type HostStripeAccount,
+  type StripeAccountStatus,
   linkStripeAccountToEvent,
   unlinkStripeAccountFromEvent,
-  type StripeAccountStatus,
-  type HostStripeAccount,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import ConfirmationDialog from "@/components/admin/confirmation-dialog"
+import { useState } from "react"
 
 interface EventStripeAccount {
   documentId: string
@@ -87,7 +87,7 @@ export default function StripeAccountSelector({
       <div className="stripe-account-selector">
         {error && (
           <div className="admin-alert admin-alert-error admin-alert-sm">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -95,7 +95,7 @@ export default function StripeAccountSelector({
         <div className={`linked-account-card ${isActive ? "active" : "inactive"}`}>
           <div className="linked-account-info">
             <div className="linked-account-header">
-              <i className="bx bxl-stripe"></i>
+              <i className="bx bxl-stripe" />
               <span>Stripe Connected</span>
               {isActive ? (
                 <span className="account-badge success">Active</span>
@@ -106,14 +106,12 @@ export default function StripeAccountSelector({
             <p className="linked-account-id">{currentAccount.stripeAccountId}</p>
             {linkedHostAccount && (
               <p className="linked-account-owner">
-                <i className="bx bx-user"></i>
+                <i className="bx bx-user" />
                 {linkedHostAccount.ownerName} ({linkedHostAccount.ownerRole})
               </p>
             )}
             {isActive ? (
-              <p className="linked-account-status">
-                Online payments are enabled for this event.
-              </p>
+              <p className="linked-account-status">Online payments are enabled for this event.</p>
             ) : (
               <p className="linked-account-status warning">
                 Complete your Stripe account setup to enable payments.
@@ -127,9 +125,9 @@ export default function StripeAccountSelector({
             className="admin-btn admin-btn-secondary admin-btn-sm"
           >
             {isLoading ? (
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
             ) : (
-              <i className="bx bx-unlink"></i>
+              <i className="bx bx-unlink" />
             )}
             Disconnect
           </button>
@@ -156,12 +154,10 @@ export default function StripeAccountSelector({
       return (
         <div className="stripe-account-selector">
           <div className="stripe-setup-required">
-            <i className="bx bx-error-circle"></i>
-            <p>
-              Your Stripe account setup is incomplete. Complete the setup to enable payments.
-            </p>
+            <i className="bx bx-error-circle" />
+            <p>Your Stripe account setup is incomplete. Complete the setup to enable payments.</p>
             <a href="/admin/stripe" className="admin-btn admin-btn-primary admin-btn-sm">
-              <i className="bx bx-right-arrow-alt"></i>
+              <i className="bx bx-right-arrow-alt" />
               Complete Setup
             </a>
           </div>
@@ -173,13 +169,13 @@ export default function StripeAccountSelector({
     return (
       <div className="stripe-account-selector">
         <div className="no-stripe-account">
-          <i className="bx bxl-stripe"></i>
+          <i className="bx bxl-stripe" />
           <p>
-            No payment accounts available. To receive payments for this event, you or another
-            host needs to connect a Stripe account.
+            No payment accounts available. To receive payments for this event, you or another host
+            needs to connect a Stripe account.
           </p>
           <a href="/admin/stripe" className="admin-btn admin-btn-secondary admin-btn-sm">
-            <i className="bx bx-link"></i>
+            <i className="bx bx-link" />
             Set up Stripe
           </a>
         </div>
@@ -218,7 +214,7 @@ export default function StripeAccountSelector({
       <div className="stripe-account-selector">
         {error && (
           <div className="admin-alert admin-alert-error admin-alert-sm">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -226,7 +222,7 @@ export default function StripeAccountSelector({
         <div className="available-account-card">
           <div className="available-account-info">
             <div className="available-account-header">
-              <i className="bx bxl-stripe"></i>
+              <i className="bx bxl-stripe" />
               <span>
                 {account.isCurrentPlayer ? "Your Stripe Account" : `${account.ownerName}'s Account`}
               </span>
@@ -245,12 +241,12 @@ export default function StripeAccountSelector({
           >
             {isLoading ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Connecting...
               </>
             ) : (
               <>
-                <i className="bx bx-link"></i>
+                <i className="bx bx-link" />
                 Enable Payments
               </>
             )}
@@ -265,19 +261,19 @@ export default function StripeAccountSelector({
     <div className="stripe-account-selector">
       {error && (
         <div className="admin-alert admin-alert-error admin-alert-sm">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
 
       <div className="multi-account-selector">
         <div className="multi-account-header">
-          <i className="bx bxl-stripe"></i>
+          <i className="bx bxl-stripe" />
           <span>Select Payment Account</span>
         </div>
         <p className="multi-account-description">
-          Multiple organizers have Stripe accounts. Select which account should receive payments
-          for this event.
+          Multiple organizers have Stripe accounts. Select which account should receive payments for
+          this event.
         </p>
 
         <div className="account-options">
@@ -298,12 +294,12 @@ export default function StripeAccountSelector({
                   <span className="account-owner">
                     {account.isCurrentPlayer ? (
                       <>
-                        <i className="bx bx-user-check"></i>
+                        <i className="bx bx-user-check" />
                         Your Account
                       </>
                     ) : (
                       <>
-                        <i className="bx bx-user"></i>
+                        <i className="bx bx-user" />
                         {account.ownerName}
                       </>
                     )}
@@ -313,7 +309,7 @@ export default function StripeAccountSelector({
                 <span className="account-id">{account.stripeAccountId}</span>
               </div>
               <div className="account-option-check">
-                <i className="bx bx-check"></i>
+                <i className="bx bx-check" />
               </div>
             </label>
           ))}
@@ -328,12 +324,12 @@ export default function StripeAccountSelector({
           >
             {isLoading ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Connecting...
               </>
             ) : (
               <>
-                <i className="bx bx-link"></i>
+                <i className="bx bx-link" />
                 Enable Payments
               </>
             )}

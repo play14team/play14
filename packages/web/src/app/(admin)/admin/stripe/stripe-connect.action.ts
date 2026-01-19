@@ -73,7 +73,7 @@ export async function getStripeAccountStatus(): Promise<StripeAccountStatus | nu
  * Create a new Stripe Express connected account
  */
 export async function createStripeAccount(
-  country: string = "FR",
+  country = "FR",
   businessType: "individual" | "company" = "individual"
 ): Promise<CreateAccountResult> {
   const result = await strapiFetch<{ data: CreateAccountResult["data"] }>(

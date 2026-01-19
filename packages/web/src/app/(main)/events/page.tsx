@@ -1,10 +1,10 @@
 import Filters from "@/components/events/filters"
-import { getEvents, getEventYearCounts } from "@/components/events/get.action"
+import { getEventYearCounts, getEvents } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import LoadMore from "@/components/events/load-more"
 import YearNav from "@/components/events/year-nav"
-import { Event } from "@/models/strapi"
-import { Metadata } from "next"
+import type { Event } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Events",
@@ -13,10 +13,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function Events() {
-  const [response, yearCounts] = await Promise.all([
-    getEvents(1, 18),
-    getEventYearCounts(),
-  ])
+  const [response, yearCounts] = await Promise.all([getEvents(1, 18), getEventYearCounts()])
   // In Strapi 5, events_connection returns nodes and pageInfo
   const events = (response?.events_connection?.nodes || []) as Event[]
   const pagination = response?.events_connection?.pageInfo || {

@@ -11,12 +11,7 @@ interface LogoProps {
   priority?: boolean
 }
 
-const Logo = ({
-  width = 180,
-  height = 60,
-  className,
-  priority = false,
-}: LogoProps) => {
+const Logo = ({ width = 180, height = 60, className, priority = false }: LogoProps) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 

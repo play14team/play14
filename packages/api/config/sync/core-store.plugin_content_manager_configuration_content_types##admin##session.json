@@ -213,12 +213,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "userId",
-        "sessionId",
-        "childId"
-      ],
+      "list": ["id", "userId", "sessionId", "childId"],
       "edit": [
         [
           {

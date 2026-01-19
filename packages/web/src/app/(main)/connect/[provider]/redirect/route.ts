@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 
 const AUTH_COOKIE_NAME = "play14_auth"
 
@@ -46,27 +46,23 @@ export async function GET(
   const error = searchParams.get("error")
   if (error) {
     console.error(`[OAuth] Error from ${provider}:`, error)
-    return NextResponse.redirect(
-      new URL(`/auth/error?error=${encodeURIComponent(error)}`, baseUrl)
-    )
+    return NextResponse.redirect(new URL(`/auth/error?error=${encodeURIComponent(error)}`, baseUrl))
   }
 
   if (!providerToken) {
     console.error(`[OAuth] No access token received from ${provider}`)
-    return NextResponse.redirect(
-      new URL("/auth/error?error=no_token", baseUrl)
-    )
+    return NextResponse.redirect(new URL("/auth/error?error=no_token", baseUrl))
   }
 
   // Exchange the provider's access_token for a Strapi JWT
   // This is required because the token from the OAuth provider is NOT the Strapi JWT
   const exchangeUrl = `${getStrapiUrl()}/api/auth/${provider}/callback?access_token=${providerToken}`
   console.log(`[OAuth] Exchanging ${provider} token for Strapi JWT`)
-  console.log(`[OAuth] Exchange URL:`, exchangeUrl.substring(0, 100) + "...")
+  console.log("[OAuth] Exchange URL:", `${exchangeUrl.substring(0, 100)}...`)
   try {
     const callbackResponse = await fetch(exchangeUrl)
 
-    console.log(`[OAuth] Exchange response status:`, callbackResponse.status)
+    console.log("[OAuth] Exchange response status:", callbackResponse.status)
     if (!callbackResponse.ok) {
       const errorData = await callbackResponse.text()
       console.error(`[OAuth] Failed to exchange token (${callbackResponse.status}):`, errorData)
@@ -77,27 +73,23 @@ export async function GET(
         if (errorJson.error?.message?.includes("Email is already taken")) {
           errorCode = "email_taken"
         } else if (errorJson.error?.message) {
-          console.error(`[OAuth] Strapi error message:`, errorJson.error.message)
+          console.error("[OAuth] Strapi error message:", errorJson.error.message)
         }
       } catch {
         // Not JSON, use raw error
       }
-      return NextResponse.redirect(
-        new URL(`/auth/error?error=${errorCode}`, baseUrl)
-      )
+      return NextResponse.redirect(new URL(`/auth/error?error=${errorCode}`, baseUrl))
     }
 
     const data = await callbackResponse.json()
     const strapiJwt = data.jwt
 
     if (!strapiJwt) {
-      console.error(`[OAuth] No JWT in Strapi response:`, data)
-      return NextResponse.redirect(
-        new URL("/auth/error?error=no_jwt", baseUrl)
-      )
+      console.error("[OAuth] No JWT in Strapi response:", data)
+      return NextResponse.redirect(new URL("/auth/error?error=no_jwt", baseUrl))
     }
 
-    console.log(`[OAuth] Successfully obtained Strapi JWT for user:`, data.user?.email)
+    console.log("[OAuth] Successfully obtained Strapi JWT for user:", data.user?.email)
 
     // Redirect to the auth callback page, which will read the stored callback URL
     // from sessionStorage (set by AuthGate before OAuth) and redirect appropriately.
@@ -118,10 +110,8 @@ export async function GET(
 
     return response
   } catch (err) {
-    console.error(`[OAuth] Token exchange error:`, err)
+    console.error("[OAuth] Token exchange error:", err)
     const errorBaseUrl = getPublicUrl() || request.url
-    return NextResponse.redirect(
-      new URL("/auth/error?error=token_exchange_error", errorBaseUrl)
-    )
+    return NextResponse.redirect(new URL("/auth/error?error=token_exchange_error", errorBaseUrl))
   }
 }

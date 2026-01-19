@@ -1,7 +1,7 @@
-import moment from "moment"
+import type { UploadFile } from "@/models/strapi"
+import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import { UploadFile } from "@/models/strapi"
 import DefaultPlayerImage from "../ui/default-player-image"
 
 export interface NavLink {
@@ -43,7 +43,10 @@ const DetailsNavigator = (props: {
                 <span className="meta-wrapper">
                   <span className="date-post">
                     {previous.date &&
-                      moment(previous.date).format("MMM Do, YYYY")}
+                      format(
+                        typeof previous.date === "string" ? parseISO(previous.date) : previous.date,
+                        "MMM do, yyyy"
+                      )}
                   </span>
                 </span>
               </span>
@@ -61,7 +64,11 @@ const DetailsNavigator = (props: {
                 <span className="next-title">{next.name}</span>
                 <span className="meta-wrapper">
                   <span className="date-post">
-                    {next.date && moment(next.date).format("MMM Do, YYYY")}
+                    {next.date &&
+                      format(
+                        typeof next.date === "string" ? parseISO(next.date) : next.date,
+                        "MMM do, yyyy"
+                      )}
                   </span>
                 </span>
               </span>
@@ -98,16 +105,16 @@ function getImage(image?: UploadFile) {
         unoptimized
       />
     )
-  else
-    return (
-      <DefaultPlayerImage
-        alt="default player image"
-        sizes="100vw"
-        width={500}
-        height={500}
-        style={{ objectFit: "cover" }}
-      />
-    )
+
+  return (
+    <DefaultPlayerImage
+      alt="default player image"
+      sizes="100vw"
+      width={500}
+      height={500}
+      style={{ objectFit: "cover" }}
+    />
+  )
 }
 
 export default DetailsNavigator

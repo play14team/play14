@@ -3,7 +3,7 @@
  * Used to attach calendar events to confirmation emails
  */
 
-import { createEvent, type EventAttributes, type EventStatus } from "ics"
+import { type EventAttributes, type EventStatus, createEvent } from "ics"
 
 interface EventData {
   name: string
@@ -43,13 +43,7 @@ export async function generateEventICS(event: EventData): Promise<string> {
       start.getMinutes(),
     ],
     startInputType: "utc",
-    end: [
-      end.getFullYear(),
-      end.getMonth() + 1,
-      end.getDate(),
-      end.getHours(),
-      end.getMinutes(),
-    ],
+    end: [end.getFullYear(), end.getMonth() + 1, end.getDate(), end.getHours(), end.getMinutes()],
     endInputType: "utc",
     title: `#play14 - ${event.name}`,
     description: event.description ? stripHtml(event.description) : undefined,
@@ -104,7 +98,11 @@ export function generateGoogleCalendarUrl(event: EventData): string {
   const start = new Date(event.start)
   const end = new Date(event.end)
 
-  const formatDate = (date: Date) => date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")
+  const formatDate = (date: Date) =>
+    date
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "")
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
@@ -216,11 +214,11 @@ function stripHtml(html: string): string {
       }
       // Handle decimal numeric entities (&#123;)
       if (decimalCode !== undefined) {
-        return String.fromCharCode(parseInt(decimalCode, 10))
+        return String.fromCharCode(Number.parseInt(decimalCode, 10))
       }
       // Handle hex numeric entities (&#xABC;)
       if (hexCode !== undefined) {
-        return String.fromCharCode(parseInt(hexCode, 16))
+        return String.fromCharCode(Number.parseInt(hexCode, 16))
       }
       // Return original if no match (shouldn't happen with this regex)
       return match

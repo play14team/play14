@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
 import Avatar from "@/components/ui/avatar"
+import Link from "next/link"
+import { useState } from "react"
 import type { PlayerClaim } from "./claims.action"
 import { approveClaim, rejectClaim } from "./claims.action"
 
@@ -78,26 +78,24 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
         <div className="claim-card-header">
           <div className="claim-card-user">
             <div className="claim-card-user-icon">
-              <i className={`bx ${getProviderIcon(claim.user.provider)}`}></i>
+              <i className={`bx ${getProviderIcon(claim.user.provider)}`} />
             </div>
             <div className="claim-card-user-info">
               <span className="claim-card-user-name">{claim.user.username}</span>
               <span className="claim-card-user-email">{claim.user.email}</span>
-              <span className="claim-card-provider">
-                via {claim.user.provider}
-              </span>
+              <span className="claim-card-provider">via {claim.user.provider}</span>
             </div>
           </div>
           <div className="claim-card-date">
-            <i className="bx bx-time"></i>
+            <i className="bx bx-time" />
             {formatDate(claim.createdAt)}
           </div>
         </div>
 
         <div className="claim-card-arrow">
-          <i className="bx bx-right-arrow-alt"></i>
+          <i className="bx bx-right-arrow-alt" />
           <span>wants to claim</span>
-          <i className="bx bx-right-arrow-alt"></i>
+          <i className="bx bx-right-arrow-alt" />
         </div>
 
         <div className="claim-card-player">
@@ -114,12 +112,10 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
               target="_blank"
             >
               {claim.player.name}
-              <i className="bx bx-link-external"></i>
+              <i className="bx bx-link-external" />
             </Link>
             {claim.player.position && (
-              <span className="claim-card-player-position">
-                {claim.player.position}
-              </span>
+              <span className="claim-card-player-position">{claim.player.position}</span>
             )}
           </div>
         </div>
@@ -131,7 +127,7 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
 
         {error && (
           <div className="claim-card-error">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -145,12 +141,12 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
           >
             {isProcessing ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Processing...
               </>
             ) : (
               <>
-                <i className="bx bx-check"></i>
+                <i className="bx bx-check" />
                 Approve
               </>
             )}
@@ -161,7 +157,7 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
             onClick={() => setShowRejectModal(true)}
             disabled={isProcessing}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Reject
           </button>
         </div>
@@ -178,13 +174,13 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
                 onClick={() => setShowRejectModal(false)}
                 disabled={isProcessing}
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             </div>
             <div className="claim-modal-body">
               <p>
-                Are you sure you want to reject <strong>{claim.user.username}</strong>&apos;s
-                claim for <strong>{claim.player.name}</strong>?
+                Are you sure you want to reject <strong>{claim.user.username}</strong>&apos;s claim
+                for <strong>{claim.player.name}</strong>?
               </p>
               <div className="form-group">
                 <label htmlFor="adminNotes">
@@ -201,7 +197,7 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
               </div>
               {error && (
                 <div className="claim-card-error">
-                  <i className="bx bx-error-circle"></i>
+                  <i className="bx bx-error-circle" />
                   {error}
                 </div>
               )}
@@ -223,12 +219,12 @@ export default function ClaimCard({ claim, onActionComplete }: ClaimCardProps) {
               >
                 {isProcessing ? (
                   <>
-                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <i className="bx bx-loader-alt bx-spin" />
                     Rejecting...
                   </>
                 ) : (
                   <>
-                    <i className="bx bx-x"></i>
+                    <i className="bx bx-x" />
                     Reject Claim
                   </>
                 )}

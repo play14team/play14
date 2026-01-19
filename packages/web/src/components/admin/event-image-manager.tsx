@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
-import Image from "next/image"
 import {
-  uploadEventImage,
+  type EventImage,
   removeEventImage,
   setEventImageFromLibrary,
-  type EventImage,
+  uploadEventImage,
 } from "@/app/(admin)/admin/events/[slug]/images.action"
+import Image from "next/image"
+import { useCallback, useRef, useState } from "react"
+import EventDefaultImageManager from "./event-default-image-manager"
 import ImageCropper from "./image-cropper"
 import MediaLibraryBrowser from "./media-library-browser"
-import EventDefaultImageManager from "./event-default-image-manager"
 
 // Gallery images: free aspect ratio, max 1920px on longest edge
 // Optimized for web: max dimension 1920px, quality 85% for <200KB file size
@@ -42,33 +42,30 @@ export default function EventImageManager({
   const [showMediaLibrary, setShowMediaLibrary] = useState(false)
   const galleryInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileSelect = useCallback(
-    (file: File) => {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setError("Please select an image file")
-        return
-      }
+  const handleFileSelect = useCallback((file: File) => {
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file")
+      return
+    }
 
-      // Validate file size (10MB max)
-      if (file.size > 10 * 1024 * 1024) {
-        setError("File size must be less than 10MB")
-        return
-      }
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File size must be less than 10MB")
+      return
+    }
 
-      setError(null)
-      setOriginalFile(file)
+    setError(null)
+    setOriginalFile(file)
 
-      // Load image for cropper preview
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setImageToCrop(e.target?.result as string)
-        setShowCropper(true)
-      }
-      reader.readAsDataURL(file)
-    },
-    []
-  )
+    // Load image for cropper preview
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setImageToCrop(e.target?.result as string)
+      setShowCropper(true)
+    }
+    reader.readAsDataURL(file)
+  }, [])
 
   const handleCroppedImage = async (blob: Blob) => {
     setShowCropper(false)
@@ -195,7 +192,7 @@ export default function EventImageManager({
 
       {error && (
         <div className="admin-alert admin-alert-error admin-alert-sm">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -211,9 +208,7 @@ export default function EventImageManager({
       {/* Gallery Section */}
       <div className="image-section">
         <h4>Event Gallery</h4>
-        <p className="section-description">
-          Additional images shown in the event gallery section.
-        </p>
+        <p className="section-description">Additional images shown in the event gallery section.</p>
 
         <input
           ref={galleryInputRef}
@@ -243,7 +238,7 @@ export default function EventImageManager({
                 disabled={isUploading}
                 title="Remove image"
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             </div>
           ))}
@@ -257,10 +252,10 @@ export default function EventImageManager({
             title="Upload new image"
           >
             {isUploading ? (
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
             ) : (
               <>
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 <span>Upload</span>
               </>
             )}
@@ -273,7 +268,7 @@ export default function EventImageManager({
             disabled={isUploading}
             title="Browse media library"
           >
-            <i className="bx bx-images"></i>
+            <i className="bx bx-images" />
             <span>Library</span>
           </button>
         </div>

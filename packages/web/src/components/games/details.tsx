@@ -1,8 +1,8 @@
 import { camelPad } from "@/libs/camelPad"
-import moment from "moment"
+import type { Game, UploadFile } from "@/models/strapi"
+import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import { Game, UploadFile } from "@/models/strapi"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
 import GamesNavigator from "./nav"
@@ -44,21 +44,17 @@ const GameDetails = (props: { game: Game }) => {
                     <ul>
                       {game.category && (
                         <li>
-                          <i className="bx bx-folder-open"></i>
+                          <i className="bx bx-folder-open" />
                           <span>Category</span>
-                          <Link
-                            href={`/games/categories/${game.category.toLowerCase()}`}
-                          >
+                          <Link href={`/games/categories/${game.category.toLowerCase()}`}>
                             {camelPad(game.category)}
                           </Link>
                         </li>
                       )}
                       <li>
-                        <i className="bx bx-calendar"></i>
+                        <i className="bx bx-calendar" />
                         <span>Published</span>
-                        <Link href="#">
-                          {moment(game.publishedAt).format("MMM Do, YYYY")}
-                        </Link>
+                        <Link href="#">{format(parseISO(game.publishedAt), "MMM do, yyyy")}</Link>
                       </li>
                     </ul>
                   </div>
@@ -68,7 +64,7 @@ const GameDetails = (props: { game: Game }) => {
                   {game.tags?.map((tag) => (
                     <div key={tag?.id} className="article-tags">
                       <span>
-                        <i className="bx bx-purchase-tag"></i>
+                        <i className="bx bx-purchase-tag" />
                       </span>
 
                       <Link key={tag?.id} href={`/games/tags/${tag?.value}`}>
@@ -97,19 +93,18 @@ const GameDetails = (props: { game: Game }) => {
                     </div>
                   )}
 
-                  {game.preparationSteps &&
-                    game.preparationSteps.length > 0 && (
-                      <div className="col-lg-12 col-md-12">
-                        <div className="content">
-                          <h3>Preparation</h3>
-                          <ul>
-                            {game.preparationSteps.map((p) => (
-                              <li key={p?.id}>{p?.value}</li>
-                            ))}
-                          </ul>
-                        </div>
+                  {game.preparationSteps && game.preparationSteps.length > 0 && (
+                    <div className="col-lg-12 col-md-12">
+                      <div className="content">
+                        <h3>Preparation</h3>
+                        <ul>
+                          {game.preparationSteps.map((p) => (
+                            <li key={p?.id}>{p?.value}</li>
+                          ))}
+                        </ul>
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {game.safety && game.safety.length > 0 && (
                     <div className="col-lg-12 col-md-12">
@@ -127,7 +122,7 @@ const GameDetails = (props: { game: Game }) => {
                   )}
                 </div>
 
-                <div className="article-footer"></div>
+                <div className="article-footer" />
               </div>
 
               <div className="content">

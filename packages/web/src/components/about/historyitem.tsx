@@ -1,6 +1,6 @@
-import moment from "moment"
-import Image from "next/image"
 import { Enum_Componentdefaulthistoryitem_Dateformat } from "@/models/strapi"
+import { format, parseISO } from "date-fns"
+import Image from "next/image"
 
 interface HistoryProps {
   date: Date | string
@@ -13,21 +13,21 @@ interface HistoryProps {
 }
 
 const HistoryItem = (props: HistoryProps) => {
-  const { date, dateFormat, additionalText, title, image, imageAlt, children } =
-    props
+  const { date, dateFormat, additionalText, title, image, imageAlt, children } = props
 
-  const format = getFormat(dateFormat)
+  const dateFormatPattern = getFormat(dateFormat)
+  const dateValue = typeof date === "string" ? parseISO(date) : date
 
   return (
     <li className="timeline-block">
       <div className="timeline-date">
-        <span>{moment(date).format("YYYY")}</span>
-        {format && moment(date).format(format)}
+        <span>{format(dateValue, "yyyy")}</span>
+        {dateFormatPattern && format(dateValue, dateFormatPattern)}
         {additionalText}
       </div>
 
       <div className="timeline-icon">
-        <span className="dot-badge"></span>
+        <span className="dot-badge" />
       </div>
 
       <div className="timeline-content">
@@ -65,7 +65,7 @@ const HistoryItem = (props: HistoryProps) => {
 const getFormat = (dateFormat: Enum_Componentdefaulthistoryitem_Dateformat) => {
   switch (dateFormat) {
     case Enum_Componentdefaulthistoryitem_Dateformat.Day:
-      return "MMMM Do"
+      return "MMMM do"
     case Enum_Componentdefaulthistoryitem_Dateformat.Month:
       return "MMMM"
     default:

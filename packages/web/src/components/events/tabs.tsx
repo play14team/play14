@@ -1,4 +1,4 @@
-import {
+import type {
   ComponentEventsSponsorship,
   ComponentEventsTimetable,
   Event,
@@ -30,16 +30,12 @@ export default function EventTabs({
       <div className="tab-content">
         {/* Overview */}
         <div id="overviewTab" className="tab-pane tabs_item">
-          {event.description && (
-            <EventDescription description={event.description} />
-          )}
+          {event.description && <EventDescription description={event.description} />}
           {hosts && <PlayerGrid title="Team" players={hosts} />}
           {mentors && <PlayerGrid title="Mentors" players={mentors} />}
           {event.sponsorships && (
             <EventSponsorships
-              sponsorships={
-                event.sponsorships as Array<ComponentEventsSponsorship>
-              }
+              sponsorships={event.sponsorships as Array<ComponentEventsSponsorship>}
             />
           )}
         </div>

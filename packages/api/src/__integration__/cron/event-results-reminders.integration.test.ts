@@ -9,14 +9,14 @@
  * - Strapi built: `bun --filter play14-api build`
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest"
 import type { Core } from "@strapi/strapi"
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
+import { processEventResultsReminders } from "../../services/cron/event-results-reminders"
+import { cleanupTestData } from "../../test-utils/seed-database"
 import {
   setupStrapiTestInstance,
   teardownStrapiTestInstance,
 } from "../../test-utils/strapi-test-instance"
-import { cleanupTestData, seedTestPlayer } from "../../test-utils/seed-database"
-import { processEventResultsReminders } from "../../services/cron/event-results-reminders"
 
 // Mock the email render to avoid issues with React.email in test environment
 vi.mock("@react-email/render", () => ({

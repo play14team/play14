@@ -1,10 +1,10 @@
 "use client"
 
+import type { PendingClaim } from "@/components/auth/player-linking/types"
+import Logo from "@/components/layout/logo"
+import DefaultPlayerImage from "@/components/ui/default-player-image"
 import Image from "next/image"
 import Link from "next/link"
-import Logo from "@/components/layout/logo"
-import type { PendingClaim } from "@/components/auth/player-linking/types"
-import DefaultPlayerImage from "@/components/ui/default-player-image"
 
 interface ClaimPendingProps {
   claim: PendingClaim
@@ -23,13 +23,11 @@ export default function ClaimPending({
     <div className="player-linking-pending">
       <Logo width={120} height={40} />
       <div className="player-linking-icon pending">
-        <i className="bx bx-time-five"></i>
+        <i className="bx bx-time-five" />
       </div>
       <h1>Claim Submitted</h1>
       <p>Your claim is being reviewed by our administrators.</p>
-      <p className="text-muted">
-        You&apos;ll receive an email once your claim has been processed.
-      </p>
+      <p className="text-muted">You&apos;ll receive an email once your claim has been processed.</p>
 
       <div className="player-linking-player-card">
         <div className="player-avatar">
@@ -55,7 +53,7 @@ export default function ClaimPending({
           <h3>{claim.player.name}</h3>
           <span className="position">{claim.player.position}</span>
           <span className="status pending">
-            <i className="bx bx-time-five"></i> Pending Review
+            <i className="bx bx-time-five" /> Pending Review
           </span>
         </div>
       </div>
@@ -73,16 +71,12 @@ export default function ClaimPending({
 
       <div className="player-linking-actions">
         <button className="btn btn-outline" onClick={onRefresh}>
-          <i className="bx bx-refresh"></i> Check Status
+          <i className="bx bx-refresh" /> Check Status
         </button>
-        <button
-          className="btn btn-danger-outline"
-          onClick={onCancel}
-          disabled={isCancelling}
-        >
+        <button className="btn btn-danger-outline" onClick={onCancel} disabled={isCancelling}>
           {isCancelling ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i> Cancelling...
+              <i className="bx bx-loader-alt bx-spin" /> Cancelling...
             </>
           ) : (
             "Cancel Claim"
@@ -92,8 +86,7 @@ export default function ClaimPending({
 
       <div className="player-linking-footer">
         <p>
-          Need help?{" "}
-          <Link href="/contact">Contact us</Link>
+          Need help? <Link href="/contact">Contact us</Link>
         </p>
       </div>
     </div>

@@ -63,12 +63,12 @@ describe("sanitize utilities", () => {
     })
 
     it("removes onclick attributes", () => {
-      const input = '<p onclick="alert(\'xss\')">Click me</p>'
+      const input = "<p onclick=\"alert('xss')\">Click me</p>"
       expect(sanitizeHtml(input)).toBe("<p>Click me</p>")
     })
 
     it("removes javascript: URLs", () => {
-      const input = '<a href="javascript:alert(\'xss\')">Click</a>'
+      const input = "<a href=\"javascript:alert('xss')\">Click</a>"
       const result = sanitizeHtml(input)
       expect(result).not.toContain("javascript:")
     })

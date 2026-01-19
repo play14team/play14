@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect, useRef, useTransition } from "react"
 import Avatar from "@/components/ui/avatar"
+import { useEffect, useRef, useState, useTransition } from "react"
 import {
-  searchPlayersForInvite,
-  getPlayerForInvite,
-  sendSingleInvite,
   type PlayerForInvite,
+  getPlayerForInvite,
+  searchPlayersForInvite,
+  sendSingleInvite,
 } from "./invite.action"
 
 interface SingleInviteFormProps {
@@ -174,7 +174,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
     if (!selectedPlayer?.user) {
       return (
         <span className="invite-status-badge invite-status-new">
-          <i className="bx bx-user-plus"></i>
+          <i className="bx bx-user-plus" />
           New account will be created
         </span>
       )
@@ -185,7 +185,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
     if (selectedPlayer.user.blocked) {
       return (
         <span className="invite-status-badge invite-status-blocked">
-          <i className="bx bx-block"></i>
+          <i className="bx bx-block" />
           User is blocked
         </span>
       )
@@ -194,7 +194,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
     if (status === "accepted") {
       return (
         <span className="invite-status-badge invite-status-accepted">
-          <i className="bx bx-check-circle"></i>
+          <i className="bx bx-check-circle" />
           Account already activated
         </span>
       )
@@ -203,7 +203,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
     if (status === "sent" || status === "reminded") {
       return (
         <span className="invite-status-badge invite-status-invited">
-          <i className="bx bx-time"></i>
+          <i className="bx bx-time" />
           Invitation sent, pending activation
         </span>
       )
@@ -211,7 +211,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
 
     return (
       <span className="invite-status-badge invite-status-pending">
-        <i className="bx bx-envelope"></i>
+        <i className="bx bx-envelope" />
         Ready to invite
       </span>
     )
@@ -233,85 +233,90 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
           <label htmlFor="player-search">Select Player</label>
           {isLoadingPreSelected ? (
             <div className="invite-search-loading-inline">
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               <span>Loading player...</span>
             </div>
           ) : (
-          <div className="invite-search-wrapper">
-            <div className="search-input-wrapper">
-              <i className="bx bx-search"></i>
-              <input
-                ref={searchInputRef}
-                id="player-search"
-                type="text"
-                placeholder="Search players by name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-                disabled={isPending || !!selectedPlayer}
-              />
-              {searchQuery && !selectedPlayer && (
-                <button
-                  type="button"
-                  className="search-clear"
-                  onClick={() => setSearchQuery("")}
-                  aria-label="Clear search"
-                >
-                  <i className="bx bx-x"></i>
-                </button>
+            <div className="invite-search-wrapper">
+              <div className="search-input-wrapper">
+                <i className="bx bx-search" />
+                <input
+                  ref={searchInputRef}
+                  id="player-search"
+                  type="text"
+                  placeholder="Search players by name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                  disabled={isPending || !!selectedPlayer}
+                />
+                {searchQuery && !selectedPlayer && (
+                  <button
+                    type="button"
+                    className="search-clear"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear search"
+                  >
+                    <i className="bx bx-x" />
+                  </button>
+                )}
+              </div>
+
+              {/* Search Results Dropdown */}
+              {searchQuery && searchResults.length > 0 && (
+                <div className="invite-search-results">
+                  {searchResults.map((player) => (
+                    <button
+                      key={player.documentId}
+                      type="button"
+                      className="invite-search-result"
+                      onClick={() => handleSelectPlayer(player)}
+                    >
+                      <Avatar
+                        src={player.avatar?.url}
+                        alt={player.name}
+                        fallback={player.name}
+                        size="sm"
+                      />
+                      <div className="invite-search-result-info">
+                        <span className="invite-search-result-name">{player.name}</span>
+                        {player.company && (
+                          <span className="invite-search-result-company">{player.company}</span>
+                        )}
+                      </div>
+                      <span
+                        className={`player-card-position ${getPositionBadgeClass(player.position)}`}
+                      >
+                        {player.position}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* No Results */}
+              {searchQuery &&
+                searchQuery.length >= 2 &&
+                !isSearching &&
+                searchResults.length === 0 && (
+                  <div className="invite-search-results">
+                    <div className="invite-search-no-results">
+                      <i className="bx bx-search-alt" />
+                      <span>No players found matching &quot;{searchQuery}&quot;</span>
+                    </div>
+                  </div>
+                )}
+
+              {/* Loading */}
+              {isSearching && (
+                <div className="invite-search-results">
+                  <div className="invite-search-loading">
+                    <i className="bx bx-loader-alt bx-spin" />
+                    <span>Searching...</span>
+                  </div>
+                </div>
               )}
             </div>
-
-            {/* Search Results Dropdown */}
-            {searchQuery && searchResults.length > 0 && (
-              <div className="invite-search-results">
-                {searchResults.map((player) => (
-                  <button
-                    key={player.documentId}
-                    type="button"
-                    className="invite-search-result"
-                    onClick={() => handleSelectPlayer(player)}
-                  >
-                    <Avatar
-                      src={player.avatar?.url}
-                      alt={player.name}
-                      fallback={player.name}
-                      size="sm"
-                    />
-                    <div className="invite-search-result-info">
-                      <span className="invite-search-result-name">{player.name}</span>
-                      {player.company && (
-                        <span className="invite-search-result-company">{player.company}</span>
-                      )}
-                    </div>
-                    <span className={`player-card-position ${getPositionBadgeClass(player.position)}`}>
-                      {player.position}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* No Results */}
-            {searchQuery && searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
-              <div className="invite-search-results">
-                <div className="invite-search-no-results">
-                  <i className="bx bx-search-alt"></i>
-                  <span>No players found matching &quot;{searchQuery}&quot;</span>
-                </div>
-              </div>
-            )}
-
-            {/* Loading */}
-            {isSearching && (
-              <div className="invite-search-results">
-                <div className="invite-search-loading">
-                  <i className="bx bx-loader-alt bx-spin"></i>
-                  <span>Searching...</span>
-                </div>
-              </div>
-            )}
-          </div>
           )}
         </div>
 
@@ -331,7 +336,9 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
                   {selectedPlayer.company && (
                     <span className="invite-selected-player-company">{selectedPlayer.company}</span>
                   )}
-                  <span className={`player-card-position ${getPositionBadgeClass(selectedPlayer.position)}`}>
+                  <span
+                    className={`player-card-position ${getPositionBadgeClass(selectedPlayer.position)}`}
+                  >
                     {selectedPlayer.position}
                   </span>
                   {getUserStatusBadge()}
@@ -342,7 +349,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
                   onClick={handleClearPlayer}
                   aria-label="Clear selection"
                 >
-                  <i className="bx bx-x"></i>
+                  <i className="bx bx-x" />
                 </button>
               </div>
             </div>
@@ -362,12 +369,11 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
               className={`admin-input ${emailError ? "admin-input-error" : ""}`}
               disabled={isPending || isBlocked}
             />
-            {emailError && (
-              <p className="admin-form-error">{emailError}</p>
-            )}
+            {emailError && <p className="admin-form-error">{emailError}</p>}
             {!emailError && selectedPlayer.user?.email && email !== selectedPlayer.user.email && (
               <p className="admin-form-help">
-                Note: Email differs from player&apos;s existing account ({selectedPlayer.user.email})
+                Note: Email differs from player&apos;s existing account ({selectedPlayer.user.email}
+                )
               </p>
             )}
           </div>
@@ -396,8 +402,9 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
         {selectedPlayer?.user?.invitationStatus === "accepted" && (
           <div className="admin-form-section admin-info-section admin-info-warning">
             <p className="admin-form-help">
-              <i className="bx bx-info-circle"></i>
-              This user has already activated their account. Sending an invite will allow them to reset their password.
+              <i className="bx bx-info-circle" />
+              This user has already activated their account. Sending an invite will allow them to
+              reset their password.
             </p>
           </div>
         )}
@@ -405,7 +412,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
         {isBlocked && (
           <div className="admin-form-section admin-info-section admin-info-error">
             <p className="admin-form-help">
-              <i className="bx bx-error-circle"></i>
+              <i className="bx bx-error-circle" />
               This user is blocked and cannot receive invitations. Please unblock them first.
             </p>
           </div>
@@ -414,9 +421,11 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
 
       {/* Result Messages */}
       {result && (
-        <div className={`admin-form-section admin-info-section ${result.success ? "admin-info-success" : "admin-info-error"}`}>
+        <div
+          className={`admin-form-section admin-info-section ${result.success ? "admin-info-success" : "admin-info-error"}`}
+        >
           <p className="admin-form-help">
-            <i className={`bx ${result.success ? "bx-check-circle" : "bx-error-circle"}`}></i>
+            <i className={`bx ${result.success ? "bx-check-circle" : "bx-error-circle"}`} />
             {result.success ? result.message : result.error}
           </p>
         </div>
@@ -424,24 +433,20 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
 
       {/* Submit Button */}
       <div className="admin-form-actions">
-        <button
-          type="submit"
-          className="admin-btn admin-btn-primary"
-          disabled={!canSubmit}
-        >
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={!canSubmit}>
           {isPending ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Sending...
             </>
           ) : selectedPlayer?.user?.invitationStatus === "accepted" ? (
             <>
-              <i className="bx bx-envelope"></i>
+              <i className="bx bx-envelope" />
               Send Password Reset
             </>
           ) : (
             <>
-              <i className="bx bx-envelope"></i>
+              <i className="bx bx-envelope" />
               Send Invite
             </>
           )}

@@ -6,8 +6,8 @@
  */
 
 import type { Core } from "@strapi/strapi"
-import { ROLE_HIERARCHY, ROLE_METADATA, type RoleType } from "./types"
 import { PERMISSION_DEFINITIONS } from "./definitions"
+import { ROLE_HIERARCHY, ROLE_METADATA, type RoleType } from "./types"
 
 interface DbRole {
   id: number
@@ -71,7 +71,9 @@ async function ensureRolesExist(strapi: Core.Strapi): Promise<Map<RoleType, DbRo
   const roleByType = new Map<RoleType, DbRole>()
 
   // Fetch existing roles
-  const existingRoles = (await strapi.db.query("plugin::users-permissions.role").findMany()) as DbRole[]
+  const existingRoles = (await strapi.db
+    .query("plugin::users-permissions.role")
+    .findMany()) as DbRole[]
 
   for (const role of existingRoles) {
     roleByType.set(role.type as RoleType, role)
@@ -110,9 +112,11 @@ export async function syncPermissions(strapi: Core.Strapi): Promise<void> {
   const roleByType = await ensureRolesExist(strapi)
 
   // Fetch all current permissions with their roles
-  const currentPermissions = (await strapi.db.query("plugin::users-permissions.permission").findMany({
-    populate: ["role"],
-  })) as DbPermission[]
+  const currentPermissions = (await strapi.db
+    .query("plugin::users-permissions.permission")
+    .findMany({
+      populate: ["role"],
+    })) as DbPermission[]
 
   // Build current state: key = "roleId:action"
   const currentByKey = new Map<string, DbPermission>()
@@ -183,7 +187,9 @@ export async function syncPermissions(strapi: Core.Strapi): Promise<void> {
           data,
         })
       } catch (error) {
-        strapi.log.error(`[Permission Bootstrap] Failed to create permission ${data.action}: ${error}`)
+        strapi.log.error(
+          `[Permission Bootstrap] Failed to create permission ${data.action}: ${error}`
+        )
       }
     }
   }

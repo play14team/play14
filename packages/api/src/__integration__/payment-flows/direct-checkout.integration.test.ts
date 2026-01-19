@@ -8,17 +8,17 @@
  * - Strapi built: `bun --filter play14-api build`
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
-import request from "supertest"
 import type { Core } from "@strapi/strapi"
+import request from "supertest"
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { getMockPaymentState, resetMockPaymentState } from "../../services/payment"
+import { cleanupTestData, seedTestEvent } from "../../test-utils/seed-database"
 import {
+  getHttpServer,
   setupStrapiTestInstance,
   teardownStrapiTestInstance,
-  getHttpServer,
 } from "../../test-utils/strapi-test-instance"
-import { cleanupTestData, seedTestEvent } from "../../test-utils/seed-database"
 import { createAuthenticatedUser, getAuthHeader } from "../helpers/auth"
-import { resetMockPaymentState, getMockPaymentState } from "../../services/payment"
 import { sendCheckoutCompleted } from "../helpers/webhook-simulator"
 
 describe("Direct Checkout Flow", () => {
@@ -46,9 +46,7 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Early Bird", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Early Bird", price: 50, capacity: 100 }],
       })
 
       // Act
@@ -58,9 +56,7 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -88,9 +84,7 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Over",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Regular", price: 75, capacity: 50 },
-        ],
+        ticketTypes: [{ name: "Regular", price: 75, capacity: 50 }],
       })
 
       // Act
@@ -100,9 +94,7 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -117,13 +109,12 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Limited", price: 100, capacity: 1 },
-        ],
+        ticketTypes: [{ name: "Limited", price: 100, capacity: 1 }],
       })
 
       // Sell out the ticket type
-      await strapi.db.connection("ticket_types")
+      await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .update({ sold_count: 1 })
 
@@ -134,9 +125,7 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -150,9 +139,7 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Regular", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Regular", price: 50, capacity: 100 }],
       })
 
       // Act - no auth header
@@ -161,9 +148,7 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -177,9 +162,7 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Regular", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Regular", price: 50, capacity: 100 }],
       })
 
       // Act - request too many tickets
@@ -189,9 +172,7 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 101 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 101 }],
           },
         })
 
@@ -250,8 +231,7 @@ describe("Direct Checkout Flow", () => {
       })
 
       // Act
-      const response = await request(httpServer)
-        .get(`/api/events/${event.documentId}/tickets`)
+      const response = await request(httpServer).get(`/api/events/${event.documentId}/tickets`)
 
       // Assert
       expect(response.status).toBe(200)
@@ -275,8 +255,7 @@ describe("Direct Checkout Flow", () => {
       })
 
       // Act
-      const response = await request(httpServer)
-        .get(`/api/events/${event.documentId}/tickets`)
+      const response = await request(httpServer).get(`/api/events/${event.documentId}/tickets`)
 
       // Assert
       expect(response.status).toBe(200)
@@ -288,13 +267,11 @@ describe("Direct Checkout Flow", () => {
   describe("Full checkout flow with webhook", () => {
     it("completes order when webhook received", async () => {
       // Arrange
-      const { token, player } = await createAuthenticatedUser(strapi)
+      const { token } = await createAuthenticatedUser(strapi)
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Step 1: Create order
@@ -304,9 +281,7 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -345,10 +320,7 @@ describe("Direct Checkout Flow", () => {
       })
 
       // Step 3: Simulate successful payment via webhook
-      const webhookResponse = await sendCheckoutCompleted(
-        httpServer,
-        sessionId
-      )
+      const webhookResponse = await sendCheckoutCompleted(httpServer, sessionId)
 
       expect(webhookResponse.status).toBe(200)
 
@@ -364,7 +336,8 @@ describe("Direct Checkout Flow", () => {
       expect(updatedOrder.hasReservation).toBe(false)
 
       // Step 5: Verify ticket type sold count updated
-      const ticketType = await strapi.db.connection("ticket_types")
+      const ticketType = await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .first()
       expect(ticketType.sold_count).toBe(2)
@@ -378,9 +351,7 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create order
@@ -390,17 +361,14 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
       const orderId = orderResponse.body.data.orderId
 
       // Act
-      const response = await request(httpServer)
-        .get(`/api/ticket-orders/${orderId}`)
+      const response = await request(httpServer).get(`/api/ticket-orders/${orderId}`)
 
       // Assert
       expect(response.status).toBe(200)
@@ -418,9 +386,7 @@ describe("Direct Checkout Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create order
@@ -430,16 +396,15 @@ describe("Direct Checkout Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
       const orderId = orderResponse.body.data.orderId
 
       // Verify reservation exists
-      const ticketTypeBefore = await strapi.db.connection("ticket_types")
+      const ticketTypeBefore = await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .first()
       expect(ticketTypeBefore.reserved_count).toBe(2)
@@ -459,7 +424,8 @@ describe("Direct Checkout Flow", () => {
       expect(order.status).toBe("cancelled")
 
       // Verify reservations released
-      const ticketTypeAfter = await strapi.db.connection("ticket_types")
+      const ticketTypeAfter = await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .first()
       expect(ticketTypeAfter.reserved_count).toBe(0)

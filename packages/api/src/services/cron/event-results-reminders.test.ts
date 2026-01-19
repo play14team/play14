@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import type { Core } from "@strapi/strapi"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 // We need to mock the email render before importing the module
 vi.mock("@react-email/render", () => ({
@@ -217,10 +217,7 @@ describe("processEventResultsReminders", () => {
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         filters: expect.objectContaining({
-          $or: [
-            { resultsReminderCount: { $null: true } },
-            { resultsReminderCount: { $lt: 3 } },
-          ],
+          $or: [{ resultsReminderCount: { $null: true } }, { resultsReminderCount: { $lt: 3 } }],
         }),
       })
     )

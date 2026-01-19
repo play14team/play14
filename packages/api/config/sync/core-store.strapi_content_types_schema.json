@@ -530,11 +530,7 @@
         },
         "type": {
           "type": "enumeration",
-          "enum": [
-            "read-only",
-            "full-access",
-            "custom"
-          ],
+          "enum": ["read-only", "full-access", "custom"],
           "configurable": false,
           "required": true,
           "default": "read-only"
@@ -631,11 +627,7 @@
           },
           "type": {
             "type": "enumeration",
-            "enum": [
-              "read-only",
-              "full-access",
-              "custom"
-            ],
+            "enum": ["read-only", "full-access", "custom"],
             "configurable": false,
             "required": true,
             "default": "read-only"
@@ -1176,44 +1168,32 @@
       "indexes": [
         {
           "name": "upload_files_folder_path_index",
-          "columns": [
-            "folder_path"
-          ],
+          "columns": ["folder_path"],
           "type": null
         },
         {
           "name": "upload_files_created_at_index",
-          "columns": [
-            "created_at"
-          ],
+          "columns": ["created_at"],
           "type": null
         },
         {
           "name": "upload_files_updated_at_index",
-          "columns": [
-            "updated_at"
-          ],
+          "columns": ["updated_at"],
           "type": null
         },
         {
           "name": "upload_files_name_index",
-          "columns": [
-            "name"
-          ],
+          "columns": ["name"],
           "type": null
         },
         {
           "name": "upload_files_size_index",
-          "columns": [
-            "size"
-          ],
+          "columns": ["size"],
           "type": null
         },
         {
           "name": "upload_files_ext_index",
-          "columns": [
-            "ext"
-          ],
+          "columns": ["ext"],
           "type": null
         }
       ],
@@ -1406,16 +1386,12 @@
       "indexes": [
         {
           "name": "upload_folders_path_id_index",
-          "columns": [
-            "path_id"
-          ],
+          "columns": ["path_id"],
           "type": "unique"
         },
         {
           "name": "upload_folders_path_index",
-          "columns": [
-            "path"
-          ],
+          "columns": ["path"],
           "type": "unique"
         }
       ],
@@ -2039,30 +2015,20 @@
           "type": "media",
           "multiple": false,
           "required": true,
-          "allowedTypes": [
-            "images"
-          ]
+          "allowedTypes": ["images"]
         },
         "images": {
           "type": "media",
           "multiple": true,
           "required": true,
-          "allowedTypes": [
-            "images"
-          ]
+          "allowedTypes": ["images"]
         },
         "content": {
           "type": "richtext"
         },
         "category": {
           "type": "enumeration",
-          "enum": [
-            "Announcement",
-            "Article",
-            "Event",
-            "Interview",
-            "Meetup"
-          ]
+          "enum": ["Announcement", "Article", "Event", "Interview", "Meetup"]
         },
         "tags": {
           "type": "relation",
@@ -2138,30 +2104,20 @@
             "type": "media",
             "multiple": false,
             "required": true,
-            "allowedTypes": [
-              "images"
-            ]
+            "allowedTypes": ["images"]
           },
           "images": {
             "type": "media",
             "multiple": true,
             "required": true,
-            "allowedTypes": [
-              "images"
-            ]
+            "allowedTypes": ["images"]
           },
           "content": {
             "type": "richtext"
           },
           "category": {
             "type": "enumeration",
-            "enum": [
-              "Announcement",
-              "Article",
-              "Event",
-              "Interview",
-              "Meetup"
-            ]
+            "enum": ["Announcement", "Article", "Event", "Interview", "Meetup"]
           },
           "tags": {
             "type": "relation",
@@ -2226,12 +2182,7 @@
         },
         "status": {
           "type": "enumeration",
-          "enum": [
-            "Announced",
-            "Open",
-            "Over",
-            "Cancelled"
-          ],
+          "enum": ["Announced", "Open", "Over", "Cancelled"],
           "default": "Announced",
           "required": true
         },
@@ -2239,9 +2190,7 @@
           "type": "media",
           "multiple": false,
           "required": true,
-          "allowedTypes": [
-            "images"
-          ],
+          "allowedTypes": ["images"],
           "pluginOptions": {
             "i18n": {
               "localized": false
@@ -2252,9 +2201,7 @@
           "type": "media",
           "multiple": true,
           "required": false,
-          "allowedTypes": [
-            "images"
-          ]
+          "allowedTypes": ["images"]
         },
         "contactEmail": {
           "type": "email",
@@ -2436,12 +2383,7 @@
           },
           "status": {
             "type": "enumeration",
-            "enum": [
-              "Announced",
-              "Open",
-              "Over",
-              "Cancelled"
-            ],
+            "enum": ["Announced", "Open", "Over", "Cancelled"],
             "default": "Announced",
             "required": true
           },
@@ -2449,9 +2391,7 @@
             "type": "media",
             "multiple": false,
             "required": true,
-            "allowedTypes": [
-              "images"
-            ],
+            "allowedTypes": ["images"],
             "pluginOptions": {
               "i18n": {
                 "localized": false
@@ -2462,9 +2402,7 @@
             "type": "media",
             "multiple": true,
             "required": false,
-            "allowedTypes": [
-              "images"
-            ]
+            "allowedTypes": ["images"]
           },
           "contactEmail": {
             "type": "email",
@@ -2711,10 +2649,7 @@
             }
           },
           "type": "enumeration",
-          "enum": [
-            "Main",
-            "Secondary"
-          ],
+          "enum": ["Main", "Secondary"],
           "required": true
         },
         "icon": {
@@ -2811,10 +2746,7 @@
               }
             },
             "type": "enumeration",
-            "enum": [
-              "Main",
-              "Secondary"
-            ],
+            "enum": ["Main", "Secondary"],
             "required": true
           },
           "icon": {
@@ -3062,14 +2994,7 @@
             }
           },
           "type": "enumeration",
-          "enum": [
-            "Game",
-            "IceBreaker",
-            "WarmUp",
-            "Facilitation",
-            "Retrospective",
-            "CoolDown"
-          ],
+          "enum": ["Game", "IceBreaker", "WarmUp", "Facilitation", "Retrospective", "CoolDown"],
           "required": true
         },
         "documentedBy": {
@@ -3150,9 +3075,7 @@
           "type": "media",
           "multiple": false,
           "required": true,
-          "allowedTypes": [
-            "images"
-          ],
+          "allowedTypes": ["images"],
           "pluginOptions": {
             "i18n": {
               "localized": false
@@ -3163,9 +3086,7 @@
           "type": "media",
           "multiple": true,
           "required": true,
-          "allowedTypes": [
-            "images"
-          ],
+          "allowedTypes": ["images"],
           "pluginOptions": {
             "i18n": {
               "localized": false
@@ -3176,9 +3097,7 @@
           "type": "media",
           "multiple": true,
           "required": true,
-          "allowedTypes": [
-            "files"
-          ],
+          "allowedTypes": ["files"],
           "pluginOptions": {
             "i18n": {
               "localized": false
@@ -3317,14 +3236,7 @@
               }
             },
             "type": "enumeration",
-            "enum": [
-              "Game",
-              "IceBreaker",
-              "WarmUp",
-              "Facilitation",
-              "Retrospective",
-              "CoolDown"
-            ],
+            "enum": ["Game", "IceBreaker", "WarmUp", "Facilitation", "Retrospective", "CoolDown"],
             "required": true
           },
           "documentedBy": {
@@ -3405,9 +3317,7 @@
             "type": "media",
             "multiple": false,
             "required": true,
-            "allowedTypes": [
-              "images"
-            ],
+            "allowedTypes": ["images"],
             "pluginOptions": {
               "i18n": {
                 "localized": false
@@ -3418,9 +3328,7 @@
             "type": "media",
             "multiple": true,
             "required": true,
-            "allowedTypes": [
-              "images"
-            ],
+            "allowedTypes": ["images"],
             "pluginOptions": {
               "i18n": {
                 "localized": false
@@ -3431,9 +3339,7 @@
             "type": "media",
             "multiple": true,
             "required": true,
-            "allowedTypes": [
-              "files"
-            ],
+            "allowedTypes": ["files"],
             "pluginOptions": {
               "i18n": {
                 "localized": false
@@ -3668,9 +3574,7 @@
       },
       "attributes": {
         "images": {
-          "allowedTypes": [
-            "images"
-          ],
+          "allowedTypes": ["images"],
           "type": "media",
           "multiple": true,
           "pluginOptions": {
@@ -3741,9 +3645,7 @@
         },
         "attributes": {
           "images": {
-            "allowedTypes": [
-              "images"
-            ],
+            "allowedTypes": ["images"],
             "type": "media",
             "multiple": true,
             "pluginOptions": {
@@ -3895,12 +3797,7 @@
         },
         "position": {
           "type": "enumeration",
-          "enum": [
-            "Player",
-            "Host",
-            "Mentor",
-            "Founder"
-          ],
+          "enum": ["Player", "Host", "Mentor", "Founder"],
           "required": true
         },
         "company": {
@@ -3920,9 +3817,7 @@
           "type": "media",
           "multiple": false,
           "required": false,
-          "allowedTypes": [
-            "images"
-          ]
+          "allowedTypes": ["images"]
         },
         "socialNetworks": {
           "type": "component",
@@ -4021,12 +3916,7 @@
           },
           "position": {
             "type": "enumeration",
-            "enum": [
-              "Player",
-              "Host",
-              "Mentor",
-              "Founder"
-            ],
+            "enum": ["Player", "Host", "Mentor", "Founder"],
             "required": true
           },
           "company": {
@@ -4046,9 +3936,7 @@
             "type": "media",
             "multiple": false,
             "required": false,
-            "allowedTypes": [
-              "images"
-            ]
+            "allowedTypes": ["images"]
           },
           "socialNetworks": {
             "type": "component",
@@ -4129,9 +4017,7 @@
           "type": "string"
         },
         "logo": {
-          "allowedTypes": [
-            "images"
-          ],
+          "allowedTypes": ["images"],
           "type": "media",
           "multiple": false
         },
@@ -4188,9 +4074,7 @@
             "type": "string"
           },
           "logo": {
-            "allowedTypes": [
-              "images"
-            ],
+            "allowedTypes": ["images"],
             "type": "media",
             "multiple": false
           },
@@ -4319,9 +4203,7 @@
           "type": "media",
           "multiple": false,
           "required": false,
-          "allowedTypes": [
-            "audios"
-          ]
+          "allowedTypes": ["audios"]
         },
         "author": {
           "type": "relation",
@@ -4376,9 +4258,7 @@
             "type": "media",
             "multiple": false,
             "required": false,
-            "allowedTypes": [
-              "audios"
-            ]
+            "allowedTypes": ["audios"]
           },
           "author": {
             "type": "relation",
@@ -4426,9 +4306,7 @@
           "type": "media",
           "multiple": false,
           "required": false,
-          "allowedTypes": [
-            "images"
-          ],
+          "allowedTypes": ["images"],
           "pluginOptions": {}
         },
         "website": {
@@ -4509,9 +4387,7 @@
             "type": "media",
             "multiple": false,
             "required": false,
-            "allowedTypes": [
-              "images"
-            ],
+            "allowedTypes": ["images"],
             "pluginOptions": {}
           },
           "website": {

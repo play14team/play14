@@ -54,11 +54,9 @@ export default function EventsTabs({
             className={`events-page-tab ${activeTab === tab.id ? "active" : ""}`}
             onClick={() => onTabChange(tab.id)}
           >
-            <i className={`bx ${tab.icon}`}></i>
+            <i className={`bx ${tab.icon}`} />
             <span>{tab.label}</span>
-            {count !== undefined && count > 0 && (
-              <span className="events-tab-badge">{count}</span>
-            )}
+            {count !== undefined && count > 0 && <span className="events-tab-badge">{count}</span>}
           </button>
         )
       })}

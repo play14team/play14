@@ -8,7 +8,10 @@ interface DownloadInvoiceButtonProps {
   orderNumber: string
 }
 
-export default function DownloadInvoiceButton({ orderId, orderNumber }: DownloadInvoiceButtonProps) {
+export default function DownloadInvoiceButton({
+  orderId,
+  orderNumber,
+}: DownloadInvoiceButtonProps) {
   const [isDownloading, setIsDownloading] = useState(false)
 
   const handleDownload = async () => {

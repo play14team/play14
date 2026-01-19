@@ -26,7 +26,7 @@ const controller = ({ strapi }: { strapi: Core.Strapi }): MediaFolderController 
       if (query.filters.parent.$null === "true") {
         filters.parent = null
       } else {
-        filters.parent = parseInt(query.filters.parent, 10)
+        filters.parent = Number.parseInt(query.filters.parent, 10)
       }
     }
 
@@ -55,9 +55,7 @@ const controller = ({ strapi }: { strapi: Core.Strapi }): MediaFolderController 
             name: folder.name,
             path: folder.path,
             pathId: folder.pathId,
-            parent: folder.parent
-              ? { id: folder.parent.id, name: folder.parent.name }
-              : null,
+            parent: folder.parent ? { id: folder.parent.id, name: folder.parent.name } : null,
             files: { count: fileCount },
             children: { count: childCount },
           }

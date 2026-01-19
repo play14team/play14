@@ -33,13 +33,13 @@ export default function EventsEmptyState({
   return (
     <div className="events-empty-state">
       <div className="events-empty-state-icon">
-        <i className={`bx ${icon}`}></i>
+        <i className={`bx ${icon}`} />
       </div>
       <h3 className="events-empty-state-title">{title}</h3>
       <p className="events-empty-state-message">{message}</p>
       {hint && <p className="events-empty-state-hint">{hint}</p>}
-      {action && (
-        action.href ? (
+      {action &&
+        (action.href ? (
           <Link
             href={action.href}
             className={`admin-btn ${action.variant === "primary" ? "admin-btn-primary" : "admin-btn-secondary"}`}
@@ -54,8 +54,7 @@ export default function EventsEmptyState({
           >
             {action.label}
           </button>
-        )
-      )}
+        ))}
     </div>
   )
 }

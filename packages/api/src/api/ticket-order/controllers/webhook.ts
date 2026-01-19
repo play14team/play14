@@ -2,36 +2,36 @@
  * Webhook controller for handling Stripe payment events
  */
 
-import type { Core } from "@strapi/strapi"
-import { join } from "path"
 import { randomBytes } from "node:crypto"
+import { join } from "node:path"
 import { render } from "@react-email/render"
+import type { Core } from "@strapi/strapi"
+import PlayerInvitationEmail from "../../../emails/player-invitation"
 import {
   generateEventICS,
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
 } from "../../../libs/calendar"
-import { generateTicketCode } from "../../../libs/tickets"
-import { generateInvoicePDF, formatTicketItems, type InvoiceData } from "../../../libs/invoice"
+import { type InvoiceData, formatTicketItems, generateInvoicePDF } from "../../../libs/invoice"
 import { nameToUsername } from "../../../libs/strings"
-import { getPaymentProvider } from "../../../services/payment"
-import {
-  confirmReservations,
-  releaseReservations,
-  confirmDiscountCode,
-  releaseDiscountCode,
-  findOrCreatePlayerForAttendee,
-  addPlayerToEventAttendees,
-} from "../../../services/ticketing"
+import { generateTicketCode } from "../../../libs/tickets"
 import { sendTicketSoldNotificationEmail as sendTicketSoldNotification } from "../../../services/email-templates"
+import { getPaymentProvider } from "../../../services/payment"
+import type { WebhookEvent } from "../../../services/payment/types"
+import {
+  addPlayerToEventAttendees,
+  confirmDiscountCode,
+  confirmReservations,
+  findOrCreatePlayerForAttendee,
+  releaseDiscountCode,
+  releaseReservations,
+} from "../../../services/ticketing"
 import {
   claimWebhookEvent,
   markWebhookCompleted,
   markWebhookFailed,
   releaseWebhookClaim,
 } from "../../../services/webhook"
-import type { WebhookEvent } from "../../../services/payment/types"
-import PlayerInvitationEmail from "../../../emails/player-invitation"
 
 interface AttendeeInfo {
   firstName: string
@@ -147,11 +147,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         // Return 500 to signal Stripe should retry
         ctx.status = 500
         return ctx.send({ error: "Processing failed, will retry" })
-      } else {
-        await markWebhookFailed(strapi, eventId, error.message)
-        // Return 200 to prevent Stripe from retrying non-retryable errors
-        return ctx.send({ received: true, error: error.message })
       }
+      await markWebhookFailed(strapi, eventId, error.message)
+      // Return 200 to prevent Stripe from retrying non-retryable errors
+      return ctx.send({ received: true, error: error.message })
     }
   },
 
@@ -161,7 +160,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   async handleCheckoutCompleted(sessionData: Record<string, unknown>) {
     const sessionId = sessionData.id as string
     const paymentIntent = sessionData.payment_intent as string
-    const metadata = sessionData.metadata as Record<string, string>
+    const _metadata = sessionData.metadata as Record<string, string>
 
     if (!sessionId) {
       strapi.log.warn("[Webhook] Missing session ID in checkout.session.completed")
@@ -1104,10 +1103,7 @@ The #play14 Team
       }
 
       // Logo path - anchor to app root so it works in both src and dist builds
-      const logoPath = join(
-        process.cwd(),
-        "public/images/play14_600x200_transparent-light.png"
-      )
+      const logoPath = join(process.cwd(), "public/images/play14_600x200_transparent-light.png")
 
       invoicePDF = await generateInvoicePDF(invoiceData, {
         organizationName: "#play14",

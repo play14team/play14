@@ -99,7 +99,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest("Discount type must be 'percentage' or 'fixed'")
     }
 
-    if (discountValue === undefined || discountValue === null || isNaN(Number(discountValue)) || Number(discountValue) < 0) {
+    if (
+      discountValue === undefined ||
+      discountValue === null ||
+      Number.isNaN(Number(discountValue)) ||
+      Number(discountValue) < 0
+    ) {
       return ctx.badRequest("Valid discount value is required (must be 0 or greater)")
     }
 
@@ -139,9 +144,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       } as any,
     })
 
-    strapi.log.info(
-      `[Discount] Code "${code}" created for event ${event.name} by ${player.name}`
-    )
+    strapi.log.info(`[Discount] Code "${code}" created for event ${event.name} by ${player.name}`)
 
     return ctx.send({
       data: discountCode,
@@ -226,7 +229,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     if (discountValue !== undefined) {
-      if (isNaN(Number(discountValue)) || Number(discountValue) < 0) {
+      if (Number.isNaN(Number(discountValue)) || Number(discountValue) < 0) {
         return ctx.badRequest("Discount value must be 0 or greater")
       }
       const type = discountType || discountCode.discountType
@@ -394,7 +397,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest("Discount code is required")
     }
 
-    if (orderAmount === undefined || orderAmount === null || isNaN(Number(orderAmount))) {
+    if (orderAmount === undefined || orderAmount === null || Number.isNaN(Number(orderAmount))) {
       return ctx.badRequest("Order amount is required")
     }
 

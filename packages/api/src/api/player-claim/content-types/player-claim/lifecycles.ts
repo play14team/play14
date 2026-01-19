@@ -3,14 +3,17 @@
  * Handles email notifications on claim events
  */
 
-import type { Core } from "@strapi/strapi"
 import { render } from "@react-email/render"
+import type { Core } from "@strapi/strapi"
 import PlayerClaimNewEmail from "../../../../emails/player-claim-new"
 
 // Get environment variables for email config
 const getAdminRecipients = (): string[] => {
   const recipients = process.env.EMAIL_ADMIN_RECIPIENTS || ""
-  return recipients.split(",").map((r) => r.trim()).filter(Boolean)
+  return recipients
+    .split(",")
+    .map((r) => r.trim())
+    .filter(Boolean)
 }
 
 const getFrontendUrl = (): string => {
@@ -38,13 +41,13 @@ export default {
     })
 
     if (!claim || !claim.user || !claim.player) {
-      strapi.log.warn(`[PlayerClaim] Could not send email: claim data incomplete`)
+      strapi.log.warn("[PlayerClaim] Could not send email: claim data incomplete")
       return
     }
 
     const adminRecipients = getAdminRecipients()
     if (adminRecipients.length === 0) {
-      strapi.log.warn(`[PlayerClaim] No admin recipients configured for email notifications`)
+      strapi.log.warn("[PlayerClaim] No admin recipients configured for email notifications")
       return
     }
 
@@ -79,19 +82,21 @@ export default {
 
       await strapi.plugin("email").service("email").send({
         to: adminRecipients,
-        subject: `[#play14] New Player Claim Request`,
+        subject: "[#play14] New Player Claim Request",
         html,
         text,
       })
 
-      strapi.log.info(`[PlayerClaim] Sent notification email to admins for claim ${result.documentId}`)
+      strapi.log.info(
+        `[PlayerClaim] Sent notification email to admins for claim ${result.documentId}`
+      )
     } catch (error) {
       strapi.log.error(`[PlayerClaim] Failed to send admin notification email: ${error}`)
     }
   },
 
   async afterUpdate(event: { result: any; params: any }) {
-    const { result, params } = event
+    const { result } = event
 
     // Get strapi instance
     const strapi = (global as any).strapi as Core.Strapi
@@ -117,7 +122,7 @@ export default {
     })
 
     if (!claim || !claim.user || !claim.player) {
-      strapi.log.warn(`[PlayerClaim] Could not send email: data incomplete`)
+      strapi.log.warn("[PlayerClaim] Could not send email: data incomplete")
       return
     }
 
@@ -126,7 +131,8 @@ export default {
     if (newStatus === "approved") {
       // Send approval email to user
       try {
-        const PlayerClaimApprovedEmail = (await import("../../../../emails/player-claim-approved")).default
+        const PlayerClaimApprovedEmail = (await import("../../../../emails/player-claim-approved"))
+          .default
 
         const html = await render(
           PlayerClaimApprovedEmail({
@@ -145,19 +151,22 @@ export default {
 
         await strapi.plugin("email").service("email").send({
           to: claim.user.email,
-          subject: `[#play14] Your Player Profile Has Been Linked!`,
+          subject: "[#play14] Your Player Profile Has Been Linked!",
           html,
           text,
         })
 
-        strapi.log.info(`[PlayerClaim] Sent approval email to ${claim.user.email} for claim ${result.documentId}`)
+        strapi.log.info(
+          `[PlayerClaim] Sent approval email to ${claim.user.email} for claim ${result.documentId}`
+        )
       } catch (error) {
         strapi.log.error(`[PlayerClaim] Failed to send approval email: ${error}`)
       }
     } else if (newStatus === "rejected") {
       // Send rejection email to user
       try {
-        const PlayerClaimRejectedEmail = (await import("../../../../emails/player-claim-rejected")).default
+        const PlayerClaimRejectedEmail = (await import("../../../../emails/player-claim-rejected"))
+          .default
 
         const html = await render(
           PlayerClaimRejectedEmail({
@@ -178,12 +187,14 @@ export default {
 
         await strapi.plugin("email").service("email").send({
           to: claim.user.email,
-          subject: `[#play14] Player Claim Update`,
+          subject: "[#play14] Player Claim Update",
           html,
           text,
         })
 
-        strapi.log.info(`[PlayerClaim] Sent rejection email to ${claim.user.email} for claim ${result.documentId}`)
+        strapi.log.info(
+          `[PlayerClaim] Sent rejection email to ${claim.user.email} for claim ${result.documentId}`
+        )
       } catch (error) {
         strapi.log.error(`[PlayerClaim] Failed to send rejection email: ${error}`)
       }

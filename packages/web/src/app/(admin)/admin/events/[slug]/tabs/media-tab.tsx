@@ -8,10 +8,7 @@ interface MediaTabProps {
   onMediaLinksChange: (mediaLinks: MediaLink[]) => void
 }
 
-export default function MediaTab({
-  mediaLinks,
-  onMediaLinksChange,
-}: MediaTabProps) {
+export default function MediaTab({ mediaLinks, onMediaLinksChange }: MediaTabProps) {
   return (
     <>
       {/* Media Links Section */}

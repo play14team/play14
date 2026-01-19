@@ -6,7 +6,7 @@ const SearchBox = () => {
   const [input, setInput] = useState("")
 
   const search = () => {
-    if (input) router.push("/search?input=" + input)
+    if (input) router.push(`/search?input=${input}`)
   }
 
   return (
@@ -23,7 +23,7 @@ const SearchBox = () => {
             }}
           />
           <button onClick={() => search()}>
-            <i className="flaticon-loupe"></i>
+            <i className="flaticon-loupe" />
           </button>
         </div>
       </div>

@@ -1,18 +1,18 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
-import { useToast } from "@/components/admin/toast"
 import ConfirmationDialog from "@/components/admin/confirmation-dialog"
+import { useToast } from "@/components/admin/toast"
 import { formatCurrency } from "@/libs/currencies"
-import {
-  type ResultLineItem,
-  type ResultCategory,
-  RESULT_CATEGORIES,
-  INCOME_CATEGORIES,
-  EXPENSE_CATEGORIES,
-} from "../results.types"
-import { createResultItem, updateResultItem, deleteResultItem } from "../results.action"
+import { useCallback, useMemo, useState } from "react"
 import type { BudgetLineItem } from "../budget.types"
+import { createResultItem, deleteResultItem, updateResultItem } from "../results.action"
+import {
+  EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
+  RESULT_CATEGORIES,
+  type ResultCategory,
+  type ResultLineItem,
+} from "../results.types"
 
 interface ResultsTabProps {
   eventDocumentId: string
@@ -39,7 +39,10 @@ export default function ResultsTab({
   const toast = useToast()
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; item: ResultLineItem | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean
+    item: ResultLineItem | null
+  }>({
     isOpen: false,
     item: null,
   })
@@ -103,7 +106,7 @@ export default function ResultsTab({
   // Helper to format currency with event's currency
   const fmt = (amount: number) => formatCurrency(amount, currency)
 
-  const formatVariance = (variance: number, isExpense: boolean = false) => {
+  const formatVariance = (variance: number, isExpense = false) => {
     const isPositive = isExpense ? variance <= 0 : variance >= 0
     const prefix = variance >= 0 ? "+" : ""
     return (
@@ -260,7 +263,7 @@ export default function ResultsTab({
               className="admin-input"
               placeholder="Amount"
               value={currentEditingItem.item.amount || ""}
-              onChange={(e) => updateEditingItem("amount", parseFloat(e.target.value) || 0)}
+              onChange={(e) => updateEditingItem("amount", Number.parseFloat(e.target.value) || 0)}
               step="0.01"
             />
           </div>
@@ -300,7 +303,7 @@ export default function ResultsTab({
       <div key={category} className="actuals-category-section">
         <div className="actuals-category-header">
           <div className="actuals-category-title">
-            <i className={`bx ${categoryInfo.icon}`}></i>
+            <i className={`bx ${categoryInfo.icon}`} />
             <span>{categoryInfo.label}</span>
           </div>
           <div className="actuals-category-values">
@@ -319,7 +322,7 @@ export default function ResultsTab({
               <div className="actuals-item-view">
                 <div className="actuals-item-info">
                   <span className="actuals-item-name">
-                    <i className="bx bx-lock-alt"></i>
+                    <i className="bx bx-lock-alt" />
                     Ticket sales
                   </span>
                   <span className="actuals-item-description">Calculated from paid orders</span>
@@ -349,7 +352,7 @@ export default function ResultsTab({
                       onClick={() => handleEditItem(item)}
                       title="Edit"
                     >
-                      <i className="bx bx-edit"></i>
+                      <i className="bx bx-edit" />
                     </button>
                     <button
                       type="button"
@@ -357,7 +360,7 @@ export default function ResultsTab({
                       onClick={() => handleDeleteItem(item)}
                       title="Delete"
                     >
-                      <i className="bx bx-trash"></i>
+                      <i className="bx bx-trash" />
                     </button>
                   </div>
                 </div>
@@ -366,11 +369,11 @@ export default function ResultsTab({
           ))}
 
           {/* New item form */}
-          {editingItem !== null && editingItem.category === category && !editingItem.item.documentId && (
-            <div className="actuals-item actuals-item-new">
-              {renderEditForm(editingItem)}
-            </div>
-          )}
+          {editingItem !== null &&
+            editingItem.category === category &&
+            !editingItem.item.documentId && (
+              <div className="actuals-item actuals-item-new">{renderEditForm(editingItem)}</div>
+            )}
         </div>
 
         {/* Add button */}
@@ -380,7 +383,7 @@ export default function ResultsTab({
             className="actuals-add-item-btn"
             onClick={() => handleAddItem(category)}
           >
-            <i className="bx bx-plus"></i>
+            <i className="bx bx-plus" />
             Add {categoryInfo.label.toLowerCase()}
           </button>
         )}
@@ -410,7 +413,7 @@ export default function ResultsTab({
 
         <div className="actuals-summary-table">
           <div className="actuals-summary-header">
-            <span></span>
+            <span />
             <span>Budget</span>
             <span>Result</span>
             <span>Variance</span>
@@ -440,16 +443,12 @@ export default function ResultsTab({
           </div>
         </div>
 
-        <div
-          className={`actuals-result-card ${totals.result >= 0 ? "profit" : "loss"}`}
-        >
+        <div className={`actuals-result-card ${totals.result >= 0 ? "profit" : "loss"}`}>
           <div className="actuals-result-icon">
-            <i className={`bx ${totals.result >= 0 ? "bx-trending-up" : "bx-trending-down"}`}></i>
+            <i className={`bx ${totals.result >= 0 ? "bx-trending-up" : "bx-trending-down"}`} />
           </div>
           <div className="actuals-result-info">
-            <span className="actuals-result-label">
-              {totals.result >= 0 ? "Profit" : "Loss"}
-            </span>
+            <span className="actuals-result-label">{totals.result >= 0 ? "Profit" : "Loss"}</span>
             <span className="actuals-result-amount">{fmt(Math.abs(totals.result))}</span>
           </div>
         </div>
@@ -458,7 +457,7 @@ export default function ResultsTab({
       {/* Income Section */}
       <div className="admin-form-section">
         <h2>
-          <i className="bx bx-trending-up"></i> Income
+          <i className="bx bx-trending-up" /> Income
         </h2>
         <p className="admin-form-section-description">
           Record income received from tickets, sponsors, and other sources.
@@ -477,11 +476,9 @@ export default function ResultsTab({
       {/* Expenses Section */}
       <div className="admin-form-section">
         <h2>
-          <i className="bx bx-trending-down"></i> Expenses
+          <i className="bx bx-trending-down" /> Expenses
         </h2>
-        <p className="admin-form-section-description">
-          Record expenses incurred during the event.
-        </p>
+        <p className="admin-form-section-description">Record expenses incurred during the event.</p>
 
         <div className="actuals-categories">
           {EXPENSE_CATEGORIES.map((cat) => renderCategorySection(cat, false))}

@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import {
-  getPlayerByDocumentId,
-  uploadPlayerPicture,
-  deletePlayerPicture,
-  type PlayerProfile,
-} from "./players"
 import * as strapiClient from "@/libs/strapi-client"
 import type { Player } from "@/models/strapi"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import {
+  type PlayerProfile,
+  deletePlayerPicture,
+  getPlayerByDocumentId,
+  uploadPlayerPicture,
+} from "./players"
 
 // Mock the strapi-client module
 vi.mock("@/libs/strapi-client", () => ({

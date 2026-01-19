@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/components/admin/toast"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { createSponsor } from "../sponsors.action"
 
 export default function SponsorCreateForm() {
@@ -57,9 +57,7 @@ export default function SponsorCreateForm() {
               className="admin-input"
               placeholder="e.g., Acme Corporation"
             />
-            <p className="admin-form-help">
-              The full name of the sponsor
-            </p>
+            <p className="admin-form-help">The full name of the sponsor</p>
           </div>
         </div>
 
@@ -74,9 +72,7 @@ export default function SponsorCreateForm() {
               className="admin-input"
               placeholder="https://example.com"
             />
-            <p className="admin-form-help">
-              The sponsor&apos;s website
-            </p>
+            <p className="admin-form-help">The sponsor&apos;s website</p>
           </div>
         </div>
       </div>
@@ -97,12 +93,12 @@ export default function SponsorCreateForm() {
         >
           {isSubmitting ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Creating...
             </>
           ) : (
             <>
-              <i className="bx bx-plus"></i>
+              <i className="bx bx-plus" />
               Create Sponsor
             </>
           )}

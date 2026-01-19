@@ -1,5 +1,5 @@
 import { deduplicate } from "@/libs/arrays"
-import { Event } from "@/models/strapi"
+import type { Event } from "@/models/strapi"
 import Link from "next/link"
 import { getEventNav } from "./get.action"
 
@@ -13,7 +13,7 @@ export default async function Statuses() {
         {locations.map((item, index) => (
           <div key={index} className="article-tags">
             <span>
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-calendar" />
             </span>
 
             <Link href={`/events/statuses/${item}`}>{item}</Link>

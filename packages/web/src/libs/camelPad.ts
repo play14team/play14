@@ -8,9 +8,7 @@ export function camelPad(str: string | undefined) {
       .replace(/([a-z\d])([A-Z])/g, "$1 $2")
       // Look for lower-case letters followed by numbers
       .replace(/([a-zA-Z])(\d)/g, "$1 $2")
-      .replace(/^./, function (str) {
-        return str.toUpperCase()
-      })
+      .replace(/^./, (str) => str.toUpperCase())
       // Remove any white space left around the word
       .trim()
   )

@@ -1,22 +1,17 @@
-import { requireOrganizer } from "@/libs/auth"
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import EventEditForm from "./event-edit-form"
 import {
-  getEventForEdit,
-  getLocations,
-  getVenues,
-  getOrganizers,
-} from "./event-edit.action"
-import {
-  getStripeAccountStatus,
   getEventHostAccounts,
+  getStripeAccountStatus,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
-import { getEventDiscountCodes } from "./discount-code.action"
+import { requireOrganizer } from "@/libs/auth"
+import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getBudgetItems } from "./budget.action"
+import { getEventDiscountCodes } from "./discount-code.action"
+import EventEditForm from "./event-edit-form"
+import { getEventForEdit, getLocations, getOrganizers, getVenues } from "./event-edit.action"
 import { getResultItems } from "./results.action"
 import { getRevenueAnalytics } from "./revenue-analytics.action"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Edit Event | #play14",
@@ -31,14 +26,13 @@ export default async function EventEditPage({ params }: PageProps) {
   const session = await requireOrganizer()
   const { slug } = await params
 
-  const [event, locations, venues, organizers, playerStripeAccount] =
-    await Promise.all([
-      getEventForEdit(slug),
-      getLocations(),
-      getVenues(),
-      getOrganizers(),
-      getStripeAccountStatus(),
-    ])
+  const [event, locations, venues, organizers, playerStripeAccount] = await Promise.all([
+    getEventForEdit(slug),
+    getLocations(),
+    getVenues(),
+    getOrganizers(),
+    getStripeAccountStatus(),
+  ])
 
   if (!event) {
     notFound()
@@ -55,7 +49,13 @@ export default async function EventEditPage({ params }: PageProps) {
   }
 
   // Fetch host accounts, discount codes, budget/result items, and revenue after we have the event (needs documentId)
-  const [hostAccounts, discountCodesResult, budgetItemsResult, resultItemsResult, revenueAnalytics] = await Promise.all([
+  const [
+    hostAccounts,
+    discountCodesResult,
+    budgetItemsResult,
+    resultItemsResult,
+    revenueAnalytics,
+  ] = await Promise.all([
     getEventHostAccounts(event.documentId),
     getEventDiscountCodes(event.documentId),
     getBudgetItems(event.documentId),
@@ -78,7 +78,7 @@ export default async function EventEditPage({ params }: PageProps) {
               className="admin-btn admin-btn-icon admin-btn-secondary"
               title="Back to Events"
             >
-              <i className="bx bx-arrow-back"></i>
+              <i className="bx bx-arrow-back" />
             </Link>
             <div>
               <h1>Edit Event</h1>

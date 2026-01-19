@@ -34,11 +34,7 @@ export function capitalize(value: string): string {
  * @param lastName - Optional last name (takes precedence over fullName)
  * @returns Username in format "firstname.lastname"
  */
-export function nameToUsername(
-  fullName?: string,
-  firstName?: string,
-  lastName?: string
-): string {
+export function nameToUsername(fullName?: string, firstName?: string, lastName?: string): string {
   // Build the name from parts or use fullName
   const name = [firstName?.trim(), lastName?.trim()].filter(Boolean).join(" ") || fullName?.trim()
 

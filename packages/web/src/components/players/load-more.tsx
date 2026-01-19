@@ -1,8 +1,8 @@
 "use client"
 
 import { useIntersection } from "@/hooks/useIntersection"
-import { Pagination, Player } from "@/models/strapi"
-import { RefObject, useCallback, useEffect, useRef, useState } from "react"
+import type { Pagination, Player } from "@/models/strapi"
+import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
 import Loader from "../layout/loader"
 import { getPlayers } from "./get.action"
 import PlayerGrid from "./grid"
@@ -10,10 +10,7 @@ import PlayerGrid from "./grid"
 export default function LoadMore({ pagination }: { pagination: Pagination }) {
   const [players, setPlayers] = useState<Player[]>([])
   const triggerRef = useRef<HTMLDivElement>(null)
-  const isVisible = useIntersection(
-    triggerRef as RefObject<HTMLDivElement>,
-    "800px",
-  )
+  const isVisible = useIntersection(triggerRef as RefObject<HTMLDivElement>, "800px")
   const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
 
   useEffect(() => {
@@ -31,10 +28,10 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
 
   if (pagination.page === pagination.pageCount) return
 
-  if (players.length == 0)
+  if (players.length === 0)
     return (
       <div>
-        <div ref={triggerRef}></div>
+        <div ref={triggerRef} />
         <Loader />
       </div>
     )

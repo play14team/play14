@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import Collapsible from "../layout/collapsible"
 
 export default function Filters({ name }: { name: ReactNode }) {
@@ -10,19 +10,19 @@ export default function Filters({ name }: { name: ReactNode }) {
         <div className="article-footer">
           <div className="article-tags">
             <span>
-              <i className="bx bx-globe"></i>
+              <i className="bx bx-globe" />
             </span>
             <Link href="/events/countries">Country</Link>
           </div>
           <div className="article-tags">
             <span>
-              <i className="bx bx-calendar"></i>
+              <i className="bx bx-calendar" />
             </span>
             <Link href="/events/statuses">Status</Link>
           </div>
           <div className="article-tags">
             <span>
-              <i className="bx bx-map-pin"></i>
+              <i className="bx bx-map-pin" />
             </span>
             <Link href="/events/locations">Location</Link>
           </div>

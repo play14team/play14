@@ -30,7 +30,7 @@ export default async function LocationsPage() {
                 href="/admin/locations/create"
                 className="admin-btn admin-btn-primary admin-btn-block"
               >
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 Create Location
               </Link>
             </div>

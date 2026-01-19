@@ -19,12 +19,11 @@ function validateCorsConfiguration(strapi: Core.Strapi): void {
           "In production, you must explicitly configure allowed CORS origins. " +
           "Example: ALLOWED_ORIGINS=https://play14.org,https://www.play14.org"
       )
-    } else {
-      strapi.log.warn(
-        "[Bootstrap] ALLOWED_ORIGINS not set - CORS will block all cross-origin requests. " +
-          "Set ALLOWED_ORIGINS for local development (e.g., ALLOWED_ORIGINS=http://localhost:3000)"
-      )
     }
+    strapi.log.warn(
+      "[Bootstrap] ALLOWED_ORIGINS not set - CORS will block all cross-origin requests. " +
+        "Set ALLOWED_ORIGINS for local development (e.g., ALLOWED_ORIGINS=http://localhost:3000)"
+    )
     return
   }
 
@@ -37,12 +36,11 @@ function validateCorsConfiguration(strapi: Core.Strapi): void {
           "This allows any website to make authenticated requests to your API. " +
           "Configure specific domains: ALLOWED_ORIGINS=https://play14.org,https://www.play14.org"
       )
-    } else {
-      strapi.log.warn(
-        "[Bootstrap] ALLOWED_ORIGINS contains wildcard '*'. " +
-          "This is acceptable for development but must not be used in production."
-      )
     }
+    strapi.log.warn(
+      "[Bootstrap] ALLOWED_ORIGINS contains wildcard '*'. " +
+        "This is acceptable for development but must not be used in production."
+    )
   } else {
     strapi.log.info(`[Bootstrap] CORS configured for origins: ${origins.join(", ")}`)
   }
@@ -92,7 +90,9 @@ function validateWebhookMiddlewareConfig(strapi: Core.Strapi): void {
     )
   }
 
-  strapi.log.info("[Bootstrap] Webhook middleware configuration validated: includeUnparsed is enabled")
+  strapi.log.info(
+    "[Bootstrap] Webhook middleware configuration validated: includeUnparsed is enabled"
+  )
 }
 
 /**
@@ -117,7 +117,7 @@ async function ensureProcessedWebhooksIndex(strapi: Core.Strapi): Promise<void> 
   if (result.rows.length === 0) {
     strapi.log.info("[Bootstrap] Creating unique index on processed_webhooks.event_id")
     await knex.raw(
-      `CREATE UNIQUE INDEX processed_webhooks_event_id_unique ON processed_webhooks(event_id)`
+      "CREATE UNIQUE INDEX processed_webhooks_event_id_unique ON processed_webhooks(event_id)"
     )
     strapi.log.info("[Bootstrap] Unique index created successfully")
   } else {
@@ -249,7 +249,9 @@ export default {
         // Set processedAt if changing to approved or rejected and not already set
         if ((newStatus === "approved" || newStatus === "rejected") && !data?.processedAt) {
           ;(context.params.data as Record<string, any>).processedAt = new Date().toISOString()
-          strapi.log.info(`[PlayerClaim Middleware] Setting processedAt to ${(context.params.data as Record<string, any>).processedAt}`)
+          strapi.log.info(
+            `[PlayerClaim Middleware] Setting processedAt to ${(context.params.data as Record<string, any>).processedAt}`
+          )
         }
 
         // Execute the update
@@ -267,9 +269,11 @@ export default {
 
               if (player) {
                 // Get user documentId for Document Service update
-                const claimUser = await strapi.documents("plugin::users-permissions.user").findFirst({
-                  filters: { id: currentClaim.user.id },
-                })
+                const claimUser = await strapi
+                  .documents("plugin::users-permissions.user")
+                  .findFirst({
+                    filters: { id: currentClaim.user.id },
+                  })
                 if (claimUser) {
                   await strapi.documents("plugin::users-permissions.user").update({
                     documentId: claimUser.documentId,
@@ -283,15 +287,15 @@ export default {
             } catch (error) {
               strapi.log.error(`[PlayerClaim Middleware] Failed to link user to player: ${error}`)
             }
-        } else {
-          strapi.log.info(
-            `[PlayerClaim Middleware] Player ${currentClaim.player.documentId} already linked to a user, skipping`
-          )
+          } else {
+            strapi.log.info(
+              `[PlayerClaim Middleware] Player ${currentClaim.player.documentId} already linked to a user, skipping`
+            )
+          }
         }
-      }
 
-      return result
-    })
+        return result
+      })
     } catch (error) {
       reportSentryError(strapi, error, {
         tags: { phase: "register", module: "app-register" },
@@ -326,10 +330,7 @@ export default {
         key: "grant",
       })
 
-      const grantConfig = (await grantStore.get()) as Record<
-        string,
-        Record<string, unknown>
-      > | null
+      const grantConfig = (await grantStore.get()) as Record<string, Record<string, unknown>> | null
 
       strapi.log.info(
         `[LinkedIn OAuth] Current grant config: ${JSON.stringify(grantConfig?.linkedin)}`
@@ -338,8 +339,7 @@ export default {
       if (grantConfig?.linkedin) {
         const currentScopes = grantConfig.linkedin.scope as string[] | undefined
         const hasDeprecatedScopes =
-          currentScopes?.includes("r_liteprofile") ||
-          currentScopes?.includes("r_emailaddress")
+          currentScopes?.includes("r_liteprofile") || currentScopes?.includes("r_emailaddress")
 
         strapi.log.info(
           `[LinkedIn OAuth] Current scopes: ${JSON.stringify(

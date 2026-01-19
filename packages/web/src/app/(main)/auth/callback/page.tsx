@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useFeatureFlags } from "@/libs/feature-flags"
 import Logo from "@/components/layout/logo"
+import { useFeatureFlags } from "@/libs/feature-flags"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 
 const SESSION_STORAGE_KEY = "auth_callback_url"
 const DEFAULT_REDIRECT = "/admin"
@@ -61,7 +61,7 @@ export default function AuthCallbackPage() {
 
         <div className="auth-error-content">
           <div className="auth-error-icon">
-            <i className="bx bx-loader-alt bx-spin"></i>
+            <i className="bx bx-loader-alt bx-spin" />
           </div>
           <h1>Signing you in...</h1>
           <p>Please wait while we complete your sign-in.</p>

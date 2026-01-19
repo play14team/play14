@@ -126,9 +126,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           ? {
               orderNumber: ticket.order.orderNumber,
               // Mask purchaser email for privacy (show first part only)
-              purchaserEmail:
-                ticket.order.purchaserEmail?.split("@")[0]?.substring(0, 3) + "***@***",
-              purchaserName: ticket.order.purchaserName?.split(" ")[0] + " ***",
+              purchaserEmail: `${ticket.order.purchaserEmail?.split("@")[0]?.substring(0, 3)}***@***`,
+              purchaserName: `${ticket.order.purchaserName?.split(" ")[0]} ***`,
             }
           : null,
         player: ticket.player

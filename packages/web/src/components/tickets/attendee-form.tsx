@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import type { AttendeeInfo, PlayerDefaults, DraftOrderResponse } from "./purchase.action"
+import { useState } from "react"
 import styles from "./attendee-form.module.scss"
+import type { AttendeeInfo, DraftOrderResponse } from "./purchase.action"
 
 const TSHIRT_SIZES = [
   { value: "none", label: "No t-shirt" },
@@ -143,7 +143,12 @@ export default function AttendeeForm({
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.header}>
-        <button type="button" className={styles.backButton} onClick={onBack} disabled={isSubmitting}>
+        <button
+          type="button"
+          className={styles.backButton}
+          onClick={onBack}
+          disabled={isSubmitting}
+        >
           <i className="bx bx-arrow-back" />
           Back to ticket selection
         </button>
@@ -179,11 +184,7 @@ export default function AttendeeForm({
               >
                 <div className={styles.attendeeTitle}>
                   <span className={styles.attendeeNumber}>
-                    {isValid ? (
-                      <i className="bx bx-check-circle" />
-                    ) : (
-                      <span>{index + 1}</span>
-                    )}
+                    {isValid ? <i className="bx bx-check-circle" /> : <span>{index + 1}</span>}
                   </span>
                   <div>
                     <strong>
@@ -338,13 +339,17 @@ export default function AttendeeForm({
           {discountAmount > 0 && (
             <div className={styles.summaryDiscount}>
               <span>Discount</span>
-              <span>-{currency} {discountAmount.toFixed(2)}</span>
+              <span>
+                -{currency} {discountAmount.toFixed(2)}
+              </span>
             </div>
           )}
         </div>
         <div className={styles.summaryTotal}>
           <span>Total</span>
-          <span>{currency} {totalAmount.toFixed(2)}</span>
+          <span>
+            {currency} {totalAmount.toFixed(2)}
+          </span>
         </div>
       </div>
 
@@ -396,11 +401,7 @@ export default function AttendeeForm({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          className={styles.submitButton}
-          disabled={!canSubmit || isSubmitting}
-        >
+        <button type="submit" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
           {isSubmitting ? (
             <>
               <i className="bx bx-loader-alt bx-spin" />

@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import type { StrapiUser } from "@/libs/auth"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import EventsTabs, { type TabId, TAB_IDS } from "./events-tabs"
-import OrganizedTab from "./tabs/organized-tab"
 import AttendedTab from "./tabs/attended-tab"
 import ClaimsTab from "./tabs/claims-tab"
-import type { StrapiUser } from "@/libs/auth"
+import OrganizedTab from "./tabs/organized-tab"
 
 interface EventsPageContentProps {
   user: StrapiUser
@@ -19,8 +19,7 @@ export default function EventsPageContent({ user }: EventsPageContentProps) {
 
   // Determine user role
   const position = user.player?.position
-  const isOrganizer =
-    position === "Host" || position === "Mentor" || position === "Founder"
+  const isOrganizer = position === "Host" || position === "Mentor" || position === "Founder"
 
   // Get initial tab from URL or default based on role
   const getInitialTab = (): TabId => {
@@ -98,9 +97,7 @@ export default function EventsPageContent({ user }: EventsPageContentProps) {
             <OrganizedTab onCountChange={handleOrganizedCountChange} />
           )}
 
-          {activeTab === "attended" && (
-            <AttendedTab onCountChange={handleAttendedCountChange} />
-          )}
+          {activeTab === "attended" && <AttendedTab onCountChange={handleAttendedCountChange} />}
 
           {activeTab === "claims" && (
             <ClaimsTab onPendingCountChange={handlePendingClaimsCountChange} />
@@ -118,11 +115,10 @@ export default function EventsPageContent({ user }: EventsPageContentProps) {
                 href="/admin/events/create"
                 className="admin-btn admin-btn-primary admin-btn-block"
               >
-                <i className="bx bx-plus"></i>
+                <i className="bx bx-plus" />
                 Create Event
               </Link>
             </div>
-
           </div>
         </div>
       )}

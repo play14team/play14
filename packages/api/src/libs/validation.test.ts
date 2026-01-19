@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
 import {
-  isValidEmail,
-  validateEmail,
-  isValidUrl,
-  validateName,
-  emailSchema,
   attendeeSchema,
+  emailSchema,
+  isValidEmail,
+  isValidUrl,
+  validateEmail,
+  validateName,
 } from "./validation"
 
 describe("validation utilities", () => {

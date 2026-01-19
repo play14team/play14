@@ -1,13 +1,11 @@
-import { Event, GeoLocation } from "@/models/strapi"
+import type { Event, GeoLocation } from "@/models/strapi"
 import { useTheme } from "next-themes"
 import { useEffect, useMemo, useState } from "react"
 import { Marker } from "react-map-gl/mapbox"
 import EventPopup, { mapColor } from "./popup"
 
 // Helper to extract coordinates from either location format
-function getCoordinates(
-  location: GeoLocation | undefined,
-): [number, number] | null {
+function getCoordinates(location: GeoLocation | undefined): [number, number] | null {
   if (!location) return null
 
   // Handle Mapbox format (geometry.coordinates)
@@ -91,9 +89,7 @@ export default function EventMarkers({ events }: { events: Event[] }) {
   return (
     <>
       {markers}
-      {popupInfo.length > 0 && (
-        <EventPopup events={popupInfo} onClose={() => setPopupInfo([])} />
-      )}
+      {popupInfo.length > 0 && <EventPopup events={popupInfo} onClose={() => setPopupInfo([])} />}
     </>
   )
 }

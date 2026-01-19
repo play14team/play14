@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
-import { registerWithCredentials } from "./register.action"
 import Turnstile from "@/components/ui/turnstile"
+import { useRouter } from "next/navigation"
+import { useState, useTransition } from "react"
+import { registerWithCredentials } from "./register.action"
 
 interface RegisterFormProps {
   callbackUrl: string
@@ -68,12 +68,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
     }
 
     startTransition(async () => {
-      const result = await registerWithCredentials(
-        username,
-        email,
-        password,
-        turnstileToken
-      )
+      const result = await registerWithCredentials(username, email, password, turnstileToken)
 
       if (result.success) {
         // After registration, redirect to the callback URL
@@ -100,9 +95,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
           autoComplete="username"
           disabled={isPending}
         />
-        {fieldErrors.username && (
-          <span className="auth-field-error">{fieldErrors.username}</span>
-        )}
+        {fieldErrors.username && <span className="auth-field-error">{fieldErrors.username}</span>}
       </div>
 
       <div className="auth-form-field">
@@ -115,9 +108,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
           autoComplete="email"
           disabled={isPending}
         />
-        {fieldErrors.email && (
-          <span className="auth-field-error">{fieldErrors.email}</span>
-        )}
+        {fieldErrors.email && <span className="auth-field-error">{fieldErrors.email}</span>}
       </div>
 
       <div className="auth-form-field">
@@ -130,9 +121,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
           autoComplete="new-password"
           disabled={isPending}
         />
-        {fieldErrors.password && (
-          <span className="auth-field-error">{fieldErrors.password}</span>
-        )}
+        {fieldErrors.password && <span className="auth-field-error">{fieldErrors.password}</span>}
       </div>
 
       <div className="auth-form-field">
@@ -167,11 +156,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
         </div>
       )}
 
-      <button
-        type="submit"
-        className="auth-login-btn auth-login-btn-submit"
-        disabled={isPending}
-      >
+      <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
         {isPending ? "Creating account..." : "Create account"}
       </button>
     </form>

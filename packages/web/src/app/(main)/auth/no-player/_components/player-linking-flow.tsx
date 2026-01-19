@@ -1,38 +1,35 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { useRouter } from "next/navigation"
+import {
+  autoLinkPlayer,
+  cancelClaim,
+  checkExactMatch,
+  createPlayerForUser,
+  getMyClaims,
+  getSuggestions,
+  submitClaim,
+} from "@/components/auth/player-linking/player-linking.action"
 import type {
   LinkingPageState,
-  PlayerSuggestion,
   PendingClaim,
+  PlayerSuggestion,
 } from "@/components/auth/player-linking/types"
-import {
-  checkExactMatch,
-  getSuggestions,
-  getMyClaims,
-  submitClaim,
-  cancelClaim,
-  autoLinkPlayer,
-  createPlayerForUser,
-} from "@/components/auth/player-linking/player-linking.action"
-import LoadingState from "./loading-state"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import AutoLinkSuccess from "./auto-link-success"
-import PlayerSuggestions from "./player-suggestions"
 import ClaimFormModal from "./claim-form-modal"
 import ClaimPending from "./claim-pending"
-import PlayerSearch from "./player-search"
 import CreatePlayerForm from "./create-player-form"
+import LoadingState from "./loading-state"
+import PlayerSearch from "./player-search"
+import PlayerSuggestions from "./player-suggestions"
 
 interface PlayerLinkingFlowProps {
   userEmail: string
   userName: string
 }
 
-export default function PlayerLinkingFlow({
-  userEmail,
-  userName,
-}: PlayerLinkingFlowProps) {
+export default function PlayerLinkingFlow({ userName }: PlayerLinkingFlowProps) {
   const router = useRouter()
   const [state, setState] = useState<LinkingPageState>("loading")
   const [exactMatchPlayer, setExactMatchPlayer] = useState<PlayerSuggestion | null>(null)
@@ -67,11 +64,9 @@ export default function PlayerLinkingFlow({
         // Successfully linked, redirect to admin
         router.push("/admin")
         return
-      } else {
-        // Auto-link failed (maybe player was claimed in between)
-        setError(linkResult.error || "Failed to link profile")
-        // Fall through to suggestions
       }
+      // Auto-link failed (maybe player was claimed in between)
+      setError(linkResult.error || "Failed to link profile")
     }
 
     // Check for pending claims
@@ -166,10 +161,10 @@ export default function PlayerLinkingFlow({
     <div className="player-linking">
       {error && (
         <div className="player-linking-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
           <button onClick={() => setError(null)}>
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
           </button>
         </div>
       )}
@@ -177,10 +172,7 @@ export default function PlayerLinkingFlow({
       {state === "loading" && <LoadingState />}
 
       {state === "auto-linking" && exactMatchPlayer && (
-        <AutoLinkSuccess
-          player={exactMatchPlayer}
-          onComplete={() => router.push("/admin")}
-        />
+        <AutoLinkSuccess player={exactMatchPlayer} onComplete={() => router.push("/admin")} />
       )}
 
       {state === "suggestions" && (

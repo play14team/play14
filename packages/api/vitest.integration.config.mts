@@ -8,8 +8,8 @@
  * - PostgreSQL test database running: podman-compose up -d play14-db-test
  */
 
+import { resolve } from "node:path"
 import { defineConfig } from "vitest/config"
-import { resolve } from "path"
 
 export default defineConfig({
   test: {

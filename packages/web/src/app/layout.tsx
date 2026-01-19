@@ -1,5 +1,5 @@
-import { ThemeProvider } from "@/components/utils/theme-provider"
 import ScrollToTop from "@/components/utils/scroll-to-top"
+import { ThemeProvider } from "@/components/utils/theme-provider"
 import "@/styles/main.scss"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"

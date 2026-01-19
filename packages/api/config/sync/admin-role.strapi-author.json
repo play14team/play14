@@ -36,9 +36,7 @@
       "action": "plugin::upload.assets.update",
       "subject": null,
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": null,
       "documentId": "gv9zw91njbxsnqydhhez005j",
       "locale": null
@@ -47,9 +45,7 @@
       "action": "plugin::upload.read",
       "subject": null,
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": null,
       "documentId": "n0nequ42dr1ui1o1vzgma8i2",
       "locale": null

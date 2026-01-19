@@ -8,30 +8,27 @@
  * - Strapi built: `bun --filter play14-api build`
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
-import request from "supertest"
 import type { Core } from "@strapi/strapi"
-import {
-  setupStrapiTestInstance,
-  teardownStrapiTestInstance,
-  getHttpServer,
-} from "../../test-utils/strapi-test-instance"
+import request from "supertest"
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { getMockPaymentState, resetMockPaymentState } from "../../services/payment"
 import {
   cleanupTestData,
+  seedPaidOrderWithTickets,
   seedTestEvent,
   seedTestOrder,
-  seedPaidOrderWithTickets,
 } from "../../test-utils/seed-database"
+import {
+  getHttpServer,
+  setupStrapiTestInstance,
+  teardownStrapiTestInstance,
+} from "../../test-utils/strapi-test-instance"
 import { createAuthenticatedUser } from "../helpers/auth"
 import {
-  resetMockPaymentState,
-  getMockPaymentState,
-} from "../../services/payment"
-import {
+  sendChargeRefunded,
   sendCheckoutCompleted,
   sendCheckoutExpired,
   sendPaymentFailed,
-  sendChargeRefunded,
   waitForWebhookProcessing,
 } from "../helpers/webhook-simulator"
 
@@ -60,9 +57,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create pending order with reservation
@@ -129,9 +124,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId = `cs_test_idempotent_${Date.now()}`
@@ -193,13 +186,12 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Set initial reservation count
-      await strapi.db.connection("ticket_types")
+      await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .update({ reserved_count: 5 })
 
@@ -247,7 +239,8 @@ describe("Webhook Handlers", () => {
       expect(updatedOrder.hasReservation).toBe(false)
 
       // Verify reservations released (5 - 2 = 3)
-      const ticketType = await strapi.db.connection("ticket_types")
+      const ticketType = await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .first()
       expect(ticketType.reserved_count).toBe(3)
@@ -261,9 +254,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId = `cs_test_fail_${Date.now()}`
@@ -330,9 +321,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create paid order with tickets
@@ -374,9 +363,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId = `cs_test_record_${Date.now()}`
@@ -420,7 +407,8 @@ describe("Webhook Handlers", () => {
       await waitForWebhookProcessing()
 
       // Assert - verify event recorded in processed_webhooks table
-      const processedWebhook = await strapi.db.connection("processed_webhooks")
+      const processedWebhook = await strapi.db
+        .connection("processed_webhooks")
         .where("event_id", eventId)
         .first()
 
@@ -439,9 +427,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId1 = `cs_test_dup1_${Date.now()}`
@@ -516,7 +502,12 @@ describe("Webhook Handlers", () => {
       })
 
       // Act - send webhook for session 1 with shared event ID
-      const response1 = await sendCheckoutCompleted(httpServer, sessionId1, undefined, sharedEventId)
+      const response1 = await sendCheckoutCompleted(
+        httpServer,
+        sessionId1,
+        undefined,
+        sharedEventId
+      )
       await waitForWebhookProcessing()
 
       // Act - try to send webhook for session 2 with the SAME event ID
@@ -533,7 +524,12 @@ describe("Webhook Handlers", () => {
         amountTotal: 5000,
         currency: "eur",
       })
-      const response2 = await sendCheckoutCompleted(httpServer, sessionId2, undefined, sharedEventId)
+      const response2 = await sendCheckoutCompleted(
+        httpServer,
+        sessionId2,
+        undefined,
+        sharedEventId
+      )
 
       // Assert - both should return 200 (idempotent)
       expect(response1.status).toBe(200)
@@ -558,9 +554,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId = `cs_test_concurrent_${Date.now()}`
@@ -620,7 +614,8 @@ describe("Webhook Handlers", () => {
       expect(tickets).toHaveLength(2)
 
       // Only one processed_webhooks entry
-      const processedCount = await strapi.db.connection("processed_webhooks")
+      const processedCount = await strapi.db
+        .connection("processed_webhooks")
         .where("event_id", eventId)
         .count("* as count")
         .first()
@@ -633,9 +628,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId = `cs_test_fail_record_${Date.now()}`
@@ -682,7 +675,8 @@ describe("Webhook Handlers", () => {
       expect(response.status).toBe(200)
 
       // Verify event recorded
-      const processedWebhook = await strapi.db.connection("processed_webhooks")
+      const processedWebhook = await strapi.db
+        .connection("processed_webhooks")
         .where("event_id", eventId)
         .first()
 
@@ -697,9 +691,7 @@ describe("Webhook Handlers", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const sessionId = `cs_test_multi_${Date.now()}`
@@ -756,10 +748,12 @@ describe("Webhook Handlers", () => {
       await waitForWebhookProcessing()
 
       // Assert - both events should be recorded
-      const completedRecord = await strapi.db.connection("processed_webhooks")
+      const completedRecord = await strapi.db
+        .connection("processed_webhooks")
         .where("event_id", completedEventId)
         .first()
-      const failedRecord = await strapi.db.connection("processed_webhooks")
+      const failedRecord = await strapi.db
+        .connection("processed_webhooks")
         .where("event_id", failedEventId)
         .first()
 
@@ -777,10 +771,12 @@ describe("Webhook Handlers", () => {
         .post("/api/webhooks/stripe")
         .set("stripe-signature", "invalid_signature")
         .set("Content-Type", "application/json")
-        .send(JSON.stringify({
-          type: "checkout.session.completed",
-          data: { object: {} },
-        }))
+        .send(
+          JSON.stringify({
+            type: "checkout.session.completed",
+            data: { object: {} },
+          })
+        )
 
       // Assert - should fail signature verification
       expect(response.status).toBe(400)
@@ -791,10 +787,12 @@ describe("Webhook Handlers", () => {
       const response = await request(httpServer)
         .post("/api/webhooks/stripe")
         .set("Content-Type", "application/json")
-        .send(JSON.stringify({
-          type: "checkout.session.completed",
-          data: { object: {} },
-        }))
+        .send(
+          JSON.stringify({
+            type: "checkout.session.completed",
+            data: { object: {} },
+          })
+        )
 
       // Assert
       expect(response.status).toBe(400)

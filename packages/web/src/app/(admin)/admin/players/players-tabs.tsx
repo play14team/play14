@@ -30,7 +30,7 @@ export default function PlayersTabs({ activeTab, onTabChange }: PlayersTabsProps
           className={`events-page-tab ${activeTab === tab.id ? "active" : ""}`}
           onClick={() => onTabChange(tab.id)}
         >
-          <i className={`bx ${tab.icon}`}></i>
+          <i className={`bx ${tab.icon}`} />
           <span>{tab.label}</span>
         </button>
       ))}

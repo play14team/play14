@@ -11,9 +11,7 @@ export default async function ArticleTag(props: {
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <Filters
-          name={`Found ${articles.length} articles with tag "${params.tag}"`}
-        />
+        <Filters name={`Found ${articles.length} articles with tag "${params.tag}"`} />
       </div>
       <div className="pt-70">
         <ArticleGrid articles={articles} />

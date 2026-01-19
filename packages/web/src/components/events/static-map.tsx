@@ -14,20 +14,11 @@ const StaticEventMap = () => {
 
   // Default to light mode during SSR/hydration
   const isDark = mounted && resolvedTheme === "dark"
-  const imageSrc = isDark
-    ? "/play14-movement-dark.png"
-    : "/play14-movement-light.png"
+  const imageSrc = isDark ? "/play14-movement-dark.png" : "/play14-movement-light.png"
 
   return (
     <div>
-      <Image
-        src={imageSrc}
-        alt="#play14 movement"
-        width={1221}
-        height={765}
-        priority
-        unoptimized
-      />
+      <Image src={imageSrc} alt="#play14 movement" width={1221} height={765} priority unoptimized />
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import Page from "@/components/layout/page"
 import PlayerDetails from "@/components/players/details"
-import { SlugParamsProps } from "@/libs/slug-params"
 import { getPlayer } from "@/components/players/get.action"
+import type { SlugParamsProps } from "@/libs/slug-params"
 import { notFound } from "next/navigation"
 
 export const revalidate = 3600

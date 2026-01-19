@@ -109,5 +109,7 @@ export function groupBudgetItemsByCategory(
  * Calculate category total from budget items
  */
 export function calculateCategoryTotal(items: BudgetLineItem[], category: BudgetCategory): number {
-  return items.filter((item) => item.category === category).reduce((sum, item) => sum + (item.total || 0), 0)
+  return items
+    .filter((item) => item.category === category)
+    .reduce((sum, item) => sum + (item.total || 0), 0)
 }

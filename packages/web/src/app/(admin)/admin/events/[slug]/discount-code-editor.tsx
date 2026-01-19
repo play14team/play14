@@ -1,15 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
+import { useEffect, useState } from "react"
 import {
-  createDiscountCode,
-  updateDiscountCode,
-  deleteDiscountCode,
-  toggleDiscountCodeActive,
   type DiscountCode,
   type DiscountCodeData,
+  createDiscountCode,
+  deleteDiscountCode,
+  toggleDiscountCodeActive,
+  updateDiscountCode,
 } from "./discount-code.action"
-import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 
 interface Props {
   eventId: string
@@ -146,11 +146,10 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
         maxDiscountAmount: data.maxDiscountAmount,
         isActive: data.isActive ?? true,
         description: data.description,
-        createdAt: localCodes.find((c) => c.documentId === editingId)?.createdAt || new Date().toISOString(),
+        createdAt:
+          localCodes.find((c) => c.documentId === editingId)?.createdAt || new Date().toISOString(),
       }
-      setLocalCodes((prev) =>
-        prev.map((c) => (c.documentId === editingId ? optimisticCode : c))
-      )
+      setLocalCodes((prev) => prev.map((c) => (c.documentId === editingId ? optimisticCode : c)))
 
       // Close form immediately for better UX
       setEditingId(null)
@@ -160,9 +159,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
 
       if (result.success && result.data) {
         // Update with server data (in case there are any differences)
-        setLocalCodes((prev) =>
-          prev.map((c) => (c.documentId === editingId ? result.data! : c))
-        )
+        setLocalCodes((prev) => prev.map((c) => (c.documentId === editingId ? result.data! : c)))
         onUpdate()
       } else {
         // Rollback on error
@@ -197,9 +194,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
 
       if (result.success && result.data) {
         // Replace temporary code with real data from server
-        setLocalCodes((prev) =>
-          prev.map((c) => (c.documentId === tempId ? result.data! : c))
-        )
+        setLocalCodes((prev) => prev.map((c) => (c.documentId === tempId ? result.data! : c)))
         onUpdate()
       } else {
         // Rollback on error: remove the temporary code
@@ -284,7 +279,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
     <div className="discount-code-editor">
       {error && (
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -352,7 +347,10 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                       step={formData.discountType === "percentage" ? 1 : 0.01}
                       value={formData.discountValue}
                       onChange={(e) =>
-                        setFormData({ ...formData, discountValue: parseFloat(e.target.value) || 0 })
+                        setFormData({
+                          ...formData,
+                          discountValue: Number.parseFloat(e.target.value) || 0,
+                        })
                       }
                       className="admin-input"
                     />
@@ -366,7 +364,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          maxUses: e.target.value ? parseInt(e.target.value) : null,
+                          maxUses: e.target.value ? Number.parseInt(e.target.value) : null,
                         })
                       }
                       className="admin-input"
@@ -411,7 +409,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          minOrderAmount: e.target.value ? parseFloat(e.target.value) : null,
+                          minOrderAmount: e.target.value ? Number.parseFloat(e.target.value) : null,
                         })
                       }
                       className="admin-input"
@@ -429,7 +427,9 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            maxDiscountAmount: e.target.value ? parseFloat(e.target.value) : null,
+                            maxDiscountAmount: e.target.value
+                              ? Number.parseFloat(e.target.value)
+                              : null,
                           })
                         }
                         className="admin-input"
@@ -505,7 +505,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                     className="admin-btn admin-btn-icon"
                     title="Edit"
                   >
-                    <i className="bx bx-edit"></i>
+                    <i className="bx bx-edit" />
                   </button>
                   <button
                     type="button"
@@ -513,7 +513,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                     className="admin-btn admin-btn-icon"
                     title={code.isActive ? "Deactivate" : "Activate"}
                   >
-                    <i className={`bx ${code.isActive ? "bx-hide" : "bx-show"}`}></i>
+                    <i className={`bx ${code.isActive ? "bx-hide" : "bx-show"}`} />
                   </button>
                   <button
                     type="button"
@@ -522,7 +522,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                     className="admin-btn admin-btn-icon admin-btn-danger"
                     title={code.usedCount > 0 ? "Cannot delete: code has been used" : "Delete"}
                   >
-                    <i className="bx bx-trash"></i>
+                    <i className="bx bx-trash" />
                   </button>
                 </div>
               </>
@@ -588,7 +588,10 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                   step={formData.discountType === "percentage" ? 1 : 0.01}
                   value={formData.discountValue}
                   onChange={(e) =>
-                    setFormData({ ...formData, discountValue: parseFloat(e.target.value) || 0 })
+                    setFormData({
+                      ...formData,
+                      discountValue: Number.parseFloat(e.target.value) || 0,
+                    })
                   }
                   className="admin-input"
                 />
@@ -602,7 +605,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      maxUses: e.target.value ? parseInt(e.target.value) : null,
+                      maxUses: e.target.value ? Number.parseInt(e.target.value) : null,
                     })
                   }
                   className="admin-input"
@@ -617,9 +620,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                 <input
                   type="datetime-local"
                   value={formData.validFrom || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, validFrom: e.target.value || null })
-                  }
+                  onChange={(e) => setFormData({ ...formData, validFrom: e.target.value || null })}
                   className="admin-input"
                 />
               </div>
@@ -628,9 +629,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                 <input
                   type="datetime-local"
                   value={formData.validUntil || ""}
-                  onChange={(e) =>
-                    setFormData({ ...formData, validUntil: e.target.value || null })
-                  }
+                  onChange={(e) => setFormData({ ...formData, validUntil: e.target.value || null })}
                   className="admin-input"
                 />
               </div>
@@ -647,7 +646,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      minOrderAmount: e.target.value ? parseFloat(e.target.value) : null,
+                      minOrderAmount: e.target.value ? Number.parseFloat(e.target.value) : null,
                     })
                   }
                   className="admin-input"
@@ -665,7 +664,9 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        maxDiscountAmount: e.target.value ? parseFloat(e.target.value) : null,
+                        maxDiscountAmount: e.target.value
+                          ? Number.parseFloat(e.target.value)
+                          : null,
                       })
                     }
                     className="admin-input"
@@ -711,7 +712,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
       {/* Add button */}
       {!isAdding && !editingId && (
         <button type="button" onClick={startAdding} className="admin-btn admin-btn-secondary">
-          <i className="bx bx-plus"></i>
+          <i className="bx bx-plus" />
           Add Discount Code
         </button>
       )}

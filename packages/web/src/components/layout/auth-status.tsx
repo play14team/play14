@@ -1,6 +1,6 @@
-import Link from "next/link"
 import { getAuthState } from "@/libs/auth"
 import { getFeatureFlags } from "@/libs/feature-flags"
+import Link from "next/link"
 import UserMenu from "./user-menu"
 
 export default async function AuthStatus() {
@@ -18,7 +18,7 @@ export default async function AuthStatus() {
 
   return (
     <Link href="/auth/login" className="auth-login-icon" title="Sign In">
-      <i className="bx bx-log-in"></i>
+      <i className="bx bx-log-in" />
     </Link>
   )
 }

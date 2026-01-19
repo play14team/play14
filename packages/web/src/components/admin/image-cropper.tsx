@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface ImageCropperProps {
   image: string
@@ -102,17 +102,7 @@ export default function ImageCropper({
     const cropHeight = crop.height * scale
 
     ctx.clearRect(cropX, cropY, cropWidth, cropHeight)
-    ctx.drawImage(
-      img,
-      crop.x,
-      crop.y,
-      crop.width,
-      crop.height,
-      cropX,
-      cropY,
-      cropWidth,
-      cropHeight
-    )
+    ctx.drawImage(img, crop.x, crop.y, crop.width, crop.height, cropX, cropY, cropWidth, cropHeight)
 
     // Draw crop border
     ctx.strokeStyle = "#ff6b00"
@@ -127,9 +117,19 @@ export default function ImageCropper({
     // Top-right
     ctx.fillRect(cropX + cropWidth - handleSize / 2, cropY - handleSize / 2, handleSize, handleSize)
     // Bottom-left
-    ctx.fillRect(cropX - handleSize / 2, cropY + cropHeight - handleSize / 2, handleSize, handleSize)
+    ctx.fillRect(
+      cropX - handleSize / 2,
+      cropY + cropHeight - handleSize / 2,
+      handleSize,
+      handleSize
+    )
     // Bottom-right
-    ctx.fillRect(cropX + cropWidth - handleSize / 2, cropY + cropHeight - handleSize / 2, handleSize, handleSize)
+    ctx.fillRect(
+      cropX + cropWidth - handleSize / 2,
+      cropY + cropHeight - handleSize / 2,
+      handleSize,
+      handleSize
+    )
   }, [img, crop])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -209,7 +209,7 @@ export default function ImageCropper({
     } else {
       // Fixed aspect ratio zoom
       const newWidth = crop.width - delta
-      const newHeight = newWidth / aspectRatio
+      const _newHeight = newWidth / aspectRatio
 
       // Calculate constraints based on image dimensions
       const minWidth = Math.max(100, img.width * 0.1)
@@ -274,17 +274,7 @@ export default function ImageCropper({
     if (!ctx) return
 
     // Draw cropped and resized image
-    ctx.drawImage(
-      img,
-      crop.x,
-      crop.y,
-      crop.width,
-      crop.height,
-      0,
-      0,
-      finalWidth,
-      finalHeight
-    )
+    ctx.drawImage(img, crop.x, crop.y, crop.width, crop.height, 0, 0, finalWidth, finalHeight)
 
     canvas.toBlob(
       (blob) => {
@@ -320,7 +310,9 @@ export default function ImageCropper({
         <div className="image-cropper-header">
           <h3>Crop Your Image</h3>
           <p>Drag to reposition, use zoom buttons to adjust size</p>
-          <p className="image-cropper-ratio">Aspect ratio: {formatRatio()} • Output: {formatOutput()}</p>
+          <p className="image-cropper-ratio">
+            Aspect ratio: {formatRatio()} • Output: {formatOutput()}
+          </p>
         </div>
 
         <div className="image-cropper-canvas-container">
@@ -341,7 +333,7 @@ export default function ImageCropper({
               onClick={() => handleZoom(-50)}
               className="admin-btn admin-btn-secondary admin-btn-sm"
             >
-              <i className="bx bx-minus"></i>
+              <i className="bx bx-minus" />
             </button>
             <span>Zoom</span>
             <button
@@ -349,25 +341,17 @@ export default function ImageCropper({
               onClick={() => handleZoom(50)}
               className="admin-btn admin-btn-secondary admin-btn-sm"
             >
-              <i className="bx bx-plus"></i>
+              <i className="bx bx-plus" />
             </button>
           </div>
         </div>
 
         <div className="image-cropper-actions">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="admin-btn admin-btn-secondary"
-          >
+          <button type="button" onClick={onCancel} className="admin-btn admin-btn-secondary">
             Cancel
           </button>
-          <button
-            type="button"
-            onClick={handleCrop}
-            className="admin-btn admin-btn-primary"
-          >
-            <i className="bx bx-check"></i>
+          <button type="button" onClick={handleCrop} className="admin-btn admin-btn-primary">
+            <i className="bx bx-check" />
             Upload
           </button>
         </div>

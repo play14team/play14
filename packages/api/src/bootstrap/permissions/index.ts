@@ -10,8 +10,8 @@
  */
 
 import type { Core } from "@strapi/strapi"
-import { syncPermissions } from "./sync"
 import { reportSentryError } from "../../services/observability/sentry-reporter"
+import { syncPermissions } from "./sync"
 
 export async function bootstrapPermissions(strapi: Core.Strapi): Promise<void> {
   strapi.log.info("[Permission Bootstrap] Starting permission synchronization...")

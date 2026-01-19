@@ -1,7 +1,7 @@
 "use server"
 
 import { restQuery, strapiFetch, strapiFetchFormData } from "@/libs/strapi-client"
-import type { Player, SocialNetwork, UploadFile, GeoLocation } from "@/models/strapi"
+import type { GeoLocation, Player, SocialNetwork, UploadFile } from "@/models/strapi"
 
 /**
  * Player edit populate configuration
@@ -37,9 +37,7 @@ export interface PlayerProfile {
  * Get a player by documentId with all editable fields
  * Used for the player profile edit form
  */
-export async function getPlayerByDocumentId(
-  documentId: string
-): Promise<PlayerProfile | null> {
+export async function getPlayerByDocumentId(documentId: string): Promise<PlayerProfile | null> {
   const response = await restQuery<Player[]>("players", {
     filters: {
       documentId: { $eq: documentId },

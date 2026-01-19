@@ -137,11 +137,7 @@ export async function setVenueLogoFromLibrary(
  * @param venueId Venue document ID
  */
 export async function removeVenueLogo(venueId: string): Promise<LogoActionResult> {
-  const result = await strapiFetch(
-    "/admin/venues/:venueId/logo",
-    { venueId },
-    { method: "DELETE" }
-  )
+  const result = await strapiFetch("/admin/venues/:venueId/logo", { venueId }, { method: "DELETE" })
 
   if (!result.ok) {
     return {

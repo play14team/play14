@@ -10,7 +10,7 @@ export default function Country({ countryCode, flagPosition }: CountryProps) {
   const countryName = clm.getCountryNameByAlpha2(countryCode)
   return (
     <>
-      {flagPosition == "after" && countryName}
+      {flagPosition === "after" && countryName}
       <ReactCountryFlag
         countryCode={countryCode}
         svg
@@ -22,7 +22,7 @@ export default function Country({ countryCode, flagPosition }: CountryProps) {
           marginLeft: "5px",
         }}
       />
-      {flagPosition == "before" && countryName}
+      {flagPosition === "before" && countryName}
     </>
   )
 }

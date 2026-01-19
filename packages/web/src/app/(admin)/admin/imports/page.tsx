@@ -1,5 +1,5 @@
-import type { Metadata } from "next"
 import { requireOrganizer } from "@/libs/auth"
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {

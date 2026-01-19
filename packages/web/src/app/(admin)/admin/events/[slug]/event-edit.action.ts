@@ -1,9 +1,9 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
-import type { TimetableDay } from "./schedule.types"
-import type { MediaLink } from "./media-links.action"
 import type { FinanceData } from "./finance.action"
+import type { MediaLink } from "./media-links.action"
+import type { TimetableDay } from "./schedule.types"
 
 // Types for event editing
 export interface EventForEdit {
@@ -219,9 +219,7 @@ interface StrapiDataResponse<T> {
 /**
  * Get event data for editing
  */
-export async function getEventForEdit(
-  slug: string
-): Promise<EventForEdit | null> {
+export async function getEventForEdit(slug: string): Promise<EventForEdit | null> {
   const result = await strapiFetch<StrapiDataResponse<EventForEdit>>(
     "/admin/events/:slug/edit",
     { slug },
@@ -235,11 +233,10 @@ export async function getEventForEdit(
 /**
  * Update event data
  */
-export async function updateEvent(
-  slug: string,
-  data: EventUpdateData
-): Promise<UpdateEventResult> {
-  const result = await strapiFetch<StrapiDataResponse<{ documentId: string; slug: string; name: string }>>(
+export async function updateEvent(slug: string, data: EventUpdateData): Promise<UpdateEventResult> {
+  const result = await strapiFetch<
+    StrapiDataResponse<{ documentId: string; slug: string; name: string }>
+  >(
     "/admin/events/:slug/edit",
     { slug },
     {

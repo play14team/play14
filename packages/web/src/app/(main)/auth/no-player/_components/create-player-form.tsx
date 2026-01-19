@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import Logo from "@/components/layout/logo"
+import { useState } from "react"
 
 interface CreatePlayerFormProps {
   defaultName: string
@@ -48,7 +48,6 @@ export default function CreatePlayerForm({
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter your full name"
             disabled={isSubmitting}
-            autoFocus
           />
         </div>
 
@@ -73,7 +72,7 @@ export default function CreatePlayerForm({
             onClick={onBack}
             disabled={isSubmitting}
           >
-            <i className="bx bx-arrow-back"></i> Back
+            <i className="bx bx-arrow-back" /> Back
           </button>
           <button
             type="submit"
@@ -82,7 +81,7 @@ export default function CreatePlayerForm({
           >
             {isSubmitting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i> Creating...
+                <i className="bx bx-loader-alt bx-spin" /> Creating...
               </>
             ) : (
               "Create Profile"
@@ -92,8 +91,8 @@ export default function CreatePlayerForm({
       </form>
 
       <p className="text-muted create-note">
-        You&apos;ll be able to add more details like your bio, avatar, and social
-        links after your profile is created.
+        You&apos;ll be able to add more details like your bio, avatar, and social links after your
+        profile is created.
       </p>
     </div>
   )

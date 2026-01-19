@@ -1,11 +1,11 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import PlayersTabs, { TAB_IDS, type TabId } from "./players-tabs"
-import PlayersList from "./players-list"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import ImportsForm from "../imports/imports-form"
+import PlayersList from "./players-list"
+import PlayersTabs, { TAB_IDS, type TabId } from "./players-tabs"
 import SingleInviteForm from "./single-invite-form"
 
 export default function PlayersPageContent() {
@@ -62,7 +62,7 @@ export default function PlayersPageContent() {
               className="admin-btn admin-btn-secondary admin-btn-block"
               target="_blank"
             >
-              <i className="bx bx-link-external"></i>
+              <i className="bx bx-link-external" />
               View Public Directory
             </Link>
           </div>

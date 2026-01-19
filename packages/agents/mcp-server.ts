@@ -19,7 +19,6 @@ import {
 import { ApifyClient } from "apify-client";
 import type {
   StrapiPlayer,
-  SocialNetwork,
   StrapiResponse,
 } from "./lib/types.js";
 
@@ -71,44 +70,44 @@ function sanitizeErrorMessage(message: string): string {
 }
 
 // Fetch with timeout helper (configurable via env)
-const FETCH_TIMEOUT_MS = parseInt(
+const FETCH_TIMEOUT_MS = Number.parseInt(
   process.env.FETCH_TIMEOUT_MS || "30000",
   10
 );
 
 // Rate limiting: delay between consecutive Strapi requests (ms, configurable via env)
-const STRAPI_REQUEST_DELAY_MS = parseInt(
+const STRAPI_REQUEST_DELAY_MS = Number.parseInt(
   process.env.STRAPI_REQUEST_DELAY_MS || "100",
   10
 );
 
 // Maximum bio length in characters (configurable via env)
-const MAX_BIO_LENGTH = parseInt(
+const MAX_BIO_LENGTH = Number.parseInt(
   process.env.MAX_BIO_LENGTH || "10000",
   10
 );
 
 // Maximum length for company name (configurable via env)
-const MAX_COMPANY_LENGTH = parseInt(
+const MAX_COMPANY_LENGTH = Number.parseInt(
   process.env.MAX_COMPANY_LENGTH || "200",
   10
 );
 
 // Maximum length for tagline/headline (configurable via env)
-const MAX_TAGLINE_LENGTH = parseInt(
+const MAX_TAGLINE_LENGTH = Number.parseInt(
   process.env.MAX_TAGLINE_LENGTH || "500",
   10
 );
 
 // Maximum total players to fetch (safety limit, configurable via env)
-const MAX_PLAYERS_FETCH = parseInt(
+const MAX_PLAYERS_FETCH = Number.parseInt(
   process.env.MAX_PLAYERS_FETCH || "10000",
   10
 );
 
 // Rate limiting for Apify/LinkedIn scraping
 // Minimum delay between scrape requests (configurable via env)
-const APIFY_MIN_DELAY_MS = parseInt(
+const APIFY_MIN_DELAY_MS = Number.parseInt(
   process.env.APIFY_MIN_DELAY_MS || "5000",
   10
 );
@@ -127,7 +126,7 @@ const STRAPI_BATCH_SIZE = 100;
 const STRAPI_MAX_PAGE_SIZE = 100;
 
 // Maximum image size for avatar uploads (10MB, configurable via env)
-const MAX_IMAGE_SIZE_BYTES = parseInt(
+const MAX_IMAGE_SIZE_BYTES = Number.parseInt(
   process.env.MAX_IMAGE_SIZE_BYTES || String(10 * 1024 * 1024),
   10
 );
@@ -184,7 +183,7 @@ async function fetchWithTimeout(
 async function fetchWithRetry(
   url: string,
   options: RequestInit = {},
-  maxRetries: number = 3
+  maxRetries = 3
 ): Promise<Response> {
   let lastError: Error | null = null;
 
@@ -497,8 +496,8 @@ interface UploadAvatarArgs {
 }
 
 async function listPlayersWithLinkedIn(
-  page: number = 1,
-  pageSize: number = 20
+  page = 1,
+  pageSize = 20
 ): Promise<object> {
   // Clamp pageSize to allowed range
   const effectivePageSize = Math.min(Math.max(1, pageSize), STRAPI_MAX_PAGE_SIZE);
@@ -959,9 +958,9 @@ async function uploadAvatar(
 
   // Check content-length before downloading to prevent memory exhaustion
   const contentLength = imageResponse.headers.get("content-length");
-  if (contentLength && parseInt(contentLength, 10) > MAX_IMAGE_SIZE_BYTES) {
+  if (contentLength && Number.parseInt(contentLength, 10) > MAX_IMAGE_SIZE_BYTES) {
     throw new Error(
-      `Image too large: ${parseInt(contentLength, 10)} bytes exceeds limit of ${MAX_IMAGE_SIZE_BYTES} bytes`
+      `Image too large: ${Number.parseInt(contentLength, 10)} bytes exceeds limit of ${MAX_IMAGE_SIZE_BYTES} bytes`
     );
   }
 

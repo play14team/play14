@@ -5,9 +5,9 @@
  * that doesn't make real API calls.
  */
 
-import type { PaymentProvider, PaymentProviderType, ConnectPaymentProvider } from "./types"
-import { StripeProvider } from "./providers/stripe"
 import { MockPaymentProvider } from "./providers/mock"
+import { StripeProvider } from "./providers/stripe"
+import type { ConnectPaymentProvider, PaymentProvider, PaymentProviderType } from "./types"
 
 let stripeProvider: StripeProvider | null = null
 let mockProvider: MockPaymentProvider | null = null
@@ -47,7 +47,9 @@ export function getPaymentProvider(providerType: PaymentProviderType): PaymentPr
  * Get payment provider with Connect support
  * Returns the provider cast to ConnectPaymentProvider
  */
-export function getConnectPaymentProvider(providerType: PaymentProviderType): ConnectPaymentProvider {
+export function getConnectPaymentProvider(
+  providerType: PaymentProviderType
+): ConnectPaymentProvider {
   const provider = getPaymentProvider(providerType)
   return provider as ConnectPaymentProvider
 }

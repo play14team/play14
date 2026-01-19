@@ -1,17 +1,17 @@
 "use client"
 
-import { useState, useEffect, type DragEvent } from "react"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
+import { STRIPE_CURRENCIES, formatPrice } from "@/libs/currencies"
+import { type DragEvent, useEffect, useState } from "react"
 import {
+  type TicketType,
+  type TicketTypeData,
   createTicketType,
-  updateTicketType,
   deleteTicketType,
   reorderTicketTypes,
   toggleTicketTypeActive,
-  type TicketType,
-  type TicketTypeData,
+  updateTicketType,
 } from "./ticket-type.action"
-import { STRIPE_CURRENCIES, formatPrice } from "@/libs/currencies"
-import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 
 interface Props {
   eventId: string
@@ -194,9 +194,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
 
       if (result.success && result.data) {
         // Replace temporary ticket with real data from server
-        setOrderedTickets((prev) =>
-          prev.map((t) => (t.documentId === tempId ? result.data! : t))
-        )
+        setOrderedTickets((prev) => prev.map((t) => (t.documentId === tempId ? result.data! : t)))
         onUpdate()
       } else {
         // Rollback on error: remove the temporary ticket
@@ -350,7 +348,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
     <div className="ticket-type-editor">
       {error && (
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -376,198 +374,203 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
               onDragOver={(event) => handleDragOver(event, ticket.documentId)}
               onDrop={(event) => handleDrop(event, ticket.documentId)}
             >
-            {editingId === ticket.documentId ? (
-              // Editing mode
-              <div className="ticket-type-form">
-                <div className="admin-form-row">
-                  <div className="admin-form-group">
-                    <label>Name *</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="admin-input"
-                      placeholder="e.g., Early Bird"
-                    />
+              {editingId === ticket.documentId ? (
+                // Editing mode
+                <div className="ticket-type-form">
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Name *</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="admin-input"
+                        placeholder="e.g., Early Bird"
+                      />
+                    </div>
+                    <div className="admin-form-group">
+                      <label>Description</label>
+                      <input
+                        type="text"
+                        value={formData.description || ""}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className="admin-input"
+                        placeholder="Optional description"
+                      />
+                    </div>
                   </div>
-                  <div className="admin-form-group">
-                    <label>Description</label>
-                    <input
-                      type="text"
-                      value={formData.description || ""}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="admin-input"
-                      placeholder="Optional description"
-                    />
-                  </div>
-                </div>
 
-                <div className="admin-form-row">
-                  <div className="admin-form-group">
-                    <label>Price *</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={formData.price}
-                      onChange={(e) =>
-                        setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
-                      }
-                      className="admin-input"
-                    />
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Price *</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={formData.price}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            price: Number.parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        className="admin-input"
+                      />
+                    </div>
+                    <div className="admin-form-group">
+                      <label>Currency</label>
+                      <select
+                        value={formData.currency}
+                        onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                        className="admin-select"
+                      >
+                        {STRIPE_CURRENCIES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.code} ({c.symbol}) - {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="admin-form-group">
+                      <label>Capacity</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={formData.capacity ?? ""}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            capacity: e.target.value ? Number.parseInt(e.target.value) : null,
+                          })
+                        }
+                        className="admin-input"
+                        placeholder="Unlimited"
+                      />
+                    </div>
                   </div>
-                  <div className="admin-form-group">
-                    <label>Currency</label>
-                    <select
-                      value={formData.currency}
-                      onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                      className="admin-select"
+
+                  <div className="admin-form-row">
+                    <div className="admin-form-group">
+                      <label>Sale Start</label>
+                      <input
+                        type="datetime-local"
+                        value={formData.validFrom || ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, validFrom: e.target.value || null })
+                        }
+                        className="admin-input"
+                      />
+                    </div>
+                    <div className="admin-form-group">
+                      <label>Sale End</label>
+                      <input
+                        type="datetime-local"
+                        value={formData.validUntil || ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, validUntil: e.target.value || null })
+                        }
+                        className="admin-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <label className="admin-checkbox-option">
+                      <input
+                        type="checkbox"
+                        checked={formData.isActive}
+                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                      />
+                      <span>Active (available for purchase)</span>
+                    </label>
+                  </div>
+
+                  <div className="ticket-type-actions">
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      disabled={isLoading}
+                      className="admin-btn admin-btn-primary admin-btn-sm"
                     >
-                      {STRIPE_CURRENCIES.map((c) => (
-                        <option key={c.code} value={c.code}>
-                          {c.code} ({c.symbol}) - {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="admin-form-group">
-                    <label>Capacity</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.capacity ?? ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          capacity: e.target.value ? parseInt(e.target.value) : null,
-                        })
-                      }
-                      className="admin-input"
-                      placeholder="Unlimited"
-                    />
+                      {isLoading ? "Saving..." : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      disabled={isLoading}
+                      className="admin-btn admin-btn-secondary admin-btn-sm"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
-
-                <div className="admin-form-row">
-                  <div className="admin-form-group">
-                    <label>Sale Start</label>
-                    <input
-                      type="datetime-local"
-                      value={formData.validFrom || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, validFrom: e.target.value || null })
-                      }
-                      className="admin-input"
-                    />
-                  </div>
-                  <div className="admin-form-group">
-                    <label>Sale End</label>
-                    <input
-                      type="datetime-local"
-                      value={formData.validUntil || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, validUntil: e.target.value || null })
-                      }
-                      className="admin-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="admin-form-row">
-                  <label className="admin-checkbox-option">
-                    <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    />
-                    <span>Active (available for purchase)</span>
-                  </label>
-                </div>
-
-                <div className="ticket-type-actions">
+              ) : (
+                // View mode
+                <>
                   <button
                     type="button"
-                    onClick={handleSave}
-                    disabled={isLoading}
-                    className="admin-btn admin-btn-primary admin-btn-sm"
+                    className="ticket-type-drag-handle"
+                    title="Drag to reorder"
+                    aria-label="Drag to reorder ticket type"
+                    disabled={isDragDisabled}
+                    draggable={!isDragDisabled}
+                    onDragStart={(event) => handleDragStart(event, ticket.documentId)}
+                    onDragEnd={handleDragEnd}
                   >
-                    {isLoading ? "Saving..." : "Save"}
+                    <i className="bx bx-menu" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    disabled={isLoading}
-                    className="admin-btn admin-btn-secondary admin-btn-sm"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // View mode
-              <>
-                <button
-                  type="button"
-                  className="ticket-type-drag-handle"
-                  title="Drag to reorder"
-                  aria-label="Drag to reorder ticket type"
-                  disabled={isDragDisabled}
-                  draggable={!isDragDisabled}
-                  onDragStart={(event) => handleDragStart(event, ticket.documentId)}
-                  onDragEnd={handleDragEnd}
-                >
-                  <i className="bx bx-menu"></i>
-                </button>
-                <div className="ticket-type-info">
-                  <div className="ticket-type-header">
-                    <h4 className="ticket-type-name">{ticket.name}</h4>
-                    {!ticket.isActive && <span className="ticket-badge inactive">Inactive</span>}
-                    {ticket.soldCount > 0 && (
-                      <span className="ticket-badge sold">{ticket.soldCount} sold</span>
+                  <div className="ticket-type-info">
+                    <div className="ticket-type-header">
+                      <h4 className="ticket-type-name">{ticket.name}</h4>
+                      {!ticket.isActive && <span className="ticket-badge inactive">Inactive</span>}
+                      {ticket.soldCount > 0 && (
+                        <span className="ticket-badge sold">{ticket.soldCount} sold</span>
+                      )}
+                    </div>
+                    {ticket.description && (
+                      <p className="ticket-type-description">{ticket.description}</p>
                     )}
-                  </div>
-                  {ticket.description && (
-                    <p className="ticket-type-description">{ticket.description}</p>
-                  )}
-                  <div className="ticket-type-details">
-                    <span className="ticket-price">{formatTicketPrice(ticket.price, ticket.currency)}</span>
-                    {ticket.capacity && (
-                      <span className="ticket-capacity">
-                        {ticket.capacity - ticket.soldCount} / {ticket.capacity} available
+                    <div className="ticket-type-details">
+                      <span className="ticket-price">
+                        {formatTicketPrice(ticket.price, ticket.currency)}
                       </span>
-                    )}
+                      {ticket.capacity && (
+                        <span className="ticket-capacity">
+                          {ticket.capacity - ticket.soldCount} / {ticket.capacity} available
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="ticket-type-actions">
-                  <button
-                    type="button"
-                    onClick={() => startEditing(ticket)}
-                    className="admin-btn admin-btn-icon"
-                    title="Edit"
-                  >
-                    <i className="bx bx-edit"></i>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleToggleActive(ticket)}
-                    className="admin-btn admin-btn-icon"
-                    title={ticket.isActive ? "Deactivate" : "Activate"}
-                  >
-                    <i className={`bx ${ticket.isActive ? "bx-hide" : "bx-show"}`}></i>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteClick(ticket)}
-                    disabled={ticket.soldCount > 0}
-                    className="admin-btn admin-btn-icon admin-btn-danger"
-                    title={ticket.soldCount > 0 ? "Cannot delete: tickets sold" : "Delete"}
-                  >
-                    <i className="bx bx-trash"></i>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+                  <div className="ticket-type-actions">
+                    <button
+                      type="button"
+                      onClick={() => startEditing(ticket)}
+                      className="admin-btn admin-btn-icon"
+                      title="Edit"
+                    >
+                      <i className="bx bx-edit" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleActive(ticket)}
+                      className="admin-btn admin-btn-icon"
+                      title={ticket.isActive ? "Deactivate" : "Activate"}
+                    >
+                      <i className={`bx ${ticket.isActive ? "bx-hide" : "bx-show"}`} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteClick(ticket)}
+                      disabled={ticket.soldCount > 0}
+                      className="admin-btn admin-btn-icon admin-btn-danger"
+                      title={ticket.soldCount > 0 ? "Cannot delete: tickets sold" : "Delete"}
+                    >
+                      <i className="bx bx-trash" />
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           )
         })}
       </div>
@@ -610,7 +613,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                   step="0.01"
                   value={formData.price}
                   onChange={(e) =>
-                    setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
+                    setFormData({ ...formData, price: Number.parseFloat(e.target.value) || 0 })
                   }
                   className="admin-input"
                 />
@@ -638,7 +641,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      capacity: e.target.value ? parseInt(e.target.value) : null,
+                      capacity: e.target.value ? Number.parseInt(e.target.value) : null,
                     })
                   }
                   className="admin-input"
@@ -704,7 +707,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
       {/* Add button */}
       {!isAdding && !editingId && (
         <button type="button" onClick={startAdding} className="admin-btn admin-btn-secondary">
-          <i className="bx bx-plus"></i>
+          <i className="bx bx-plus" />
           Add Ticket Type
         </button>
       )}

@@ -1,16 +1,16 @@
 "use server"
 
-import { SlugParamsProps } from "@/libs/slug-params"
-import { restQuery, normalizeConnection } from "@/libs/strapi-client"
+import type { SlugParamsProps } from "@/libs/slug-params"
+import { normalizeConnection, restQuery } from "@/libs/strapi-client"
 import {
-  eventItemPopulate,
-  eventDetailsPopulate,
-  eventNavPopulate,
-  eventMarkersPopulate,
   eventCalendarPopulate,
+  eventDetailsPopulate,
+  eventItemPopulate,
+  eventMarkersPopulate,
+  eventNavPopulate,
   testimonialsPopulate,
 } from "@/libs/strapi-populate"
-import moment from "moment"
+import { formatISO } from "date-fns"
 
 // Types - will be replaced by OpenAPI generated types when available
 interface UploadFile {
@@ -122,7 +122,9 @@ interface Testimonial {
  * If ticketingMode is explicitly set to "internal" or "external", use it
  * Otherwise derive from legacy fields (stripeAccount for internal, registration for external)
  */
-function computeTicketingMode(event: Event & { stripeAccount?: { documentId?: string } }): "none" | "internal" | "external" {
+function computeTicketingMode(
+  event: Event & { stripeAccount?: { documentId?: string } }
+): "none" | "internal" | "external" {
   // If explicitly set to internal or external, use it
   if (event.ticketingMode === "internal" || event.ticketingMode === "external") {
     return event.ticketingMode
@@ -148,7 +150,7 @@ export async function getEvents(
   pageSize: number,
   status?: string,
   location?: string,
-  country?: string,
+  country?: string
 ) {
   const filters: Record<string, unknown> = {}
   if (status) {
@@ -184,11 +186,7 @@ export async function getEvents(
  * Get all events with optional filters
  * Fetches all pages since Strapi limits pageSize to 100
  */
-export async function getAllEvents(
-  status?: string,
-  location?: string,
-  country?: string,
-) {
+export async function getAllEvents(status?: string, location?: string, country?: string) {
   const allEvents: Event[] = []
   let page = 1
   const pageSize = 100
@@ -236,12 +234,15 @@ export async function getAllEvents(
  */
 export async function getEvent({ params }: SlugParamsProps) {
   const { slug } = await params
-  const response = await restQuery<(Event & { stripeAccount?: { documentId?: string } })[]>("events", {
-    filters: {
-      slug: { $eq: slug },
-    },
-    populate: eventDetailsPopulate,
-  })
+  const response = await restQuery<(Event & { stripeAccount?: { documentId?: string } })[]>(
+    "events",
+    {
+      filters: {
+        slug: { $eq: slug },
+      },
+      populate: eventDetailsPopulate,
+    }
+  )
 
   const event = response.data?.[0]
   if (!event) return null
@@ -258,7 +259,7 @@ export async function getEvent({ params }: SlugParamsProps) {
  * REST equivalent of: events/slugs.graphql
  */
 export async function getEventSlugs() {
-  const today = moment().format()
+  const today = formatISO(new Date())
   const response = await restQuery<Array<{ slug: string }>>("events", {
     fields: ["slug"],
     filters: {
@@ -403,11 +404,7 @@ export async function getEventYearCounts(): Promise<Record<number, number>> {
 /**
  * Get paginated events for a specific year
  */
-export async function getEventsByYear(
-  year: number,
-  page: number,
-  pageSize: number,
-) {
+export async function getEventsByYear(year: number, page: number, pageSize: number) {
   const startOfYear = `${year}-01-01T00:00:00.000Z`
   const endOfYear = `${year}-12-31T23:59:59.999Z`
 

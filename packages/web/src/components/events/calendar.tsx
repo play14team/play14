@@ -1,18 +1,29 @@
 "use client"
 
-import moment from "moment"
+import { format, getDay, parse, startOfWeek } from "date-fns"
+import enUS from "date-fns/locale/en-US"
 import { useRouter } from "next/navigation"
-import { useState, useCallback } from "react"
+import { useCallback, useState } from "react"
 import {
   Calendar,
-  Event,
+  type Event,
+  type NavigateAction,
   Views,
-  momentLocalizer,
-  NavigateAction,
+  dateFnsLocalizer,
 } from "react-big-calendar"
 import { mapColor } from "./popup"
 
-const localizer = momentLocalizer(moment)
+const locales = {
+  "en-US": enUS,
+}
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek: (date, locale) => startOfWeek(date, { weekStartsOn: 1, locale }),
+  getDay,
+  locales,
+})
 
 interface EventCalendarProps {
   events: CalendarEvent[]
@@ -30,15 +41,12 @@ export default function EventCalendar({ events }: EventCalendarProps) {
   const views = [Views.MONTH]
 
   const onDoubleClickEvent = (event: { slug: string }) => {
-    router.push("/events/" + event.slug)
+    router.push(`/events/${event.slug}`)
   }
 
-  const onNavigate = useCallback(
-    (newDate: Date, _view: string, _action: NavigateAction) => {
-      setDate(newDate)
-    },
-    [],
-  )
+  const onNavigate = useCallback((newDate: Date, _view: string, _action: NavigateAction) => {
+    setDate(newDate)
+  }, [])
 
   const eventPropGetter = useCallback((event: CalendarEvent) => {
     const backgroundColor = mapColor(event.eventStatus)

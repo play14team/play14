@@ -10,6 +10,6 @@ export default {
     ],
   },
   async bootstrap() {
-    console.log("Admin panel bootstrapped");
+    console.log("Admin panel bootstrapped")
   },
-};
+}

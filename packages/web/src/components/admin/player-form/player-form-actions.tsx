@@ -38,7 +38,7 @@ export default function PlayerFormActions({
       {showPositionSection && (
         <div className="action-status">
           <span className={`position-badge position-${currentPosition.toLowerCase()}`}>
-            <i className="bx bx-user-circle"></i>
+            <i className="bx bx-user-circle" />
             {currentPosition}
           </span>
           <p className="status-description">Current position in the community</p>
@@ -56,9 +56,9 @@ export default function PlayerFormActions({
               disabled={isPositionUpdating}
             >
               {isPositionUpdating ? (
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
               ) : (
-                <i className="bx bx-chevron-up"></i>
+                <i className="bx bx-chevron-up" />
               )}
               Promote to {promoteTarget}
             </button>
@@ -71,9 +71,9 @@ export default function PlayerFormActions({
               disabled={isPositionUpdating}
             >
               {isPositionUpdating ? (
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
               ) : (
-                <i className="bx bx-chevron-down"></i>
+                <i className="bx bx-chevron-down" />
               )}
               Demote to {demoteTarget}
             </button>
@@ -88,7 +88,7 @@ export default function PlayerFormActions({
           className="admin-btn admin-btn-secondary admin-btn-block"
           target="_blank"
         >
-          <i className="bx bx-link-external"></i>
+          <i className="bx bx-link-external" />
           View public profile
         </Link>
 
@@ -102,12 +102,12 @@ export default function PlayerFormActions({
         >
           {isSubmitting ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Saving...
             </>
           ) : (
             <>
-              <i className="bx bx-save"></i>
+              <i className="bx bx-save" />
               Save changes
             </>
           )}
@@ -119,7 +119,7 @@ export default function PlayerFormActions({
             onClick={onDiscard}
             className="admin-btn admin-btn-danger-outline admin-btn-block"
           >
-            <i className="bx bx-undo"></i>
+            <i className="bx bx-undo" />
             Discard changes
           </button>
         )}
@@ -128,7 +128,7 @@ export default function PlayerFormActions({
       {/* Dirty State Indicator */}
       {isDirty && (
         <div className="dirty-indicator">
-          <i className="bx bx-edit-alt"></i>
+          <i className="bx bx-edit-alt" />
           <span>You have unsaved changes</span>
         </div>
       )}

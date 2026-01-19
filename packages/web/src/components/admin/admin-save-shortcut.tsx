@@ -61,9 +61,7 @@ export default function AdminSaveShortcut() {
       const focusedDialog =
         activeElement?.closest("dialog[open]") ?? document.querySelector("dialog[open]")
       const saveTarget =
-        findSaveTarget(focusedForm) ??
-        findSaveTarget(focusedDialog) ??
-        findSaveTarget(document)
+        findSaveTarget(focusedForm) ?? findSaveTarget(focusedDialog) ?? findSaveTarget(document)
 
       if (!saveTarget) return
 

@@ -2,8 +2,8 @@
 
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
-import styles from "./loader.module.css"
 import { HashLoader } from "react-spinners"
+import styles from "./loader.module.css"
 
 const Loader = (props: { size?: string }) => {
   const { size } = props

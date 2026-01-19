@@ -61,7 +61,8 @@ export default {
       config: {
         policies: [],
         middlewares: [],
-        description: "Create a new event with default schedule and tickets (Host/Mentor/Founder only)",
+        description:
+          "Create a new event with default schedule and tickets (Host/Mentor/Founder only)",
       },
     },
     // Event edit routes - MUST be before :slug catch-all

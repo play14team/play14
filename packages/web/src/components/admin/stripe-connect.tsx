@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import {
-  createStripeAccount,
-  getOnboardingUrl,
-  getDashboardUrl,
   type StripeAccountStatus,
+  createStripeAccount,
+  getDashboardUrl,
+  getOnboardingUrl,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
+import { useState } from "react"
 
 interface Props {
   account: StripeAccountStatus | null
@@ -29,7 +29,11 @@ const COUNTRIES = [
   { code: "US", name: "United States" },
 ]
 
-export default function StripeConnect({ account, returnPath = "/admin/stripe", onAccountCreated }: Props) {
+export default function StripeConnect({
+  account,
+  returnPath = "/admin/stripe",
+  onAccountCreated,
+}: Props) {
   const [isLoading, setIsLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -128,7 +132,7 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
     return (
       <div className={`stripe-account-status ${config.color}`}>
         <div className="status-header">
-          <i className={`bx ${config.icon}`}></i>
+          <i className={`bx ${config.icon}`} />
           <span className="status-label">{config.label}</span>
         </div>
         <p className="status-description">{config.description}</p>
@@ -147,11 +151,11 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
 
         <div className="account-capabilities">
           <div className={`capability ${account.chargesEnabled ? "enabled" : "disabled"}`}>
-            <i className={`bx ${account.chargesEnabled ? "bx-check" : "bx-x"}`}></i>
+            <i className={`bx ${account.chargesEnabled ? "bx-check" : "bx-x"}`} />
             <span>Payments</span>
           </div>
           <div className={`capability ${account.payoutsEnabled ? "enabled" : "disabled"}`}>
-            <i className={`bx ${account.payoutsEnabled ? "bx-check" : "bx-x"}`}></i>
+            <i className={`bx ${account.payoutsEnabled ? "bx-check" : "bx-x"}`} />
             <span>Payouts</span>
           </div>
         </div>
@@ -165,7 +169,7 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
       <div className="stripe-connect-widget">
         {error && (
           <div className="admin-alert admin-alert-error">
-            <i className="bx bx-error-circle"></i>
+            <i className="bx bx-error-circle" />
             {error}
           </div>
         )}
@@ -173,7 +177,7 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
         {!showCreateForm ? (
           <div className="stripe-connect-cta">
             <div className="stripe-logo">
-              <i className="bx bxl-stripe"></i>
+              <i className="bx bxl-stripe" />
             </div>
             <h3>Connect with Stripe</h3>
             <p>Connect your Stripe account to receive payments directly from event attendees.</p>
@@ -182,7 +186,7 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
               onClick={() => setShowCreateForm(true)}
               className="admin-btn admin-btn-primary"
             >
-              <i className="bx bx-link"></i>
+              <i className="bx bx-link" />
               Get Started
             </button>
           </div>
@@ -241,17 +245,17 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
               >
                 {isRedirecting ? (
                   <>
-                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <i className="bx bx-loader-alt bx-spin" />
                     Redirecting to Stripe...
                   </>
                 ) : isLoading ? (
                   <>
-                    <i className="bx bx-loader-alt bx-spin"></i>
+                    <i className="bx bx-loader-alt bx-spin" />
                     Creating...
                   </>
                 ) : (
                   <>
-                    <i className="bx bxl-stripe"></i>
+                    <i className="bx bxl-stripe" />
                     Continue to Stripe
                   </>
                 )}
@@ -276,7 +280,7 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
     <div className="stripe-connect-widget">
       {error && (
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -293,17 +297,17 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
           >
             {isRedirecting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Redirecting to Stripe...
               </>
             ) : isLoading ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Loading...
               </>
             ) : (
               <>
-                <i className="bx bx-right-arrow-alt"></i>
+                <i className="bx bx-right-arrow-alt" />
                 Complete Setup
               </>
             )}
@@ -319,17 +323,17 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
           >
             {isRedirecting ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Redirecting to Stripe...
               </>
             ) : isLoading ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Loading...
               </>
             ) : (
               <>
-                <i className="bx bx-error"></i>
+                <i className="bx bx-error" />
                 Complete Verification
               </>
             )}
@@ -345,12 +349,12 @@ export default function StripeConnect({ account, returnPath = "/admin/stripe", o
           >
             {isLoading ? (
               <>
-                <i className="bx bx-loader-alt bx-spin"></i>
+                <i className="bx bx-loader-alt bx-spin" />
                 Loading...
               </>
             ) : (
               <>
-                <i className="bx bx-link-external"></i>
+                <i className="bx bx-link-external" />
                 Open Stripe Dashboard
               </>
             )}

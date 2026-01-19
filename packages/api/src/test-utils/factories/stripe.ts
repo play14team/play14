@@ -144,9 +144,7 @@ export function createMockPaymentIntent(
 /**
  * Create a mock Stripe Express account
  */
-export function createMockAccount(
-  overrides: Partial<MockAccount> = {}
-): MockAccount {
+export function createMockAccount(overrides: Partial<MockAccount> = {}): MockAccount {
   accountCounter++
 
   return {
@@ -168,9 +166,7 @@ export function createMockAccount(
 /**
  * Create an incomplete (onboarding not finished) account
  */
-export function createIncompleteAccount(
-  overrides: Partial<MockAccount> = {}
-): MockAccount {
+export function createIncompleteAccount(overrides: Partial<MockAccount> = {}): MockAccount {
   return createMockAccount({
     charges_enabled: false,
     payouts_enabled: false,
@@ -182,9 +178,7 @@ export function createIncompleteAccount(
 /**
  * Create a mock account link
  */
-export function createMockAccountLink(
-  overrides: Partial<MockAccountLink> = {}
-): MockAccountLink {
+export function createMockAccountLink(overrides: Partial<MockAccountLink> = {}): MockAccountLink {
   return {
     object: "account_link",
     url: "https://connect.stripe.com/setup/e/acct_test/abc123",
@@ -233,7 +227,10 @@ export function createCheckoutCompletedEvent(
   sessionOverrides: Partial<MockCheckoutSession> = {}
 ): MockWebhookEvent {
   const session = createCompletedCheckoutSession(sessionOverrides)
-  return createMockWebhookEvent("checkout.session.completed", session as unknown as Record<string, unknown>)
+  return createMockWebhookEvent(
+    "checkout.session.completed",
+    session as unknown as Record<string, unknown>
+  )
 }
 
 /**
@@ -243,7 +240,10 @@ export function createCheckoutExpiredEvent(
   sessionOverrides: Partial<MockCheckoutSession> = {}
 ): MockWebhookEvent {
   const session = createExpiredCheckoutSession(sessionOverrides)
-  return createMockWebhookEvent("checkout.session.expired", session as unknown as Record<string, unknown>)
+  return createMockWebhookEvent(
+    "checkout.session.expired",
+    session as unknown as Record<string, unknown>
+  )
 }
 
 /**

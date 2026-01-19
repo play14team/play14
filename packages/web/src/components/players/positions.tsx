@@ -6,7 +6,7 @@ import { getPlayerNav } from "./get.action"
 export default async function Positions() {
   const players = await getPlayerNav()
   const positions = deduplicate(
-    players.filter((i) => i.position).map((i) => i.position!.toLowerCase()),
+    players.filter((i) => i.position).map((i) => i.position!.toLowerCase())
   )
 
   return (
@@ -15,12 +15,10 @@ export default async function Positions() {
         {positions.map((position, index) => (
           <div key={index} className="article-tags">
             <span>
-              <i className="bx bx-user-pin"></i>
+              <i className="bx bx-user-pin" />
             </span>
 
-            <Link href={`/players/positions/${position}`}>
-              {capitalizeFirstLetter(position)}
-            </Link>
+            <Link href={`/players/positions/${position}`}>{capitalizeFirstLetter(position)}</Link>
           </div>
         ))}
       </div>

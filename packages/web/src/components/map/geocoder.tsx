@@ -1,6 +1,6 @@
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
 import mapboxgl from "mapbox-gl"
-import React from "react"
+import type React from "react"
 import { useControl } from "react-map-gl/mapbox"
 
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
@@ -65,7 +65,7 @@ const GeocoderControl: React.FC<GeocoderControlProps> = ({
       onError && ctrl.on("error", onError)
       return ctrl as any
     },
-    { position },
+    { position }
   )
 
   return null

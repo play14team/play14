@@ -228,12 +228,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "stripeAccountId",
-        "player",
-        "accountStatus"
-      ],
+      "list": ["id", "stripeAccountId", "player", "accountStatus"],
       "edit": [
         [
           {

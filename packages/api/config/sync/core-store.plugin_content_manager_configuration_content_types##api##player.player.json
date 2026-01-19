@@ -375,13 +375,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "slug",
-        "position",
-        "avatar",
-        "company"
-      ],
+      "list": ["name", "slug", "position", "avatar", "company"],
       "edit": [
         [
           {

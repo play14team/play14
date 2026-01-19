@@ -1,7 +1,6 @@
-import React from "react"
 import { Button, Heading, Link, Text } from "@react-email/components"
-import { Layout } from "./components/layout"
 import { CalendarSection } from "./components/calendar-section"
+import { Layout } from "./components/layout"
 
 interface TicketConfirmationEmailProps {
   orderNumber: string
@@ -78,9 +77,16 @@ export default function TicketConfirmationEmail({
       <div style={ticketsBoxStyle}>
         <Heading as="h3">Your Tickets</Heading>
         {tickets.map((ticket, index) => (
-          <div key={index} style={{ padding: "12px 0", borderBottom: index < tickets.length - 1 ? "1px solid #eee" : "none" }}>
+          <div
+            key={index}
+            style={{
+              padding: "12px 0",
+              borderBottom: index < tickets.length - 1 ? "1px solid #eee" : "none",
+            }}
+          >
             <Text style={{ margin: "0" }}>
-              <strong>{ticket.ticketTypeName}:</strong> <span style={codeStyle}>{ticket.ticketCode}</span>
+              <strong>{ticket.ticketTypeName}:</strong>{" "}
+              <span style={codeStyle}>{ticket.ticketCode}</span>
             </Text>
             <Text style={{ color: "#666", fontSize: "13px", margin: "4px 0 0 0" }}>
               Attendee: {ticket.attendeeName}

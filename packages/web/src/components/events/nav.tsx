@@ -1,5 +1,5 @@
-import { Event, UploadFile } from "@/models/strapi"
-import DetailsNavigator, { NavLink } from "../layout/detailsnav"
+import type { Event, UploadFile } from "@/models/strapi"
+import DetailsNavigator, { type NavLink } from "../layout/detailsnav"
 import { getEventNav } from "./get.action"
 
 export default async function EventsNavigator({
@@ -8,7 +8,7 @@ export default async function EventsNavigator({
   current: string
 }) {
   const events = (await getEventNav()) as Event[]
-  const index = events.findIndex((a) => a.slug == current)
+  const index = events.findIndex((a) => a.slug === current)
 
   // If event not found in list, show no navigation
   if (index === -1) {

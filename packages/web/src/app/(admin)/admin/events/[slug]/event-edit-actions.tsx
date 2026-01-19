@@ -1,10 +1,10 @@
 "use client"
 
-import Link from "next/link"
 import { formatCurrency } from "@/libs/currencies"
+import Link from "next/link"
 import type { BudgetLineItem } from "./budget.types"
-import type { ResultLineItem } from "./results.types"
 import type { TabId } from "./event-edit-tabs"
+import type { ResultLineItem } from "./results.types"
 import type { TicketType } from "./ticket-type.action"
 
 interface BudgetSummary {
@@ -64,7 +64,7 @@ function calculateBudgetSummary(items: BudgetLineItem[]): BudgetSummary {
   }
 }
 
-function calculateResultsSummary(items: ResultLineItem[], ticketRevenue: number = 0): BudgetSummary {
+function calculateResultsSummary(items: ResultLineItem[], ticketRevenue = 0): BudgetSummary {
   let manualIncome = 0
   let totalExpenses = 0
 
@@ -110,18 +110,17 @@ export default function EventEditActions({
   const resultsSummary = calculateResultsSummary(resultItems, ticketRevenue)
   const isRegistrationOpen = eventStatus === "Open"
   const hasInternalTickets = ticketTypes.length > 0
-  const hasExternalRegistration = Boolean(
-    registrationLink.trim() || registrationWidgetCode.trim()
-  )
+  const hasExternalRegistration = Boolean(registrationLink.trim() || registrationWidgetCode.trim())
   const canOpenRegistration = hasInternalTickets || hasExternalRegistration
   const openRegistrationHint = isRegistrationOpen
     ? "Registration is already open."
     : canOpenRegistration
-    ? "Set the event status to Open."
-    : "Add a ticket type or external registration link/widget to open registration."
+      ? "Set the event status to Open."
+      : "Add a ticket type or external registration link/widget to open registration."
 
   // Helper to format currency with event's currency (no decimal places for summary)
-  const fmt = (amount: number) => formatCurrency(amount, currency, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+  const fmt = (amount: number) =>
+    formatCurrency(amount, currency, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
   const handleOpenRegistration = () => {
     if (!isRegistrationOpen && canOpenRegistration) {
@@ -136,12 +135,12 @@ export default function EventEditActions({
         <span className={`publication-badge ${isPublished ? "published" : "draft"}`}>
           {isPublished ? (
             <>
-              <i className="bx bx-check-circle"></i>
+              <i className="bx bx-check-circle" />
               Published
             </>
           ) : (
             <>
-              <i className="bx bx-edit"></i>
+              <i className="bx bx-edit" />
               Draft
             </>
           )}
@@ -158,7 +157,7 @@ export default function EventEditActions({
             href={`/admin/events/${eventSlug}/preview`}
             className="admin-btn admin-btn-secondary admin-btn-block"
           >
-            <i className="bx bx-show"></i>
+            <i className="bx bx-show" />
             Preview
           </Link>
         )}
@@ -169,7 +168,7 @@ export default function EventEditActions({
             className="admin-btn admin-btn-secondary admin-btn-block"
             target="_blank"
           >
-            <i className="bx bx-link-external"></i>
+            <i className="bx bx-link-external" />
             View public page
           </Link>
         )}
@@ -182,17 +181,17 @@ export default function EventEditActions({
         >
           {isPublishing ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               {isPublished ? "Unpublishing..." : "Publishing..."}
             </>
           ) : isPublished ? (
             <>
-              <i className="bx bx-hide"></i>
+              <i className="bx bx-hide" />
               Unpublish
             </>
           ) : (
             <>
-              <i className="bx bx-globe"></i>
+              <i className="bx bx-globe" />
               Publish
             </>
           )}
@@ -205,7 +204,7 @@ export default function EventEditActions({
           title={openRegistrationHint}
           className={`admin-btn admin-btn-block ${isRegistrationOpen ? "admin-btn-secondary" : "admin-btn-success"}`}
         >
-          <i className="bx bx-door-open"></i>
+          <i className="bx bx-door-open" />
           {isRegistrationOpen ? "Registration is open" : "Open registration"}
         </button>
 
@@ -219,12 +218,12 @@ export default function EventEditActions({
         >
           {isSubmitting ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Saving...
             </>
           ) : (
             <>
-              <i className="bx bx-save"></i>
+              <i className="bx bx-save" />
               Save changes
             </>
           )}
@@ -236,7 +235,7 @@ export default function EventEditActions({
             onClick={onDiscard}
             className="admin-btn admin-btn-danger-outline admin-btn-block"
           >
-            <i className="bx bx-undo"></i>
+            <i className="bx bx-undo" />
             Discard changes
           </button>
         )}
@@ -247,57 +246,63 @@ export default function EventEditActions({
         <>
           <hr />
           <div className="action-budget-summary">
-          <h4>
-            <i className="bx bx-calculator"></i>
-            {activeTab === "budget" ? "Budget" : "Results"} Summary
-          </h4>
+            <h4>
+              <i className="bx bx-calculator" />
+              {activeTab === "budget" ? "Budget" : "Results"} Summary
+            </h4>
 
-          {activeTab === "budget" ? (
-            <div className="budget-summary-compact">
-              <div className="summary-row income">
-                <span className="summary-label">Income</span>
-                <span className="summary-value">{fmt(budgetSummary.totalIncome)}</span>
+            {activeTab === "budget" ? (
+              <div className="budget-summary-compact">
+                <div className="summary-row income">
+                  <span className="summary-label">Income</span>
+                  <span className="summary-value">{fmt(budgetSummary.totalIncome)}</span>
+                </div>
+                <div className="summary-row expenses">
+                  <span className="summary-label">Expenses</span>
+                  <span className="summary-value">{fmt(budgetSummary.totalExpenses)}</span>
+                </div>
+                <div
+                  className={`summary-row margin ${budgetSummary.margin >= 0 ? "positive" : "negative"}`}
+                >
+                  <span className="summary-label">Margin</span>
+                  <span className="summary-value">
+                    {budgetSummary.margin >= 0 ? "+" : ""}
+                    {fmt(budgetSummary.margin)}
+                  </span>
+                </div>
               </div>
-              <div className="summary-row expenses">
-                <span className="summary-label">Expenses</span>
-                <span className="summary-value">{fmt(budgetSummary.totalExpenses)}</span>
+            ) : (
+              <div className="budget-summary-compact">
+                <div className="summary-section-label">Budget</div>
+                <div
+                  className={`summary-row margin ${budgetSummary.margin >= 0 ? "positive" : "negative"}`}
+                >
+                  <span className="summary-label">Projected</span>
+                  <span className="summary-value">
+                    {budgetSummary.margin >= 0 ? "+" : ""}
+                    {fmt(budgetSummary.margin)}
+                  </span>
+                </div>
+                <div className="summary-section-label">Actuals</div>
+                <div className="summary-row income">
+                  <span className="summary-label">Income</span>
+                  <span className="summary-value">{fmt(resultsSummary.totalIncome)}</span>
+                </div>
+                <div className="summary-row expenses">
+                  <span className="summary-label">Expenses</span>
+                  <span className="summary-value">{fmt(resultsSummary.totalExpenses)}</span>
+                </div>
+                <div
+                  className={`summary-row margin ${resultsSummary.margin >= 0 ? "positive" : "negative"}`}
+                >
+                  <span className="summary-label">Result</span>
+                  <span className="summary-value">
+                    {resultsSummary.margin >= 0 ? "+" : ""}
+                    {fmt(resultsSummary.margin)}
+                  </span>
+                </div>
               </div>
-              <div className={`summary-row margin ${budgetSummary.margin >= 0 ? "positive" : "negative"}`}>
-                <span className="summary-label">Margin</span>
-                <span className="summary-value">
-                  {budgetSummary.margin >= 0 ? "+" : ""}
-                  {fmt(budgetSummary.margin)}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="budget-summary-compact">
-              <div className="summary-section-label">Budget</div>
-              <div className={`summary-row margin ${budgetSummary.margin >= 0 ? "positive" : "negative"}`}>
-                <span className="summary-label">Projected</span>
-                <span className="summary-value">
-                  {budgetSummary.margin >= 0 ? "+" : ""}
-                  {fmt(budgetSummary.margin)}
-                </span>
-              </div>
-              <div className="summary-section-label">Actuals</div>
-              <div className="summary-row income">
-                <span className="summary-label">Income</span>
-                <span className="summary-value">{fmt(resultsSummary.totalIncome)}</span>
-              </div>
-              <div className="summary-row expenses">
-                <span className="summary-label">Expenses</span>
-                <span className="summary-value">{fmt(resultsSummary.totalExpenses)}</span>
-              </div>
-              <div className={`summary-row margin ${resultsSummary.margin >= 0 ? "positive" : "negative"}`}>
-                <span className="summary-label">Result</span>
-                <span className="summary-value">
-                  {resultsSummary.margin >= 0 ? "+" : ""}
-                  {fmt(resultsSummary.margin)}
-                </span>
-              </div>
-            </div>
-          )}
+            )}
           </div>
         </>
       )}
@@ -305,7 +310,7 @@ export default function EventEditActions({
       {/* Dirty State Indicator - at bottom to avoid layout shift */}
       {isDirty && (
         <div className="dirty-indicator">
-          <i className="bx bx-edit-alt"></i>
+          <i className="bx bx-edit-alt" />
           <span>You have unsaved changes</span>
         </div>
       )}

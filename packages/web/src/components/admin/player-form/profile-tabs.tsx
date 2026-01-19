@@ -20,11 +20,7 @@ interface ProfileTabsProps {
   showStripeTab: boolean
 }
 
-export default function ProfileTabs({
-  activeTab,
-  onTabChange,
-  showStripeTab,
-}: ProfileTabsProps) {
+export default function ProfileTabs({ activeTab, onTabChange, showStripeTab }: ProfileTabsProps) {
   const visibleTabs = showStripeTab ? TABS : TABS.filter((tab) => tab.id !== "stripe")
 
   // Don't show tabs if there's only one
@@ -41,7 +37,7 @@ export default function ProfileTabs({
           className={`profile-tab ${activeTab === tab.id ? "active" : ""}`}
           onClick={() => onTabChange(tab.id)}
         >
-          <i className={`bx ${tab.icon}`}></i>
+          <i className={`bx ${tab.icon}`} />
           <span>{tab.label}</span>
         </button>
       ))}

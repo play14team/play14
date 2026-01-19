@@ -145,12 +145,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "content",
-        "audio",
-        "author",
-        "createdBy"
-      ],
+      "list": ["content", "audio", "author", "createdBy"],
       "edit": [
         [
           {

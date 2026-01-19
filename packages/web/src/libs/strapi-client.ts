@@ -1,6 +1,6 @@
 import "server-only"
+import { type StrapiClient, strapi } from "@strapi/client"
 import qs from "qs"
-import { strapi, type StrapiClient } from "@strapi/client"
 import { getAuthCookie } from "./auth"
 
 // ============================================================================
@@ -18,7 +18,7 @@ import { getAuthCookie } from "./auth"
  *
  * @throws Error if the identifier is invalid
  */
-export function validatePathSegment(value: string, paramName: string = "id"): string {
+export function validatePathSegment(value: string, paramName = "id"): string {
   if (!value || typeof value !== "string") {
     throw new Error(`Invalid ${paramName}: must be a non-empty string`)
   }
@@ -50,9 +50,7 @@ export function validatePathSegment(value: string, paramName: string = "id"): st
  * Validates multiple path segments at once
  * @throws Error if any identifier is invalid
  */
-export function validatePathSegments(
-  segments: Record<string, string>
-): Record<string, string> {
+export function validatePathSegments(segments: Record<string, string>): Record<string, string> {
   const validated: Record<string, string> = {}
   for (const [name, value] of Object.entries(segments)) {
     validated[name] = validatePathSegment(value, name)
@@ -71,10 +69,7 @@ export function validatePathSegments(
  * const url = buildApiUrl('/admin/events/:slug/edit', { slug })
  * ```
  */
-export function buildApiUrl(
-  pathTemplate: string,
-  params: Record<string, string> = {}
-): string {
+export function buildApiUrl(pathTemplate: string, params: Record<string, string> = {}): string {
   // Validate all parameters first
   const validatedParams = validatePathSegments(params)
 
@@ -94,21 +89,17 @@ export function buildApiUrl(
   return `${STRAPI_URL}${path.startsWith("/api") ? path : `/api${path}`}`
 }
 
-const STRAPI_REST_ENDPOINT =
-  (process.env.STRAPI_API_URL || "").replace(/\/$/, "") + "/api"
+const STRAPI_REST_ENDPOINT = `${(process.env.STRAPI_API_URL || "").replace(/\/$/, "")}/api`
 
 // Fallback to production if primary endpoint is unavailable
 const STRAPI_FALLBACK_ENDPOINT = process.env.STRAPI_FALLBACK_API_URL
-  ? process.env.STRAPI_FALLBACK_API_URL.replace(/\/$/, "") + "/api"
+  ? `${process.env.STRAPI_FALLBACK_API_URL.replace(/\/$/, "")}/api`
   : "https://community.play14.org/api"
 
 /**
  * Fetch with timeout to prevent hanging connections
  */
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit = {},
-): Promise<Response> {
+async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
   const timeout = 30000 // 30 seconds
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)
@@ -185,7 +176,7 @@ async function tryFetch(
   baseUrl: string,
   endpoint: string,
   queryString: string,
-  token: string | undefined,
+  token: string | undefined
 ): Promise<{ response: Response; url: string } | null> {
   const url = `${baseUrl}/${endpoint}${queryString}`
 
@@ -201,18 +192,13 @@ async function tryFetch(
       return { response, url }
     }
 
-    console.warn(
-      "[Strapi] Request returned error:",
-      url,
-      response.status,
-      response.statusText,
-    )
+    console.warn("[Strapi] Request returned error:", url, response.status, response.statusText)
     return null
   } catch (error) {
     console.warn(
       "[Strapi] Request failed:",
       url,
-      error instanceof Error ? error.message : String(error),
+      error instanceof Error ? error.message : String(error)
     )
     return null
   }
@@ -221,17 +207,14 @@ async function tryFetch(
 /**
  * Safely parse JSON response with error handling
  */
-async function parseJsonResponse<T>(
-  response: Response,
-  url: string,
-): Promise<StrapiResponse<T>> {
+async function parseJsonResponse<T>(response: Response, url: string): Promise<StrapiResponse<T>> {
   try {
     return (await response.json()) as StrapiResponse<T>
   } catch (error) {
     console.error(
       "[Strapi] Failed to parse JSON:",
       url,
-      error instanceof Error ? error.message : String(error),
+      error instanceof Error ? error.message : String(error)
     )
     throw new Error("Invalid JSON response from Strapi API")
   }
@@ -244,23 +227,15 @@ async function parseJsonResponse<T>(
  */
 export async function restQuery<T>(
   endpoint: string,
-  params?: StrapiParams,
+  params?: StrapiParams
 ): Promise<StrapiResponse<T>> {
-  const queryString = params
-    ? `?${qs.stringify(params, { encodeValuesOnly: true })}`
-    : ""
+  const queryString = params ? `?${qs.stringify(params, { encodeValuesOnly: true })}` : ""
 
   const primaryToken = process.env.STRAPI_API_SECRET
-  const fallbackToken =
-    process.env.STRAPI_FALLBACK_API_SECRET || process.env.STRAPI_API_SECRET
+  const fallbackToken = process.env.STRAPI_FALLBACK_API_SECRET || process.env.STRAPI_API_SECRET
 
   // Try primary endpoint first
-  const primaryResult = await tryFetch(
-    STRAPI_REST_ENDPOINT,
-    endpoint,
-    queryString,
-    primaryToken,
-  )
+  const primaryResult = await tryFetch(STRAPI_REST_ENDPOINT, endpoint, queryString, primaryToken)
 
   if (primaryResult) {
     return parseJsonResponse<T>(primaryResult.response, primaryResult.url)
@@ -269,14 +244,14 @@ export async function restQuery<T>(
   // Fallback to production if primary failed and fallback is different
   if (STRAPI_REST_ENDPOINT !== STRAPI_FALLBACK_ENDPOINT) {
     console.log(
-      `[Strapi] Primary endpoint unavailable, trying fallback: ${STRAPI_FALLBACK_ENDPOINT}`,
+      `[Strapi] Primary endpoint unavailable, trying fallback: ${STRAPI_FALLBACK_ENDPOINT}`
     )
 
     const fallbackResult = await tryFetch(
       STRAPI_FALLBACK_ENDPOINT,
       endpoint,
       queryString,
-      fallbackToken,
+      fallbackToken
     )
 
     if (fallbackResult) {
@@ -290,7 +265,7 @@ export async function restQuery<T>(
   console.error("Endpoint:", url)
   console.error("Both primary and fallback endpoints failed")
   console.error("=========================================================")
-  throw new Error(`REST API Error: Unable to reach Strapi API`)
+  throw new Error("REST API Error: Unable to reach Strapi API")
 }
 
 /**
@@ -300,9 +275,7 @@ export async function restQuery<T>(
  * REST: { data: [...], meta: { pagination: {...} } }
  * GraphQL: { entity_connection: { nodes: [...], pageInfo: {...} } }
  */
-export function normalizeConnection<T>(
-  response: StrapiResponse<T[]>,
-): StrapiConnectionResponse<T> {
+export function normalizeConnection<T>(response: StrapiResponse<T[]>): StrapiConnectionResponse<T> {
   return {
     nodes: response.data || [],
     pageInfo: response.meta?.pagination || defaultPagination,
@@ -313,9 +286,7 @@ export function normalizeConnection<T>(
  * Extracts a single entity from REST response
  * Handles both single object and array responses
  */
-export function normalizeEntity<T>(
-  response: StrapiResponse<T | T[]>,
-): T | null {
+export function normalizeEntity<T>(response: StrapiResponse<T | T[]>): T | null {
   if (!response.data) return null
   return Array.isArray(response.data) ? response.data[0] || null : response.data
 }
@@ -325,7 +296,7 @@ export function normalizeEntity<T>(
  * documentId is the primary identifier (string)
  */
 export function getDocumentId(
-  item: { documentId?: string; id?: string | number } | null | undefined,
+  item: { documentId?: string; id?: string | number } | null | undefined
 ): string | null {
   return item?.documentId || item?.id?.toString() || null
 }
@@ -418,10 +389,7 @@ export interface StrapiFetchResult<T> {
  * Build a safe path with validated parameters
  * Internal helper for strapiFetch
  */
-function buildSafePath(
-  pathTemplate: string,
-  params: Record<string, string> = {}
-): string {
+function buildSafePath(pathTemplate: string, params: Record<string, string> = {}): string {
   // Validate all parameters first
   const validatedParams = validatePathSegments(params)
 
@@ -444,7 +412,9 @@ function buildSafePath(
 /**
  * Get appropriate Strapi client based on auth options
  */
-async function getClientForOptions(options: Pick<StrapiFetchOptions, "noAuth" | "optionalAuth">): Promise<StrapiClient> {
+async function getClientForOptions(
+  options: Pick<StrapiFetchOptions, "noAuth" | "optionalAuth">
+): Promise<StrapiClient> {
   if (options.noAuth) {
     return getPublicStrapiClient()
   }
@@ -510,7 +480,9 @@ export async function strapiFetch<T>(
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } }
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string }
+      }
       return {
         ok: false,
         status: response.status,
@@ -518,7 +490,7 @@ export async function strapiFetch<T>(
       }
     }
 
-    const data = await response.json() as T
+    const data = (await response.json()) as T
     return {
       ok: true,
       status: response.status,
@@ -554,7 +526,7 @@ export async function strapiFetch<T>(
  */
 export async function strapiFetchFormData<T>(
   pathTemplate: string,
-  params: Record<string, string> = {},
+  params: Record<string, string>,
   formData: FormData
 ): Promise<StrapiFetchResult<T>> {
   const client = await getStrapiClient()
@@ -568,7 +540,9 @@ export async function strapiFetchFormData<T>(
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } }
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string }
+      }
       return {
         ok: false,
         status: response.status,
@@ -576,7 +550,7 @@ export async function strapiFetchFormData<T>(
       }
     }
 
-    const data = await response.json() as T
+    const data = (await response.json()) as T
     return {
       ok: true,
       status: response.status,
@@ -602,7 +576,7 @@ export async function strapiFetchFormData<T>(
  */
 export async function strapiFetchWithQuery<T>(
   pathTemplate: string,
-  params: Record<string, string> = {},
+  params: Record<string, string>,
   queryParams: URLSearchParams | Record<string, string>,
   options: Omit<StrapiFetchOptions, "body"> = {}
 ): Promise<StrapiFetchResult<T>> {
@@ -628,7 +602,9 @@ export async function strapiFetchWithQuery<T>(
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({})) as { error?: { message?: string } }
+      const errorData = (await response.json().catch(() => ({}))) as {
+        error?: { message?: string }
+      }
       return {
         ok: false,
         status: response.status,
@@ -636,7 +612,7 @@ export async function strapiFetchWithQuery<T>(
       }
     }
 
-    const data = await response.json() as T
+    const data = (await response.json()) as T
     return {
       ok: true,
       status: response.status,

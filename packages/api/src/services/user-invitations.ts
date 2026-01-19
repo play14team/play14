@@ -1,6 +1,6 @@
-import type { Core } from "@strapi/strapi"
 import { randomBytes } from "node:crypto"
 import { render } from "@react-email/render"
+import type { Core } from "@strapi/strapi"
 import UserInvitationEmail from "../emails/user-invitation"
 
 interface InvitationUser {
@@ -34,11 +34,7 @@ function createResetPasswordToken(): string {
   return randomBytes(64).toString("hex")
 }
 
-async function buildEmailPayload(
-  user: InvitationUser,
-  reminder: boolean,
-  resetToken: string
-) {
+async function buildEmailPayload(user: InvitationUser, reminder: boolean, resetToken: string) {
   const inviteUrl = buildInviteUrl(resetToken)
   const html = await render(
     UserInvitationEmail({
@@ -55,9 +51,7 @@ async function buildEmailPayload(
     }),
     { plainText: true }
   )
-  const subject = reminder
-    ? "Reminder: your #play14 account is ready"
-    : "You're invited to #play14"
+  const subject = reminder ? "Reminder: your #play14 account is ready" : "You're invited to #play14"
 
   return { html, text, subject }
 }
@@ -134,8 +128,7 @@ function isRateLimitError(error: unknown): boolean {
   }
 
   return (
-    getErrorStatusCode(error) === 429 ||
-    (error as { name?: string }).name === "rate_limit_exceeded"
+    getErrorStatusCode(error) === 429 || (error as { name?: string }).name === "rate_limit_exceeded"
   )
 }
 
@@ -314,12 +307,10 @@ async function revertUserStatus(
   toStatus: string
 ): Promise<void> {
   const knex = strapi.db.connection
-  await knex("up_users")
-    .where("document_id", userDocumentId)
-    .update({
-      invitation_status: toStatus,
-      updated_at: new Date(),
-    })
+  await knex("up_users").where("document_id", userDocumentId).update({
+    invitation_status: toStatus,
+    updated_at: new Date(),
+  })
 }
 
 export async function processUserInvitations(strapi: Core.Strapi): Promise<void> {
@@ -328,9 +319,7 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
   }
 
   const limit = Number(process.env.INVITATION_SEND_LIMIT || DEFAULT_INVITE_LIMIT)
-  const reminderDays = Number(
-    process.env.INVITATION_REMINDER_DAYS || DEFAULT_REMINDER_DAYS
-  )
+  const reminderDays = Number(process.env.INVITATION_REMINDER_DAYS || DEFAULT_REMINDER_DAYS)
   const sendDelayMs = Number(process.env.INVITATION_SEND_DELAY_MS || DEFAULT_INVITE_DELAY_MS)
   const maxRetries = Number(process.env.INVITATION_SEND_MAX_RETRIES || DEFAULT_INVITE_MAX_RETRIES)
   const retryDelayMs = Number(
@@ -339,30 +328,23 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
   const reminderThreshold = new Date(Date.now() - reminderDays * 24 * 60 * 60 * 1000)
   const rateLimiter = createRateLimiter(sendDelayMs)
 
-  const pendingUsers = await strapi
-    .documents("plugin::users-permissions.user")
-    .findMany({
-      filters: {
-        invitationStatus: "pending",
-        blocked: false,
-      },
-      limit,
-      populate: {
-        player: { fields: ["name"] },
-      },
-    })
+  const pendingUsers = await strapi.documents("plugin::users-permissions.user").findMany({
+    filters: {
+      invitationStatus: "pending",
+      blocked: false,
+    },
+    limit,
+    populate: {
+      player: { fields: ["name"] },
+    },
+  })
 
   for (const user of pendingUsers as InvitationUser[]) {
     if (!user.email) continue
 
     // ATOMIC CLAIM: Try to claim this user for processing
     // Only one container will succeed in multi-container deployments
-    const claimed = await claimUserForProcessing(
-      strapi,
-      user.documentId,
-      "pending",
-      "processing"
-    )
+    const claimed = await claimUserForProcessing(strapi, user.documentId, "pending", "processing")
 
     if (!claimed) {
       // Another container already claimed this user or status changed
@@ -400,36 +382,31 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
     }
   }
 
-  const reminderUsers = await strapi
-    .documents("plugin::users-permissions.user")
-    .findMany({
-      filters: {
-        invitationStatus: "sent",
-        invitationSentAt: { $lt: reminderThreshold.toISOString() },
-        invitationReminderSentAt: { $null: true },
-        blocked: false,
-      },
-      limit,
-      populate: {
-        player: { fields: ["name"] },
-      },
-    })
+  const reminderUsers = await strapi.documents("plugin::users-permissions.user").findMany({
+    filters: {
+      invitationStatus: "sent",
+      invitationSentAt: { $lt: reminderThreshold.toISOString() },
+      invitationReminderSentAt: { $null: true },
+      blocked: false,
+    },
+    limit,
+    populate: {
+      player: { fields: ["name"] },
+    },
+  })
 
   for (const user of reminderUsers as InvitationUser[]) {
     if (!user.email) continue
 
     // ATOMIC CLAIM: Try to claim this user for reminder processing
     // Uses "reminding" as intermediate status to prevent duplicates
-    const claimed = await claimUserForProcessing(
-      strapi,
-      user.documentId,
-      "sent",
-      "reminding"
-    )
+    const claimed = await claimUserForProcessing(strapi, user.documentId, "sent", "reminding")
 
     if (!claimed) {
       // Another container already claimed this user or status changed
-      strapi.log.debug(`[Invitations] User ${user.email} already being processed for reminder, skipping`)
+      strapi.log.debug(
+        `[Invitations] User ${user.email} already being processed for reminder, skipping`
+      )
       continue
     }
 
@@ -439,15 +416,7 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
         documentId: user.documentId,
         data: { resetPasswordToken: resetToken } as any,
       })
-      await sendWithRateLimit(
-        strapi,
-        user,
-        true,
-        resetToken,
-        rateLimiter,
-        maxRetries,
-        retryDelayMs
-      )
+      await sendWithRateLimit(strapi, user, true, resetToken, rateLimiter, maxRetries, retryDelayMs)
       await strapi.documents("plugin::users-permissions.user").update({
         documentId: user.documentId,
         data: {

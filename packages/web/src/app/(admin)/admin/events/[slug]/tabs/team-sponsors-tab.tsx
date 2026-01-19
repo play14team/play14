@@ -1,9 +1,7 @@
 "use client"
 
+import OrganizerSelect, { SelectedOrganizer } from "@/components/admin/organizer-select"
 import SponsorEditor from "@/components/admin/sponsor-editor"
-import OrganizerSelect, {
-  SelectedOrganizer,
-} from "@/components/admin/organizer-select"
 import type { EventForEdit, OrganizerOption } from "../event-edit.action"
 import type { Sponsorship } from "../sponsor.action"
 
@@ -76,11 +74,7 @@ export default function TeamSponsorsTab({
                   <SelectedOrganizer
                     key={id}
                     organizer={findOrganizer(id, eventHosts)}
-                    onRemove={() =>
-                      setSelectedHostIds(
-                        selectedHostIds.filter((hId) => hId !== id)
-                      )
-                    }
+                    onRemove={() => setSelectedHostIds(selectedHostIds.filter((hId) => hId !== id))}
                   />
                 ))}
               </ul>
@@ -95,13 +89,9 @@ export default function TeamSponsorsTab({
             <OrganizerSelect
               organizers={organizers}
               selectedIds={selectedMentorIds}
-              onSelect={(id) =>
-                setSelectedMentorIds([...selectedMentorIds, id])
-              }
+              onSelect={(id) => setSelectedMentorIds([...selectedMentorIds, id])}
               placeholder="Add a mentor..."
-              filterFn={(o) =>
-                o.position === "Mentor" || o.position === "Founder"
-              }
+              filterFn={(o) => o.position === "Mentor" || o.position === "Founder"}
             />
             {selectedMentorIds.length > 0 && (
               <ul className="organizer-list">
@@ -110,9 +100,7 @@ export default function TeamSponsorsTab({
                     key={id}
                     organizer={findOrganizer(id, eventMentors)}
                     onRemove={() =>
-                      setSelectedMentorIds(
-                        selectedMentorIds.filter((mId) => mId !== id)
-                      )
+                      setSelectedMentorIds(selectedMentorIds.filter((mId) => mId !== id))
                     }
                   />
                 ))}
@@ -126,13 +114,9 @@ export default function TeamSponsorsTab({
       <div className="admin-form-section">
         <h2>Sponsors</h2>
         <p className="admin-form-section-description">
-          Manage sponsors for this event organized by category (Gold, Silver,
-          etc.).
+          Manage sponsors for this event organized by category (Gold, Silver, etc.).
         </p>
-        <SponsorEditor
-          sponsorships={sponsorships}
-          onChange={onSponsorshipsChange}
-        />
+        <SponsorEditor sponsorships={sponsorships} onChange={onSponsorshipsChange} />
       </div>
     </>
   )

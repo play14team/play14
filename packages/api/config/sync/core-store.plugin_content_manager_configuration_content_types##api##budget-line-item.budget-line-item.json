@@ -200,12 +200,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "category",
-        "name",
-        "description"
-      ],
+      "list": ["id", "category", "name", "description"],
       "edit": [
         [
           {

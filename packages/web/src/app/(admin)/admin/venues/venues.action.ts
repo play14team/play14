@@ -88,12 +88,9 @@ export async function getVenues(
     queryParams.search = search
   }
 
-  const result = await strapiFetchWithQuery<VenuesListResponse>(
-    "/admin/venues",
-    {},
-    queryParams,
-    { cache: "no-store" }
-  )
+  const result = await strapiFetchWithQuery<VenuesListResponse>("/admin/venues", {}, queryParams, {
+    cache: "no-store",
+  })
 
   if (!result.ok) {
     console.error(`[Venues] Failed to fetch venues: ${result.status} - ${result.error}`)
@@ -106,9 +103,7 @@ export async function getVenues(
 /**
  * Get a venue for editing
  */
-export async function getVenueForEdit(
-  venueId: string
-): Promise<VenueForEdit | null> {
+export async function getVenueForEdit(venueId: string): Promise<VenueForEdit | null> {
   const result = await strapiFetch<{ data: VenueForEdit }>(
     "/admin/venues/:venueId",
     { venueId },
@@ -187,14 +182,8 @@ export async function updateVenue(
 /**
  * Delete a venue
  */
-export async function deleteVenue(
-  venueId: string
-): Promise<{ success: boolean; error?: string }> {
-  const result = await strapiFetch(
-    "/admin/venues/:venueId",
-    { venueId },
-    { method: "DELETE" }
-  )
+export async function deleteVenue(venueId: string): Promise<{ success: boolean; error?: string }> {
+  const result = await strapiFetch("/admin/venues/:venueId", { venueId }, { method: "DELETE" })
 
   if (!result.ok) {
     return {

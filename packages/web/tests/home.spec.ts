@@ -1,9 +1,5 @@
 import { expect, test } from "@playwright/test"
-import {
-  verifyNavigation,
-  verifyPageLayout,
-  waitForPageLoad,
-} from "./utils/test-helpers"
+import { verifyNavigation, verifyPageLayout, waitForPageLoad } from "./utils/test-helpers"
 
 test.describe("Home Page", () => {
   test.beforeEach(async ({ page }) => {
@@ -32,9 +28,7 @@ test.describe("Home Page", () => {
     const summarySection = page.locator("#summary")
     await expect(summarySection).toBeVisible()
     await expect(page.getByText("What is #play14?")).toBeVisible()
-    await expect(
-      page.getByText("transformative power of play", { exact: false }),
-    ).toBeVisible()
+    await expect(page.getByText("transformative power of play", { exact: false })).toBeVisible()
   })
 
   test("should display upcoming events section", async ({ page }) => {
@@ -74,40 +68,28 @@ test.describe("Home Page", () => {
 
   test("should have working links to main sections", async ({ page }) => {
     // Check link to players
-    await expect(
-      page.getByRole("link", { name: /players/i }).first(),
-    ).toBeVisible()
+    await expect(page.getByRole("link", { name: /players/i }).first()).toBeVisible()
 
     // Check link to games
-    await expect(
-      page.getByRole("link", { name: /games/i }).first(),
-    ).toBeVisible()
+    await expect(page.getByRole("link", { name: /games/i }).first()).toBeVisible()
 
     // Check link to events map
-    await expect(
-      page.getByRole("link", { name: /global event/i }),
-    ).toBeVisible()
+    await expect(page.getByRole("link", { name: /global event/i })).toBeVisible()
   })
 
   test("should display Benjamin Franklin quote", async ({ page }) => {
-    await expect(
-      page.getByText("Tell me and I forget", { exact: false }),
-    ).toBeVisible()
+    await expect(page.getByText("Tell me and I forget", { exact: false })).toBeVisible()
     await expect(page.getByText("Benjamin Franklin")).toBeVisible()
   })
 
   test("should display Plato quote", async ({ page }) => {
-    await expect(
-      page.getByText("discover more about a person", { exact: false }),
-    ).toBeVisible()
+    await expect(page.getByText("discover more about a person", { exact: false })).toBeVisible()
     await expect(page.getByText("Plato")).toBeVisible()
   })
 
   test("should navigate to events page from navbar", async ({ page }) => {
     const navbar = page.locator("#navbar")
-    const eventsLink = navbar
-      .getByRole("link", { name: "Events", exact: true })
-      .first()
+    const eventsLink = navbar.getByRole("link", { name: "Events", exact: true }).first()
     await eventsLink.waitFor({ state: "visible", timeout: 10000 })
 
     // Scroll into view before clicking

@@ -13,7 +13,7 @@ export async function GET() {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
       },
-      { status: 200 },
+      { status: 200 }
     )
   } catch (error) {
     // If something goes wrong, return 503 Service Unavailable
@@ -23,7 +23,7 @@ export async function GET() {
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 503 },
+      { status: 503 }
     )
   }
 }

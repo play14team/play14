@@ -2,10 +2,8 @@
  * Tests for invoice generation
  */
 
-import { describe, it, expect } from "vitest"
-import { generateInvoicePDF, formatTicketItems, type InvoiceData } from "./invoice"
-import { writeFileSync } from "fs"
-import { join } from "path"
+import { describe, expect, it } from "vitest"
+import { type InvoiceData, formatTicketItems, generateInvoicePDF } from "./invoice"
 
 describe("Invoice Generation", () => {
   it("should generate a valid PDF buffer", async () => {

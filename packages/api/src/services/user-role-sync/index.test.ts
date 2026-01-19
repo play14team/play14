@@ -6,8 +6,8 @@
  * - syncUserRoleWithPlayerPosition: Sync role on OAuth login
  */
 
-import { describe, it, expect, beforeEach, vi, type Mock } from "vitest"
 import type { Core } from "@strapi/strapi"
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest"
 import { syncUserRoleFromPlayer, syncUserRoleWithPlayerPosition } from "./index"
 
 // ============================================================================
@@ -166,10 +166,7 @@ describe("syncUserRoleFromPlayer", () => {
   })
 
   it("returns false when player not found", async () => {
-    const result = await syncUserRoleFromPlayer(
-      mockStrapi as unknown as Core.Strapi,
-      "nonexistent"
-    )
+    const result = await syncUserRoleFromPlayer(mockStrapi as unknown as Core.Strapi, "nonexistent")
 
     expect(result).toBe(false)
     expect(mockStrapi.log.warn).toHaveBeenCalledWith(expect.stringContaining("Player not found"))
@@ -182,9 +179,7 @@ describe("syncUserRoleFromPlayer", () => {
     const result = await syncUserRoleFromPlayer(mockStrapi as unknown as Core.Strapi, "player-1")
 
     expect(result).toBe(false)
-    expect(mockStrapi.log.debug).toHaveBeenCalledWith(
-      expect.stringContaining("has no linked user")
-    )
+    expect(mockStrapi.log.debug).toHaveBeenCalledWith(expect.stringContaining("has no linked user"))
   })
 
   it("returns false for unknown position", async () => {

@@ -43,14 +43,7 @@
         }
       },
       "type": "enumeration",
-      "enum": [
-        "Game",
-        "IceBreaker",
-        "WarmUp",
-        "Facilitation",
-        "Retrospective",
-        "CoolDown"
-      ],
+      "enum": ["Game", "IceBreaker", "WarmUp", "Facilitation", "Retrospective", "CoolDown"],
       "required": true
     },
     "documentedBy": {

@@ -2,7 +2,7 @@
  * Unit tests for payment provider factory
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 // Mock the StripeProvider
 vi.mock("./providers/stripe", () => ({
@@ -14,9 +14,6 @@ vi.mock("./providers/stripe", () => ({
 
 // Set environment variable before importing
 process.env.STRIPE_SECRET_KEY = "sk_test_mock_key"
-
-import { getPaymentProvider } from "./factory"
-import { StripeProvider } from "./providers/stripe"
 
 describe("getPaymentProvider", () => {
   beforeEach(() => {
@@ -58,9 +55,7 @@ describe("getPaymentProvider", () => {
       const { getPaymentProvider } = await import("./factory")
 
       // @ts-expect-error - Testing invalid input
-      expect(() => getPaymentProvider("unknown")).toThrow(
-        "Unknown payment provider type: unknown"
-      )
+      expect(() => getPaymentProvider("unknown")).toThrow("Unknown payment provider type: unknown")
     })
   })
 })

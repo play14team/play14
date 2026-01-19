@@ -1,7 +1,7 @@
 import "server-only"
+import type { Player } from "@/models/strapi"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
-import type { Player, UploadFile } from "@/models/strapi"
 
 // ============================================================================
 // TYPES
@@ -106,7 +106,12 @@ export async function getCurrentUser(): Promise<StrapiUser | null> {
     }
 
     const user = await response.json()
-    console.log("[Auth] User fetched successfully:", user.email, "- Player:", user.player ? user.player.name : "none")
+    console.log(
+      "[Auth] User fetched successfully:",
+      user.email,
+      "- Player:",
+      user.player ? user.player.name : "none"
+    )
     return user
   } catch (error) {
     console.error("[Auth] Failed to get current user:", error)
@@ -199,7 +204,9 @@ export async function requireFounder(callbackUrl?: string): Promise<Session & { 
 /**
  * Require Organizer role - redirects if user is not Host, Mentor, or Founder
  */
-export async function requireOrganizer(callbackUrl?: string): Promise<Session & { player: Player }> {
+export async function requireOrganizer(
+  callbackUrl?: string
+): Promise<Session & { player: Player }> {
   const session = await requirePlayer(callbackUrl)
 
   const position = session.player.position || ""
@@ -221,7 +228,7 @@ export async function requireOrganizer(callbackUrl?: string): Promise<Session & 
  */
 export async function handleOAuthCallback(
   accessToken: string,
-  redirectTo: string = "/admin"
+  redirectTo = "/admin"
 ): Promise<void> {
   await setAuthCookie(accessToken)
   redirect(redirectTo)
@@ -230,7 +237,7 @@ export async function handleOAuthCallback(
 /**
  * Sign out - clear cookie and redirect
  */
-export async function signOut(redirectTo: string = "/"): Promise<void> {
+export async function signOut(redirectTo = "/"): Promise<void> {
   await clearAuthCookie()
   redirect(redirectTo)
 }

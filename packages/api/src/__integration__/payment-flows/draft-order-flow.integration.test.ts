@@ -8,21 +8,17 @@
  * - Strapi built: `bun --filter play14-api build`
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
-import request from "supertest"
 import type { Core } from "@strapi/strapi"
+import request from "supertest"
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { resetMockPaymentState } from "../../services/payment"
+import { cleanupTestData, seedTestEvent, seedTestTicketType } from "../../test-utils/seed-database"
 import {
+  getHttpServer,
   setupStrapiTestInstance,
   teardownStrapiTestInstance,
-  getHttpServer,
 } from "../../test-utils/strapi-test-instance"
-import {
-  cleanupTestData,
-  seedTestEvent,
-  seedTestTicketType,
-} from "../../test-utils/seed-database"
 import { createAuthenticatedUser, getAuthHeader } from "../helpers/auth"
-import { resetMockPaymentState } from "../../services/payment"
 import { sendCheckoutCompleted } from "../helpers/webhook-simulator"
 
 describe("Draft Order Flow", () => {
@@ -50,9 +46,7 @@ describe("Draft Order Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Act
@@ -62,9 +56,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -87,16 +79,14 @@ describe("Draft Order Flow", () => {
 
     it("returns player defaults for attendee prefill", async () => {
       // Arrange
-      const { token, player, user } = await createAuthenticatedUser(strapi, {
+      const { token } = await createAuthenticatedUser(strapi, {
         email: "john@example.com",
         playerName: "John Doe",
       })
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Act
@@ -106,9 +96,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -126,9 +114,7 @@ describe("Draft Order Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create draft
@@ -138,9 +124,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -192,9 +176,7 @@ describe("Draft Order Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create draft with 2 tickets
@@ -204,9 +186,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -216,9 +196,7 @@ describe("Draft Order Flow", () => {
         .set(getAuthHeader(token))
         .send({
           data: {
-            attendees: [
-              { firstName: "John", lastName: "Doe", email: "john@example.com" },
-            ],
+            attendees: [{ firstName: "John", lastName: "Doe", email: "john@example.com" }],
             gdprConsent: true,
             termsAccepted: true,
           },
@@ -235,9 +213,7 @@ describe("Draft Order Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const draftResponse = await request(httpServer)
@@ -246,9 +222,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -258,9 +232,7 @@ describe("Draft Order Flow", () => {
         .set(getAuthHeader(token))
         .send({
           data: {
-            attendees: [
-              { firstName: "John", lastName: "Doe", email: "john@example.com" },
-            ],
+            attendees: [{ firstName: "John", lastName: "Doe", email: "john@example.com" }],
             gdprConsent: false,
             termsAccepted: true,
           },
@@ -278,9 +250,7 @@ describe("Draft Order Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create draft
@@ -290,9 +260,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -355,9 +323,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: freeTicketType.documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: freeTicketType.documentId, quantity: 1 }],
           },
         })
 
@@ -369,9 +335,7 @@ describe("Draft Order Flow", () => {
         .set(getAuthHeader(token))
         .send({
           data: {
-            attendees: [
-              { firstName: "John", lastName: "Doe", email: "john@example.com" },
-            ],
+            attendees: [{ firstName: "John", lastName: "Doe", email: "john@example.com" }],
             gdprConsent: true,
             termsAccepted: true,
           },
@@ -401,9 +365,7 @@ describe("Draft Order Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create draft without adding attendee info
@@ -413,9 +375,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 1 }],
           },
         })
 
@@ -432,13 +392,11 @@ describe("Draft Order Flow", () => {
   describe("Complete draft order flow with webhook", () => {
     it("completes full draft → attendees → checkout → payment flow", async () => {
       // Arrange
-      const { token, player } = await createAuthenticatedUser(strapi)
+      const { token } = await createAuthenticatedUser(strapi)
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Step 1: Create draft
@@ -448,9 +406,7 @@ describe("Draft Order Flow", () => {
         .send({
           data: {
             eventId: event.documentId,
-            tickets: [
-              { ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 },
-            ],
+            tickets: [{ ticketTypeId: event.ticketTypes![0].documentId, quantity: 2 }],
           },
         })
 
@@ -496,10 +452,7 @@ describe("Draft Order Flow", () => {
       const sessionId = order.providerSessionId
 
       // Step 5: Simulate webhook
-      const webhookResponse = await sendCheckoutCompleted(
-        httpServer,
-        sessionId
-      )
+      const webhookResponse = await sendCheckoutCompleted(httpServer, sessionId)
 
       expect(webhookResponse.status).toBe(200)
 

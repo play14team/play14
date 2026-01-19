@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import Link from "next/link"
 import Image from "next/image"
-import { getSponsors, type SponsorListItem, type SponsorsListResponse } from "./sponsors.action"
+import Link from "next/link"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { type SponsorListItem, type SponsorsListResponse, getSponsors } from "./sponsors.action"
 
 export default function SponsorsList() {
   const [sponsors, setSponsors] = useState<SponsorListItem[]>([])
@@ -70,14 +70,15 @@ export default function SponsorsList() {
     if (!sponsor.logo) return null
     const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
     // Prefer thumbnail or small format
-    const url = sponsor.logo.formats?.thumbnail?.url || sponsor.logo.formats?.small?.url || sponsor.logo.url
+    const url =
+      sponsor.logo.formats?.thumbnail?.url || sponsor.logo.formats?.small?.url || sponsor.logo.url
     return url.startsWith("http") ? url : `${baseUrl}${url}`
   }
 
   if (isLoading && sponsors.length === 0) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading sponsors...</span>
       </div>
     )
@@ -86,14 +87,14 @@ export default function SponsorsList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
         <button
           type="button"
           className="admin-btn admin-btn-secondary"
           onClick={() => fetchSponsors(1, debouncedSearch)}
         >
-          <i className="bx bx-refresh"></i>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -105,7 +106,7 @@ export default function SponsorsList() {
       <div className="venues-toolbar">
         <div className="venues-search">
           <div className="search-input-wrapper">
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
             <input
               type="text"
               placeholder="Search sponsors..."
@@ -120,7 +121,7 @@ export default function SponsorsList() {
                 onClick={() => handleSearchChange("")}
                 aria-label="Clear search"
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             )}
           </div>
@@ -132,7 +133,7 @@ export default function SponsorsList() {
             className="admin-btn admin-btn-secondary admin-btn-sm"
             onClick={handleClearFilters}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Clear filters
           </button>
         )}
@@ -145,17 +146,15 @@ export default function SponsorsList() {
 
       {isLoading ? (
         <div className="claims-loading">
-          <i className="bx bx-loader-alt bx-spin"></i>
+          <i className="bx bx-loader-alt bx-spin" />
           <span>Loading...</span>
         </div>
       ) : sponsors.length === 0 ? (
         <div className="claims-empty">
-          <i className="bx bx-diamond"></i>
+          <i className="bx bx-diamond" />
           <h3>No sponsors found</h3>
           <p>
-            {searchQuery
-              ? "Try adjusting your search"
-              : "Create your first sponsor to get started"}
+            {searchQuery ? "Try adjusting your search" : "Create your first sponsor to get started"}
           </p>
           {searchQuery && (
             <button
@@ -188,20 +187,18 @@ export default function SponsorsList() {
                         style={{ objectFit: "contain" }}
                       />
                     ) : (
-                      <i className="bx bx-diamond"></i>
+                      <i className="bx bx-diamond" />
                     )}
                   </div>
                   <div className="venue-card-info">
                     <h3 className="venue-card-name">{sponsor.name}</h3>
-                    {sponsor.url && (
-                      <span className="venue-card-address">{sponsor.url}</span>
-                    )}
+                    {sponsor.url && <span className="venue-card-address">{sponsor.url}</span>}
                     <span className="venue-card-events">
                       {sponsor.eventsCount} event{sponsor.eventsCount !== 1 ? "s" : ""}
                     </span>
                   </div>
                   <div className="venue-card-action">
-                    <i className="bx bx-chevron-right"></i>
+                    <i className="bx bx-chevron-right" />
                   </div>
                 </Link>
               )
@@ -216,7 +213,7 @@ export default function SponsorsList() {
                 disabled={pagination.page <= 1}
                 onClick={() => handlePageChange(pagination.page - 1)}
               >
-                <i className="bx bx-chevron-left"></i>
+                <i className="bx bx-chevron-left" />
                 Previous
               </button>
               <span className="pagination-info">
@@ -229,7 +226,7 @@ export default function SponsorsList() {
                 onClick={() => handlePageChange(pagination.page + 1)}
               >
                 Next
-                <i className="bx bx-chevron-right"></i>
+                <i className="bx bx-chevron-right" />
               </button>
             </div>
           )}

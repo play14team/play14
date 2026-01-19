@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import Image from "next/image"
 import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
 import DefaultPlayerImage from "@/components/ui/default-player-image"
+import Image from "next/image"
+import { useState } from "react"
 
 interface ClaimFormModalProps {
   player: PlayerSuggestion
@@ -39,7 +39,7 @@ export default function ClaimFormModal({
         <div className="modal-header">
           <h2>Claim this profile</h2>
           <button className="modal-close" onClick={onCancel} disabled={isSubmitting}>
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
           </button>
         </div>
 
@@ -73,9 +73,7 @@ export default function ClaimFormModal({
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="reason">
-                Why do you believe this is your profile?
-              </label>
+              <label htmlFor="reason">Why do you believe this is your profile?</label>
               <textarea
                 id="reason"
                 value={reason}
@@ -84,9 +82,7 @@ export default function ClaimFormModal({
                 rows={4}
                 disabled={isSubmitting}
               />
-              <span className="char-count">
-                {reason.length} / 20 minimum characters
-              </span>
+              <span className="char-count">{reason.length} / 20 minimum characters</span>
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
@@ -107,7 +103,7 @@ export default function ClaimFormModal({
               >
                 {isSubmitting ? (
                   <>
-                    <i className="bx bx-loader-alt bx-spin"></i> Submitting...
+                    <i className="bx bx-loader-alt bx-spin" /> Submitting...
                   </>
                 ) : (
                   "Submit Claim"

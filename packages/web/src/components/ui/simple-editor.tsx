@@ -1,11 +1,11 @@
 "use client"
 
-import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import Link from "@tiptap/extension-link"
-import Heading from "@tiptap/extension-heading"
 import Blockquote from "@tiptap/extension-blockquote"
+import Heading from "@tiptap/extension-heading"
 import HorizontalRule from "@tiptap/extension-horizontal-rule"
+import Link from "@tiptap/extension-link"
+import { EditorContent, useEditor } from "@tiptap/react"
+import StarterKit from "@tiptap/starter-kit"
 import { useCallback } from "react"
 
 interface SimpleEditorProps {
@@ -106,14 +106,14 @@ export default function SimpleEditor({
         >
           H3
         </button>
-        <span className="toolbar-divider"></span>
+        <span className="toolbar-divider" />
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive("bold") ? "is-active" : ""}
           title="Bold"
         >
-          <i className="bx bx-bold"></i>
+          <i className="bx bx-bold" />
         </button>
         <button
           type="button"
@@ -121,7 +121,7 @@ export default function SimpleEditor({
           className={editor.isActive("italic") ? "is-active" : ""}
           title="Italic"
         >
-          <i className="bx bx-italic"></i>
+          <i className="bx bx-italic" />
         </button>
         <button
           type="button"
@@ -129,16 +129,16 @@ export default function SimpleEditor({
           className={editor.isActive("strike") ? "is-active" : ""}
           title="Strikethrough"
         >
-          <i className="bx bx-strikethrough"></i>
+          <i className="bx bx-strikethrough" />
         </button>
-        <span className="toolbar-divider"></span>
+        <span className="toolbar-divider" />
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive("bulletList") ? "is-active" : ""}
           title="Bullet List"
         >
-          <i className="bx bx-list-ul"></i>
+          <i className="bx bx-list-ul" />
         </button>
         <button
           type="button"
@@ -146,7 +146,7 @@ export default function SimpleEditor({
           className={editor.isActive("orderedList") ? "is-active" : ""}
           title="Numbered List"
         >
-          <i className="bx bx-list-ol"></i>
+          <i className="bx bx-list-ol" />
         </button>
         <button
           type="button"
@@ -154,23 +154,23 @@ export default function SimpleEditor({
           className={editor.isActive("blockquote") ? "is-active" : ""}
           title="Quote"
         >
-          <i className="bx bxs-quote-left"></i>
+          <i className="bx bxs-quote-left" />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           title="Horizontal Rule"
         >
-          <i className="bx bx-minus"></i>
+          <i className="bx bx-minus" />
         </button>
-        <span className="toolbar-divider"></span>
+        <span className="toolbar-divider" />
         <button
           type="button"
           onClick={setLink}
           className={editor.isActive("link") ? "is-active" : ""}
           title="Link"
         >
-          <i className="bx bx-link"></i>
+          <i className="bx bx-link" />
         </button>
         {editor.isActive("link") && (
           <button
@@ -178,7 +178,7 @@ export default function SimpleEditor({
             onClick={() => editor.chain().focus().unsetLink().run()}
             title="Remove Link"
           >
-            <i className="bx bx-unlink"></i>
+            <i className="bx bx-unlink" />
           </button>
         )}
       </div>

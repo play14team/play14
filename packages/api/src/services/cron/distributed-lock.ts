@@ -9,8 +9,8 @@
  * if a container crashes while holding a lock.
  */
 
-import Redis from "ioredis"
 import { randomBytes } from "node:crypto"
+import Redis from "ioredis"
 
 // Singleton Redis client
 let redisClient: Redis | null = null
@@ -172,7 +172,7 @@ export function withDistributedLock<T extends (...args: any[]) => Promise<any>>(
   taskFn: T,
   ttlMs: number = 5 * 60 * 1000
 ): T {
-  return (async (...args: Parameters<T>): Promise<ReturnType<T> | void> => {
+  return (async (...args: Parameters<T>): Promise<ReturnType<T> | undefined> => {
     const lockToken = await acquireLock(taskName, ttlMs)
 
     if (!lockToken) {

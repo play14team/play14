@@ -1,15 +1,15 @@
 "use client"
 
+import type {
+  HostStripeAccount,
+  StripeAccountStatus,
+} from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import StripeAccountSelector from "@/components/admin/stripe-account-selector"
-import TicketTypeEditor from "../ticket-type-editor"
 import DiscountCodeEditor from "../discount-code-editor"
-import type { TicketType } from "../ticket-type.action"
 import type { DiscountCode } from "../discount-code.action"
 import type { EventForEdit, TicketingMode } from "../event-edit.action"
-import type {
-  StripeAccountStatus,
-  HostStripeAccount,
-} from "@/app/(admin)/admin/stripe/stripe-connect.action"
+import TicketTypeEditor from "../ticket-type-editor"
+import type { TicketType } from "../ticket-type.action"
 
 interface TicketsTabProps {
   eventDocumentId: string
@@ -63,10 +63,13 @@ export default function TicketsTab({
             />
             <div className="admin-radio-card-content">
               <div className="admin-radio-card-header">
-                <i className="bx bx-x-circle"></i>
+                <i className="bx bx-x-circle" />
                 <span>No Ticketing</span>
               </div>
-              <p>Attendees cannot register online. Registration will be handled manually or the event is free and open to all.</p>
+              <p>
+                Attendees cannot register online. Registration will be handled manually or the event
+                is free and open to all.
+              </p>
             </div>
           </label>
 
@@ -80,10 +83,13 @@ export default function TicketsTab({
             />
             <div className="admin-radio-card-content">
               <div className="admin-radio-card-header">
-                <i className="bx bxl-stripe"></i>
+                <i className="bx bxl-stripe" />
                 <span>Internal Ticketing (Stripe)</span>
               </div>
-              <p>Use our built-in ticketing system powered by Stripe. Manage ticket types, pricing, and receive payments directly.</p>
+              <p>
+                Use our built-in ticketing system powered by Stripe. Manage ticket types, pricing,
+                and receive payments directly.
+              </p>
             </div>
           </label>
 
@@ -97,14 +103,16 @@ export default function TicketsTab({
             />
             <div className="admin-radio-card-content">
               <div className="admin-radio-card-header">
-                <i className="bx bx-link-external"></i>
+                <i className="bx bx-link-external" />
                 <span>External Registration</span>
               </div>
-              <p>Use an external platform (Eventbrite, Meetup, etc.) for registration. Provide a link or embed their widget.</p>
+              <p>
+                Use an external platform (Eventbrite, Meetup, etc.) for registration. Provide a link
+                or embed their widget.
+              </p>
             </div>
           </label>
         </div>
-
       </div>
 
       {/* Internal Ticketing (Stripe) */}
@@ -191,7 +199,8 @@ export default function TicketsTab({
               onChange={(e) => onRegistrationWidgetCodeChange(e.target.value)}
             />
             <p className="admin-help-text">
-              Paste the HTML/JavaScript code provided by your ticketing platform to embed their registration widget directly on the event page.
+              Paste the HTML/JavaScript code provided by your ticketing platform to embed their
+              registration widget directly on the event page.
             </p>
           </div>
         </div>

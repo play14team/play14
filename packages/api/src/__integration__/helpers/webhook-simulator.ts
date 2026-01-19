@@ -5,14 +5,14 @@
  * events to test webhook handlers using the mock payment provider.
  */
 
-import type { Server } from "http"
+import type { Server } from "node:http"
 import request from "supertest"
 import {
+  createMockWebhookEvent,
   getMockPaymentState,
   simulateMockCheckoutComplete,
   simulateMockCheckoutExpired,
   simulateMockPaymentFailed,
-  createMockWebhookEvent,
 } from "../../services/payment"
 
 /**
@@ -22,7 +22,7 @@ export async function sendWebhookEvent(
   httpServer: Server,
   eventType: string,
   data: Record<string, unknown>,
-  signature: string = "mock_signature_valid",
+  signature = "mock_signature_valid",
   eventId?: string
 ): Promise<request.Response> {
   const payload = JSON.stringify({
@@ -165,8 +165,8 @@ export async function sendCheckoutExpired(
 export async function sendPaymentFailed(
   httpServer: Server,
   sessionId: string,
-  errorCode: string = "card_declined",
-  errorMessage: string = "Your card was declined",
+  errorCode = "card_declined",
+  errorMessage = "Your card was declined",
   eventId?: string
 ): Promise<request.Response> {
   const state = getMockPaymentState()
@@ -301,6 +301,6 @@ export async function sendAccountUpdated(
  * Webhooks may trigger async operations, this helps ensure
  * the database state is consistent before assertions.
  */
-export async function waitForWebhookProcessing(ms: number = 100): Promise<void> {
+export async function waitForWebhookProcessing(ms = 100): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

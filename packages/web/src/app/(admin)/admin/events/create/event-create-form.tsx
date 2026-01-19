@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import SimpleEditor from "@/components/ui/simple-editor"
 import { useToast } from "@/components/admin/toast"
+import SimpleEditor from "@/components/ui/simple-editor"
+import { TZDate } from "@date-fns/tz"
+import { addDays, format, isAfter, isValid } from "date-fns"
+import { useRouter } from "next/navigation"
+import { useEffect, useMemo, useState } from "react"
 import {
-  createEvent,
+  type EventCreateData,
   type LocationOption,
   type VenueOption,
-  type EventCreateData,
+  createEvent,
 } from "./event-create.action"
 
 // Common European countries for the dropdown
@@ -31,13 +33,15 @@ const COUNTRIES = [
 function getTimezones(): { value: string; region: string }[] {
   try {
     const timezones = Intl.supportedValuesOf("timeZone")
-    return timezones.map((tz) => {
+    const supported = timezones.includes("UTC") ? timezones : ["UTC", ...timezones]
+    return supported.map((tz) => {
       const region = tz.split("/")[0]
       return { value: tz, region }
     })
   } catch {
     // Fallback for older browsers
     return [
+      { value: "UTC", region: "UTC" },
       { value: "Europe/Paris", region: "Europe" },
       { value: "Europe/London", region: "Europe" },
       { value: "America/New_York", region: "America" },
@@ -75,87 +79,82 @@ export default function EventCreateForm({ locations, venues }: Props) {
   const [newVenueName, setNewVenueName] = useState("")
   const [newVenueAddress, setNewVenueAddress] = useState("")
   const [description, setDescription] = useState("")
-  const [timezone, setTimezone] = useState(
-    () => Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Paris"
-  )
+  const [timezone, setTimezone] = useState("UTC")
 
   // Get all timezones from browser API
   const allTimezones = useMemo(() => getTimezones(), [])
-  const timezoneRegions = useMemo(
-    () => getTimezoneRegions(allTimezones),
-    [allTimezones]
-  )
+  const timezoneRegions = useMemo(() => getTimezoneRegions(allTimezones), [allTimezones])
   const [endDate, setEndDate] = useState("")
   const [endTime, setEndTime] = useState("17:00")
 
   // Auto-calculate end date when start date changes (if end date not manually set)
   const [endDateManuallySet, setEndDateManuallySet] = useState(false)
 
+  const parseDateTimeInput = (date: string, time: string, tz: string) => {
+    const zone = tz || "UTC"
+    if (!date || !time) return new TZDate(Number.NaN, zone)
+    const [year, month, day] = date.split("-").map(Number)
+    const [hour, minute] = time.split(":").map(Number)
+    if ([year, month, day, hour, minute].some(Number.isNaN)) {
+      return new TZDate(Number.NaN, zone)
+    }
+    return new TZDate(year, month - 1, day, hour, minute, 0, 0, zone)
+  }
+
   // Calculate default end date based on start date
   useEffect(() => {
     if (!startDate || !startTime || endDateManuallySet) return
 
-    const start = new Date(`${startDate}T${startTime}:00`)
-    if (isNaN(start.getTime())) return
+    const start = parseDateTimeInput(startDate, startTime, timezone)
+    if (!isValid(start)) return
 
-    const end = new Date(start)
-    end.setDate(end.getDate() + 2)
+    const end = addDays(start, 2)
 
     // Format as YYYY-MM-DD for input
-    const year = end.getFullYear()
-    const month = String(end.getMonth() + 1).padStart(2, "0")
-    const day = String(end.getDate()).padStart(2, "0")
-    setEndDate(`${year}-${month}-${day}`)
+    setEndDate(format(end, "yyyy-MM-dd"))
     setEndTime("17:00")
-  }, [startDate, startTime, endDateManuallySet])
+  }, [startDate, startTime, endDateManuallySet, timezone])
 
   // Parse end date for preview display
   const endDatePreview = useMemo(() => {
     if (!endDate || !endTime) return null
-    const end = new Date(`${endDate}T${endTime}:00`)
-    if (isNaN(end.getTime())) return null
+    const end = parseDateTimeInput(endDate, endTime, timezone)
+    if (!isValid(end)) return null
     return end
-  }, [endDate, endTime])
+  }, [endDate, endTime, timezone])
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-  }
+  const startDatePreview = useMemo(() => {
+    if (!startDate || !startTime) return null
+    const start = parseDateTimeInput(startDate, startTime, timezone)
+    if (!isValid(start)) return null
+    return start
+  }, [startDate, startTime, timezone])
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    })
-  }
+  const formatDate = (date: TZDate) => format(date, "EEEE, MMMM d, yyyy")
+  const formatTime = (date: TZDate) => format(date, "HH:mm")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
 
     // Build the start datetime
-    const startDateTime = new Date(`${startDate}T${startTime}:00`)
-    if (isNaN(startDateTime.getTime())) {
+    const startDateTime = parseDateTimeInput(startDate, startTime, timezone)
+    if (!isValid(startDateTime)) {
       toast.error("Invalid start date/time")
       setIsSubmitting(false)
       return
     }
 
     // Build the end datetime
-    const endDateTime = new Date(`${endDate}T${endTime}:00`)
-    if (isNaN(endDateTime.getTime())) {
+    const endDateTime = parseDateTimeInput(endDate, endTime, timezone)
+    if (!isValid(endDateTime)) {
       toast.error("Invalid end date/time")
       setIsSubmitting(false)
       return
     }
 
     // Validate end is after start
-    if (endDateTime <= startDateTime) {
+    if (!isAfter(endDateTime, startDateTime)) {
       toast.error("End date/time must be after start date/time")
       setIsSubmitting(false)
       return
@@ -277,9 +276,7 @@ export default function EventCreateForm({ locations, venues }: Props) {
               required
               className="admin-input"
             />
-            <p className="admin-form-help">
-              Auto-calculated as start + 2 days, but can be changed
-            </p>
+            <p className="admin-form-help">Auto-calculated as start + 2 days, but can be changed</p>
           </div>
 
           <div className="admin-form-group">
@@ -323,18 +320,17 @@ export default function EventCreateForm({ locations, venues }: Props) {
           <div className="admin-form-group" />
         </div>
 
-        {endDatePreview && startDate && (
+        {endDatePreview && startDatePreview && (
           <div className="end-date-preview">
-            <i className="bx bx-calendar-check"></i>
+            <i className="bx bx-calendar-check" />
             <span>
-              Event runs from <strong>{formatDate(new Date(`${startDate}T${startTime}:00`))}</strong> to{" "}
+              Event runs from <strong>{formatDate(startDatePreview)}</strong> to{" "}
               <strong>{formatDate(endDatePreview)}</strong> at{" "}
               <strong>{formatTime(endDatePreview)}</strong>
             </span>
           </div>
         )}
       </div>
-
 
       <div className="admin-form-section">
         <h2>Location *</h2>
@@ -517,19 +513,19 @@ export default function EventCreateForm({ locations, venues }: Props) {
         <h2>What happens next?</h2>
         <ul>
           <li>
-            <i className="bx bx-check"></i>
+            <i className="bx bx-check" />
             Event will be created in &quot;Announced&quot; status (draft)
           </li>
           <li>
-            <i className="bx bx-check"></i>
+            <i className="bx bx-check" />
             Default schedule will be generated based on your start/end dates
           </li>
           <li>
-            <i className="bx bx-check"></i>
+            <i className="bx bx-check" />
             Two ticket types created: Early Bird and Standard (prices at 0)
           </li>
           <li>
-            <i className="bx bx-check"></i>
+            <i className="bx bx-check" />
             You will be added as a Host for this event
           </li>
         </ul>
@@ -544,12 +540,12 @@ export default function EventCreateForm({ locations, venues }: Props) {
         >
           {isSubmitting ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Creating event...
             </>
           ) : (
             <>
-              <i className="bx bx-calendar-plus"></i>
+              <i className="bx bx-calendar-plus" />
               Create Event
             </>
           )}

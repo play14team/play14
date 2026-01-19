@@ -8,10 +8,10 @@
  * - PostgreSQL test database running: podman-compose up -d play14-db-test
  */
 
-import { stat } from "fs/promises"
-import { resolve } from "path"
-import { exec } from "child_process"
-import { promisify } from "util"
+import { exec } from "node:child_process"
+import { stat } from "node:fs/promises"
+import { resolve } from "node:path"
+import { promisify } from "node:util"
 
 const execAsync = promisify(exec)
 

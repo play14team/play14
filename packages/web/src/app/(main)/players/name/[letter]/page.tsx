@@ -1,14 +1,10 @@
-import Filters from "@/components/players/filters"
-import PlayerGrid from "@/components/players/grid"
-import AlphabetNav from "@/components/players/alphabet-nav"
 import ScrollToTop from "@/components/layout/scroll-to-top"
-import { Player } from "@/models/strapi"
-import { Metadata } from "next"
+import AlphabetNav from "@/components/players/alphabet-nav"
+import Filters from "@/components/players/filters"
+import { getAllPlayers, getPlayerLetterCounts } from "@/components/players/get.action"
+import PlayerGrid from "@/components/players/grid"
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import {
-  getAllPlayers,
-  getPlayerLetterCounts,
-} from "@/components/players/get.action"
 
 export const metadata: Metadata = {
   title: "Players",
@@ -35,7 +31,7 @@ export default async function PlayersByLetter(props: {
 
   // Sort players using locale-aware sorting to handle accented characters correctly
   const players = allPlayers.sort((a, b) =>
-    a.name.localeCompare(b.name, "en", { sensitivity: "base" }),
+    a.name.localeCompare(b.name, "en", { sensitivity: "base" })
   )
 
   const pagination = {

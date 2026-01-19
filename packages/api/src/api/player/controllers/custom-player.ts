@@ -3,15 +3,15 @@
  * Allows authenticated users to update only their own player profile
  */
 
-import type { Core } from "@strapi/strapi"
-import slugify from "slugify"
 import { randomBytes } from "node:crypto"
 import { render } from "@react-email/render"
-import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
-import { isValidUrl, isValidEmail } from "../../../libs/validation"
-import { nameToUsername } from "../../../libs/strings"
-import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
+import type { Core } from "@strapi/strapi"
+import slugify from "slugify"
 import UserInvitationEmail from "../../../emails/user-invitation"
+import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
+import { nameToUsername } from "../../../libs/strings"
+import { isValidEmail, isValidUrl } from "../../../libs/validation"
+import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 
 /**
  * Get or create a folder in the media library by name
@@ -19,10 +19,7 @@ import UserInvitationEmail from "../../../emails/user-invitation"
  * @param folderName - Name of the folder to find or create
  * @returns The folder ID
  */
-async function getOrCreateMediaFolder(
-  strapi: Core.Strapi,
-  folderName: string
-): Promise<number> {
+async function getOrCreateMediaFolder(strapi: Core.Strapi, folderName: string): Promise<number> {
   // Try to find existing folder by name at root level
   const existingFolder = await strapi.db.query("plugin::upload.folder").findOne({
     where: {
@@ -37,12 +34,10 @@ async function getOrCreateMediaFolder(
 
   // Create the folder if it doesn't exist
   // Get the next pathId
-  const maxPathIdResult = await strapi.db
-    .query("plugin::upload.folder")
-    .findMany({
-      orderBy: { pathId: "desc" },
-      limit: 1,
-    })
+  const maxPathIdResult = await strapi.db.query("plugin::upload.folder").findMany({
+    orderBy: { pathId: "desc" },
+    limit: 1,
+  })
 
   const nextPathId = maxPathIdResult.length > 0 ? maxPathIdResult[0].pathId + 1 : 1
 
@@ -87,19 +82,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get user with player relation
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: {
-          player: {
-            populate: {
-              avatar: true,
-              socialNetworks: true,
-            },
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: {
+        player: {
+          populate: {
+            avatar: true,
+            socialNetworks: true,
           },
         },
-      })
+      },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.notFound("No player profile linked to this user")
@@ -121,12 +114,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get user with player relation to get the player documentId
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.notFound("No player profile linked to this user")
@@ -192,12 +183,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Don't allow changing slug or other protected fields
-    delete sanitizedData.slug
-    delete sanitizedData.documentId
+    sanitizedData.slug = undefined
+    sanitizedData.documentId = undefined
 
-    strapi.log.info(
-      `[Player] User ${user.id} updating player ${playerDocumentId}`,
-    )
+    strapi.log.info(`[Player] User ${user.id} updating player ${playerDocumentId}`)
     strapi.log.debug(`[Player] Update data: ${JSON.stringify(sanitizedData)}`)
 
     try {
@@ -233,12 +222,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get user with player relation
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.notFound("No player profile linked to this user")
@@ -278,9 +265,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         files: fileArray,
       })
 
-      strapi.log.info(
-        `[Player] Successfully uploaded avatar for player ${playerDocumentId}`,
-      )
+      strapi.log.info(`[Player] Successfully uploaded avatar for player ${playerDocumentId}`)
 
       // Return the updated player with avatar
       const updatedPlayer = await strapi.documents("api::player.player").findOne({
@@ -311,16 +296,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get user with player relation and avatar
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: {
-          player: {
-            populate: { avatar: true },
-          },
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: {
+        player: {
+          populate: { avatar: true },
         },
-      })
+      },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.notFound("No player profile linked to this user")
@@ -338,9 +321,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const uploadService = strapi.plugin("upload").service("upload")
       await uploadService.remove(player.avatar)
 
-      strapi.log.info(
-        `[Player] Deleted avatar for player ${playerDocumentId}`,
-      )
+      strapi.log.info(`[Player] Deleted avatar for player ${playerDocumentId}`)
 
       // Return the updated player without avatar
       const updatedPlayer = await strapi.documents("api::player.player").findOne({
@@ -372,12 +353,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user already has a player linked
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (userWithPlayer?.player) {
       return ctx.badRequest("You already have a player profile linked")
@@ -397,7 +376,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     })
 
     if (existingPlayer.length > 0) {
-      return ctx.badRequest("A player with this name already exists. Please claim that profile instead.")
+      return ctx.badRequest(
+        "A player with this name already exists. Please claim that profile instead."
+      )
     }
 
     try {
@@ -452,12 +433,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check if user already has a player linked
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (userWithPlayer?.player) {
       return ctx.badRequest("You already have a player profile linked")
@@ -486,7 +465,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Verify the name matches (case-insensitive)
     const userName = user.username || ""
     if (player.name.toLowerCase() !== userName.toLowerCase()) {
-      return ctx.forbidden("Player name does not match your account name. Please use the claim process instead.")
+      return ctx.forbidden(
+        "Player name does not match your account name. Please use the claim process instead."
+      )
     }
 
     try {
@@ -505,9 +486,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
 
-      strapi.log.info(
-        `[Player] Auto-linked player ${playerId} to user ${user.id} (${user.email})`
-      )
+      strapi.log.info(`[Player] Auto-linked player ${playerId} to user ${user.id} (${user.email})`)
 
       return ctx.send({
         data: {
@@ -536,12 +515,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -596,8 +573,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       Founder: 3,
     }
 
-    const targetCurrentRank = positionRank[targetCurrentPosition] || 0
-    const targetNewRank = positionRank[newPosition] || 0
+    const _targetCurrentRank = positionRank[targetCurrentPosition] || 0
+    const _targetNewRank = positionRank[newPosition] || 0
 
     // Apply permission rules based on current user's position
     if (currentUserPosition === "Host") {
@@ -615,9 +592,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         (t) => t.from === targetCurrentPosition && t.to === newPosition
       )
       if (!isAllowed) {
-        return ctx.forbidden(
-          "Mentors can only upgrade Players to Host, or Hosts to Mentor"
-        )
+        return ctx.forbidden("Mentors can only upgrade Players to Host, or Hosts to Mentor")
       }
     }
     // Founders can do anything - no restrictions
@@ -667,12 +642,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -693,9 +666,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       }
 
-      const normalizeInviteStatus = (
-        status?: string | null
-      ): "pending" | "accepted" | null => {
+      const normalizeInviteStatus = (status?: string | null): "pending" | "accepted" | null => {
         if (!status || status === "none") return null
         if (status === "accepted") return "accepted"
         if (["pending", "sent", "reminded", "processing", "reminding"].includes(status)) {
@@ -751,22 +722,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const inviteStatusByPlayerDocumentId = new Map<string, "pending" | "accepted">()
 
       if (playerDocumentIds.length > 0) {
-        const users = await strapi
-          .documents("plugin::users-permissions.user")
-          .findMany({
-            filters: {
-              player: {
-                documentId: {
-                  $in: playerDocumentIds,
-                },
+        const users = await strapi.documents("plugin::users-permissions.user").findMany({
+          filters: {
+            player: {
+              documentId: {
+                $in: playerDocumentIds,
               },
             },
-            populate: {
-              player: {
-                fields: ["documentId"],
-              },
+          },
+          populate: {
+            player: {
+              fields: ["documentId"],
             },
-          })
+          },
+        })
 
         for (const user of users as Array<{
           invitationStatus?: string | null
@@ -817,12 +786,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -875,12 +842,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -951,12 +916,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Don't allow changing slug or documentId
-    delete sanitizedData.slug
-    delete sanitizedData.documentId
+    sanitizedData.slug = undefined
+    sanitizedData.documentId = undefined
 
-    strapi.log.info(
-      `[Player] Organizer ${userWithPlayer.player.name} updating player ${playerId}`
-    )
+    strapi.log.info(`[Player] Organizer ${userWithPlayer.player.name} updating player ${playerId}`)
 
     try {
       const updatedPlayer = await strapi.documents("api::player.player").update({
@@ -990,12 +953,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -1071,12 +1032,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -1142,12 +1101,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -1241,12 +1198,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get user with player relation
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.notFound("No player profile linked to this user")
@@ -1256,37 +1211,33 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     try {
       // Get events from player's attended relation
-      const playerWithAttended = await strapi
-        .documents("api::player.player")
-        .findOne({
-          documentId: player.documentId,
-          populate: {
-            attended: {
-              populate: {
-                defaultImage: { fields: ["url", "width", "height", "formats"] },
-                location: { fields: ["name", "country", "slug"] },
-              },
+      const playerWithAttended = await strapi.documents("api::player.player").findOne({
+        documentId: player.documentId,
+        populate: {
+          attended: {
+            populate: {
+              defaultImage: { fields: ["url", "width", "height", "formats"] },
+              location: { fields: ["name", "country", "slug"] },
             },
           },
-        })
+        },
+      })
 
       // Get events from paid ticket orders
-      const paidOrders = await strapi
-        .documents("api::ticket-order.ticket-order")
-        .findMany({
-          filters: {
-            player: { documentId: player.documentId },
-            status: "paid",
-          },
-          populate: {
-            event: {
-              populate: {
-                defaultImage: { fields: ["url", "width", "height", "formats"] },
-                location: { fields: ["name", "country", "slug"] },
-              },
+      const paidOrders = await strapi.documents("api::ticket-order.ticket-order").findMany({
+        filters: {
+          player: { documentId: player.documentId },
+          status: "paid",
+        },
+        populate: {
+          event: {
+            populate: {
+              defaultImage: { fields: ["url", "width", "height", "formats"] },
+              location: { fields: ["name", "country", "slug"] },
             },
           },
-        })
+        },
+      })
 
       // Build a map to deduplicate events
       const attendedMap = new Map<
@@ -1368,12 +1319,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Get the current user's player to check their position
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: user.id },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
 
     if (!userWithPlayer?.player) {
       return ctx.forbidden("You must have a linked player profile")
@@ -1419,11 +1368,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Check if player has a linked user
       if (targetUser) {
         // Get full user details
-        const fullUser = await strapi
-          .documents("plugin::users-permissions.user")
-          .findFirst({
-            filters: { id: targetUser.id },
-          })
+        const fullUser = await strapi.documents("plugin::users-permissions.user").findFirst({
+          filters: { id: targetUser.id },
+        })
 
         if (!fullUser) {
           return ctx.internalServerError("Failed to retrieve user data")
@@ -1437,7 +1384,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         // Determine user status
         if (fullUser.invitationStatus === "accepted") {
           userStatus = "accepted"
-        } else if (fullUser.invitationStatus === "sent" || fullUser.invitationStatus === "reminded") {
+        } else if (
+          fullUser.invitationStatus === "sent" ||
+          fullUser.invitationStatus === "reminded"
+        ) {
           userStatus = "invited"
         }
 
@@ -1470,7 +1420,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         })
 
         if (!userRole) {
-          strapi.log.error(`[Player] Role '${roleType}' not found for position '${targetPlayer.position}'`)
+          strapi.log.error(
+            `[Player] Role '${roleType}' not found for position '${targetPlayer.position}'`
+          )
           return ctx.internalServerError("Failed to create user")
         }
 

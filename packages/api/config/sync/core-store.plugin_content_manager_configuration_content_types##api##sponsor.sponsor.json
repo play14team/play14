@@ -144,12 +144,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "name",
-        "url",
-        "logo",
-        "createdBy"
-      ],
+      "list": ["name", "url", "logo", "createdBy"],
       "edit": [
         [
           {

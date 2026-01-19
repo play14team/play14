@@ -85,9 +85,7 @@ export function createArticleWithoutAuthor(
 /**
  * Create an article without image
  */
-export function createArticleWithoutImage(
-  overrides: Partial<ArticleFixture> = {}
-): ArticleFixture {
+export function createArticleWithoutImage(overrides: Partial<ArticleFixture> = {}): ArticleFixture {
   return createArticle({
     defaultImage: null,
     ...overrides,
@@ -97,9 +95,7 @@ export function createArticleWithoutImage(
 /**
  * Create a minimal article
  */
-export function createMinimalArticle(
-  overrides: Partial<ArticleFixture> = {}
-): ArticleFixture {
+export function createMinimalArticle(overrides: Partial<ArticleFixture> = {}): ArticleFixture {
   return createArticle({
     abstract: null,
     defaultImage: null,

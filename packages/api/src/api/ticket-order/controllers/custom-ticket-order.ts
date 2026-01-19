@@ -3,30 +3,29 @@
  * Handles ticket purchase flow, order status, and refunds
  */
 
+import { join } from "node:path"
 import type { Core } from "@strapi/strapi"
-import { join } from "path"
+import { type InvoiceData, generateInvoicePDF } from "../../../libs/invoice"
+import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
+import { sanitizeText, validateEmail, validateName } from "../../../libs/validation"
 import {
   sendOrderConfirmationEmail,
   sendPlayerInvitationEmail,
   sendTicketSoldNotificationEmail,
 } from "../../../services/email-templates"
-import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
-import { generateInvoicePDF, formatTicketItems, type InvoiceData } from "../../../libs/invoice"
-import { validateEmail, validateName, sanitizeText } from "../../../libs/validation"
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
 import {
-  createReservations,
-  releaseReservations,
-  getReservationExpiry,
-  sellTicketsAtomic,
-  reserveDiscountCode,
-  releaseDiscountCode,
-  confirmDiscountCode,
-  useDiscountCodeAtomic,
-  findOrCreatePlayerForAttendee as findOrCreatePlayerService,
-  addPlayerToEventAttendees,
   ORDER_LIMITS,
+  addPlayerToEventAttendees,
+  createReservations,
+  findOrCreatePlayerForAttendee as findOrCreatePlayerService,
+  getReservationExpiry,
+  releaseDiscountCode,
+  releaseReservations,
+  reserveDiscountCode,
+  sellTicketsAtomic,
+  useDiscountCodeAtomic,
 } from "../../../services/ticketing"
 
 interface AttendeeInfo {
@@ -333,7 +332,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Check ticket type capacity (includes reserved tickets)
       // Available = capacity - sold - reserved
       const effectiveUsed = (ticketType.soldCount || 0) + (ticketType.reservedCount || 0)
-      const available = ticketType.capacity ? ticketType.capacity - effectiveUsed : Infinity
+      const available = ticketType.capacity
+        ? ticketType.capacity - effectiveUsed
+        : Number.POSITIVE_INFINITY
 
       if (ticketRequest.quantity > available) {
         return ctx.badRequest(
@@ -424,7 +425,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       if (connectedAccountId && accountIsActive) {
         // Use destination charges - funds go directly to host's account
-        const platformFeePercent = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || "0")
+        const platformFeePercent = Number.parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || "0")
         const applicationFeeAmount = Math.round(totalAmount * 100 * (platformFeePercent / 100)) // Fee in cents
 
         session = await provider.createCheckoutSessionWithConnect({
@@ -602,7 +603,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           totalAmount: order.totalAmount,
           currency: order.currency,
           // Mask purchaser info for unauthenticated requests
-          purchaserName: order.purchaserName?.split(" ")[0] + " ***",
+          purchaserName: `${order.purchaserName?.split(" ")[0]} ***`,
           paidAt: order.paidAt,
           event: order.event
             ? {
@@ -1050,7 +1051,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Check ticket type capacity (includes reserved tickets)
       // Available = capacity - sold - reserved
       const effectiveUsed = (ticketType.soldCount || 0) + (ticketType.reservedCount || 0)
-      const available = ticketType.capacity ? ticketType.capacity - effectiveUsed : Infinity
+      const available = ticketType.capacity
+        ? ticketType.capacity - effectiveUsed
+        : Number.POSITIVE_INFINITY
 
       if (ticketRequest.quantity > available) {
         return ctx.badRequest(
@@ -1370,7 +1373,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Available = capacity - sold - reserved
       const effectiveUsed = (ticketType.soldCount || 0) + (ticketType.reservedCount || 0)
-      const available = ticketType.capacity ? ticketType.capacity - effectiveUsed : Infinity
+      const available = ticketType.capacity
+        ? ticketType.capacity - effectiveUsed
+        : Number.POSITIVE_INFINITY
 
       if (detail.quantity > available) {
         return ctx.badRequest(
@@ -1477,7 +1482,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       if (connectedAccountId && accountIsActive) {
         // Use destination charges
-        const platformFeePercent = parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || "0")
+        const platformFeePercent = Number.parseFloat(process.env.STRIPE_PLATFORM_FEE_PERCENT || "0")
         const applicationFeeAmount = Math.round(
           (order as any).totalAmount * 100 * (platformFeePercent / 100)
         )
@@ -1916,10 +1921,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Logo path - anchor to app root so it works in both src and dist builds
-    const logoPath = join(
-      process.cwd(),
-      "public/images/play14_600x200_transparent-light.png"
-    )
+    const logoPath = join(process.cwd(), "public/images/play14_600x200_transparent-light.png")
 
     try {
       const pdfBuffer = await generateInvoicePDF(invoiceData, {

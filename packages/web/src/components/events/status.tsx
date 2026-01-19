@@ -1,4 +1,4 @@
-import { Enum_Event_Eventstatus } from "@/models/strapi"
+import type { Enum_Event_Eventstatus } from "@/models/strapi"
 
 const icons: Record<string, string> = {
   Announced: "calendar-plus",
@@ -13,7 +13,7 @@ const EventStatus = (props: { status: Enum_Event_Eventstatus | string }) => {
 
   return (
     <>
-      <i className={`bx bx-${icon}`}></i> {status}
+      <i className={`bx bx-${icon}`} /> {status}
     </>
   )
 }

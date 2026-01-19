@@ -5,8 +5,8 @@
 
 import type { Core } from "@strapi/strapi"
 import Stripe from "stripe"
-import { STRIPE_DEFAULTS } from "../../../services/ticketing"
 import { reportSentryError } from "../../../services/observability/sentry-reporter"
+import { STRIPE_DEFAULTS } from "../../../services/ticketing"
 
 export default ({ strapi }: { strapi: Core.Strapi }) => {
   // Initialize Stripe client
@@ -527,7 +527,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
         const isFounder = player.position === "Founder"
 
         if (!isOwnerHost && !isOwnerMentor && !isFounder) {
-          return ctx.forbidden("The selected Stripe account does not belong to an organizer of this event")
+          return ctx.forbidden(
+            "The selected Stripe account does not belong to an organizer of this event"
+          )
         }
       } else {
         // Fallback: use current user's account (backwards compatibility)

@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import ClaimCard from "./claim-card"
-import { getPendingClaims, type PlayerClaim } from "./claims.action"
+import { type PlayerClaim, getPendingClaims } from "./claims.action"
 
 export default function ClaimsList() {
   const router = useRouter()
@@ -38,7 +38,7 @@ export default function ClaimsList() {
   if (isLoading) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading claims...</span>
       </div>
     )
@@ -47,14 +47,10 @@ export default function ClaimsList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
-        <button
-          type="button"
-          className="admin-btn admin-btn-secondary"
-          onClick={fetchClaims}
-        >
-          <i className="bx bx-refresh"></i>
+        <button type="button" className="admin-btn admin-btn-secondary" onClick={fetchClaims}>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -65,7 +61,7 @@ export default function ClaimsList() {
     return (
       <div className="claims-empty">
         <div className="claims-empty-icon">
-          <i className="bx bx-check-circle"></i>
+          <i className="bx bx-check-circle" />
         </div>
         <h3>No Pending Claims</h3>
         <p>All player profile claims have been processed.</p>
@@ -81,11 +77,7 @@ export default function ClaimsList() {
       </div>
       <div className="claims-grid">
         {claims.map((claim) => (
-          <ClaimCard
-            key={claim.documentId}
-            claim={claim}
-            onActionComplete={handleActionComplete}
-          />
+          <ClaimCard key={claim.documentId} claim={claim} onActionComplete={handleActionComplete} />
         ))}
       </div>
     </div>

@@ -41,12 +41,7 @@ const ALLOWED_TAGS = [
 /**
  * Allowed HTML attributes
  */
-const ALLOWED_ATTR = [
-  "href",
-  "target",
-  "rel",
-  "class",
-]
+const ALLOWED_ATTR = ["href", "target", "rel", "class"]
 
 /**
  * Sanitize HTML content for rich text fields (bio, descriptions)
@@ -85,13 +80,13 @@ export function sanitizeHtml(html: string | null | undefined): string | null {
   // Post-process: ensure all external links have rel="noopener noreferrer"
   const withSafeLinks = sanitized.replace(
     /<a\s+([^>]*href=["'][^"']*["'][^>]*)>/gi,
-    (match, attrs) => {
+    (_match, attrs) => {
       // Add target="_blank" if not present
-      if (!attrs.includes('target=')) {
+      if (!attrs.includes("target=")) {
         attrs += ' target="_blank"'
       }
       // Add rel="noopener noreferrer" if not present
-      if (!attrs.includes('rel=')) {
+      if (!attrs.includes("rel=")) {
         attrs += ' rel="noopener noreferrer"'
       }
       return `<a ${attrs}>`

@@ -11,9 +11,7 @@ export default async function EventStatus(props: {
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <Filters
-          name={`Found ${events.length} events with status "${params.status}"`}
-        />
+        <Filters name={`Found ${events.length} events with status "${params.status}"`} />
       </div>
       <div className="pt-70">
         <EventGrid events={events} />

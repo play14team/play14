@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/admin/toast"
-import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import CountrySelector from "@/components/admin/country-selector"
+import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
+import { useToast } from "@/components/admin/toast"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { createLocation } from "../locations.action"
 
 export default function LocationCreateForm() {
@@ -67,9 +67,7 @@ export default function LocationCreateForm() {
               className="admin-input"
               placeholder="e.g., Paris, Luxembourg, Berlin"
             />
-            <p className="admin-form-help">
-              The city or region name where events take place
-            </p>
+            <p className="admin-form-help">The city or region name where events take place</p>
           </div>
         </div>
 
@@ -89,7 +87,8 @@ export default function LocationCreateForm() {
       <div className="admin-form-section">
         <h2>Map Location</h2>
         <p className="admin-form-section-description">
-          Set the coordinates for this location on the map. This is used for displaying events on maps.
+          Set the coordinates for this location on the map. This is used for displaying events on
+          maps.
         </p>
 
         <div className="admin-form-row">
@@ -115,12 +114,12 @@ export default function LocationCreateForm() {
         >
           {isSubmitting ? (
             <>
-              <i className="bx bx-loader-alt bx-spin"></i>
+              <i className="bx bx-loader-alt bx-spin" />
               Creating...
             </>
           ) : (
             <>
-              <i className="bx bx-plus"></i>
+              <i className="bx bx-plus" />
               Create Location
             </>
           )}

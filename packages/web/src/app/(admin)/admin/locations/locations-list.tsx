@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react"
-import Link from "next/link"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
+import Link from "next/link"
+import { useCallback, useEffect, useRef, useState } from "react"
 import ReactCountryFlag from "react-country-flag"
-import { getLocations, type LocationListItem, type LocationsListResponse } from "./locations.action"
+import { type LocationListItem, type LocationsListResponse, getLocations } from "./locations.action"
 
 // Register English locale for country names
 countries.registerLocale(en)
@@ -39,7 +39,7 @@ export default function LocationsList() {
 
       // Extract unique countries from results (on first load only)
       if (page === 1 && !search && !country) {
-        const uniqueCountries = [...new Set(result.data.map(l => l.country))].sort()
+        const uniqueCountries = [...new Set(result.data.map((l) => l.country))].sort()
         setAllCountries(uniqueCountries)
       }
     } catch {
@@ -73,7 +73,7 @@ export default function LocationsList() {
   useEffect(() => {
     const fetchAllCountries = async () => {
       const result = await getLocations(1, 1000) // Get all to extract countries
-      const uniqueCountries = [...new Set(result.data.map(l => l.country))].sort()
+      const uniqueCountries = [...new Set(result.data.map((l) => l.country))].sort()
       setAllCountries(uniqueCountries)
     }
     fetchAllCountries()
@@ -103,7 +103,7 @@ export default function LocationsList() {
   if (isLoading && locations.length === 0) {
     return (
       <div className="claims-loading">
-        <i className="bx bx-loader-alt bx-spin"></i>
+        <i className="bx bx-loader-alt bx-spin" />
         <span>Loading locations...</span>
       </div>
     )
@@ -112,14 +112,14 @@ export default function LocationsList() {
   if (error) {
     return (
       <div className="claims-error">
-        <i className="bx bx-error-circle"></i>
+        <i className="bx bx-error-circle" />
         <p>{error}</p>
         <button
           type="button"
           className="admin-btn admin-btn-secondary"
           onClick={() => fetchLocations(1, debouncedSearch, selectedCountry)}
         >
-          <i className="bx bx-refresh"></i>
+          <i className="bx bx-refresh" />
           Try Again
         </button>
       </div>
@@ -131,7 +131,7 @@ export default function LocationsList() {
       <div className="locations-toolbar">
         <div className="locations-search">
           <div className="search-input-wrapper">
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
             <input
               type="text"
               placeholder="Search locations..."
@@ -146,7 +146,7 @@ export default function LocationsList() {
                 onClick={() => handleSearchChange("")}
                 aria-label="Clear search"
               >
-                <i className="bx bx-x"></i>
+                <i className="bx bx-x" />
               </button>
             )}
           </div>
@@ -173,7 +173,7 @@ export default function LocationsList() {
             className="admin-btn admin-btn-secondary admin-btn-sm"
             onClick={handleClearFilters}
           >
-            <i className="bx bx-x"></i>
+            <i className="bx bx-x" />
             Clear filters
           </button>
         )}
@@ -187,12 +187,12 @@ export default function LocationsList() {
 
       {isLoading ? (
         <div className="claims-loading">
-          <i className="bx bx-loader-alt bx-spin"></i>
+          <i className="bx bx-loader-alt bx-spin" />
           <span>Loading...</span>
         </div>
       ) : locations.length === 0 ? (
         <div className="claims-empty">
-          <i className="bx bx-map"></i>
+          <i className="bx bx-map" />
           <h3>No locations found</h3>
           <p>
             {searchQuery || selectedCountry
@@ -228,15 +228,13 @@ export default function LocationsList() {
                 </div>
                 <div className="location-card-info">
                   <h3 className="location-card-name">{location.name}</h3>
-                  <span className="location-card-country">
-                    {getCountryName(location.country)}
-                  </span>
+                  <span className="location-card-country">{getCountryName(location.country)}</span>
                   <span className="location-card-events">
                     {location.eventsCount} event{location.eventsCount !== 1 ? "s" : ""}
                   </span>
                 </div>
                 <div className="location-card-action">
-                  <i className="bx bx-chevron-right"></i>
+                  <i className="bx bx-chevron-right" />
                 </div>
               </Link>
             ))}
@@ -250,7 +248,7 @@ export default function LocationsList() {
                 disabled={pagination.page <= 1}
                 onClick={() => handlePageChange(pagination.page - 1)}
               >
-                <i className="bx bx-chevron-left"></i>
+                <i className="bx bx-chevron-left" />
                 Previous
               </button>
               <span className="pagination-info">
@@ -263,7 +261,7 @@ export default function LocationsList() {
                 onClick={() => handlePageChange(pagination.page + 1)}
               >
                 Next
-                <i className="bx bx-chevron-right"></i>
+                <i className="bx bx-chevron-right" />
               </button>
             </div>
           )}

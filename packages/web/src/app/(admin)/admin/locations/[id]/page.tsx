@@ -1,7 +1,7 @@
 import { requireOrganizer } from "@/libs/auth"
-import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getLocationForEdit } from "../locations.action"
 import LocationEditForm from "./location-edit-form"
 
@@ -33,7 +33,7 @@ export default async function LocationEditPage({ params }: PageProps) {
               className="admin-btn admin-btn-icon admin-btn-secondary"
               title="Back to Locations"
             >
-              <i className="bx bx-arrow-back"></i>
+              <i className="bx bx-arrow-back" />
             </Link>
             <div>
               <h1>Edit Location</h1>

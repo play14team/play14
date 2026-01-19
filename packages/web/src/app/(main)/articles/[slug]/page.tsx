@@ -1,7 +1,7 @@
 import ArticleDetails from "@/components/articles/details"
 import { getArticle, getArticleSlugs } from "@/components/articles/get.action"
 import Page from "@/components/layout/page"
-import { SlugParamsProps } from "@/libs/slug-params"
+import type { SlugParamsProps } from "@/libs/slug-params"
 import type { Article } from "@/models/strapi"
 import { notFound } from "next/navigation"
 
@@ -21,7 +21,7 @@ export async function generateStaticParams() {
   } catch (error) {
     console.warn(
       "[Build] Failed to generate static params for articles:",
-      error instanceof Error ? error.message : String(error),
+      error instanceof Error ? error.message : String(error)
     )
     console.warn("[Build] Articles will be generated on-demand at runtime")
     return []
@@ -38,9 +38,7 @@ export async function generateMetadata(props: SlugParamsProps) {
     }
   }
 
-  const images = article.images
-    ?.filter(Boolean)
-    ?.map((i) => (i as { url: string }).url) as string[]
+  const images = article.images?.filter(Boolean)?.map((i) => (i as { url: string }).url) as string[]
 
   return {
     title: `Articles | ${article.title}`,

@@ -1,11 +1,11 @@
-import { redirect, notFound } from "next/navigation"
-import Link from "next/link"
-import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
-import { getFeatureFlags } from "@/libs/feature-flags"
 import LoginButtons from "@/components/auth/login-buttons"
 import LoginForm from "@/components/auth/login-form"
 import Logo from "@/components/layout/logo"
+import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
+import { getFeatureFlags } from "@/libs/feature-flags"
 import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Login",
@@ -78,7 +78,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         <p className="auth-register-link">
           Don&apos;t have an account?{" "}
-          <Link href={`/auth/register${callbackUrl !== "/admin" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}>
+          <Link
+            href={`/auth/register${callbackUrl !== "/admin" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
+          >
             Create one
           </Link>
         </p>

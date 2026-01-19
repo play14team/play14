@@ -1,9 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
-import {
-  validatePathSegment,
-  validatePathSegments,
-  buildApiUrl,
-} from "./strapi-client"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { buildApiUrl, validatePathSegment, validatePathSegments } from "./strapi-client"
 
 // Mock process.env for buildApiUrl tests
 const originalEnv = process.env
@@ -46,9 +42,7 @@ describe("validatePathSegment", () => {
 
   describe("SSRF attack prevention", () => {
     it("rejects path traversal with ../", () => {
-      expect(() => validatePathSegment("../etc/passwd")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("../etc/passwd")).toThrow("contains invalid characters")
     })
 
     it("rejects path traversal with ..\\", () => {
@@ -58,33 +52,25 @@ describe("validatePathSegment", () => {
     })
 
     it("rejects URL-encoded path traversal", () => {
-      expect(() => validatePathSegment("%2e%2e%2f")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("%2e%2e%2f")).toThrow("contains invalid characters")
     })
 
     it("rejects absolute paths", () => {
-      expect(() => validatePathSegment("/etc/passwd")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("/etc/passwd")).toThrow("contains invalid characters")
     })
 
     it("rejects URLs", () => {
-      expect(() =>
-        validatePathSegment("http://evil.com/malicious")
-      ).toThrow("contains invalid characters")
+      expect(() => validatePathSegment("http://evil.com/malicious")).toThrow(
+        "contains invalid characters"
+      )
     })
 
     it("rejects URL with protocol-relative paths", () => {
-      expect(() => validatePathSegment("//evil.com/path")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("//evil.com/path")).toThrow("contains invalid characters")
     })
 
     it("rejects null bytes", () => {
-      expect(() => validatePathSegment("valid\x00evil")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("valid\x00evil")).toThrow("contains invalid characters")
     })
 
     it("rejects newlines (HTTP header injection)", () => {
@@ -100,33 +86,23 @@ describe("validatePathSegment", () => {
     })
 
     it("rejects query strings", () => {
-      expect(() => validatePathSegment("slug?admin=true")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("slug?admin=true")).toThrow("contains invalid characters")
     })
 
     it("rejects hash fragments", () => {
-      expect(() => validatePathSegment("slug#section")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("slug#section")).toThrow("contains invalid characters")
     })
 
     it("rejects spaces in the middle", () => {
-      expect(() => validatePathSegment("my slug")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("my slug")).toThrow("contains invalid characters")
     })
 
     it("rejects dots", () => {
-      expect(() => validatePathSegment("file.txt")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("file.txt")).toThrow("contains invalid characters")
     })
 
     it("rejects colons", () => {
-      expect(() => validatePathSegment("C:")).toThrow(
-        "contains invalid characters"
-      )
+      expect(() => validatePathSegment("C:")).toThrow("contains invalid characters")
     })
   })
 
@@ -153,9 +129,7 @@ describe("validatePathSegment", () => {
 
     it("rejects strings exceeding max length", () => {
       const longString = "a".repeat(256)
-      expect(() => validatePathSegment(longString)).toThrow(
-        "exceeds maximum length"
-      )
+      expect(() => validatePathSegment(longString)).toThrow("exceeds maximum length")
     })
 
     it("accepts strings at max length", () => {
@@ -235,26 +209,26 @@ describe("buildApiUrl", () => {
   })
 
   it("throws when multiple required parameters are missing", () => {
-    expect(() =>
-      buildApiUrl("/events/:slug/tickets/:ticketId", { slug: "my-event" })
-    ).toThrow("Missing required path parameters: :ticketId")
+    expect(() => buildApiUrl("/events/:slug/tickets/:ticketId", { slug: "my-event" })).toThrow(
+      "Missing required path parameters: :ticketId"
+    )
   })
 
   it("validates parameters before building URL", () => {
-    expect(() =>
-      buildApiUrl("/events/:slug", { slug: "../../../etc/passwd" })
-    ).toThrow("Invalid slug: contains invalid characters")
+    expect(() => buildApiUrl("/events/:slug", { slug: "../../../etc/passwd" })).toThrow(
+      "Invalid slug: contains invalid characters"
+    )
   })
 
   it("prevents SSRF via malicious slug", () => {
-    expect(() =>
-      buildApiUrl("/events/:slug", { slug: "http://evil.com" })
-    ).toThrow("Invalid slug: contains invalid characters")
+    expect(() => buildApiUrl("/events/:slug", { slug: "http://evil.com" })).toThrow(
+      "Invalid slug: contains invalid characters"
+    )
   })
 
   it("prevents path traversal via parameters", () => {
-    expect(() =>
-      buildApiUrl("/events/:slug/edit", { slug: "..%2F..%2Fetc%2Fpasswd" })
-    ).toThrow("Invalid slug: contains invalid characters")
+    expect(() => buildApiUrl("/events/:slug/edit", { slug: "..%2F..%2Fetc%2Fpasswd" })).toThrow(
+      "Invalid slug: contains invalid characters"
+    )
   })
 })

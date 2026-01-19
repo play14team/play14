@@ -79,7 +79,8 @@ export default {
       config: {
         policies: [],
         middlewares: [],
-        description: "Update a player's position (Host/Mentor/Founder only, with hierarchical permissions)",
+        description:
+          "Update a player's position (Host/Mentor/Founder only, with hierarchical permissions)",
       },
     },
     {

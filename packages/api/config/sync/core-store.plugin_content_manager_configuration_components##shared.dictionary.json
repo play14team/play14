@@ -58,12 +58,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "key",
-        "value",
-        "documentId"
-      ],
+      "list": ["id", "key", "value", "documentId"],
       "edit": [
         [
           {

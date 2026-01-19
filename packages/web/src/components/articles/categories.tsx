@@ -5,9 +5,7 @@ import { getArticleNav } from "./get.action"
 export default async function Categories() {
   const articles = await getArticleNav()
 
-  const categories = [
-    ...new Set(articles.map((a) => a.category?.toLowerCase())),
-  ]
+  const categories = [...new Set(articles.map((a) => a.category?.toLowerCase()))]
 
   return (
     <div className="blog-details-desc pb-70">
@@ -15,12 +13,10 @@ export default async function Categories() {
         {categories.sort().map((cat, index) => (
           <div key={index} className="article-tags">
             <span>
-              <i className="bx bx-folder"></i>
+              <i className="bx bx-folder" />
             </span>
 
-            <Link href={`/articles/categories/${cat}`}>
-              {capitalizeFirstLetter(cat)}
-            </Link>
+            <Link href={`/articles/categories/${cat}`}>{capitalizeFirstLetter(cat)}</Link>
           </div>
         ))}
       </div>

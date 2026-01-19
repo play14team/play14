@@ -45,11 +45,7 @@ export const DropdownMenuItem = React.forwardRef<
 >(({ className, destructive, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={clsx(
-      "ui-dropdown-item",
-      destructive && "ui-dropdown-item-destructive",
-      className
-    )}
+    className={clsx("ui-dropdown-item", destructive && "ui-dropdown-item-destructive", className)}
     {...props}
   />
 ))

@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import Avatar from "@/components/ui/avatar"
 import type { OrganizerOption } from "@/app/(admin)/admin/events/[slug]/event-edit.action"
+import Avatar from "@/components/ui/avatar"
+import { useEffect, useRef, useState } from "react"
 
 interface OrganizerSelectProps {
   organizers: OrganizerOption[]
@@ -31,18 +31,14 @@ export default function OrganizerSelect({
     // Apply custom filter if provided
     if (filterFn && !filterFn(o)) return false
     // Apply search filter
-    if (search && !o.name.toLowerCase().includes(search.toLowerCase()))
-      return false
+    if (search && !o.name.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
         setSearch("")
       }
@@ -75,13 +71,13 @@ export default function OrganizerSelect({
         aria-haspopup="listbox"
       >
         <span className="organizer-select-placeholder">{placeholder}</span>
-        <i className={`bx bx-chevron-${isOpen ? "up" : "down"}`}></i>
+        <i className={`bx bx-chevron-${isOpen ? "up" : "down"}`} />
       </button>
 
       {isOpen && (
         <div className="organizer-select-dropdown">
           <div className="organizer-select-search">
-            <i className="bx bx-search"></i>
+            <i className="bx bx-search" />
             <input
               ref={inputRef}
               type="text"
@@ -91,7 +87,7 @@ export default function OrganizerSelect({
             />
           </div>
 
-          <ul className="organizer-select-list" role="listbox">
+          <ul className="organizer-select-list">
             {availableOrganizers.length === 0 ? (
               <li className="organizer-select-empty">
                 {search ? "No matches found" : "No organizers available"}
@@ -100,7 +96,6 @@ export default function OrganizerSelect({
               availableOrganizers.map((organizer) => (
                 <li
                   key={organizer.documentId}
-                  role="option"
                   aria-selected={false}
                   className="organizer-select-option"
                   onClick={() => handleSelect(organizer.documentId)}
@@ -112,12 +107,8 @@ export default function OrganizerSelect({
                     size="sm"
                   />
                   <div className="organizer-select-option-info">
-                    <span className="organizer-select-option-name">
-                      {organizer.name}
-                    </span>
-                    <span className="organizer-select-option-position">
-                      {organizer.position}
-                    </span>
+                    <span className="organizer-select-option-name">{organizer.name}</span>
+                    <span className="organizer-select-option-position">{organizer.position}</span>
                   </div>
                 </li>
               ))
@@ -134,10 +125,7 @@ interface SelectedOrganizerProps {
   onRemove: () => void
 }
 
-export function SelectedOrganizer({
-  organizer,
-  onRemove,
-}: SelectedOrganizerProps) {
+export function SelectedOrganizer({ organizer, onRemove }: SelectedOrganizerProps) {
   if (!organizer) return null
 
   return (
@@ -151,13 +139,8 @@ export function SelectedOrganizer({
         />
         <span>{organizer.name}</span>
       </div>
-      <button
-        type="button"
-        className="organizer-remove"
-        onClick={onRemove}
-        title="Remove"
-      >
-        <i className="bx bx-x"></i>
+      <button type="button" className="organizer-remove" onClick={onRemove} title="Remove">
+        <i className="bx bx-x" />
       </button>
     </li>
   )

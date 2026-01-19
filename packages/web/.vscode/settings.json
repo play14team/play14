@@ -18,9 +18,7 @@
     "titleBar.inactiveBackground": "#0b1c0899",
     "titleBar.inactiveForeground": "#e7e7e799"
   },
-  "conventionalCommits.scopes": [
-        "events"
-  ],
+  "conventionalCommits.scopes": ["events"],
   "terminal.integrated.enablePersistentSessions": true,
   "terminal.integrated.persistentSessionReviveProcess": "onExit",
   "claude.commitMessage.includeClaudeCodeAttribution": false

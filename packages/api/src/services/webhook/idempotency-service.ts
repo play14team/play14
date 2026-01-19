@@ -51,14 +51,10 @@ export async function claimWebhookEvent(
 
     if (isUniqueViolation) {
       // Event already exists - check its status
-      const existing = await knex("processed_webhooks")
-        .where("event_id", eventId)
-        .first()
+      const existing = await knex("processed_webhooks").where("event_id", eventId).first()
 
       if (existing) {
-        strapi.log.info(
-          `[Idempotency] Event ${eventId} already ${existing.status} - skipping`
-        )
+        strapi.log.info(`[Idempotency] Event ${eventId} already ${existing.status} - skipping`)
         return {
           shouldProcess: false,
           alreadyProcessed: true,
@@ -82,12 +78,14 @@ export async function markWebhookCompleted(
 ): Promise<void> {
   const knex = strapi.db.connection
 
-  await knex("processed_webhooks").where("event_id", eventId).update({
-    status: "completed",
-    processed_at: new Date(),
-    metadata: metadata ? JSON.stringify(metadata) : null,
-    updated_at: new Date(),
-  })
+  await knex("processed_webhooks")
+    .where("event_id", eventId)
+    .update({
+      status: "completed",
+      processed_at: new Date(),
+      metadata: metadata ? JSON.stringify(metadata) : null,
+      updated_at: new Date(),
+    })
 
   strapi.log.info(`[Idempotency] Event ${eventId} marked as completed`)
 }
@@ -103,11 +101,13 @@ export async function markWebhookFailed(
 ): Promise<void> {
   const knex = strapi.db.connection
 
-  await knex("processed_webhooks").where("event_id", eventId).update({
-    status: "failed",
-    metadata: JSON.stringify({ error: errorMessage }),
-    updated_at: new Date(),
-  })
+  await knex("processed_webhooks")
+    .where("event_id", eventId)
+    .update({
+      status: "failed",
+      metadata: JSON.stringify({ error: errorMessage }),
+      updated_at: new Date(),
+    })
 
   strapi.log.info(`[Idempotency] Event ${eventId} marked as failed`)
 }
@@ -116,10 +116,7 @@ export async function markWebhookFailed(
  * Release a webhook event claim (delete the record).
  * Use this when you want Stripe to retry the webhook.
  */
-export async function releaseWebhookClaim(
-  strapi: Core.Strapi,
-  eventId: string
-): Promise<void> {
+export async function releaseWebhookClaim(strapi: Core.Strapi, eventId: string): Promise<void> {
   const knex = strapi.db.connection
 
   await knex("processed_webhooks").where("event_id", eventId).delete()
@@ -135,7 +132,7 @@ export async function releaseWebhookClaim(
  */
 export async function cleanupOldWebhookRecords(
   strapi: Core.Strapi,
-  olderThanDays: number = 7
+  olderThanDays = 7
 ): Promise<number> {
   const knex = strapi.db.connection
   const cutoffDate = new Date()
@@ -147,9 +144,7 @@ export async function cleanupOldWebhookRecords(
     .delete()
 
   if (deletedCount > 0) {
-    strapi.log.info(
-      `[Idempotency] Cleaned up ${deletedCount} old webhook records`
-    )
+    strapi.log.info(`[Idempotency] Cleaned up ${deletedCount} old webhook records`)
   }
 
   return deletedCount

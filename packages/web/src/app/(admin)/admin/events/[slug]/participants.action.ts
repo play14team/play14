@@ -60,8 +60,8 @@ interface StrapiDataResponse<T> {
  */
 export async function getEventParticipants(
   eventDocumentId: string,
-  page: number = 1,
-  pageSize: number = 50
+  page = 1,
+  pageSize = 50
 ): Promise<ActionResult<ParticipantsResponse>> {
   const result = await strapiFetchWithQuery<StrapiDataResponse<ParticipantsResponse>>(
     "/admin/events/:eventDocumentId/participants",
@@ -141,11 +141,9 @@ export async function undoCheckIn(
 export async function getParticipantStats(
   eventDocumentId: string
 ): Promise<ActionResult<{ total: number; checkedIn: number; pending: number }>> {
-  const result = await strapiFetch<StrapiDataResponse<{ total: number; checkedIn: number; pending: number }>>(
-    "/admin/events/:eventDocumentId/participants/stats",
-    { eventDocumentId },
-    { cache: "no-store" }
-  )
+  const result = await strapiFetch<
+    StrapiDataResponse<{ total: number; checkedIn: number; pending: number }>
+  >("/admin/events/:eventDocumentId/participants/stats", { eventDocumentId }, { cache: "no-store" })
 
   if (!result.ok) {
     return {

@@ -1,9 +1,9 @@
+import { PlayerForm } from "@/components/admin/player-form"
 import { requireOrganizer } from "@/libs/auth"
-import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { getPlayerForEdit } from "../players.action"
-import { PlayerForm } from "@/components/admin/player-form"
 
 export const metadata: Metadata = {
   title: "Edit Player",
@@ -33,7 +33,7 @@ export default async function PlayerEditPage({ params }: PageProps) {
               className="admin-btn admin-btn-icon admin-btn-secondary"
               title="Back to Players"
             >
-              <i className="bx bx-arrow-back"></i>
+              <i className="bx bx-arrow-back" />
             </Link>
             <div>
               <h1>Edit Player</h1>

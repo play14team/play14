@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef, useEffect, useMemo } from "react"
-import ReactCountryFlag from "react-country-flag"
 import { getCountryName } from "@/app/(admin)/admin/events/[slug]/hooks/use-event-form"
+import { useEffect, useMemo, useRef, useState } from "react"
+import ReactCountryFlag from "react-country-flag"
 
 export interface LocationOption {
   documentId: string
@@ -102,9 +102,7 @@ export default function LocationSelector({
                   title={getCountryName(selectedLocation.country)}
                 />
               </span>
-              <span className="location-selector-text">
-                {selectedLocation.name}
-              </span>
+              <span className="location-selector-text">{selectedLocation.name}</span>
             </>
           ) : (
             <span className="location-selector-text location-selector-placeholder">
@@ -113,7 +111,7 @@ export default function LocationSelector({
           )}
         </div>
         <span className="location-selector-arrow">
-          <i className="bx bx-chevron-down"></i>
+          <i className="bx bx-chevron-down" />
         </span>
       </button>
 
@@ -156,18 +154,12 @@ export default function LocationSelector({
                 </button>
               ))
             ) : (
-              <div className="location-selector-empty">
-                No locations found
-              </div>
+              <div className="location-selector-empty">No locations found</div>
             )}
           </div>
 
-          <button
-            type="button"
-            className="location-selector-create"
-            onClick={handleCreateNew}
-          >
-            <i className="bx bx-plus"></i>
+          <button type="button" className="location-selector-create" onClick={handleCreateNew}>
+            <i className="bx bx-plus" />
             Create new location
           </button>
         </div>

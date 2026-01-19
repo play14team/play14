@@ -1,17 +1,17 @@
 "use client"
 
-import { useState, useCallback, useMemo } from "react"
-import { useToast } from "@/components/admin/toast"
 import ConfirmationDialog from "@/components/admin/confirmation-dialog"
+import { useToast } from "@/components/admin/toast"
 import { formatCurrency } from "@/libs/currencies"
+import { useCallback, useMemo, useState } from "react"
+import { createBudgetItem, deleteBudgetItem, updateBudgetItem } from "../budget.action"
 import {
-  type BudgetLineItem,
-  type BudgetCategory,
   BUDGET_CATEGORIES,
-  INCOME_CATEGORIES,
+  type BudgetCategory,
+  type BudgetLineItem,
   EXPENSE_CATEGORIES,
+  INCOME_CATEGORIES,
 } from "../budget.types"
-import { createBudgetItem, updateBudgetItem, deleteBudgetItem } from "../budget.action"
 
 interface BudgetTabProps {
   eventDocumentId: string
@@ -35,7 +35,10 @@ export default function BudgetTab({
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [targetMargin, setTargetMargin] = useState(0)
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; item: BudgetLineItem | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean
+    item: BudgetLineItem | null
+  }>({
     isOpen: false,
     item: null,
   })
@@ -224,7 +227,9 @@ export default function BudgetTab({
               className="admin-input"
               placeholder="Unit price"
               value={currentEditingItem.item.unitPrice || ""}
-              onChange={(e) => updateEditingItem("unitPrice", parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                updateEditingItem("unitPrice", Number.parseFloat(e.target.value) || 0)
+              }
               step="0.01"
             />
           </div>
@@ -234,13 +239,11 @@ export default function BudgetTab({
             className="admin-input budget-item-quantity"
             placeholder="Qty"
             value={currentEditingItem.item.quantity || ""}
-            onChange={(e) => updateEditingItem("quantity", parseInt(e.target.value) || 1)}
+            onChange={(e) => updateEditingItem("quantity", Number.parseInt(e.target.value) || 1)}
             min="1"
           />
           <span className="budget-item-equals">=</span>
-          <span className="budget-item-total">
-            {fmt(currentEditingItem.item.total || 0)}
-          </span>
+          <span className="budget-item-total">{fmt(currentEditingItem.item.total || 0)}</span>
         </div>
         <input
           type="text"
@@ -271,7 +274,7 @@ export default function BudgetTab({
     </div>
   )
 
-  const renderCategorySection = (category: BudgetCategory, isIncome: boolean) => {
+  const renderCategorySection = (category: BudgetCategory, _isIncome: boolean) => {
     const items = itemsByCategory[category]
     const categoryInfo = BUDGET_CATEGORIES[category]
     const categoryTotal = items.reduce((sum, item) => sum + (item.total || 0), 0)
@@ -280,7 +283,7 @@ export default function BudgetTab({
       <div key={category} className="budget-category-section">
         <div className="budget-category-header">
           <div className="budget-category-title">
-            <i className={`bx ${categoryInfo.icon}`}></i>
+            <i className={`bx ${categoryInfo.icon}`} />
             <span>{categoryInfo.label}</span>
           </div>
           <div className="budget-category-total">{fmt(categoryTotal)}</div>
@@ -312,7 +315,7 @@ export default function BudgetTab({
                       onClick={() => handleEditItem(item)}
                       title="Edit"
                     >
-                      <i className="bx bx-edit"></i>
+                      <i className="bx bx-edit" />
                     </button>
                     <button
                       type="button"
@@ -320,7 +323,7 @@ export default function BudgetTab({
                       onClick={() => handleDeleteItem(item)}
                       title="Delete"
                     >
-                      <i className="bx bx-trash"></i>
+                      <i className="bx bx-trash" />
                     </button>
                   </div>
                 </div>
@@ -329,11 +332,11 @@ export default function BudgetTab({
           ))}
 
           {/* New item form */}
-          {editingItem !== null && editingItem.category === category && !editingItem.item.documentId && (
-            <div className="budget-item budget-item-new">
-              {renderEditForm(editingItem)}
-            </div>
-          )}
+          {editingItem !== null &&
+            editingItem.category === category &&
+            !editingItem.item.documentId && (
+              <div className="budget-item budget-item-new">{renderEditForm(editingItem)}</div>
+            )}
         </div>
 
         {/* Add button */}
@@ -343,7 +346,7 @@ export default function BudgetTab({
             className="budget-add-item-btn"
             onClick={() => handleAddItem(category)}
           >
-            <i className="bx bx-plus"></i>
+            <i className="bx bx-plus" />
             Add {categoryInfo.label.toLowerCase()}
           </button>
         )}
@@ -408,7 +411,7 @@ export default function BudgetTab({
                 type="number"
                 className="admin-input"
                 value={targetMargin}
-                onChange={(e) => setTargetMargin(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setTargetMargin(Number.parseFloat(e.target.value) || 0)}
                 step="100"
               />
             </div>
@@ -429,18 +432,17 @@ export default function BudgetTab({
               >
                 {totals.totalIncome >= totals.breakEvenIncome ? (
                   <>
-                    <i className="bx bx-check-circle"></i>
+                    <i className="bx bx-check-circle" />
                     <span>
-                      On track! {fmt(totals.totalIncome - totals.breakEvenIncome)} above
-                      target.
+                      On track! {fmt(totals.totalIncome - totals.breakEvenIncome)} above target.
                     </span>
                   </>
                 ) : (
                   <>
-                    <i className="bx bx-error-circle"></i>
+                    <i className="bx bx-error-circle" />
                     <span>
-                      Need {fmt(totals.breakEvenIncome - totals.totalIncome)} more income
-                      to reach target.
+                      Need {fmt(totals.breakEvenIncome - totals.totalIncome)} more income to reach
+                      target.
                     </span>
                   </>
                 )}
@@ -453,7 +455,7 @@ export default function BudgetTab({
       {/* Income Section */}
       <div className="admin-form-section">
         <h2>
-          <i className="bx bx-trending-up"></i> Projected Income
+          <i className="bx bx-trending-up" /> Projected Income
         </h2>
         <p className="admin-form-section-description">
           Estimate your income from tickets, sponsors, and other sources.
@@ -472,11 +474,9 @@ export default function BudgetTab({
       {/* Expenses Section */}
       <div className="admin-form-section">
         <h2>
-          <i className="bx bx-trending-down"></i> Projected Expenses
+          <i className="bx bx-trending-down" /> Projected Expenses
         </h2>
-        <p className="admin-form-section-description">
-          Plan your expenses by category.
-        </p>
+        <p className="admin-form-section-description">Plan your expenses by category.</p>
 
         <div className="budget-categories">
           {EXPENSE_CATEGORIES.map((cat) => renderCategorySection(cat, false))}

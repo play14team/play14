@@ -59,9 +59,7 @@ export interface RevenueAnalytics {
  * Get revenue analytics for an event
  * @param eventId - The event document ID
  */
-export async function getRevenueAnalytics(
-  eventId: string
-): Promise<RevenueAnalytics | null> {
+export async function getRevenueAnalytics(eventId: string): Promise<RevenueAnalytics | null> {
   const result = await strapiFetch<{ data: RevenueAnalytics }>(
     "/admin/events/:eventId/revenue-analytics",
     { eventId },

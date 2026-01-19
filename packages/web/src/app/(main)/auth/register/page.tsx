@@ -1,11 +1,11 @@
-import { redirect, notFound } from "next/navigation"
-import Link from "next/link"
-import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
-import { getFeatureFlags } from "@/libs/feature-flags"
 import LoginButtons from "@/components/auth/login-buttons"
 import RegisterForm from "@/components/auth/register-form"
 import Logo from "@/components/layout/logo"
+import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
+import { getFeatureFlags } from "@/libs/feature-flags"
 import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Register",
@@ -71,7 +71,9 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
         <div className="auth-login-footer">
           <p>
             Already have an account?{" "}
-            <Link href={`/auth/login${callbackUrl !== "/admin" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}>
+            <Link
+              href={`/auth/login${callbackUrl !== "/admin" ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
+            >
               Sign in
             </Link>
           </p>

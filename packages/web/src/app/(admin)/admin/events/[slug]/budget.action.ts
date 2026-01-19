@@ -1,7 +1,7 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
-import type { BudgetLineItem, ActionResult } from "./budget.types"
+import type { ActionResult, BudgetLineItem } from "./budget.types"
 
 interface StrapiDataResponse<T> {
   data: T

@@ -1,14 +1,14 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { uploadPlayerPicture, deletePlayerPicture } from "@/libs/api/players"
 import {
-  setPlayerAvatarFromLibrary,
   removePlayerAvatar,
+  setPlayerAvatarFromLibrary,
   uploadPlayerAvatar,
 } from "@/app/(admin)/admin/players/players.action"
-import { useToast } from "../toast"
+import { deletePlayerPicture, uploadPlayerPicture } from "@/libs/api/players"
+import { useRouter } from "next/navigation"
 import ImageManager from "../image-manager"
+import { useToast } from "../toast"
 
 const AVATAR_OUTPUT_SIZE = 400
 

@@ -2,12 +2,8 @@
  * Unit tests for calendar utilities
  */
 
-import { describe, it, expect } from "vitest"
-import {
-  generateEventICS,
-  generateGoogleCalendarUrl,
-  generateOutlookCalendarUrl,
-} from "./calendar"
+import { describe, expect, it } from "vitest"
+import { generateEventICS, generateGoogleCalendarUrl, generateOutlookCalendarUrl } from "./calendar"
 
 describe("generateEventICS", () => {
   const baseEvent = {

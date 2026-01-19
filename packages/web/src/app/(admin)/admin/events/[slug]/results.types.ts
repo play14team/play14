@@ -82,7 +82,7 @@ export interface ResultsSummaryWithBudget extends ResultsSummary {
  */
 export function calculateResultsSummary(
   items: ResultLineItem[],
-  ticketRevenue: number = 0
+  ticketRevenue = 0
 ): ResultsSummary {
   let manualIncome = 0
   let totalExpenses = 0
@@ -130,7 +130,7 @@ export function groupResultItemsByCategory(
 export function calculateResultCategoryTotal(
   items: ResultLineItem[],
   category: ResultCategory,
-  ticketRevenue: number = 0
+  ticketRevenue = 0
 ): number {
   const manualTotal = items
     .filter((item) => item.category === category)

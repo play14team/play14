@@ -2,10 +2,10 @@
 
 import Link from "next/link"
 import React, { useState } from "react"
+import AuthStatusClient from "./auth-status-client"
 import Logo from "./logo"
 import SearchBox from "./searchbox"
 import ThemeToggle from "./theme-toggle"
-import AuthStatusClient from "./auth-status-client"
 
 interface AuthUser {
   id: number
@@ -46,9 +46,7 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
     window.scrollTo(0, 0)
   })
 
-  const classOne = collapsed
-    ? "collapse navbar-collapse"
-    : "collapse navbar-collapse show"
+  const classOne = collapsed ? "collapse navbar-collapse" : "collapse navbar-collapse show"
   const classTwo = collapsed
     ? "navbar-toggler navbar-toggler-right collapsed"
     : "navbar-toggler navbar-toggler-right"
@@ -59,11 +57,7 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
         <div className="tarn-nav">
           <div className="container">
             <nav className="navbar navbar-expand-lg navbar-light">
-              <Link
-                href="/"
-                onClick={() => setCollapsed(true)}
-                className="navbar-brand"
-              >
+              <Link href="/" onClick={() => setCollapsed(true)} className="navbar-brand">
                 <Logo width={180} height={60} priority />
               </Link>
 
@@ -77,9 +71,9 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
                 aria-expanded="false"
                 aria-label="Toggle navigation"
               >
-                <span className="icon-bar top-bar"></span>
-                <span className="icon-bar middle-bar"></span>
-                <span className="icon-bar bottom-bar"></span>
+                <span className="icon-bar top-bar" />
+                <span className="icon-bar middle-bar" />
+                <span className="icon-bar bottom-bar" />
               </button>
 
               <div className={classOne} id="navbarSupportedContent">
@@ -92,7 +86,7 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
 
                   <li className="nav-item">
                     <Link href="/events" className="nav-link">
-                      Events <i className="bx bx-chevron-down"></i>
+                      Events <i className="bx bx-chevron-down" />
                     </Link>
 
                     <ul className="dropdown-menu">
@@ -140,7 +134,7 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
 
                   <li className="nav-item">
                     <Link href="/events" className="nav-link">
-                      Community <i className="bx bx-chevron-down"></i>
+                      Community <i className="bx bx-chevron-down" />
                     </Link>
 
                     <ul className="dropdown-menu">
@@ -155,11 +149,7 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
                       </li>
 
                       <li className="nav-item">
-                        <Link
-                          href="/games"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
+                        <Link href="/games" onClick={() => setCollapsed(true)} className="nav-link">
                           Games
                         </Link>
                       </li>
@@ -187,12 +177,8 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
                   </li>
 
                   <li className="nav-item">
-                    <Link
-                      href="/about"
-                      className="nav-link"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      About <i className="bx bx-chevron-down"></i>
+                    <Link href="/about" className="nav-link" onClick={(e) => e.preventDefault()}>
+                      About <i className="bx bx-chevron-down" />
                     </Link>
 
                     <ul className="dropdown-menu">

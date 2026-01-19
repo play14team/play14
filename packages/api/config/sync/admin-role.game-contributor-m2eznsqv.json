@@ -41,10 +41,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -79,10 +76,7 @@
           "ratings.connection",
           "ratings.silliness"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -93,14 +87,9 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::game.game",
       "properties": {
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "szgcei2ysxyal6bwa62wkdk5",
       "locale": null
@@ -109,10 +98,7 @@
       "action": "plugin::content-manager.explorer.publish",
       "subject": "api::game.game",
       "properties": {
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -147,10 +133,7 @@
           "ratings.connection",
           "ratings.silliness"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -185,10 +168,7 @@
           "ratings.connection",
           "ratings.silliness"
         ],
-        "locales": [
-          "en",
-          "fr"
-        ]
+        "locales": ["en", "fr"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -255,9 +235,7 @@
       "action": "plugin::upload.assets.update",
       "subject": null,
       "properties": {},
-      "conditions": [
-        "admin::is-creator"
-      ],
+      "conditions": ["admin::is-creator"],
       "actionParameters": {},
       "documentId": "ltutoeb58sldoj0j329z2ese",
       "locale": null

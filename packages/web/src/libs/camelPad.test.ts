@@ -2,7 +2,7 @@
  * Unit tests for camelPad utility
  */
 
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { camelPad } from "./camelPad"
 
 describe("camelPad", () => {

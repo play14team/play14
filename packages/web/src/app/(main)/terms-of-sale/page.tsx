@@ -1,5 +1,5 @@
 import Page from "@/components/layout/page"
-import { Metadata } from "next"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "General Terms and Conditions of Sale",
@@ -10,8 +10,8 @@ export default function TermsOfSale() {
     <Page name="General Terms and Conditions of Sale">
       <div className="container">
         <p className="pt-70">
-          These General Terms and Conditions of Sale (&quot;Terms of Sale&quot;) govern the
-          purchase of tickets for #play14 events (the &quot;Events&quot;) through our website at
+          These General Terms and Conditions of Sale (&quot;Terms of Sale&quot;) govern the purchase
+          of tickets for #play14 events (the &quot;Events&quot;) through our website at
           https://play14.org (the &quot;Site&quot;). By purchasing a ticket, you agree to be bound
           by these Terms of Sale. Please read them carefully before completing your purchase.
         </p>
@@ -23,29 +23,22 @@ export default function TermsOfSale() {
             system. In these Terms of Sale:
           </p>
           <ul>
-            <li>
-              &quot;Event&quot; means a #play14 unconference organized in a specific location
-            </li>
-            <li>
-              &quot;Ticket&quot; means the right to attend a specific Event
-            </li>
+            <li>&quot;Event&quot; means a #play14 unconference organized in a specific location</li>
+            <li>&quot;Ticket&quot; means the right to attend a specific Event</li>
             <li>
               &quot;Purchaser&quot; means the person who completes the ticket purchase transaction
             </li>
             <li>
-              &quot;Attendee&quot; means the person who will attend the Event using a purchased Ticket
+              &quot;Attendee&quot; means the person who will attend the Event using a purchased
+              Ticket
             </li>
-            <li>
-              &quot;Organizer&quot; means the local organizing team responsible for the Event
-            </li>
+            <li>&quot;Organizer&quot; means the local organizing team responsible for the Event</li>
           </ul>
         </div>
 
         <div className="pt-5">
           <h2>2. Ticket Purchase Process</h2>
-          <p>
-            To purchase tickets, you must:
-          </p>
+          <p>To purchase tickets, you must:</p>
           <ul>
             <li>Create an account or sign in to an existing account on the Site</li>
             <li>Select the Event you wish to attend</li>
@@ -76,18 +69,16 @@ export default function TermsOfSale() {
 
         <div className="pt-5">
           <h2>4. Ticket Delivery</h2>
-          <p>
-            Tickets are delivered electronically. Upon successful payment:
-          </p>
+          <p>Tickets are delivered electronically. Upon successful payment:</p>
           <ul>
             <li>The Purchaser receives a confirmation email with all ticket details</li>
             <li>Each Attendee receives their individual ticket with a unique code</li>
             <li>New Attendees who do not have an account receive an invitation to create one</li>
           </ul>
           <p>
-            Tickets can be accessed at any time through your account on the Site. Please ensure
-            the email addresses provided are correct, as we cannot be held responsible for
-            non-delivery due to incorrect email addresses.
+            Tickets can be accessed at any time through your account on the Site. Please ensure the
+            email addresses provided are correct, as we cannot be held responsible for non-delivery
+            due to incorrect email addresses.
           </p>
         </div>
 
@@ -122,12 +113,12 @@ export default function TermsOfSale() {
           </p>
           <ul>
             <li>
-              <strong>Event Cancellation:</strong> If an Event is cancelled by the Organizers,
-              you will receive a full refund of the ticket price
+              <strong>Event Cancellation:</strong> If an Event is cancelled by the Organizers, you
+              will receive a full refund of the ticket price
             </li>
             <li>
-              <strong>Event Rescheduling:</strong> If an Event is rescheduled and you cannot
-              attend the new date, you may request a refund
+              <strong>Event Rescheduling:</strong> If an Event is rescheduled and you cannot attend
+              the new date, you may request a refund
             </li>
             <li>
               <strong>Exceptional Circumstances:</strong> The Organizers may, at their sole
@@ -142,9 +133,7 @@ export default function TermsOfSale() {
 
         <div className="pt-5">
           <h2>7. Attendee Information and Data Collection</h2>
-          <p>
-            When purchasing tickets, you must provide information for each Attendee, including:
-          </p>
+          <p>When purchasing tickets, you must provide information for each Attendee, including:</p>
           <ul>
             <li>First name and last name</li>
             <li>Email address</li>
@@ -152,9 +141,7 @@ export default function TermsOfSale() {
             <li>Food preferences or allergies (optional)</li>
             <li>Photo and video consent (required)</li>
           </ul>
-          <p>
-            This information is collected to:
-          </p>
+          <p>This information is collected to:</p>
           <ul>
             <li>Provide personalized event materials (such as t-shirts)</li>
             <li>Accommodate dietary requirements during the Event</li>
@@ -180,10 +167,13 @@ export default function TermsOfSale() {
             <li>Event reports and documentation</li>
           </ul>
           <p>
-            <strong>By purchasing a ticket, each Attendee must consent to being photographed and
-            filmed during the Event.</strong> This consent is a mandatory requirement for
-            attendance, as the open and collaborative nature of #play14 events makes it impractical
-            to exclude specific individuals from group photos and videos.
+            <strong>
+              By purchasing a ticket, each Attendee must consent to being photographed and filmed
+              during the Event.
+            </strong>{" "}
+            This consent is a mandatory requirement for attendance, as the open and collaborative
+            nature of #play14 events makes it impractical to exclude specific individuals from group
+            photos and videos.
           </p>
           <p>
             You may withdraw your consent at any time by contacting the Event organizers. However,
@@ -198,9 +188,7 @@ export default function TermsOfSale() {
               We may not be able to remove you from materials that have already been published or
               shared with third parties
             </li>
-            <li>
-              Withdrawal of consent may affect your ability to attend the Event
-            </li>
+            <li>Withdrawal of consent may affect your ability to attend the Event</li>
           </ul>
         </div>
 
@@ -216,16 +204,14 @@ export default function TermsOfSale() {
             <li>Can be claimed and managed by the Attendee through account creation</li>
           </ul>
           <p>
-            Attendees who do not have an existing account will receive an invitation email to
-            create one and claim their player profile.
+            Attendees who do not have an existing account will receive an invitation email to create
+            one and claim their player profile.
           </p>
         </div>
 
         <div className="pt-5">
           <h2>10. Event Admission and Rules</h2>
-          <p>
-            Tickets grant access to the specified Event only. By attending, you agree to:
-          </p>
+          <p>Tickets grant access to the specified Event only. By attending, you agree to:</p>
           <ul>
             <li>Follow the Event&apos;s code of conduct</li>
             <li>Comply with instructions from the Organizers</li>
@@ -240,23 +226,17 @@ export default function TermsOfSale() {
 
         <div className="pt-5">
           <h2>11. Limitation of Liability</h2>
-          <p>
-            To the fullest extent permitted by applicable law:
-          </p>
+          <p>To the fullest extent permitted by applicable law:</p>
           <ul>
-            <li>
-              #play14 events are organized by volunteer teams and are non-profit in nature
-            </li>
+            <li>#play14 events are organized by volunteer teams and are non-profit in nature</li>
             <li>
               We are not liable for any indirect, incidental, special, or consequential damages
               arising from your attendance at an Event
             </li>
+            <li>Our total liability is limited to the amount paid for your ticket</li>
             <li>
-              Our total liability is limited to the amount paid for your ticket
-            </li>
-            <li>
-              We are not responsible for personal belongings, injuries, or any incidents during
-              the Event beyond our reasonable control
+              We are not responsible for personal belongings, injuries, or any incidents during the
+              Event beyond our reasonable control
             </li>
           </ul>
         </div>

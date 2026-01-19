@@ -1,13 +1,18 @@
 "use client"
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/components/admin/toast"
-import { useFormDirty, useBeforeUnload } from "@/hooks/use-form-dirty"
-import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import SponsorLogoManager from "@/components/admin/sponsor-logo-manager"
-import { updateSponsor, deleteSponsor, type SponsorForEdit, type SocialNetwork } from "../sponsors.action"
-import { type SponsorLogo } from "../logo.action"
+import { useToast } from "@/components/admin/toast"
+import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
+import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { SponsorLogo } from "../logo.action"
+import {
+  type SocialNetwork,
+  type SponsorForEdit,
+  deleteSponsor,
+  updateSponsor,
+} from "../sponsors.action"
 
 const SOCIAL_NETWORK_TYPES = [
   "Twitter",
@@ -246,7 +251,10 @@ export default function SponsorEditForm({ sponsor }: Props) {
               ? { ...sponsor.logo.formats.small, url: normalizeUrl(sponsor.logo.formats.small.url) }
               : undefined,
             medium: sponsor.logo.formats.medium
-              ? { ...sponsor.logo.formats.medium, url: normalizeUrl(sponsor.logo.formats.medium.url) }
+              ? {
+                  ...sponsor.logo.formats.medium,
+                  url: normalizeUrl(sponsor.logo.formats.medium.url),
+                }
               : undefined,
             large: sponsor.logo.formats.large
               ? { ...sponsor.logo.formats.large, url: normalizeUrl(sponsor.logo.formats.large.url) }
@@ -344,7 +352,7 @@ export default function SponsorEditForm({ sponsor }: Props) {
                       onClick={() => removeSocialNetwork(index)}
                       title="Remove"
                     >
-                      <i className="bx bx-trash"></i>
+                      <i className="bx bx-trash" />
                     </button>
                   </div>
                 ))}
@@ -354,7 +362,7 @@ export default function SponsorEditForm({ sponsor }: Props) {
                   className="admin-btn admin-btn-secondary admin-btn-sm"
                   onClick={addSocialNetwork}
                 >
-                  <i className="bx bx-plus"></i>
+                  <i className="bx bx-plus" />
                   Add Social Network
                 </button>
               </div>
@@ -377,9 +385,9 @@ export default function SponsorEditForm({ sponsor }: Props) {
                         href={`/admin/events/${event.slug}`}
                         className="venue-event-link"
                       >
-                        <i className="bx bx-calendar-event"></i>
+                        <i className="bx bx-calendar-event" />
                         <span>{event.name}</span>
-                        <i className="bx bx-link-external"></i>
+                        <i className="bx bx-link-external" />
                       </a>
                     ))}
                   </div>
@@ -399,12 +407,12 @@ export default function SponsorEditForm({ sponsor }: Props) {
             >
               {isSubmitting ? (
                 <>
-                  <i className="bx bx-loader-alt bx-spin"></i>
+                  <i className="bx bx-loader-alt bx-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <i className="bx bx-save"></i>
+                  <i className="bx bx-save" />
                   Save changes
                 </>
               )}
@@ -416,7 +424,7 @@ export default function SponsorEditForm({ sponsor }: Props) {
                 onClick={handleDiscard}
                 className="admin-btn admin-btn-danger-outline admin-btn-block"
               >
-                <i className="bx bx-undo"></i>
+                <i className="bx bx-undo" />
                 Discard changes
               </button>
             )}
@@ -427,14 +435,14 @@ export default function SponsorEditForm({ sponsor }: Props) {
                 className="admin-btn admin-btn-danger admin-btn-block"
                 onClick={() => setShowDeleteConfirm(true)}
               >
-                <i className="bx bx-trash"></i>
+                <i className="bx bx-trash" />
                 Delete sponsor
               </button>
             )}
 
             {!canDelete && (
               <p className="admin-form-help">
-                <i className="bx bx-info-circle"></i>
+                <i className="bx bx-info-circle" />
                 Cannot delete: this sponsor is used by {sponsor.eventsCount} event
                 {sponsor.eventsCount !== 1 ? "s" : ""}.
               </p>
@@ -451,7 +459,7 @@ export default function SponsorEditForm({ sponsor }: Props) {
                 >
                   {isDeleting ? (
                     <>
-                      <i className="bx bx-loader-alt bx-spin"></i>
+                      <i className="bx bx-loader-alt bx-spin" />
                       Deleting...
                     </>
                   ) : (
@@ -473,7 +481,7 @@ export default function SponsorEditForm({ sponsor }: Props) {
           {/* Dirty State Indicator */}
           {isDirty && (
             <div className="dirty-indicator">
-              <i className="bx bx-edit-alt"></i>
+              <i className="bx bx-edit-alt" />
               <span>You have unsaved changes</span>
             </div>
           )}

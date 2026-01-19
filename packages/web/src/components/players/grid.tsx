@@ -1,4 +1,4 @@
-import { Player } from "@/models/strapi"
+import type { Player } from "@/models/strapi"
 import PlayerCard from "./card"
 
 const PlayerGrid = ({
@@ -17,13 +17,12 @@ const PlayerGrid = ({
           </div>
         )}
         <div className="row">
-          {players &&
-            players.map((player, index) => (
-              <PlayerCard
-                key={player.documentId || player.slug || player.name || `player-${index}`}
-                player={player}
-              />
-            ))}
+          {players?.map((player, index) => (
+            <PlayerCard
+              key={player.documentId || player.slug || player.name || `player-${index}`}
+              player={player}
+            />
+          ))}
         </div>
       </div>
     </section>

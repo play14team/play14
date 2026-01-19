@@ -230,13 +230,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "title",
-        "author",
-        "category",
-        "defaultImage",
-        "tags"
-      ],
+      "list": ["title", "author", "category", "defaultImage", "tags"],
       "edit": [
         [
           {

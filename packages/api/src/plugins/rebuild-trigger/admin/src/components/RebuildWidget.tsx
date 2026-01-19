@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react"
-import { Button, Flex, Typography, Box, Loader, Badge } from "@strapi/design-system"
+import { Badge, Box, Button, Flex, Loader, Typography } from "@strapi/design-system"
+import { ArrowClockwise, Check, Cross, ExternalLink, Play, Trash } from "@strapi/icons"
 import { useFetchClient, useNotification } from "@strapi/strapi/admin"
-import { Check, Cross, Play, ExternalLink, ArrowClockwise, Trash } from "@strapi/icons"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 const PLUGIN_ID = "rebuild-trigger"
 const POLL_INTERVAL = 10000 // Poll every 10 seconds when a build is in progress
@@ -165,7 +165,10 @@ const RebuildWidget = () => {
             }
           }
         }
-      } else if (latestRun && (latestRun.status === "in_progress" || latestRun.status === "queued")) {
+      } else if (
+        latestRun &&
+        (latestRun.status === "in_progress" || latestRun.status === "queued")
+      ) {
         // Show in-progress runs even if we didn't trigger them
         setCurrentRun(latestRun)
         setIsPolling(true)
@@ -209,8 +212,7 @@ const RebuildWidget = () => {
       // Fetch status after a short delay to get the new run
       setTimeout(async () => {
         const statusResponse = await get(`/${PLUGIN_ID}/status`)
-        const { latestRun } =
-          (statusResponse?.data as { latestRun?: WorkflowRun }) || {}
+        const { latestRun } = (statusResponse?.data as { latestRun?: WorkflowRun }) || {}
         if (latestRun) {
           triggeredRunId.current = latestRun.id
           setCurrentRun(latestRun)
@@ -294,8 +296,7 @@ const RebuildWidget = () => {
         )}
 
         {hasFailed && (
-          <Button onClick={handleRetry} variant="danger" startIcon={<ArrowClockwise />}
-          >
+          <Button onClick={handleRetry} variant="danger" startIcon={<ArrowClockwise />}>
             Retry
           </Button>
         )}

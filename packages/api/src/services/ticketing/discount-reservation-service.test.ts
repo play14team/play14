@@ -8,12 +8,12 @@
  * - useDiscountCodeAtomic: Atomic use for free orders
  */
 
-import { describe, it, expect, beforeEach, vi, type Mock } from "vitest"
 import type { Core } from "@strapi/strapi"
+import { type Mock, beforeEach, describe, expect, it, vi } from "vitest"
 import {
-  reserveDiscountCode,
   confirmDiscountCode,
   releaseDiscountCode,
+  reserveDiscountCode,
   useDiscountCodeAtomic,
 } from "./discount-reservation-service"
 
@@ -79,7 +79,7 @@ interface MockDatabase {
 
 function createMockKnex(db: MockDatabase) {
   // Track the code parameter from the raw query for use in the WHERE clause
-  let lastRawCodeParam: string | null = null
+  let _lastRawCodeParam: string | null = null
 
   const rawQuery = vi.fn((sql: string, params?: any[]) => {
     const sqlLower = sql.toLowerCase().replace(/\s+/g, " ").trim()
@@ -87,7 +87,7 @@ function createMockKnex(db: MockDatabase) {
     // Handle LOWER(discount_codes.code) = LOWER(?) - this is used as a where condition
     // knex.raw() returns an object that represents the raw SQL, we need to capture the params
     if (sqlLower.includes("lower(discount_codes.code)")) {
-      lastRawCodeParam = params?.[0] as string
+      _lastRawCodeParam = params?.[0] as string
       // Return a marker object that the where handler can recognize
       return { __isRawCondition: true, codeParam: params?.[0] }
     }
@@ -254,19 +254,19 @@ function createMockKnex(db: MockDatabase) {
 
   // Query builder for joins
   const queryBuilder = (table: string) => {
-    let joinedTables: string[] = []
-    let whereConditions: Array<{ column: string; value: any; codeParam?: string }> = []
+    const joinedTables: string[] = []
+    const whereConditions: Array<{ column: string; value: any; codeParam?: string }> = []
     let selectedColumns: string[] = []
 
     const builder: any = {
-      join: (joinTable: string, col1: string, col2: string) => {
+      join: (joinTable: string, _col1: string, _col2: string) => {
         joinedTables.push(joinTable)
         return builder
       },
       where: (columnOrRaw: any, value?: any) => {
         if (typeof columnOrRaw === "string") {
           whereConditions.push({ column: columnOrRaw, value })
-        } else if (columnOrRaw && columnOrRaw.__isRawCondition) {
+        } else if (columnOrRaw?.__isRawCondition) {
           // This is a raw condition from knex.raw()
           whereConditions.push({ column: "raw", value: null, codeParam: columnOrRaw.codeParam })
         }
@@ -291,7 +291,7 @@ function createMockKnex(db: MockDatabase) {
             if (!event) return null
 
             // Find discount code linked to this event
-            for (const [docId, discountCode] of db.discountCodes) {
+            for (const [_docId, discountCode] of db.discountCodes) {
               if (discountCode.code.toLowerCase() === searchCode) {
                 const link = db.discountCodeEventLinks.find(
                   (l) => l.discount_code_id === discountCode.id && l.event_id === event.id
@@ -315,7 +315,7 @@ function createMockKnex(db: MockDatabase) {
 
   // Direct table query builder
   const tableQueryBuilder = (table: string) => {
-    let whereConditions: Array<{ column: string; value: any }> = []
+    const whereConditions: Array<{ column: string; value: any }> = []
 
     const builder: any = {
       where: (column: string, value: any) => {

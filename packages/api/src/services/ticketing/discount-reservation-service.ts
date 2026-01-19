@@ -108,12 +108,14 @@ async function atomicReserveDiscountCode(
       documentId: row.document_id,
       code: row.code,
       discountType: row.discount_type,
-      discountValue: parseFloat(row.discount_value),
+      discountValue: Number.parseFloat(row.discount_value),
       maxUses: row.max_uses,
       usedCount: row.used_count || 0,
       reservedCount: row.reserved_count || 0,
-      maxDiscountAmount: row.max_discount_amount ? parseFloat(row.max_discount_amount) : null,
-      minOrderAmount: row.min_order_amount ? parseFloat(row.min_order_amount) : null,
+      maxDiscountAmount: row.max_discount_amount
+        ? Number.parseFloat(row.max_discount_amount)
+        : null,
+      minOrderAmount: row.min_order_amount ? Number.parseFloat(row.min_order_amount) : null,
     },
   }
 }
@@ -196,7 +198,11 @@ export async function reserveDiscountCode(
 
   // First find the discount code for this event (non-atomic, just for lookup)
   const discountCodeRecord = await knex("discount_codes")
-    .join("discount_codes_event_lnk", "discount_codes.id", "discount_codes_event_lnk.discount_code_id")
+    .join(
+      "discount_codes_event_lnk",
+      "discount_codes.id",
+      "discount_codes_event_lnk.discount_code_id"
+    )
     .join("events", "discount_codes_event_lnk.event_id", "events.id")
     .where(knex.raw("LOWER(discount_codes.code) = LOWER(?)", [code.trim()]))
     .where("events.document_id", eventDocumentId)
@@ -308,7 +314,11 @@ export async function useDiscountCodeAtomic(
 
   // First find the discount code for this event
   const discountCodeRecord = await knex("discount_codes")
-    .join("discount_codes_event_lnk", "discount_codes.id", "discount_codes_event_lnk.discount_code_id")
+    .join(
+      "discount_codes_event_lnk",
+      "discount_codes.id",
+      "discount_codes_event_lnk.discount_code_id"
+    )
     .join("events", "discount_codes_event_lnk.event_id", "events.id")
     .where(knex.raw("LOWER(discount_codes.code) = LOWER(?)", [code.trim()]))
     .where("events.document_id", eventDocumentId)
@@ -367,12 +377,12 @@ export async function useDiscountCodeAtomic(
     documentId: row.document_id,
     code: row.code,
     discountType: row.discount_type,
-    discountValue: parseFloat(row.discount_value),
+    discountValue: Number.parseFloat(row.discount_value),
     maxUses: row.max_uses,
     usedCount: row.used_count || 0,
     reservedCount: row.reserved_count || 0,
-    maxDiscountAmount: row.max_discount_amount ? parseFloat(row.max_discount_amount) : null,
-    minOrderAmount: row.min_order_amount ? parseFloat(row.min_order_amount) : null,
+    maxDiscountAmount: row.max_discount_amount ? Number.parseFloat(row.max_discount_amount) : null,
+    minOrderAmount: row.min_order_amount ? Number.parseFloat(row.min_order_amount) : null,
   }
 
   // Calculate discount amount

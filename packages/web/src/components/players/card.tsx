@@ -1,6 +1,6 @@
+import type { Player, UploadFile } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
-import { Player, UploadFile } from "@/models/strapi"
 import SocialNetworks from "../layout/socialnetworks"
 import DefaultPlayerImage from "../ui/default-player-image"
 
@@ -57,9 +57,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
             <h3>{player.name}</h3>
           </Link>
           <span>{player.position}</span>
-          {player.socialNetworks && (
-            <SocialNetworks socialNetworks={player.socialNetworks} />
-          )}
+          {player.socialNetworks && <SocialNetworks socialNetworks={player.socialNetworks} />}
         </div>
       </div>
     </article>

@@ -8,22 +8,22 @@
  * - Strapi built: `bun --filter play14-api build`
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
-import request from "supertest"
 import type { Core } from "@strapi/strapi"
-import {
-  setupStrapiTestInstance,
-  teardownStrapiTestInstance,
-  getHttpServer,
-} from "../../test-utils/strapi-test-instance"
+import request from "supertest"
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
+import { resetMockPaymentState } from "../../services/payment"
 import {
   cleanupTestData,
-  seedTestEvent,
   seedPaidOrderWithTickets,
+  seedTestEvent,
   seedTestOrder,
 } from "../../test-utils/seed-database"
+import {
+  getHttpServer,
+  setupStrapiTestInstance,
+  teardownStrapiTestInstance,
+} from "../../test-utils/strapi-test-instance"
 import { createAuthenticatedUser, createEventHost, getAuthHeader } from "../helpers/auth"
-import { resetMockPaymentState } from "../../services/payment"
 import { sendChargeRefunded, waitForWebhookProcessing } from "../helpers/webhook-simulator"
 
 describe("Refund Flow", () => {
@@ -51,9 +51,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const order = await seedPaidOrderWithTickets(strapi, {
@@ -81,9 +79,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create pending order (not paid)
@@ -108,9 +104,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Create already refunded order
@@ -140,9 +134,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
         hosts: [host.player.id],
       })
 
@@ -176,9 +168,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const order = await seedPaidOrderWithTickets(strapi, {
@@ -203,9 +193,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const order = await seedPaidOrderWithTickets(strapi, {
@@ -216,8 +204,9 @@ describe("Refund Flow", () => {
       })
 
       // Act - no auth header
-      const response = await request(httpServer)
-        .post(`/api/ticket-orders/${order.documentId}/refund`)
+      const response = await request(httpServer).post(
+        `/api/ticket-orders/${order.documentId}/refund`
+      )
 
       // Assert - Strapi returns 403 (Forbidden) for unauthenticated requests to protected routes
       expect(response.status).toBe(403)
@@ -231,9 +220,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const order = await seedPaidOrderWithTickets(strapi, {
@@ -271,9 +258,7 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       const order = await seedPaidOrderWithTickets(strapi, {
@@ -311,13 +296,12 @@ describe("Refund Flow", () => {
       const event = await seedTestEvent(strapi, {
         eventStatus: "Open",
         ticketingMode: "internal",
-        ticketTypes: [
-          { name: "Standard", price: 50, capacity: 100 },
-        ],
+        ticketTypes: [{ name: "Standard", price: 50, capacity: 100 }],
       })
 
       // Set initial sold count
-      await strapi.db.connection("ticket_types")
+      await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .update({ sold_count: 10 })
 
@@ -333,7 +317,8 @@ describe("Refund Flow", () => {
       await waitForWebhookProcessing()
 
       // Assert - sold count should be decremented
-      const ticketType = await strapi.db.connection("ticket_types")
+      const ticketType = await strapi.db
+        .connection("ticket_types")
         .where("document_id", event.ticketTypes![0].documentId)
         .first()
 

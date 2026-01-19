@@ -132,7 +132,8 @@ export const ATTENDANCE_CLAIM_ACTIONS = {
   GET_OVER_EVENTS: "api::attendance-claim.custom-attendance-claim.getOverEvents",
   GET_MY_CLAIMS: "api::attendance-claim.custom-attendance-claim.getMyClaims",
   GET_PENDING_FOR_PLAYER: "api::attendance-claim.custom-attendance-claim.getPendingClaimsForPlayer",
-  GET_PENDING_FOR_MY_EVENTS: "api::attendance-claim.custom-attendance-claim.getPendingClaimsForMyEvents",
+  GET_PENDING_FOR_MY_EVENTS:
+    "api::attendance-claim.custom-attendance-claim.getPendingClaimsForMyEvents",
   SUBMIT_CLAIM: "api::attendance-claim.custom-attendance-claim.submitClaim",
   CANCEL_CLAIM: "api::attendance-claim.custom-attendance-claim.cancelClaim",
   APPROVE_CLAIM: "api::attendance-claim.custom-attendance-claim.approveClaim",

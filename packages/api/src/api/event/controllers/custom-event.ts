@@ -4,10 +4,10 @@
  * Only accessible by Hosts, Mentors, and Founders
  */
 
+import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
-import { generateTimetable } from "../templates/schedule-templates"
 import { imageSize } from "image-size"
-import * as fs from "fs"
+import { generateTimetable } from "../templates/schedule-templates"
 
 const ORGANIZER_POSITIONS = ["Host", "Mentor", "Founder"]
 
@@ -72,12 +72,10 @@ async function getOrCreateFolder(
   }
 
   // Get the next pathId for creating a new folder
-  const maxPathIdResult = await strapi.db
-    .query("plugin::upload.folder")
-    .findMany({
-      orderBy: { pathId: "desc" },
-      limit: 1,
-    })
+  const maxPathIdResult = await strapi.db.query("plugin::upload.folder").findMany({
+    orderBy: { pathId: "desc" },
+    limit: 1,
+  })
 
   const nextPathId = maxPathIdResult.length > 0 ? maxPathIdResult[0].pathId + 1 : 1
 
@@ -136,12 +134,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * Get the current user's linked player
    */
   async getLinkedPlayer(userId: number) {
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: userId },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: userId },
+      populate: { player: true },
+    })
     return userWithPlayer?.player || null
   },
 
@@ -230,9 +226,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           isPublished: publishedIds.has(e.documentId),
           isHost,
           isMentor,
-          location: e.location
-            ? { name: e.location.name, country: e.location.country }
-            : null,
+          location: e.location ? { name: e.location.name, country: e.location.country } : null,
           defaultImage: e.defaultImage
             ? {
                 url: e.defaultImage.url,
@@ -261,12 +255,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("Only organizers can access this resource")
     }
 
-    const locations = await strapi
-      .documents("api::event-location.event-location")
-      .findMany({
-        fields: ["documentId", "name", "country"],
-        sort: { name: "asc" },
-      })
+    const locations = await strapi.documents("api::event-location.event-location").findMany({
+      fields: ["documentId", "name", "country"],
+      sort: { name: "asc" },
+    })
 
     return ctx.send({
       data: locations.map((l: any) => ({
@@ -324,11 +316,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     const organizers = await strapi.documents("api::player.player").findMany({
       filters: {
-        $or: [
-          { position: "Host" },
-          { position: "Mentor" },
-          { position: "Founder" },
-        ],
+        $or: [{ position: "Host" }, { position: "Mentor" }, { position: "Founder" }],
       },
       fields: ["documentId", "name", "position"],
       populate: {
@@ -418,17 +406,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("Only Hosts, Mentors, or Founders can create events")
     }
 
-    const {
-      name,
-      start,
-      end,
-      locationId,
-      newLocation,
-      venueId,
-      newVenue,
-      description,
-      timezone,
-    } = ctx.request.body?.data || {}
+    const { name, start, end, locationId, newLocation, venueId, newVenue, description, timezone } =
+      ctx.request.body?.data || {}
 
     // Validation
     if (!name || name.trim().length === 0) {
@@ -473,24 +452,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         locationData.location = newLocation.location
       }
 
-      const createdLocation = await strapi
-        .documents("api::event-location.event-location")
-        .create({
-          data: locationData,
-        })
+      const createdLocation = await strapi.documents("api::event-location.event-location").create({
+        data: locationData,
+      })
       finalLocationId = createdLocation.documentId
 
-      strapi.log.info(
-        `[Event] New location "${newLocation.name}" created by ${player.name}`
-      )
+      strapi.log.info(`[Event] New location "${newLocation.name}" created by ${player.name}`)
     }
 
     // Resolve location to get the numeric ID
-    const location = await strapi
-      .documents("api::event-location.event-location")
-      .findOne({
-        documentId: finalLocationId,
-      })
+    const location = await strapi.documents("api::event-location.event-location").findOne({
+      documentId: finalLocationId,
+    })
 
     if (!location) {
       return ctx.badRequest("Location not found")
@@ -498,7 +471,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Create venue if needed
     let venueNumericId: number | null = null
-    if (newVenue && newVenue.name) {
+    if (newVenue?.name) {
       const createdVenue = await strapi.documents("api::venue.venue").create({
         data: {
           name: newVenue.name.trim(),
@@ -507,9 +480,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       })
       venueNumericId = createdVenue.id
 
-      strapi.log.info(
-        `[Event] New venue "${newVenue.name}" created by ${player.name}`
-      )
+      strapi.log.info(`[Event] New venue "${newVenue.name}" created by ${player.name}`)
     } else if (venueId) {
       const venue = await strapi.documents("api::venue.venue").findOne({
         documentId: venueId,
@@ -630,12 +601,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access (host, mentor, or founder)
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -703,12 +670,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -755,9 +718,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
         updateData.location = createdLocation.id
 
-        strapi.log.info(
-          `[Event] New location "${newLocation.name}" created by ${player.name}`
-        )
+        strapi.log.info(`[Event] New location "${newLocation.name}" created by ${player.name}`)
       }
     } else if (requestData.locationId) {
       const location = await strapi
@@ -913,9 +874,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       status: publishedEvent ? "published" : "draft",
     })
 
-    strapi.log.info(
-      `[Event] Event "${updated.name}" (${updated.slug}) updated by ${player.name}`
-    )
+    strapi.log.info(`[Event] Event "${updated.name}" (${updated.slug}) updated by ${player.name}`)
 
     return ctx.send({
       data: {
@@ -956,12 +915,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -973,9 +928,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       documentId: event.documentId,
     })
 
-    strapi.log.info(
-      `[Event] Event "${event.name}" (${event.slug}) published by ${player.name}`
-    )
+    strapi.log.info(`[Event] Event "${event.name}" (${event.slug}) published by ${player.name}`)
 
     return ctx.send({
       data: {
@@ -1018,12 +971,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1035,9 +984,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       documentId: event.documentId,
     })
 
-    strapi.log.info(
-      `[Event] Event "${event.name}" (${event.slug}) unpublished by ${player.name}`
-    )
+    strapi.log.info(`[Event] Event "${event.name}" (${event.slug}) unpublished by ${player.name}`)
 
     return ctx.send({
       data: {
@@ -1130,12 +1077,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1209,12 +1152,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1252,7 +1191,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Update the event with finance data
     // Note: Cast to any needed because Strapi 5 types don't properly handle component fields
-    const updated = await strapi.documents("api::event.event").update({
+    const _updated = await strapi.documents("api::event.event").update({
       documentId: event.documentId,
       data: {
         finance: financeData,
@@ -1304,12 +1243,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1348,7 +1283,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Update the event with media data
     // Note: Cast to any needed because Strapi 5 types don't properly handle component fields
-    const updated = await strapi.documents("api::event.event").update({
+    const _updated = await strapi.documents("api::event.event").update({
       documentId: event.documentId,
       data: {
         media: mediaData,
@@ -1400,12 +1335,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1479,7 +1410,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Update the event with timetable data
     // Note: Cast to any needed because Strapi 5 types don't properly handle component fields
-    const updated = await strapi.documents("api::event.event").update({
+    const _updated = await strapi.documents("api::event.event").update({
       documentId: event.documentId,
       data: {
         timetable: timetableData,
@@ -1533,12 +1464,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1569,8 +1496,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           if (!isValidDefaultImageRatio(dimensions.width, dimensions.height)) {
             const currentRatio = (dimensions.width / dimensions.height).toFixed(2)
             return ctx.badRequest(
-              `Default image must have a 6:5 aspect ratio (e.g., 600x500). ` +
-              `Your image is ${dimensions.width}x${dimensions.height} (ratio: ${currentRatio}).`
+              `Default image must have a 6:5 aspect ratio (e.g., 600x500). Your image is ${dimensions.width}x${dimensions.height} (ratio: ${currentRatio}).`
             )
           }
         } else {
@@ -1579,7 +1505,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           if (maxDimension > GALLERY_IMAGE_MAX_DIMENSION) {
             return ctx.badRequest(
               `Gallery image dimensions are too large. Maximum dimension is ${GALLERY_IMAGE_MAX_DIMENSION}px. ` +
-              `Your image is ${dimensions.width}x${dimensions.height}.`
+                `Your image is ${dimensions.width}x${dimensions.height}.`
             )
           }
         }
@@ -1692,12 +1618,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1779,8 +1701,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest("Invalid field. Must be 'defaultImage' or 'images'")
     }
 
-    const numericFileId = parseInt(fileId, 10)
-    if (isNaN(numericFileId)) {
+    const numericFileId = Number.parseInt(fileId, 10)
+    if (Number.isNaN(numericFileId)) {
       return ctx.badRequest("Invalid fileId")
     }
 
@@ -1800,12 +1722,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -1889,12 +1807,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -2001,12 +1915,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -2034,7 +1944,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       expired: { count: 0, amount: 0 },
     }
 
-    const ticketTypeRevenue: Record<string, { name: string; price: number; quantity: number; revenue: number }> = {}
+    const ticketTypeRevenue: Record<
+      string,
+      { name: string; price: number; quantity: number; revenue: number }
+    > = {}
     const timelineData: Record<string, { orders: number; revenue: number }> = {}
 
     let totalRevenue = 0
@@ -2176,12 +2089,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -2197,13 +2106,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       populate: {
         ticketType: { fields: ["documentId", "name"] },
         order: {
-          fields: ["documentId", "orderNumber", "purchaserName", "purchaserEmail", "status", "paidAt"],
+          fields: [
+            "documentId",
+            "orderNumber",
+            "purchaserName",
+            "purchaserEmail",
+            "status",
+            "paidAt",
+          ],
         },
         attendeeInfo: true,
       },
       sort: { createdAt: "desc" },
-      start: (parseInt(page as string, 10) - 1) * parseInt(pageSize as string, 10),
-      limit: parseInt(pageSize as string, 10),
+      start: (Number.parseInt(page as string, 10) - 1) * Number.parseInt(pageSize as string, 10),
+      limit: Number.parseInt(pageSize as string, 10),
     })
 
     // Get total count for pagination
@@ -2216,8 +2132,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     })
 
     const total = totalTickets.length
-    const pageNum = parseInt(page as string, 10)
-    const pageSizeNum = parseInt(pageSize as string, 10)
+    const pageNum = Number.parseInt(page as string, 10)
+    const pageSizeNum = Number.parseInt(pageSize as string, 10)
 
     return ctx.send({
       data: {
@@ -2284,12 +2200,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -2356,12 +2268,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {
@@ -2440,12 +2348,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Verify organizer access
-    const isHost = (event as any).hosts?.some(
-      (h: any) => h.documentId === player.documentId
-    )
-    const isMentor = (event as any).mentors?.some(
-      (m: any) => m.documentId === player.documentId
-    )
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
     const isFounder = player.position === "Founder"
 
     if (!isHost && !isMentor && !isFounder) {

@@ -117,12 +117,7 @@
       }
     },
     "layouts": {
-      "list": [
-        "id",
-        "action",
-        "token",
-        "createdAt"
-      ],
+      "list": ["id", "action", "token", "createdAt"],
       "edit": [
         [
           {

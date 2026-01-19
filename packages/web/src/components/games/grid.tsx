@@ -1,4 +1,4 @@
-import { Game } from "@/models/strapi"
+import type { Game } from "@/models/strapi"
 import GameCard from "./card"
 
 const GameGrid = ({ games }: { games: Game[] }) => {
@@ -6,8 +6,9 @@ const GameGrid = ({ games }: { games: Game[] }) => {
     <div className="courses-area">
       <div className="container">
         <div className="row">
-          {games &&
-            games.map((game) => <GameCard key={game.documentId} game={game} />)}
+          {games?.map((game) => (
+            <GameCard key={game.documentId} game={game} />
+          ))}
         </div>
       </div>
     </div>

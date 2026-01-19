@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest"
-import { getRegistry, getMetrics, getContentType } from "./metrics"
+import { describe, expect, it, vi } from "vitest"
+import { getContentType, getMetrics, getRegistry } from "./metrics"
 
 // Mock prom-client
 vi.mock("prom-client", () => {

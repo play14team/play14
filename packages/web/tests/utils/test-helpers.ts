@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test"
+import { type Page, expect } from "@playwright/test"
 
 /**
  * Common test helper functions for play14-web tests
@@ -28,9 +28,7 @@ export async function verifyNavigation(page: Page) {
   await expect(navbar.getByText("Events").first()).toBeVisible()
   await expect(navbar.getByText("Community").first()).toBeVisible()
   await expect(navbar.getByText("About").first()).toBeVisible()
-  await expect(
-    navbar.getByRole("link", { name: "Contact" }).first(),
-  ).toBeVisible()
+  await expect(navbar.getByRole("link", { name: "Contact" }).first()).toBeVisible()
 }
 
 /**
@@ -45,11 +43,7 @@ export async function waitForPageLoad(page: Page, timeout = 30000) {
 /**
  * Check if grid items are displayed
  */
-export async function verifyGridItems(
-  page: Page,
-  selector: string,
-  minCount = 1,
-) {
+export async function verifyGridItems(page: Page, selector: string, minCount = 1) {
   const items = page.locator(selector)
   await expect(items.first()).toBeVisible({ timeout: 10000 })
   expect(await items.count()).toBeGreaterThanOrEqual(minCount)
@@ -67,9 +61,7 @@ export async function verifyPageTitle(page: Page, expectedTitle: string) {
   // Check if title contains expected text or contains play14
   const titleLower = title.toLowerCase()
   const expectedLower = expectedTitle.toLowerCase()
-  expect(
-    titleLower.includes(expectedLower) || titleLower.includes("play14"),
-  ).toBeTruthy()
+  expect(titleLower.includes(expectedLower) || titleLower.includes("play14")).toBeTruthy()
 }
 
 /**
@@ -136,9 +128,7 @@ export async function verifyLinkWorks(page: Page, linkText: string) {
  * Test theme toggle
  */
 export async function testThemeToggle(page: Page) {
-  const themeToggle = page
-    .locator('[aria-label*="theme"], .theme-toggle')
-    .first()
+  const themeToggle = page.locator('[aria-label*="theme"], .theme-toggle').first()
   if ((await themeToggle.count()) > 0) {
     const htmlBefore = await page.locator("html").getAttribute("class")
     await themeToggle.click()
@@ -153,11 +143,7 @@ export async function testThemeToggle(page: Page) {
  * Get detail page links by filtering out navigation links
  * More robust approach: get all links, then filter by checking href patterns
  */
-export async function getDetailLinks(
-  page: Page,
-  baseHref: string,
-  excludePatterns: string[] = [],
-) {
+export async function getDetailLinks(page: Page, baseHref: string, excludePatterns: string[] = []) {
   // Wait for links to exist first
   await page.waitForSelector(`a[href^='${baseHref}']`, { timeout: 15000 })
 
@@ -169,9 +155,7 @@ export async function getDetailLinks(
     const href = await allLinks.nth(i).getAttribute("href")
     if (href) {
       // Check if href matches any exclude patterns
-      const shouldExclude = excludePatterns.some((pattern) =>
-        href.includes(pattern),
-      )
+      const shouldExclude = excludePatterns.some((pattern) => href.includes(pattern))
       if (!shouldExclude) {
         validLinks.push(href)
       }
@@ -188,7 +172,7 @@ export async function clickFirstDetailLink(
   page: Page,
   baseHref: string,
   excludePatterns: string[] = [],
-  retries = 3,
+  retries = 3
 ): Promise<boolean> {
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
@@ -226,7 +210,7 @@ export async function navigateViaDropdown(
   page: Page,
   dropdownTrigger: string,
   linkName: string,
-  retries = 3,
+  retries = 3
 ): Promise<boolean> {
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
@@ -256,4 +240,3 @@ export async function navigateViaDropdown(
   }
   return false
 }
-

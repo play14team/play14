@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
 import type { MediaLink } from "@/app/(admin)/admin/events/[slug]/media-links.action"
+import { useState } from "react"
 
 const MEDIA_TYPES = [
   { value: "Photos", label: "Photos", icon: "bx-images" },
@@ -104,7 +104,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
     <div className="media-links-editor">
       {error && (
         <div className="admin-alert admin-alert-error">
-          <i className="bx bx-error-circle"></i>
+          <i className="bx bx-error-circle" />
           {error}
         </div>
       )}
@@ -166,7 +166,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
               <>
                 <div className="media-link-info">
                   <div className="media-link-type">
-                    <i className={`bx ${getTypeInfo(link.type).icon}`}></i>
+                    <i className={`bx ${getTypeInfo(link.type).icon}`} />
                     <span>{link.type}</span>
                   </div>
                   <a
@@ -176,7 +176,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     className="media-link-url"
                   >
                     {link.url}
-                    <i className="bx bx-link-external"></i>
+                    <i className="bx bx-link-external" />
                   </a>
                 </div>
                 <div className="media-link-actions">
@@ -187,7 +187,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     title="Edit"
                     disabled={editing !== null}
                   >
-                    <i className="bx bx-edit"></i>
+                    <i className="bx bx-edit" />
                   </button>
                   <button
                     type="button"
@@ -196,7 +196,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     title="Delete"
                     disabled={editing !== null}
                   >
-                    <i className="bx bx-trash"></i>
+                    <i className="bx bx-trash" />
                   </button>
                 </div>
               </>
@@ -220,9 +220,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                   className="admin-input"
                   placeholder="https://photos.google.com/... or https://youtube.com/..."
                 />
-                <p className="admin-form-help">
-                  Link to an external photo album or video playlist
-                </p>
+                <p className="admin-form-help">Link to an external photo album or video playlist</p>
               </div>
               <div className="admin-form-group" style={{ flex: 1 }}>
                 <label>Type</label>
@@ -264,14 +262,15 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
       {/* Add button */}
       {!editing && (
         <button type="button" onClick={startAdding} className="admin-btn admin-btn-secondary">
-          <i className="bx bx-plus"></i>
+          <i className="bx bx-plus" />
           Add Media Link
         </button>
       )}
 
       {mediaLinks.length === 0 && !editing && (
         <p className="media-links-empty">
-          No external photo or video links added yet. Add links to Google Photos, Flickr, YouTube playlists, etc.
+          No external photo or video links added yet. Add links to Google Photos, Flickr, YouTube
+          playlists, etc.
         </p>
       )}
     </div>

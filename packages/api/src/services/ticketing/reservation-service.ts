@@ -66,9 +66,7 @@ async function atomicReserveTickets(
   if (updatedRows.length === 0) {
     // Either ticket type doesn't exist OR not enough capacity
     // Check which case it is
-    const ticketType = await knex("ticket_types")
-      .where("document_id", ticketTypeDocumentId)
-      .first()
+    const ticketType = await knex("ticket_types").where("document_id", ticketTypeDocumentId).first()
 
     if (!ticketType) {
       return { success: false, error: `Ticket type ${ticketTypeDocumentId} not found` }
@@ -76,7 +74,7 @@ async function atomicReserveTickets(
 
     const available = ticketType.capacity
       ? ticketType.capacity - (ticketType.sold_count || 0) - (ticketType.reserved_count || 0)
-      : Infinity
+      : Number.POSITIVE_INFINITY
 
     return {
       success: false,
@@ -178,9 +176,7 @@ async function atomicSellTickets(
   const updatedRows = result.rows || result
   if (updatedRows.length === 0) {
     // Check if ticket exists
-    const ticketType = await knex("ticket_types")
-      .where("document_id", ticketTypeDocumentId)
-      .first()
+    const ticketType = await knex("ticket_types").where("document_id", ticketTypeDocumentId).first()
 
     if (!ticketType) {
       return { success: false, error: `Ticket type ${ticketTypeDocumentId} not found` }
@@ -188,7 +184,7 @@ async function atomicSellTickets(
 
     const available = ticketType.capacity
       ? ticketType.capacity - (ticketType.sold_count || 0) - (ticketType.reserved_count || 0)
-      : Infinity
+      : Number.POSITIVE_INFINITY
 
     return {
       success: false,
@@ -251,7 +247,9 @@ export async function createReservations(
       } as any,
     })
 
-    strapi.log.info(`[Reservation] Created reservations for order ${orderId}, expires at ${expiresAt.toISOString()}`)
+    strapi.log.info(
+      `[Reservation] Created reservations for order ${orderId}, expires at ${expiresAt.toISOString()}`
+    )
 
     return { success: true, reservedQuantities }
   } catch (error: any) {
@@ -292,9 +290,7 @@ export async function confirmReservations(
     for (const [ticketTypeId, quantity] of ticketQuantities) {
       await atomicConfirmTickets(trx, ticketTypeId, quantity, hadReservation)
 
-      strapi.log.debug(
-        `[Reservation] Confirmed ${quantity} tickets for type ${ticketTypeId}`
-      )
+      strapi.log.debug(`[Reservation] Confirmed ${quantity} tickets for type ${ticketTypeId}`)
     }
   })
 

@@ -1,7 +1,7 @@
 import { requireOrganizer } from "@/libs/auth"
+import type { Metadata } from "next"
 import EventCreateForm from "./event-create-form"
 import { getLocations, getVenues } from "./event-create.action"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Create Event | #play14",

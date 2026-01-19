@@ -1,14 +1,11 @@
+import ScrollToTop from "@/components/layout/scroll-to-top"
+import AlphabetNav from "@/components/players/alphabet-nav"
 import Filters from "@/components/players/filters"
+import { getPlayerLetterCounts, getPlayers } from "@/components/players/get.action"
 import PlayerGrid from "@/components/players/grid"
 import LoadMore from "@/components/players/load-more"
-import AlphabetNav from "@/components/players/alphabet-nav"
-import ScrollToTop from "@/components/layout/scroll-to-top"
-import { Player } from "@/models/strapi"
-import { Metadata } from "next"
-import {
-  getPlayers,
-  getPlayerLetterCounts,
-} from "@/components/players/get.action"
+import type { Player } from "@/models/strapi"
+import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Players",

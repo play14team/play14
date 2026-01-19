@@ -8,8 +8,8 @@
  *   podman-compose up play14-db-test
  */
 
+import { resolve } from "node:path"
 import type { Core } from "@strapi/strapi"
-import { resolve } from "path"
 
 let strapiInstance: Core.Strapi | null = null
 
@@ -36,11 +36,15 @@ export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
   // Respects environment variables if already set (e.g., by CI), otherwise uses defaults
   // CI sets DATABASE_* directly, local dev can use TEST_DATABASE_* for overrides
   process.env.DATABASE_CLIENT = "postgres"
-  process.env.DATABASE_HOST = process.env.DATABASE_HOST || process.env.TEST_DATABASE_HOST || "localhost"
+  process.env.DATABASE_HOST =
+    process.env.DATABASE_HOST || process.env.TEST_DATABASE_HOST || "localhost"
   process.env.DATABASE_PORT = process.env.DATABASE_PORT || process.env.TEST_DATABASE_PORT || "5433"
-  process.env.DATABASE_NAME = process.env.DATABASE_NAME || process.env.TEST_DATABASE_NAME || "play14_test"
-  process.env.DATABASE_USERNAME = process.env.DATABASE_USERNAME || process.env.TEST_DATABASE_USERNAME || "test_user"
-  process.env.DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || process.env.TEST_DATABASE_PASSWORD || "test_password"
+  process.env.DATABASE_NAME =
+    process.env.DATABASE_NAME || process.env.TEST_DATABASE_NAME || "play14_test"
+  process.env.DATABASE_USERNAME =
+    process.env.DATABASE_USERNAME || process.env.TEST_DATABASE_USERNAME || "test_user"
+  process.env.DATABASE_PASSWORD =
+    process.env.DATABASE_PASSWORD || process.env.TEST_DATABASE_PASSWORD || "test_password"
   process.env.DATABASE_SCHEMA = process.env.DATABASE_SCHEMA || "public"
   process.env.DATABASE_SSL = process.env.DATABASE_SSL || "false"
 

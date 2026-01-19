@@ -10,12 +10,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    * Get the current user's linked player
    */
   async getLinkedPlayer(userId: number) {
-    const userWithPlayer = await strapi
-      .documents("plugin::users-permissions.user")
-      .findFirst({
-        filters: { id: userId },
-        populate: { player: true },
-      })
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: userId },
+      populate: { player: true },
+    })
     return userWithPlayer?.player || null
   },
 
@@ -75,15 +73,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       },
     })
 
-    const pendingClaims = await strapi.documents("api::attendance-claim.attendance-claim").findMany({
-      filters: {
-        player: { id: player.id },
-        claimStatus: "pending",
-      },
-      populate: {
-        event: { fields: ["documentId"] },
-      },
-    })
+    const pendingClaims = await strapi
+      .documents("api::attendance-claim.attendance-claim")
+      .findMany({
+        filters: {
+          player: { id: player.id },
+          claimStatus: "pending",
+        },
+        populate: {
+          event: { fields: ["documentId"] },
+        },
+      })
 
     const attendedIds = new Set(existingAttendance?.attended?.map((e: any) => e.documentId) || [])
     const pendingIds = new Set(pendingClaims.map((c: any) => c.event?.documentId))
@@ -149,15 +149,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       },
     })
 
-    const pendingClaims = await strapi.documents("api::attendance-claim.attendance-claim").findMany({
-      filters: {
-        player: { id: player.id },
-        claimStatus: "pending",
-      },
-      populate: {
-        event: { fields: ["documentId"] },
-      },
-    })
+    const pendingClaims = await strapi
+      .documents("api::attendance-claim.attendance-claim")
+      .findMany({
+        filters: {
+          player: { id: player.id },
+          claimStatus: "pending",
+        },
+        populate: {
+          event: { fields: ["documentId"] },
+        },
+      })
 
     const attendedIds = new Set(existingAttendance?.attended?.map((e: any) => e.documentId) || [])
     const pendingIds = new Set(pendingClaims.map((c: any) => c.event?.documentId))
@@ -271,13 +273,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Check for existing pending claim
-    const existingClaim = await strapi.documents("api::attendance-claim.attendance-claim").findMany({
-      filters: {
-        player: { id: player.id },
-        event: { documentId: eventId },
-        claimStatus: "pending",
-      },
-    })
+    const existingClaim = await strapi
+      .documents("api::attendance-claim.attendance-claim")
+      .findMany({
+        filters: {
+          player: { id: player.id },
+          event: { documentId: eventId },
+          claimStatus: "pending",
+        },
+      })
 
     if (existingClaim.length > 0) {
       return ctx.badRequest("You already have a pending claim for this event")
