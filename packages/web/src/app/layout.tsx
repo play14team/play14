@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/utils/theme-provider"
 import "@/styles/main.scss"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import NextTopLoader from "nextjs-toploader"
 
 const inter = Inter({ subsets: ["latin"] })
 const title = "#play14 - play is the way"
@@ -84,6 +85,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider>
+          <NextTopLoader color="#FF5200" showSpinner={false} />
           <ScrollToTop />
           {children}
         </ThemeProvider>
