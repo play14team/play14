@@ -1,5 +1,6 @@
 import EventDetails from "@/components/events/details"
-import { getEvent } from "@/components/events/get.action"
+import { getEventSlugs } from "@/components/events/get.action"
+import { getEventBySlug } from "@/components/events/get.cached"
 import Page from "@/components/layout/page"
 import { formatDate } from "@/libs/dates"
 import type { SlugParamsProps } from "@/libs/slug-params"
@@ -7,17 +8,23 @@ import { notFound } from "next/navigation"
 
 export const revalidate = 3600
 
-// export async function generateStaticParams() {
-//   const response = await getEventSlugs()
-//   const events = dataAsArrayOf<EventEntity>(response.events)
+// Enable dynamic params for future events not pre-generated
+export const dynamicParams = true
 
-//   return events.map((event) => ({
-//     slug: event.attributes?.slug!,
-//   }))
-// }
+/**
+ * Pre-generate static pages for past events at build time.
+ * Future/current events are generated on-demand and cached.
+ */
+export async function generateStaticParams() {
+  const response = await getEventSlugs()
+  return response.events.map((event) => ({
+    slug: event.slug,
+  }))
+}
 
 export async function generateMetadata(props: SlugParamsProps) {
-  const event = await getEvent(props)
+  const { slug } = await props.params
+  const event = await getEventBySlug(slug)
 
   // Handle case where event is not found
   if (!event) {
@@ -48,7 +55,8 @@ export async function generateMetadata(props: SlugParamsProps) {
 }
 
 export default async function Event(props: SlugParamsProps) {
-  const event = await getEvent(props)
+  const { slug } = await props.params
+  const event = await getEventBySlug(slug)
 
   if (!event) {
     notFound()
