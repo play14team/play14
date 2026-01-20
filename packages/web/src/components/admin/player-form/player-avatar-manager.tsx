@@ -49,7 +49,7 @@ export default function PlayerAvatarManager({
     } else {
       const formData = new FormData()
       formData.append("files", croppedFile)
-      const result = await uploadPlayerAvatar(playerId, formData)
+      const result = await uploadPlayerAvatar(playerId, formData, playerSlug)
       if (result.success) {
         if (result.avatarUrl) {
           onAvatarChange({ url: result.avatarUrl })
@@ -73,7 +73,7 @@ export default function PlayerAvatarManager({
         throw new Error(result.error || "Failed to delete avatar")
       }
     } else {
-      const result = await removePlayerAvatar(playerId)
+      const result = await removePlayerAvatar(playerId, playerSlug)
       if (result.success) {
         onAvatarChange(null)
         toast.success("Avatar removed!")
@@ -86,7 +86,7 @@ export default function PlayerAvatarManager({
 
   const handleLibrarySelect = async (imageId: number, imageUrl: string) => {
     // Library is only available in admin mode or for organizers
-    const result = await setPlayerAvatarFromLibrary(playerId, imageId)
+    const result = await setPlayerAvatarFromLibrary(playerId, imageId, playerSlug)
     if (result.success) {
       onAvatarChange({ url: imageUrl })
       toast.success("Avatar updated!")

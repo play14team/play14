@@ -7,23 +7,7 @@ import Logo from "./logo"
 import SearchBox from "./searchbox"
 import ThemeToggle from "./theme-toggle"
 
-interface AuthUser {
-  id: number
-  username: string
-  email: string
-  player?: {
-    slug: string
-    avatar?: {
-      url: string
-    }
-  }
-}
-
-interface NavbarProps {
-  initialUser?: AuthUser | null
-}
-
-const Navbar = ({ initialUser = null }: NavbarProps) => {
+const Navbar = () => {
   const [collapsed, setCollapsed] = useState(true)
 
   const toggleNavbar = () => {
@@ -223,7 +207,7 @@ const Navbar = ({ initialUser = null }: NavbarProps) => {
 
                 <SearchBox />
                 <ThemeToggle />
-                <AuthStatusClient initialUser={initialUser} />
+                <AuthStatusClient />
               </div>
             </nav>
           </div>

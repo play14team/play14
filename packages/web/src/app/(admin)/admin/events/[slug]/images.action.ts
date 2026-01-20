@@ -6,6 +6,7 @@ import {
   strapiFetchFormData,
   strapiFetchWithQuery,
 } from "@/libs/strapi-client"
+import { revalidateEventPages } from "./event-edit.action"
 
 // STRAPI_URL kept for URL normalization (converting relative URLs to absolute)
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
@@ -120,6 +121,9 @@ export async function uploadEventImage(
     }
   }
 
+  // Revalidate public pages after successful upload
+  await revalidateEventPages(slug)
+
   return {
     success: true,
     data: result.data?.data,
@@ -153,6 +157,9 @@ export async function setEventImageFromLibrary(
     }
   }
 
+  // Revalidate public pages after successful update
+  await revalidateEventPages(slug)
+
   return {
     success: true,
     data: result.data?.data,
@@ -182,6 +189,9 @@ export async function removeEventImage(
       error: result.error || "Failed to remove image",
     }
   }
+
+  // Revalidate public pages after successful removal
+  await revalidateEventPages(slug)
 
   return { success: true }
 }

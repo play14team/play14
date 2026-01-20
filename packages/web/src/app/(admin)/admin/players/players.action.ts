@@ -2,6 +2,20 @@
 
 import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
 import type { GeoLocation } from "@/models/strapi"
+import { revalidatePath } from "next/cache"
+
+/**
+ * Revalidate all public pages that display player data
+ */
+function revalidatePlayerPages(slug?: string) {
+  // Revalidate the specific player page if slug is provided
+  if (slug) {
+    revalidatePath(`/players/${slug}`)
+  }
+
+  // Revalidate player listing pages
+  revalidatePath("/players")
+}
 
 export interface PlayerListItem {
   documentId: string
@@ -123,7 +137,8 @@ export interface PlayerUpdateData {
  */
 export async function updatePlayer(
   playerId: string,
-  data: PlayerUpdateData
+  data: PlayerUpdateData,
+  slug?: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
     "/admin/players/:playerId",
@@ -141,6 +156,9 @@ export async function updatePlayer(
     }
   }
 
+  // Revalidate public pages after successful update
+  revalidatePlayerPages(slug)
+
   return { success: true }
 }
 
@@ -149,7 +167,8 @@ export async function updatePlayer(
  */
 export async function updatePlayerPosition(
   playerId: string,
-  position: string
+  position: string,
+  slug?: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
     "/admin/players/:playerId/position",
@@ -167,6 +186,9 @@ export async function updatePlayerPosition(
     }
   }
 
+  // Revalidate public pages after successful update
+  revalidatePlayerPages(slug)
+
   return { success: true }
 }
 
@@ -175,7 +197,8 @@ export async function updatePlayerPosition(
  */
 export async function setPlayerAvatarFromLibrary(
   playerId: string,
-  fileId: number
+  fileId: number,
+  slug?: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
     "/admin/players/:playerId/avatar/library",
@@ -193,6 +216,9 @@ export async function setPlayerAvatarFromLibrary(
     }
   }
 
+  // Revalidate public pages after successful update
+  revalidatePlayerPages(slug)
+
   return { success: true }
 }
 
@@ -200,7 +226,8 @@ export async function setPlayerAvatarFromLibrary(
  * Remove a player's avatar (organizers only)
  */
 export async function removePlayerAvatar(
-  playerId: string
+  playerId: string,
+  slug?: string
 ): Promise<{ success: boolean; error?: string }> {
   const result = await strapiFetch(
     "/admin/players/:playerId/avatar",
@@ -215,6 +242,9 @@ export async function removePlayerAvatar(
     }
   }
 
+  // Revalidate public pages after successful update
+  revalidatePlayerPages(slug)
+
   return { success: true }
 }
 
@@ -223,7 +253,8 @@ export async function removePlayerAvatar(
  */
 export async function uploadPlayerAvatar(
   playerId: string,
-  formData: FormData
+  formData: FormData,
+  slug?: string
 ): Promise<{ success: boolean; error?: string; avatarUrl?: string }> {
   const result = await strapiFetchFormData<{ data: { avatar?: { url: string } } }>(
     "/admin/players/:playerId/avatar/upload",
@@ -237,6 +268,9 @@ export async function uploadPlayerAvatar(
       error: result.error || "Failed to upload avatar",
     }
   }
+
+  // Revalidate public pages after successful update
+  revalidatePlayerPages(slug)
 
   return {
     success: true,

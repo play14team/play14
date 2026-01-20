@@ -12,7 +12,7 @@ import {
 import { useFeatureFlags } from "@/libs/feature-flags"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface AuthUser {
   id: number
@@ -26,14 +26,24 @@ interface AuthUser {
   }
 }
 
-interface AuthStatusClientProps {
-  initialUser: AuthUser | null
-}
-
-export default function AuthStatusClient({ initialUser }: AuthStatusClientProps) {
+export default function AuthStatusClient() {
   const router = useRouter()
-  const [user, setUser] = useState<AuthUser | null>(initialUser)
-  const { flags, isLoading } = useFeatureFlags()
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [isLoadingUser, setIsLoadingUser] = useState(true)
+  const { flags, isLoading: isLoadingFlags } = useFeatureFlags()
+
+  // Fetch user on client side to avoid forcing dynamic rendering on layouts
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data.user)
+        setIsLoadingUser(false)
+      })
+      .catch(() => {
+        setIsLoadingUser(false)
+      })
+  }, [])
 
   const handleSignOut = async () => {
     await fetch("/api/auth/signout", { method: "POST" })
@@ -42,10 +52,14 @@ export default function AuthStatusClient({ initialUser }: AuthStatusClientProps)
     router.refresh()
   }
 
+  // Show nothing while loading user or flags
+  if (isLoadingUser || isLoadingFlags) {
+    return null
+  }
+
   if (!user) {
     // Only show login button if feature flag is enabled
-    // Show nothing while loading flags to avoid flash of login button
-    if (isLoading || !flags?.loginEnabled) {
+    if (!flags?.loginEnabled) {
       return null
     }
 

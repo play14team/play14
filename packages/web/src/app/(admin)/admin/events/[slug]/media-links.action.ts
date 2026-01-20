@@ -1,6 +1,7 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
+import { revalidateEventPages } from "./event-edit.action"
 
 // Types for media links management
 export interface MediaLink {
@@ -41,6 +42,9 @@ export async function updateEventMediaLinks(
       error: result.error || "Failed to update media links",
     }
   }
+
+  // Revalidate public pages after successful update
+  await revalidateEventPages(slug)
 
   return {
     success: true,

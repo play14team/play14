@@ -2,6 +2,20 @@
 
 import { strapiFetch } from "@/libs/strapi-client"
 import type { GeoLocation } from "@/models/strapi"
+import { revalidatePath } from "next/cache"
+
+/**
+ * Revalidate all public pages that display player data
+ */
+function revalidatePlayerPages(slug?: string) {
+  // Revalidate the specific player page if slug is provided
+  if (slug) {
+    revalidatePath(`/players/${slug}`)
+  }
+
+  // Revalidate player listing pages
+  revalidatePath("/players")
+}
 
 export interface SocialNetworkInput {
   id?: string
@@ -31,7 +45,8 @@ export interface UpdateResult {
  */
 export async function updatePlayerProfile(
   _documentId: string,
-  data: PlayerUpdateData
+  data: PlayerUpdateData,
+  slug?: string
 ): Promise<UpdateResult> {
   // Format social networks for Strapi component
   const socialNetworks = data.socialNetworks?.map((sn) => ({
@@ -69,6 +84,9 @@ export async function updatePlayerProfile(
     console.error("[PlayerProfile] Update failed:", result.error)
     return { success: false, error: result.error || "Failed to update profile" }
   }
+
+  // Revalidate public pages after successful update
+  revalidatePlayerPages(slug)
 
   return { success: true }
 }

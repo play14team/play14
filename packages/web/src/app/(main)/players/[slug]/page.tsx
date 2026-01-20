@@ -1,22 +1,28 @@
 import Page from "@/components/layout/page"
 import PlayerDetails from "@/components/players/details"
-import { getPlayer } from "@/components/players/get.action"
+import { getPlayerSlugs } from "@/components/players/get.action"
+import { getPlayerBySlug } from "@/components/players/get.cached"
 import type { SlugParamsProps } from "@/libs/slug-params"
 import { notFound } from "next/navigation"
 
 export const revalidate = 3600
 
-// export async function generateStaticParams() {
-//   const response = await getPlayerSlugs()
-//   const players = dataAsArrayOf<PlayerEntity>(response.players)
+// Enable dynamic params for players not pre-generated
+export const dynamicParams = true
 
-//   return players.map((player) => ({
-//     slug: player.attributes?.slug!,
-//   }))
-// }
+/**
+ * Pre-generate static pages for all visible players at build time.
+ */
+export async function generateStaticParams() {
+  const response = await getPlayerSlugs()
+  return response.players.map((player) => ({
+    slug: player.slug,
+  }))
+}
 
 export async function generateMetadata(props: SlugParamsProps) {
-  const player = await getPlayer(props)
+  const { slug } = await props.params
+  const player = await getPlayerBySlug(slug)
 
   if (!player) {
     return {
@@ -38,7 +44,8 @@ export async function generateMetadata(props: SlugParamsProps) {
 }
 
 export default async function Player(props: SlugParamsProps) {
-  const player = await getPlayer(props)
+  const { slug } = await props.params
+  const player = await getPlayerBySlug(slug)
 
   if (!player) {
     notFound()

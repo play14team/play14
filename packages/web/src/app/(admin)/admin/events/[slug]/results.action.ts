@@ -1,6 +1,7 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
+import { revalidateEventPages } from "./event-edit.action"
 import type { ActionResult, ResultLineItem } from "./results.types"
 
 interface StrapiDataResponse<T> {
@@ -37,7 +38,8 @@ export async function getResultItems(
  */
 export async function createResultItem(
   eventDocumentId: string,
-  item: Omit<ResultLineItem, "id" | "documentId">
+  item: Omit<ResultLineItem, "id" | "documentId">,
+  slug?: string
 ): Promise<ActionResult<ResultLineItem>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem>>(
     "/admin/events/:eventId/result-items",
@@ -55,6 +57,11 @@ export async function createResultItem(
     }
   }
 
+  // Revalidate public pages after successful creation
+  if (slug) {
+    await revalidateEventPages(slug)
+  }
+
   return {
     success: true,
     data: result.data?.data,
@@ -66,7 +73,8 @@ export async function createResultItem(
  */
 export async function updateResultItem(
   itemDocumentId: string,
-  data: Partial<ResultLineItem>
+  data: Partial<ResultLineItem>,
+  slug?: string
 ): Promise<ActionResult<ResultLineItem>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem>>(
     "/admin/result-items/:id",
@@ -84,6 +92,11 @@ export async function updateResultItem(
     }
   }
 
+  // Revalidate public pages after successful update
+  if (slug) {
+    await revalidateEventPages(slug)
+  }
+
   return {
     success: true,
     data: result.data?.data,
@@ -93,7 +106,10 @@ export async function updateResultItem(
 /**
  * Delete a result item
  */
-export async function deleteResultItem(itemDocumentId: string): Promise<ActionResult> {
+export async function deleteResultItem(
+  itemDocumentId: string,
+  slug?: string
+): Promise<ActionResult> {
   const result = await strapiFetch<StrapiDataResponse<{ success: boolean }>>(
     "/admin/result-items/:id",
     { id: itemDocumentId },
@@ -107,6 +123,11 @@ export async function deleteResultItem(itemDocumentId: string): Promise<ActionRe
     }
   }
 
+  // Revalidate public pages after successful deletion
+  if (slug) {
+    await revalidateEventPages(slug)
+  }
+
   return {
     success: true,
   }
@@ -117,7 +138,8 @@ export async function deleteResultItem(itemDocumentId: string): Promise<ActionRe
  */
 export async function bulkUpdateResultItems(
   eventDocumentId: string,
-  items: Array<Partial<ResultLineItem> & { documentId?: string }>
+  items: Array<Partial<ResultLineItem> & { documentId?: string }>,
+  slug?: string
 ): Promise<ActionResult<ResultLineItem[]>> {
   const result = await strapiFetch<StrapiDataResponse<ResultLineItem[]>>(
     "/admin/events/:eventId/result-items/bulk",
@@ -133,6 +155,11 @@ export async function bulkUpdateResultItems(
       success: false,
       error: result.error || "Failed to bulk update result items",
     }
+  }
+
+  // Revalidate public pages after successful bulk update
+  if (slug) {
+    await revalidateEventPages(slug)
   }
 
   return {

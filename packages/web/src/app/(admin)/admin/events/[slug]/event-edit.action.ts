@@ -1,9 +1,26 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
+import { revalidatePath } from "next/cache"
 import type { FinanceData } from "./finance.action"
 import type { MediaLink } from "./media-links.action"
 import type { TimetableDay } from "./schedule.types"
+
+/**
+ * Revalidate all public pages that display event data
+ */
+export async function revalidateEventPages(slug: string) {
+  // Revalidate the specific event page
+  revalidatePath(`/events/${slug}`)
+
+  // Revalidate event listing pages
+  revalidatePath("/events")
+  revalidatePath("/events/map")
+  revalidatePath("/events/calendar")
+
+  // Revalidate home page (may show upcoming events)
+  revalidatePath("/")
+}
 
 // Types for event editing
 export interface EventForEdit {
@@ -252,6 +269,9 @@ export async function updateEvent(slug: string, data: EventUpdateData): Promise<
     }
   }
 
+  // Revalidate public pages after successful update
+  await revalidateEventPages(slug)
+
   return {
     success: true,
     event: result.data?.data,
@@ -327,6 +347,9 @@ export async function publishEvent(slug: string): Promise<PublishResult> {
     }
   }
 
+  // Revalidate public pages after publishing
+  await revalidateEventPages(slug)
+
   return {
     success: true,
     isPublished: result.data?.data?.isPublished,
@@ -349,6 +372,9 @@ export async function unpublishEvent(slug: string): Promise<PublishResult> {
       error: result.error || "Failed to unpublish event",
     }
   }
+
+  // Revalidate public pages after unpublishing
+  await revalidateEventPages(slug)
 
   return {
     success: true,

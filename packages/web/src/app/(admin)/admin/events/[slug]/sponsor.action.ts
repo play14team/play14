@@ -1,6 +1,7 @@
 "use server"
 
 import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
+import { revalidateEventPages } from "./event-edit.action"
 
 // Types for sponsor management
 export interface SponsorLogo {
@@ -158,6 +159,9 @@ export async function updateEventSponsorships(
       error: result.error || "Failed to update sponsorships",
     }
   }
+
+  // Revalidate public pages after successful update
+  await revalidateEventPages(slug)
 
   return {
     success: true,

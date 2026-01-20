@@ -66,6 +66,52 @@ const getLogoUrl = (): string => {
   return `${baseUrl}/images/play14_600x200_transparent-light.png`
 }
 
+/**
+ * Trigger on-demand revalidation of static pages in the Next.js frontend.
+ * This is called after ticket purchases to update the participant list on event pages.
+ * Failures are logged but don't affect the webhook processing (non-critical).
+ */
+const triggerFrontendRevalidation = async (
+  type: "event" | "player",
+  slug: string,
+  strapi: Core.Strapi
+): Promise<void> => {
+  const frontendUrl = process.env.FRONTEND_URL
+  const revalidateSecret = process.env.REVALIDATE_SECRET
+
+  if (!frontendUrl || !revalidateSecret) {
+    strapi.log.debug(
+      "[Webhook] Skipping frontend revalidation - FRONTEND_URL or REVALIDATE_SECRET not configured"
+    )
+    return
+  }
+
+  try {
+    const response = await fetch(`${frontendUrl}/api/revalidate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-revalidate-token": revalidateSecret,
+      },
+      body: JSON.stringify({ type, slug }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      strapi.log.warn(
+        `[Webhook] Frontend revalidation failed: ${response.status} - ${errorText} | type=${type}, slug=${slug}`
+      )
+    } else {
+      strapi.log.info(`[Webhook] Frontend revalidation triggered | type=${type}, slug=${slug}`)
+    }
+  } catch (error: any) {
+    // Non-critical failure - log and continue
+    strapi.log.warn(
+      `[Webhook] Frontend revalidation error: ${error.message} | type=${type}, slug=${slug}`
+    )
+  }
+}
+
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
    * Handle Stripe webhook events with comprehensive observability
@@ -448,6 +494,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Notify event organizers about the sale
       await this.sendTicketSoldNotificationEmail(order, createdTickets)
+
+      // Trigger frontend revalidation to update participant list on event page
+      await triggerFrontendRevalidation("event", order.event.slug, strapi)
 
       const handlerDurationMs = handlerTimer.elapsed()
       strapi.log.info(
@@ -985,7 +1034,7 @@ The #play14 Team
           populate: { ticketType: { fields: ["documentId"] } },
         },
         player: true,
-        event: true,
+        event: { fields: ["id", "documentId", "name", "slug"] },
       },
     })
 
@@ -1059,6 +1108,11 @@ The #play14 Team
           } as any,
         })
       }
+    }
+
+    // Trigger frontend revalidation to update participant list on event page
+    if (order.event?.slug) {
+      await triggerFrontendRevalidation("event", order.event.slug, strapi)
     }
 
     strapi.log.info(

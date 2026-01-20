@@ -1,6 +1,7 @@
 "use server"
 
 import { strapiFetch } from "@/libs/strapi-client"
+import { revalidateEventPages } from "./event-edit.action"
 import type { ActionResult, TimetableDay } from "./schedule.types"
 
 // Re-export types for convenience (types can be re-exported from server files)
@@ -28,6 +29,9 @@ export async function updateEventSchedule(
       error: result.error || "Failed to update schedule",
     }
   }
+
+  // Revalidate public pages after successful update
+  await revalidateEventPages(slug)
 
   return {
     success: true,

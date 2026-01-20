@@ -291,7 +291,7 @@ export default function PlayerForm({
   const handlePromote = async () => {
     if (!promoteTarget) return
     setIsPositionUpdating(true)
-    const result = await updatePlayerPosition(player.documentId, promoteTarget)
+    const result = await updatePlayerPosition(player.documentId, promoteTarget, player.slug)
     if (result.success) {
       setCurrentPosition(promoteTarget)
       toast.success(`Player promoted to ${promoteTarget}!`)
@@ -305,7 +305,7 @@ export default function PlayerForm({
   const handleDemote = async () => {
     if (!demoteTarget) return
     setIsPositionUpdating(true)
-    const result = await updatePlayerPosition(player.documentId, demoteTarget)
+    const result = await updatePlayerPosition(player.documentId, demoteTarget, player.slug)
     if (result.success) {
       setCurrentPosition(demoteTarget)
       toast.success(`Player demoted to ${demoteTarget}`)
@@ -327,8 +327,8 @@ export default function PlayerForm({
     const data = buildFormData()
     const result =
       mode === "self"
-        ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
-        : await updatePlayer(player.documentId, data as AdminUpdateData)
+        ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData, player.slug)
+        : await updatePlayer(player.documentId, data as AdminUpdateData, player.slug)
 
     if (result.success) {
       toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
@@ -389,8 +389,8 @@ export default function PlayerForm({
     const data = buildFormData()
     const result =
       mode === "self"
-        ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData)
-        : await updatePlayer(player.documentId, data as AdminUpdateData)
+        ? await updatePlayerProfile(player.documentId, data as ProfileUpdateData, player.slug)
+        : await updatePlayer(player.documentId, data as AdminUpdateData, player.slug)
 
     if (result.success) {
       toast.success(mode === "self" ? "Profile updated successfully!" : "Player profile updated!")
@@ -412,7 +412,7 @@ export default function PlayerForm({
     }
 
     setIsSubmitting(false)
-  }, [buildFormData, mode, player.documentId, toast, resetDirtyState, router])
+  }, [buildFormData, mode, player.documentId, player.slug, toast, resetDirtyState, router])
 
   const handleDiscardAndNavigate = useCallback(() => {
     resetDirtyState()

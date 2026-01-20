@@ -6,14 +6,15 @@ import { formatDate } from "@/libs/dates"
 import type { SlugParamsProps } from "@/libs/slug-params"
 import { notFound } from "next/navigation"
 
+// Fallback revalidation every hour (on-demand revalidation handles admin updates immediately)
 export const revalidate = 3600
 
-// Enable dynamic params for future events not pre-generated
+// Enable dynamic params for any new events not pre-generated at build time
 export const dynamicParams = true
 
 /**
- * Pre-generate static pages for past events at build time.
- * Future/current events are generated on-demand and cached.
+ * Pre-generate static pages for all events at build time.
+ * Pages are revalidated on-demand when updated in admin.
  */
 export async function generateStaticParams() {
   const response = await getEventSlugs()

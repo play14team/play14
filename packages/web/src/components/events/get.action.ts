@@ -10,7 +10,6 @@ import {
   eventNavPopulate,
   testimonialsPopulate,
 } from "@/libs/strapi-populate"
-import { formatISO } from "date-fns"
 
 // Types - will be replaced by OpenAPI generated types when available
 interface UploadFile {
@@ -255,16 +254,14 @@ export async function getEvent({ params }: SlugParamsProps) {
 }
 
 /**
- * Get all event slugs for static generation (past events only)
+ * Get all event slugs for static generation
+ * With on-demand revalidation, all events (past and future) can be pre-generated.
+ * Future events will be revalidated when updated in admin.
  * REST equivalent of: events/slugs.graphql
  */
 export async function getEventSlugs() {
-  const today = formatISO(new Date())
   const response = await restQuery<Array<{ slug: string }>>("events", {
     fields: ["slug"],
-    filters: {
-      end: { $lt: today },
-    },
     pagination: { page: 1, pageSize: 5000 },
   })
 
