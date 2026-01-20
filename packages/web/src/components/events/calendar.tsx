@@ -1,7 +1,8 @@
 "use client"
 
 import { format, getDay, parse, startOfWeek } from "date-fns"
-import enUS from "date-fns/locale/en-US"
+import type { Locale } from "date-fns/locale"
+import { enUS } from "date-fns/locale/en-US"
 import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
 import {
@@ -20,7 +21,7 @@ const locales = {
 const localizer = dateFnsLocalizer({
   format,
   parse,
-  startOfWeek: (date, locale) => startOfWeek(date, { weekStartsOn: 1, locale }),
+  startOfWeek: (date: Date, locale: Locale) => startOfWeek(date, { weekStartsOn: 1, locale }),
   getDay,
   locales,
 })

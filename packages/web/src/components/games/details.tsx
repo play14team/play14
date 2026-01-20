@@ -51,11 +51,13 @@ const GameDetails = (props: { game: Game }) => {
                           </Link>
                         </li>
                       )}
-                      <li>
-                        <i className="bx bx-calendar" />
-                        <span>Published</span>
-                        <Link href="#">{format(parseISO(game.publishedAt), "MMM do, yyyy")}</Link>
-                      </li>
+                      {game.publishedAt && (
+                        <li>
+                          <i className="bx bx-calendar" />
+                          <span>Published</span>
+                          <Link href="#">{format(parseISO(game.publishedAt), "MMM do, yyyy")}</Link>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </div>

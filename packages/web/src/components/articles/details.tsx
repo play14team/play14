@@ -51,11 +51,13 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                         {article.category}
                       </Link>
                     </li>
-                    <li>
-                      <i className="bx bx-calendar" />
-                      <span>Last Updated</span>
-                      <Link href="#">{format(parseISO(article.updatedAt), "MMM do, yyyy")}</Link>
-                    </li>
+                    {article.updatedAt && (
+                      <li>
+                        <i className="bx bx-calendar" />
+                        <span>Last Updated</span>
+                        <Link href="#">{format(parseISO(article.updatedAt), "MMM do, yyyy")}</Link>
+                      </li>
+                    )}
                   </ul>
                 </div>
 

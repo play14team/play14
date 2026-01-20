@@ -72,7 +72,7 @@ const ArticleCard = ({ article }: { article: Article }) => {
             </li>
             <li>
               <i className="flaticon-calendar" />
-              {format(parseISO(article.publishedAt), "MMM do, yyyy")}
+              {article.publishedAt && format(parseISO(article.publishedAt), "MMM do, yyyy")}
             </li>
           </ul>
           <h3>

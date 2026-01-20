@@ -10,8 +10,8 @@ export function formatDate(
 ) {
   const firstFormat = "MMMM dd"
   const tz = timezone || "UTC"
-  const startDate = new TZDate(start, tz)
-  const endDate = new TZDate(end, tz)
+  const startDate = new TZDate(typeof start === "string" ? new Date(start) : start, tz)
+  const endDate = new TZDate(typeof end === "string" ? new Date(end) : end, tz)
   const secondFormat = `${
     startDate.getMonth() !== endDate.getMonth() ? "MMMM " : ""
   }dd ${displayYear ? "yyyy" : ""}`

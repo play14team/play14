@@ -9,7 +9,7 @@ const EventTime = ({
   timezone?: string
 }) => {
   const formatPattern = "EEE, MMM do - HH:mm"
-  const base = time instanceof Date ? time.getTime() : time
+  const base = time instanceof Date ? time : new Date(time)
   const zone = timezone || "UTC"
   const date = new TZDate(base, zone)
 

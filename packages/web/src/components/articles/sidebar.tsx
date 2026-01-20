@@ -60,7 +60,9 @@ const ArticleSidebar = async () => {
               </div>
             </Link>
             <div className="info">
-              <span>{format(parseISO(article.publishedAt), "MMM do, yyyy")} </span>
+              {article.publishedAt && (
+                <span>{format(parseISO(article.publishedAt), "MMM do, yyyy")} </span>
+              )}
               <h4 className="title usmall">
                 <Link href={`/articles/${article.slug}`}>{article.title}</Link>
               </h4>
