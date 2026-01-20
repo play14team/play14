@@ -5,9 +5,37 @@ import CreateVenueModal from "@/components/admin/create-venue-modal"
 import type { MapLocation } from "@/components/admin/location-map-picker"
 import LocationSelector from "@/components/admin/location-selector"
 import VenueSelector from "@/components/admin/venue-selector"
+import { TZDate } from "@date-fns/tz"
+import { format, isValid } from "date-fns"
 import { useState } from "react"
 import type { LocationOption, VenueOption } from "../event-edit.action"
 import { EVENT_STATUSES } from "../hooks/use-event-form"
+
+function formatEventDateSummary(
+  startDate: string,
+  startTime: string,
+  endDate: string,
+  endTime: string,
+  timezone: string
+): string | null {
+  if (!startDate || !startTime || !endDate || !endTime) return null
+
+  const tz = timezone || "UTC"
+  const [startYear, startMonth, startDay] = startDate.split("-").map(Number)
+  const [startHour, startMinute] = startTime.split(":").map(Number)
+  const [endYear, endMonth, endDay] = endDate.split("-").map(Number)
+  const [endHour, endMinute] = endTime.split(":").map(Number)
+
+  const start = new TZDate(startYear, startMonth - 1, startDay, startHour, startMinute, 0, 0, tz)
+  const end = new TZDate(endYear, endMonth - 1, endDay, endHour, endMinute, 0, 0, tz)
+
+  if (!isValid(start) || !isValid(end)) return null
+
+  const startFormatted = format(start, "EEEE MMMM do 'at' HH:mm")
+  const endFormatted = format(end, "EEEE MMMM do 'at' HH:mm")
+
+  return `Event starts on ${startFormatted} and ends on ${endFormatted}`
+}
 
 interface BasicsTabProps {
   // Event Details
@@ -299,6 +327,16 @@ export default function BasicsTab({
             />
           </div>
         </div>
+
+        {formatEventDateSummary(startDate, startTime, endDate, endTime, timezone) && (
+          <p
+            className="admin-form-section-description"
+            style={{ marginTop: "16px", marginBottom: 0 }}
+          >
+            <i className="bx bx-calendar" style={{ marginRight: "8px" }} />
+            {formatEventDateSummary(startDate, startTime, endDate, endTime, timezone)}
+          </p>
+        )}
       </div>
 
       {/* Location & Venue Section */}

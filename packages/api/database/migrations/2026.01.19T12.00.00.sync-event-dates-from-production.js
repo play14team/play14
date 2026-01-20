@@ -301,9 +301,13 @@ export async function up(knex) {
       continue
     }
 
+    // Store local times as UTC timestamps using PostgreSQL timezone conversion
+    // The timezone() function interprets the timestamp as being in the specified timezone
+    // and converts it to UTC for storage
+    // NOTE: This requires the server to run in UTC (TZ=UTC) for consistent behavior
     const count = await knex("events").where("document_id", documentId).update({
-      start: knex.raw("?::timestamp at time zone ?", [event.localStart, timezone]),
-      end: knex.raw("?::timestamp at time zone ?", [event.localEnd, timezone]),
+      start: knex.raw("timezone(?, ?::timestamp)", [timezone, event.localStart]),
+      end: knex.raw("timezone(?, ?::timestamp)", [timezone, event.localEnd]),
       timezone,
       updated_at: now,
     })

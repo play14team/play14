@@ -546,6 +546,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Fetch event with all relations needed for editing
     const event = await strapi.documents("api::event.event").findFirst({
       filters: { slug: { $eq: slug } },
+      fields: [
+        "documentId",
+        "slug",
+        "name",
+        "start",
+        "end",
+        "timezone",
+        "eventStatus",
+        "tagline",
+        "description",
+        "contactEmail",
+        "ticketingMode",
+      ],
       populate: {
         location: { fields: ["documentId", "name", "country"] },
         venue: { fields: ["documentId", "name", "addressDetails"] },

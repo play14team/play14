@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "strapi build",
-    "dev": "strapi develop",
+    "dev": "TZ=UTC strapi develop",
     "export": "strapi export --file ../backup/database/play14",
     "import": "strapi import --file ../backup/database/play14.tar.gz.enc",
     "start": "strapi start",
@@ -31,7 +31,7 @@
     "test:emails": "bun run scripts/test-emails-simple.ts",
     "ts:generate-types": "strapi ts:generate-types",
     "ts:generate-types:watch": "strapi ts:generate-types --watch",
-    "dev:db": "podman-compose up -d play14-db && strapi develop",
+    "dev:db": "podman-compose up -d play14-db && TZ=UTC strapi develop",
     "dev:pods": "podman-compose up --build",
     "db": "podman-compose up -d play14-db",
     "up": "podman-compose up && podman logs -f play14-api",
