@@ -179,7 +179,7 @@ export default ({ env }: { env: any }) => ({
           modelName: "player",
           queryConstraints: {
             where: {
-              publishedAt: { $notNull: true },
+              $and: [{ publishedAt: { $notNull: true } }, { visible: { $ne: false } }],
             },
           },
           fuzzysortOptions: {
