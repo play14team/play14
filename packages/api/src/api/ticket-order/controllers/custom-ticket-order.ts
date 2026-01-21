@@ -63,6 +63,25 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
+   * Manually verify JWT and get user for routes with auth: false
+   * This allows optional authentication - returns null if no valid token
+   */
+  async getUserFromToken(ctx: any) {
+    try {
+      const token = await strapi.plugins["users-permissions"].services.jwt.getToken(ctx)
+      if (token?.id) {
+        const user = await strapi
+          .query("plugin::users-permissions.user")
+          .findOne({ where: { id: token.id } })
+        return user
+      }
+    } catch {
+      // No valid token or token verification failed - this is expected for unauthenticated requests
+    }
+    return null
+  },
+
+  /**
    * Get available ticket types for an event
    * Supports both published and draft events (for preview functionality)
    */
@@ -543,10 +562,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   /**
    * Get order status and details
    * SECURITY: Unauthenticated users get limited info, authenticated owners get full details
+   * Note: This route has auth: false, so we manually verify JWT for optional authentication
    */
   async getOrderStatus(ctx) {
     const { orderId } = ctx.params
-    const user = ctx.state.user
+    // Manually verify JWT since this route has auth: false for optional authentication
+    const user = await this.getUserFromToken(ctx)
 
     const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
       documentId: orderId,
