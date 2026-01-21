@@ -8,6 +8,11 @@ on:
       - "packages/web/**"
       - "!packages/**/.github/**"
   workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: "Force rebuild of all packages"
+        type: boolean
+        default: true
 
 concurrency:
   group: production-deployment
@@ -29,8 +34,8 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      api-changed: ${{ steps.changes.outputs.api }}
-      web-changed: ${{ steps.changes.outputs.web }}
+      api-changed: ${{ steps.result.outputs.api }}
+      web-changed: ${{ steps.result.outputs.web }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,8 +43,9 @@ jobs:
           fetch-depth: 2
 
       - name: Detect changed paths
-        uses: dorny/paths-filter@v3
         id: changes
+        if: github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v3
         with:
           filters: |
             api:
@@ -47,14 +53,40 @@ jobs:
             web:
               - 'packages/web/**'
 
+      - name: Determine final change status
+        id: result
+        env:
+          IS_MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
+          FORCE_REBUILD: ${{ github.event_name == 'workflow_dispatch' && (inputs.force_rebuild == true || inputs.force_rebuild == '') }}
+          API_CHANGED: ${{ steps.changes.outputs.api }}
+          WEB_CHANGED: ${{ steps.changes.outputs.web }}
+        run: |
+          if [ "$IS_MANUAL" = "true" ]; then
+            if [ "$FORCE_REBUILD" = "true" ]; then
+              echo "Manual trigger with force rebuild - marking all packages as changed"
+              echo "api=true" >> $GITHUB_OUTPUT
+              echo "web=true" >> $GITHUB_OUTPUT
+            else
+              echo "Manual trigger without force rebuild - marking all packages as changed anyway"
+              echo "api=true" >> $GITHUB_OUTPUT
+              echo "web=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "Push event - using detected changes"
+            echo "api=$API_CHANGED" >> $GITHUB_OUTPUT
+            echo "web=$WEB_CHANGED" >> $GITHUB_OUTPUT
+          fi
+
   # ============================================================================
-  # API VALIDATION JOBS (parallel, conditional)
+  # VALIDATION (single job with biome check + typecheck)
   # ============================================================================
-  api-typecheck:
-    name: API Type Check
+  validate:
+    name: Lint & Type Check
     runs-on: ubuntu-latest
     needs: detect-changes
-    if: needs.detect-changes.outputs.api-changed == 'true'
+    if: needs.detect-changes.outputs.api-changed == 'true' || needs.detect-changes.outputs.web-changed == 'true'
+    env:
+      WEB_CHANGED: ${{ needs.detect-changes.outputs.web-changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -75,44 +107,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Type check
-        working-directory: packages/api
-        run: bun run tsc --noEmit
+      - name: Run biome check (lint + format)
+        run: bun run check
 
-  # ============================================================================
-  # WEB VALIDATION JOBS (parallel, conditional)
-  # ============================================================================
-  web-lint-typecheck:
-    name: Web Lint & Type Check
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.web-changed == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.5
-
-      - name: Cache bun dependencies
-        uses: actions/cache@v5
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Run linter
-        working-directory: packages/web
-        run: bun run lint
-
-      - name: Type check
-        working-directory: packages/web
+      - name: Type check (web)
+        if: env.WEB_CHANGED == 'true'
         run: bun run typecheck
 
   # ============================================================================
@@ -121,11 +120,11 @@ jobs:
   api-build-deploy:
     name: API Build & Deploy
     runs-on: ubuntu-latest
-    needs: [detect-changes, api-typecheck]
+    needs: [detect-changes, validate]
     if: |
       always() &&
       needs.detect-changes.outputs.api-changed == 'true' &&
-      (needs.api-typecheck.result == 'success')
+      needs.validate.result == 'success'
     environment: production
     permissions:
       id-token: write
@@ -246,10 +245,12 @@ jobs:
   api-health-check:
     name: API Health Check
     runs-on: ubuntu-latest
-    needs: [detect-changes]
+    needs: [detect-changes, validate]
     if: |
+      always() &&
       needs.detect-changes.outputs.api-changed != 'true' &&
-      needs.detect-changes.outputs.web-changed == 'true'
+      needs.detect-changes.outputs.web-changed == 'true' &&
+      needs.validate.result == 'success'
     environment: production
     permissions:
       id-token: write
@@ -305,11 +306,11 @@ jobs:
   web-build-deploy:
     name: Web Build & Deploy
     runs-on: ubuntu-latest
-    needs: [detect-changes, web-lint-typecheck, api-build-deploy, api-health-check]
+    needs: [detect-changes, validate, api-build-deploy, api-health-check]
     if: |
       always() &&
       needs.detect-changes.outputs.web-changed == 'true' &&
-      (needs.web-lint-typecheck.result == 'success') &&
+      needs.validate.result == 'success' &&
       (needs.api-build-deploy.result == 'success' || needs.api-build-deploy.result == 'skipped') &&
       (needs.api-health-check.result == 'success' || needs.api-health-check.result == 'skipped')
     environment: production
@@ -460,7 +461,7 @@ jobs:
   deployment-summary:
     name: Deployment Summary
     runs-on: ubuntu-latest
-    needs: [detect-changes, api-build-deploy, api-health-check, web-build-deploy]
+    needs: [detect-changes, validate, api-build-deploy, api-health-check, web-build-deploy]
     if: always()
     env:
       API_CHANGED: ${{ needs.detect-changes.outputs.api-changed }}
