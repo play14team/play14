@@ -404,6 +404,7 @@ export async function getEventYearCounts(): Promise<Record<number, number>> {
  */
 export async function getEventYears(): Promise<string[]> {
   const yearCounts = await getEventYearCounts()
+  console.log("[Build] Year counts from API:", JSON.stringify(yearCounts))
   return Object.entries(yearCounts)
     .filter(([, count]) => count > 0)
     .map(([year]) => year)

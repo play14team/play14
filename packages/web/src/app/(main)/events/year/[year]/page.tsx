@@ -23,6 +23,7 @@ export const dynamicParams = true
 
 export async function generateStaticParams() {
   const years = await getEventYears()
+  console.log(`[Build] Pre-generating ${years.length} year pages: ${years.join(", ")}`)
   return years.map((year) => ({ year }))
 }
 
