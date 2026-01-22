@@ -28,7 +28,11 @@ export default function YearNav({ currentYear, yearCounts }: YearNavProps) {
   return (
     <div className="year-nav centered">
       <div className="year-buttons">
-        <Link href="/events" className={`year-btn ${!currentYear ? "active" : ""}`}>
+        <Link
+          href="/events"
+          prefetch={false}
+          className={`year-btn ${!currentYear ? "active" : ""}`}
+        >
           All
         </Link>
         {years.map((year) => {
@@ -38,6 +42,7 @@ export default function YearNav({ currentYear, yearCounts }: YearNavProps) {
             <Link
               key={year}
               href={`/events/year/${year}`}
+              prefetch={false}
               className={`year-btn ${isActive ? "active" : ""}`}
             >
               {year}

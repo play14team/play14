@@ -14,7 +14,7 @@ const ArticleCard = ({ article }: { article: Article }) => {
     <article id={article.title} key={article.title} className="col-lg-4 col-md-6">
       <div className="single-blog-post shadow">
         <div className="post-image">
-          <Link href={url} className="d-block image">
+          <Link href={url} prefetch={false} className="d-block image">
             {image && (
               <Image
                 src={image.url}
@@ -76,7 +76,9 @@ const ArticleCard = ({ article }: { article: Article }) => {
             </li>
           </ul>
           <h3>
-            <Link href={url}>{article.title}</Link>
+            <Link href={url} prefetch={false}>
+              {article.title}
+            </Link>
           </h3>
           <p>
             {article.summary && article.summary.length > 200

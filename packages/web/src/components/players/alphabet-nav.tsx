@@ -14,7 +14,11 @@ export default function AlphabetNav({ currentLetter, letterCounts }: AlphabetNav
   return (
     <div className="alphabet-nav centered">
       <div className="alphabet-buttons">
-        <Link href="/players" className={`alphabet-btn ${!currentLetter ? "active" : ""}`}>
+        <Link
+          href="/players"
+          prefetch={false}
+          className={`alphabet-btn ${!currentLetter ? "active" : ""}`}
+        >
           All
         </Link>
         {ALPHABET.map((letter) => {
@@ -26,6 +30,7 @@ export default function AlphabetNav({ currentLetter, letterCounts }: AlphabetNav
             <Link
               key={letter}
               href={isDisabled ? "#" : `/players/name/${letter}`}
+              prefetch={false}
               className={`alphabet-btn ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
               onClick={isDisabled ? (e) => e.preventDefault() : undefined}
             >

@@ -22,7 +22,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
     <article id={event.name} key={event.name} className="col-lg-4 col-sm-6 col-md-6">
       <div className="single-events-box shadow" style={{ borderRadius: "10px" }}>
         <div className="image" style={{ position: "relative", height: "300px" }}>
-          <Link href={url} className="d-block">
+          <Link href={url} prefetch={false} className="d-block">
             {typeof image === "object" && image.url && (
               <Image
                 src={image.url}
@@ -61,7 +61,9 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
 
         <div className="content">
           <h3>
-            <Link href={url}>{event.name}</Link>
+            <Link href={url} prefetch={false}>
+              {event.name}
+            </Link>
           </h3>
           <ul className="d-flex list-unstyled justify-content-between">
             <li>

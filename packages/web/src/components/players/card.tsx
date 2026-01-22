@@ -16,7 +16,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
       <div className="single-scientist-box">
         <div style={{ position: "relative", height: "300px", width: "100%" }}>
           {avatar && (
-            <Link href={url}>
+            <Link href={url} prefetch={false}>
               <Image
                 src={avatar.url}
                 alt={avatar.name}
@@ -35,7 +35,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
             </Link>
           )}
           {!avatar && (
-            <Link href={url}>
+            <Link href={url} prefetch={false}>
               <DefaultPlayerImage
                 alt="default player image"
                 className="shadow img-border"
@@ -53,7 +53,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
         </div>
 
         <div className="content">
-          <Link href={url}>
+          <Link href={url} prefetch={false}>
             <h3>{player.name}</h3>
           </Link>
           <span>{player.position}</span>

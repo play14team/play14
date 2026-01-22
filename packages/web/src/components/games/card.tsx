@@ -14,7 +14,7 @@ const GameCard = ({ game }: { game: Game }) => {
     <article id={game.name} key={game.name} className="col-lg-4 col-md-6">
       <div className="single-courses-box">
         <div className="courses-image">
-          <Link href={url} className="d-block image">
+          <Link href={url} prefetch={false} className="d-block image">
             {image && (
               <Image
                 src={image.url}
@@ -64,14 +64,16 @@ const GameCard = ({ game }: { game: Game }) => {
                   unoptimized
                 />
               )}
-              <Link href={`/players/${proposedby.slug}`}>
+              <Link href={`/players/${proposedby.slug}`} prefetch={false}>
                 <span>&nbsp;{proposedby.name}</span>
               </Link>
             </div>
           )}
 
           <h3>
-            <Link href={url}>{game.name}</Link>
+            <Link href={url} prefetch={false}>
+              {game.name}
+            </Link>
           </h3>
           <p>
             {game.summary && game.summary.length > 200
