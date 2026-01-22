@@ -32,16 +32,13 @@ export default function YearNav({ currentYear, yearCounts }: YearNavProps) {
           All
         </Link>
         {years.map((year) => {
-          const count = yearCounts[year] || 0
-          const isDisabled = count === 0
           const isActive = currentYear === year
 
           return (
             <Link
               key={year}
-              href={isDisabled ? "#" : `/events/year/${year}`}
-              className={`year-btn ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
-              onClick={isDisabled ? (e) => e.preventDefault() : undefined}
+              href={`/events/year/${year}`}
+              className={`year-btn ${isActive ? "active" : ""}`}
             >
               {year}
             </Link>
