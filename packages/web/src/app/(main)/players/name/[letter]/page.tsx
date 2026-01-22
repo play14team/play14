@@ -1,4 +1,3 @@
-import ScrollToTop from "@/components/layout/scroll-to-top"
 import AlphabetNav from "@/components/players/alphabet-nav"
 import Filters from "@/components/players/filters"
 import { getAllPlayers, getPlayerLetterCounts } from "@/components/players/get.action"
@@ -58,7 +57,6 @@ export default async function PlayersByLetter(props: {
         <AlphabetNav currentLetter={rawLetter} letterCounts={letterCounts} />
       </div>
       <PlayerGrid players={players} />
-      <ScrollToTop />
     </>
   )
 }

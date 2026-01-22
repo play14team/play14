@@ -1,6 +1,7 @@
 import Footer from "@/components/layout/footer"
 import Loader from "@/components/layout/loader"
 import Navbar from "@/components/layout/navbar"
+import ScrollToTop from "@/components/layout/scroll-to-top"
 import { WebVitals } from "@/components/utils/web-vitals"
 import Script from "next/script"
 import { Suspense } from "react"
@@ -27,6 +28,7 @@ export default function MainLayout({
         </div>
       </main>
       <Footer />
+      <ScrollToTop />
     </>
   )
 }

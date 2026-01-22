@@ -1,4 +1,3 @@
-import ScrollToTop from "@/components/layout/scroll-to-top"
 import AlphabetNav from "@/components/players/alphabet-nav"
 import Filters from "@/components/players/filters"
 import { getPlayerLetterCounts, getPlayers } from "@/components/players/get.action"
@@ -46,7 +45,6 @@ export default async function Players() {
       </div>
       <PlayerGrid players={players} />
       <LoadMore pagination={pagination} />
-      <ScrollToTop />
     </>
   )
 }
