@@ -1,5 +1,5 @@
 import Filters from "@/components/events/filters"
-import { getEventYearCounts, getEventsByYear } from "@/components/events/get.action"
+import { getEventYearCounts, getEventYears, getEventsByYear } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import LoadMoreYear from "@/components/events/load-more-year"
 import YearNav from "@/components/events/year-nav"
@@ -19,6 +19,12 @@ export async function generateMetadata({ params }: YearEventsPageProps): Promise
 }
 
 export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const years = await getEventYears()
+  return years.map((year) => ({ year }))
+}
 
 export default async function YearEventsPage({ params }: YearEventsPageProps) {
   const { year: yearParam } = await params

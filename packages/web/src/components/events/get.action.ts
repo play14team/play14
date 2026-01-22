@@ -399,6 +399,18 @@ export async function getEventYearCounts(): Promise<Record<number, number>> {
 }
 
 /**
+ * Get all years that have events for static generation
+ * Returns an array of years (as strings) that have at least one event
+ */
+export async function getEventYears(): Promise<string[]> {
+  const yearCounts = await getEventYearCounts()
+  return Object.entries(yearCounts)
+    .filter(([, count]) => count > 0)
+    .map(([year]) => year)
+    .sort((a, b) => Number(b) - Number(a))
+}
+
+/**
  * Get paginated events for a specific year
  */
 export async function getEventsByYear(year: number, page: number, pageSize: number) {
