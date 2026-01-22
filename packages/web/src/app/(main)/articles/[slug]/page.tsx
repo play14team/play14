@@ -5,7 +5,8 @@ import type { SlugParamsProps } from "@/libs/slug-params"
 import type { Article } from "@/models/strapi"
 import { notFound } from "next/navigation"
 
-export const revalidate = 3600
+// Enable dynamic params for articles not pre-generated
+export const dynamicParams = true
 
 export async function generateStaticParams() {
   try {

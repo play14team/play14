@@ -2,7 +2,6 @@ import Filters from "@/components/players/filters"
 import { getAllPlayers } from "@/components/players/get.action"
 import PlayerGrid from "@/components/players/grid"
 
-export const revalidate = 3600
 export const dynamicParams = true
 
 export async function generateStaticParams() {

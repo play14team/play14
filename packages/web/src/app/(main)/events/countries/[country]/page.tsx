@@ -3,7 +3,6 @@ import { getAllEvents, getEventCountries } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import Country from "@/components/layout/country"
 
-export const revalidate = 3600
 export const dynamicParams = true
 
 export async function generateStaticParams() {

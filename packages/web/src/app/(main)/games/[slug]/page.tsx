@@ -5,7 +5,8 @@ import type { SlugParamsProps } from "@/libs/slug-params"
 import type { Game } from "@/models/strapi"
 import { notFound } from "next/navigation"
 
-export const revalidate = 3600
+// Enable dynamic params for games not pre-generated
+export const dynamicParams = true
 
 export async function generateStaticParams() {
   try {

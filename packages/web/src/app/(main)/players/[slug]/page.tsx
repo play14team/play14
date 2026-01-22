@@ -5,8 +5,6 @@ import { getPlayerBySlug } from "@/components/players/get.cached"
 import type { SlugParamsProps } from "@/libs/slug-params"
 import { notFound } from "next/navigation"
 
-export const revalidate = 3600
-
 // Enable dynamic params for players not pre-generated
 export const dynamicParams = true
 

@@ -3,7 +3,6 @@ import { getAllGames, getGameCategories } from "@/components/games/get.action"
 import GameGrid from "@/components/games/grid"
 import { camelPad } from "@/libs/camelPad"
 
-export const revalidate = 3600
 export const dynamicParams = true
 
 export async function generateStaticParams() {

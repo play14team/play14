@@ -2,7 +2,6 @@ import Filters from "@/components/games/filters"
 import { getAllGames, getGameTags } from "@/components/games/get.action"
 import GameGrid from "@/components/games/grid"
 
-export const revalidate = 3600
 export const dynamicParams = true
 
 export async function generateStaticParams() {

@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "Players",
 }
 
-export const revalidate = 3600
 export const dynamicParams = true
 
 export async function generateStaticParams() {
