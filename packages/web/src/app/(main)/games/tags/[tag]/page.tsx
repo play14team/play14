@@ -1,6 +1,15 @@
 import Filters from "@/components/games/filters"
-import { getAllGames } from "@/components/games/get.action"
+import { getAllGames, getGameTags } from "@/components/games/get.action"
 import GameGrid from "@/components/games/grid"
+
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const tags = await getGameTags()
+  console.log(`[Build] Pre-generating ${tags.length} game tag pages`)
+  return tags.map((tag) => ({ tag: encodeURIComponent(tag) }))
+}
 
 export default async function GameTag(props: {
   params: Promise<{ tag: string }>

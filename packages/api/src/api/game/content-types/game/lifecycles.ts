@@ -1,4 +1,5 @@
 import { toSlug } from "../../../../libs/strings"
+import { triggerContentRevalidation } from "../../../../services/frontend-revalidation"
 
 /**
  * Lifecycle hooks for Game content type
@@ -22,5 +23,14 @@ export default {
   beforeUpdate(game: { params: { data: { name?: string; slug?: string } } }) {
     const { data } = game.params
     validate(data)
+  },
+  afterCreate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::game.game", event.result, "create")
+  },
+  afterUpdate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::game.game", event.result, "update")
+  },
+  afterDelete(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::game.game", event.result, "delete")
   },
 }

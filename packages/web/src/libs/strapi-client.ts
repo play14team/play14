@@ -99,8 +99,11 @@ const STRAPI_FALLBACK_ENDPOINT = process.env.STRAPI_FALLBACK_API_URL
 /**
  * Fetch with timeout to prevent hanging connections
  */
-async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise<Response> {
-  const timeout = 30000 // 30 seconds
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeout = 30000
+): Promise<Response> {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)
 
@@ -112,6 +115,55 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}): Promise
   } finally {
     clearTimeout(timeoutId)
   }
+}
+
+/**
+ * Retry configuration for API requests
+ */
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelay: 1000, // 1 second
+  maxDelay: 10000, // 10 seconds
+  timeout: 30000, // 30 seconds per attempt
+}
+
+/**
+ * Sleep for a specified number of milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+/**
+ * Calculate exponential backoff delay with jitter
+ */
+function getBackoffDelay(attempt: number): number {
+  const exponentialDelay = RETRY_CONFIG.baseDelay * 2 ** attempt
+  const jitter = Math.random() * 1000 // Add up to 1 second of random jitter
+  return Math.min(exponentialDelay + jitter, RETRY_CONFIG.maxDelay)
+}
+
+/**
+ * Check if an error is retryable (timeout, network error, or 5xx server error)
+ */
+function isRetryableError(error: unknown, response?: Response): boolean {
+  // Timeout errors (AbortError)
+  if (error instanceof Error && error.name === "AbortError") {
+    return true
+  }
+  // Network errors
+  if (error instanceof TypeError && error.message.includes("fetch")) {
+    return true
+  }
+  // Server errors (5xx)
+  if (response && response.status >= 500) {
+    return true
+  }
+  // Rate limiting (429)
+  if (response && response.status === 429) {
+    return true
+  }
+  return false
 }
 
 /**
@@ -170,7 +222,7 @@ const defaultPagination: StrapiPagination = {
 }
 
 /**
- * Attempts to fetch from a specific endpoint
+ * Attempts to fetch from a specific endpoint with retry logic
  */
 async function tryFetch(
   baseUrl: string,
@@ -180,28 +232,58 @@ async function tryFetch(
 ): Promise<{ response: Response; url: string } | null> {
   const url = `${baseUrl}/${endpoint}${queryString}`
 
-  try {
-    const response = await fetchWithTimeout(url, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        "Content-Type": "application/json",
-      },
-    })
+  for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
+    try {
+      const response = await fetchWithTimeout(
+        url,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+        },
+        RETRY_CONFIG.timeout
+      )
 
-    if (response.ok) {
-      return { response, url }
+      if (response.ok) {
+        return { response, url }
+      }
+
+      // Check if we should retry based on status code
+      if (isRetryableError(null, response) && attempt < RETRY_CONFIG.maxRetries) {
+        const delay = getBackoffDelay(attempt)
+        console.warn(
+          `[Strapi] Request returned ${response.status}, retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${RETRY_CONFIG.maxRetries}):`,
+          url
+        )
+        await sleep(delay)
+        continue
+      }
+
+      console.warn("[Strapi] Request returned error:", url, response.status, response.statusText)
+      return null
+    } catch (error) {
+      // Check if we should retry based on error type
+      if (isRetryableError(error) && attempt < RETRY_CONFIG.maxRetries) {
+        const delay = getBackoffDelay(attempt)
+        console.warn(
+          `[Strapi] Request failed with ${error instanceof Error ? error.name : "error"}, retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${RETRY_CONFIG.maxRetries}):`,
+          url
+        )
+        await sleep(delay)
+        continue
+      }
+
+      console.warn(
+        "[Strapi] Request failed:",
+        url,
+        error instanceof Error ? error.message : String(error)
+      )
+      return null
     }
-
-    console.warn("[Strapi] Request returned error:", url, response.status, response.statusText)
-    return null
-  } catch (error) {
-    console.warn(
-      "[Strapi] Request failed:",
-      url,
-      error instanceof Error ? error.message : String(error)
-    )
-    return null
   }
+
+  return null
 }
 
 /**

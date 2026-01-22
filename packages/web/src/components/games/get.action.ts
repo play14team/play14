@@ -169,3 +169,54 @@ export async function getGameNav() {
 
   return allGames
 }
+
+/**
+ * Get all unique game categories
+ * Used for static generation of category filter pages
+ */
+export async function getGameCategories(): Promise<string[]> {
+  const response = await restQuery<Array<{ category?: string }>>("games", {
+    fields: ["category"],
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const games = response.data || []
+  const categories = new Set<string>()
+
+  games.forEach((game) => {
+    if (game.category) {
+      categories.add(game.category)
+    }
+  })
+
+  const result = Array.from(categories).sort()
+  console.log(`[Build] Found ${result.length} unique game categories`)
+  return result
+}
+
+/**
+ * Get all unique game tags
+ * Used for static generation of tag filter pages
+ */
+export async function getGameTags(): Promise<string[]> {
+  const response = await restQuery<Array<{ tags?: Tag[] }>>("games", {
+    fields: ["id"],
+    populate: { tags: { fields: ["value"] } },
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const games = response.data || []
+  const tags = new Set<string>()
+
+  games.forEach((game) => {
+    game.tags?.forEach((tag) => {
+      if (tag.value) {
+        tags.add(tag.value)
+      }
+    })
+  })
+
+  const result = Array.from(tags).sort()
+  console.log(`[Build] Found ${result.length} unique game tags`)
+  return result
+}

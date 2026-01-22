@@ -1,7 +1,16 @@
 import Filters from "@/components/games/filters"
-import { getAllGames } from "@/components/games/get.action"
+import { getAllGames, getGameCategories } from "@/components/games/get.action"
 import GameGrid from "@/components/games/grid"
 import { camelPad } from "@/libs/camelPad"
+
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const categories = await getGameCategories()
+  console.log(`[Build] Pre-generating ${categories.length} game category pages`)
+  return categories.map((category) => ({ category }))
+}
 
 export default async function GameCategory(props: {
   params: Promise<{ category: string }>

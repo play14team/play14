@@ -471,3 +471,53 @@ export async function getAllEventsByYear(year: number) {
 
   return allEvents
 }
+
+/**
+ * Get all unique country codes that have events
+ * Used for static generation of country filter pages
+ */
+export async function getEventCountries(): Promise<string[]> {
+  const response = await restQuery<Array<{ location?: { country: string } }>>("events", {
+    fields: ["id"],
+    populate: { location: { fields: ["country"] } },
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const events = response.data || []
+  const countries = new Set<string>()
+
+  events.forEach((event) => {
+    if (event.location?.country) {
+      countries.add(event.location.country)
+    }
+  })
+
+  const result = Array.from(countries).sort()
+  console.log(`[Build] Found ${result.length} unique countries with events`)
+  return result
+}
+
+/**
+ * Get all unique location slugs that have events
+ * Used for static generation of location filter pages
+ */
+export async function getEventLocationSlugs(): Promise<string[]> {
+  const response = await restQuery<Array<{ location?: { slug: string } }>>("events", {
+    fields: ["id"],
+    populate: { location: { fields: ["slug"] } },
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const events = response.data || []
+  const locations = new Set<string>()
+
+  events.forEach((event) => {
+    if (event.location?.slug) {
+      locations.add(event.location.slug)
+    }
+  })
+
+  const result = Array.from(locations).sort()
+  console.log(`[Build] Found ${result.length} unique locations with events`)
+  return result
+}

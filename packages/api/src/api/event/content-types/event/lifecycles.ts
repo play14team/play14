@@ -1,4 +1,5 @@
 import { eventToSlug } from "../../../../libs/strings"
+import { triggerContentRevalidation } from "../../../../services/frontend-revalidation"
 
 /**
  * Lifecycle hooks for Event content type
@@ -22,5 +23,14 @@ export default {
   beforeUpdate(event: { params: { data: { name?: string; start?: string; slug?: string } } }) {
     const { data } = event.params
     validate(data)
+  },
+  afterCreate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::event.event", event.result, "create")
+  },
+  afterUpdate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::event.event", event.result, "update")
+  },
+  afterDelete(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::event.event", event.result, "delete")
   },
 }

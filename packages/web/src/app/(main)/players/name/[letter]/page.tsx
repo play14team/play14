@@ -11,6 +11,16 @@ export const metadata: Metadata = {
 }
 
 export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const letterCounts = await getPlayerLetterCounts()
+  const letters = Object.entries(letterCounts)
+    .filter(([, count]) => count > 0)
+    .map(([letter]) => ({ letter: letter.toLowerCase() }))
+  console.log(`[Build] Pre-generating ${letters.length} player letter pages`)
+  return letters
+}
 
 export default async function PlayersByLetter(props: {
   params: Promise<{ letter: string }>

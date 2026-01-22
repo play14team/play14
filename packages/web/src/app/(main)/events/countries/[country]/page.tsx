@@ -1,7 +1,16 @@
 import Filters from "@/components/events/filters"
-import { getAllEvents } from "@/components/events/get.action"
+import { getAllEvents, getEventCountries } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import Country from "@/components/layout/country"
+
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const countries = await getEventCountries()
+  console.log(`[Build] Pre-generating ${countries.length} event country pages`)
+  return countries.map((country) => ({ country }))
+}
 
 export default async function EventCountry(props: {
   params: Promise<{ country: string }>

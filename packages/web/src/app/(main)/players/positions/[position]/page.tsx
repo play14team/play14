@@ -2,6 +2,16 @@ import Filters from "@/components/players/filters"
 import { getAllPlayers } from "@/components/players/get.action"
 import PlayerGrid from "@/components/players/grid"
 
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  // Player positions are a fixed set in the platform
+  const positions = ["player", "host", "mentor", "founder"]
+  console.log(`[Build] Pre-generating ${positions.length} player position pages`)
+  return positions.map((position) => ({ position }))
+}
+
 export default async function PlayerPosition(props: {
   params: Promise<{ position: string }>
 }) {

@@ -199,3 +199,54 @@ export async function getArticleNav() {
 
   return allArticles
 }
+
+/**
+ * Get all unique article categories
+ * Used for static generation of category filter pages
+ */
+export async function getArticleCategories(): Promise<string[]> {
+  const response = await restQuery<Array<{ category?: string }>>("articles", {
+    fields: ["category"],
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const articles = response.data || []
+  const categories = new Set<string>()
+
+  articles.forEach((article) => {
+    if (article.category) {
+      categories.add(article.category)
+    }
+  })
+
+  const result = Array.from(categories).sort()
+  console.log(`[Build] Found ${result.length} unique article categories`)
+  return result
+}
+
+/**
+ * Get all unique article tags
+ * Used for static generation of tag filter pages
+ */
+export async function getArticleTags(): Promise<string[]> {
+  const response = await restQuery<Array<{ tags?: Tag[] }>>("articles", {
+    fields: ["id"],
+    populate: { tags: { fields: ["value"] } },
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  const articles = response.data || []
+  const tags = new Set<string>()
+
+  articles.forEach((article) => {
+    article.tags?.forEach((tag) => {
+      if (tag.value) {
+        tags.add(tag.value)
+      }
+    })
+  })
+
+  const result = Array.from(tags).sort()
+  console.log(`[Build] Found ${result.length} unique article tags`)
+  return result
+}

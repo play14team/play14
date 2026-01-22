@@ -1,6 +1,15 @@
 import Filters from "@/components/articles/filters"
-import { getAllArticles } from "@/components/articles/get.action"
+import { getAllArticles, getArticleCategories } from "@/components/articles/get.action"
 import ArticleGrid from "@/components/articles/grid"
+
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const categories = await getArticleCategories()
+  console.log(`[Build] Pre-generating ${categories.length} article category pages`)
+  return categories.map((category) => ({ category }))
+}
 
 export default async function ArticleCategory(props: {
   params: Promise<{ category: string }>

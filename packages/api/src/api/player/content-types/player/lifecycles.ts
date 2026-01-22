@@ -1,4 +1,5 @@
 import { toSlug } from "../../../../libs/strings"
+import { triggerContentRevalidation } from "../../../../services/frontend-revalidation"
 
 /**
  * Lifecycle hooks for Player content type
@@ -23,10 +24,13 @@ export default {
     const { data } = player.params
     validate(data)
   },
+  afterCreate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::player.player", event.result, "create")
+  },
   /**
-   * After updating a player, sync the linked user's role if:
-   * - The user relation was modified (player linked to user via admin)
-   * - The player has a linked user
+   * After updating a player:
+   * 1. Sync the linked user's role if the user relation was modified
+   * 2. Trigger frontend revalidation
    */
   async afterUpdate(event: { result: any; params: any }) {
     const { result, params } = event
@@ -45,5 +49,11 @@ export default {
         strapi.log.error(`[Player Lifecycle] Failed to sync role after user link: ${err}`)
       }
     }
+
+    // Trigger frontend revalidation
+    triggerContentRevalidation(strapi, "api::player.player", result, "update")
+  },
+  afterDelete(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::player.player", event.result, "delete")
   },
 }

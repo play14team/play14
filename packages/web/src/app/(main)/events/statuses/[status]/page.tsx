@@ -2,6 +2,16 @@ import Filters from "@/components/events/filters"
 import { getAllEvents } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  // Event statuses are a fixed enum in Strapi
+  const statuses = ["Announced", "Open", "Over", "Cancelled"]
+  console.log(`[Build] Pre-generating ${statuses.length} event status pages`)
+  return statuses.map((status) => ({ status }))
+}
+
 export default async function EventStatus(props: {
   params: Promise<{ status: string }>
 }) {

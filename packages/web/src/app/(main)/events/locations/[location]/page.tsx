@@ -1,6 +1,15 @@
 import Filters from "@/components/events/filters"
-import { getAllEvents } from "@/components/events/get.action"
+import { getAllEvents, getEventLocationSlugs } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
+
+export const revalidate = 3600
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+  const locations = await getEventLocationSlugs()
+  console.log(`[Build] Pre-generating ${locations.length} event location pages`)
+  return locations.map((location) => ({ location }))
+}
 
 export default async function EventLocation(props: {
   params: Promise<{ location: string }>
