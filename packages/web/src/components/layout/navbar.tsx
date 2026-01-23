@@ -64,8 +64,112 @@ const Navbar = () => {
                 <ul className="navbar-nav">
                   <li className="nav-item">
                     <Link href="/" className="nav-link">
-                      Home
+                      Home <i className="bx bx-chevron-down" />
                     </Link>
+
+                    <ul className="dropdown-menu">
+                      <li className="nav-item">
+                        <Link href="/" onClick={() => setCollapsed(true)} className="nav-link">
+                          Home
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#power-of-play"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Power of Play
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#upcoming-events"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Upcoming Events
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#statistics"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Statistics
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#world-map"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          World Map
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#activities"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          The Experience
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#manifesto-and-code-of-conduct"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Manifesto & Code of Conduct
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#testimonials"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Testimonials
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#gallery"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Gallery
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link
+                          href="/#benefits"
+                          onClick={() => setCollapsed(true)}
+                          className="nav-link"
+                        >
+                          Benefits
+                        </Link>
+                      </li>
+
+                      <li className="nav-item">
+                        <Link href="/#faq" onClick={() => setCollapsed(true)} className="nav-link">
+                          FAQ
+                        </Link>
+                      </li>
+                    </ul>
                   </li>
 
                   <li className="nav-item">
