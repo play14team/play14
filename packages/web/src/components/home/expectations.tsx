@@ -17,7 +17,7 @@ export default async function Expectations({
             <div key={expectation.documentId} className="col-lg-6 col-sm-6">
               <div className="single-solutions-box">
                 <div className="icon orange">
-                  <i className={expectation.icon} />
+                  <i className={expectation.icon} aria-hidden="true" />
                 </div>
                 <h3>{expectation.title}</h3>
                 <HtmlContent>{expectation.content || ""}</HtmlContent>

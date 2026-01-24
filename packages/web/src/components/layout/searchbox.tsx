@@ -17,13 +17,14 @@ const SearchBox = () => {
             type="text"
             className="input-search"
             placeholder="Search for anything"
+            aria-label="Search for anything"
             onChange={(e) => setInput(e.currentTarget.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") search()
             }}
           />
-          <button onClick={() => search()}>
-            <i className="flaticon-loupe" />
+          <button onClick={() => search()} type="button" aria-label="Search">
+            <i className="flaticon-loupe" aria-hidden="true" />
           </button>
         </div>
       </div>

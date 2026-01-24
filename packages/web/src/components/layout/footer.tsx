@@ -8,18 +8,22 @@ const Footer = () => {
     {
       url: "https://www.linkedin.com/groups/7478250",
       icon: "linkedin",
+      label: "LinkedIn",
     },
     {
       url: "https://twitter.com/play14team",
       icon: "twitter",
+      label: "Twitter",
     },
     {
       url: "https://www.youtube.com/channel/UCk_bP4BFqSSA4dqUz9cRK8A",
       icon: "youtube",
+      label: "YouTube",
     },
     {
       url: "https://www.facebook.com/Play14-making-the-world-more-fun-than-fun-315955075134911/",
       icon: "facebook",
+      label: "Facebook",
     },
   ]
   const currentYear = new Date().getFullYear()
@@ -39,8 +43,14 @@ const Footer = () => {
                 {socialLinks.map((action, index) => {
                   return (
                     <li key={index}>
-                      <Link href={action.url} className="d-block" target="_blank" rel="noreferrer">
-                        <i className={`bx bxl-${action.icon}`} />
+                      <Link
+                        href={action.url}
+                        className="d-block"
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${action.label} (opens in new tab)`}
+                      >
+                        <i className={`bx bxl-${action.icon}`} aria-hidden="true" />
                       </Link>
                     </li>
                   )
@@ -144,7 +154,7 @@ const Footer = () => {
       <div className="footer-map">
         <Image
           src={footerMap}
-          alt="footer-logo"
+          alt=""
           style={{
             maxWidth: "100%",
             height: "auto",
