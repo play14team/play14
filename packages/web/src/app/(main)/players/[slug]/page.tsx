@@ -1,4 +1,3 @@
-import Page from "@/components/layout/page"
 import PlayerDetails from "@/components/players/details"
 import { getPlayerSlugs } from "@/components/players/get.action"
 import { getPlayerBySlug } from "@/components/players/get.cached"
@@ -49,9 +48,5 @@ export default async function Player(props: SlugParamsProps) {
     notFound()
   }
 
-  return (
-    <Page name={player.name}>
-      <PlayerDetails player={player} />
-    </Page>
-  )
+  return <PlayerDetails player={player} />
 }
