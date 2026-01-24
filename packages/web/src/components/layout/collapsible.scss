@@ -1,25 +1,33 @@
+.collapsible {
+  text-align: center;
+}
 .collapsible .content {
   padding: 6px;
   background-color: var(--collapsible-content);
 }
 .collapsible .header {
-  display: flex;
-  align-items: center;
-  width: 100%;
+  display: inline-flex;
+  align-items: baseline;
   border: none;
-  background-color: var(--collapsible-header);
+  background: transparent;
   padding: 6px;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   font: inherit;
   color: inherit;
+
+  &:focus-visible {
+    outline: 2px solid var(--orange);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 .collapsible .collapsible-title {
-  font-size: 2rem;
+  font-size: 40px;
   font-weight: 700;
   margin: 0;
 }
 .collapsible .collapsible-icon {
   padding-left: 10px;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
 }

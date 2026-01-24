@@ -2,7 +2,7 @@
 
 import type { PropsWithChildren, ReactNode } from "react"
 import { useCollapse } from "react-collapsed"
-import "./collapsible.module.scss"
+import "./collapsible.scss"
 
 interface CollapsibleProps extends PropsWithChildren {
   name: ReactNode
