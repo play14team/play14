@@ -1,11 +1,12 @@
-import type { GeoLocation, Player, UploadFile } from "@/models/strapi"
+import { deduplicateBy } from "@/libs/arrays"
+import type { Event as EventType, GeoLocation, Player, UploadFile } from "@/models/strapi"
 import Image from "next/image"
-import SocialNetworks from "../layout/socialnetworks"
+import Link from "next/link"
+import HtmlContent from "../layout/html-content"
 import Map from "../map"
 import DefaultPlayerImage from "../ui/default-player-image"
-import PlayersNavigator from "./nav"
-import PlayerSidebar from "./sidebar"
-import PlayerTabs from "./tabs"
+import PlayerNav from "./nav"
+import PlayerProfileTabs from "./profile-tabs"
 
 // Helper to check if location is a GeoLocation object (has coordinates)
 function isGeoLocation(location: string | GeoLocation | undefined): location is GeoLocation {
@@ -17,88 +18,190 @@ function isGeoLocation(location: string | GeoLocation | undefined): location is 
 function getLocationName(location: string | GeoLocation | undefined): string | null {
   if (!location) return null
   if (typeof location === "string") return location
-  // GeoLocation object - extract place_name
   if ("place_name" in location && location.place_name) {
     return location.place_name
   }
   return null
 }
 
-const PlayerDetails = ({ player }: { player: Player }) => {
+// Helper to get position badge class
+function getPositionClass(position?: string): string {
+  const pos = position?.toLowerCase() || "player"
+  if (["founder", "host", "mentor", "player"].includes(pos)) {
+    return pos
+  }
+  return "player"
+}
+
+// Map social network type to icon
+function mapSocialIcon(type: string): string {
+  if (type === "Email") return "bx bx-envelope"
+  return `bx bxl-${type.toLowerCase()}`
+}
+
+export default function PlayerDetails({ player }: { player: Player }) {
   const avatar = player.avatar as UploadFile
   const locationName = getLocationName(player.location)
   const hasGeoLocation = isGeoLocation(player.location)
+  const socialNetworks = player.socialNetworks || []
+
+  const hosted = player.hosted || []
+  const mentored = player.mentored || []
+  const attended = player.attended || []
+
+  // Calculate total unique events (deduplicated across all categories)
+  const allUniqueEvents = deduplicateBy(
+    (event: EventType) => event.documentId || event.slug,
+    attended,
+    hosted,
+    mentored
+  )
+  const totalUniqueEvents = allUniqueEvents.length
 
   return (
-    <div className="case-studies-details-area pb-100">
-      <PlayersNavigator current={player.slug} />
-      <div className="container pt-5">
-        <div className="row">
-          <div className="col-lg-4 col-md-12">
-            <div className="single-scientist-box">
-              {avatar && (
+    <div className="player-profile">
+      <div className="container">
+        {/* Navigation */}
+        <PlayerNav current={player.slug} />
+
+        {/* Hero section: Avatar + Info */}
+        <div className="player-profile-hero">
+          {/* Avatar column with social links */}
+          <div className="player-profile-avatar">
+            <div className="player-profile-avatar__image-container">
+              {avatar ? (
                 <Image
                   src={avatar.url}
-                  alt={avatar.name}
-                  width={350}
-                  height={350}
+                  alt={player.name}
+                  width={280}
+                  height={280}
                   priority
-                  className="shadow"
-                  style={{
-                    borderRadius: "10px",
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: "450px",
-                    objectFit: "cover",
-                  }}
+                  className="player-profile-avatar__image"
                   unoptimized
                 />
-              )}
-              {!avatar && (
+              ) : (
                 <DefaultPlayerImage
-                  width={350}
-                  height={350}
+                  width={280}
+                  height={280}
                   priority
-                  className="shadow"
-                  style={{
-                    borderRadius: "10px",
-                    width: "100%",
-                    height: "auto",
-                    maxHeight: "450px",
-                    objectFit: "cover",
-                  }}
+                  className="player-profile-avatar__image"
                 />
               )}
-              <div className="content">
-                {player.socialNetworks && <SocialNetworks socialNetworks={player.socialNetworks} />}
-              </div>
             </div>
+
+            {/* Social links under avatar */}
+            {socialNetworks.length > 0 && (
+              <div className="player-profile-avatar__socials">
+                {socialNetworks.map(
+                  (network) =>
+                    network?.url && (
+                      <Link
+                        key={network.id}
+                        href={network.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="player-profile-avatar__social-link"
+                        title={network.type as string}
+                      >
+                        <i className={mapSocialIcon(network.type as string)} />
+                      </Link>
+                    )
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="col-lg-4 col-md-12 px-4">
-            <div className="events-details-location">
-              <Map
-                location={hasGeoLocation ? (player.location as GeoLocation) : undefined}
-                height={"450px"}
-                zoom={hasGeoLocation ? 10 : undefined}
-              />
-              {locationName && !hasGeoLocation && (
-                <p className="pt-2">
-                  <i className="bx bx-map" /> {locationName}
-                </p>
+          {/* Info column */}
+          <div className="player-profile-info">
+            {/* Name and badge */}
+            <div className="player-profile-info__title">
+              <h1 className="player-profile-info__name">{player.name}</h1>
+              {player.position && (
+                <span
+                  className={`player-profile-info__position-badge player-profile-info__position-badge--${getPositionClass(player.position)}`}
+                >
+                  {player.position}
+                </span>
               )}
             </div>
-          </div>
 
-          <div className="col-lg-4 col-md-12">
-            <PlayerSidebar player={player} />
+            {player.tagline && <p className="player-profile-info__tagline">{player.tagline}</p>}
+
+            {/* Meta: company, website, location */}
+            <div className="player-profile-info__meta">
+              {player.company && (
+                <span className="player-profile-info__meta-item">
+                  <i className="bx bx-building" />
+                  {player.company}
+                </span>
+              )}
+              {player.website && (
+                <span className="player-profile-info__meta-item">
+                  <i className="bx bx-globe" />
+                  <Link href={player.website} target="_blank" rel="noreferrer">
+                    {player.website.replace(/^https?:\/\//, "")}
+                  </Link>
+                </span>
+              )}
+              {locationName && (
+                <span className="player-profile-info__meta-item">
+                  <i className="bx bx-map" />
+                  {locationName}
+                </span>
+              )}
+            </div>
+
+            {/* Stats */}
+            {totalUniqueEvents > 0 && (
+              <div className="player-profile-info__stats">
+                <span className="player-profile-info__stat">
+                  <strong>{totalUniqueEvents}</strong> events
+                </span>
+                {hosted.length > 0 && (
+                  <span className="player-profile-info__stat">
+                    <strong>{hosted.length}</strong> hosted
+                  </span>
+                )}
+                {mentored.length > 0 && (
+                  <span className="player-profile-info__stat">
+                    <strong>{mentored.length}</strong> mentored
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        <PlayerTabs player={player} />
+        {/* Bio section - full width */}
+        {player.bio && (
+          <div className="player-profile-bio">
+            <HtmlContent>{player.bio}</HtmlContent>
+          </div>
+        )}
+
+        {/* Map section */}
+        {(hasGeoLocation || locationName) && (
+          <div className="player-profile-map">
+            <div className="player-profile-map__container">
+              {hasGeoLocation ? (
+                <Map location={player.location as GeoLocation} height="300px" zoom={10} />
+              ) : (
+                <div className="player-profile-map__fallback">
+                  <i className="bx bx-map" />
+                  <span>{locationName}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Events tabs section */}
+        <PlayerProfileTabs
+          attended={attended.filter(Boolean) as EventType[]}
+          hosted={hosted.filter(Boolean) as EventType[]}
+          mentored={mentored.filter(Boolean) as EventType[]}
+        />
       </div>
     </div>
   )
 }
-
-export default PlayerDetails
