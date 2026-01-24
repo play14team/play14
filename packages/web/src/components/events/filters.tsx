@@ -10,19 +10,19 @@ export default function Filters({ name }: { name: ReactNode }) {
         <div className="article-footer">
           <div className="article-tags">
             <span>
-              <i className="bx bx-globe" />
+              <i className="bx bx-globe" aria-hidden="true" />
             </span>
             <Link href="/events/countries">Country</Link>
           </div>
           <div className="article-tags">
             <span>
-              <i className="bx bx-calendar" />
+              <i className="bx bx-calendar" aria-hidden="true" />
             </span>
             <Link href="/events/statuses">Status</Link>
           </div>
           <div className="article-tags">
             <span>
-              <i className="bx bx-map-pin" />
+              <i className="bx bx-map-pin" aria-hidden="true" />
             </span>
             <Link href="/events/locations">Location</Link>
           </div>

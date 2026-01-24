@@ -13,7 +13,7 @@ const EventStatus = (props: { status: Enum_Event_Eventstatus | string }) => {
 
   return (
     <>
-      <i className={`bx bx-${icon}`} /> {status}
+      <i className={`bx bx-${icon}`} aria-hidden="true" /> {status}
     </>
   )
 }

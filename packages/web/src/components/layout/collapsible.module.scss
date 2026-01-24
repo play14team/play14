@@ -3,7 +3,23 @@
   background-color: var(--collapsible-content);
 }
 .collapsible .header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: none;
   background-color: var(--collapsible-header);
   padding: 6px;
   cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.collapsible .collapsible-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+.collapsible .collapsible-icon {
+  padding-left: 10px;
+  font-size: 1.25rem;
 }

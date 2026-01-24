@@ -26,12 +26,13 @@ export default function YearNav({ currentYear, yearCounts }: YearNavProps) {
   const years = getYears(yearCounts)
 
   return (
-    <div className="year-nav centered">
+    <nav className="year-nav centered" aria-label="Filter events by year">
       <div className="year-buttons">
         <Link
           href="/events"
           prefetch={false}
           className={`year-btn ${!currentYear ? "active" : ""}`}
+          aria-current={!currentYear ? "page" : undefined}
         >
           All
         </Link>
@@ -44,12 +45,13 @@ export default function YearNav({ currentYear, yearCounts }: YearNavProps) {
               href={`/events/year/${year}`}
               prefetch={false}
               className={`year-btn ${isActive ? "active" : ""}`}
+              aria-current={isActive ? "page" : undefined}
             >
               {year}
             </Link>
           )
         })}
       </div>
-    </div>
+    </nav>
   )
 }
