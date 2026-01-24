@@ -30,8 +30,9 @@ export default ({ env }: { env: any }) => ({
       maxSize: env.int("CACHE_MAX_SIZE", 1024 * 1024 * 1024), // 1GB default
       ttl: env.int("CACHE_TTL", 1000 * 60 * 60), // 1 hour default
       allowStale: false,
-      // Redis configuration (used when provider is 'redis')
-      redisConfig: env("REDIS_URL", "redis://localhost:6379"),
+      // Redis configuration (only used when provider is 'redis')
+      // No default - Redis is optional and only used if REDIS_URL is set
+      redisConfig: env("REDIS_URL") || undefined,
       // Cache settings
       cacheHeaders: true,
       cacheAuthorizedRequests: env.bool("CACHE_AUTHORIZED_REQUESTS", false),

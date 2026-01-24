@@ -1324,6 +1324,40 @@ export interface ApiHostingHosting extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiLikedItemLikedItem extends Struct.CollectionTypeSchema {
+  collectionName: 'liked_items';
+  info: {
+    displayName: 'Liked Item';
+    pluralName: 'liked-items';
+    singularName: 'liked-item';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    contributors: Schema.Attribute.Relation<'manyToMany', 'api::player.player'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    image: Schema.Attribute.Media<'images'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::liked-item.liked-item'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface ApiPlayerClaimPlayerClaim extends Struct.CollectionTypeSchema {
   collectionName: 'player_claims';
   info: {
@@ -1404,6 +1438,10 @@ export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<'none'>;
     documented: Schema.Attribute.Relation<'manyToMany', 'api::game.game'>;
     hosted: Schema.Attribute.Relation<'manyToMany', 'api::event.event'>;
+    likedItems: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::liked-item.liked-item'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -2626,6 +2664,7 @@ declare module '@strapi/strapi' {
       'api::history.history': ApiHistoryHistory;
       'api::home.home': ApiHomeHome;
       'api::hosting.hosting': ApiHostingHosting;
+      'api::liked-item.liked-item': ApiLikedItemLikedItem;
       'api::player-claim.player-claim': ApiPlayerClaimPlayerClaim;
       'api::player.player': ApiPlayerPlayer;
       'api::processed-webhook.processed-webhook': ApiProcessedWebhookProcessedWebhook;

@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "liked_items",
+  "info": {
+    "singularName": "liked-item",
+    "pluralName": "liked-items",
+    "displayName": "Liked Item"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "allowedTypes": ["images"],
+      "type": "media",
+      "multiple": false
+    },
+    "contributors": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::player.player",
+      "inversedBy": "likedItems"
+    }
+  }
+}

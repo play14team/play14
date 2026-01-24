@@ -295,6 +295,28 @@ export const TESTIMONIAL_ACTIONS = {
   DELETE: "api::testimonial.testimonial.delete",
 } as const
 
+export const LIKED_ITEM_ACTIONS = {
+  // Standard CRUD
+  FIND: "api::liked-item.liked-item.find",
+  FIND_ONE: "api::liked-item.liked-item.findOne",
+  CREATE: "api::liked-item.liked-item.create",
+  UPDATE: "api::liked-item.liked-item.update",
+  DELETE: "api::liked-item.liked-item.delete",
+
+  // Custom actions for admin panel (founders only)
+  LIST: "api::liked-item.custom-liked-item.list",
+  FIND_ONE_ADMIN: "api::liked-item.custom-liked-item.findOne",
+  CREATE_ADMIN: "api::liked-item.custom-liked-item.create",
+  UPDATE_ADMIN: "api::liked-item.custom-liked-item.update",
+  DELETE_ADMIN: "api::liked-item.custom-liked-item.delete",
+  UPLOAD_IMAGE: "api::liked-item.custom-liked-item.uploadImage",
+  SET_IMAGE_FROM_LIBRARY: "api::liked-item.custom-liked-item.setImageFromLibrary",
+  REMOVE_IMAGE: "api::liked-item.custom-liked-item.removeImage",
+
+  // Public showcase (no auth required)
+  LIST_PUBLIC: "api::liked-item.custom-liked-item.listPublic",
+} as const
+
 export const VENUE_ACTIONS = {
   // Standard CRUD
   FIND: "api::venue.venue.find",

@@ -93,6 +93,15 @@ podman-compose down
 
 When creating or modifying UI components, always consider both light and dark mode. Ensure styles work correctly in both themes.
 
+## Writing style
+
+Use sentence case for all text: only capitalize the first letter of the first word. Do not capitalize every word in titles, headings, labels, or button text.
+
+- Correct: "Things we like", "Create new event", "Back to home"
+- Incorrect: "Things We Like", "Create New Event", "Back To Home"
+
+Exceptions: proper nouns, acronyms, and brand names keep their standard capitalization (e.g., "Next.js", "Strapi", "#play14").
+
 ## API Permissions Bootstrap
 
 When adding or modifying content types, controllers, or routes in the API package that require permission handling, remember to update the permissions bootstrap files:

@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi"
+import { bootstrapLikedItemImages } from "./bootstrap/liked-items"
 import { bootstrapPermissions } from "./bootstrap/permissions"
 import { reportSentryError } from "./services/observability/sentry-reporter"
 
@@ -367,6 +368,9 @@ export default {
 
       // Bootstrap user role permissions
       await bootstrapPermissions(strapi)
+
+      // Bootstrap liked items images (uploads images from data folder if missing)
+      await bootstrapLikedItemImages(strapi)
     } catch (error) {
       reportSentryError(strapi, error, {
         tags: { phase: "bootstrap", module: "app-bootstrap" },

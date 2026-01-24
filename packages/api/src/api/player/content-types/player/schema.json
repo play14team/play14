@@ -115,6 +115,12 @@
     "defaultFoodPreferences": {
       "type": "text",
       "private": true
+    },
+    "likedItems": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::liked-item.liked-item",
+      "mappedBy": "contributors"
     }
   }
 }
