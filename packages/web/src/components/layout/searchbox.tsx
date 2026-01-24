@@ -1,32 +1,38 @@
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+"use client"
+
+import SearchCommand from "@/components/ui/search-command"
+import { useEffect, useState } from "react"
 
 const SearchBox = () => {
-  const router = useRouter()
-  const [input, setInput] = useState("")
+  const [isOpen, setIsOpen] = useState(false)
 
-  const search = () => {
-    if (input) router.push(`/search?input=${input}`)
-  }
+  // Global keyboard shortcut (Cmd/Ctrl + K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault()
+        setIsOpen(true)
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => document.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   return (
     <div className="others-option d-flex align-items-center">
       <div className="option-item">
-        <div className="search-box">
-          <input
-            type="text"
-            className="input-search"
-            placeholder="Search for anything"
-            aria-label="Search for anything"
-            onChange={(e) => setInput(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") search()
-            }}
-          />
-          <button onClick={() => search()} type="button" aria-label="Search">
-            <i className="flaticon-loupe" aria-hidden="true" />
-          </button>
-        </div>
+        <button
+          type="button"
+          className="ui-search-trigger"
+          onClick={() => setIsOpen(true)}
+          aria-label="Open search"
+        >
+          <i className="flaticon-loupe" aria-hidden="true" />
+          <span className="ui-search-trigger-text">Search...</span>
+          <kbd className="ui-search-trigger-kbd">⌘K</kbd>
+        </button>
+        <SearchCommand isOpen={isOpen} onOpenChange={setIsOpen} />
       </div>
     </div>
   )
