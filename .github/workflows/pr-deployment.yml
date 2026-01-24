@@ -157,7 +157,8 @@ jobs:
 
       - name: Run API integration tests
         if: env.API_CHANGED == 'true'
-        run: bun run test:int
+        working-directory: packages/api
+        run: bunx vitest run -c vitest.integration.config.mts
         env:
           NODE_ENV: test
           DATABASE_HOST: 127.0.0.1
@@ -170,6 +171,8 @@ jobs:
           TRANSFER_TOKEN_SALT: test-transfer-token-salt-for-ci
           APP_KEYS: test-app-key-1,test-app-key-2,test-app-key-3,test-app-key-4
           JWT_SECRET: test-jwt-secret-for-ci
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
   # ============================================================================
   # API BUILD & DEPLOY (when API changed)
