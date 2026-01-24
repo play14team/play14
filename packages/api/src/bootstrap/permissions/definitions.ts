@@ -29,6 +29,7 @@ import {
   HOSTING_ACTIONS,
   I18N_ACTIONS,
   IMPORT_ACTIONS,
+  LIKED_ITEM_ACTIONS,
   MEDIA_FILE_ACTIONS,
   MEDIA_FOLDER_ACTIONS,
   PERMISSIONS_ACTIONS,
@@ -62,6 +63,9 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Content (public)
   { action: EXPECTATION_ACTIONS.FIND, minimumRole: ROLE_TYPES.PUBLIC },
+
+  // Liked items showcase (public - for public showcase page)
+  { action: LIKED_ITEM_ACTIONS.LIST_PUBLIC, minimumRole: ROLE_TYPES.PUBLIC },
 
   // User me (needed for auth flow)
   { action: USER_ACTIONS.ME, minimumRole: ROLE_TYPES.PUBLIC },
@@ -347,6 +351,23 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: VENUE_ACTIONS.CREATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: VENUE_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: VENUE_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
+
+  // Liked items full CRUD (founders only)
+  { action: LIKED_ITEM_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.FIND_ONE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.CREATE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
+
+  // Liked items admin management (founders only)
+  { action: LIKED_ITEM_ACTIONS.LIST, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.FIND_ONE_ADMIN, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.CREATE_ADMIN, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.UPDATE_ADMIN, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.DELETE_ADMIN, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.UPLOAD_IMAGE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.SET_IMAGE_FROM_LIBRARY, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: LIKED_ITEM_ACTIONS.REMOVE_IMAGE, minimumRole: ROLE_TYPES.FOUNDER },
 
   // File uploads
   { action: UPLOAD_ACTIONS.FIND, minimumRole: ROLE_TYPES.HOST },
