@@ -1,0 +1,269 @@
+// ===========================================
+// Mobile Menu Component Styles
+// ===========================================
+
+// Hamburger trigger button
+.ui-mobile-menu-trigger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 1199px) {
+    display: flex;
+  }
+}
+
+.ui-mobile-menu-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: var(--color-text);
+  border-radius: 2px;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+
+  .ui-mobile-menu-trigger.is-open & {
+    &.top-bar {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    &.middle-bar {
+      opacity: 0;
+    }
+
+    &.bottom-bar {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+  }
+}
+
+// Overlay backdrop
+.ui-mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: mobileMenuOverlayFadeIn 0.2s ease;
+}
+
+@keyframes mobileMenuOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// Content panel
+.ui-mobile-menu-content {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 320px;
+  height: 100%;
+  background-color: var(--dropdown-bg);
+  z-index: 1001;
+  overflow-y: auto;
+  animation: mobileMenuSlideIn 0.3s ease;
+  outline: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+@keyframes mobileMenuSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+// Header with close button
+.ui-mobile-menu-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ui-mobile-menu-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+
+  i {
+    font-size: 28px;
+  }
+}
+
+// Navigation container
+.ui-mobile-menu-nav {
+  padding: 16px;
+}
+
+// Section trigger (collapsible header)
+.ui-mobile-menu-section-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+
+  &[data-state="open"] {
+    color: var(--color-orange);
+  }
+}
+
+.ui-mobile-menu-chevron {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+
+  &.is-open {
+    transform: rotate(180deg);
+  }
+}
+
+// Section content (collapsible body)
+.ui-mobile-menu-section-content {
+  overflow: hidden;
+  padding-left: 16px;
+
+  &[data-state="open"] {
+    animation: mobileMenuSectionOpen 0.2s ease-out;
+  }
+
+  &[data-state="closed"] {
+    animation: mobileMenuSectionClose 0.2s ease-out;
+  }
+}
+
+@keyframes mobileMenuSectionOpen {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes mobileMenuSectionClose {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+// Links
+.ui-mobile-menu-link {
+  display: block;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-orange);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+}
+
+.ui-mobile-menu-link-primary {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+// Screen reader only utility
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

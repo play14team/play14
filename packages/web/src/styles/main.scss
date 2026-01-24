@@ -10,8 +10,12 @@
 @use "ui/avatar";
 @use "ui/dropdown";
 @use "ui/tabs";
+@use "ui/search-command";
+@use "ui/filter-bar";
 @use "ui/player-profile";
 @use "ui/event-profile";
+@use "ui/navigation-menu";
+@use "ui/mobile-menu";
 
 // Auth pages
 @use "auth/login";
