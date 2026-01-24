@@ -117,7 +117,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
               // Editing mode
               <div className="media-link-form">
                 <div className="admin-form-row">
-                  <div className="admin-form-group" style={{ flex: 2 }}>
+                  <div className="admin-form-group admin-form-group-wide">
                     <label>URL *</label>
                     <input
                       type="url"
@@ -127,7 +127,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                       placeholder="https://photos.google.com/..."
                     />
                   </div>
-                  <div className="admin-form-group" style={{ flex: 1 }}>
+                  <div className="admin-form-group admin-form-group-narrow">
                     <label>Type</label>
                     <select
                       value={editing.type}
@@ -211,7 +211,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
           <div className="media-link-form">
             <h4>Add Media Link</h4>
             <div className="admin-form-row">
-              <div className="admin-form-group" style={{ flex: 2 }}>
+              <div className="admin-form-group admin-form-group-wide">
                 <label>URL *</label>
                 <input
                   type="url"
@@ -222,7 +222,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                 />
                 <p className="admin-form-help">Link to an external photo album or video playlist</p>
               </div>
-              <div className="admin-form-group" style={{ flex: 1 }}>
+              <div className="admin-form-group admin-form-group-narrow">
                 <label>Type</label>
                 <select
                   value={editing.type}

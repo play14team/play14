@@ -240,3 +240,76 @@ export async function navigateViaDropdown(
   }
   return false
 }
+
+// =============================================================================
+// RESPONSIVE TESTING HELPERS
+// =============================================================================
+
+/**
+ * Check if an element causes horizontal overflow
+ */
+export async function checkElementOverflow(
+  page: Page,
+  selector: string,
+  viewportWidth: number
+): Promise<{ overflows: boolean; actualWidth: number }> {
+  const element = page.locator(selector).first()
+  if ((await element.count()) === 0) {
+    return { overflows: false, actualWidth: 0 }
+  }
+
+  const box = await element.boundingBox()
+  if (!box) {
+    return { overflows: false, actualWidth: 0 }
+  }
+
+  return {
+    overflows: box.x + box.width > viewportWidth,
+    actualWidth: box.width,
+  }
+}
+
+/**
+ * Verify no horizontal scrollbar on page
+ */
+export async function verifyNoHorizontalScroll(page: Page): Promise<boolean> {
+  return await page.evaluate(() => {
+    return document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
+  })
+}
+
+/**
+ * Set mobile viewport and optionally emulate touch
+ */
+export async function setMobileViewport(
+  page: Page,
+  width: number,
+  height: number,
+  reduceMotion = true
+): Promise<void> {
+  await page.setViewportSize({ width, height })
+  if (reduceMotion) {
+    await page.emulateMedia({ reducedMotion: "reduce" })
+  }
+}
+
+/**
+ * Common mobile viewport presets
+ */
+export const MOBILE_VIEWPORTS = {
+  iPhoneSE: { width: 375, height: 667 },
+  iPhone14: { width: 390, height: 844 },
+  iPhone14Plus: { width: 428, height: 926 },
+  Pixel5: { width: 393, height: 851 },
+  iPad: { width: 810, height: 1080 },
+} as const
+
+/**
+ * Get viewport dimensions from preset name
+ */
+export function getViewport(name: keyof typeof MOBILE_VIEWPORTS): {
+  width: number
+  height: number
+} {
+  return MOBILE_VIEWPORTS[name]
+}

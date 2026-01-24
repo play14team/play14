@@ -82,7 +82,9 @@
       "Bash(bunx biome check:*)",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_network_requests",
-      "mcp__playwright__browser_close"
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_take_screenshot"
     ]
   },
   "enableAllProjectMcpServers": true,

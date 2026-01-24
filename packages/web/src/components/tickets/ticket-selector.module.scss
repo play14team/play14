@@ -233,3 +233,28 @@
     margin: 0.5rem 0;
   }
 }
+
+// ===========================================
+// Responsive - Mobile
+// ===========================================
+
+@media (max-width: 480px) {
+  .ticketType {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .ticketInfo {
+    width: 100%;
+  }
+
+  .priceRow {
+    flex-wrap: wrap;
+  }
+
+  .quantitySelector {
+    justify-content: center;
+    width: 100%;
+  }
+}

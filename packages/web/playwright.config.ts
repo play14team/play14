@@ -28,17 +28,38 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers and devices */
   projects: [
+    // Desktop browsers
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+    },
+
+    // Mobile devices
+    {
+      name: "mobile-iphone-se",
+      use: { ...devices["iPhone SE"] }, // 375x667
+    },
+    {
+      name: "mobile-iphone-14",
+      use: { ...devices["iPhone 14"] }, // 390x844
+    },
+    {
+      name: "mobile-pixel-5",
+      use: { ...devices["Pixel 5"] }, // 393x851
+    },
+
+    // Tablet
+    {
+      name: "tablet-ipad",
+      use: { ...devices["iPad (gen 7)"] }, // 810x1080
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "pnpm dev",
+    command: "bun dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
