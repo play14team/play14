@@ -264,7 +264,7 @@ const Navbar = () => {
 
                       <li className="nav-item">
                         <Link href="/likes" onClick={() => setCollapsed(true)} className="nav-link">
-                          Things We Like
+                          Things we like
                         </Link>
                       </li>
                     </ul>

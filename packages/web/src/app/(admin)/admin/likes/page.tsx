@@ -4,7 +4,7 @@ import Link from "next/link"
 import LikedItemsList from "./liked-items-list"
 
 export const metadata: Metadata = {
-  title: "Things We Like",
+  title: "Things we like",
 }
 
 export default async function LikesPage() {
@@ -13,7 +13,7 @@ export default async function LikesPage() {
   return (
     <div className="admin-page">
       <div className="admin-page-header">
-        <h1>Things We Like</h1>
+        <h1>Things we like</h1>
         <p>Manage showcase items - things the community recommends</p>
       </div>
 

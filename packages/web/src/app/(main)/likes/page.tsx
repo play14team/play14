@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { getPublicLikedItems, type LikedItemPublic } from "./get.action"
+import { type LikedItemPublic, getPublicLikedItems } from "./get.action"
 import "./likes.scss"
 
 export const metadata: Metadata = {
-  title: "Things We Like",
+  title: "Things we like",
   description:
     "A curated collection of tools, resources, and products that the #play14 community recommends.",
 }
@@ -15,16 +15,11 @@ export const revalidate = 3600 // Revalidate every hour
 function getImageUrl(item: LikedItemPublic): string | null {
   if (!item.image) return null
   const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
-  const url =
-    item.image.formats?.medium?.url ||
-    item.image.formats?.small?.url ||
-    item.image.url
+  const url = item.image.formats?.medium?.url || item.image.formats?.small?.url || item.image.url
   return url.startsWith("http") ? url : `${baseUrl}${url}`
 }
 
-function getAvatarUrl(
-  contributor: LikedItemPublic["contributors"][0]
-): string | null {
+function getAvatarUrl(contributor: LikedItemPublic["contributors"][0]): string | null {
   if (!contributor.avatar) return null
   const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
   const url =
@@ -41,10 +36,10 @@ export default async function LikesPage() {
     <div className="likes-page">
       <header className="likes-header">
         <div className="centered">
-          <h1>Things We Like</h1>
+          <h1>Things we like</h1>
           <p>
-            A curated collection of tools, resources, and products that the
-            #play14 community recommends.
+            A curated collection of tools, resources, and products that the #play14 community
+            recommends.
           </p>
         </div>
       </header>
@@ -55,10 +50,7 @@ export default async function LikesPage() {
             <div className="likes-empty">
               <i className="bx bx-heart" />
               <h2>Coming Soon</h2>
-              <p>
-                We&apos;re building a collection of things we love. Check back
-                soon!
-              </p>
+              <p>We&apos;re building a collection of things we love. Check back soon!</p>
             </div>
           ) : (
             <div className="likes-grid">
@@ -90,15 +82,11 @@ export default async function LikesPage() {
                     <div className="liked-item-info">
                       <h3>{item.name}</h3>
                       {item.description && (
-                        <p className="liked-item-description">
-                          {item.description}
-                        </p>
+                        <p className="liked-item-description">{item.description}</p>
                       )}
                       {item.contributors.length > 0 && (
                         <div className="liked-item-contributors">
-                          <span className="contributors-label">
-                            Recommended by:
-                          </span>
+                          <span className="contributors-label">Recommended by:</span>
                           <div className="contributors-avatars">
                             {item.contributors.map((contributor) => {
                               const avatarUrl = getAvatarUrl(contributor)

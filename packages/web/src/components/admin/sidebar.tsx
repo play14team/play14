@@ -100,7 +100,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
         {
           href: "/admin/likes",
           icon: "bx-heart",
-          label: "Things We Like",
+          label: "Things we like",
           founderOnly: true,
         },
         {
