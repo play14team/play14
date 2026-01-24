@@ -19,7 +19,7 @@ const Loader = (props: { size?: string }) => {
   const color = mounted && resolvedTheme === "dark" ? "#ff6b2c" : "#FF5200"
 
   return (
-    <div className={styles.loader} style={style}>
+    <div className={styles.loader} style={style} role="status" aria-label="Loading">
       <HashLoader color={color} />
     </div>
   )

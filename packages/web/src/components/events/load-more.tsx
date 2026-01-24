@@ -41,9 +41,9 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   const newPagination = { ...pagination, page: pagination.page + 1 }
 
   return (
-    <>
+    <div aria-live="polite">
       <EventGrid events={events} />
       <LoadMore pagination={newPagination} />
-    </>
+    </div>
   )
 }

@@ -85,7 +85,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
               )}
               {!countryName && (
                 <span className="location">
-                  <i className="bx bx-world" /> {event.location?.name}
+                  <i className="bx bx-world" aria-hidden="true" /> {event.location?.name}
                 </span>
               )}
             </li>
@@ -93,7 +93,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
               <span className="location">
                 {isPending ? (
                   <span className="event-status event-status-pending">
-                    <i className="bx bx-time-five" /> Pending
+                    <i className="bx bx-time-five" aria-hidden="true" /> Pending
                   </span>
                 ) : (
                   <EventStatus status={event.eventStatus} />
