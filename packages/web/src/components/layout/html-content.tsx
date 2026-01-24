@@ -16,6 +16,7 @@ const ALLOWED_TAGS = [
   "sub",
   "sup",
   // Headings
+  "h1",
   "h2",
   "h3",
   "h4",

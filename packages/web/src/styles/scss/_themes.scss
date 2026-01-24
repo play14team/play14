@@ -576,6 +576,40 @@ body,
   }
 }
 
+// Mapbox fullscreen dark mode fix
+// When entering fullscreen, the element is detached from [data-theme] context
+// So we need to explicitly style the fullscreen element for dark mode
+html[data-theme="dark"] {
+  .mapboxgl-map:fullscreen,
+  .mapboxgl-map:-webkit-full-screen {
+    .mapboxgl-ctrl-group {
+      background-color: #2a2a2a;
+      border: 1px solid #444444;
+
+      button {
+        background-color: #2a2a2a;
+
+        &:hover {
+          background-color: #3a3a3a;
+        }
+      }
+    }
+
+    .mapboxgl-ctrl-group button + button {
+      border-top-color: #444444;
+    }
+
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+    .mapboxgl-ctrl button.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon,
+    .mapboxgl-ctrl button.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon,
+    .mapboxgl-ctrl button.mapboxgl-ctrl-geolocate .mapboxgl-ctrl-icon,
+    .mapboxgl-ctrl button.mapboxgl-ctrl-fullscreen .mapboxgl-ctrl-icon,
+    .mapboxgl-ctrl button.mapboxgl-ctrl-shrink .mapboxgl-ctrl-icon {
+      filter: invert(1);
+    }
+  }
+}
+
 // ===========================================
 // Game/Services Details Info Dark Mode
 // ===========================================

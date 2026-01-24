@@ -113,11 +113,11 @@ const ICalendar = ({
       <Link
         href="#"
         onClick={handleDownload}
-        className="default-btn btn-gray"
+        className="event-profile-info__action-btn event-profile-info__action-btn--secondary"
         aria-label="Add event to your calendar"
       >
-        <i className="flaticon-calendar" />
-        Add to Calendar
+        <i className="bx bx-calendar" />
+        Add to calendar
       </Link>
     )
   }
