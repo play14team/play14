@@ -84,7 +84,9 @@
       "mcp__playwright__browser_network_requests",
       "mcp__playwright__browser_close",
       "mcp__playwright__browser_resize",
-      "mcp__playwright__browser_take_screenshot"
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_snapshot"
     ]
   },
   "enableAllProjectMcpServers": true,
