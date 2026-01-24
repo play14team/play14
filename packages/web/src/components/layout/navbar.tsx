@@ -1,330 +1,170 @@
 "use client"
 
+import clsx from "clsx"
 import Link from "next/link"
-import React, { useState } from "react"
+import { usePathname } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
+import { MobileMenu, type NavItem } from "../ui/mobile-menu"
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "../ui/navigation-menu"
 import AuthStatusClient from "./auth-status-client"
 import Logo from "./logo"
 import SearchBox from "./searchbox"
 import ThemeToggle from "./theme-toggle"
 
-const Navbar = () => {
-  const [collapsed, setCollapsed] = useState(true)
+const navigationItems: NavItem[] = [
+  {
+    label: "Home",
+    href: "/",
+    items: [
+      { label: "Home", href: "/" },
+      { label: "Power of play", href: "/#power-of-play" },
+      { label: "Upcoming events", href: "/#upcoming-events" },
+      { label: "Statistics", href: "/#statistics" },
+      { label: "World map", href: "/#world-map" },
+      { label: "The experience", href: "/#activities" },
+      { label: "Manifesto & code of conduct", href: "/#manifesto-and-code-of-conduct" },
+      { label: "Testimonials", href: "/#testimonials" },
+      { label: "Gallery", href: "/#gallery" },
+      { label: "Benefits", href: "/#benefits" },
+      { label: "FAQ", href: "/#faq" },
+    ],
+  },
+  {
+    label: "Events",
+    href: "/events",
+    items: [
+      { label: "Events", href: "/events" },
+      { label: "Calendar", href: "/events/calendar" },
+      { label: "Map", href: "/events/map" },
+      { label: "Hosting an event", href: "/events/hosting" },
+    ],
+  },
+  {
+    label: "Community",
+    href: "/community",
+    items: [
+      { label: "Players", href: "/players" },
+      { label: "Games", href: "/games" },
+      { label: "Articles", href: "/articles" },
+      { label: "Testimonials", href: "/events/testimonials" },
+      { label: "Things we like", href: "/likes" },
+    ],
+  },
+  {
+    label: "About",
+    href: "/about",
+    items: [
+      { label: "Our story", href: "/about/story" },
+      { label: "Our values", href: "/about/values" },
+      { label: "Our format", href: "/about/format" },
+    ],
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    items: null,
+  },
+]
 
-  const toggleNavbar = () => {
-    setCollapsed(!collapsed)
-  }
+interface NavLinkProps {
+  href: string
+  children: React.ReactNode
+  className?: string
+}
 
-  React.useEffect(() => {
-    const elementId = document.getElementById("navbar")
-    document.addEventListener("scroll", () => {
-      if (window.scrollY > 170) {
-        if (elementId) {
-          elementId.classList.add("is-sticky")
+function NavLink({ href, children, className }: NavLinkProps) {
+  const pathname = usePathname()
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // Check if this is an anchor link on the current page
+      if (href.startsWith("/#") && pathname === "/") {
+        e.preventDefault()
+        const targetId = href.slice(2) // Remove "/#"
+        const element = document.getElementById(targetId)
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" })
         }
-      } else {
-        if (elementId) {
-          elementId.classList.remove("is-sticky")
-        }
+      } else if (href === "/" && pathname === "/") {
+        e.preventDefault()
+        window.scrollTo({ top: 0, behavior: "smooth" })
       }
-    })
-    window.scrollTo(0, 0)
-  })
-
-  const classOne = collapsed ? "collapse navbar-collapse" : "collapse navbar-collapse show"
-  const classTwo = collapsed
-    ? "navbar-toggler navbar-toggler-right collapsed"
-    : "navbar-toggler navbar-toggler-right"
+    },
+    [href, pathname]
+  )
 
   return (
-    <React.Fragment>
-      <div id="navbar" className="navbar-area">
-        <div className="tarn-nav">
-          <div className="container">
-            <nav className="navbar navbar-expand-lg navbar-light">
-              <Link href="/" onClick={() => setCollapsed(true)} className="navbar-brand">
-                <Logo width={180} height={60} priority />
-              </Link>
-
-              <button
-                onClick={toggleNavbar}
-                className={classTwo}
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent"
-                aria-expanded={!collapsed}
-                aria-label="Toggle navigation"
-              >
-                <span className="icon-bar top-bar" />
-                <span className="icon-bar middle-bar" />
-                <span className="icon-bar bottom-bar" />
-              </button>
-
-              <div className={classOne} id="navbarSupportedContent">
-                <ul className="navbar-nav">
-                  <li className="nav-item">
-                    <Link href="/" className="nav-link">
-                      Home <i className="bx bx-chevron-down" aria-hidden="true" />
-                    </Link>
-
-                    <ul className="dropdown-menu">
-                      <li className="nav-item">
-                        <Link href="/" onClick={() => setCollapsed(true)} className="nav-link">
-                          Home
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#power-of-play"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Power of Play
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#upcoming-events"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Upcoming Events
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#statistics"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Statistics
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#world-map"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          World Map
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#activities"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          The Experience
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#manifesto-and-code-of-conduct"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Manifesto & Code of Conduct
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#testimonials"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Testimonials
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#gallery"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Gallery
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/#benefits"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Benefits
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link href="/#faq" onClick={() => setCollapsed(true)} className="nav-link">
-                          FAQ
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link href="/events" className="nav-link">
-                      Events <i className="bx bx-chevron-down" aria-hidden="true" />
-                    </Link>
-
-                    <ul className="dropdown-menu">
-                      <li className="nav-item">
-                        <Link
-                          href="/events"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Events
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/events/calendar"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Calendar
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/events/map"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Map
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/events/hosting"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Hosting an event
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link href="/events" className="nav-link">
-                      Community <i className="bx bx-chevron-down" aria-hidden="true" />
-                    </Link>
-
-                    <ul className="dropdown-menu">
-                      <li className="nav-item">
-                        <Link
-                          href="/players"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Players
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link href="/games" onClick={() => setCollapsed(true)} className="nav-link">
-                          Games
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/articles"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Articles
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/events/testimonials"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Testimonials
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link href="/likes" onClick={() => setCollapsed(true)} className="nav-link">
-                          Things we like
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link href="/about" className="nav-link" onClick={(e) => e.preventDefault()}>
-                      About <i className="bx bx-chevron-down" aria-hidden="true" />
-                    </Link>
-
-                    <ul className="dropdown-menu">
-                      <li className="nav-item">
-                        <Link
-                          href="/about/story"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Our story
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/about/values"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Our values
-                        </Link>
-                      </li>
-
-                      <li className="nav-item">
-                        <Link
-                          href="/about/format"
-                          onClick={() => setCollapsed(true)}
-                          className="nav-link"
-                        >
-                          Our format
-                        </Link>
-                      </li>
-                    </ul>
-                  </li>
-
-                  <li className="nav-item">
-                    <Link href="/contact" className="nav-link">
-                      Contact
-                    </Link>
-                  </li>
-                </ul>
-
-                <SearchBox />
-                <ThemeToggle />
-                <AuthStatusClient />
-              </div>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </React.Fragment>
+    <Link href={href} className={className} onClick={handleClick}>
+      {children}
+    </Link>
   )
 }
 
-export default Navbar
+export default function Navbar() {
+  const [isSticky, setIsSticky] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 170)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  return (
+    <header id="navbar" className={clsx("navbar-area", isSticky && "is-sticky")}>
+      <div className="tarn-nav">
+        <div className="container">
+          <nav className="ui-navbar">
+            <Link href="/" className="navbar-brand">
+              <Logo width={180} height={60} priority />
+            </Link>
+
+            <NavigationMenu>
+              <NavigationMenuList>
+                {navigationItems.map((item) =>
+                  item.items ? (
+                    <NavigationMenuItem key={item.label}>
+                      <NavigationMenuTrigger>{item.label}</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        {item.items.map((subItem) => (
+                          <NavigationMenuLink key={subItem.href} asChild>
+                            <NavLink href={subItem.href}>{subItem.label}</NavLink>
+                          </NavigationMenuLink>
+                        ))}
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  ) : (
+                    <NavigationMenuItem key={item.label}>
+                      <NavigationMenuLink asChild>
+                        <NavLink href={item.href} className="ui-navigation-menu-link">
+                          {item.label}
+                        </NavLink>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  )
+                )}
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            <div className="ui-navbar-actions">
+              <SearchBox />
+              <ThemeToggle />
+              <AuthStatusClient />
+            </div>
+
+            <MobileMenu items={navigationItems} />
+          </nav>
+        </div>
+      </div>
+    </header>
+  )
+}
