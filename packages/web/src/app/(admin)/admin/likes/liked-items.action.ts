@@ -192,11 +192,7 @@ export async function updateLikedItem(
 export async function deleteLikedItem(
   itemId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const result = await strapiFetch(
-    "/admin/liked-items/:itemId",
-    { itemId },
-    { method: "DELETE" }
-  )
+  const result = await strapiFetch("/admin/liked-items/:itemId", { itemId }, { method: "DELETE" })
 
   if (!result.ok) {
     return {

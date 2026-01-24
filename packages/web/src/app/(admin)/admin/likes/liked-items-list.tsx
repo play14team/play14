@@ -167,9 +167,7 @@ export default function LikedItemsList() {
           <i className="bx bx-heart" />
           <h3>No liked items found</h3>
           <p>
-            {searchQuery
-              ? "Try adjusting your search"
-              : "Add your first liked item to get started"}
+            {searchQuery ? "Try adjusting your search" : "Add your first liked item to get started"}
           </p>
           {searchQuery && (
             <button

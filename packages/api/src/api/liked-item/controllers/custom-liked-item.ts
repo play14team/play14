@@ -3,28 +3,8 @@
  * Allows founders to manage "things we like" showcase items
  */
 
-import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
-import { imageSize } from "image-size"
 import slugify from "slugify"
-
-/**
- * Get image dimensions from a file
- * @param filePath - Path to the image file
- * @returns Object with width and height, or null if unable to read
- */
-function getImageDimensions(filePath: string): { width: number; height: number } | null {
-  try {
-    const buffer = fs.readFileSync(filePath)
-    const dimensions = imageSize(buffer)
-    if (dimensions.width && dimensions.height) {
-      return { width: dimensions.width, height: dimensions.height }
-    }
-    return null
-  } catch {
-    return null
-  }
-}
 
 /**
  * Get or create a folder in the media library by name
@@ -184,17 +164,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
               formats: item.image.formats,
             }
           : null,
-        contributors: item.contributors?.map((c: any) => ({
-          documentId: c.documentId,
-          name: c.name,
-          slug: c.slug,
-          avatar: c.avatar
-            ? {
-                url: c.avatar.url,
-                formats: c.avatar.formats,
-              }
-            : null,
-        })) || [],
+        contributors:
+          item.contributors?.map((c: any) => ({
+            documentId: c.documentId,
+            name: c.name,
+            slug: c.slug,
+            avatar: c.avatar
+              ? {
+                  url: c.avatar.url,
+                  formats: c.avatar.formats,
+                }
+              : null,
+          })) || [],
         contributorsCount: item.contributors?.length || 0,
       }))
 
@@ -257,17 +238,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
                 formats: item.image.formats,
               }
             : null,
-          contributors: item.contributors?.map((c: any) => ({
-            documentId: c.documentId,
-            name: c.name,
-            slug: c.slug,
-            avatar: c.avatar
-              ? {
-                  url: c.avatar.url,
-                  formats: c.avatar.formats,
-                }
-              : null,
-          })) || [],
+          contributors:
+            item.contributors?.map((c: any) => ({
+              documentId: c.documentId,
+              name: c.name,
+              slug: c.slug,
+              avatar: c.avatar
+                ? {
+                    url: c.avatar.url,
+                    formats: c.avatar.formats,
+                  }
+                : null,
+            })) || [],
         },
       })
     } catch (error) {
@@ -406,11 +388,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
                 formats: updatedItem.image.formats,
               }
             : null,
-          contributors: updatedItem.contributors?.map((c: any) => ({
-            documentId: c.documentId,
-            name: c.name,
-            slug: c.slug,
-          })) || [],
+          contributors:
+            updatedItem.contributors?.map((c: any) => ({
+              documentId: c.documentId,
+              name: c.name,
+              slug: c.slug,
+            })) || [],
         },
       })
     } catch (error) {
@@ -659,17 +642,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
               formats: item.image.formats,
             }
           : null,
-        contributors: item.contributors?.map((c: any) => ({
-          documentId: c.documentId,
-          name: c.name,
-          slug: c.slug,
-          avatar: c.avatar
-            ? {
-                url: c.avatar.url,
-                formats: c.avatar.formats,
-              }
-            : null,
-        })) || [],
+        contributors:
+          item.contributors?.map((c: any) => ({
+            documentId: c.documentId,
+            name: c.name,
+            slug: c.slug,
+            avatar: c.avatar
+              ? {
+                  url: c.avatar.url,
+                  formats: c.avatar.formats,
+                }
+              : null,
+          })) || [],
       }))
 
       return ctx.send({
