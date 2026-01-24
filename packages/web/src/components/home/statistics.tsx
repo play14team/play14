@@ -18,7 +18,7 @@ function StatCard({ item }: { item: StatItem }) {
   const content = (
     <div className="single-funfacts-box">
       <div className="icon">
-        <i className={`${item.icon} ${item.color}`} />
+        <i className={`${item.icon} ${item.color}`} aria-hidden="true" />
       </div>
       <h3>
         {formatNumber(item.value)}

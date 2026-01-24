@@ -52,7 +52,7 @@ const Navbar = () => {
                 data-toggle="collapse"
                 data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent"
-                aria-expanded="false"
+                aria-expanded={!collapsed}
                 aria-label="Toggle navigation"
               >
                 <span className="icon-bar top-bar" />
@@ -64,7 +64,7 @@ const Navbar = () => {
                 <ul className="navbar-nav">
                   <li className="nav-item">
                     <Link href="/" className="nav-link">
-                      Home <i className="bx bx-chevron-down" />
+                      Home <i className="bx bx-chevron-down" aria-hidden="true" />
                     </Link>
 
                     <ul className="dropdown-menu">
@@ -174,7 +174,7 @@ const Navbar = () => {
 
                   <li className="nav-item">
                     <Link href="/events" className="nav-link">
-                      Events <i className="bx bx-chevron-down" />
+                      Events <i className="bx bx-chevron-down" aria-hidden="true" />
                     </Link>
 
                     <ul className="dropdown-menu">
@@ -222,7 +222,7 @@ const Navbar = () => {
 
                   <li className="nav-item">
                     <Link href="/events" className="nav-link">
-                      Community <i className="bx bx-chevron-down" />
+                      Community <i className="bx bx-chevron-down" aria-hidden="true" />
                     </Link>
 
                     <ul className="dropdown-menu">
@@ -272,7 +272,7 @@ const Navbar = () => {
 
                   <li className="nav-item">
                     <Link href="/about" className="nav-link" onClick={(e) => e.preventDefault()}>
-                      About <i className="bx bx-chevron-down" />
+                      About <i className="bx bx-chevron-down" aria-hidden="true" />
                     </Link>
 
                     <ul className="dropdown-menu">

@@ -184,18 +184,18 @@ export default function Home() {
             </li>
             <li>
               A fun and energetic time with{" "}
-              <Link href="https://youtu.be/N2quY1ZPF50" target="_blank">
+              <Link href="https://youtu.be/N2quY1ZPF50" target="_blank" rel="noopener">
                 dancing
               </Link>
               ,{" "}
-              <Link href="https://youtu.be/jpLCTQgHhqs" target="_blank">
+              <Link href="https://youtu.be/jpLCTQgHhqs" target="_blank" rel="noopener">
                 singing
               </Link>{" "}
               or being silly together
             </li>
             <li>
               An{" "}
-              <Link href="https://youtu.be/T7HPg2-xowc" target="_blank">
+              <Link href="https://youtu.be/T7HPg2-xowc" target="_blank" rel="noopener">
                 improv theater
               </Link>{" "}
               session where you can work on your confidence and ability to speak publicly

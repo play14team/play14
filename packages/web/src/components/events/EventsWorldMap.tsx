@@ -324,9 +324,13 @@ export default function EventsWorldMap({
         aria-label="World map showing countries with #play14 events"
       >
         {error ? (
-          <div className="error-message">{error}</div>
+          <div className="error-message" role="alert">
+            {error}
+          </div>
         ) : isLoading ? (
-          <div className="loading-message">Loading event locations...</div>
+          <div className="loading-message" role="status" aria-live="polite">
+            Loading event locations...
+          </div>
         ) : (
           <div className="map-wrapper">
             <WorldMap

@@ -132,7 +132,7 @@ export default function Faq() {
                   id={`faq-button-${item.id}`}
                   type="button"
                 >
-                  <i className="bx bx-chevron-down" />
+                  <i className="bx bx-chevron-down" aria-hidden="true" />
                   <span>{item.question}</span>
                 </button>
               </h3>
