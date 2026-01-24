@@ -98,6 +98,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           organizerOnly: true,
         },
         {
+          href: "/admin/likes",
+          icon: "bx-heart",
+          label: "Things We Like",
+          founderOnly: true,
+        },
+        {
           href: "/admin/orders",
           icon: "bx-receipt",
           label: "Orders",
