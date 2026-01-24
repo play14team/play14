@@ -1,4 +1,4 @@
-import EventDetails from "@/components/events/details"
+import EventDetails from "@/components/events/details/index"
 import { getEventSlugs } from "@/components/events/get.action"
 import { getEventBySlug } from "@/components/events/get.cached"
 import Page from "@/components/layout/page"

@@ -6,7 +6,7 @@ import HorizontalRule from "@tiptap/extension-horizontal-rule"
 import Link from "@tiptap/extension-link"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 
 interface SimpleEditorProps {
   content: string
@@ -19,6 +19,9 @@ export default function SimpleEditor({
   onChange,
   placeholder = "Write something...",
 }: SimpleEditorProps) {
+  // Force re-render on selection change to update toolbar button states
+  const [, setSelectionUpdate] = useState(0)
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -54,6 +57,10 @@ export default function SimpleEditor({
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
+    },
+    onSelectionUpdate: () => {
+      // Force re-render to update toolbar button active states
+      setSelectionUpdate((prev) => prev + 1)
     },
   })
 

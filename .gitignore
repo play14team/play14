@@ -110,3 +110,4 @@ coverage
 .github\instructions\codacy.instructions.md
 
 docs/BACKLOG.md
+.playwright-mcp
