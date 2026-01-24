@@ -130,7 +130,6 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      short_sha: ${{ steps.vars.outputs.short_sha }}
       api_url: ${{ steps.get-url.outputs.url }}
     steps:
       - name: Checkout code
@@ -172,10 +171,6 @@ jobs:
       - name: Log in to container registry
         run: az acr login --name play14containerregistry
 
-      - name: Get short commit SHA
-        id: vars
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
       - name: Build and push container image
         env:
           COMMIT_SHA: ${{ github.sha }}
@@ -184,7 +179,6 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:prod
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ env.COMMIT_SHA }}
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:latest
           file: packages/api/Dockerfile
@@ -318,7 +312,6 @@ jobs:
       id-token: write
       contents: read
     outputs:
-      short_sha: ${{ steps.vars.outputs.short_sha }}
       web_url: ${{ steps.get-url.outputs.url }}
     steps:
       - name: Checkout code
@@ -382,10 +375,6 @@ jobs:
       - name: Log in to container registry
         run: az acr login --name play14containerregistry
 
-      - name: Get short commit SHA
-        id: vars
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
       - name: Build and push container image
         env:
           COMMIT_SHA: ${{ github.sha }}
@@ -394,7 +383,6 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:prod
-            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:${{ env.COMMIT_SHA }}
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:latest
           file: packages/web/Dockerfile

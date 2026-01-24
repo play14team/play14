@@ -187,12 +187,14 @@ jobs:
       needs.detect-changes.outputs.api-changed == 'true' &&
       needs.validate.result == 'success'
     environment: acceptance
+    env:
+      COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     permissions:
       id-token: write
       contents: read
       pull-requests: write
     outputs:
-      short_sha: ${{ steps.vars.outputs.short_sha }}
       api_url: ${{ steps.get-url.outputs.url }}
     steps:
       - name: Checkout code
@@ -234,22 +236,15 @@ jobs:
       - name: Log in to container registry
         run: az acr login --name play14containerregistry
 
-      - name: Get short commit SHA
-        id: vars
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
       - name: Build and push container image
         uses: docker/build-push-action@v6
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         with:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:acc
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ env.COMMIT_SHA }}
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}-${{ env.PR_HEAD_SHA }}
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}-${{ env.COMMIT_SHA }}
           file: packages/api/Dockerfile
           context: .
 
@@ -259,7 +254,7 @@ jobs:
           az containerapp update \
             -n "$API_CONTAINER_APP" \
             -g "$RESOURCE_GROUP" \
-            --image "$REGISTRY/$API_IMAGE_NAME:${{ steps.vars.outputs.short_sha }}"
+            --image "$REGISTRY/$API_IMAGE_NAME:$COMMIT_SHA"
 
       - name: Start Container App
         env:
@@ -411,12 +406,14 @@ jobs:
       (needs.api-build-deploy.result == 'success' || needs.api-build-deploy.result == 'skipped') &&
       (needs.api-health-check.result == 'success' || needs.api-health-check.result == 'skipped')
     environment: acceptance
+    env:
+      COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     permissions:
       id-token: write
       contents: read
       pull-requests: write
     outputs:
-      short_sha: ${{ steps.vars.outputs.short_sha }}
       web_url: ${{ steps.get-url.outputs.url }}
     steps:
       - name: Checkout code
@@ -481,22 +478,15 @@ jobs:
       - name: Log in to container registry
         run: az acr login --name play14containerregistry
 
-      - name: Get short commit SHA
-        id: vars
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-
       - name: Build and push container image
         uses: docker/build-push-action@v6
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         with:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:acc
-            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:${{ steps.vars.outputs.short_sha }}
+            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:${{ env.COMMIT_SHA }}
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}
-            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}-${{ env.PR_HEAD_SHA }}
+            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}-${{ env.COMMIT_SHA }}
           file: packages/web/Dockerfile
           context: packages/web
 
@@ -508,7 +498,7 @@ jobs:
           az containerapp update \
             -n "$WEB_CONTAINER_APP" \
             -g "$RESOURCE_GROUP" \
-            --image "$REGISTRY/$WEB_IMAGE_NAME:${{ steps.vars.outputs.short_sha }}" \
+            --image "$REGISTRY/$WEB_IMAGE_NAME:$COMMIT_SHA" \
             --set-env-vars \
               STRAPI_API_URL="$STRAPI_API_URL" \
               STRAPI_API_SECRET=secretref:strapi-api-secret \
@@ -593,8 +583,6 @@ jobs:
       API_URL_FROM_BUILD: ${{ needs.api-build-deploy.outputs.api_url }}
       API_URL_FROM_HEALTH: ${{ needs.api-health-check.outputs.api_url }}
       WEB_URL: ${{ needs.web-build-deploy.outputs.web_url }}
-      SHORT_SHA_API: ${{ needs.api-build-deploy.outputs.short_sha }}
-      SHORT_SHA_WEB: ${{ needs.web-build-deploy.outputs.short_sha }}
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Post deployment summary
