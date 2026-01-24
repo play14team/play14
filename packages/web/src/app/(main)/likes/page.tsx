@@ -57,13 +57,14 @@ export default async function LikesPage() {
               {items.map((item) => {
                 const imageUrl = getImageUrl(item)
                 return (
-                  <a
-                    key={item.documentId}
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="liked-item-card"
-                  >
+                  <div key={item.documentId} className="liked-item-card">
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="liked-item-link"
+                      aria-label={`Visit ${item.name}`}
+                    />
                     <div className="liked-item-image">
                       {imageUrl ? (
                         <Image
@@ -86,7 +87,7 @@ export default async function LikesPage() {
                       )}
                       {item.contributors.length > 0 && (
                         <div className="liked-item-contributors">
-                          <span className="contributors-label">Recommended by:</span>
+                          <span className="contributors-label">Recommended by</span>
                           <div className="contributors-avatars">
                             {item.contributors.map((contributor) => {
                               const avatarUrl = getAvatarUrl(contributor)
@@ -106,7 +107,7 @@ export default async function LikesPage() {
                     <div className="liked-item-external">
                       <i className="bx bx-link-external" />
                     </div>
-                  </a>
+                  </div>
                 )
               })}
             </div>
