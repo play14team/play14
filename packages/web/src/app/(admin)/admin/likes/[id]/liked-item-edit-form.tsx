@@ -6,7 +6,7 @@ import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getPlayers, type PlayerListItem } from "../../players/players.action"
+import { type PlayerListItem, getPlayers } from "../../players/players.action"
 import {
   type ContributorInfo,
   type LikedItemForEdit,
@@ -299,9 +299,7 @@ export default function LikedItemEditForm({ item }: Props) {
     if (!currentImage) return null
     const baseUrl = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"
     const imageUrl =
-      currentImage.formats?.medium?.url ||
-      currentImage.formats?.small?.url ||
-      currentImage.url
+      currentImage.formats?.medium?.url || currentImage.formats?.small?.url || currentImage.url
     return imageUrl.startsWith("http") ? imageUrl : `${baseUrl}${imageUrl}`
   }
 
@@ -652,29 +650,43 @@ export default function LikedItemEditForm({ item }: Props) {
           position: relative;
         }
         .player-search .search-input-wrapper {
+          position: relative;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
         }
-        .player-search .search-input-wrapper i {
+        .player-search .search-input-wrapper > i.bx-search {
+          position: absolute;
+          left: 12px;
+          color: var(--color-text-secondary);
+          pointer-events: none;
+          z-index: 1;
+        }
+        .player-search .search-input-wrapper > i.bx-loader-alt {
+          position: absolute;
+          right: 12px;
           color: var(--color-text-secondary);
         }
         .player-search input {
           flex: 1;
+          padding-left: 36px !important;
+          padding-right: 36px !important;
         }
         .player-results {
           position: absolute;
           top: 100%;
           left: 0;
           right: 0;
-          background: var(--color-bg-primary);
-          border: 1px solid var(--color-border);
+          background: var(--admin-card-bg, #fff);
+          border: 1px solid var(--color-border, #e0e0e0);
           border-radius: 8px;
           margin-top: 4px;
           max-height: 200px;
           overflow-y: auto;
-          z-index: 10;
+          z-index: 100;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        :global([data-theme="dark"]) .player-results {
+          background: var(--admin-card-bg, #1e1e1e);
         }
         .player-result {
           display: flex;
@@ -682,24 +694,32 @@ export default function LikedItemEditForm({ item }: Props) {
           gap: 0.5rem;
           padding: 0.5rem 0.75rem;
           width: 100%;
-          background: none;
+          background: transparent;
           border: none;
           text-align: left;
           cursor: pointer;
           font-size: 0.875rem;
+          color: var(--color-text-primary, #333);
         }
         .player-result:hover {
-          background: var(--color-bg-secondary);
+          background: var(--color-bg-secondary, #f5f5f5);
         }
-        .player-result i {
+        :global([data-theme="dark"]) .player-result {
+          color: var(--color-text-primary, #fff);
+        }
+        :global([data-theme="dark"]) .player-result:hover {
+          background: var(--color-bg-secondary, #2a2a2a);
+        }
+        .player-result i.bx-user {
           width: 28px;
           height: 28px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--color-bg-tertiary);
+          background: var(--color-bg-tertiary, #e0e0e0);
           border-radius: 50%;
           font-size: 1rem;
+          flex-shrink: 0;
         }
         .player-company {
           color: var(--color-text-secondary);

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Image from "next/image"
-import Link from "next/link"
+import ContributorLink from "./contributor-link"
 import { type LikedItemPublic, getPublicLikedItems } from "./get.action"
 import "./likes.scss"
 
@@ -91,26 +91,12 @@ export default async function LikesPage() {
                             {item.contributors.map((contributor) => {
                               const avatarUrl = getAvatarUrl(contributor)
                               return (
-                                <Link
+                                <ContributorLink
                                   key={contributor.documentId}
                                   href={`/players/${contributor.slug}`}
-                                  className="contributor-link"
-                                  title={contributor.name}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  {avatarUrl ? (
-                                    <Image
-                                      src={avatarUrl}
-                                      alt={contributor.name}
-                                      width={32}
-                                      height={32}
-                                    />
-                                  ) : (
-                                    <span className="contributor-initial">
-                                      {contributor.name.charAt(0)}
-                                    </span>
-                                  )}
-                                </Link>
+                                  name={contributor.name}
+                                  avatarUrl={avatarUrl}
+                                />
                               )
                             })}
                           </div>
