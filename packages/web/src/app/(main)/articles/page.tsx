@@ -1,7 +1,6 @@
-import Filters from "@/components/articles/filters"
-import { getArticles } from "@/components/articles/get.action"
-import ArticleGrid from "@/components/articles/grid"
-import LoadMore from "@/components/articles/load-more"
+import ArticlesPageContent from "@/components/articles/articles-page-content"
+import { getArticleFilterOptions } from "@/components/articles/get-filter-options.action"
+import { getAllArticles } from "@/components/articles/get.action"
 import type { Article } from "@/models/strapi"
 import type { Metadata } from "next"
 
@@ -9,36 +8,26 @@ export const metadata: Metadata = {
   title: "Articles",
 }
 
+// Force static generation - filtering happens client-side
+export const dynamic = "force-static"
 export const revalidate = 3600
 
+/**
+ * Articles page with pure client-side filtering
+ *
+ * - Page is statically generated with ALL articles at build time
+ * - Filter options are pre-fetched at build time
+ * - Filtering happens entirely client-side (instant, no loading)
+ * - URL params are used for shareable filter states
+ */
 export default async function Articles() {
-  const response = (await getArticles(1, 18)) as {
-    articles_connection?: {
-      nodes: Article[]
-      pageInfo: {
-        page: number
-        pageSize: number
-        total: number
-        pageCount: number
-      }
-    }
-  }
-  const articles = (response?.articles_connection?.nodes || []) as Article[]
-  const pagination = response?.articles_connection?.pageInfo || {
-    total: 0,
-    page: 1,
-    pageSize: 18,
-    pageCount: 1,
-  }
+  // Fetch ALL articles and filter options in parallel at build time
+  const [filterOptions, articles] = await Promise.all([
+    getArticleFilterOptions(),
+    getAllArticles(), // Fetches all pages (Strapi limits to 100 per page)
+  ])
 
   return (
-    <>
-      <div className="centered pt-5 pb-5">
-        <Filters name="Articles" />
-        <p>Total: {pagination.total}</p>
-      </div>
-      <ArticleGrid articles={articles} />
-      <LoadMore pagination={pagination} />
-    </>
+    <ArticlesPageContent initialArticles={articles as Article[]} filterOptions={filterOptions} />
   )
 }

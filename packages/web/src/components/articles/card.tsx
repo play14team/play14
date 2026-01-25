@@ -21,10 +21,10 @@ const ArticleCard = ({ article }: { article: Article }) => {
                 alt={image.name}
                 width={image.width || 400}
                 height={image.height || 400}
-                blurDataURL={
-                  (image as { blurhash?: string }).blurhash ?? process.env.DEFAULT_BLURHASH
-                }
-                placeholder="blur"
+                {...((image as { blurhash?: string }).blurhash && {
+                  blurDataURL: (image as { blurhash?: string }).blurhash,
+                  placeholder: "blur" as const,
+                })}
                 sizes="100vw"
                 style={{
                   objectFit: "cover",

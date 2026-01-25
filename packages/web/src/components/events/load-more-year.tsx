@@ -2,7 +2,7 @@
 
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Event, Pagination } from "@/models/strapi"
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Loader from "../layout/loader"
 import { getEventsByYear } from "./get.action"
 import EventGrid from "./grid"
@@ -14,8 +14,7 @@ interface LoadMoreYearProps {
 
 export default function LoadMoreYear({ pagination, year }: LoadMoreYearProps) {
   const [events, setEvents] = useState<Event[]>([])
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const isVisible = useIntersection(triggerRef as RefObject<HTMLDivElement>, "800px")
+  const [isVisible, triggerRef] = useIntersection("800px")
   const callback = useCallback(loadMore, [pagination.page, pagination.pageSize, year])
 
   useEffect(() => {
@@ -35,8 +34,7 @@ export default function LoadMoreYear({ pagination, year }: LoadMoreYearProps) {
 
   if (events.length === 0)
     return (
-      <div>
-        <div ref={triggerRef} />
+      <div ref={triggerRef}>
         <Loader />
       </div>
     )

@@ -2,36 +2,45 @@
 
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Article, Pagination } from "@/models/strapi"
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Loader from "../layout/loader"
 import { getArticles } from "./get.action"
 import ArticleGrid from "./grid"
 
-export default function LoadMore({ pagination }: { pagination: Pagination }) {
+interface ArticleFilters {
+  category?: string
+  tag?: string
+}
+
+interface LoadMoreProps {
+  pagination: Pagination
+  filters?: ArticleFilters
+}
+
+export default function LoadMore({ pagination, filters }: LoadMoreProps) {
   const [articles, setArticles] = useState<Article[]>([])
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const isVisible = useIntersection(triggerRef as RefObject<HTMLDivElement>, "800px")
-  const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
+  const [isVisible, triggerRef] = useIntersection("800px")
+
+  const loadMore = useCallback(() => {
+    getArticles(pagination.page + 1, pagination.pageSize, filters?.category, filters?.tag).then(
+      (res) => {
+        const articles = (res.articles_connection?.nodes || []) as Article[]
+        setArticles(articles)
+      }
+    )
+  }, [pagination.page, pagination.pageSize, filters])
 
   useEffect(() => {
     if (isVisible) {
-      callback()
+      loadMore()
     }
-  }, [callback, isVisible])
+  }, [loadMore, isVisible])
 
-  function loadMore() {
-    getArticles(pagination.page + 1, pagination.pageSize).then((res) => {
-      const articles = (res.articles_connection?.nodes || []) as Article[]
-      setArticles(articles)
-    })
-  }
-
-  if (pagination.page === pagination.pageCount) return
+  if (pagination.page === pagination.pageCount) return null
 
   if (articles.length === 0)
     return (
-      <div>
-        <div ref={triggerRef} />
+      <div ref={triggerRef}>
         <Loader />
       </div>
     )
@@ -41,7 +50,7 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   return (
     <>
       <ArticleGrid articles={articles} />
-      <LoadMore pagination={newPagination} />
+      <LoadMore pagination={newPagination} filters={filters} />
     </>
   )
 }

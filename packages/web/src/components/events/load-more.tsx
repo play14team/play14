@@ -2,38 +2,53 @@
 
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Event, Pagination } from "@/models/strapi"
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Loader from "../layout/loader"
 import { getEvents } from "./get.action"
 import EventGrid from "./grid"
 
-export default function LoadMore({ pagination }: { pagination: Pagination }) {
+interface EventFilters {
+  status?: string | string[]
+  location?: string | string[]
+  country?: string | string[]
+  year?: number
+}
+
+interface LoadMoreProps {
+  pagination: Pagination
+  filters?: EventFilters
+}
+
+export default function LoadMore({ pagination, filters }: LoadMoreProps) {
   const [events, setEvents] = useState<Event[]>([])
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const isVisible = useIntersection(triggerRef as RefObject<HTMLDivElement>, "800px")
-  const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
+  const [isVisible, triggerRef] = useIntersection("800px")
+
+  const loadMore = useCallback(() => {
+    getEvents(
+      pagination.page + 1,
+      pagination.pageSize,
+      filters?.status,
+      filters?.location,
+      filters?.country,
+      filters?.year
+    ).then((res) => {
+      // In Strapi 5, events_connection returns nodes
+      const events = (res.events_connection?.nodes || []) as Event[]
+      setEvents(events)
+    })
+  }, [pagination.page, pagination.pageSize, filters])
 
   useEffect(() => {
     if (isVisible) {
-      callback()
+      loadMore()
     }
-  }, [callback, isVisible])
+  }, [loadMore, isVisible])
 
-  function loadMore() {
-    getEvents(pagination.page + 1, pagination.pageSize).then((res) => {
-      // In Strapi 5, events_connection returns nodes
-      const events = (res.events_connection?.nodes || []) as Event[]
-      console.log(events)
-      setEvents(events)
-    })
-  }
-
-  if (pagination.page === pagination.pageCount) return
+  if (pagination.page === pagination.pageCount) return null
 
   if (events.length === 0)
     return (
-      <div>
-        <div ref={triggerRef} />
+      <div ref={triggerRef}>
         <Loader />
       </div>
     )
@@ -43,7 +58,7 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   return (
     <div aria-live="polite">
       <EventGrid events={events} />
-      <LoadMore pagination={newPagination} />
+      <LoadMore pagination={newPagination} filters={filters} />
     </div>
   )
 }

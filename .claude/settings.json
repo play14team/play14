@@ -101,6 +101,25 @@
             "command": "node .claude/biome-hook.mjs"
           }
         ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/play-sound.sh question"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/play-sound.sh done"
+          }
+        ]
       }
     ]
   },
