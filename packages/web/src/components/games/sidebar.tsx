@@ -1,18 +1,7 @@
 import type { Game } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
-import Avatar from "../ui/avatar"
-
-// Rating stars component
-function RatingStars({ value, max = 5 }: { value: number; max?: number }) {
-  return (
-    <div className="rating-stars" aria-label={`${value} out of ${max} stars`}>
-      {Array.from({ length: max }, (_, i) => (
-        <i key={i} className={`fa fa-star ${i < value ? "active" : ""}`} aria-hidden="true" />
-      ))}
-    </div>
-  )
-}
+import Ratings from "../layout/ratings"
 
 // Get file type icon based on extension
 function getFileIcon(ext?: string | null): string {
@@ -37,213 +26,166 @@ function getFileIcon(ext?: string | null): string {
 
 export default function GameSidebar({ game }: { game: Game }) {
   const hasRatings = game.ratings?.energy || game.ratings?.connection || game.ratings?.silliness
-  const hasContributors =
-    (game.proposedBy && game.proposedBy.length > 0) ||
-    (game.documentedBy && game.documentedBy.length > 0)
-  const hasResources = game.resources && game.resources.length > 0
 
   return (
-    <aside className="game-details-sidebar" aria-label="Game information">
-      {/* Game info card */}
-      <div className="game-details-sidebar-card">
-        <h2 className="game-details-sidebar-title">Game info</h2>
-        <ul className="game-details-info-list">
+    <aside className="services-details-info" style={{ marginTop: "15px" }}>
+      {/* Main info section - using same pattern as player sidebar */}
+      <div className="services-contact-info" style={{ borderRadius: "10px" }}>
+        <ul>
           {/* Timebox */}
-          <li className="game-details-info-item">
+          <li>
             <div className="icon">
               <i className="bx bx-time" aria-hidden="true" />
             </div>
-            <div className="content">
-              <span className="label">Duration</span>
-              <span className="value">{game.timebox || "Not specified"}</span>
-            </div>
+            <span>Duration</span>
+            {game.timebox || "Not specified"}
           </li>
 
           {/* Scale */}
-          <li className="game-details-info-item">
+          <li>
             <div className="icon">
               <i className="bx bx-group" aria-hidden="true" />
             </div>
-            <div className="content">
-              <span className="label">Group size</span>
-              <span className="value">{game.scale || "Any"}</span>
-            </div>
+            <span>Group size</span>
+            {game.scale || "Any"}
           </li>
+
+          {/* Ratings */}
+          {hasRatings && (
+            <li>
+              <div className="icon">
+                <i className="bx bx-star" aria-hidden="true" />
+              </div>
+              <span>Ratings</span>
+              {game.ratings?.energy !== undefined && (
+                <Ratings name="Energy" value={game.ratings.energy} />
+              )}
+              {game.ratings?.connection !== undefined && (
+                <Ratings name="Connection" value={game.ratings.connection} />
+              )}
+              {game.ratings?.silliness !== undefined && (
+                <Ratings name="Silliness" value={game.ratings.silliness} />
+              )}
+            </li>
+          )}
 
           {/* First played at */}
           {game.firstPlayedAt && (
-            <li className="game-details-info-item">
+            <li>
               <div className="icon">
-                <i className="bx bx-calendar-event" aria-hidden="true" />
+                <i className="bx bx-map" aria-hidden="true" />
               </div>
-              <div className="content">
-                <span className="label">First played at</span>
-                <span className="value">
-                  <Link href={`/events/${game.firstPlayedAt.slug}`}>{game.firstPlayedAt.name}</Link>
-                </span>
-              </div>
+              <span>First played</span>
+              <Link href={`/events/${game.firstPlayedAt.slug}`}>{game.firstPlayedAt.name}</Link>
             </li>
           )}
 
           {/* Credits */}
           {game.credits && (
-            <li className="game-details-info-item">
+            <li>
               <div className="icon">
                 <i className="bx bx-award" aria-hidden="true" />
               </div>
-              <div className="content">
-                <span className="label">Credits</span>
-                <span className="value">{game.credits}</span>
-              </div>
+              <span>Credits</span>
+              {game.credits}
             </li>
           )}
-        </ul>
-
-        {/* Ratings */}
-        {hasRatings && (
-          <div className="game-details-ratings">
-            <h3 className="game-details-sidebar-title" style={{ marginTop: "16px" }}>
-              Ratings
-            </h3>
-            {game.ratings?.energy !== undefined && (
-              <div className="game-details-rating">
-                <span>Energy</span>
-                <RatingStars value={game.ratings.energy} />
-              </div>
-            )}
-            {game.ratings?.connection !== undefined && (
-              <div className="game-details-rating">
-                <span>Connection</span>
-                <RatingStars value={game.ratings.connection} />
-              </div>
-            )}
-            {game.ratings?.silliness !== undefined && (
-              <div className="game-details-rating">
-                <span>Silliness</span>
-                <RatingStars value={game.ratings.silliness} />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Contributors card */}
-      {hasContributors && (
-        <div className="game-details-sidebar-card">
-          <h2 className="game-details-sidebar-title">Contributors</h2>
 
           {/* Proposed by */}
           {game.proposedBy && game.proposedBy.length > 0 && (
-            <>
-              <span
-                className="label"
-                style={{
-                  display: "block",
-                  marginBottom: "12px",
-                  fontSize: "12px",
-                  color: "var(--color-text-muted)",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                Proposed by
-              </span>
-              <div className="game-details-contributors">
-                {game.proposedBy.map((player) => (
-                  <Link
-                    key={player.slug}
-                    href={`/players/${player.slug}`}
-                    className="game-details-contributor"
-                  >
-                    {player.avatar?.url ? (
-                      <Image
-                        src={player.avatar.url}
-                        alt={player.name || "Player avatar"}
-                        width={48}
-                        height={48}
-                        className="avatar"
-                        unoptimized
-                      />
-                    ) : (
-                      <Avatar fallback={player.name || ""} size="lg" />
-                    )}
-                    <span className="name">{player.name}</span>
-                  </Link>
-                ))}
+            <li>
+              <div className="icon">
+                <i className="bx bx-bulb" aria-hidden="true" />
               </div>
-            </>
+              <span>Proposed by</span>
+              {game.proposedBy.map((player) => (
+                <Link
+                  key={player.slug}
+                  href={`/players/${player.slug}`}
+                  className="centered pt-3"
+                  style={{ display: "block" }}
+                >
+                  {player.avatar?.url && (
+                    <Image
+                      src={player.avatar.url}
+                      alt={player.avatar.name || player.name || "Player avatar"}
+                      width={200}
+                      height={200}
+                      priority
+                      unoptimized
+                      style={{
+                        borderRadius: "10px",
+                        width: "100%",
+                        height: "auto",
+                        maxWidth: "200px",
+                      }}
+                    />
+                  )}
+                  <h5 className="centered pt-2">{player.name}</h5>
+                </Link>
+              ))}
+            </li>
           )}
 
           {/* Documented by */}
           {game.documentedBy && game.documentedBy.length > 0 && (
-            <>
-              <span
-                className="label"
-                style={{
-                  display: "block",
-                  marginBottom: "12px",
-                  marginTop: "16px",
-                  fontSize: "12px",
-                  color: "var(--color-text-muted)",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                Documented by
-              </span>
-              <div className="game-details-contributors">
-                {game.documentedBy.map((player) => (
-                  <Link
-                    key={player.slug}
-                    href={`/players/${player.slug}`}
-                    className="game-details-contributor"
-                  >
-                    {player.avatar?.url ? (
-                      <Image
-                        src={player.avatar.url}
-                        alt={player.name || "Player avatar"}
-                        width={48}
-                        height={48}
-                        className="avatar"
-                        unoptimized
-                      />
-                    ) : (
-                      <Avatar fallback={player.name || ""} size="lg" />
-                    )}
-                    <span className="name">{player.name}</span>
-                  </Link>
-                ))}
+            <li>
+              <div className="icon">
+                <i className="bx bx-edit" aria-hidden="true" />
               </div>
-            </>
+              <span>Documented by</span>
+              {game.documentedBy.map((player) => (
+                <Link
+                  key={player.slug}
+                  href={`/players/${player.slug}`}
+                  className="centered pt-3"
+                  style={{ display: "block" }}
+                >
+                  {player.avatar?.url && (
+                    <Image
+                      src={player.avatar.url}
+                      alt={player.avatar.name || player.name || "Player avatar"}
+                      width={200}
+                      height={200}
+                      priority
+                      unoptimized
+                      style={{
+                        borderRadius: "10px",
+                        width: "100%",
+                        height: "auto",
+                        maxWidth: "200px",
+                      }}
+                    />
+                  )}
+                  <h5 className="centered pt-2">{player.name}</h5>
+                </Link>
+              ))}
+            </li>
           )}
-        </div>
-      )}
+        </ul>
+      </div>
 
-      {/* Resources card */}
-      {hasResources && (
-        <div className="game-details-sidebar-card">
-          <h2 className="game-details-sidebar-title">Resources</h2>
-          <div className="game-details-resources">
-            {game.resources?.map((r) => {
+      {/* Resources section - using same pattern as original */}
+      {game.resources && game.resources.length > 0 && (
+        <div className="download-file">
+          <h3>Resources</h3>
+          <ul>
+            {game.resources.map((r) => {
               if (!r) return null
               return (
-                <a
-                  key={r.id}
-                  href={r.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="game-details-resource"
-                  aria-label={`Download ${r.name}`}
-                >
-                  <i className={getFileIcon(r.ext)} aria-hidden="true" />
-                  <span className="name">{r.name}</span>
-                  <i className="bx bx-download download-icon" aria-hidden="true" />
-                </a>
+                <li key={r.id}>
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Download ${r.name}`}
+                  >
+                    {r.name} <i className={getFileIcon(r.ext)} aria-hidden="true" />
+                  </a>
+                </li>
               )
             })}
-          </div>
+          </ul>
         </div>
       )}
     </aside>

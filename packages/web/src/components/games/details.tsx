@@ -3,7 +3,6 @@ import type { Game, UploadFile } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import Separator from "../ui/separator"
 import GamesNavigator from "./nav"
 import GameSidebar from "./sidebar"
 import GameTabs from "./tabs"
@@ -13,82 +12,94 @@ export default function GameDetails({ game }: { game: Game }) {
   const hasTags = game.tags && game.tags.length > 0
 
   return (
-    <article className="game-details" aria-labelledby="game-title">
+    <div className="services-details-area pb-100">
       <GamesNavigator current={game.slug} />
-
       <div className="container">
-        {/* Hero image */}
-        {image?.url && (
-          <div className="game-details-hero">
-            <Image
-              src={image.url}
-              alt={image.name || game.name || "Game image"}
-              fill
-              priority
-              className="game-details-hero-image"
-              sizes="100vw"
-              unoptimized
-            />
-          </div>
-        )}
+        {/* Two-column layout like player/event pages */}
+        <div className="row">
+          {/* Main content column */}
+          <div className="col-lg-8 col-md-12">
+            <div className="services-details-desc">
+              {/* Hero image */}
+              {image?.url && (
+                <div className="game-details-hero">
+                  <Image
+                    src={image.url}
+                    alt={image.name || game.name || "Game image"}
+                    fill
+                    priority
+                    className="game-details-hero-image"
+                    sizes="(max-width: 768px) 100vw, 66vw"
+                    unoptimized
+                  />
+                </div>
+              )}
 
-        {/* Header section */}
-        <header className="game-details-header">
-          <h1 id="game-title">{game.name}</h1>
+              {/* Meta information */}
+              <div className="blog-details-desc">
+                <div className="article-content">
+                  <div className="entry-meta">
+                    <ul>
+                      {game.category && (
+                        <li>
+                          <i className="bx bx-folder-open" aria-hidden="true" />
+                          <span>Category</span>
+                          <Link href={`/games/categories/${game.category.toLowerCase()}`}>
+                            {camelPad(game.category)}
+                          </Link>
+                        </li>
+                      )}
+                      {game.publishedAt && (
+                        <li>
+                          <i className="bx bx-calendar" aria-hidden="true" />
+                          <span>Published</span>
+                          <time dateTime={game.publishedAt}>
+                            {format(parseISO(game.publishedAt), "MMM do, yyyy")}
+                          </time>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
 
-          {/* Meta information */}
-          <div className="game-details-meta" role="list" aria-label="Game metadata">
-            {game.category && (
-              <div className="game-details-meta-item" role="listitem">
-                <i className="bx bx-folder-open" aria-hidden="true" />
-                <Link href={`/games/categories/${game.category.toLowerCase()}`}>
-                  {camelPad(game.category)}
-                </Link>
+                {/* Tags */}
+                {hasTags && (
+                  <div className="article-footer">
+                    {game.tags?.map((tag) => (
+                      <div key={tag?.id} className="article-tags">
+                        <span>
+                          <i className="bx bx-purchase-tag" aria-hidden="true" />
+                        </span>
+                        <Link href={`/games/tags/${tag?.value}`}>{tag?.value}</Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Summary */}
+                {game.summary && (
+                  <div className="article-footer">
+                    <div className="content">
+                      <h2>Summary</h2>
+                      <p>{game.summary}</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-            {game.publishedAt && (
-              <div className="game-details-meta-item" role="listitem">
-                <i className="bx bx-calendar" aria-hidden="true" />
-                <time dateTime={game.publishedAt}>
-                  {format(parseISO(game.publishedAt), "MMM do, yyyy")}
-                </time>
-              </div>
-            )}
+            </div>
+
+            {/* Tabs section - using same wrapper as player/event pages */}
+            <div className="courses-details-desc">
+              <GameTabs game={game} />
+            </div>
           </div>
 
-          {/* Tags */}
-          {hasTags && (
-            <nav className="game-details-tags" aria-label="Game tags">
-              {game.tags?.map((tag) => (
-                <Link key={tag?.id} href={`/games/tags/${tag?.value}`} className="game-details-tag">
-                  <i className="bx bx-purchase-tag" aria-hidden="true" />
-                  {tag?.value}
-                </Link>
-              ))}
-            </nav>
-          )}
-        </header>
-
-        {/* Main content area */}
-        <div className="game-details-content">
-          {/* Left column - Main content */}
-          <main className="game-details-main">
-            {/* Summary */}
-            {game.summary && (
-              <>
-                <p className="game-details-summary">{game.summary}</p>
-                <Separator />
-              </>
-            )}
-
-            {/* Tabbed content */}
-            <GameTabs game={game} />
-          </main>
-
-          {/* Right column - Sidebar */}
-          <GameSidebar game={game} />
+          {/* Sidebar column */}
+          <div className="col-lg-4 col-md-12">
+            <GameSidebar game={game} />
+          </div>
         </div>
       </div>
-    </article>
+    </div>
   )
 }

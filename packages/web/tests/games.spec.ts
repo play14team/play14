@@ -190,13 +190,9 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify main content area
-      const main = page.locator("main.game-details-main")
-      await expect(main).toBeVisible()
-
-      // Verify game title
-      const title = page.locator("h1#game-title")
-      await expect(title).toBeVisible()
+      // Verify main content area (using same pattern as other detail pages)
+      const mainContent = page.locator(".services-details-desc")
+      await expect(mainContent).toBeVisible()
     }
   })
 
@@ -208,9 +204,9 @@ test.describe("Game Details Page", () => {
     if (clicked) {
       await verifyPageLayout(page)
 
-      // Verify article structure
-      const article = page.locator("article.game-details")
-      await expect(article).toBeVisible()
+      // Verify page uses services-details-area (consistent with other pages)
+      const detailsArea = page.locator(".services-details-area")
+      await expect(detailsArea).toBeVisible()
     }
   })
 
@@ -220,13 +216,9 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify sidebar exists
-      const sidebar = page.locator("aside.game-details-sidebar")
+      // Verify sidebar exists (using services-details-info pattern)
+      const sidebar = page.locator(".services-details-info")
       await expect(sidebar).toBeVisible()
-
-      // Verify sidebar has info cards
-      const sidebarCard = page.locator(".game-details-sidebar-card").first()
-      await expect(sidebarCard).toBeVisible()
     }
   })
 
@@ -236,7 +228,7 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify tabs component
+      // Verify Radix UI tabs component
       const tabsList = page.locator(".ui-tabs-list")
       await expect(tabsList).toBeVisible()
 
@@ -249,7 +241,7 @@ test.describe("Game Details Page", () => {
     }
   })
 
-  test("should display hero image", async ({ page }) => {
+  test("should display hero image when available", async ({ page }) => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
@@ -265,15 +257,15 @@ test.describe("Game Details Page", () => {
     }
   })
 
-  test("should have responsive grid layout", async ({ page }) => {
+  test("should use Bootstrap grid layout", async ({ page }) => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify grid layout container
-      const content = page.locator(".game-details-content")
-      await expect(content).toBeVisible()
+      // Verify Bootstrap row/column structure
+      const row = page.locator(".services-details-area .row")
+      await expect(row).toBeVisible()
     }
   })
 })
