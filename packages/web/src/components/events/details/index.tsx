@@ -18,9 +18,15 @@ import EventProfileTabs from "./event-profile-tabs"
 import EventRegistration from "./event-registration"
 
 export default async function EventDetails({ event }: { event: Event }) {
-  const defaultImage = event.defaultImage as UploadFile
-  const eventLocation = event.location as EventLocation
-  const venue = event.venue as Venue
+  const defaultImage =
+    event.defaultImage && typeof event.defaultImage === "object"
+      ? (event.defaultImage as UploadFile)
+      : undefined
+  const eventLocation =
+    event.location && typeof event.location === "object"
+      ? (event.location as EventLocation)
+      : undefined
+  const venue = event.venue && typeof event.venue === "object" ? (event.venue as Venue) : undefined
   const country = eventLocation?.country
     ? clm.getCountryNameByAlpha2(eventLocation.country)
     : undefined

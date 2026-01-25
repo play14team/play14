@@ -40,7 +40,8 @@ function mapSocialIcon(type: string): string {
 }
 
 export default function PlayerDetails({ player }: { player: Player }) {
-  const avatar = player.avatar as UploadFile
+  const avatar =
+    player.avatar && typeof player.avatar === "object" ? (player.avatar as UploadFile) : undefined
   const locationName = getLocationName(player.location)
   const hasGeoLocation = isGeoLocation(player.location)
   const socialNetworks = player.socialNetworks || []

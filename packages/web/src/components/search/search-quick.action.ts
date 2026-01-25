@@ -8,65 +8,7 @@ import {
   searchGamePopulate,
   searchPlayerPopulate,
 } from "@/libs/strapi-populate"
-
-interface UploadFile {
-  name: string
-  url: string
-  width?: number
-  height?: number
-}
-
-interface Event {
-  documentId: string
-  slug: string
-  name: string
-  start: string
-  end: string
-  timezone?: string
-  eventStatus: string
-  defaultImage?: UploadFile
-  location?: {
-    name: string
-    country: string
-  }
-}
-
-interface Article {
-  documentId: string
-  slug: string
-  title: string
-  category?: string
-  summary?: string
-  publishedAt?: string
-  defaultImage?: UploadFile
-  author?: {
-    name: string
-    slug: string
-    avatar?: UploadFile
-  }
-}
-
-interface Game {
-  documentId: string
-  slug: string
-  name: string
-  category?: string
-  summary?: string
-  defaultImage?: UploadFile
-  proposedBy?: Array<{
-    name: string
-    slug: string
-    avatar?: UploadFile
-  }>
-}
-
-interface Player {
-  documentId: string
-  slug: string
-  name: string
-  position?: string
-  avatar?: UploadFile
-}
+import type { Article, Event, Game, Player } from "@/models/strapi"
 
 const QUICK_SEARCH_LIMIT = 10
 const SEARCH_INDEX_LIMIT = 500
@@ -104,7 +46,7 @@ export async function fetchSearchIndex(): Promise<QuickSearchResults> {
     events: (eventsRes.data || []).map(
       (e): QuickSearchItem => ({
         type: "event",
-        documentId: e.documentId,
+        documentId: e.documentId ?? e.slug,
         slug: e.slug,
         name: e.name,
         subtitle: e.location?.name,
@@ -115,7 +57,7 @@ export async function fetchSearchIndex(): Promise<QuickSearchResults> {
     articles: (articlesRes.data || []).map(
       (a): QuickSearchItem => ({
         type: "article",
-        documentId: a.documentId,
+        documentId: a.documentId ?? a.slug,
         slug: a.slug,
         name: a.title,
         subtitle: a.author?.name,
@@ -126,7 +68,7 @@ export async function fetchSearchIndex(): Promise<QuickSearchResults> {
     games: (gamesRes.data || []).map(
       (g): QuickSearchItem => ({
         type: "game",
-        documentId: g.documentId,
+        documentId: g.documentId ?? g.slug,
         slug: g.slug,
         name: g.name,
         subtitle: g.category,
@@ -137,7 +79,7 @@ export async function fetchSearchIndex(): Promise<QuickSearchResults> {
     players: (playersRes.data || []).map(
       (p): QuickSearchItem => ({
         type: "player",
-        documentId: p.documentId,
+        documentId: p.documentId ?? p.slug,
         slug: p.slug,
         name: p.name,
         subtitle: p.position,
@@ -205,7 +147,7 @@ export async function searchQuick(input: string): Promise<QuickSearchResults> {
     events: (eventsRes.data || []).map(
       (e): QuickSearchItem => ({
         type: "event",
-        documentId: e.documentId,
+        documentId: e.documentId ?? e.slug,
         slug: e.slug,
         name: e.name,
         subtitle: e.location?.name,
@@ -216,7 +158,7 @@ export async function searchQuick(input: string): Promise<QuickSearchResults> {
     articles: (articlesRes.data || []).map(
       (a): QuickSearchItem => ({
         type: "article",
-        documentId: a.documentId,
+        documentId: a.documentId ?? a.slug,
         slug: a.slug,
         name: a.title,
         subtitle: a.author?.name,
@@ -227,7 +169,7 @@ export async function searchQuick(input: string): Promise<QuickSearchResults> {
     games: (gamesRes.data || []).map(
       (g): QuickSearchItem => ({
         type: "game",
-        documentId: g.documentId,
+        documentId: g.documentId ?? g.slug,
         slug: g.slug,
         name: g.name,
         subtitle: g.category,
@@ -238,7 +180,7 @@ export async function searchQuick(input: string): Promise<QuickSearchResults> {
     players: (playersRes.data || []).map(
       (p): QuickSearchItem => ({
         type: "player",
-        documentId: p.documentId,
+        documentId: p.documentId ?? p.slug,
         slug: p.slug,
         name: p.name,
         subtitle: p.position,
