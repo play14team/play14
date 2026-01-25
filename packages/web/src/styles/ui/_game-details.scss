@@ -1,23 +1,484 @@
 // ===========================================
-// Game Details Page - Additional Styles
-// Uses existing services-details-* classes for consistency
-// Only includes new components specific to games
+// Game Profile Page Styles
+// Follows the same BEM pattern as player-profile and event-profile
 // ===========================================
 
-// Hero image section
-.game-details-hero {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 25px;
+.game-profile {
+  padding: 0 0 70px;
+}
+
+// ===========================================
+// Hero Section
+// ===========================================
+
+.game-profile-hero {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 40px;
 
   @media (max-width: 767px) {
-    height: 200px;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__image-container {
+    position: relative;
+    flex-shrink: 0;
+    width: 400px;
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: var(--color-bg-elevated);
+
+    @media (max-width: 991px) {
+      width: 300px;
+      height: 225px;
+    }
+
+    @media (max-width: 767px) {
+      width: 100%;
+      height: 200px;
+    }
+  }
+
+  &__image {
+    object-fit: cover;
   }
 }
 
-.game-details-hero-image {
-  object-fit: cover;
+// ===========================================
+// Info Section (in hero)
+// ===========================================
+
+.game-profile-info {
+  flex: 1;
+  min-width: 0;
+
+  &__name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 16px;
+    line-height: 1.2;
+
+    @media (max-width: 767px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  &__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    i {
+      font-size: 16px;
+      color: var(--color-orange);
+    }
+
+    &:hover {
+      color: var(--color-orange);
+    }
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  &__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    i {
+      font-size: 14px;
+      color: var(--color-orange);
+    }
+
+    &:hover {
+      background-color: var(--color-orange);
+      border-color: var(--color-orange);
+      color: white;
+
+      i {
+        color: white;
+      }
+    }
+  }
+
+  &__summary {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+}
+
+// ===========================================
+// Content Section (tabs + sidebar)
+// ===========================================
+
+.game-profile-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 40px;
+
+  @media (max-width: 991px) {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+.game-profile-main {
+  min-width: 0;
+}
+
+// ===========================================
+// Sidebar
+// ===========================================
+
+.game-profile-sidebar {
+  @media (max-width: 991px) {
+    order: -1;
+  }
+
+  &__card {
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    > i {
+      font-size: 18px;
+      color: var(--color-orange);
+      width: 24px;
+      text-align: center;
+    }
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    flex: 1;
+    font-size: 14px;
+    color: var(--color-text);
+    text-align: right;
+
+    &--link {
+      color: var(--color-orange);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  // Ratings section
+  &__ratings {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  // Contributors section
+  &__contributors {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__contributor-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  &__contributor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background-color: var(--color-bg);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      background-color: var(--color-surface-hover);
+    }
+  }
+
+  &__contributor-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  &__contributor-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  // Resources section
+  &__resources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__resource {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      background-color: var(--color-surface-hover);
+      border-color: var(--color-orange);
+    }
+
+    > i:first-child {
+      font-size: 24px;
+      color: var(--color-orange);
+    }
+
+    > span {
+      flex: 1;
+      font-size: 14px;
+      color: var(--color-text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    > i:last-child {
+      font-size: 18px;
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+// ===========================================
+// Tab Content Styles
+// ===========================================
+
+// Description section (in tabs)
+.game-details-description {
+  h2,
+  h3,
+  h4 {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    color: var(--color-text);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  p {
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+
+  ul,
+  ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+
+  a {
+    color: var(--color-orange);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Empty state
+.game-details-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-muted);
+
+  i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 15px;
+  }
+}
+
+// Info cards (materials, preparation, safety)
+.game-details-info-card {
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    position: relative;
+    padding: 10px 0 10px 24px;
+    color: var(--color-text);
+    line-height: 1.5;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 16px;
+      width: 8px;
+      height: 8px;
+      background-color: var(--color-orange);
+      border-radius: 50%;
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+}
+
+// Section titles in info cards
+.game-details-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  i {
+    color: var(--color-orange);
+    font-size: 20px;
+  }
+}
+
+// Safety card with warning styling
+.game-details-safety-card {
+  background-color: rgba(255, 201, 0, 0.1);
+  border-color: var(--color-yellow);
+
+  .game-details-section-title {
+    color: var(--color-yellow);
+
+    i {
+      color: var(--color-yellow);
+    }
+  }
+
+  li::before {
+    background-color: var(--color-yellow);
+  }
+}
+
+// Dark mode safety card
+[data-theme="dark"] .game-details-safety-card {
+  background-color: rgba(255, 201, 0, 0.05);
 }

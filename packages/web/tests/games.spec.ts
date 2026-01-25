@@ -190,9 +190,13 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify main content area (using same pattern as other detail pages)
-      const mainContent = page.locator(".services-details-desc")
-      await expect(mainContent).toBeVisible()
+      // Verify game profile page structure
+      const gameProfile = page.locator(".game-profile")
+      await expect(gameProfile).toBeVisible()
+
+      // Verify game name is displayed
+      const gameName = page.locator(".game-profile-info__name")
+      await expect(gameName).toBeVisible()
     }
   })
 
@@ -204,9 +208,9 @@ test.describe("Game Details Page", () => {
     if (clicked) {
       await verifyPageLayout(page)
 
-      // Verify page uses services-details-area (consistent with other pages)
-      const detailsArea = page.locator(".services-details-area")
-      await expect(detailsArea).toBeVisible()
+      // Verify game profile uses BEM pattern like player/event pages
+      const gameProfile = page.locator(".game-profile")
+      await expect(gameProfile).toBeVisible()
     }
   })
 
@@ -216,9 +220,13 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify sidebar exists (using services-details-info pattern)
-      const sidebar = page.locator(".services-details-info")
+      // Verify sidebar exists with modern BEM naming
+      const sidebar = page.locator(".game-profile-sidebar")
       await expect(sidebar).toBeVisible()
+
+      // Verify sidebar has cards
+      const sidebarCard = page.locator(".game-profile-sidebar__card").first()
+      await expect(sidebarCard).toBeVisible()
     }
   })
 
@@ -241,31 +249,31 @@ test.describe("Game Details Page", () => {
     }
   })
 
-  test("should display hero image when available", async ({ page }) => {
+  test("should display hero section", async ({ page }) => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Hero image section should be visible (if game has image)
-      const hero = page.locator(".game-details-hero")
-      // Hero might not exist if game has no image, so just check it doesn't break
-      const heroExists = (await hero.count()) > 0
-      if (heroExists) {
-        await expect(hero).toBeVisible()
-      }
+      // Verify hero section exists
+      const hero = page.locator(".game-profile-hero")
+      await expect(hero).toBeVisible()
+
+      // Verify game info section in hero
+      const gameInfo = page.locator(".game-profile-info")
+      await expect(gameInfo).toBeVisible()
     }
   })
 
-  test("should use Bootstrap grid layout", async ({ page }) => {
+  test("should use CSS Grid layout for content", async ({ page }) => {
     await page.goto("/games")
     await waitForPageLoad(page)
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      // Verify Bootstrap row/column structure
-      const row = page.locator(".services-details-area .row")
-      await expect(row).toBeVisible()
+      // Verify CSS Grid content layout
+      const content = page.locator(".game-profile-content")
+      await expect(content).toBeVisible()
     }
   })
 })

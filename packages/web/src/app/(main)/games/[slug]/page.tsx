@@ -63,7 +63,7 @@ export default async function Game(props: SlugParamsProps) {
   }
 
   return (
-    <Page name={game.name}>
+    <Page name={game.name} hideName={true}>
       <GameDetails game={game} />
     </Page>
   )
