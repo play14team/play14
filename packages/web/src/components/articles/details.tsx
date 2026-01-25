@@ -1,139 +1,104 @@
 import type { Article, UploadFile } from "@/models/strapi"
-import { format, parseISO } from "date-fns"
 import Image from "next/image"
-import Link from "next/link"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
-import SocialLinks from "../layout/social-links"
+import Separator from "../ui/separator"
+import AuthorCard from "./author-card"
+import ArticleInfoSidebar from "./info-sidebar"
 import ArticlesNavigator from "./nav"
 import ArticleSidebar from "./sidebar"
 
-const ArticleDetails = ({ article }: { article: Article }) => {
+interface ArticleDetailsProps {
+  article: Article
+}
+
+/**
+ * Modern article details component with improved layout, accessibility, and responsiveness.
+ * Uses Bootstrap grid for consistency with player and event details pages.
+ * Features a hero image, sticky info sidebar, rich content area, and related articles sidebar.
+ */
+export default function ArticleDetails({ article }: ArticleDetailsProps) {
   const image = article.defaultImage as UploadFile
-  const author = article.author
-  const text = encodeURI("Take a look at this #play14 article")
+  const hasGallery = article.images && article.images.length > 0
 
   return (
-    <div className="blog-details-area pb-100">
+    <article className="article-details-area pb-100" aria-labelledby="article-title">
+      {/* Navigation */}
       <ArticlesNavigator current={article.slug!} />
-      <div className="container pt-5">
+
+      {/* Hero image section */}
+      <header className="article-details-hero">
+        <div className="article-details-hero-image">
+          <Image
+            src={image?.url || "/placeholder-article.jpg"}
+            alt={image?.name || article.title || "Article image"}
+            fill
+            priority
+            sizes="100vw"
+            style={{ objectFit: "cover" }}
+            placeholder="blur"
+            blurDataURL={(image as { blurhash?: string })?.blurhash || process.env.DEFAULT_BLURHASH}
+            unoptimized
+          />
+          <div className="article-details-hero-overlay" aria-hidden="true" />
+        </div>
+      </header>
+
+      {/* Main content area - using Bootstrap grid for consistency */}
+      <div className="container pt-4">
         <div className="row">
-          <div className="col-lg-8 col-md-12">
-            <div className="blog-details-desc">
-              <div className="article-image">
-                <Image
-                  src={image.url || "#"}
-                  alt={image.name}
-                  width={400}
-                  height={400}
-                  priority
-                  {...((image as { blurhash?: string }).blurhash && {
-                    blurDataURL: (image as { blurhash?: string }).blurhash,
-                    placeholder: "blur" as const,
-                  })}
-                  className="shadow"
-                  style={{
-                    maxWidth: "100%",
-                    objectFit: "cover",
-                    borderRadius: "10px",
-                  }}
-                  unoptimized
-                />
-              </div>
+          {/* Left column: Article info sidebar */}
+          <div className="col-lg-3 col-md-12">
+            <ArticleInfoSidebar article={article} />
+          </div>
 
-              <div className="article-content">
-                <div className="entry-meta">
-                  <ul>
-                    <li>
-                      <i className="bx bx-folder-open" />
-                      <span>Category</span>
-                      <Link href={`/articles/categories/${article.category}`}>
-                        {article.category}
-                      </Link>
-                    </li>
-                    {article.updatedAt && (
-                      <li>
-                        <i className="bx bx-calendar" />
-                        <span>Last Updated</span>
-                        <Link href="#">{format(parseISO(article.updatedAt), "MMM do, yyyy")}</Link>
-                      </li>
-                    )}
-                  </ul>
-                </div>
+          {/* Center column: Main content */}
+          <div className="col-lg-6 col-md-12">
+            <main className="article-details-content">
+              <HtmlContent>{article.content!}</HtmlContent>
 
-                <div className="article-footer">
-                  <div className="article-tags">
-                    <span>
-                      <i className="bx bx-purchase-tag" />
-                    </span>
+              {/* Author card - full version at the bottom of content */}
+              {article.author && (
+                <>
+                  <Separator className="article-details-separator" />
+                  <section aria-labelledby="about-author-heading">
+                    <h2 id="about-author-heading" className="visually-hidden">
+                      About the author
+                    </h2>
+                    <AuthorCard author={article.author} />
+                  </section>
+                </>
+              )}
 
-                    {article.tags?.filter(Boolean)?.map((tag) => {
-                      const t = tag as { id: string; value: string }
-                      return (
-                        <Link key={t.id} href={`/articles/tags/${t.value}`}>
-                          {t.value}
-                        </Link>
-                      )
-                    })}
-                  </div>
-
-                  <div className="article-share">
-                    <SocialLinks text={text} className="social" />
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <HtmlContent>{article.content!}</HtmlContent>
-                </div>
-
-                {author && (
-                  <div className=" pt-70">
-                    <div className="article-author">
-                      <div className="author-profile-header" />
-                      <div className="author-profile">
-                        <div className="author-profile-title">
-                          <Image
-                            src={author.avatar?.url || "#"}
-                            className="shadow-sm"
-                            alt={author.name}
-                            width={200}
-                            height={200}
-                            unoptimized
-                          />
-                          <Link href={`/players/${author.slug}`}>
-                            <h4>{author?.name}</h4>
-                          </Link>
-                          <span className="d-block">{author?.position}</span>
-                          <p>{author?.tagline}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-4">
-                  {article.images && (
+              {/* Image gallery */}
+              {hasGallery && (
+                <>
+                  <Separator className="article-details-separator" />
+                  <section aria-labelledby="gallery-heading">
+                    <h2 id="gallery-heading" className="article-details-section-title">
+                      <i className="bx bx-images" aria-hidden="true" />
+                      Gallery
+                    </h2>
                     <Gallery
                       images={
-                        article.images.filter(Boolean) as Array<{
+                        article.images!.filter(Boolean) as Array<{
                           url: string
                           name?: string | null
                         }>
                       }
                     />
-                  )}
-                </div>
-              </div>
-            </div>
+                  </section>
+                </>
+              )}
+            </main>
           </div>
 
-          <div className="col-lg-4 col-md-12">
+          {/* Right column: Related articles sidebar */}
+          <div className="col-lg-3 col-md-12">
             <ArticleSidebar />
           </div>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
-
-export default ArticleDetails
