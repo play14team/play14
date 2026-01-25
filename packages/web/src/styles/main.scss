@@ -9,9 +9,15 @@
 // UI Components
 @use "ui/avatar";
 @use "ui/dropdown";
+@use "ui/filter-bar";
+@use "ui/navigation-menu";
+@use "ui/mobile-menu";
+@use "ui/search-command";
 @use "ui/tabs";
 @use "ui/separator";
 @use "ui/game-details";
+@use "ui/event-profile";
+@use "ui/player-profile";
 
 // Auth pages
 @use "auth/login";

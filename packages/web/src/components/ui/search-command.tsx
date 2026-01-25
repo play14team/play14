@@ -4,7 +4,8 @@ import * as Dialog from "@radix-ui/react-dialog"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
-import { EMPTY_SEARCH_RESULTS, searchQuick } from "@/components/search/search-quick.action"
+import { searchQuick } from "@/components/search/search-quick.action"
+import { EMPTY_SEARCH_RESULTS } from "@/components/search/search-quick.constants"
 import { useDebounce } from "@/hooks/use-debounce"
 import {
   type QuickSearchResults,

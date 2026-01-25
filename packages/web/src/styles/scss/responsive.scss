@@ -14,10 +14,10 @@ $value_nine: 1550px;
 /* Max width 767px */
 @media only #{$media} and ($feature_max : $value_two) {
   body {
-    font-size: 15px;
+    font-size: 20px;
   }
   p {
-    font-size: 15px;
+    font-size: 20px;
   }
   .container {
     max-width: 100%;

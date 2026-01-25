@@ -7,7 +7,7 @@ import DefaultPlayerImage from "../ui/default-player-image"
 export interface NavLink {
   slug: string
   name: string
-  image: UploadFile
+  image?: UploadFile
   date?: Date | string
 }
 
@@ -19,102 +19,66 @@ const DetailsNavigator = (props: {
   const { previous, next, entity } = props
 
   return (
-    <nav className="tracer-post-navigation">
-      {previous && (
-        <div className="prev-link-wrapper" style={{ flex: "none" }}>
-          <div className="info-prev-link-wrapper">
-            <Link href={`/${entity}/${previous.slug}`}>
-              <span className="image-prev">
-                <div
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    height: "100px",
-                  }}
-                >
-                  {getImage(previous.image)}
-                </div>
-
-                <span className="post-nav-title">Prev</span>
-              </span>
-
-              <span className="prev-link-info-wrapper">
-                <span className="prev-title">{previous.name}</span>
-                <span className="meta-wrapper">
-                  <span className="date-post">
-                    {previous.date &&
-                      format(
-                        typeof previous.date === "string" ? parseISO(previous.date) : previous.date,
-                        "MMM do, yyyy"
-                      )}
-                  </span>
-                </span>
-              </span>
-            </Link>
+    <nav className="event-profile-nav">
+      {previous ? (
+        <Link
+          href={`/${entity}/${previous.slug}`}
+          className="event-profile-nav__link event-profile-nav__link--prev"
+        >
+          <i className="bx bx-chevron-left event-profile-nav__icon" />
+          {renderNavImage(previous.image, previous.name)}
+          <div className="event-profile-nav__info">
+            <span className="event-profile-nav__name">{previous.name}</span>
+            {previous.date && (
+              <span className="event-profile-nav__date">{formatDate(previous.date)}</span>
+            )}
           </div>
-        </div>
+        </Link>
+      ) : (
+        <div className="event-profile-nav__placeholder" />
       )}
-      {!previous && <p> </p>}
 
-      {next && (
-        <div className="next-link-wrapper" style={{ flex: "none" }}>
-          <div className="info-next-link-wrapper">
-            <Link href={`/${entity}/${next.slug}`}>
-              <span className="next-link-info-wrapper">
-                <span className="next-title">{next.name}</span>
-                <span className="meta-wrapper">
-                  <span className="date-post">
-                    {next.date &&
-                      format(
-                        typeof next.date === "string" ? parseISO(next.date) : next.date,
-                        "MMM do, yyyy"
-                      )}
-                  </span>
-                </span>
-              </span>
-
-              <span className="image-next">
-                <div
-                  style={{
-                    position: "relative",
-                    width: "100%",
-                    height: "100px",
-                  }}
-                >
-                  {getImage(next.image)}
-                </div>
-                <span className="post-nav-title">Next</span>
-              </span>
-            </Link>
+      {next ? (
+        <Link
+          href={`/${entity}/${next.slug}`}
+          className="event-profile-nav__link event-profile-nav__link--next"
+        >
+          <div className="event-profile-nav__info">
+            <span className="event-profile-nav__name">{next.name}</span>
+            {next.date && <span className="event-profile-nav__date">{formatDate(next.date)}</span>}
           </div>
-        </div>
+          {renderNavImage(next.image, next.name)}
+          <i className="bx bx-chevron-right event-profile-nav__icon" />
+        </Link>
+      ) : (
+        <div className="event-profile-nav__placeholder" />
       )}
     </nav>
   )
 }
 
-function getImage(image?: UploadFile) {
-  if (image)
+function renderNavImage(image: UploadFile | undefined, name: string) {
+  if (image) {
     return (
       <Image
         src={image.url}
-        alt={image.name}
-        sizes="100vw"
-        fill
-        style={{ objectFit: "cover" }}
+        alt={image.name || name}
+        width={40}
+        height={40}
+        className="event-profile-nav__image"
         unoptimized
       />
     )
+  }
 
   return (
-    <DefaultPlayerImage
-      alt="default player image"
-      sizes="100vw"
-      width={500}
-      height={500}
-      style={{ objectFit: "cover" }}
-    />
+    <DefaultPlayerImage alt={name} width={40} height={40} className="event-profile-nav__image" />
   )
+}
+
+function formatDate(date: Date | string): string {
+  const parsed = typeof date === "string" ? parseISO(date) : date
+  return format(parsed, "MMM d, yyyy")
 }
 
 export default DetailsNavigator

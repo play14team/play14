@@ -9,17 +9,10 @@ import {
   searchPlayerPopulate,
 } from "@/libs/strapi-populate"
 import type { Article, Event, Game, Player } from "@/models/strapi"
+import { EMPTY_SEARCH_RESULTS } from "./search-quick.constants"
 
 const QUICK_SEARCH_LIMIT = 10
 const SEARCH_INDEX_LIMIT = 500
-
-/** Empty search results for early returns and error states */
-export const EMPTY_SEARCH_RESULTS: QuickSearchResults = {
-  events: [],
-  articles: [],
-  games: [],
-  players: [],
-}
 
 /**
  * Fetches the full search index for client-side fuzzy matching.
