@@ -26,7 +26,6 @@ import {
   GAME_ACTIONS,
   HISTORY_ACTIONS,
   HOME_ACTIONS,
-  HOSTING_ACTIONS,
   I18N_ACTIONS,
   IMPORT_ACTIONS,
   LIKED_ITEM_ACTIONS,
@@ -318,11 +317,6 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: HOME_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },
   { action: HOME_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: HOME_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
-
-  // Hosting management
-  { action: HOSTING_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },
-  { action: HOSTING_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
-  { action: HOSTING_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
 
   // Sponsors full CRUD
   { action: SPONSOR_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },

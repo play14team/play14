@@ -1281,49 +1281,6 @@ export interface ApiHomeHome extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiHostingHosting extends Struct.SingleTypeSchema {
-  collectionName: 'hostings';
-  info: {
-    displayName: 'Hosting';
-    pluralName: 'hostings';
-    singularName: 'hosting';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  pluginOptions: {
-    i18n: {
-      localized: true;
-    };
-  };
-  attributes: {
-    content: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::hosting.hosting'
-    >;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiLikedItemLikedItem extends Struct.CollectionTypeSchema {
   collectionName: 'liked_items';
   info: {
@@ -2663,7 +2620,6 @@ declare module '@strapi/strapi' {
       'api::game.game': ApiGameGame;
       'api::history.history': ApiHistoryHistory;
       'api::home.home': ApiHomeHome;
-      'api::hosting.hosting': ApiHostingHosting;
       'api::liked-item.liked-item': ApiLikedItemLikedItem;
       'api::player-claim.player-claim': ApiPlayerClaimPlayerClaim;
       'api::player.player': ApiPlayerPlayer;

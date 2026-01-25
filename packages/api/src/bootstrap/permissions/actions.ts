@@ -254,12 +254,6 @@ export const HOME_ACTIONS = {
   DELETE: "api::home.home.delete",
 } as const
 
-export const HOSTING_ACTIONS = {
-  FIND: "api::hosting.hosting.find",
-  UPDATE: "api::hosting.hosting.update",
-  DELETE: "api::hosting.hosting.delete",
-} as const
-
 export const SPONSOR_ACTIONS = {
   // Standard CRUD
   FIND: "api::sponsor.sponsor.find",
