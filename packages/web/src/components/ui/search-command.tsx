@@ -93,6 +93,10 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
     setIsLoading(true)
     searchQuick(debouncedQuery)
       .then(setResults)
+      .catch((error) => {
+        console.error("Search failed:", error)
+        setResults({ events: [], articles: [], games: [], players: [] })
+      })
       .finally(() => setIsLoading(false))
   }, [debouncedQuery])
 
@@ -181,7 +185,12 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
                   (item) => item.documentId === group.items[0]?.documentId
                 )
                 return (
-                  <div key={group.label} className="ui-search-group">
+                  <div
+                    key={group.label}
+                    className="ui-search-group"
+                    role="group"
+                    aria-label={group.label}
+                  >
                     <div className="ui-search-group-label">{group.label}</div>
                     {group.items.map((item, itemIndex) => (
                       <SearchItem

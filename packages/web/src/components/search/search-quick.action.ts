@@ -96,6 +96,11 @@ export async function fetchSearchIndex(): Promise<QuickSearchResults> {
  * Results are filtered server-side and then re-scored client-side with Fuse.js.
  */
 export async function searchQuick(input: string): Promise<QuickSearchResults> {
+  // Validate input length and format
+  if (!input || input.length < 2 || input.length > 100) {
+    return { events: [], articles: [], games: [], players: [] }
+  }
+
   const [eventsRes, articlesRes, gamesRes, playersRes] = await Promise.all([
     restQuery<Event[]>("events", {
       filters: {
