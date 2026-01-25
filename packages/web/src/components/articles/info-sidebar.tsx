@@ -2,7 +2,6 @@ import type { Article, Tag } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Link from "next/link"
 import SocialLinks from "../layout/social-links"
-import Separator from "../ui/separator"
 import AuthorCard from "./author-card"
 
 interface ArticleInfoSidebarProps {
@@ -10,122 +9,101 @@ interface ArticleInfoSidebarProps {
 }
 
 /**
- * A modern sidebar component for article metadata.
- * Displays category, dates, tags, author info, and share options.
+ * A sidebar component for article metadata.
+ * Uses the same styling pattern as player sidebar (case-studies-details-info).
+ * Displays author, category, dates, tags, and share options.
  */
 export default function ArticleInfoSidebar({ article }: ArticleInfoSidebarProps) {
   const text = encodeURI("Take a look at this #play14 article")
   const tags = (article.tags?.filter(Boolean) || []) as Tag[]
 
   return (
-    <aside className="article-info-sidebar" aria-label="Article information">
-      {/* Author section */}
-      {article.author && (
-        <>
-          <section className="article-info-section" aria-labelledby="author-heading">
-            <h3 id="author-heading" className="article-info-section-title">
-              <i className="bx bx-user" aria-hidden="true" />
-              Written by
-            </h3>
-            <AuthorCard author={article.author} variant="compact" />
-          </section>
-          <Separator className="article-info-separator" />
-        </>
-      )}
+    <aside className="case-studies-sidebar-sticky" aria-label="Article information">
+      <div className="case-studies-details-info">
+        <ul>
+          {/* Author */}
+          {article.author && (
+            <li>
+              <div className="icon" aria-hidden="true">
+                <i className="bx bx-user" />
+              </div>
+              <span>Written by</span>
+              <AuthorCard author={article.author} variant="compact" />
+            </li>
+          )}
 
-      {/* Metadata section */}
-      <section className="article-info-section" aria-labelledby="metadata-heading">
-        <h3 id="metadata-heading" className="visually-hidden">
-          Article details
-        </h3>
-        <ul className="article-info-list" role="list">
+          {/* Category */}
           {article.category && (
-            <li className="article-info-item">
-              <div className="article-info-icon" aria-hidden="true">
+            <li>
+              <div className="icon" aria-hidden="true">
                 <i className="bx bx-folder-open" />
               </div>
-              <div className="article-info-content">
-                <span className="article-info-label">Category</span>
-                <Link
-                  href={`/articles/categories/${article.category.toLowerCase()}`}
-                  className="article-info-value article-info-link"
-                >
-                  {article.category}
-                </Link>
-              </div>
+              <span>Category</span>
+              <Link href={`/articles/categories/${article.category.toLowerCase()}`}>
+                {article.category}
+              </Link>
             </li>
           )}
 
+          {/* Published date */}
           {article.publishedAt && (
-            <li className="article-info-item">
-              <div className="article-info-icon" aria-hidden="true">
+            <li>
+              <div className="icon" aria-hidden="true">
                 <i className="bx bx-calendar" />
               </div>
-              <div className="article-info-content">
-                <span className="article-info-label">Published</span>
-                <time
-                  dateTime={article.publishedAt}
-                  className="article-info-value"
-                >
-                  {format(parseISO(article.publishedAt), "MMMM do, yyyy")}
-                </time>
-              </div>
+              <span>Published</span>
+              <time dateTime={article.publishedAt}>
+                {format(parseISO(article.publishedAt), "MMMM do, yyyy")}
+              </time>
             </li>
           )}
 
+          {/* Updated date */}
           {article.updatedAt && article.updatedAt !== article.publishedAt && (
-            <li className="article-info-item">
-              <div className="article-info-icon" aria-hidden="true">
+            <li>
+              <div className="icon" aria-hidden="true">
                 <i className="bx bx-revision" />
               </div>
-              <div className="article-info-content">
-                <span className="article-info-label">Updated</span>
-                <time
-                  dateTime={article.updatedAt}
-                  className="article-info-value"
-                >
-                  {format(parseISO(article.updatedAt), "MMMM do, yyyy")}
-                </time>
-              </div>
+              <span>Updated</span>
+              <time dateTime={article.updatedAt}>
+                {format(parseISO(article.updatedAt), "MMMM do, yyyy")}
+              </time>
             </li>
           )}
         </ul>
-      </section>
 
-      {/* Tags section */}
-      {tags.length > 0 && (
-        <>
-          <Separator className="article-info-separator" />
-          <section className="article-info-section" aria-labelledby="tags-heading">
-            <h3 id="tags-heading" className="article-info-section-title">
+        {/* Tags section */}
+        {tags.length > 0 && (
+          <div className="article-tags-section">
+            <h4 className="article-tags-title">
               <i className="bx bx-purchase-tag" aria-hidden="true" />
               Tags
-            </h3>
-            <div className="article-info-tags" role="list" aria-label="Article tags">
+            </h4>
+            <div className="article-tags" role="list" aria-label="Article tags">
               {tags.map((tag) => (
                 <Link
                   key={tag.id}
                   href={`/articles/tags/${tag.value}`}
-                  className="article-info-tag"
+                  className="article-tag"
                   role="listitem"
                 >
                   {tag.value}
                 </Link>
               ))}
             </div>
-          </section>
-        </>
-      )}
+          </div>
+        )}
 
-      {/* Share section */}
-      <Separator className="article-info-separator" />
-      <section className="article-info-section" aria-labelledby="share-heading">
-        <h3 id="share-heading" className="article-info-section-title">
-          <i className="bx bx-share-alt" aria-hidden="true" />
-          Share this article
-        </h3>
-        <SocialLinks text={text} className="article-info-social" />
-      </section>
+        {/* Share section */}
+        <div className="events-share">
+          <div className="share-info">
+            <span>
+              Share this article <i className="flaticon-share" aria-hidden="true" />
+            </span>
+            <SocialLinks text={text} className="social-link" />
+          </div>
+        </div>
+      </div>
     </aside>
   )
 }

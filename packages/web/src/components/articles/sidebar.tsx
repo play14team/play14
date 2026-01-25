@@ -2,12 +2,12 @@ import type { Article } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import Separator from "../ui/separator"
 import { getArticleSidebar } from "./get.action"
 
 /**
- * Modern sidebar component for related articles.
- * Displays latest articles, categories, and tags with improved accessibility.
+ * Sidebar component for related articles.
+ * Uses consistent styling with other sidebars in the application.
+ * Displays latest articles, categories, and tags.
  */
 export default async function ArticleSidebar() {
   const response = await getArticleSidebar()
@@ -40,110 +40,78 @@ export default async function ArticleSidebar() {
   )
 
   return (
-    <aside className="article-related-sidebar" aria-label="Related articles and navigation">
+    <aside className="widget-area" aria-label="Related articles and navigation">
       {/* Latest articles section */}
-      <section className="article-related-section" aria-labelledby="latest-articles-heading">
-        <h3 id="latest-articles-heading" className="article-related-section-title">
-          <i className="bx bx-news" aria-hidden="true" />
+      <section className="widget widget_recent_entries" aria-labelledby="latest-articles-heading">
+        <h3 id="latest-articles-heading" className="widget-title">
           Latest articles
         </h3>
 
-        <div className="article-related-list" role="list">
+        <ul className="recent-posts-list">
           {latest?.map((article) => (
-            <article
-              key={article.documentId}
-              className="article-related-item"
-              role="listitem"
-            >
+            <li key={article.documentId}>
               <Link
                 href={`/articles/${article.slug}`}
-                className="article-related-item-link"
                 aria-label={`Read article: ${article.title}`}
               >
-                <div className="article-related-item-image">
+                <div className="recent-post-thumb">
                   <Image
                     src={article.defaultImage?.url || "/placeholder-article.jpg"}
                     alt=""
-                    fill
-                    sizes="100px"
+                    width={80}
+                    height={80}
                     style={{ objectFit: "cover" }}
                     unoptimized
                   />
                 </div>
-                <div className="article-related-item-content">
+                <div className="recent-post-content">
                   {article.publishedAt && (
-                    <time
-                      dateTime={article.publishedAt}
-                      className="article-related-item-date"
-                    >
+                    <time dateTime={article.publishedAt} className="recent-post-date">
+                      <i className="bx bx-calendar" aria-hidden="true" />
                       {format(parseISO(article.publishedAt), "MMM do, yyyy")}
                     </time>
                   )}
-                  <h4 className="article-related-item-title">{article.title}</h4>
+                  <h4>{article.title}</h4>
                 </div>
               </Link>
-            </article>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
-
-      <Separator className="article-related-separator" />
 
       {/* Categories section */}
       {Object.keys(categoryCount).length > 0 && (
-        <>
-          <section
-            className="article-related-section"
-            aria-labelledby="categories-heading"
-          >
-            <h3 id="categories-heading" className="article-related-section-title">
-              <i className="bx bx-folder" aria-hidden="true" />
-              Categories
-            </h3>
+        <section className="widget widget_categories" aria-labelledby="categories-heading">
+          <h3 id="categories-heading" className="widget-title">
+            Categories
+          </h3>
 
-            <ul className="article-related-categories" role="list">
-              {Object.entries(categoryCount).map(([category, count]) => (
-                <li key={category} role="listitem">
-                  <Link
-                    href={`/articles/categories/${category.toLowerCase()}`}
-                    className="article-related-category-link"
-                  >
-                    <span className="article-related-category-name">{category}</span>
-                    <span
-                      className="article-related-category-count"
-                      aria-label={`${count} articles`}
-                    >
-                      {count}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <Separator className="article-related-separator" />
-        </>
+          <ul role="list">
+            {Object.entries(categoryCount).map(([category, count]) => (
+              <li key={category}>
+                <Link href={`/articles/categories/${category.toLowerCase()}`}>
+                  {category}
+                  <span className="post-count" aria-label={`${count} articles`}>
+                    ({count})
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {/* Tags section */}
       {Object.keys(tagsCount).length > 0 && (
-        <section className="article-related-section" aria-labelledby="tags-heading">
-          <h3 id="tags-heading" className="article-related-section-title">
-            <i className="bx bx-purchase-tag" aria-hidden="true" />
+        <section className="widget widget_tag_cloud" aria-labelledby="sidebar-tags-heading">
+          <h3 id="sidebar-tags-heading" className="widget-title">
             Popular tags
           </h3>
 
-          <div className="article-related-tags" role="list" aria-label="Article tags">
-            {Object.entries(tagsCount).map(([tag, count]) => (
-              <Link
-                key={tag}
-                href={`/articles/tags/${tag}`}
-                className="article-related-tag"
-                role="listitem"
-                aria-label={`${tag} (${count} articles)`}
-              >
+          <div className="tagcloud" role="list" aria-label="Article tags">
+            {Object.entries(tagsCount).map(([tag]) => (
+              <Link key={tag} href={`/articles/tags/${tag}`} role="listitem">
                 {tag}
-                <span className="article-related-tag-count">{count}</span>
               </Link>
             ))}
           </div>
