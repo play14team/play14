@@ -10,7 +10,7 @@ interface ArticleInfoSidebarProps {
 
 /**
  * A sidebar component for article metadata.
- * Uses the same styling pattern as player sidebar (case-studies-details-info).
+ * Uses the same styling pattern as game sidebar (services-details-info).
  * Displays author, category, dates, tags, and share options.
  */
 export default function ArticleInfoSidebar({ article }: ArticleInfoSidebarProps) {
@@ -18,8 +18,8 @@ export default function ArticleInfoSidebar({ article }: ArticleInfoSidebarProps)
   const tags = (article.tags?.filter(Boolean) || []) as Tag[]
 
   return (
-    <aside className="case-studies-sidebar-sticky" aria-label="Article information">
-      <div className="case-studies-details-info">
+    <aside className="services-details-info" aria-label="Article information">
+      <div className="services-contact-info">
         <ul>
           {/* Author */}
           {article.author && (
@@ -94,7 +94,7 @@ export default function ArticleInfoSidebar({ article }: ArticleInfoSidebarProps)
           </div>
         )}
 
-        {/* Share section */}
+        {/* Share section - using events-share pattern */}
         <div className="events-share">
           <div className="share-info">
             <span>
