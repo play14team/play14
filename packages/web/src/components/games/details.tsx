@@ -3,177 +3,92 @@ import type { Game, UploadFile } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
-import Gallery from "../layout/gallery"
-import HtmlContent from "../layout/html-content"
+import Separator from "../ui/separator"
 import GamesNavigator from "./nav"
 import GameSidebar from "./sidebar"
+import GameTabs from "./tabs"
 
-const GameDetails = (props: { game: Game }) => {
-  const { game } = props
+export default function GameDetails({ game }: { game: Game }) {
   const image = game.defaultImage as UploadFile
+  const hasTags = game.tags && game.tags.length > 0
 
   return (
-    <div className="services-details-area pb-100">
+    <article className="game-details" aria-labelledby="game-title">
       <GamesNavigator current={game.slug} />
+
       <div className="container">
-        <div className="row">
-          <div className="col-lg-8 col-md-12">
-            <div className="services-details-desc">
-              <div className="row align-items-center align-items-stretch">
-                <div className="image">
-                  <Image
-                    src={image.url || "#"}
-                    alt={image.name}
-                    width={1000}
-                    height={1000}
-                    priority
-                    className="shadow"
-                    style={{
-                      maxWidth: "100%",
-                      objectFit: "cover",
-                      borderRadius: "10px",
-                    }}
-                    unoptimized
-                  />
-                </div>
+        {/* Hero image */}
+        {image?.url && (
+          <div className="game-details-hero">
+            <Image
+              src={image.url}
+              alt={image.name || game.name || "Game image"}
+              fill
+              priority
+              className="game-details-hero-image"
+              sizes="100vw"
+              unoptimized
+            />
+          </div>
+        )}
+
+        {/* Header section */}
+        <header className="game-details-header">
+          <h1 id="game-title">{game.name}</h1>
+
+          {/* Meta information */}
+          <div className="game-details-meta" role="list" aria-label="Game metadata">
+            {game.category && (
+              <div className="game-details-meta-item" role="listitem">
+                <i className="bx bx-folder-open" aria-hidden="true" />
+                <Link href={`/games/categories/${game.category.toLowerCase()}`}>
+                  {camelPad(game.category)}
+                </Link>
               </div>
-
-              <div className="blog-details-desc">
-                <div className="article-content">
-                  <div className="entry-meta">
-                    <ul>
-                      {game.category && (
-                        <li>
-                          <i className="bx bx-folder-open" />
-                          <span>Category</span>
-                          <Link href={`/games/categories/${game.category.toLowerCase()}`}>
-                            {camelPad(game.category)}
-                          </Link>
-                        </li>
-                      )}
-                      {game.publishedAt && (
-                        <li>
-                          <i className="bx bx-calendar" />
-                          <span>Published</span>
-                          <Link href="#">{format(parseISO(game.publishedAt), "MMM do, yyyy")}</Link>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="article-footer">
-                  {game.tags?.map((tag) => (
-                    <div key={tag?.id} className="article-tags">
-                      <span>
-                        <i className="bx bx-purchase-tag" />
-                      </span>
-
-                      <Link key={tag?.id} href={`/games/tags/${tag?.value}`}>
-                        {tag?.value}
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="article-footer">
-                  <div className="content">
-                    <h2>Summary</h2>
-                    <p>{game.summary}</p>
-                  </div>
-
-                  {game.materials && game.materials.length > 0 && (
-                    <div className="col-lg-12 col-md-12">
-                      <div className="content">
-                        <h3>Materials</h3>
-                        <ul>
-                          {game.materials.map((m) => (
-                            <li key={m?.id}>{m?.value}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-
-                  {game.preparationSteps && game.preparationSteps.length > 0 && (
-                    <div className="col-lg-12 col-md-12">
-                      <div className="content">
-                        <h3>Preparation</h3>
-                        <ul>
-                          {game.preparationSteps.map((p) => (
-                            <li key={p?.id}>{p?.value}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-
-                  {game.safety && game.safety.length > 0 && (
-                    <div className="col-lg-12 col-md-12">
-                      <div className="content">
-                        <h3>Safety</h3>
-                        <ul>
-                          {game.safety.map((s) => (
-                            <li key={s?.id}>
-                              <strong>{s?.key}</strong>: {s?.value}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="article-footer" />
+            )}
+            {game.publishedAt && (
+              <div className="game-details-meta-item" role="listitem">
+                <i className="bx bx-calendar" aria-hidden="true" />
+                <time dateTime={game.publishedAt}>
+                  {format(parseISO(game.publishedAt), "MMM do, yyyy")}
+                </time>
               </div>
-
-              <div className="content">
-                <HtmlContent>{game.description}</HtmlContent>
-              </div>
-
-              {game.images && game.images.length > 1 && (
-                <div className="row pt-70">
-                  <h2>Images</h2>
-                  <Gallery
-                    images={
-                      game.images.filter(Boolean) as Array<{
-                        url: string
-                        name?: string | null
-                      }>
-                    }
-                  />
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
-          <div className="col-lg-4 col-md-12">
-            <GameSidebar game={game} />
-          </div>
+          {/* Tags */}
+          {hasTags && (
+            <nav className="game-details-tags" aria-label="Game tags">
+              {game.tags?.map((tag) => (
+                <Link key={tag?.id} href={`/games/tags/${tag?.value}`} className="game-details-tag">
+                  <i className="bx bx-purchase-tag" aria-hidden="true" />
+                  {tag?.value}
+                </Link>
+              ))}
+            </nav>
+          )}
+        </header>
 
-          {/* <h3>Game metrics</h3>
-                  <div className="col-lg-12 col-md-12">
-                      {
-                          game.metrics.map(metric => {
-                              return (
-                                  <div>
-                                      <div className="side">
-                                          <div>{metric.name}</div>
-                                      </div>
-                                      <div className="middle">
-                                          <div className="bar-container">
-                                              <div className={`bar-${(metric.value/20)}`}></div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              )
-                          })
-                      }
-                  </div> */}
+        {/* Main content area */}
+        <div className="game-details-content">
+          {/* Left column - Main content */}
+          <main className="game-details-main">
+            {/* Summary */}
+            {game.summary && (
+              <>
+                <p className="game-details-summary">{game.summary}</p>
+                <Separator />
+              </>
+            )}
+
+            {/* Tabbed content */}
+            <GameTabs game={game} />
+          </main>
+
+          {/* Right column - Sidebar */}
+          <GameSidebar game={game} />
         </div>
       </div>
-    </div>
+    </article>
   )
 }
-
-export default GameDetails
