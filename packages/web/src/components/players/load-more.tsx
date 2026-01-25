@@ -2,36 +2,45 @@
 
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Pagination, Player } from "@/models/strapi"
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Loader from "../layout/loader"
 import { getPlayers } from "./get.action"
 import PlayerGrid from "./grid"
 
-export default function LoadMore({ pagination }: { pagination: Pagination }) {
+interface PlayerFilters {
+  position?: string
+  letter?: string
+}
+
+interface LoadMoreProps {
+  pagination: Pagination
+  filters?: PlayerFilters
+}
+
+export default function LoadMore({ pagination, filters }: LoadMoreProps) {
   const [players, setPlayers] = useState<Player[]>([])
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const isVisible = useIntersection(triggerRef as RefObject<HTMLDivElement>, "800px")
-  const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
+  const [isVisible, triggerRef] = useIntersection("800px")
+
+  const loadMore = useCallback(() => {
+    getPlayers(pagination.page + 1, pagination.pageSize, filters?.position, filters?.letter).then(
+      (res) => {
+        const players = (res.players_connection?.nodes || []) as Player[]
+        setPlayers(players)
+      }
+    )
+  }, [pagination.page, pagination.pageSize, filters])
 
   useEffect(() => {
     if (isVisible) {
-      callback()
+      loadMore()
     }
-  }, [callback, isVisible])
+  }, [loadMore, isVisible])
 
-  function loadMore() {
-    getPlayers(pagination.page + 1, pagination.pageSize).then((res) => {
-      const players = (res.players_connection?.nodes || []) as Player[]
-      setPlayers(players)
-    })
-  }
-
-  if (pagination.page === pagination.pageCount) return
+  if (pagination.page === pagination.pageCount) return null
 
   if (players.length === 0)
     return (
-      <div>
-        <div ref={triggerRef} />
+      <div ref={triggerRef}>
         <Loader />
       </div>
     )
@@ -41,7 +50,7 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   return (
     <>
       <PlayerGrid players={players} />
-      <LoadMore pagination={newPagination} />
+      <LoadMore pagination={newPagination} filters={filters} />
     </>
   )
 }

@@ -141,32 +141,92 @@ function computeTicketingMode(
 }
 
 /**
+ * Filter parameters for events
+ */
+export interface EventFilters {
+  status?: string | string[]
+  location?: string | string[]
+  country?: string | string[]
+  year?: number
+}
+
+/**
+ * Build Strapi filters from EventFilters
+ */
+function buildEventFilters(params: EventFilters): Record<string, unknown> {
+  const filters: Record<string, unknown> = {}
+
+  // Status filter (supports multi-value)
+  if (params.status) {
+    const statuses = Array.isArray(params.status) ? params.status : [params.status]
+    if (statuses.length === 1) {
+      filters.eventStatus = { $eqi: statuses[0] }
+    } else if (statuses.length > 1) {
+      filters.eventStatus = { $in: statuses }
+    }
+  }
+
+  // Location filter (supports multi-value)
+  if (params.location) {
+    const locations = Array.isArray(params.location) ? params.location : [params.location]
+    if (locations.length === 1) {
+      filters.location = {
+        ...((filters.location as object) || {}),
+        slug: { $eqi: locations[0] },
+      }
+    } else if (locations.length > 1) {
+      filters.location = {
+        ...((filters.location as object) || {}),
+        slug: { $in: locations },
+      }
+    }
+  }
+
+  // Country filter (supports multi-value)
+  if (params.country) {
+    const countries = Array.isArray(params.country) ? params.country : [params.country]
+    if (countries.length === 1) {
+      filters.location = {
+        ...((filters.location as object) || {}),
+        country: { $eqi: countries[0] },
+      }
+    } else if (countries.length > 1) {
+      filters.location = {
+        ...((filters.location as object) || {}),
+        country: { $in: countries },
+      }
+    }
+  }
+
+  // Year filter
+  if (params.year) {
+    const startOfYear = `${params.year}-01-01T00:00:00.000Z`
+    const endOfYear = `${params.year}-12-31T23:59:59.999Z`
+    filters.start = {
+      $gte: startOfYear,
+      $lte: endOfYear,
+    }
+  }
+
+  return filters
+}
+
+/**
  * Get paginated events list
  * REST equivalent of: events/grid.graphql
+ *
+ * Supports combined filtering by status, location, country, and year.
+ * Each filter can be a single value or array for multi-select.
  */
 export async function getEvents(
   page: number,
   pageSize: number,
-  status?: string,
-  location?: string,
-  country?: string
+  status?: string | string[],
+  location?: string | string[],
+  country?: string | string[],
+  year?: number
 ) {
-  const filters: Record<string, unknown> = {}
-  if (status) {
-    filters.eventStatus = { $eqi: status }
-  }
-  if (location) {
-    filters.location = {
-      ...((filters.location as object) || {}),
-      slug: { $eqi: location },
-    }
-  }
-  if (country) {
-    filters.location = {
-      ...((filters.location as object) || {}),
-      country: { $eqi: country },
-    }
-  }
+  const filters = buildEventFilters({ status, location, country, year })
 
   const response = await restQuery<Event[]>("events", {
     sort: ["start:desc"],
@@ -184,28 +244,21 @@ export async function getEvents(
 /**
  * Get all events with optional filters
  * Fetches all pages since Strapi limits pageSize to 100
+ *
+ * Supports combined filtering by status, location, country, and year.
+ * Each filter can be a single value or array for multi-select.
  */
-export async function getAllEvents(status?: string, location?: string, country?: string) {
+export async function getAllEvents(
+  status?: string | string[],
+  location?: string | string[],
+  country?: string | string[],
+  year?: number
+) {
   const allEvents: Event[] = []
   let page = 1
   const pageSize = 100
 
-  const filters: Record<string, unknown> = {}
-  if (status) {
-    filters.eventStatus = { $eqi: status }
-  }
-  if (location) {
-    filters.location = {
-      ...((filters.location as object) || {}),
-      slug: { $eqi: location },
-    }
-  }
-  if (country) {
-    filters.location = {
-      ...((filters.location as object) || {}),
-      country: { $eqi: country },
-    }
-  }
+  const filters = buildEventFilters({ status, location, country, year })
 
   while (true) {
     const response = await restQuery<Event[]>("events", {

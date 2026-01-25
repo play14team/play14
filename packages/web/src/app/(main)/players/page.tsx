@@ -1,8 +1,6 @@
-import AlphabetNav from "@/components/players/alphabet-nav"
-import Filters from "@/components/players/filters"
-import { getPlayerLetterCounts, getPlayers } from "@/components/players/get.action"
-import PlayerGrid from "@/components/players/grid"
-import LoadMore from "@/components/players/load-more"
+import { getPlayerFilterOptions } from "@/components/players/get-filter-options.action"
+import { getAllPlayers } from "@/components/players/get.action"
+import PlayersPageContent from "@/components/players/players-page-content"
 import type { Player } from "@/models/strapi"
 import type { Metadata } from "next"
 
@@ -10,41 +8,24 @@ export const metadata: Metadata = {
   title: "Players",
 }
 
+// Force static generation - filtering happens client-side
+export const dynamic = "force-static"
 export const revalidate = 3600
 
+/**
+ * Players page with pure client-side filtering
+ *
+ * - Page is statically generated with ALL players at build time
+ * - Filter options are pre-fetched at build time
+ * - Filtering happens entirely client-side (instant, no loading)
+ * - URL params are used for shareable filter states
+ */
 export default async function Players() {
-  // Fetch letter counts for navigation
-  const letterCounts = await getPlayerLetterCounts()
+  // Fetch ALL players and filter options in parallel at build time
+  const [filterOptions, players] = await Promise.all([
+    getPlayerFilterOptions(),
+    getAllPlayers(), // Fetches all pages (Strapi limits to 100 per page)
+  ])
 
-  // All mode: paginated infinite scroll
-  const response = (await getPlayers(1, 24)) as {
-    players_connection?: {
-      nodes: Player[]
-      pageInfo: {
-        page: number
-        pageSize: number
-        total: number
-        pageCount: number
-      }
-    }
-  }
-  const players = (response?.players_connection?.nodes || []) as Player[]
-  const pagination = response?.players_connection?.pageInfo || {
-    total: 0,
-    page: 1,
-    pageSize: 24,
-    pageCount: 1,
-  }
-
-  return (
-    <>
-      <div className="centered pt-5 pb-5">
-        <Filters name="Players" />
-        <p>Total: {pagination.total}</p>
-        <AlphabetNav currentLetter={undefined} letterCounts={letterCounts} />
-      </div>
-      <PlayerGrid players={players} />
-      <LoadMore pagination={pagination} />
-    </>
-  )
+  return <PlayersPageContent initialPlayers={players as Player[]} filterOptions={filterOptions} />
 }

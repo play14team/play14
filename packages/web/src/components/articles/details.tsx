@@ -27,10 +27,10 @@ const ArticleDetails = ({ article }: { article: Article }) => {
                   width={400}
                   height={400}
                   priority
-                  placeholder="blur"
-                  blurDataURL={
-                    (image as { blurhash?: string }).blurhash || process.env.DEFAULT_BLURHASH
-                  }
+                  {...((image as { blurhash?: string }).blurhash && {
+                    blurDataURL: (image as { blurhash?: string }).blurhash,
+                    placeholder: "blur" as const,
+                  })}
                   className="shadow"
                   style={{
                     maxWidth: "100%",

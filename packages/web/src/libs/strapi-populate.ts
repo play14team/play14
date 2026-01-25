@@ -234,6 +234,9 @@ export const gameItemPopulate = {
   defaultImage: {
     fields: imageFields,
   },
+  tags: {
+    fields: ["value"],
+  },
 }
 
 /**
@@ -317,6 +320,9 @@ export const articleItemPopulate = {
         fields: imageFields,
       },
     },
+  },
+  tags: {
+    fields: ["value"],
   },
 }
 

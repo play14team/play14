@@ -2,36 +2,45 @@
 
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Game, Pagination } from "@/models/strapi"
-import { type RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Loader from "../layout/loader"
 import { getGames } from "./get.action"
 import GameGrid from "./grid"
 
-export default function LoadMore({ pagination }: { pagination: Pagination }) {
+interface GameFilters {
+  category?: string
+  tag?: string
+}
+
+interface LoadMoreProps {
+  pagination: Pagination
+  filters?: GameFilters
+}
+
+export default function LoadMore({ pagination, filters }: LoadMoreProps) {
   const [games, setGames] = useState<Game[]>([])
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const isVisible = useIntersection(triggerRef as RefObject<HTMLDivElement>, "800px")
-  const callback = useCallback(loadMore, [pagination.page, pagination.pageSize])
+  const [isVisible, triggerRef] = useIntersection("800px")
+
+  const loadMore = useCallback(() => {
+    getGames(pagination.page + 1, pagination.pageSize, filters?.category, filters?.tag).then(
+      (res) => {
+        const games = (res.games_connection?.nodes || []) as Game[]
+        setGames(games)
+      }
+    )
+  }, [pagination.page, pagination.pageSize, filters])
 
   useEffect(() => {
     if (isVisible) {
-      callback()
+      loadMore()
     }
-  }, [callback, isVisible])
+  }, [loadMore, isVisible])
 
-  function loadMore() {
-    getGames(pagination.page + 1, pagination.pageSize).then((res) => {
-      const games = (res.games_connection?.nodes || []) as Game[]
-      setGames(games)
-    })
-  }
-
-  if (pagination.page === pagination.pageCount) return
+  if (pagination.page === pagination.pageCount) return null
 
   if (games.length === 0)
     return (
-      <div>
-        <div ref={triggerRef} />
+      <div ref={triggerRef}>
         <Loader />
       </div>
     )
@@ -41,7 +50,7 @@ export default function LoadMore({ pagination }: { pagination: Pagination }) {
   return (
     <>
       <GameGrid games={games} />
-      <LoadMore pagination={newPagination} />
+      <LoadMore pagination={newPagination} filters={filters} />
     </>
   )
 }

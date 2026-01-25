@@ -1,8 +1,6 @@
-import Filters from "@/components/events/filters"
-import { getEventYearCounts, getEvents } from "@/components/events/get.action"
-import EventGrid from "@/components/events/grid"
-import LoadMore from "@/components/events/load-more"
-import YearNav from "@/components/events/year-nav"
+import EventsPageContent from "@/components/events/events-page-content"
+import { getEventFilterOptions } from "@/components/events/get-filter-options.action"
+import { getAllEvents } from "@/components/events/get.action"
 import type { Event } from "@/models/strapi"
 import type { Metadata } from "next"
 
@@ -10,28 +8,24 @@ export const metadata: Metadata = {
   title: "Events",
 }
 
+// Force static generation - filtering happens client-side
+export const dynamic = "force-static"
 export const revalidate = 3600
 
+/**
+ * Events page with pure client-side filtering
+ *
+ * - Page is statically generated with ALL events at build time
+ * - Filter options are pre-fetched at build time
+ * - Filtering happens entirely client-side (instant, no loading)
+ * - URL params are used for shareable filter states
+ */
 export default async function Events() {
-  const [response, yearCounts] = await Promise.all([getEvents(1, 18), getEventYearCounts()])
-  // In Strapi 5, events_connection returns nodes and pageInfo
-  const events = (response?.events_connection?.nodes || []) as Event[]
-  const pagination = response?.events_connection?.pageInfo || {
-    total: 0,
-    page: 1,
-    pageSize: 18,
-    pageCount: 1,
-  }
+  // Fetch ALL events and filter options in parallel at build time
+  const [filterOptions, events] = await Promise.all([
+    getEventFilterOptions(),
+    getAllEvents(), // Fetches all pages (Strapi limits to 100 per page)
+  ])
 
-  return (
-    <>
-      <div className="centered pt-5 pb-5">
-        <Filters name="Events" />
-        <YearNav yearCounts={yearCounts} />
-        <p>Total: {pagination.total}</p>
-      </div>
-      <EventGrid events={events} />
-      <LoadMore pagination={pagination} />
-    </>
-  )
+  return <EventsPageContent initialEvents={events as Event[]} filterOptions={filterOptions} />
 }
