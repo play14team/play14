@@ -66,7 +66,11 @@ export default function FilterMulti({
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger className="filter-trigger" aria-label={`Filter by ${filter.label}`}>
+      <Popover.Trigger
+        className="filter-trigger"
+        aria-label={`Filter by ${filter.label}`}
+        aria-expanded={open}
+      >
         {filter.icon && <i className={filter.icon} aria-hidden="true" />}
         <span>{filter.label}</span>
         {selectedCount > 0 && <span className="filter-trigger-badge">{selectedCount}</span>}
@@ -74,7 +78,7 @@ export default function FilterMulti({
       </Popover.Trigger>
 
       <Popover.Portal>
-        <Popover.Content className="filter-dropdown" sideOffset={8} align="start">
+        <Popover.Content className="filter-dropdown" sideOffset={8} align="start" role="listbox">
           {/* Search input */}
           <div className="filter-dropdown-search">
             <input

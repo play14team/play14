@@ -28,8 +28,12 @@ export default function EventProfileTabs({
   hosts,
   mentors,
 }: EventProfileTabsProps) {
-  const timetable = event.timetable as Array<Maybe<ComponentEventsTimetable>>
-  const images = event.images?.filter(Boolean) as Array<{ url: string; name?: string | null }>
+  const timetable = Array.isArray(event.timetable)
+    ? (event.timetable as Array<Maybe<ComponentEventsTimetable>>)
+    : []
+  const images = Array.isArray(event.images)
+    ? (event.images.filter(Boolean) as Array<{ url: string; name?: string | null }>)
+    : []
 
   // Memoize counts and checks
   const participantCount = useMemo(() => participants.length, [participants])
