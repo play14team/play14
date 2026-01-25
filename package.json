@@ -17,7 +17,7 @@
     "lint:fix": "bun run --cwd packages/api lint:fix && bun run --cwd packages/web lint:fix",
     "check": "bun run --cwd packages/api check && bun run --cwd packages/web check",
     "format": "bun run --cwd packages/api format && bun run --cwd packages/web format",
-    "typecheck": "bun run --cwd packages/web typecheck",
+    "typecheck": "bun run --cwd packages/api typecheck && bun run --cwd packages/web typecheck",
     "test": "bun run --cwd packages/api test && bun run --cwd packages/web test",
     "test:api": "bun run --cwd packages/api test",
     "test:web": "bun run --cwd packages/web test",

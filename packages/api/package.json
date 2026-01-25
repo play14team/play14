@@ -18,6 +18,7 @@
     "lint:fix": "biome lint --write .",
     "format": "biome format --write src",
     "check": "biome check .",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

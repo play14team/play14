@@ -83,6 +83,7 @@ export default function FilterMulti({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoFocus
+              aria-label={`Search ${filter.label}`}
             />
           </div>
 

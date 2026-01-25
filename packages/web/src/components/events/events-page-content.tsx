@@ -50,6 +50,7 @@ export default function EventsPageContent({
 
   // Pure client-side filtering - instant, no server fetch
   const filteredEvents = useMemo(() => {
+    const normalizedCountryFilters = activeFilters.country?.map((country) => country.toLowerCase())
     return initialEvents.filter((event) => {
       // Year filter (extract year from start date)
       if (activeFilters.year?.length) {
@@ -67,9 +68,9 @@ export default function EventsPageContent({
       }
 
       // Country filter (lowercase comparison)
-      if (activeFilters.country?.length) {
+      if (normalizedCountryFilters?.length) {
         const eventCountry = event.location?.country?.toLowerCase()
-        if (!eventCountry || !activeFilters.country.includes(eventCountry)) {
+        if (!eventCountry || !normalizedCountryFilters.includes(eventCountry)) {
           return false
         }
       }

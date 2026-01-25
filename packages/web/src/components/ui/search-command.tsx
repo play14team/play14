@@ -135,7 +135,7 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
           break
         case "Enter":
           e.preventDefault()
-          if (flatItems[activeIndex]) {
+          if (activeIndex < flatItems.length && flatItems[activeIndex]) {
             handleSelect(flatItems[activeIndex])
           } else if (query.length >= 2) {
             // Navigate to full search if no item selected
@@ -154,8 +154,11 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="ui-search-overlay" />
-        <Dialog.Content className="ui-search-content" aria-describedby={undefined}>
+        <Dialog.Content className="ui-search-content" aria-describedby="search-description">
           <Dialog.Title className="visually-hidden">Search</Dialog.Title>
+          <Dialog.Description className="visually-hidden" id="search-description">
+            Search events, players, games, and articles
+          </Dialog.Description>
           <div className="ui-search-header">
             <i className="bx bx-search" aria-hidden="true" />
             <input
