@@ -28,6 +28,8 @@ export default function EventProfileTabs({
   hosts,
   mentors,
 }: EventProfileTabsProps) {
+  // Runtime validation: Strapi API may return null/undefined instead of empty arrays
+  // for unpopulated relations, despite TypeScript types suggesting otherwise.
   const timetable = Array.isArray(event.timetable)
     ? (event.timetable as Array<Maybe<ComponentEventsTimetable>>)
     : []
@@ -35,10 +37,28 @@ export default function EventProfileTabs({
     ? (event.images.filter(Boolean) as Array<{ url: string; name?: string | null }>)
     : []
 
+  // Log unexpected data shapes for monitoring API contract violations
+  if (
+    event.timetable !== null &&
+    event.timetable !== undefined &&
+    !Array.isArray(event.timetable)
+  ) {
+    console.warn("[EventProfileTabs] Expected array for timetable", {
+      actualType: typeof event.timetable,
+      eventSlug: event.slug,
+    })
+  }
+  if (event.images !== null && event.images !== undefined && !Array.isArray(event.images)) {
+    console.warn("[EventProfileTabs] Expected array for images", {
+      actualType: typeof event.images,
+      eventSlug: event.slug,
+    })
+  }
+
   // Memoize counts and checks
   const participantCount = useMemo(() => participants.length, [participants])
-  const imageCount = useMemo(() => images?.length || 0, [images])
-  const hasSchedule = useMemo(() => timetable && timetable.length > 0, [timetable])
+  const imageCount = useMemo(() => images.length, [images])
+  const hasSchedule = useMemo(() => timetable.length > 0, [timetable])
   const hasOverviewContent = useMemo(
     () =>
       !!event.description ||

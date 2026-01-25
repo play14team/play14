@@ -4,7 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
-import { searchQuick } from "@/components/search/search-quick.action"
+import { EMPTY_SEARCH_RESULTS, searchQuick } from "@/components/search/search-quick.action"
 import { useDebounce } from "@/hooks/use-debounce"
 import {
   type QuickSearchResults,
@@ -30,6 +30,7 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
   const [results, setResults] = useState<QuickSearchResults | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [error, setError] = useState<string | null>(null)
 
   const debouncedQuery = useDebounce(query, 300)
   const scoredResults = useFuzzySearch(results, debouncedQuery)
@@ -87,15 +88,26 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
   useEffect(() => {
     if (debouncedQuery.length < 2) {
       setResults(null)
+      setError(null)
       return
     }
 
     setIsLoading(true)
+    setError(null)
     searchQuick(debouncedQuery)
-      .then(setResults)
-      .catch((error) => {
-        console.error("Search failed:", error)
-        setResults({ events: [], articles: [], games: [], players: [] })
+      .then((data) => {
+        setResults(data)
+        setError(null)
+      })
+      .catch((err) => {
+        console.error("[SearchCommand] Search failed:", {
+          query: debouncedQuery,
+          queryLength: debouncedQuery.length,
+          timestamp: new Date().toISOString(),
+          error: err instanceof Error ? err.message : String(err),
+        })
+        setError("Unable to perform search. Please try again.")
+        setResults(EMPTY_SEARCH_RESULTS)
       })
       .finally(() => setIsLoading(false))
   }, [debouncedQuery])
@@ -105,6 +117,7 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
     if (isOpen) {
       setQuery("")
       setResults(null)
+      setError(null)
       setActiveIndex(0)
       // Focus input after dialog animation
       setTimeout(() => inputRef.current?.focus(), 50)
@@ -204,10 +217,24 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
                 )
               })}
 
-            {query.length >= 2 && !isLoading && !hasResults && (
+            {query.length >= 2 && !isLoading && error && (
+              <div className="ui-search-empty">
+                <i className="bx bx-error-circle" aria-hidden="true" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {query.length >= 2 && !isLoading && !error && !hasResults && (
               <div className="ui-search-empty">
                 <i className="bx bx-search-alt" aria-hidden="true" />
                 <span>No results found for "{query}"</span>
+              </div>
+            )}
+
+            {query.length > 100 && (
+              <div className="ui-search-hint">
+                <i className="bx bx-error-circle" aria-hidden="true" />
+                <span>Search query too long (max 100 characters)</span>
               </div>
             )}
 
