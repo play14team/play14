@@ -2,6 +2,25 @@
   color: var(--color-yellow) !important;
 }
 
+.ratingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  color: var(--color-text);
+  margin-bottom: 12px;
+}
+
+.ratingRow:last-child {
+  margin-bottom: 0;
+}
+
+.smallRatings {
+  display: flex;
+  gap: 3px;
+}
+
 .smallRatings i {
   color: var(--color-border);
+  font-size: 20px;
 }

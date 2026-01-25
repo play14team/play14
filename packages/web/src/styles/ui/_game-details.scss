@@ -43,6 +43,7 @@
 
   &__image {
     object-fit: cover;
+    object-position: center;
   }
 }
 
@@ -55,14 +56,14 @@
   min-width: 0;
 
   &__name {
-    font-size: 2rem;
+    font-size: 2.7rem;
     font-weight: 700;
     color: var(--color-text);
     margin: 0 0 16px;
     line-height: 1.2;
 
     @media (max-width: 767px) {
-      font-size: 1.5rem;
+      font-size: 2rem;
     }
   }
 
@@ -77,13 +78,13 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
+    font-size: 19px;
     color: var(--color-text-muted);
     text-decoration: none;
     transition: color 0.2s ease;
 
     i {
-      font-size: 16px;
+      font-size: 20px;
       color: var(--color-orange);
     }
 
@@ -103,8 +104,8 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 6px 12px;
-    font-size: 13px;
+    padding: 8px 16px;
+    font-size: 18px;
     font-weight: 500;
     color: var(--color-text);
     background-color: var(--color-bg-elevated);
@@ -114,7 +115,7 @@
     transition: all 0.2s ease;
 
     i {
-      font-size: 14px;
+      font-size: 18px;
       color: var(--color-orange);
     }
 
@@ -130,7 +131,7 @@
   }
 
   &__summary {
-    font-size: 1rem;
+    font-size: 1.05rem;
     line-height: 1.7;
     color: var(--color-text-muted);
     margin: 0;
@@ -156,6 +157,23 @@
   min-width: 0;
 }
 
+// Larger tab headers for game page
+.game-profile {
+  .ui-tabs-trigger {
+    font-size: 20px;
+
+    i {
+      font-size: 22px;
+    }
+  }
+
+  .ui-tabs-badge {
+    font-size: 14px;
+    min-width: 22px;
+    height: 22px;
+  }
+}
+
 // ===========================================
 // Sidebar
 // ===========================================
@@ -174,7 +192,7 @@
   }
 
   &__title {
-    font-size: 1rem;
+    font-size: 1.6rem;
     font-weight: 600;
     color: var(--color-text);
     margin: 0 0 16px;
@@ -208,7 +226,7 @@
   }
 
   &__label {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--color-text-muted);
     text-transform: uppercase;
@@ -217,7 +235,7 @@
 
   &__value {
     flex: 1;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--color-text);
     text-align: right;
 
@@ -249,7 +267,7 @@
 
   &__contributor-label {
     display: block;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--color-text-muted);
     text-transform: uppercase;
@@ -278,14 +296,14 @@
   }
 
   &__contributor-avatar {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
   }
 
   &__contributor-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: var(--color-text);
   }
@@ -319,13 +337,13 @@
     }
 
     > i:first-child {
-      font-size: 24px;
+      font-size: 28px;
       color: var(--color-orange);
     }
 
     > span {
       flex: 1;
-      font-size: 14px;
+      font-size: 19px;
       color: var(--color-text);
       overflow: hidden;
       text-overflow: ellipsis;
@@ -333,7 +351,7 @@
     }
 
     > i:last-child {
-      font-size: 18px;
+      font-size: 22px;
       color: var(--color-text-muted);
     }
   }
@@ -345,12 +363,48 @@
 
 // Description section (in tabs)
 .game-details-description {
-  h2,
-  h3,
-  h4 {
-    margin-top: 24px;
-    margin-bottom: 12px;
+  font-size: 1.05rem;
+  margin-top: 32px;
+  line-height: 1.85;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--color-text);
+    margin: 4rem 0 2.5rem 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h2 {
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 3rem 0 2rem 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 2.5rem 0 1.75rem 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  h4 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 1rem 0 0.5rem 0;
 
     &:first-child {
       margin-top: 0;
@@ -358,19 +412,21 @@
   }
 
   p {
-    line-height: 1.7;
-    margin-bottom: 16px;
+    line-height: 1.85;
+    margin-bottom: 24px;
+    font-size: 1.05rem;
   }
 
   ul,
   ol {
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     padding-left: 24px;
   }
 
   li {
-    margin-bottom: 8px;
-    line-height: 1.6;
+    margin-bottom: 12px;
+    line-height: 1.8;
+    font-size: 1.05rem;
   }
 
   img {
@@ -386,6 +442,21 @@
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  code {
+    color: var(--color-orange);
+    background-color: var(--color-bg-elevated);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: "Courier New", monospace;
+    font-size: 0.95em;
+  }
+
+  pre code {
+    display: block;
+    padding: 12px;
+    overflow-x: auto;
   }
 }
 
@@ -404,7 +475,7 @@
 
   p {
     margin: 0;
-    font-size: 15px;
+    font-size: 18px;
   }
 }
 
@@ -416,26 +487,35 @@
   padding: 20px;
 
   ul {
-    margin: 0;
+    margin: 20px 0 0 0;
     padding: 0;
     list-style: none;
   }
 
   li {
     position: relative;
-    padding: 10px 0 10px 24px;
+    padding: 16px 0 16px 24px;
     color: var(--color-text);
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 1.1rem;
+
+    &:first-child {
+      padding-top: 24px;
+    }
 
     &::before {
       content: "";
       position: absolute;
       left: 0;
-      top: 16px;
+      top: 22px;
       width: 8px;
       height: 8px;
       background-color: var(--color-orange);
       border-radius: 50%;
+    }
+
+    &:first-child::before {
+      top: 30px;
     }
 
     &:not(:last-child) {
@@ -446,17 +526,17 @@
 
 // Section titles in info cards
 .game-details-section-title {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-text);
-  margin: 0 0 16px;
+  margin: 0 0 24px;
   display: flex;
   align-items: center;
   gap: 8px;
 
   i {
     color: var(--color-orange);
-    font-size: 20px;
+    font-size: 26px;
   }
 }
 

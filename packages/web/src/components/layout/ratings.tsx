@@ -5,15 +5,15 @@ const Ratings = (props: { name: string; value: number }) => {
   const stars = []
 
   for (let index = 1; index <= value; index++) {
-    stars.push(<i className={`fa fa-star ${styles.ratingColor}`} />)
+    stars.push(<i key={`filled-${index}`} className={`fa fa-star ${styles.ratingColor}`} />)
   }
   for (let index = value + 1; index <= 5; index++) {
-    stars.push(<i className="fa fa-star" />)
+    stars.push(<i key={`empty-${index}`} className="fa fa-star" />)
   }
 
   return (
-    <div className="mt-2 d-flex justify-content-between align-items-center">
-      {name}
+    <div className={styles.ratingRow}>
+      <span>{name}</span>
       <div className={styles.smallRatings}>{stars}</div>
     </div>
   )

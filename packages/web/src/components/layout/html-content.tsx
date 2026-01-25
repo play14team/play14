@@ -43,6 +43,30 @@ function stripInlineStyles(html: string): string {
   return html.replace(/\s*style="[^"]*"/gi, "")
 }
 
+// Transform all-caps text to sentence case in HTML
+function normalizeAllCapsText(html: string): string {
+  // Match text content inside tags (not tag names or attributes)
+  return html.replace(/>([^<]+)</g, (match, text) => {
+    // Only process if text has letters and is all-caps
+    if (!/[A-Za-zÀ-ÖØ-öø-ÿ]/.test(text)) return match
+    if (/[a-zà-öø-ÿ]/.test(text)) return match // Has lowercase, skip
+
+    const letters = text.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, "")
+    if (letters.length < 3) return match // Too short, skip
+
+    const upper = letters.replace(/[^A-ZÀ-ÖØ-Þ]/g, "")
+    if (upper.length / letters.length <= 0.8) return match // Not mostly caps, skip
+
+    // Transform to sentence case
+    const lower = text.toLocaleLowerCase()
+    const normalized = lower.replace(/(^\s*[a-zà-öø-ÿ])|([.!?]\s+[a-zà-öø-ÿ])/g, (m: string) =>
+      m.toLocaleUpperCase()
+    )
+
+    return `>${normalized}<`
+  })
+}
+
 /**
  * Sanitize HTML content to prevent XSS attacks
  */
@@ -78,9 +102,11 @@ const HtmlContent = ({
 }) => {
   if (!children) return <></>
 
-  // Sanitize first to prevent XSS, then optionally strip styles
+  // Sanitize first to prevent XSS, then optionally strip styles, then normalize all-caps
   const sanitized = sanitizeHtml(children)
-  const content = preserveStyles ? sanitized : stripInlineStyles(sanitized)
+  const withoutStyles = preserveStyles ? sanitized : stripInlineStyles(sanitized)
+  const content = normalizeAllCapsText(withoutStyles)
+
   return <>{parse(content)}</>
 }
 
