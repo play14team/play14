@@ -190,8 +190,13 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      const main = page.locator("main")
+      // Verify main content area
+      const main = page.locator("main.game-details-main")
       await expect(main).toBeVisible()
+
+      // Verify game title
+      const title = page.locator("h1#game-title")
+      await expect(title).toBeVisible()
     }
   })
 
@@ -202,6 +207,10 @@ test.describe("Game Details Page", () => {
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
       await verifyPageLayout(page)
+
+      // Verify article structure
+      const article = page.locator("article.game-details")
+      await expect(article).toBeVisible()
     }
   })
 
@@ -211,8 +220,60 @@ test.describe("Game Details Page", () => {
 
     const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
     if (clicked) {
-      const main = page.locator("main")
-      await expect(main).toBeVisible()
+      // Verify sidebar exists
+      const sidebar = page.locator("aside.game-details-sidebar")
+      await expect(sidebar).toBeVisible()
+
+      // Verify sidebar has info cards
+      const sidebarCard = page.locator(".game-details-sidebar-card").first()
+      await expect(sidebarCard).toBeVisible()
+    }
+  })
+
+  test("should display accessible tabs", async ({ page }) => {
+    await page.goto("/games")
+    await waitForPageLoad(page)
+
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
+    if (clicked) {
+      // Verify tabs component
+      const tabsList = page.locator(".ui-tabs-list")
+      await expect(tabsList).toBeVisible()
+
+      // Verify at least one tab trigger
+      const tabTrigger = page.locator(".ui-tabs-trigger").first()
+      await expect(tabTrigger).toBeVisible()
+
+      // Verify tab has proper ARIA label
+      await expect(tabsList).toHaveAttribute("aria-label", /game information tabs/i)
+    }
+  })
+
+  test("should display hero image", async ({ page }) => {
+    await page.goto("/games")
+    await waitForPageLoad(page)
+
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
+    if (clicked) {
+      // Hero image section should be visible (if game has image)
+      const hero = page.locator(".game-details-hero")
+      // Hero might not exist if game has no image, so just check it doesn't break
+      const heroExists = (await hero.count()) > 0
+      if (heroExists) {
+        await expect(hero).toBeVisible()
+      }
+    }
+  })
+
+  test("should have responsive grid layout", async ({ page }) => {
+    await page.goto("/games")
+    await waitForPageLoad(page)
+
+    const clicked = await clickFirstDetailLink(page, "/games/", ["categories", "tags"])
+    if (clicked) {
+      // Verify grid layout container
+      const content = page.locator(".game-details-content")
+      await expect(content).toBeVisible()
     }
   })
 })
