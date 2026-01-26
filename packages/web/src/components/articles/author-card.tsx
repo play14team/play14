@@ -19,12 +19,7 @@ export default function AuthorCard({ author, variant = "default" }: AuthorCardPr
         className="article-author-compact"
         aria-label={`View ${author.name}'s profile`}
       >
-        <Avatar
-          src={author.avatar?.url}
-          alt={author.name}
-          fallback={author.name}
-          size="sm"
-        />
+        <Avatar src={author.avatar?.url} alt={author.name} fallback={author.name} size="sm" />
         <span className="article-author-compact-name">{author.name}</span>
       </Link>
     )
