@@ -63,7 +63,7 @@ export default async function Article(props: SlugParamsProps) {
   }
 
   return (
-    <Page name={article.title}>
+    <Page name={article.title} hideName={true}>
       <ArticleDetails article={article} />
     </Page>
   )

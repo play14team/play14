@@ -1,103 +1,144 @@
 import type { Article, UploadFile } from "@/models/strapi"
+import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
-import Separator from "../ui/separator"
 import AuthorCard from "./author-card"
 import ArticleInfoSidebar from "./info-sidebar"
 import ArticlesNavigator from "./nav"
-import ArticleSidebar from "./sidebar"
+import RelatedSection from "./related-section"
 
 interface ArticleDetailsProps {
   article: Article
 }
 
 /**
- * Modern article details component with improved layout, accessibility, and responsiveness.
- * Uses Bootstrap grid for consistency with player and event details pages.
- * Features a hero image, sticky info sidebar, rich content area, and related articles sidebar.
+ * Modern article details component with horizontal hero layout.
+ * Features:
+ * - Hero section with image on left, metadata on right
+ * - Clean typography and visual hierarchy
+ * - Full-width content area below hero
+ * - Gallery and related articles at bottom
  */
 export default function ArticleDetails({ article }: ArticleDetailsProps) {
   const image = article.defaultImage as UploadFile
   const hasGallery = article.images && article.images.length > 0
 
   return (
-    <article className="article-details-area pb-100" aria-labelledby="article-title">
-      {/* Navigation */}
-      <ArticlesNavigator current={article.slug!} />
+    <article className="article-profile" aria-labelledby="article-title">
+      <div className="container">
+        {/* Navigation */}
+        <ArticlesNavigator current={article.slug!} />
 
-      {/* Hero image section */}
-      <header className="article-details-hero">
-        <div className="article-details-hero-image">
-          <Image
-            src={image?.url || "/placeholder-article.jpg"}
-            alt={image?.name || article.title || "Article image"}
-            fill
-            priority
-            sizes="100vw"
-            style={{ objectFit: "cover" }}
-            placeholder="blur"
-            blurDataURL={(image as { blurhash?: string })?.blurhash || process.env.DEFAULT_BLURHASH}
-            unoptimized
-          />
-          <div className="article-details-hero-overlay" aria-hidden="true" />
-        </div>
-      </header>
+        {/* Hero section: Image left, metadata right */}
+        <header className="article-profile-hero">
+          {/* Left: Featured image */}
+          <figure className="article-profile-hero__image">
+            <Image
+              src={image?.url || "/placeholder-article.jpg"}
+              alt={image?.name || article.title || "Article image"}
+              width={image?.width || 800}
+              height={image?.height || 450}
+              priority
+              placeholder="blur"
+              blurDataURL={
+                (image as { blurhash?: string })?.blurhash || process.env.DEFAULT_BLURHASH
+              }
+              unoptimized
+            />
+          </figure>
 
-      {/* Main content area - using Bootstrap grid for consistency */}
-      <div className="container pt-4">
-        <div className="row">
-          {/* Left column: Article info sidebar */}
-          <div className="col-lg-3 col-md-12">
+          {/* Right: Article info */}
+          <div className="article-profile-hero__info">
+            {/* Category badge */}
+            {article.category && (
+              <span className="article-profile-hero__badge">
+                <i className="bx bx-folder-open" aria-hidden="true" />
+                {article.category}
+              </span>
+            )}
+
+            {/* Article title */}
+            <h1 id="article-title" className="article-profile-hero__title">
+              {article.title}
+            </h1>
+
+            {/* Author info */}
+            {article.author && (
+              <div className="article-profile-hero__author">
+                <AuthorCard author={article.author} variant="compact" />
+              </div>
+            )}
+
+            {/* Dates */}
+            <div className="article-profile-hero__dates">
+              {article.publishedAt && (
+                <div className="article-profile-hero__date">
+                  <i className="bx bx-calendar" aria-hidden="true" />
+                  <span>Published</span>
+                  <time dateTime={article.publishedAt}>
+                    {format(parseISO(article.publishedAt), "MMMM d, yyyy")}
+                  </time>
+                </div>
+              )}
+              {article.updatedAt && article.updatedAt !== article.publishedAt && (
+                <div className="article-profile-hero__date">
+                  <i className="bx bx-revision" aria-hidden="true" />
+                  <span>Updated</span>
+                  <time dateTime={article.updatedAt}>
+                    {format(parseISO(article.updatedAt), "MMMM d, yyyy")}
+                  </time>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Main content area */}
+        <div className="row article-profile-main">
+          {/* Main content column */}
+          <div className="col-lg-8 col-md-12">
+            <main className="article-profile-content">
+              <HtmlContent>{article.content!}</HtmlContent>
+            </main>
+
+            {/* Author card - full version */}
+            {article.author && (
+              <section className="article-profile-author" aria-labelledby="about-author-heading">
+                <h2 id="about-author-heading" className="visually-hidden">
+                  About the author
+                </h2>
+                <AuthorCard author={article.author} />
+              </section>
+            )}
+
+            {/* Image gallery */}
+            {hasGallery && (
+              <section className="article-profile-gallery" aria-labelledby="gallery-heading">
+                <h2 id="gallery-heading" className="article-profile-gallery__title">
+                  <i className="bx bx-images" aria-hidden="true" />
+                  Photo gallery
+                </h2>
+                <Gallery
+                  images={
+                    article.images!.filter(Boolean) as Array<{
+                      url: string
+                      name?: string | null
+                    }>
+                  }
+                />
+              </section>
+            )}
+          </div>
+
+          {/* Sidebar with categories, tags, share */}
+          <div className="col-lg-4 col-md-12">
             <ArticleInfoSidebar article={article} />
           </div>
-
-          {/* Center column: Main content */}
-          <div className="col-lg-6 col-md-12">
-            <main className="article-details-content">
-              <HtmlContent>{article.content!}</HtmlContent>
-
-              {/* Author card - full version at the bottom of content */}
-              {article.author && (
-                <>
-                  <Separator className="article-details-separator" />
-                  <section aria-labelledby="about-author-heading">
-                    <h2 id="about-author-heading" className="visually-hidden">
-                      About the author
-                    </h2>
-                    <AuthorCard author={article.author} />
-                  </section>
-                </>
-              )}
-
-              {/* Image gallery */}
-              {hasGallery && (
-                <>
-                  <Separator className="article-details-separator" />
-                  <section aria-labelledby="gallery-heading">
-                    <h2 id="gallery-heading" className="article-details-section-title">
-                      <i className="bx bx-images" aria-hidden="true" />
-                      Gallery
-                    </h2>
-                    <Gallery
-                      images={
-                        article.images!.filter(Boolean) as Array<{
-                          url: string
-                          name?: string | null
-                        }>
-                      }
-                    />
-                  </section>
-                </>
-              )}
-            </main>
-          </div>
-
-          {/* Right column: Related articles sidebar */}
-          <div className="col-lg-3 col-md-12">
-            <ArticleSidebar />
-          </div>
         </div>
+
+        {/* Related articles section */}
+        <RelatedSection />
       </div>
     </article>
   )

@@ -18,46 +18,49 @@ const DetailsNavigator = (props: {
 }) => {
   const { previous, next, entity } = props
 
+  // Use entity-specific class names for styling
+  const baseClass = entity === "articles" ? "article-profile-nav" : "event-profile-nav"
+
   return (
-    <nav className="event-profile-nav">
+    <nav className={baseClass}>
       {previous ? (
         <Link
           href={`/${entity}/${previous.slug}`}
-          className="event-profile-nav__link event-profile-nav__link--prev"
+          className={`${baseClass}__link ${baseClass}__link--prev`}
         >
-          <i className="bx bx-chevron-left event-profile-nav__icon" />
-          {renderNavImage(previous.image, previous.name)}
-          <div className="event-profile-nav__info">
-            <span className="event-profile-nav__name">{previous.name}</span>
+          <i className={`bx bx-chevron-left ${baseClass}__icon`} />
+          {renderNavImage(previous.image, previous.name, baseClass)}
+          <div className={`${baseClass}__info`}>
+            <span className={`${baseClass}__title`}>{previous.name}</span>
             {previous.date && (
-              <span className="event-profile-nav__date">{formatDate(previous.date)}</span>
+              <span className={`${baseClass}__date`}>{formatDate(previous.date)}</span>
             )}
           </div>
         </Link>
       ) : (
-        <div className="event-profile-nav__placeholder" />
+        <div className={`${baseClass}__placeholder`} />
       )}
 
       {next ? (
         <Link
           href={`/${entity}/${next.slug}`}
-          className="event-profile-nav__link event-profile-nav__link--next"
+          className={`${baseClass}__link ${baseClass}__link--next`}
         >
-          <div className="event-profile-nav__info">
-            <span className="event-profile-nav__name">{next.name}</span>
-            {next.date && <span className="event-profile-nav__date">{formatDate(next.date)}</span>}
+          <div className={`${baseClass}__info`}>
+            <span className={`${baseClass}__title`}>{next.name}</span>
+            {next.date && <span className={`${baseClass}__date`}>{formatDate(next.date)}</span>}
           </div>
-          {renderNavImage(next.image, next.name)}
-          <i className="bx bx-chevron-right event-profile-nav__icon" />
+          {renderNavImage(next.image, next.name, baseClass)}
+          <i className={`bx bx-chevron-right ${baseClass}__icon`} />
         </Link>
       ) : (
-        <div className="event-profile-nav__placeholder" />
+        <div className={`${baseClass}__placeholder`} />
       )}
     </nav>
   )
 }
 
-function renderNavImage(image: UploadFile | undefined, name: string) {
+function renderNavImage(image: UploadFile | undefined, name: string, baseClass: string) {
   if (image) {
     return (
       <Image
@@ -65,15 +68,13 @@ function renderNavImage(image: UploadFile | undefined, name: string) {
         alt={image.name || name}
         width={40}
         height={40}
-        className="event-profile-nav__image"
+        className={`${baseClass}__image`}
         unoptimized
       />
     )
   }
 
-  return (
-    <DefaultPlayerImage alt={name} width={40} height={40} className="event-profile-nav__image" />
-  )
+  return <DefaultPlayerImage alt={name} width={40} height={40} className={`${baseClass}__image`} />
 }
 
 function formatDate(date: Date | string): string {
