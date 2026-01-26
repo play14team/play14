@@ -1,16 +1,17 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.3.13/schema.json",
   "extends": ["../../biome.json"],
   "files": {
-    "ignore": [
-      ".next/",
-      "out/",
-      "build/",
-      "coverage/",
-      "public/",
-      "src/models/",
-      "src/styles/css/",
-      "src/styles/font-awesome/"
+    "includes": [
+      "!**/.next/",
+      "!**/out/",
+      "!**/build/",
+      "!**/coverage/",
+      "!**/public/",
+      "!**/src/models/",
+      "!**/src/styles/css/",
+      "!**/src/styles/font-awesome/"
     ]
   }
 }
