@@ -1,4 +1,3 @@
-import Filters from "@/components/events/filters"
 import { getEventYearCounts, getEventYears, getEventsByYear } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import LoadMoreYear from "@/components/events/load-more-year"
@@ -50,7 +49,7 @@ export default async function YearEventsPage({ params }: YearEventsPageProps) {
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <Filters name={`Events ${year}`} />
+        <h1>Events {year}</h1>
         <YearNav currentYear={year} yearCounts={yearCounts} />
         <p>Total: {pagination.total}</p>
       </div>
