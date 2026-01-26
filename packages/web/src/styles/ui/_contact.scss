@@ -1,0 +1,322 @@
+// ===========================================
+// Contact Page Styles
+// ===========================================
+
+// Contact cards
+.contact-card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 32px 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-2px);
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+
+  p {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    flex-grow: 1;
+  }
+}
+
+.contact-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-orange) 0%, #f5a623 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+
+  i {
+    font-size: 28px;
+    color: #fff;
+  }
+
+  &.contact-card-icon-slack {
+    background: linear-gradient(135deg, #4a154b 0%, #611f69 100%);
+  }
+
+  &.contact-card-icon-whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  }
+
+  &.contact-card-icon-email {
+    background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+  }
+}
+
+.contact-card-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
+  opacity: 0.1;
+
+  i {
+    font-size: 72px;
+    color: var(--color-text);
+  }
+}
+
+.contact-card-action {
+  margin-top: 20px;
+
+  // Override default-btn to match newsletter button style
+  .default-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--color-orange);
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+    &:hover {
+      background-color: var(--color-orange-dark, #d96d2f);
+      color: #fff;
+      transform: scale(0.98);
+    }
+
+    &.contact-btn-slack {
+      background-color: #4a154b;
+
+      &:hover {
+        background-color: #611f69;
+      }
+    }
+
+    &.contact-btn-whatsapp {
+      background-color: #25d366;
+
+      &:hover {
+        background-color: #128c7e;
+      }
+    }
+
+    &.contact-btn-email {
+      background-color: #0078d4;
+
+      &:hover {
+        background-color: #005a9e;
+      }
+    }
+
+    i {
+      font-size: 18px;
+    }
+  }
+
+  // Newsletter form adjustments for contact card
+  .newsletter-signup {
+    margin-top: 0;
+  }
+
+  .newsletter-description {
+    display: none;
+  }
+}
+
+// Centered newsletter section
+.newsletter-section-centered {
+  text-align: center;
+  max-width: 500px;
+  margin: 40px auto 0;
+
+  h3 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--color-text);
+  }
+
+  p {
+    font-size: 15px;
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .newsletter-signup {
+    margin-top: 0;
+  }
+
+  .newsletter-description {
+    display: none;
+  }
+}
+
+// Social links grid
+.social-links-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.social-link-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 32px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  min-width: 140px;
+
+  &:hover {
+    border-color: var(--color-orange);
+    box-shadow: 0 4px 12px rgba(238, 128, 54, 0.15);
+    transform: translateY(-2px);
+
+    i {
+      color: var(--color-orange);
+    }
+  }
+
+  i {
+    font-size: 36px;
+    color: var(--color-text-muted);
+    transition: color 0.2s ease;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+}
+
+// Organization info
+.org-info {
+  h3 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+      color: var(--color-orange);
+    }
+  }
+
+  p {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: 18px;
+
+    a {
+      color: var(--color-orange);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.org-address {
+  background-color: var(--color-surface);
+  border-radius: 12px;
+  padding: 32px;
+  border: 1px solid var(--color-border);
+
+  h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      color: var(--color-orange);
+    }
+  }
+
+  address {
+    font-style: normal;
+    font-size: 17px;
+    line-height: 1.9;
+    color: var(--color-text-muted);
+    margin-bottom: 20px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      color: var(--color-orange);
+    }
+
+    a {
+      color: var(--color-orange);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 991px) {
+  .contact-card {
+    margin-bottom: 20px;
+  }
+
+  .org-address {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .social-links-grid {
+    gap: 12px;
+  }
+
+  .social-link-card {
+    min-width: 100px;
+    padding: 20px 24px;
+
+    i {
+      font-size: 28px;
+    }
+  }
+}

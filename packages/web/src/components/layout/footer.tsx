@@ -1,3 +1,4 @@
+import NewsletterSignup from "@/components/newsletter/newsletter-signup"
 import footerMap from "@/styles/images/footer-map.png"
 import Image from "next/image"
 import Link from "next/link"
@@ -32,14 +33,14 @@ const Footer = () => {
     <footer className="footer-area bg-color">
       <div className="container">
         <div className="row">
-          <div className="col-lg-4 col-sm-6">
-            <div className="single-footer-widget">
-              <Link href="/" className="logo">
-                <Logo width={300} height={100} />
+          <div className="col-lg-3 col-sm-6">
+            <div className="single-footer-widget text-center">
+              <Link href="/" className="logo d-inline-block">
+                <Logo width={250} height={83} />
               </Link>
-              <p>play is the way</p>
+              <p className="mt-3">play is the way</p>
 
-              <ul className="social-link">
+              <ul className="social-link justify-content-center">
                 {socialLinks.map((action, index) => {
                   return (
                     <li key={index}>
@@ -59,8 +60,15 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="col-lg-2 col-sm-6">
-            <div className="single-footer-widget pl-5">
+          <div className="col-lg-4 col-sm-6">
+            <div className="single-footer-widget">
+              <h3>Stay updated</h3>
+              <NewsletterSignup source="footer" />
+            </div>
+          </div>
+
+          <div className="col-lg-2 col-sm-6 ps-lg-5">
+            <div className="single-footer-widget">
               <h3>Explore</h3>
 
               <ul className="footer-links-list">
@@ -77,7 +85,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="col-lg-2 col-sm-6">
+          <div className="col-lg-3 col-sm-6">
             <div className="single-footer-widget">
               <h3>Resources</h3>
 
@@ -93,29 +101,6 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link href="/articles">Our articles</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="col-lg-4 col-sm-6">
-            <div className="single-footer-widget">
-              <h3>Address</h3>
-
-              <ul className="footer-contact-info">
-                <li>
-                  <i className="bx bx-building" />
-                  #play14 a.s.b.l.
-                  <br />
-                  46 boulevard Jules Salentiny
-                  <br />
-                  L-2511 Luxembourg
-                  <br />
-                  LUXEMBOUG
-                </li>
-                <li>
-                  <i className="bx bx-envelope" />
-                  <a href="mailto:team@play14.org">team@play14.org</a>
                 </li>
               </ul>
             </div>

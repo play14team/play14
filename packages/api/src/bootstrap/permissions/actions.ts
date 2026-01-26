@@ -383,3 +383,14 @@ export const RESULT_LINE_ITEM_ACTIONS = {
   DELETE: "api::result-line-item.custom-result-line-item.delete",
   BULK_UPDATE: "api::result-line-item.custom-result-line-item.bulkUpdate",
 } as const
+
+// ==================== NEWSLETTER ====================
+export const NEWSLETTER_ACTIONS = {
+  SUBSCRIBE: "api::newsletter.newsletter.subscribe",
+} as const
+
+// ==================== LINKEDIN ====================
+export const LINKEDIN_POST_ACTIONS = {
+  PREVIEW: "api::linkedin-post.custom-linkedin-post.previewPost",
+  POST_MANUALLY: "api::linkedin-post.custom-linkedin-post.postManually",
+} as const

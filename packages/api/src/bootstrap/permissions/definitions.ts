@@ -29,8 +29,10 @@ import {
   I18N_ACTIONS,
   IMPORT_ACTIONS,
   LIKED_ITEM_ACTIONS,
+  LINKEDIN_POST_ACTIONS,
   MEDIA_FILE_ACTIONS,
   MEDIA_FOLDER_ACTIONS,
+  NEWSLETTER_ACTIONS,
   PERMISSIONS_ACTIONS,
   PLAYER_ACTIONS,
   PLAYER_CLAIM_ACTIONS,
@@ -65,6 +67,13 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Liked items showcase (public - for public showcase page)
   { action: LIKED_ITEM_ACTIONS.LIST_PUBLIC, minimumRole: ROLE_TYPES.PUBLIC },
+
+  // Newsletter subscription (public)
+  { action: NEWSLETTER_ACTIONS.SUBSCRIBE, minimumRole: ROLE_TYPES.PUBLIC },
+
+  // LinkedIn post management (Host+ can preview/post)
+  { action: LINKEDIN_POST_ACTIONS.PREVIEW, minimumRole: ROLE_TYPES.HOST },
+  { action: LINKEDIN_POST_ACTIONS.POST_MANUALLY, minimumRole: ROLE_TYPES.HOST },
 
   // User me (needed for auth flow)
   { action: USER_ACTIONS.ME, minimumRole: ROLE_TYPES.PUBLIC },
