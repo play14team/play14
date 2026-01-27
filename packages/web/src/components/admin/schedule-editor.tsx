@@ -1,12 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import {
   DAYS_OF_WEEK,
   type DayOfWeek,
   type Timeslot,
   type TimetableDay,
 } from "@/app/(admin)/admin/events/[slug]/schedule.types"
-import { useState } from "react"
 
 interface Props {
   schedule: TimetableDay[]

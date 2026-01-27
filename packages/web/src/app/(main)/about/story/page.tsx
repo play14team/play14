@@ -1,10 +1,10 @@
+import type { Metadata } from "next"
 import { getStory } from "@/components/about/get.action"
 import HistoryItem from "@/components/about/historyitem"
 import HtmlContent from "@/components/layout/html-content"
 import Page from "@/components/layout/page"
 import PlayerGrid from "@/components/players/grid"
 import type { Enum_Componentdefaulthistoryitem_Dateformat, History, Player } from "@/models/strapi"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "About | Our story",

@@ -1,8 +1,8 @@
+import { notFound } from "next/navigation"
 import PlayerDetails from "@/components/players/details"
 import { getPlayerSlugs } from "@/components/players/get.action"
 import { getPlayerBySlug } from "@/components/players/get.cached"
 import type { SlugParamsProps } from "@/libs/slug-params"
-import { notFound } from "next/navigation"
 
 // Enable dynamic params for players not pre-generated
 export const dynamicParams = true

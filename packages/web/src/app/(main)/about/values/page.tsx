@@ -1,9 +1,9 @@
-import CodeOfConduct from "@/components/layout/codeofconduct"
-import Manifesto from "@/components/layout/manifesto"
-import Page from "@/components/layout/page"
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import CodeOfConduct from "@/components/layout/codeofconduct"
+import Manifesto from "@/components/layout/manifesto"
+import Page from "@/components/layout/page"
 
 export const metadata: Metadata = {
   title: "About | Our values",

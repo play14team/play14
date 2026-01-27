@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import {
   type EventImage,
   removeEventImage,
@@ -7,7 +8,6 @@ import {
   uploadEventImage,
 } from "@/app/(admin)/admin/events/[slug]/images.action"
 import { useToast } from "@/components/admin/toast"
-import { useRouter } from "next/navigation"
 import ImageManager from "./image-manager"
 
 // Default image aspect ratio: 6:5 (e.g., 600x500)

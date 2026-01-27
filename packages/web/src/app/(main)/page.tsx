@@ -1,3 +1,4 @@
+import Link from "next/link"
 import EventsWorldMap from "@/components/events/EventsWorldMap"
 import Expectations from "@/components/home/expectations"
 import Faq from "@/components/home/faq"
@@ -9,7 +10,6 @@ import CodeOfConduct from "@/components/layout/codeofconduct"
 import Manifesto from "@/components/layout/manifesto"
 import Title from "@/components/layout/title"
 import { Enum_Expectation_Type } from "@/models/strapi"
-import Link from "next/link"
 
 export const revalidate = 3600
 

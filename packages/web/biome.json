@@ -4,14 +4,14 @@
   "extends": ["../../biome.json"],
   "files": {
     "includes": [
-      "!**/.next/",
-      "!**/out/",
-      "!**/build/",
-      "!**/coverage/",
-      "!**/public/",
-      "!**/src/models/",
-      "!**/src/styles/css/",
-      "!**/src/styles/font-awesome/"
+      "!**/.next",
+      "!**/out",
+      "!**/build",
+      "!**/coverage",
+      "!**/public",
+      "!**/src/models",
+      "!**/src/styles/css",
+      "!**/src/styles/font-awesome"
     ]
   }
 }

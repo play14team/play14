@@ -1,8 +1,8 @@
 "use client"
 
-import type { UploadFile } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
+import type { UploadFile } from "@/models/strapi"
 
 // ============================================================================
 // TYPES

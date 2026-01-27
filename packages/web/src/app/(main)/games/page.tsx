@@ -1,8 +1,8 @@
-import GamesPageContent from "@/components/games/games-page-content"
-import { getGameFilterOptions } from "@/components/games/get-filter-options.action"
-import { getAllGames } from "@/components/games/get.action"
-import type { Game } from "@/models/strapi"
 import type { Metadata } from "next"
+import GamesPageContent from "@/components/games/games-page-content"
+import { getAllGames } from "@/components/games/get.action"
+import { getGameFilterOptions } from "@/components/games/get-filter-options.action"
+import type { Game } from "@/models/strapi"
 
 export const metadata: Metadata = {
   title: "Games",

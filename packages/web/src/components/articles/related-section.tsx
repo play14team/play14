@@ -1,7 +1,7 @@
-import type { Article } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
+import type { Article } from "@/models/strapi"
 import { getArticleSidebar } from "./get.action"
 
 /**

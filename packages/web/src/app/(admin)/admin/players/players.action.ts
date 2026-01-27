@@ -1,8 +1,8 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
 import type { GeoLocation } from "@/models/strapi"
-import { revalidatePath } from "next/cache"
 
 /**
  * Revalidate all public pages that display player data

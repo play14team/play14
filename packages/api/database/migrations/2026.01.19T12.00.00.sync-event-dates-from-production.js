@@ -32,8 +32,7 @@ const normalizeKey = (value) =>
         .trim()
     : ""
 
-const makeKey = (name, country) =>
-  `${normalizeKey(name)}|${(country || "").toUpperCase()}`
+const makeKey = (name, country) => `${normalizeKey(name)}|${(country || "").toUpperCase()}`
 
 const manualTimezoneByKey = new Map([
   [makeKey("Amsterdam", "NL"), "Europe/Amsterdam"],
@@ -130,8 +129,7 @@ const deriveTimezoneFromLocation = ({ name, country, fallbackName }) => {
   return null
 }
 
-const stripYearSuffix = (value) =>
-  value ? value.replace(/\s+\d{4}\s*$/u, "").trim() : ""
+const stripYearSuffix = (value) => (value ? value.replace(/\s+\d{4}\s*$/u, "").trim() : "")
 
 export async function up(knex) {
   console.log("Starting migration: Sync event dates from production JSON snapshot")
@@ -199,10 +197,7 @@ export async function up(knex) {
       columns.find((col) => col.includes("location") && col.endsWith("_id"))
     const eventIdColumn =
       columns.find(
-        (col) =>
-          col.endsWith("_id") &&
-          col.includes("event") &&
-          !col.includes("event_location")
+        (col) => col.endsWith("_id") && col.includes("event") && !col.includes("event_location")
       ) || columns.find((col) => col === "event_id")
 
     if (eventIdColumn && locationIdColumn) {
@@ -305,12 +300,14 @@ export async function up(knex) {
     // The timezone() function interprets the timestamp as being in the specified timezone
     // and converts it to UTC for storage
     // NOTE: This requires the server to run in UTC (TZ=UTC) for consistent behavior
-    const count = await knex("events").where("document_id", documentId).update({
-      start: knex.raw("timezone(?, ?::timestamp)", [timezone, event.localStart]),
-      end: knex.raw("timezone(?, ?::timestamp)", [timezone, event.localEnd]),
-      timezone,
-      updated_at: now,
-    })
+    const count = await knex("events")
+      .where("document_id", documentId)
+      .update({
+        start: knex.raw("timezone(?, ?::timestamp)", [timezone, event.localStart]),
+        end: knex.raw("timezone(?, ?::timestamp)", [timezone, event.localEnd]),
+        timezone,
+        updated_at: now,
+      })
 
     if (count > 0) {
       updatedDocuments++
@@ -327,7 +324,5 @@ export async function up(knex) {
 }
 
 export async function down() {
-  console.log(
-    "Rollback skipped: snapshot sync is non-destructive and not safely reversible"
-  )
+  console.log("Rollback skipped: snapshot sync is non-destructive and not safely reversible")
 }

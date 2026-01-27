@@ -1,7 +1,7 @@
-import NewsletterSignup from "@/components/newsletter/newsletter-signup"
-import footerMap from "@/styles/images/footer-map.png"
 import Image from "next/image"
 import Link from "next/link"
+import NewsletterSignup from "@/components/newsletter/newsletter-signup"
+import footerMap from "@/styles/images/footer-map.png"
 import Logo from "./logo"
 
 const Footer = () => {

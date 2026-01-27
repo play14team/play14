@@ -1,7 +1,7 @@
 "use client"
 
-import type { GeoLocation } from "@/models/strapi"
 import dynamic from "next/dynamic"
+import type { GeoLocation } from "@/models/strapi"
 
 // Lazy load the map component for better performance
 const Map = dynamic(() => import("@/components/map"), {

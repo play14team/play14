@@ -1,11 +1,11 @@
 "use client"
 
-import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 import { useEffect, useState } from "react"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 import {
+  createDiscountCode,
   type DiscountCode,
   type DiscountCodeData,
-  createDiscountCode,
   deleteDiscountCode,
   toggleDiscountCodeActive,
   updateDiscountCode,
@@ -364,7 +364,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          maxUses: e.target.value ? Number.parseInt(e.target.value) : null,
+                          maxUses: e.target.value ? Number.parseInt(e.target.value, 10) : null,
                         })
                       }
                       className="admin-input"
@@ -605,7 +605,7 @@ export default function DiscountCodeEditor({ eventId, discountCodes, onUpdate }:
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      maxUses: e.target.value ? Number.parseInt(e.target.value) : null,
+                      maxUses: e.target.value ? Number.parseInt(e.target.value, 10) : null,
                     })
                   }
                   className="admin-input"

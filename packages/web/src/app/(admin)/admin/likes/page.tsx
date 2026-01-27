@@ -1,6 +1,6 @@
-import { requireFounder } from "@/libs/auth"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { requireFounder } from "@/libs/auth"
 import LikedItemsList from "./liked-items-list"
 
 export const metadata: Metadata = {

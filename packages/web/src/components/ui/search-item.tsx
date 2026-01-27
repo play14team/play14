@@ -1,8 +1,8 @@
 "use client"
 
-import { type ScoredSearchItem, getHighlightSegments } from "@/hooks/use-fuzzy-search"
 import clsx from "clsx"
 import Image from "next/image"
+import { getHighlightSegments, type ScoredSearchItem } from "@/hooks/use-fuzzy-search"
 
 interface SearchItemProps {
   item: ScoredSearchItem

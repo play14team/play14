@@ -1,14 +1,14 @@
 "use client"
 
-import {
-  type Sponsor,
-  type Sponsorship,
-  createSponsor,
-  getAvailableSponsors,
-} from "@/app/(admin)/admin/events/[slug]/sponsor.action"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import { createPortal } from "react-dom"
+import {
+  createSponsor,
+  getAvailableSponsors,
+  type Sponsor,
+  type Sponsorship,
+} from "@/app/(admin)/admin/events/[slug]/sponsor.action"
 
 const DEFAULT_CATEGORIES = ["Gold", "Silver", "Bronze", "Partner"]
 

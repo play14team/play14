@@ -1,8 +1,8 @@
 "use client"
 
+import { useMemo } from "react"
 import { deduplicateBy } from "@/libs/arrays"
 import type { Event as EventType } from "@/models/strapi"
-import { useMemo } from "react"
 import EventGrid from "../events/grid"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 

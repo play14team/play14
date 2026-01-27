@@ -1,5 +1,5 @@
-import type { Author } from "@/models/strapi"
 import Link from "next/link"
+import type { Author } from "@/models/strapi"
 import Avatar from "../ui/avatar"
 
 interface AuthorCardProps {

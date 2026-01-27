@@ -1,7 +1,7 @@
-import { requireOrganizer } from "@/libs/auth"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { requireOrganizer } from "@/libs/auth"
 import { getLocationForEdit } from "../locations.action"
 import LocationEditForm from "./location-edit-form"
 

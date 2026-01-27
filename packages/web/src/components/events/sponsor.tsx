@@ -1,6 +1,6 @@
-import type { Sponsor, UploadFile } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
+import type { Sponsor, UploadFile } from "@/models/strapi"
 import SocialNetworks from "../layout/socialnetworks"
 
 const EventSponsor = (props: { sponsor: Sponsor }) => {

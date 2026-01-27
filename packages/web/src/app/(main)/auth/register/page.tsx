@@ -1,11 +1,11 @@
+import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 import LoginButtons from "@/components/auth/login-buttons"
 import RegisterForm from "@/components/auth/register-form"
 import Logo from "@/components/layout/logo"
 import { getAuthState, getOAuthConnectUrl } from "@/libs/auth"
 import { getFeatureFlags } from "@/libs/feature-flags"
-import type { Metadata } from "next"
-import Link from "next/link"
-import { notFound, redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Register",

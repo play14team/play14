@@ -1,5 +1,5 @@
-import { cancelPendingOrder } from "@/components/tickets/purchase.action"
 import Link from "next/link"
+import { cancelPendingOrder } from "@/components/tickets/purchase.action"
 import styles from "./page.module.scss"
 
 interface CancelledPageProps {

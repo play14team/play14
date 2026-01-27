@@ -1,15 +1,15 @@
+import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound } from "next/navigation"
 import {
   getEventHostAccounts,
   getStripeAccountStatus,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import { requireOrganizer } from "@/libs/auth"
-import type { Metadata } from "next"
-import Link from "next/link"
-import { notFound } from "next/navigation"
 import { getBudgetItems } from "./budget.action"
 import { getEventDiscountCodes } from "./discount-code.action"
-import EventEditForm from "./event-edit-form"
 import { getEventForEdit, getLocations, getOrganizers, getVenues } from "./event-edit.action"
+import EventEditForm from "./event-edit-form"
 import { getResultItems } from "./results.action"
 import { getRevenueAnalytics } from "./revenue-analytics.action"
 

@@ -5,7 +5,7 @@ import en from "i18n-iso-countries/langs/en.json"
 import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
 import ReactCountryFlag from "react-country-flag"
-import { type LocationListItem, type LocationsListResponse, getLocations } from "./locations.action"
+import { getLocations, type LocationListItem, type LocationsListResponse } from "./locations.action"
 
 // Register English locale for country names
 countries.registerLocale(en)

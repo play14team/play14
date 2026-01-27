@@ -32,7 +32,5 @@ export async function up(knex) {
 }
 
 export async function down() {
-  console.log(
-    "Rollback skipped: data fix is non-destructive and not safely reversible"
-  )
+  console.log("Rollback skipped: data fix is non-destructive and not safely reversible")
 }

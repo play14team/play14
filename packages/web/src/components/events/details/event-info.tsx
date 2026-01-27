@@ -1,10 +1,10 @@
+import Link from "next/link"
 import {
   Enum_Componenteventsmedia_Type,
   Enum_Event_Eventstatus,
   type Event,
   type Venue,
 } from "@/models/strapi"
-import Link from "next/link"
 import SocialLinks from "../../layout/social-links"
 import ICalendar from "../ical"
 import EventTime from "../time"

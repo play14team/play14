@@ -1,5 +1,5 @@
 import crypto from "node:crypto"
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
 import { join, resolve } from "node:path"
 import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
@@ -412,8 +412,8 @@ export function mergeContacts(
     }
   }
 
-  attendeeContacts.forEach((contact) => upsert(contact, "attendee"))
-  mailchimpContacts.forEach((contact) => upsert(contact, "mailchimp"))
+  for (const contact of attendeeContacts) upsert(contact, "attendee")
+  for (const contact of mailchimpContacts) upsert(contact, "mailchimp")
 
   return Array.from(merged.values())
 }
@@ -839,7 +839,7 @@ export async function runAudienceAttendeeImport(
           .map((key) => {
             const value = String(row[key as keyof typeof row] ?? "")
             if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-              return `"${value.replace(/\"/g, '""')}"`
+              return `"${value.replace(/"/g, '""')}"`
             }
             return value
           })

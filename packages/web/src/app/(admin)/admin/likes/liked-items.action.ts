@@ -1,7 +1,7 @@
 "use server"
 
-import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
 import { revalidatePath } from "next/cache"
+import { strapiFetch, strapiFetchFormData, strapiFetchWithQuery } from "@/libs/strapi-client"
 
 /**
  * Revalidate all public pages that display liked items data

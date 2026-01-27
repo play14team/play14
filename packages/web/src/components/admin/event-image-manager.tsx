@@ -1,13 +1,13 @@
 "use client"
 
+import Image from "next/image"
+import { useCallback, useRef, useState } from "react"
 import {
   type EventImage,
   removeEventImage,
   setEventImageFromLibrary,
   uploadEventImage,
 } from "@/app/(admin)/admin/events/[slug]/images.action"
-import Image from "next/image"
-import { useCallback, useRef, useState } from "react"
 import EventDefaultImageManager from "./event-default-image-manager"
 import ImageCropper from "./image-cropper"
 import MediaLibraryBrowser from "./media-library-browser"

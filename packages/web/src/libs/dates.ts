@@ -1,6 +1,6 @@
-import type { Maybe } from "@/models/strapi"
 import { TZDate } from "@date-fns/tz"
 import { format } from "date-fns"
+import type { Maybe } from "@/models/strapi"
 
 export function formatDate(
   start: Date | string,

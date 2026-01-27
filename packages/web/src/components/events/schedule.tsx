@@ -3,11 +3,7 @@
 import type { ComponentEventsTimetable, Maybe } from "@/models/strapi"
 import styles from "./schedule.module.scss"
 
-const EventSchedule = ({
-  timetable,
-}: {
-  timetable: Array<Maybe<ComponentEventsTimetable>>
-}) => {
+const EventSchedule = ({ timetable }: { timetable: Array<Maybe<ComponentEventsTimetable>> }) => {
   const formatTime = (time: string) => {
     // Extract HH:mm from time string
     return time.substring(0, 5)

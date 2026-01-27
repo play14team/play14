@@ -1,10 +1,10 @@
 "use client"
 
-import { Enum_Event_Eventstatus, type Event, type GeoLocation } from "@/models/strapi"
-import { useTheme } from "next-themes"
 import Link from "next/link"
+import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { Popup } from "react-map-gl/mapbox"
+import { Enum_Event_Eventstatus, type Event, type GeoLocation } from "@/models/strapi"
 import EventDate from "./date"
 
 // Helper to extract coordinates from either location format
@@ -38,13 +38,7 @@ const getThemeColors = (isDark: boolean) => ({
   default: isDark ? "#3eb5ed" : "#0098dd", // Blue
 })
 
-const EventPopup = ({
-  events,
-  onClose,
-}: {
-  events: Event[]
-  onClose: () => void
-}) => {
+const EventPopup = ({ events, onClose }: { events: Event[]; onClose: () => void }) => {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 

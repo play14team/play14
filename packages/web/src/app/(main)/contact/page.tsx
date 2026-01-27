@@ -1,7 +1,7 @@
-import Page from "@/components/layout/page"
-import NewsletterSignup from "@/components/newsletter/newsletter-signup"
 import type { Metadata } from "next"
 import Link from "next/link"
+import Page from "@/components/layout/page"
+import NewsletterSignup from "@/components/newsletter/newsletter-signup"
 
 export const metadata: Metadata = {
   title: "Contact",

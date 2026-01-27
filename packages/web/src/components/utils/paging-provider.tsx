@@ -1,7 +1,7 @@
 "use client"
 
-import type { Pagination } from "@/models/strapi"
 import type { PropsWithChildren } from "react"
+import type { Pagination } from "@/models/strapi"
 import Paging from "../layout/paging"
 
 interface PaginationProps extends PropsWithChildren {

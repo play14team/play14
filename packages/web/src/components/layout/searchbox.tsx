@@ -1,7 +1,7 @@
 "use client"
 
-import SearchCommand from "@/components/ui/search-command"
 import { useEffect, useState } from "react"
+import SearchCommand from "@/components/ui/search-command"
 
 const SearchBox = () => {
   const [isOpen, setIsOpen] = useState(false)

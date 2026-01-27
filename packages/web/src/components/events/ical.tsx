@@ -1,16 +1,10 @@
 "use client"
 
-import { Enum_Event_Eventstatus, type Event } from "@/models/strapi"
-import { type EventAttributes, createEvent } from "ics"
+import { createEvent, type EventAttributes } from "ics"
 import Link from "next/link"
+import { Enum_Event_Eventstatus, type Event } from "@/models/strapi"
 
-const ICalendar = ({
-  event,
-  asButton = false,
-}: {
-  event: Event
-  asButton?: boolean
-}) => {
+const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boolean }) => {
   const start = new Date(event.start)
   const end = new Date(event.end)
 

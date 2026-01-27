@@ -1,7 +1,7 @@
-import type { UploadFile } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
+import type { UploadFile } from "@/models/strapi"
 import DefaultPlayerImage from "../ui/default-player-image"
 
 export interface NavLink {

@@ -1,4 +1,4 @@
-import { type Page, expect, test } from "@playwright/test"
+import { expect, type Page, test } from "@playwright/test"
 import { waitForPageLoad } from "./utils/test-helpers"
 
 // Define viewport sizes for testing

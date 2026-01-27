@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import ContributorLink from "./contributor-link"
-import { type LikedItemPublic, getPublicLikedItems } from "./get.action"
+import { getPublicLikedItems, type LikedItemPublic } from "./get.action"
 import "./likes.scss"
 
 export const metadata: Metadata = {

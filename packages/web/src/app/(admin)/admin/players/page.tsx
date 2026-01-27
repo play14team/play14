@@ -1,5 +1,5 @@
-import { requireOrganizer } from "@/libs/auth"
 import type { Metadata } from "next"
+import { requireOrganizer } from "@/libs/auth"
 import PlayersPageContent from "./players-page-content"
 
 export const metadata: Metadata = {

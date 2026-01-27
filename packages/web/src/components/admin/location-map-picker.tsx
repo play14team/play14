@@ -11,8 +11,8 @@ import Map, {
   GeolocateControl,
   Marker,
   NavigationControl,
+  useControl,
 } from "react-map-gl/mapbox"
-import { useControl } from "react-map-gl/mapbox"
 
 export interface MapLocation {
   geometry?: {

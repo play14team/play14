@@ -1,13 +1,13 @@
 "use client"
 
-import {
-  type EventImage,
-  type MediaFolder,
-  listMediaLibraryFiles,
-  listMediaLibraryFolders,
-} from "@/app/(admin)/admin/events/[slug]/images.action"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
+import {
+  type EventImage,
+  listMediaLibraryFiles,
+  listMediaLibraryFolders,
+  type MediaFolder,
+} from "@/app/(admin)/admin/events/[slug]/images.action"
 
 interface MediaLibraryBrowserProps {
   isOpen: boolean

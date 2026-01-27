@@ -1,12 +1,12 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import {
   removePlayerAvatar,
   setPlayerAvatarFromLibrary,
   uploadPlayerAvatar,
 } from "@/app/(admin)/admin/players/players.action"
 import { deletePlayerPicture, uploadPlayerPicture } from "@/libs/api/players"
-import { useRouter } from "next/navigation"
 import ImageManager from "../image-manager"
 import { useToast } from "../toast"
 

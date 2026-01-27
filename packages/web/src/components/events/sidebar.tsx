@@ -1,5 +1,5 @@
-import { Enum_Componenteventsmedia_Type, Enum_Event_Eventstatus, type Event } from "@/models/strapi"
 import Link from "next/link"
+import { Enum_Componenteventsmedia_Type, Enum_Event_Eventstatus, type Event } from "@/models/strapi"
 import SocialLinks from "../layout/social-links"
 import ICalendar from "./ical"
 import EventStatus from "./status"

@@ -1,6 +1,6 @@
-import type { Player, UploadFile } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
+import type { Player, UploadFile } from "@/models/strapi"
 import DefaultPlayerImage from "../ui/default-player-image"
 import { getPlayerNav } from "./get.action"
 

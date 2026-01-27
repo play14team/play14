@@ -1,5 +1,5 @@
-import { requireFounder } from "@/libs/auth"
 import type { Metadata } from "next"
+import { requireFounder } from "@/libs/auth"
 import ClaimsList from "./claims-list"
 
 export const metadata: Metadata = {

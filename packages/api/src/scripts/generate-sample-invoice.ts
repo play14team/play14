@@ -5,7 +5,7 @@
 
 import { writeFileSync } from "node:fs"
 import { join } from "node:path"
-import { type InvoiceData, generateInvoicePDF } from "../libs/invoice"
+import { generateInvoicePDF, type InvoiceData } from "../libs/invoice"
 
 async function main() {
   console.log("Generating sample invoice...")

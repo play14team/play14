@@ -1,7 +1,7 @@
 import "server-only"
-import type { Player } from "@/models/strapi"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import type { Player } from "@/models/strapi"
 
 // ============================================================================
 // TYPES

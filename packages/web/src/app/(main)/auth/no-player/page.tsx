@@ -1,5 +1,5 @@
-import { requireAuth } from "@/libs/auth"
 import type { Metadata } from "next"
+import { requireAuth } from "@/libs/auth"
 import PlayerLinkingFlow from "./_components/player-linking-flow"
 
 export const metadata: Metadata = {

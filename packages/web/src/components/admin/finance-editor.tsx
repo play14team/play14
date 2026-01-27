@@ -1,7 +1,7 @@
 "use client"
 
-import type { FinanceData } from "@/app/(admin)/admin/events/[slug]/finance.action"
 import { useEffect, useState } from "react"
+import type { FinanceData } from "@/app/(admin)/admin/events/[slug]/finance.action"
 
 interface Props {
   financeData: FinanceData | null

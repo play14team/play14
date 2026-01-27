@@ -1,7 +1,7 @@
-import CodeOfConduct from "@/components/layout/codeofconduct"
-import Page from "@/components/layout/page"
 import type { Metadata } from "next"
 import Link from "next/link"
+import CodeOfConduct from "@/components/layout/codeofconduct"
+import Page from "@/components/layout/page"
 import styles from "./hosting.module.scss"
 
 export const metadata: Metadata = {

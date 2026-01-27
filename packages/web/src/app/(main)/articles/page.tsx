@@ -1,8 +1,8 @@
-import ArticlesPageContent from "@/components/articles/articles-page-content"
-import { getArticleFilterOptions } from "@/components/articles/get-filter-options.action"
-import { getAllArticles } from "@/components/articles/get.action"
-import type { Article } from "@/models/strapi"
 import type { Metadata } from "next"
+import ArticlesPageContent from "@/components/articles/articles-page-content"
+import { getAllArticles } from "@/components/articles/get.action"
+import { getArticleFilterOptions } from "@/components/articles/get-filter-options.action"
+import type { Article } from "@/models/strapi"
 
 export const metadata: Metadata = {
   title: "Articles",

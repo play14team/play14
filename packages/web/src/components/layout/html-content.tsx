@@ -100,7 +100,7 @@ const HtmlContent = ({
   children: string | undefined
   preserveStyles?: boolean
 }) => {
-  if (!children) return <></>
+  if (!children) return null
 
   // Sanitize first to prevent XSS, then optionally strip styles, then normalize all-caps
   const sanitized = sanitizeHtml(children)

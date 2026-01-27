@@ -7,7 +7,7 @@
  */
 
 import type { Core } from "@strapi/strapi"
-import { type Mock, beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it, type Mock, vi } from "vitest"
 import { syncUserRoleFromPlayer, syncUserRoleWithPlayerPosition } from "./index"
 
 // ============================================================================

@@ -5,11 +5,11 @@ import type {
   StripeAccountStatus,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import StripeAccountSelector from "@/components/admin/stripe-account-selector"
-import DiscountCodeEditor from "../discount-code-editor"
 import type { DiscountCode } from "../discount-code.action"
+import DiscountCodeEditor from "../discount-code-editor"
 import type { EventForEdit, TicketingMode } from "../event-edit.action"
-import TicketTypeEditor from "../ticket-type-editor"
 import type { TicketType } from "../ticket-type.action"
+import TicketTypeEditor from "../ticket-type-editor"
 
 interface TicketsTabProps {
   eventDocumentId: string

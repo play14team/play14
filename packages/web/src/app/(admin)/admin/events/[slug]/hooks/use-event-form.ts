@@ -1,11 +1,11 @@
 "use client"
 
-import type { MapLocation } from "@/components/admin/location-map-picker"
 import { TZDate } from "@date-fns/tz"
 import { format, isAfter, isValid } from "date-fns"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
 import { useMemo, useState } from "react"
+import type { MapLocation } from "@/components/admin/location-map-picker"
 import type { EventForEdit, EventUpdateData, TicketingMode } from "../event-edit.action"
 import type { FinanceData } from "../finance.action"
 import type { MediaLink } from "../media-links.action"

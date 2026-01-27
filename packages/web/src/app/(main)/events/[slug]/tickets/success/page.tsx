@@ -1,5 +1,5 @@
-import { getOrderStatus } from "@/components/tickets/purchase.action"
 import Link from "next/link"
+import { getOrderStatus } from "@/components/tickets/purchase.action"
 import AutoRedirect from "./auto-redirect"
 import styles from "./page.module.scss"
 

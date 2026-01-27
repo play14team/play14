@@ -4,12 +4,12 @@
 
 import { describe, expect, it } from "vitest"
 import {
-  STRIPE_CURRENCIES,
-  STRIPE_CURRENCY_CODES,
-  ZERO_DECIMAL_CURRENCIES,
   formatCurrency,
   formatPrice,
   getCurrency,
+  STRIPE_CURRENCIES,
+  STRIPE_CURRENCY_CODES,
+  ZERO_DECIMAL_CURRENCIES,
 } from "./currencies"
 
 describe("STRIPE_CURRENCIES", () => {

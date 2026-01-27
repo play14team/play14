@@ -1,8 +1,8 @@
 "use client" // Error components must be Client Components
 
+import { useEffect } from "react"
 import ErrorMessage from "@/components/layout/error-message"
 import Page from "@/components/layout/page"
-import { useEffect } from "react"
 
 export default function EventsError({
   error,

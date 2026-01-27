@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import type {
   ComponentEventsSponsorship,
   ComponentEventsTimetable,
@@ -7,7 +8,6 @@ import type {
   Maybe,
   Player,
 } from "@/models/strapi"
-import { useMemo } from "react"
 import Gallery from "../../layout/gallery"
 import HtmlContent from "../../layout/html-content"
 import PlayerGrid from "../../players/grid"

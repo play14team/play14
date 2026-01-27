@@ -20,11 +20,11 @@ import {
   stripeAccountsTotal,
   ticketOrdersAmountTotal,
   ticketOrdersTotal,
+  ticketsCheckedInTotal,
+  ticketsTotal,
   ticketTypesAvailable,
   ticketTypesCapacity,
   ticketTypesSold,
-  ticketsCheckedInTotal,
-  ticketsTotal,
 } from "./metrics"
 import { reportSentryError } from "./sentry-reporter"
 

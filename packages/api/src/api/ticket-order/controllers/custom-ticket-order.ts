@@ -11,7 +11,7 @@
 
 import { join } from "node:path"
 import type { Core } from "@strapi/strapi"
-import { type InvoiceData, generateInvoicePDF } from "../../../libs/invoice"
+import { generateInvoicePDF, type InvoiceData } from "../../../libs/invoice"
 import { generateOrderNumber, generateTicketCode } from "../../../libs/tickets"
 import { sanitizeText, validateEmail, validateName } from "../../../libs/validation"
 import {
@@ -28,11 +28,11 @@ import { reportSentryError } from "../../../services/observability/sentry-report
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
 import {
-  ORDER_LIMITS,
   addPlayerToEventAttendees,
   createReservations,
   findOrCreatePlayerForAttendee as findOrCreatePlayerService,
   getReservationExpiry,
+  ORDER_LIMITS,
   releaseDiscountCode,
   releaseReservations,
   reserveDiscountCode,
@@ -1446,6 +1446,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // (for free orders, we validate + use in one atomic operation since there's no payment flow)
       // This prevents TOCTOU where the discount code became unavailable since draft creation
       if (order.discountCode?.documentId) {
+        // biome-ignore lint/correctness/useHookAtTopLevel: this is a backend utility function, not a React hook
         const discountResult = await useDiscountCodeAtomic(
           strapi,
           event.documentId,

@@ -1,5 +1,5 @@
-import type { Maybe, SocialNetwork } from "@/models/strapi"
 import Link from "next/link"
+import type { Maybe, SocialNetwork } from "@/models/strapi"
 
 function mapIcon(type: string) {
   if (type === "Email") return "bx bx-envelope"
@@ -7,9 +7,7 @@ function mapIcon(type: string) {
   return `bx bxl-${type.toLowerCase()}`
 }
 
-const SocialNetworks = (props: {
-  socialNetworks: Array<Maybe<SocialNetwork>>
-}) => {
+const SocialNetworks = (props: { socialNetworks: Array<Maybe<SocialNetwork>> }) => {
   const { socialNetworks } = props
   return (
     <ul className="social">

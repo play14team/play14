@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react"
 import {
-  type Participant,
   checkInParticipant,
   getEventParticipants,
   getParticipantStats,
+  type Participant,
   undoCheckIn,
 } from "../participants.action"
 import styles from "./participants-tab.module.scss"

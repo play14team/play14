@@ -1,6 +1,6 @@
-import { Enum_Event_Eventstatus, type Event, type UploadFile } from "@/models/strapi"
 import Image from "next/image"
 import ReactCountryFlag from "react-country-flag"
+import { Enum_Event_Eventstatus, type Event, type UploadFile } from "@/models/strapi"
 import EventDate from "../date"
 import EventStatus from "../status"
 import EventTimer from "./event-timer"

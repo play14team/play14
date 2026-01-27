@@ -3,22 +3,19 @@
  */
 
 export {
-  cleanExpiredTicketOrders,
-  cleanAbandonedDraftOrders,
-  reservationHealthCheck,
-} from "./ticket-orders"
-
-export { updateEventStatus } from "./events"
-
-export { processEventResultsReminders } from "./event-results-reminders"
-
-export { updatePlayerPositions } from "./players"
-
-export {
   acquireLock,
+  closeRedisConnection,
+  getInstanceId,
+  isRedisAvailable,
   releaseLock,
   withDistributedLock,
-  closeRedisConnection,
-  isRedisAvailable,
-  getInstanceId,
 } from "./distributed-lock"
+export { processEventResultsReminders } from "./event-results-reminders"
+export { updateEventStatus } from "./events"
+
+export { updatePlayerPositions } from "./players"
+export {
+  cleanAbandonedDraftOrders,
+  cleanExpiredTicketOrders,
+  reservationHealthCheck,
+} from "./ticket-orders"

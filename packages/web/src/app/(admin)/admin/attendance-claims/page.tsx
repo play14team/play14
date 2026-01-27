@@ -1,6 +1,6 @@
-import { requireAuth } from "@/libs/auth"
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
+import { requireAuth } from "@/libs/auth"
 import AttendanceClaimsList from "./attendance-claims-list"
 
 export const metadata: Metadata = {

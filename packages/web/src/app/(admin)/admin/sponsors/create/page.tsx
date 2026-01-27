@@ -1,6 +1,6 @@
-import { requireOrganizer } from "@/libs/auth"
 import type { Metadata } from "next"
 import Link from "next/link"
+import { requireOrganizer } from "@/libs/auth"
 import SponsorCreateForm from "./sponsor-create-form"
 
 export const metadata: Metadata = {

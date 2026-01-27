@@ -9,7 +9,7 @@ import {
   EventsEmptyState,
   type FilterOption,
 } from "../components"
-import { type MyEvent, getMyEvents } from "../events.action"
+import { getMyEvents, type MyEvent } from "../events.action"
 
 type StatusFilter = "mine" | "active" | "all" | "drafts" | "over"
 

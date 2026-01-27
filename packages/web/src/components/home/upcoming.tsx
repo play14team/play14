@@ -1,5 +1,5 @@
-import type { Event } from "@/models/strapi"
 import { formatISO } from "date-fns"
+import type { Event } from "@/models/strapi"
 import EventGrid from "../events/grid"
 import { getUpcomingEvents } from "./get.action"
 

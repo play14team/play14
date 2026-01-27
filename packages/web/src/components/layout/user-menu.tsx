@@ -1,5 +1,7 @@
 "use client"
 
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import Avatar from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -10,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { StrapiUser } from "@/libs/auth"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 
 interface UserMenuProps {
   user: StrapiUser

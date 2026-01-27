@@ -1,8 +1,8 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import type { OrganizerOption } from "@/app/(admin)/admin/events/[slug]/event-edit.action"
 import Avatar from "@/components/ui/avatar"
-import { useEffect, useRef, useState } from "react"
 
 interface OrganizerSelectProps {
   organizers: OrganizerOption[]

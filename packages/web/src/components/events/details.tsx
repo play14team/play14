@@ -1,3 +1,7 @@
+import clm from "country-locale-map"
+import Image from "next/image"
+import Link from "next/link"
+import ReactCountryFlag from "react-country-flag"
 import { deduplicateBy } from "@/libs/arrays"
 import {
   Enum_Event_Eventstatus,
@@ -7,10 +11,6 @@ import {
   type UploadFile,
   type Venue,
 } from "@/models/strapi"
-import clm from "country-locale-map"
-import Image from "next/image"
-import Link from "next/link"
-import ReactCountryFlag from "react-country-flag"
 import Map from "../map"
 import EventDate from "./date"
 import EventsNavigator from "./nav"

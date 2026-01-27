@@ -1,10 +1,10 @@
 "use client"
 
+import Image from "next/image"
+import Link from "next/link"
 import type { PendingClaim } from "@/components/auth/player-linking/types"
 import Logo from "@/components/layout/logo"
 import DefaultPlayerImage from "@/components/ui/default-player-image"
-import Image from "next/image"
-import Link from "next/link"
 
 interface ClaimPendingProps {
   claim: PendingClaim

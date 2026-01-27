@@ -1,10 +1,10 @@
+import type { Metadata } from "next"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
 import ResetPasswordForm from "@/components/auth/reset-password-form"
 import Logo from "@/components/layout/logo"
 import { getAuthState } from "@/libs/auth"
 import { getFeatureFlags } from "@/libs/feature-flags"
-import type { Metadata } from "next"
-import Link from "next/link"
-import { notFound, redirect } from "next/navigation"
 
 export const metadata: Metadata = {
   title: "Set Password",

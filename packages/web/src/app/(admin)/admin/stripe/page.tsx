@@ -1,6 +1,6 @@
+import { redirect } from "next/navigation"
 import StripeConnect from "@/components/admin/stripe-connect"
 import { getAuthCookie } from "@/libs/auth"
-import { redirect } from "next/navigation"
 import { getStripeAccountStatus } from "./stripe-connect.action"
 
 export const metadata = {

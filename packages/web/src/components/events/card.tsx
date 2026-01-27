@@ -1,9 +1,9 @@
-import type { Event } from "@/models/strapi"
-import defaultEvent from "@/styles/images/events/event1.jpg"
 import clm from "country-locale-map"
 import Image from "next/image"
 import Link from "next/link"
 import ReactCountryFlag from "react-country-flag"
+import type { Event } from "@/models/strapi"
+import defaultEvent from "@/styles/images/events/event1.jpg"
 import EventDate from "./date"
 import EventStatus from "./status"
 

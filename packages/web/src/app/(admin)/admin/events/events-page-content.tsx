@@ -1,10 +1,10 @@
 "use client"
 
-import type { StrapiUser } from "@/libs/auth"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
-import EventsTabs, { type TabId, TAB_IDS } from "./events-tabs"
+import type { StrapiUser } from "@/libs/auth"
+import EventsTabs, { TAB_IDS, type TabId } from "./events-tabs"
 import AttendedTab from "./tabs/attended-tab"
 import ClaimsTab from "./tabs/claims-tab"
 import OrganizedTab from "./tabs/organized-tab"

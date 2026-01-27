@@ -1,7 +1,7 @@
 "use client"
 
-import { createVenue } from "@/app/(admin)/admin/venues/venues.action"
 import { useEffect, useRef, useState } from "react"
+import { createVenue } from "@/app/(admin)/admin/venues/venues.action"
 import LocationMapPicker, { type MapLocation } from "./location-map-picker"
 import { useToast } from "./toast"
 

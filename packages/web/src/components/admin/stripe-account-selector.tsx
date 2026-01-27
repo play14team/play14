@@ -1,13 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import {
   type HostStripeAccount,
-  type StripeAccountStatus,
   linkStripeAccountToEvent,
+  type StripeAccountStatus,
   unlinkStripeAccountFromEvent,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import ConfirmationDialog from "@/components/admin/confirmation-dialog"
-import { useState } from "react"
 
 interface EventStripeAccount {
   documentId: string

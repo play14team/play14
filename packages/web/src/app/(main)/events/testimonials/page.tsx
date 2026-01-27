@@ -1,8 +1,8 @@
+import type { Metadata } from "next"
 import { getTestimonials } from "@/components/events/get.action"
 import TestimonialItem from "@/components/events/testimonial"
 import Page from "@/components/layout/page"
 import type { Testimonial } from "@/models/strapi"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Events | Testimonials",

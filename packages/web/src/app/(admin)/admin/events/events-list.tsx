@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { publishEvent, unpublishEvent } from "./[slug]/event-edit.action"
-import { type MyEvent, getMyEvents } from "./events.action"
+import { getMyEvents, type MyEvent } from "./events.action"
 
 type StatusFilter = "active" | "all" | "drafts" | "over" | "cancelled"
 

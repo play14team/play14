@@ -1,5 +1,5 @@
-import { getAuthCookie } from "@/libs/auth"
 import { type NextRequest, NextResponse } from "next/server"
+import { getAuthCookie } from "@/libs/auth"
 
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
 

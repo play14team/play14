@@ -1,14 +1,14 @@
 "use client"
 
-import ConfirmationDialog from "@/components/admin/confirmation-dialog"
-import { STRIPE_CURRENCIES, formatPrice } from "@/libs/currencies"
 import { type DragEvent, useEffect, useState } from "react"
+import ConfirmationDialog from "@/components/admin/confirmation-dialog"
+import { formatPrice, STRIPE_CURRENCIES } from "@/libs/currencies"
 import {
-  type TicketType,
-  type TicketTypeData,
   createTicketType,
   deleteTicketType,
   reorderTicketTypes,
+  type TicketType,
+  type TicketTypeData,
   toggleTicketTypeActive,
   updateTicketType,
 } from "./ticket-type.action"
@@ -440,7 +440,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            capacity: e.target.value ? Number.parseInt(e.target.value) : null,
+                            capacity: e.target.value ? Number.parseInt(e.target.value, 10) : null,
                           })
                         }
                         className="admin-input"
@@ -641,7 +641,7 @@ export default function TicketTypeEditor({ eventId, ticketTypes, onUpdate }: Pro
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      capacity: e.target.value ? Number.parseInt(e.target.value) : null,
+                      capacity: e.target.value ? Number.parseInt(e.target.value, 10) : null,
                     })
                   }
                   className="admin-input"

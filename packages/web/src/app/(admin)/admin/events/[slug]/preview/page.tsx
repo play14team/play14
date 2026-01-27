@@ -1,9 +1,9 @@
-import EventDetails from "@/components/events/details"
-import { requireOrganizer } from "@/libs/auth"
-import type { Event } from "@/models/strapi"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import EventDetails from "@/components/events/details"
+import { requireOrganizer } from "@/libs/auth"
+import type { Event } from "@/models/strapi"
 import { getEventPreview } from "./preview.action"
 
 export const metadata: Metadata = {

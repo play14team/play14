@@ -1,8 +1,8 @@
 "use client" // Error components must be Client Components
 
-import ErrorMessage from "@/components/layout/error-message"
 import * as Sentry from "@sentry/nextjs"
 import { useEffect } from "react"
+import ErrorMessage from "@/components/layout/error-message"
 
 export default function Error({
   error,

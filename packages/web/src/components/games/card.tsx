@@ -1,8 +1,8 @@
+import Image from "next/image"
+import Link from "next/link"
 import { camelPad } from "@/libs/camelPad"
 import type { Game } from "@/models/strapi"
 import defaultGame from "@/styles/images/gallery/gallery5.jpg"
-import Image from "next/image"
-import Link from "next/link"
 
 const GameCard = ({ game }: { game: Game }) => {
   const url = `/games/${encodeURIComponent(game.slug)}`

@@ -1,8 +1,8 @@
 "use client"
 
-import { requestRefund } from "@/components/tickets/purchase.action"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { requestRefund } from "@/components/tickets/purchase.action"
 import styles from "./refund-button.module.scss"
 
 interface RefundButtonProps {

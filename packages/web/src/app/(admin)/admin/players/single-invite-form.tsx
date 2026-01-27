@@ -1,10 +1,10 @@
 "use client"
 
-import Avatar from "@/components/ui/avatar"
 import { useEffect, useRef, useState, useTransition } from "react"
+import Avatar from "@/components/ui/avatar"
 import {
-  type PlayerForInvite,
   getPlayerForInvite,
+  type PlayerForInvite,
   searchPlayersForInvite,
   sendSingleInvite,
 } from "./invite.action"

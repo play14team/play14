@@ -1,6 +1,6 @@
-import { Enum_Componentdefaulthistoryitem_Dateformat } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
+import { Enum_Componentdefaulthistoryitem_Dateformat } from "@/models/strapi"
 
 interface HistoryProps {
   date: Date | string

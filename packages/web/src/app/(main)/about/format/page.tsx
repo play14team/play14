@@ -1,9 +1,9 @@
+import type { Metadata } from "next"
+import Image from "next/image"
 import { getFormat } from "@/components/about/get.action"
 import Expectations from "@/components/home/expectations"
 import Page from "@/components/layout/page"
 import { Enum_Expectation_Type } from "@/models/strapi"
-import type { Metadata } from "next"
-import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "About | Our format",

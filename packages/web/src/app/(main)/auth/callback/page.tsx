@@ -1,9 +1,9 @@
 "use client"
 
-import Logo from "@/components/layout/logo"
-import { useFeatureFlags } from "@/libs/feature-flags"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
+import Logo from "@/components/layout/logo"
+import { useFeatureFlags } from "@/libs/feature-flags"
 
 const SESSION_STORAGE_KEY = "auth_callback_url"
 const DEFAULT_REDIRECT = "/admin"

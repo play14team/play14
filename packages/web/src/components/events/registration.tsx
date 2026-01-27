@@ -1,7 +1,7 @@
 "use client"
 
-import type { Event } from "@/models/strapi"
 import Link from "next/link"
+import type { Event } from "@/models/strapi"
 import HtmlContent from "../layout/html-content"
 import { TicketPurchaseFlow } from "../tickets"
 

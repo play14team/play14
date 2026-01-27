@@ -27,7 +27,6 @@ export { default as ActiveFilters } from "./active-filters"
 export { default as FilterBar } from "./filter-bar"
 export { default as FilterMulti } from "./filter-multi"
 export { default as FilterToggle } from "./filter-toggle"
-export { useFilters } from "./use-filters"
 export type {
   ActiveFilters as ActiveFiltersType,
   ActiveFiltersProps,
@@ -38,3 +37,4 @@ export type {
   FilterToggleProps,
   UseFiltersReturn,
 } from "./types"
+export { useFilters } from "./use-filters"

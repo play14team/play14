@@ -5,7 +5,7 @@ import { revalidateEventPages } from "./event-edit.action"
 import type { ActionResult, TimetableDay } from "./schedule.types"
 
 // Re-export types for convenience (types can be re-exported from server files)
-export type { DayOfWeek, Timeslot, TimetableDay, ActionResult } from "./schedule.types"
+export type { ActionResult, DayOfWeek, Timeslot, TimetableDay } from "./schedule.types"
 
 /**
  * Update event schedule (timetable)

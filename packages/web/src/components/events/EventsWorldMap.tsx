@@ -1,11 +1,11 @@
 "use client"
 
-import WorldMap from "@/components/map/WorldMap"
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
+import WorldMap from "@/components/map/WorldMap"
 import { getCountriesWithEvents } from "./get-countries-with-events.action"
 import {
   type EventsByCountry,

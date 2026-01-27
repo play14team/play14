@@ -1,12 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import {
-  type StripeAccountStatus,
   createStripeAccount,
   getDashboardUrl,
   getOnboardingUrl,
+  type StripeAccountStatus,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
-import { useState } from "react"
 
 interface Props {
   account: StripeAccountStatus | null

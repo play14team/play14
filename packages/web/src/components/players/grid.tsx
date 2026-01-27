@@ -1,13 +1,7 @@
 import type { Player } from "@/models/strapi"
 import PlayerCard from "./card"
 
-const PlayerGrid = ({
-  title,
-  players,
-}: {
-  title?: string
-  players: Player[]
-}) => {
+const PlayerGrid = ({ title, players }: { title?: string; players: Player[] }) => {
   return (
     <section className="scientist-area">
       <div className="container">

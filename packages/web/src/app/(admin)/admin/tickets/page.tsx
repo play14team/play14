@@ -1,6 +1,6 @@
+import Link from "next/link"
 import { getMyTickets } from "@/components/tickets/ticket.action"
 import { requireAuth } from "@/libs/auth"
-import Link from "next/link"
 import styles from "./page.module.scss"
 
 export const metadata = {

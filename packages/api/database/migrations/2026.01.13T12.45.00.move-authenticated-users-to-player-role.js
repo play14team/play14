@@ -33,7 +33,7 @@ export async function up(knex) {
   try {
     const columnInfo = await knex("up_users").columnInfo()
     userColumnNames = Object.keys(columnInfo)
-  } catch (error) {
+  } catch {
     console.log("Unable to inspect up_users columns; falling back to schema checks")
   }
 
@@ -76,7 +76,7 @@ export async function up(knex) {
         .where({ table_schema: "public" })
         .where("table_name", "like", "up_users_role%")
       linkTables = rows.map((row) => row.table_name)
-    } catch (error) {
+    } catch {
       console.log("Unable to inspect information_schema tables, skipping link table lookup")
     }
   }
@@ -84,9 +84,7 @@ export async function up(knex) {
   for (const table of linkTables) {
     const columns = await knex(table).columnInfo()
     const columnNames = Object.keys(columns)
-    const roleColumn = columnNames.find(
-      (name) => name.includes("role") && name.endsWith("_id")
-    )
+    const roleColumn = columnNames.find((name) => name.includes("role") && name.endsWith("_id"))
     if (!roleColumn) continue
 
     const updated = await knex(table)

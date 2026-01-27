@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from "vitest"
-import { type InvoiceData, formatTicketItems, generateInvoicePDF } from "./invoice"
+import { formatTicketItems, generateInvoicePDF, type InvoiceData } from "./invoice"
 
 describe("Invoice Generation", () => {
   it("should generate a valid PDF buffer", async () => {

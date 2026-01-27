@@ -1,8 +1,8 @@
 "use client"
 
+import { useState, useTransition } from "react"
 import TestimonialItem from "@/components/events/testimonial"
 import type { Testimonial } from "@/models/strapi"
-import { useState, useTransition } from "react"
 import { HOME_TESTIMONIALS_COUNT } from "./constants"
 import { getRandomTestimonials } from "./get.action"
 

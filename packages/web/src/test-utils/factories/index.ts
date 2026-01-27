@@ -9,40 +9,38 @@
  * ```
  */
 
-// Event factories
-export {
-  createEvent,
-  createPastEvent,
-  createEventWithoutImage,
-  resetEventCounter,
-  type EventFixture,
-  type EventImage,
-  type EventLocation,
-} from "./event"
-
-// Player factories
-export {
-  createPlayer,
-  createMinimalPlayer,
-  createPlayerWithoutAvatar,
-  resetPlayerCounter,
-  type PlayerFixture,
-  type PlayerImage,
-  type SocialNetwork,
-} from "./player"
-
 // Article factories
 export {
+  type ArticleAuthor,
+  type ArticleFixture,
+  type ArticleImage,
+  type ArticleTag,
   createArticle,
   createArticleWithoutAuthor,
   createArticleWithoutImage,
   createMinimalArticle,
   resetArticleCounter,
-  type ArticleFixture,
-  type ArticleImage,
-  type ArticleAuthor,
-  type ArticleTag,
 } from "./article"
+// Event factories
+export {
+  createEvent,
+  createEventWithoutImage,
+  createPastEvent,
+  type EventFixture,
+  type EventImage,
+  type EventLocation,
+  resetEventCounter,
+} from "./event"
+// Player factories
+export {
+  createMinimalPlayer,
+  createPlayer,
+  createPlayerWithoutAvatar,
+  type PlayerFixture,
+  type PlayerImage,
+  resetPlayerCounter,
+  type SocialNetwork,
+} from "./player"
 
 /**
  * Reset all factory counters

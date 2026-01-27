@@ -1,10 +1,10 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import CountrySelector from "@/components/admin/country-selector"
 import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import { useToast } from "@/components/admin/toast"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
 import { createLocation } from "../locations.action"
 
 export default function LocationCreateForm() {

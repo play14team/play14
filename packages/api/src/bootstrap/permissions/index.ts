@@ -30,6 +30,6 @@ export async function bootstrapPermissions(strapi: Core.Strapi): Promise<void> {
   }
 }
 
-// Re-export types and constants for external use
-export { ROLE_TYPES, ROLE_HIERARCHY, type RoleType } from "./types"
 export { PERMISSION_DEFINITIONS } from "./definitions"
+// Re-export types and constants for external use
+export { ROLE_HIERARCHY, ROLE_TYPES, type RoleType } from "./types"

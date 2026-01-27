@@ -33,12 +33,12 @@ export interface MyEvent {
 
 // Re-export types from claim-attendance
 export type {
-  EventLocation,
-  ClaimableEvent,
   AttendanceClaim,
-  EventsResponse,
-  ClaimsResponse,
   ClaimActionResponse,
+  ClaimableEvent,
+  ClaimsResponse,
+  EventLocation,
+  EventsResponse,
 } from "../claim-attendance/claim-attendance.action"
 
 // New type for attended events

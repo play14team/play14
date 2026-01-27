@@ -1,10 +1,10 @@
 "use client"
 
+import { useEffect, useMemo, useState } from "react"
+import ReactCountryFlag from "react-country-flag"
 import { FilterBar, type FilterConfig, type FilterOption, useFilters } from "@/components/filters"
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Event } from "@/models/strapi"
-import { useEffect, useMemo, useState } from "react"
-import ReactCountryFlag from "react-country-flag"
 import Loader from "../layout/loader"
 import EventGrid from "./grid"
 

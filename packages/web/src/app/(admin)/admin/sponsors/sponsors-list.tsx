@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { type SponsorListItem, type SponsorsListResponse, getSponsors } from "./sponsors.action"
+import { getSponsors, type SponsorListItem, type SponsorsListResponse } from "./sponsors.action"
 
 export default function SponsorsList() {
   const [sponsors, setSponsors] = useState<SponsorListItem[]>([])

@@ -1,10 +1,10 @@
 "use client"
 
-import LoginButtons from "@/components/auth/login-buttons"
-import { loginWithCredentials } from "@/components/auth/login.action"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useTransition } from "react"
+import { loginWithCredentials } from "@/components/auth/login.action"
+import LoginButtons from "@/components/auth/login-buttons"
 import styles from "./auth-gate.module.scss"
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337"

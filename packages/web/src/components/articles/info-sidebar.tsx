@@ -1,5 +1,5 @@
-import type { Article, Tag } from "@/models/strapi"
 import Link from "next/link"
+import type { Article, Tag } from "@/models/strapi"
 import SocialLinks from "../layout/social-links"
 import { getArticleSidebar } from "./get.action"
 

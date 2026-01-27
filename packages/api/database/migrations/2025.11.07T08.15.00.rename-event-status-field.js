@@ -65,8 +65,6 @@ export async function down(knex) {
 
     console.log("Successfully renamed event_status column back to status")
   } else {
-    console.log(
-      "Cannot rollback: status column already exists or event_status column not found"
-    )
+    console.log("Cannot rollback: status column already exists or event_status column not found")
   }
 }

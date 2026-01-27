@@ -1,8 +1,8 @@
 "use client"
 
-import Avatar from "@/components/ui/avatar"
 import Link from "next/link"
 import { useState } from "react"
+import Avatar from "@/components/ui/avatar"
 import type { PlayerClaim } from "./claims.action"
 import { approveClaim, rejectClaim } from "./claims.action"
 

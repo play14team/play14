@@ -255,7 +255,7 @@ async function sendTestEmails() {
   if (requestedFilters.length > 0 && emailsToSend.length === 0) {
     console.error("❌ Error: No email templates matched the filter.")
     console.error("Available templates:")
-    emails.forEach((email) => console.error(`- ${email.id}`))
+    for (const email of emails) console.error(`- ${email.id}`)
     process.exit(1)
   }
   if (requestedFilters.length > 0) {

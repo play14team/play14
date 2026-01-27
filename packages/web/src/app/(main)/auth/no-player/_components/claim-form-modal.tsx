@@ -1,9 +1,9 @@
 "use client"
 
-import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
-import DefaultPlayerImage from "@/components/ui/default-player-image"
 import Image from "next/image"
 import { useState } from "react"
+import type { PlayerSuggestion } from "@/components/auth/player-linking/types"
+import DefaultPlayerImage from "@/components/ui/default-player-image"
 
 interface ClaimFormModalProps {
   player: PlayerSuggestion

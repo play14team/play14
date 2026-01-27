@@ -79,7 +79,6 @@ describe("StripeProvider", () => {
   describe("constructor", () => {
     it("throws error when STRIPE_SECRET_KEY is not set", () => {
       const originalKey = process.env.STRIPE_SECRET_KEY
-      // biome-ignore lint/performance/noDelete: delete is required to unset env vars (setting to undefined converts to string "undefined")
       delete process.env.STRIPE_SECRET_KEY
 
       try {

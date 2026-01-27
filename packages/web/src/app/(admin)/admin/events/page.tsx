@@ -1,5 +1,5 @@
-import { requireAuth } from "@/libs/auth"
 import type { Metadata } from "next"
+import { requireAuth } from "@/libs/auth"
 import EventsPageContent from "./events-page-content"
 
 export const metadata: Metadata = {

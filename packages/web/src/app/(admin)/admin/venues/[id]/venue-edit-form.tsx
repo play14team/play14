@@ -1,14 +1,14 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useToast } from "@/components/admin/toast"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import VenueLogoManager from "@/components/admin/venue-logo-manager"
 import VenueMapPicker, { type MapLocation } from "@/components/admin/venue-map-picker"
 import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
-import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { VenueLogo } from "../logo.action"
-import { type VenueForEdit, deleteVenue, updateVenue } from "../venues.action"
+import { deleteVenue, updateVenue, type VenueForEdit } from "../venues.action"
 
 interface Props {
   venue: VenueForEdit

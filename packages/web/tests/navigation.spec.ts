@@ -189,7 +189,7 @@ test.describe("Footer", () => {
       text?.includes("play14") ||
         text?.includes("copyright") ||
         text?.includes("©") ||
-        text?.length! > 10
+        (text?.length ?? 0) > 10
     ).toBeTruthy()
   })
 

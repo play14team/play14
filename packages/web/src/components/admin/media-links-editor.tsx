@@ -1,7 +1,7 @@
 "use client"
 
-import type { MediaLink } from "@/app/(admin)/admin/events/[slug]/media-links.action"
 import { useState } from "react"
+import type { MediaLink } from "@/app/(admin)/admin/events/[slug]/media-links.action"
 
 const MEDIA_TYPES = [
   { value: "Photos", label: "Photos", icon: "bx-images" },

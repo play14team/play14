@@ -1,8 +1,8 @@
-import type { Article } from "@/models/strapi"
-import defaultArticle from "@/styles/images/gallery/gallery5.jpg"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
+import type { Article } from "@/models/strapi"
+import defaultArticle from "@/styles/images/gallery/gallery5.jpg"
 
 const ArticleCard = ({ article }: { article: Article }) => {
   const url = `/articles/${encodeURIComponent(article.slug!)}`

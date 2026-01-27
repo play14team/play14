@@ -18,7 +18,7 @@ import {
   generateGoogleCalendarUrl,
   generateOutlookCalendarUrl,
 } from "../../../libs/calendar"
-import { type InvoiceData, formatTicketItems, generateInvoicePDF } from "../../../libs/invoice"
+import { formatTicketItems, generateInvoicePDF, type InvoiceData } from "../../../libs/invoice"
 import { nameToUsername } from "../../../libs/strings"
 import { generateTicketCode } from "../../../libs/tickets"
 import { sendTicketSoldNotificationEmail as sendTicketSoldNotification } from "../../../services/email-templates"

@@ -67,9 +67,7 @@ export async function up(knex) {
   // Get event IDs and their document IDs to deduplicate
   // In Strapi 5, the same document can have multiple rows (draft/published)
   const eventIds = allFinanceLinks.map((l) => l.entity_id)
-  const events = await knex("events")
-    .select("id", "document_id")
-    .whereIn("id", eventIds)
+  const events = await knex("events").select("id", "document_id").whereIn("id", eventIds)
 
   // Create a map of event_id -> document_id
   const eventDocMap = new Map(events.map((e) => [e.id, e.document_id]))
@@ -96,7 +94,9 @@ export async function up(knex) {
     }
   }
 
-  console.log(`Found ${financeLinks.length} unique events with finance data (${allFinanceLinks.length} total links)`)
+  console.log(
+    `Found ${financeLinks.length} unique events with finance data (${allFinanceLinks.length} total links)`
+  )
 
   // Get the finance data
   const componentIds = financeLinks.map((l) => l.cmp_id)
@@ -117,7 +117,9 @@ export async function up(knex) {
     // Get the draft event ID for this document (Strapi admin edits draft version)
     const draftEventId = draftEventMap.get(eventDocumentId)
     if (!finance || !eventDocumentId || !draftEventId) {
-      console.log(`Skipping link: event_id=${link.entity_id}, cmp_id=${link.cmp_id} - missing data or no draft`)
+      console.log(
+        `Skipping link: event_id=${link.entity_id}, cmp_id=${link.cmp_id} - missing data or no draft`
+      )
       skippedCount++
       continue
     }
@@ -130,7 +132,9 @@ export async function up(knex) {
       .count("* as count")
 
     if (Number(existingItems[0].count) > 0) {
-      console.log(`Skipping event ${eventDocumentId}: already has ${existingItems[0].count} result items`)
+      console.log(
+        `Skipping event ${eventDocumentId}: already has ${existingItems[0].count} result items`
+      )
       skippedCount++
       continue
     }
@@ -231,14 +235,10 @@ export async function down(knex) {
   const itemIds = migratedItems.map((item) => item.id)
 
   // Delete from link table first (foreign key constraint)
-  await knex("result_line_items_event_lnk")
-    .whereIn("result_line_item_id", itemIds)
-    .delete()
+  await knex("result_line_items_event_lnk").whereIn("result_line_item_id", itemIds).delete()
 
   // Then delete the items
-  const deleted = await knex("result_line_items")
-    .whereIn("id", itemIds)
-    .delete()
+  const deleted = await knex("result_line_items").whereIn("id", itemIds).delete()
 
   console.log(`Rollback complete: deleted ${deleted} migrated result items`)
 }

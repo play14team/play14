@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   type PlayerUpdateData as AdminUpdateData,
   type PlayerForEdit,
@@ -13,8 +15,6 @@ import SimpleEditor from "@/components/ui/simple-editor"
 import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
 import type { PlayerProfile } from "@/libs/api/players"
 import type { GeoLocation } from "@/models/strapi"
-import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   type PlayerUpdateData as ProfileUpdateData,
   updatePlayerProfile,

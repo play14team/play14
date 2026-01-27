@@ -6,11 +6,11 @@ import { describe, expect, it } from "vitest"
 import {
   type BudgetCategory,
   type BudgetLineItem,
-  EXPENSE_CATEGORIES,
-  INCOME_CATEGORIES,
   calculateBudgetSummary,
   calculateCategoryTotal,
+  EXPENSE_CATEGORIES,
   groupBudgetItemsByCategory,
+  INCOME_CATEGORIES,
 } from "./budget.types"
 
 // Helper to create a budget line item

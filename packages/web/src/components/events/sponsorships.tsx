@@ -6,9 +6,7 @@ interface GroupedSponsorship {
   sponsors: Sponsor[]
 }
 
-const EventSponsorships = (props: {
-  sponsorships: Array<ComponentEventsSponsorship>
-}) => {
+const EventSponsorships = (props: { sponsorships: Array<ComponentEventsSponsorship> }) => {
   const { sponsorships } = props
 
   // Group sponsors by category name

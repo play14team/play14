@@ -1,16 +1,16 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import SponsorLogoManager from "@/components/admin/sponsor-logo-manager"
 import { useToast } from "@/components/admin/toast"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
-import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type { SponsorLogo } from "../logo.action"
 import {
+  deleteSponsor,
   type SocialNetwork,
   type SponsorForEdit,
-  deleteSponsor,
   updateSponsor,
 } from "../sponsors.action"
 

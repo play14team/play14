@@ -91,7 +91,7 @@ export async function up(knex) {
       if (rows.length > 0) {
         junctionTable = rows[0].table_name
       }
-    } catch (error) {
+    } catch {
       console.log("Unable to query information_schema for junction table")
     }
   }
@@ -157,9 +157,7 @@ export async function up(knex) {
       )
 
       if (!likedItemColumn || !playerColumn) {
-        console.log(
-          `Could not find proper columns in ${junctionTable}, skipping contributor links`
-        )
+        console.log(`Could not find proper columns in ${junctionTable}, skipping contributor links`)
         continue
       }
 

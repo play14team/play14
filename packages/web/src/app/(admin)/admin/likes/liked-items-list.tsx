@@ -4,9 +4,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
+  getLikedItems,
   type LikedItemListItem,
   type LikedItemsListResponse,
-  getLikedItems,
 } from "./liked-items.action"
 
 export default function LikedItemsList() {

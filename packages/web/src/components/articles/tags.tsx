@@ -1,5 +1,5 @@
-import { deduplicate } from "@/libs/arrays"
 import Link from "next/link"
+import { deduplicate } from "@/libs/arrays"
 import { getArticleNav } from "./get.action"
 
 export default async function Tags() {

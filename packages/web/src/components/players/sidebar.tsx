@@ -1,5 +1,5 @@
-import type { GeoLocation, Player } from "@/models/strapi"
 import Link from "next/link"
+import type { GeoLocation, Player } from "@/models/strapi"
 
 // Helper to get location display name from string or GeoLocation
 function getLocationName(location: string | GeoLocation | undefined): string | null {

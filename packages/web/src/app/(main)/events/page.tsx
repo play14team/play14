@@ -1,8 +1,8 @@
-import EventsPageContent from "@/components/events/events-page-content"
-import { getEventFilterOptions } from "@/components/events/get-filter-options.action"
-import { getAllEvents } from "@/components/events/get.action"
-import type { Event } from "@/models/strapi"
 import type { Metadata } from "next"
+import EventsPageContent from "@/components/events/events-page-content"
+import { getAllEvents } from "@/components/events/get.action"
+import { getEventFilterOptions } from "@/components/events/get-filter-options.action"
+import type { Event } from "@/models/strapi"
 
 export const metadata: Metadata = {
   title: "Events",

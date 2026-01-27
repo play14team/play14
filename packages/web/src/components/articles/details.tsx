@@ -1,6 +1,6 @@
-import type { Article, UploadFile } from "@/models/strapi"
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
+import type { Article, UploadFile } from "@/models/strapi"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
 import AuthorCard from "./author-card"

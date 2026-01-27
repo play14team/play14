@@ -1,8 +1,8 @@
 "use client"
 
-import { getCountryName } from "@/app/(admin)/admin/events/[slug]/hooks/use-event-form"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ReactCountryFlag from "react-country-flag"
+import { getCountryName } from "@/app/(admin)/admin/events/[slug]/hooks/use-event-form"
 
 export interface LocationOption {
   documentId: string

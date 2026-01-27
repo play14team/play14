@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation"
 import { useCallback, useState } from "react"
 import {
   Calendar,
+  dateFnsLocalizer,
   type Event,
   type NavigateAction,
   Views,
-  dateFnsLocalizer,
 } from "react-big-calendar"
 import { mapColor } from "./popup"
 

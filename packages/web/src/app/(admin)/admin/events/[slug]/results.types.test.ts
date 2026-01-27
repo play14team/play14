@@ -4,13 +4,13 @@
 
 import { describe, expect, it } from "vitest"
 import {
+  calculateResultCategoryTotal,
+  calculateResultsSummary,
   EXPENSE_CATEGORIES,
+  groupResultItemsByCategory,
   INCOME_CATEGORIES,
   type ResultCategory,
   type ResultLineItem,
-  calculateResultCategoryTotal,
-  calculateResultsSummary,
-  groupResultItemsByCategory,
 } from "./results.types"
 
 // Helper to create a result line item

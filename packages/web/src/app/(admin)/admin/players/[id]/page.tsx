@@ -1,8 +1,8 @@
-import { PlayerForm } from "@/components/admin/player-form"
-import { requireOrganizer } from "@/libs/auth"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { PlayerForm } from "@/components/admin/player-form"
+import { requireOrganizer } from "@/libs/auth"
 import { getPlayerForEdit } from "../players.action"
 
 export const metadata: Metadata = {

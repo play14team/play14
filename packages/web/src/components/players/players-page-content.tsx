@@ -1,9 +1,9 @@
 "use client"
 
+import { useEffect, useMemo, useState } from "react"
 import { FilterBar, type FilterConfig, type FilterOption, useFilters } from "@/components/filters"
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Player } from "@/models/strapi"
-import { useEffect, useMemo, useState } from "react"
 import Loader from "../layout/loader"
 import PlayerGrid from "./grid"
 

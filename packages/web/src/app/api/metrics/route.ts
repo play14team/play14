@@ -1,5 +1,5 @@
-import { getContentType, getMetrics } from "@/libs/metrics"
 import { NextResponse } from "next/server"
+import { getContentType, getMetrics } from "@/libs/metrics"
 
 /**
  * GET /api/metrics

@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { type VenueListItem, type VenuesListResponse, getVenues } from "./venues.action"
+import { getVenues, type VenueListItem, type VenuesListResponse } from "./venues.action"
 
 export default function VenuesList() {
   const [venues, setVenues] = useState<VenueListItem[]>([])

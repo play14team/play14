@@ -1,7 +1,7 @@
-import { requireOrganizer } from "@/libs/auth"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { requireOrganizer } from "@/libs/auth"
 import { getSponsorForEdit } from "../sponsors.action"
 import SponsorEditForm from "./sponsor-edit-form"
 

@@ -1,8 +1,8 @@
+import type { Metadata } from "next"
 import { getEventMarkers } from "@/components/events/get.action"
 import EventMap from "@/components/events/map"
 import Page from "@/components/layout/page"
 import type { Event } from "@/models/strapi"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Events | Map",

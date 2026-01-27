@@ -1,9 +1,9 @@
 "use client"
 
-import type { Testimonial } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
 import ReactAudioPlayer from "react-audio-player"
+import type { Testimonial } from "@/models/strapi"
 import HtmlContent from "../layout/html-content"
 
 const TestimonialItem = ({ testimonial }: { testimonial: Testimonial }) => {

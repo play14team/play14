@@ -1,8 +1,8 @@
+import type { Metadata } from "next"
+import Link from "next/link"
 import { getMyOrders } from "@/components/tickets/purchase.action"
 import Avatar from "@/components/ui/avatar"
 import { requirePlayer } from "@/libs/auth"
-import type { Metadata } from "next"
-import Link from "next/link"
 import { getMyAttendedEvents, getMyEvents } from "./events/events.action"
 import styles from "./page.module.scss"
 

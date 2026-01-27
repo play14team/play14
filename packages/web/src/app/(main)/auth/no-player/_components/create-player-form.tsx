@@ -1,7 +1,7 @@
 "use client"
 
-import Logo from "@/components/layout/logo"
 import { useState } from "react"
+import Logo from "@/components/layout/logo"
 
 interface CreatePlayerFormProps {
   defaultName: string

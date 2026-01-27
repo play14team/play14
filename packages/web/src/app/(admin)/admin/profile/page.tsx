@@ -1,8 +1,8 @@
+import type { Metadata } from "next"
 import { getStripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import { PlayerForm } from "@/components/admin/player-form"
 import { getPlayerByDocumentId } from "@/libs/api/players"
 import { requirePlayer } from "@/libs/auth"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Edit Profile",

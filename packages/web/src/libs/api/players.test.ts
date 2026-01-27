@@ -1,10 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import * as strapiClient from "@/libs/strapi-client"
 import type { Player } from "@/models/strapi"
-import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
-  type PlayerProfile,
   deletePlayerPicture,
   getPlayerByDocumentId,
+  type PlayerProfile,
   uploadPlayerPicture,
 } from "./players"
 

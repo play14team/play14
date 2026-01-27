@@ -1,7 +1,7 @@
 "use client"
 
-import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
 import { useEffect, useState } from "react"
+import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
 import DiscountCodeInput from "./discount-code-input"
 import type {
   AuthStatus,

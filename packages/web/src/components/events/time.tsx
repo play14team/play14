@@ -1,13 +1,7 @@
 import { TZDate } from "@date-fns/tz"
 import { format } from "date-fns"
 
-const EventTime = ({
-  time,
-  timezone,
-}: {
-  time: Date | string
-  timezone?: string
-}) => {
+const EventTime = ({ time, timezone }: { time: Date | string; timezone?: string }) => {
   const formatPattern = "EEE, MMM do - HH:mm"
   const base = time instanceof Date ? time : new Date(time)
   const zone = timezone || "UTC"

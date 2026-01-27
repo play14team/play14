@@ -1,8 +1,8 @@
-import { getPlayerFilterOptions } from "@/components/players/get-filter-options.action"
+import type { Metadata } from "next"
 import { getAllPlayers } from "@/components/players/get.action"
+import { getPlayerFilterOptions } from "@/components/players/get-filter-options.action"
 import PlayersPageContent from "@/components/players/players-page-content"
 import type { Player } from "@/models/strapi"
-import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Players",

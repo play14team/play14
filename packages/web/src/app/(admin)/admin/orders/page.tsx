@@ -1,6 +1,6 @@
+import Link from "next/link"
 import { getMyOrders } from "@/components/tickets/purchase.action"
 import { requireAuth } from "@/libs/auth"
-import Link from "next/link"
 import styles from "./page.module.scss"
 
 export const metadata = {

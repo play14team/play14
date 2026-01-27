@@ -1,9 +1,5 @@
 "use client"
 
-import {
-  type RevenueAnalytics,
-  getRevenueAnalytics,
-} from "@/app/(admin)/admin/events/[slug]/revenue-analytics.action"
 import { useEffect, useState } from "react"
 import {
   Area,
@@ -17,6 +13,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import {
+  getRevenueAnalytics,
+  type RevenueAnalytics,
+} from "@/app/(admin)/admin/events/[slug]/revenue-analytics.action"
 import styles from "./revenue-dashboard.module.scss"
 
 interface Props {

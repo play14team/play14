@@ -1,10 +1,9 @@
 "use client"
 
-import type { Event } from "@/models/strapi"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
-
 import Map, { FullscreenControl, GeolocateControl, NavigationControl } from "react-map-gl/mapbox"
+import type { Event } from "@/models/strapi"
 import GeocoderControl from "../map/geocoder"
 
 import "mapbox-gl/dist/mapbox-gl.css"

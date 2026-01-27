@@ -1,9 +1,9 @@
 "use client"
 
-import Avatar from "@/components/ui/avatar"
 import Link from "next/link"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { type PlayerListItem, type PlayersListResponse, getPlayers } from "./players.action"
+import Avatar from "@/components/ui/avatar"
+import { getPlayers, type PlayerListItem, type PlayersListResponse } from "./players.action"
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 const POSITIONS = ["Founder", "Mentor", "Host", "Player"] as const

@@ -1,12 +1,12 @@
 "use client"
 
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
+import { useEffect, useState } from "react"
 import Logo from "@/components/layout/logo"
 import Avatar from "@/components/ui/avatar"
 import type { StrapiUser } from "@/libs/auth"
-import { useTheme } from "next-themes"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
 
 interface AdminSidebarProps {
   user: StrapiUser

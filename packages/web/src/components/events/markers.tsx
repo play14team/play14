@@ -1,7 +1,7 @@
-import type { Event, GeoLocation } from "@/models/strapi"
 import { useTheme } from "next-themes"
 import { useEffect, useMemo, useState } from "react"
 import { Marker } from "react-map-gl/mapbox"
+import type { Event, GeoLocation } from "@/models/strapi"
 import EventPopup, { mapColor } from "./popup"
 
 // Helper to extract coordinates from either location format

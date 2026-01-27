@@ -1,9 +1,9 @@
+import { notFound } from "next/navigation"
 import GameDetails from "@/components/games/details"
 import { getGame, getGameSlugs } from "@/components/games/get.action"
 import Page from "@/components/layout/page"
 import type { SlugParamsProps } from "@/libs/slug-params"
 import type { Game } from "@/models/strapi"
-import { notFound } from "next/navigation"
 
 // Enable dynamic params for games not pre-generated
 export const dynamicParams = true

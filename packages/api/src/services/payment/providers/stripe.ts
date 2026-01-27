@@ -6,7 +6,7 @@
  */
 
 import Stripe from "stripe"
-import { type LogContext, createLogger, startTimer } from "../../observability/logger"
+import { createLogger, type LogContext, startTimer } from "../../observability/logger"
 import { stripeApiCallsTotal, stripeApiDuration } from "../../observability/metrics"
 import type {
   AccountLink,

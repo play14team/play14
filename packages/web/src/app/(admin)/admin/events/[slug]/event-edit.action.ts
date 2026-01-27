@@ -1,7 +1,7 @@
 "use server"
 
-import { strapiFetch } from "@/libs/strapi-client"
 import { revalidatePath } from "next/cache"
+import { strapiFetch } from "@/libs/strapi-client"
 import type { FinanceData } from "./finance.action"
 import type { MediaLink } from "./media-links.action"
 import type { TimetableDay } from "./schedule.types"

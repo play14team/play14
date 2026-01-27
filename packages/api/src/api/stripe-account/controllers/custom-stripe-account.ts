@@ -462,8 +462,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
         }
       }
 
-      event.hosts?.forEach((h: any) => processOrganizer(h, "host"))
-      event.mentors?.forEach((m: any) => processOrganizer(m, "mentor"))
+      for (const h of event.hosts ?? []) processOrganizer(h, "host")
+      for (const m of event.mentors ?? []) processOrganizer(m, "mentor")
 
       return ctx.send({
         data: accounts,

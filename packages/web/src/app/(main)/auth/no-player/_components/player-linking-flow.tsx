@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import {
   autoLinkPlayer,
   cancelClaim,
@@ -14,8 +16,6 @@ import type {
   PendingClaim,
   PlayerSuggestion,
 } from "@/components/auth/player-linking/types"
-import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
 import AutoLinkSuccess from "./auto-link-success"
 import ClaimFormModal from "./claim-form-modal"
 import ClaimPending from "./claim-pending"

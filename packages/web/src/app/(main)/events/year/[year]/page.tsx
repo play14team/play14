@@ -1,10 +1,10 @@
-import { getEventYearCounts, getEventYears, getEventsByYear } from "@/components/events/get.action"
+import type { Metadata } from "next"
+import { notFound } from "next/navigation"
+import { getEventsByYear, getEventYearCounts, getEventYears } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
 import LoadMoreYear from "@/components/events/load-more-year"
 import YearNav from "@/components/events/year-nav"
 import type { Event } from "@/models/strapi"
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
 
 interface YearEventsPageProps {
   params: Promise<{ year: string }>

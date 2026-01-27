@@ -1,6 +1,6 @@
+import { cache } from "react"
 import { restQuery } from "@/libs/strapi-client"
 import { eventDetailsPopulate } from "@/libs/strapi-populate"
-import { cache } from "react"
 
 // Types matching get.action.ts
 interface UploadFile {

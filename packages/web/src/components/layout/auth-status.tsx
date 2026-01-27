@@ -1,6 +1,6 @@
+import Link from "next/link"
 import { getAuthState } from "@/libs/auth"
 import { getFeatureFlags } from "@/libs/feature-flags"
-import Link from "next/link"
 import UserMenu from "./user-menu"
 
 export default async function AuthStatus() {

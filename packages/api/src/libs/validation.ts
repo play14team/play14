@@ -94,11 +94,7 @@ export const urlSchema = z
  * Creates a name validation schema with configurable options
  */
 export function createNameSchema(
-  options: {
-    field?: string
-    minLength?: number
-    maxLength?: number
-  } = {}
+  options: { field?: string; minLength?: number; maxLength?: number } = {}
 ) {
   const { field = "Name", minLength = 1, maxLength = 100 } = options
 
@@ -243,12 +239,7 @@ export function sanitizeText(text: string): string {
  * Create a sanitized text schema for free-text fields
  * Strips HTML and limits length
  */
-export function createSanitizedTextSchema(
-  options: {
-    maxLength?: number
-    field?: string
-  } = {}
-) {
+export function createSanitizedTextSchema(options: { maxLength?: number; field?: string } = {}) {
   const { maxLength = 500, field = "Text" } = options
 
   return z

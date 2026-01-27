@@ -1,31 +1,28 @@
 "use client"
 
+import { useRouter, useSearchParams } from "next/navigation"
+import { useCallback, useEffect, useRef, useState } from "react"
 import type {
   HostStripeAccount,
   StripeAccountStatus,
 } from "@/app/(admin)/admin/stripe/stripe-connect.action"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useToast } from "@/components/admin/toast"
+import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
+import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
+import type { BudgetLineItem } from "./budget.types"
 import type { DiscountCode } from "./discount-code.action"
 import {
   type EventForEdit,
   type LocationOption,
   type OrganizerOption,
-  type VenueOption,
   publishEvent,
   unpublishEvent,
   updateEvent,
+  type VenueOption,
 } from "./event-edit.action"
-import type { TicketType } from "./ticket-type.action"
-
-import { useToast } from "@/components/admin/toast"
-import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
-import { useBeforeUnload, useFormDirty } from "@/hooks/use-form-dirty"
 import EventEditActions from "./event-edit-actions"
 import EventEditTabs, { TAB_IDS, type TabId } from "./event-edit-tabs"
 import { useEventForm } from "./hooks/use-event-form"
-
-import type { BudgetLineItem } from "./budget.types"
 import type { ResultLineItem } from "./results.types"
 import BasicsTab from "./tabs/basics-tab"
 import BudgetTab from "./tabs/budget-tab"
@@ -36,6 +33,7 @@ import ParticipantsTab from "./tabs/participants-tab"
 import ResultsTab from "./tabs/results-tab"
 import ScheduleTicketsTab from "./tabs/schedule-tickets-tab"
 import TeamSponsorsTab from "./tabs/team-sponsors-tab"
+import type { TicketType } from "./ticket-type.action"
 
 interface Props {
   event: EventForEdit

@@ -4,13 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function SocialLinks({
-  text,
-  className,
-}: {
-  text: string
-  className: string
-}) {
+export default function SocialLinks({ text, className }: { text: string; className: string }) {
   const pathname = usePathname()
   const [url, setUrl] = useState(pathname)
 

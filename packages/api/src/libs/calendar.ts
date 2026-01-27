@@ -3,7 +3,7 @@
  * Used to attach calendar events to confirmation emails
  */
 
-import { type EventAttributes, type EventStatus, createEvent } from "ics"
+import { createEvent, type EventAttributes, type EventStatus } from "ics"
 
 interface EventData {
   name: string

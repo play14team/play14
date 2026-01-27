@@ -1,8 +1,8 @@
 "use client"
 
+import { useCallback, useEffect, useState } from "react"
 import { useIntersection } from "@/hooks/useIntersection"
 import type { Pagination, Player } from "@/models/strapi"
-import { useCallback, useEffect, useState } from "react"
 import Loader from "../layout/loader"
 import { getPlayers } from "./get.action"
 import PlayerGrid from "./grid"

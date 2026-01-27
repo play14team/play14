@@ -1,5 +1,7 @@
 "use client"
 
+import { usePathname, useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import {
   trackAttendeeInfoSubmitted,
   trackAuthRequired,
@@ -11,20 +13,18 @@ import {
   trackTicketsViewed,
   withCheckoutSpan,
 } from "@/libs/sentry-metrics"
-import { usePathname, useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
 import AttendeeForm from "./attendee-form"
 import AuthGate from "./auth-gate"
 import {
   type AttendeeInfo,
   type AuthStatus,
-  type DraftOrderResponse,
-  type EventTicketsResponse,
-  type TicketSelection,
   checkAuthStatus,
   createDraftOrder,
+  type DraftOrderResponse,
+  type EventTicketsResponse,
   finalizeCheckout,
   getAvailableTickets,
+  type TicketSelection,
   updateAttendeeInfo,
 } from "./purchase.action"
 import styles from "./ticket-purchase-flow.module.scss"

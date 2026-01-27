@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { type Play14Statistics, getStatistics } from "./get.action"
+import { getStatistics, type Play14Statistics } from "./get.action"
 
 interface StatItem {
   value: number

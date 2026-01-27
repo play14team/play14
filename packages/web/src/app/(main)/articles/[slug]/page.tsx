@@ -1,9 +1,9 @@
+import { notFound } from "next/navigation"
 import ArticleDetails from "@/components/articles/details"
 import { getArticle, getArticleSlugs } from "@/components/articles/get.action"
 import Page from "@/components/layout/page"
 import type { SlugParamsProps } from "@/libs/slug-params"
 import type { Article } from "@/models/strapi"
-import { notFound } from "next/navigation"
 
 // Enable dynamic params for articles not pre-generated
 export const dynamicParams = true

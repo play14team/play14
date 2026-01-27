@@ -1,10 +1,10 @@
+import { notFound } from "next/navigation"
 import EventDetails from "@/components/events/details/index"
 import { getEventSlugs } from "@/components/events/get.action"
 import { getEventBySlug } from "@/components/events/get.cached"
 import Page from "@/components/layout/page"
 import { formatDate } from "@/libs/dates"
 import type { SlugParamsProps } from "@/libs/slug-params"
-import { notFound } from "next/navigation"
 
 // Enable dynamic params for any new events not pre-generated at build time
 export const dynamicParams = true

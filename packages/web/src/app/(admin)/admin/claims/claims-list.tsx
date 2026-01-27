@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import ClaimCard from "./claim-card"
-import { type PlayerClaim, getPendingClaims } from "./claims.action"
+import { getPendingClaims, type PlayerClaim } from "./claims.action"
 
 export default function ClaimsList() {
   const router = useRouter()

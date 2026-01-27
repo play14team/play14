@@ -2,11 +2,7 @@ import type { Event, UploadFile } from "@/models/strapi"
 import DetailsNavigator, { type NavLink } from "../layout/detailsnav"
 import { getEventNav } from "./get.action"
 
-export default async function EventsNavigator({
-  current,
-}: {
-  current: string
-}) {
+export default async function EventsNavigator({ current }: { current: string }) {
   const events = (await getEventNav()) as Event[]
   const index = events.findIndex((a) => a.slug === current)
 

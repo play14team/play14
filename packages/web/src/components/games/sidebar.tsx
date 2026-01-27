@@ -1,6 +1,6 @@
-import type { Game } from "@/models/strapi"
 import Image from "next/image"
 import Link from "next/link"
+import type { Game } from "@/models/strapi"
 import Ratings from "../layout/ratings"
 
 // Get file type icon based on extension

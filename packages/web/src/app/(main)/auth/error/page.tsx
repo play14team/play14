@@ -1,6 +1,6 @@
-import Logo from "@/components/layout/logo"
 import type { Metadata } from "next"
 import Link from "next/link"
+import Logo from "@/components/layout/logo"
 
 export const metadata: Metadata = {
   title: "Authentication Error",

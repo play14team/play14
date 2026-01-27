@@ -1,9 +1,9 @@
 "use client"
 
+import { useCallback, useMemo, useState } from "react"
 import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 import { useToast } from "@/components/admin/toast"
 import { formatCurrency } from "@/libs/currencies"
-import { useCallback, useMemo, useState } from "react"
 import { createBudgetItem, deleteBudgetItem, updateBudgetItem } from "../budget.action"
 import {
   BUDGET_CATEGORIES,
@@ -239,7 +239,9 @@ export default function BudgetTab({
             className="admin-input budget-item-quantity"
             placeholder="Qty"
             value={currentEditingItem.item.quantity || ""}
-            onChange={(e) => updateEditingItem("quantity", Number.parseInt(e.target.value) || 1)}
+            onChange={(e) =>
+              updateEditingItem("quantity", Number.parseInt(e.target.value, 10) || 1)
+            }
             min="1"
           />
           <span className="budget-item-equals">=</span>

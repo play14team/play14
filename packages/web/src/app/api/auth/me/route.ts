@@ -1,5 +1,5 @@
-import { getCurrentUser } from "@/libs/auth"
 import { NextResponse } from "next/server"
+import { getCurrentUser } from "@/libs/auth"
 
 export async function GET() {
   const user = await getCurrentUser()

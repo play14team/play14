@@ -1,5 +1,5 @@
-import type { Pagination } from "@/models/strapi"
 import Link from "next/link"
+import type { Pagination } from "@/models/strapi"
 
 interface PagingProps {
   pagination: Pagination

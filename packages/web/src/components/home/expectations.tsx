@@ -2,11 +2,7 @@ import type { Enum_Expectation_Type, Expectation } from "@/models/strapi"
 import HtmlContent from "../layout/html-content"
 import { getExpectations } from "./get.action"
 
-export default async function Expectations({
-  type,
-}: {
-  type: Enum_Expectation_Type
-}) {
+export default async function Expectations({ type }: { type: Enum_Expectation_Type }) {
   const expectations = (await getExpectations(type)) as Expectation[]
 
   return (
