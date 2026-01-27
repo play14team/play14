@@ -55,6 +55,7 @@ const navigationItems: NavItem[] = [
       { label: "Articles", href: "/articles" },
       { label: "Testimonials", href: "/events/testimonials" },
       { label: "Things we like", href: "/likes" },
+      { label: "Debriefing cube", href: "/tools/debriefing-cube" },
     ],
   },
   {
