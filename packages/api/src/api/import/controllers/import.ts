@@ -78,11 +78,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         data: {
           summary: result.summary,
           reportRows: result.reportRows,
+          errors: result.errors,
         },
       })
     } catch (error) {
-      strapi.log.error(`[Import] Failed to process upload: ${error}`)
-      return ctx.internalServerError("Import failed")
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      strapi.log.error(`[Import] Failed to process upload: ${errorMessage}`)
+      return ctx.internalServerError(`Import failed: ${errorMessage}`)
     }
   },
 })

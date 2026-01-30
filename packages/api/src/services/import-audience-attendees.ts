@@ -67,11 +67,19 @@ export interface ImportAudienceAttendeesOptions {
   writeReports?: boolean
 }
 
+export interface ImportError {
+  email?: string
+  name?: string
+  operation: "createPlayer" | "createUser" | "linkUser" | "updatePlayer" | "sendInvitation"
+  message: string
+}
+
 export interface ImportAudienceAttendeesResult {
   dryRun: boolean
   reportPath?: string
   reportCsvPath?: string
   reportRows: ImportReportRow[]
+  errors: ImportError[]
   summary: {
     contacts: number
     createPlayers: number
@@ -81,6 +89,7 @@ export interface ImportAudienceAttendeesResult {
     updateUsers: number
     skipped: number
     ambiguousMatches: number
+    failed: number
   }
 }
 
@@ -869,17 +878,25 @@ export async function runAudienceAttendeeImport(
       reportPath,
       reportCsvPath: csvPath,
       reportRows,
-      summary,
+      errors: [],
+      summary: { ...summary, failed: 0 },
     }
   }
 
-  await strapi.db.transaction(async () => {
-    for (const action of actions.createPlayers) {
-      const playerName = action.name
-      const playerRecord = playersByName
-        .get(normalizeName(playerName))
-        ?.find((player) => player.name === playerName)
-      if (!playerRecord?.planned) continue
+  const errors: ImportError[] = []
+
+  // Process each operation individually to allow partial success
+  // If one player/user fails, continue with the rest
+
+  // Create players
+  for (const action of actions.createPlayers) {
+    const playerName = action.name
+    const playerRecord = playersByName
+      .get(normalizeName(playerName))
+      ?.find((player) => player.name === playerName)
+    if (!playerRecord?.planned) continue
+
+    try {
       const createdPlayer = await strapi.documents("api::player.player").create({
         data: {
           name: playerRecord.name,
@@ -894,11 +911,24 @@ export async function runAudienceAttendeeImport(
       playerRecord.id = createdPlayer.id
       playerRecord.documentId = createdPlayer.documentId
       playerRecord.planned = false
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      strapi.log.error(`[Import] Failed to create player ${playerName}: ${errorMessage}`)
+      errors.push({
+        email: action.email,
+        name: playerName,
+        operation: "createPlayer",
+        message: errorMessage,
+      })
     }
+  }
 
-    for (const action of actions.createUsers) {
-      const user = usersByEmail.get(action.email)
-      if (!user || !user.planned) continue
+  // Create users
+  for (const action of actions.createUsers) {
+    const user = usersByEmail.get(action.email)
+    if (!user || !user.planned) continue
+
+    try {
       const password = `${crypto.randomBytes(16).toString("hex")}!`
 
       // Determine role based on player's position
@@ -922,30 +952,63 @@ export async function runAudienceAttendeeImport(
       user.id = createdUser.id
       user.documentId = createdUser.documentId
       user.planned = false
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      strapi.log.error(`[Import] Failed to create user ${action.email}: ${errorMessage}`)
+      errors.push({
+        email: action.email,
+        name: action.playerName,
+        operation: "createUser",
+        message: errorMessage,
+      })
     }
+  }
 
-    for (const action of actions.linkUsers) {
-      const user = usersByEmail.get(action.email)
-      if (!user || !user.player || !user.documentId || !user.player.id) continue
+  // Link users to players
+  for (const action of actions.linkUsers) {
+    const user = usersByEmail.get(action.email)
+    if (!user || !user.player || !user.documentId || !user.player.id) continue
+
+    try {
       await strapi.documents("plugin::users-permissions.user").update({
         documentId: user.documentId,
         data: { player: user.player.id } as any,
       })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      strapi.log.error(`[Import] Failed to link user ${action.email}: ${errorMessage}`)
+      errors.push({
+        email: action.email,
+        name: action.playerName,
+        operation: "linkUser",
+        message: errorMessage,
+      })
     }
+  }
 
-    for (const action of actions.updatePlayers) {
-      const targetDocumentId =
-        action.documentId ||
-        existingPlayers.find((p) => p.name === action.name)?.documentId ||
-        playersByName.get(normalizeName(action.name))?.find((p) => p.name === action.name)
-          ?.documentId
-      if (!targetDocumentId) continue
+  // Update players
+  for (const action of actions.updatePlayers) {
+    const targetDocumentId =
+      action.documentId ||
+      existingPlayers.find((p) => p.name === action.name)?.documentId ||
+      playersByName.get(normalizeName(action.name))?.find((p) => p.name === action.name)?.documentId
+    if (!targetDocumentId) continue
+
+    try {
       await strapi.documents("api::player.player").update({
         documentId: targetDocumentId,
         data: action.updates as any,
       })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      strapi.log.error(`[Import] Failed to update player ${action.name}: ${errorMessage}`)
+      errors.push({
+        name: action.name,
+        operation: "updatePlayer",
+        message: errorMessage,
+      })
     }
-  })
+  }
 
   // Send invitation emails to newly created users immediately
   // This is done outside the transaction to avoid blocking database writes
@@ -978,11 +1041,19 @@ export async function runAudienceAttendeeImport(
     }
   }
 
+  if (errors.length > 0) {
+    logInfo(`- Errors: ${errors.length}`)
+    for (const error of errors) {
+      logInfo(`  - ${error.operation}: ${error.email || error.name} - ${error.message}`)
+    }
+  }
+
   return {
     dryRun,
     reportPath,
     reportCsvPath: csvPath,
     reportRows,
-    summary,
+    errors,
+    summary: { ...summary, failed: errors.length },
   }
 }
