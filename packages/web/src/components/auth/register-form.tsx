@@ -15,6 +15,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true)
 
   const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
@@ -68,7 +69,13 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
     }
 
     startTransition(async () => {
-      const result = await registerWithCredentials(username, email, password, turnstileToken)
+      const result = await registerWithCredentials(
+        username,
+        email,
+        password,
+        turnstileToken,
+        subscribeNewsletter
+      )
 
       if (result.success) {
         // After registration, redirect to the callback URL
@@ -137,6 +144,18 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
         {fieldErrors.confirmPassword && (
           <span className="auth-field-error">{fieldErrors.confirmPassword}</span>
         )}
+      </div>
+
+      <div className="auth-form-field auth-form-checkbox">
+        <label>
+          <input
+            type="checkbox"
+            checked={subscribeNewsletter}
+            onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+            disabled={isPending}
+          />
+          <span>Subscribe to our newsletter</span>
+        </label>
       </div>
 
       {turnstileSiteKey && (

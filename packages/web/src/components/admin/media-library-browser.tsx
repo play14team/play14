@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import {
@@ -422,9 +423,14 @@ export default function MediaLibraryBrowser({
                   title={file.name}
                 >
                   {isDisplayable ? (
-                    // Use native img to avoid Next.js Image optimization issues with various formats
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={thumbnailUrl} alt={file.name} loading="lazy" />
+                    <Image
+                      src={thumbnailUrl}
+                      alt={file.name}
+                      fill
+                      sizes="120px"
+                      style={{ objectFit: "cover" }}
+                      unoptimized
+                    />
                   ) : (
                     <div className="media-library-item-placeholder">
                       <i className="bx bx-image" />

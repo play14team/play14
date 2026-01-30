@@ -11,6 +11,7 @@ import UserInvitationEmail from "../../../emails/user-invitation"
 import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
 import { nameToUsername } from "../../../libs/strings"
 import { isValidEmail, isValidUrl } from "../../../libs/validation"
+import { addContactToAudience } from "../../../services/resend-audience"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 
 /**
@@ -1336,7 +1337,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     const { id: playerId } = ctx.params
-    const { email, customMessage } = ctx.request.body?.data || {}
+    const { email, customMessage, subscribeNewsletter } = ctx.request.body?.data || {}
 
     if (!playerId) {
       return ctx.badRequest("Player ID is required")
@@ -1499,6 +1500,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       strapi.log.info(
         `[Player] Organizer ${userWithPlayer.player.name} sent invite to ${email} for player ${targetPlayer.name}`
       )
+
+      // Subscribe to newsletter if opted in - fire and forget
+      if (subscribeNewsletter) {
+        addContactToAudience(email.toLowerCase(), targetPlayer.name, "invite").catch((err) => {
+          strapi.log.warn(`[Player] Failed to subscribe ${email} to newsletter: ${err}`)
+        })
+      }
 
       return ctx.send({
         success: true,

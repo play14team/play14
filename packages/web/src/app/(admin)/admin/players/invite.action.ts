@@ -109,7 +109,8 @@ export async function getPlayerForInvite(playerId: string): Promise<PlayerForInv
 export async function sendSingleInvite(
   playerId: string,
   email: string,
-  customMessage?: string
+  customMessage?: string,
+  subscribeNewsletter?: boolean
 ): Promise<SendInviteResult> {
   const result = await strapiFetch<{
     success: boolean
@@ -124,6 +125,7 @@ export async function sendSingleInvite(
         data: {
           email,
           customMessage: customMessage || undefined,
+          subscribeNewsletter: subscribeNewsletter ?? true,
         },
       },
     }

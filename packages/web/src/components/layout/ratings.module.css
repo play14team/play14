@@ -1,5 +1,5 @@
-.ratingColor {
-  color: var(--color-yellow) !important;
+.ratingColor.ratingColor {
+  color: var(--color-yellow);
 }
 
 .ratingRow {

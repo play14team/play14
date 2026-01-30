@@ -57,7 +57,8 @@ export async function registerWithCredentials(
   username: string,
   email: string,
   password: string,
-  turnstileToken: string | null = null
+  turnstileToken: string | null = null,
+  subscribeNewsletter = false
 ): Promise<RegisterResult> {
   // Block registration if feature is disabled
   const flags = await getFeatureFlags()
@@ -127,6 +128,19 @@ export async function registerWithCredentials(
 
   // Store the JWT in an httpOnly cookie
   await setAuthCookie(result.data.jwt)
+
+  // Subscribe to newsletter if opted in - fire and forget
+  if (subscribeNewsletter) {
+    strapiFetch(
+      "/newsletter/subscribe",
+      {},
+      {
+        method: "POST",
+        body: { email, firstName: username, source: "registration" },
+        noAuth: true,
+      }
+    ).catch(() => {}) // Silently ignore errors
+  }
 
   return { success: true }
 }

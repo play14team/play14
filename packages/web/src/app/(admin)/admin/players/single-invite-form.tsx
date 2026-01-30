@@ -38,6 +38,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
   const [isLoadingPreSelected, setIsLoadingPreSelected] = useState(false)
   const [email, setEmail] = useState("")
   const [customMessage, setCustomMessage] = useState("")
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true)
   const [emailError, setEmailError] = useState<string | null>(null)
   const [result, setResult] = useState<{
     success: boolean
@@ -107,6 +108,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
     setSelectedPlayer(null)
     setEmail("")
     setCustomMessage("")
+    setSubscribeNewsletter(true)
     setEmailError(null)
     setResult(null)
     // Focus on search input
@@ -149,7 +151,8 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
       const response = await sendSingleInvite(
         selectedPlayer.documentId,
         email.trim(),
-        customMessage.trim() || undefined
+        customMessage.trim() || undefined,
+        subscribeNewsletter
       )
 
       if (response.success) {
@@ -161,6 +164,7 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
         setSelectedPlayer(null)
         setEmail("")
         setCustomMessage("")
+        setSubscribeNewsletter(true)
       } else {
         setResult({
           success: false,
@@ -394,6 +398,25 @@ export default function SingleInviteForm({ preSelectedPlayerId }: SingleInviteFo
             />
             <p className="admin-form-help">
               This message will appear in the invitation email before the standard content.
+            </p>
+          </div>
+        )}
+
+        {/* Newsletter Subscription */}
+        {selectedPlayer && !isBlocked && (
+          <div className="admin-form-group">
+            <label className="admin-checkbox-label">
+              <input
+                type="checkbox"
+                checked={subscribeNewsletter}
+                onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+                disabled={isPending}
+              />
+              <span>Subscribe to newsletter</span>
+            </label>
+            <p className="admin-form-help">
+              Subscribe this player to the #play14 newsletter to receive updates about events and
+              community news.
             </p>
           </div>
         )}
