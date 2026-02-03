@@ -158,7 +158,6 @@ const SimpleEditor = forwardRef<SimpleEditorRef, SimpleEditorProps>(function Sim
       const clipboardText = await navigator.clipboard.readText()
       if (clipboardText) {
         // Use the markdown extension's storage to convert and insert
-        // biome-ignore lint/suspicious/noExplicitAny: tiptap-markdown storage type not exported
         const markdownExtension = (editor.storage as any).markdown
         if (markdownExtension?.parser?.parse) {
           // Get the markdown parser from storage and insert content
@@ -172,7 +171,6 @@ const SimpleEditor = forwardRef<SimpleEditorRef, SimpleEditorProps>(function Sim
       // Clipboard API might not be available or permission denied
       const markdown = window.prompt("Paste your markdown content here:")
       if (markdown) {
-        // biome-ignore lint/suspicious/noExplicitAny: tiptap-markdown storage type not exported
         const markdownExtension = (editor.storage as any).markdown
         if (markdownExtension?.parser?.parse) {
           editor.commands.setContent(markdownExtension.parser.parse(markdown))

@@ -167,6 +167,7 @@ export async function processEventResultsReminders(strapi: Core.Strapi): Promise
     populate: {
       hosts: { fields: ["name"] },
     },
+    sort: [{ end: "asc" }, { name: "asc" }],
   })) as unknown as EventForReminder[]
 
   console.log(`[EventResultsReminders] Found ${events.length} potential events for reminders`)
