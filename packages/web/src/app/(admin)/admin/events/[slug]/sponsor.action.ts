@@ -63,14 +63,14 @@ export async function getAvailableSponsors(): Promise<SponsorActionResult<Sponso
 }
 
 /**
- * Create a new sponsor
+ * Create a new sponsor (uses admin endpoint for host+ permissions)
  */
 export async function createSponsor(data: {
   name: string
   url?: string
 }): Promise<SponsorActionResult<Sponsor>> {
   const result = await strapiFetch<{ data: Sponsor }>(
-    "/sponsors",
+    "/admin/sponsors",
     {},
     {
       method: "POST",
