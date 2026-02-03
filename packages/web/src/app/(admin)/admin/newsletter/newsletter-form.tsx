@@ -1,9 +1,9 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useToast } from "@/components/admin/toast/toast-context"
-import SimpleEditor from "@/components/ui/simple-editor"
+import SimpleEditor, { type SimpleEditorRef } from "@/components/ui/simple-editor"
 import AiAssistantPanel from "./ai-assistant-panel"
 import {
   createNewsletter,
@@ -34,6 +34,9 @@ export default function NewsletterForm({ newsletter }: NewsletterFormProps) {
   const [showPreview, setShowPreview] = useState(false)
   const [showAiPanel, setShowAiPanel] = useState(false)
   const [showConfirmSend, setShowConfirmSend] = useState(false)
+  const [selectedText, setSelectedText] = useState<string | null>(null)
+  const [selectionRange, setSelectionRange] = useState<{ from: number; to: number } | null>(null)
+  const editorRef = useRef<SimpleEditorRef>(null)
 
   const isEditable = !newsletter || newsletter.sendStatus === "draft"
   const hasContent = subject.trim().length > 0 && body.trim().length > 0
@@ -144,6 +147,23 @@ export default function NewsletterForm({ newsletter }: NewsletterFormProps) {
     setSubject(selectedSubject)
   }, [])
 
+  const handleSelectionChange = useCallback(
+    (selected: string | null, range: { from: number; to: number } | null) => {
+      setSelectedText(selected)
+      setSelectionRange(range)
+    },
+    []
+  )
+
+  const handleReplaceSelection = useCallback(
+    (html: string) => {
+      if (selectionRange && editorRef.current) {
+        editorRef.current.replaceSelection(selectionRange.from, selectionRange.to, html)
+      }
+    },
+    [selectionRange]
+  )
+
   return (
     <div className="newsletter-form-container">
       <div className="newsletter-form-main">
@@ -167,8 +187,10 @@ export default function NewsletterForm({ newsletter }: NewsletterFormProps) {
             <label>Content</label>
             {isEditable ? (
               <SimpleEditor
+                ref={editorRef}
                 content={body}
                 onChange={setBody}
+                onSelectionChange={handleSelectionChange}
                 placeholder="Write your newsletter content..."
               />
             ) : (
@@ -251,7 +273,10 @@ export default function NewsletterForm({ newsletter }: NewsletterFormProps) {
         <div className="newsletter-form-sidebar">
           <AiAssistantPanel
             currentContent={body}
+            selectedContent={selectedText}
+            hasSelection={!!selectionRange}
             onContentGenerated={handleAiContentGenerated}
+            onReplaceSelection={handleReplaceSelection}
             onSubjectSelected={handleAiSubjectSelected}
             onClose={() => setShowAiPanel(false)}
           />

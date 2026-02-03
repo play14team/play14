@@ -4,22 +4,31 @@ import Blockquote from "@tiptap/extension-blockquote"
 import Heading from "@tiptap/extension-heading"
 import HorizontalRule from "@tiptap/extension-horizontal-rule"
 import Link from "@tiptap/extension-link"
+import { DOMSerializer } from "@tiptap/pm/model"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import { Markdown } from "tiptap-markdown"
 
 interface SimpleEditorProps {
   content: string
   onChange: (html: string) => void
+  onSelectionChange?: (
+    selectedHtml: string | null,
+    selectionRange: { from: number; to: number } | null
+  ) => void
   placeholder?: string
 }
 
-export default function SimpleEditor({
-  content,
-  onChange,
-  placeholder = "Write something...",
-}: SimpleEditorProps) {
+export interface SimpleEditorRef {
+  replaceSelection: (from: number, to: number, html: string) => void
+  hasSelection: () => boolean
+}
+
+const SimpleEditor = forwardRef<SimpleEditorRef, SimpleEditorProps>(function SimpleEditor(
+  { content, onChange, onSelectionChange, placeholder = "Write something..." },
+  ref
+) {
   // Force re-render on selection change to update toolbar button states
   const [, setSelectionUpdate] = useState(0)
   // Track if content change is from internal editing (to avoid loops)
@@ -67,11 +76,45 @@ export default function SimpleEditor({
       isInternalChange.current = true
       onChange(editor.getHTML())
     },
-    onSelectionUpdate: () => {
+    onSelectionUpdate: ({ editor }) => {
       // Force re-render to update toolbar button active states
       setSelectionUpdate((prev) => prev + 1)
+
+      // Report selection to parent if callback provided
+      if (onSelectionChange) {
+        const { from, to } = editor.state.selection
+        if (from !== to) {
+          // Get HTML of selected content using DOMSerializer
+          const selectedFragment = editor.state.doc.slice(from, to)
+          const div = document.createElement("div")
+          const serializer = DOMSerializer.fromSchema(editor.schema)
+          const dom = serializer.serializeFragment(selectedFragment.content)
+          div.appendChild(dom)
+          onSelectionChange(div.innerHTML, { from, to })
+        } else {
+          onSelectionChange(null, null)
+        }
+      }
     },
   })
+
+  // Expose methods to parent via ref
+  useImperativeHandle(
+    ref,
+    () => ({
+      replaceSelection: (from: number, to: number, html: string) => {
+        if (!editor) return
+        // Delete the selected range and insert new content
+        editor.chain().focus().deleteRange({ from, to }).insertContent(html).run()
+      },
+      hasSelection: () => {
+        if (!editor) return false
+        const { from, to } = editor.state.selection
+        return from !== to
+      },
+    }),
+    [editor]
+  )
 
   // Sync external content changes to editor (e.g., from AI assistant)
   useEffect(() => {
@@ -254,4 +297,6 @@ export default function SimpleEditor({
       <EditorContent editor={editor} />
     </div>
   )
-}
+})
+
+export default SimpleEditor

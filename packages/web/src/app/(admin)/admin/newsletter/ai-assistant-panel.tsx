@@ -6,14 +6,20 @@ import { aiGenerateContent, aiImproveContent, aiSuggestSubjects } from "./newsle
 
 interface AiAssistantPanelProps {
   currentContent: string
+  selectedContent: string | null
+  hasSelection: boolean
   onContentGenerated: (content: string) => void
+  onReplaceSelection: (html: string) => void
   onSubjectSelected: (subject: string) => void
   onClose: () => void
 }
 
 export default function AiAssistantPanel({
   currentContent,
+  selectedContent,
+  hasSelection,
   onContentGenerated,
+  onReplaceSelection,
   onSubjectSelected,
   onClose,
 }: AiAssistantPanelProps) {
@@ -27,6 +33,8 @@ export default function AiAssistantPanel({
   const [isGenerating, setIsGenerating] = useState(false)
   const [isImproving, setIsImproving] = useState(false)
   const [isSuggestingSubjects, setIsSuggestingSubjects] = useState(false)
+  // Track if we improved a selection (to know whether to replace selection or all content)
+  const [improvedFromSelection, setImprovedFromSelection] = useState(false)
 
   const [activeSection, setActiveSection] = useState<"generate" | "improve" | "subjects">(
     "generate"
@@ -61,7 +69,12 @@ export default function AiAssistantPanel({
   }, [prompt, toast])
 
   const handleImprove = useCallback(async () => {
-    if (!currentContent.trim()) {
+    // Use selected content if available, otherwise use full content
+    const trimmedSelection = selectedContent?.trim()
+    const isFromSelection = !!trimmedSelection && hasSelection
+    const contentToImprove = isFromSelection ? trimmedSelection : currentContent.trim()
+
+    if (!contentToImprove) {
       toast.error("Please write some content first")
       return
     }
@@ -72,8 +85,9 @@ export default function AiAssistantPanel({
 
     setIsImproving(true)
     setGeneratedContent("")
+    setImprovedFromSelection(isFromSelection)
     try {
-      const result = await aiImproveContent(currentContent, improveInstructions)
+      const result = await aiImproveContent(contentToImprove, improveInstructions)
       if (result.success && result.content) {
         setGeneratedContent(result.content)
       } else {
@@ -89,7 +103,7 @@ export default function AiAssistantPanel({
     } finally {
       setIsImproving(false)
     }
-  }, [currentContent, improveInstructions, toast])
+  }, [currentContent, selectedContent, hasSelection, improveInstructions, toast])
 
   const handleSuggestSubjects = useCallback(async () => {
     if (!currentContent.trim()) {
@@ -120,11 +134,27 @@ export default function AiAssistantPanel({
 
   const handleUseContent = useCallback(() => {
     if (generatedContent) {
-      onContentGenerated(generatedContent)
+      // If we improved a selection and still have one, replace just the selection
+      if (activeSection === "improve" && improvedFromSelection && hasSelection) {
+        onReplaceSelection(generatedContent)
+        toast.success("Selection replaced")
+      } else {
+        // Otherwise replace all content (for generate, or improve without selection)
+        onContentGenerated(generatedContent)
+        toast.success("Content applied")
+      }
       setGeneratedContent("")
-      toast.success("Content applied")
+      setImprovedFromSelection(false)
     }
-  }, [generatedContent, onContentGenerated, toast])
+  }, [
+    generatedContent,
+    activeSection,
+    improvedFromSelection,
+    hasSelection,
+    onContentGenerated,
+    onReplaceSelection,
+    toast,
+  ])
 
   const handleSelectSubject = useCallback(
     (subject: string) => {
@@ -196,6 +226,18 @@ export default function AiAssistantPanel({
 
         {activeSection === "improve" && (
           <div className="ai-assistant-section">
+            {selectedContent?.trim() ? (
+              <p className="ai-assistant-hint ai-assistant-hint-info">
+                <i className="bx bx-selection" /> Improving selected text only
+              </p>
+            ) : (
+              currentContent.trim() && (
+                <p className="ai-assistant-hint">
+                  <i className="bx bx-info-circle" /> Select text in the editor to improve only that
+                  portion
+                </p>
+              )
+            )}
             <label htmlFor="ai-improve">How should the content be improved?</label>
             <textarea
               id="ai-improve"
@@ -232,12 +274,16 @@ export default function AiAssistantPanel({
               type="button"
               className="admin-btn admin-btn-primary admin-btn-block"
               onClick={handleImprove}
-              disabled={isImproving || !currentContent.trim() || !improveInstructions.trim()}
+              disabled={
+                isImproving ||
+                (!currentContent.trim() && !selectedContent?.trim()) ||
+                !improveInstructions.trim()
+              }
             >
               <i className="bx bx-edit" />
               {isImproving ? "Improving..." : "Improve content"}
             </button>
-            {!currentContent.trim() && (
+            {!currentContent.trim() && !selectedContent?.trim() && (
               <p className="ai-assistant-hint">Write some content first to improve it</p>
             )}
           </div>
