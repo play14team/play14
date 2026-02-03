@@ -219,6 +219,7 @@ export default function NewsletterForm({ newsletter }: NewsletterFormProps) {
                     className="admin-btn admin-btn-secondary"
                     onClick={handleSaveDraft}
                     disabled={isSaving || !hasContent}
+                    data-save-shortcut
                   >
                     <i className="bx bx-save" />
                     {isSaving ? "Saving..." : "Save draft"}

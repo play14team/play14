@@ -104,12 +104,6 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           founderOnly: true,
         },
         {
-          href: "/admin/newsletter",
-          icon: "bx-envelope",
-          label: "Newsletter",
-          founderOnly: true,
-        },
-        {
           href: "/admin/orders",
           icon: "bx-receipt",
           label: "Orders",
@@ -118,6 +112,17 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           href: "/admin/tickets",
           icon: "bx-barcode",
           label: "Tickets",
+        },
+      ],
+    },
+    {
+      title: "Communication",
+      items: [
+        {
+          href: "/admin/newsletter",
+          icon: "bx-envelope",
+          label: "Newsletter",
+          founderOnly: true,
         },
       ],
     },
