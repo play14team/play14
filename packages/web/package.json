@@ -76,6 +76,7 @@
     "recharts": "^3.6.0",
     "server-only": "^0.0.1",
     "sharp": "^0.34.5",
+    "tiptap-markdown": "^0.9.0",
     "yet-another-react-lightbox": "^3.28.0",
     "zod": "^4.3.5"
   },

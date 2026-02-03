@@ -104,6 +104,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           founderOnly: true,
         },
         {
+          href: "/admin/newsletter",
+          icon: "bx-envelope",
+          label: "Newsletter",
+          founderOnly: true,
+        },
+        {
           href: "/admin/orders",
           icon: "bx-receipt",
           label: "Orders",

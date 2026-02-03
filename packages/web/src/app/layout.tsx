@@ -72,6 +72,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Boxicons from CDN for full icon set */}
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
         {shouldPatchPerformanceMeasure && (
           <script
             dangerouslySetInnerHTML={{ __html: performanceMeasurePatch }}

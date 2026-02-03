@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsletter_sends",
+  "info": {
+    "singularName": "newsletter-send",
+    "pluralName": "newsletter-sends",
+    "displayName": "Newsletter Send",
+    "description": "Newsletter content and send history"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "subject": {
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    "body": {
+      "type": "richtext",
+      "required": true
+    },
+    "sendStatus": {
+      "type": "enumeration",
+      "enum": ["draft", "sending", "sent", "failed"],
+      "default": "draft",
+      "required": true
+    },
+    "sentAt": {
+      "type": "datetime"
+    },
+    "recipientCount": {
+      "type": "integer"
+    },
+    "resendBroadcastId": {
+      "type": "string"
+    },
+    "errorMessage": {
+      "type": "text"
+    }
+  }
+}

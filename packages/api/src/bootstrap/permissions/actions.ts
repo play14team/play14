@@ -394,3 +394,24 @@ export const LINKEDIN_POST_ACTIONS = {
   PREVIEW: "api::linkedin-post.custom-linkedin-post.previewPost",
   POST_MANUALLY: "api::linkedin-post.custom-linkedin-post.postManually",
 } as const
+
+// ==================== NEWSLETTER SEND ====================
+export const NEWSLETTER_SEND_ACTIONS = {
+  // CRUD (founders only)
+  LIST: "api::newsletter-send.custom-newsletter-send.list",
+  FIND_ONE: "api::newsletter-send.custom-newsletter-send.findOne",
+  CREATE: "api::newsletter-send.custom-newsletter-send.create",
+  UPDATE: "api::newsletter-send.custom-newsletter-send.update",
+  DELETE: "api::newsletter-send.custom-newsletter-send.delete",
+
+  // Send operations (founders only)
+  AUDIENCE_COUNT: "api::newsletter-send.custom-newsletter-send.audienceCount",
+  SEND_TEST: "api::newsletter-send.custom-newsletter-send.sendTest",
+  SEND: "api::newsletter-send.custom-newsletter-send.send",
+  PREVIEW: "api::newsletter-send.custom-newsletter-send.preview",
+
+  // AI operations (founders only)
+  AI_GENERATE: "api::newsletter-send.custom-newsletter-send.aiGenerate",
+  AI_IMPROVE: "api::newsletter-send.custom-newsletter-send.aiImprove",
+  AI_SUGGEST_SUBJECTS: "api::newsletter-send.custom-newsletter-send.aiSuggestSubjects",
+} as const

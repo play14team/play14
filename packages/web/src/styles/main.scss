@@ -39,11 +39,12 @@
 @use "admin/venues";
 @use "admin/sponsors";
 @use "admin/budget";
+@use "admin/newsletter-admin";
 
 // Third-party CSS
+// Note: boxicons is loaded from CDN in layout.tsx for access to full icon set
 @import "css/bootstrap.min.css";
 @import "css/animate.min.css";
-@import "css/boxicons.min.css";
 @import "css/flaticon.css";
 @import "font-awesome/css/font-awesome.min.css";
 @import "react-big-calendar/lib/css/react-big-calendar.css";

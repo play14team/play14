@@ -33,6 +33,7 @@ import {
   MEDIA_FILE_ACTIONS,
   MEDIA_FOLDER_ACTIONS,
   NEWSLETTER_ACTIONS,
+  NEWSLETTER_SEND_ACTIONS,
   PERMISSIONS_ACTIONS,
   PLAYER_ACTIONS,
   PLAYER_CLAIM_ACTIONS,
@@ -405,4 +406,19 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Cancel pending order (player - users can cancel their own pending orders)
   { action: TICKET_ORDER_ACTIONS.CANCEL_ORDER, minimumRole: ROLE_TYPES.PLAYER },
+
+  // ==================== NEWSLETTER SEND (FOUNDER ONLY) ====================
+  // Newsletter management for community broadcasts
+  { action: NEWSLETTER_SEND_ACTIONS.LIST, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.FIND_ONE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.CREATE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.AUDIENCE_COUNT, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.SEND_TEST, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.SEND, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.PREVIEW, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.AI_GENERATE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.AI_IMPROVE, minimumRole: ROLE_TYPES.FOUNDER },
+  { action: NEWSLETTER_SEND_ACTIONS.AI_SUGGEST_SUBJECTS, minimumRole: ROLE_TYPES.FOUNDER },
 ]

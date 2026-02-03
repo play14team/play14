@@ -1315,6 +1315,50 @@ export interface ApiLikedItemLikedItem extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiNewsletterSendNewsletterSend
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'newsletter_sends';
+  info: {
+    description: 'Newsletter content and send history';
+    displayName: 'Newsletter Send';
+    pluralName: 'newsletter-sends';
+    singularName: 'newsletter-send';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    body: Schema.Attribute.RichText & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    errorMessage: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::newsletter-send.newsletter-send'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    recipientCount: Schema.Attribute.Integer;
+    resendBroadcastId: Schema.Attribute.String;
+    sendStatus: Schema.Attribute.Enumeration<
+      ['draft', 'sending', 'sent', 'failed']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'draft'>;
+    sentAt: Schema.Attribute.DateTime;
+    subject: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPlayerClaimPlayerClaim extends Struct.CollectionTypeSchema {
   collectionName: 'player_claims';
   info: {
@@ -2621,6 +2665,7 @@ declare module '@strapi/strapi' {
       'api::history.history': ApiHistoryHistory;
       'api::home.home': ApiHomeHome;
       'api::liked-item.liked-item': ApiLikedItemLikedItem;
+      'api::newsletter-send.newsletter-send': ApiNewsletterSendNewsletterSend;
       'api::player-claim.player-claim': ApiPlayerClaimPlayerClaim;
       'api::player.player': ApiPlayerPlayer;
       'api::processed-webhook.processed-webhook': ApiProcessedWebhookProcessedWebhook;
