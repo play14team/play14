@@ -61,6 +61,18 @@ export default {
         description: "Delete a newsletter draft (founders only)",
       },
     },
+    // Retry failed newsletter
+    {
+      method: "POST",
+      path: "/admin/newsletters/:id/retry",
+      handler: "custom-newsletter-send.retry",
+      info: { apiName: "newsletter-send", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Reset a failed newsletter to draft for retry (founders only)",
+      },
+    },
     // Send operations
     {
       method: "GET",

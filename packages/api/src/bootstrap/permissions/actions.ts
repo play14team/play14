@@ -403,6 +403,7 @@ export const NEWSLETTER_SEND_ACTIONS = {
   CREATE: "api::newsletter-send.custom-newsletter-send.create",
   UPDATE: "api::newsletter-send.custom-newsletter-send.update",
   DELETE: "api::newsletter-send.custom-newsletter-send.delete",
+  RETRY: "api::newsletter-send.custom-newsletter-send.retry",
 
   // Send operations (founders only)
   AUDIENCE_COUNT: "api::newsletter-send.custom-newsletter-send.audienceCount",

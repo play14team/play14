@@ -277,6 +277,59 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
+   * Reset a failed newsletter back to draft status for retry
+   */
+  async retry(ctx) {
+    if (!(await requireFounder(strapi, ctx))) return
+
+    const { id: newsletterId } = ctx.params
+
+    if (!newsletterId) {
+      return ctx.badRequest("Newsletter ID is required")
+    }
+
+    try {
+      const newsletter = await strapi.documents("api::newsletter-send.newsletter-send").findOne({
+        documentId: newsletterId,
+      })
+
+      if (!newsletter) {
+        return ctx.notFound("Newsletter not found")
+      }
+
+      if (newsletter.sendStatus !== "failed") {
+        return ctx.badRequest("Only failed newsletters can be retried")
+      }
+
+      const updatedNewsletter = await strapi
+        .documents("api::newsletter-send.newsletter-send")
+        .update({
+          documentId: newsletterId,
+          data: {
+            sendStatus: "draft",
+            errorMessage: null,
+          } as any,
+        })
+
+      strapi.log.info(
+        `[Newsletter] Reset failed newsletter to draft: ${newsletter.subject} (${newsletterId})`
+      )
+
+      return ctx.send({
+        data: {
+          documentId: updatedNewsletter.documentId,
+          subject: updatedNewsletter.subject,
+          body: updatedNewsletter.body,
+          sendStatus: updatedNewsletter.sendStatus,
+        },
+      })
+    } catch (error) {
+      strapi.log.error(`[Newsletter] Failed to reset newsletter for retry: ${error}`)
+      return ctx.internalServerError("Failed to reset newsletter")
+    }
+  },
+
+  /**
    * Get subscriber count from the newsletter segment
    */
   async audienceCount(ctx) {

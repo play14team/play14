@@ -169,6 +169,28 @@ export async function deleteNewsletter(
   return { success: true }
 }
 
+/**
+ * Retry a failed newsletter (reset to draft)
+ */
+export async function retryNewsletter(
+  newsletterId: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await strapiFetch(
+    "/admin/newsletters/:newsletterId/retry",
+    { newsletterId },
+    { method: "POST" }
+  )
+
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to reset newsletter for retry",
+    }
+  }
+
+  return { success: true }
+}
+
 // ==================== SEND ACTIONS ====================
 
 /**

@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useToast } from "@/components/admin/toast/toast-context"
-import { deleteNewsletter, getNewsletters, type NewsletterListItem } from "./newsletter.action"
+import {
+  deleteNewsletter,
+  getNewsletters,
+  type NewsletterListItem,
+  retryNewsletter,
+} from "./newsletter.action"
 
 interface NewsletterHistoryProps {
   onEdit: (newsletterId: string) => void
@@ -44,6 +49,20 @@ export default function NewsletterHistory({ onEdit, isLoadingEdit }: NewsletterH
       }
     },
     [loadNewsletters, toast]
+  )
+
+  const handleRetry = useCallback(
+    async (newsletterId: string) => {
+      const result = await retryNewsletter(newsletterId)
+      if (result.success) {
+        toast.success("Newsletter reset to draft. You can now edit and resend it.")
+        loadNewsletters()
+        onEdit(newsletterId)
+      } else {
+        toast.error(result.error || "Failed to reset newsletter")
+      }
+    },
+    [loadNewsletters, toast, onEdit]
   )
 
   const formatDate = (dateString: string | null) => {
@@ -132,6 +151,17 @@ export default function NewsletterHistory({ onEdit, isLoadingEdit }: NewsletterH
                       <i className="bx bx-trash" />
                     </button>
                   </>
+                )}
+                {newsletter.sendStatus === "failed" && (
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-warning admin-btn-sm"
+                    onClick={() => handleRetry(newsletter.documentId)}
+                    disabled={isLoadingEdit}
+                    title="Retry sending"
+                  >
+                    <i className={`bx ${isLoadingEdit ? "bx-loader-alt bx-spin" : "bx-refresh"}`} />
+                  </button>
                 )}
               </td>
             </tr>
