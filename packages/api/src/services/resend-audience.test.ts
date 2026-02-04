@@ -20,6 +20,7 @@ describe("addContactToAudience", () => {
   beforeEach(() => {
     process.env = { ...originalEnv }
     process.env.RESEND_API_KEY = "test-api-key"
+    process.env.RESEND_NEWSLETTER_SEGMENT_ID = "segment-123"
     vi.clearAllMocks()
   })
 
@@ -58,6 +59,13 @@ describe("addContactToAudience", () => {
           Authorization: "Bearer test-api-key",
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          email: "test@example.com",
+          first_name: undefined,
+          unsubscribed: false,
+          properties: { source: "website" },
+          segments: ["segment-123"],
+        }),
       })
     )
   })
@@ -84,6 +92,7 @@ describe("addContactToAudience", () => {
           first_name: "John",
           unsubscribed: false,
           properties: { source: "footer" },
+          segments: ["segment-123"],
         }),
       })
     )
@@ -130,7 +139,7 @@ describe("addContactToAudience", () => {
     )
   })
 
-  it("does not include properties when source is not provided", async () => {
+  it("uses default source 'website' when source is not provided", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ id: "contact-789", email: "test@example.com" }),
@@ -145,7 +154,32 @@ describe("addContactToAudience", () => {
           email: "test@example.com",
           first_name: "Jane",
           unsubscribed: false,
-          properties: undefined,
+          properties: { source: "website" },
+          segments: ["segment-123"],
+        }),
+      })
+    )
+  })
+
+  it("does not include segments when RESEND_NEWSLETTER_SEGMENT_ID is not configured", async () => {
+    process.env.RESEND_NEWSLETTER_SEGMENT_ID = undefined
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ id: "contact-999", email: "test@example.com" }),
+    })
+
+    await addContactToAudience("test@example.com")
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "https://api.resend.com/contacts",
+      expect.objectContaining({
+        body: JSON.stringify({
+          email: "test@example.com",
+          first_name: undefined,
+          unsubscribed: false,
+          properties: { source: "website" },
+          segments: undefined,
         }),
       })
     )

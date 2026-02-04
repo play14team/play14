@@ -6,7 +6,7 @@
 import type { Core } from "@strapi/strapi"
 import { renderNewsletterEmail } from "../../../emails/newsletter-template"
 import { generateDraft, improveContent, suggestSubjects } from "../../../services/gemini-content"
-import { getAudienceCount, sendBroadcast, sendTestEmail } from "../../../services/resend-broadcast"
+import { getSegmentCount, sendBroadcast, sendTestEmail } from "../../../services/resend-broadcast"
 
 /**
  * Check if user is a founder
@@ -277,16 +277,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
-   * Get audience count
+   * Get subscriber count from the newsletter segment
    */
   async audienceCount(ctx) {
     if (!(await requireFounder(strapi, ctx))) return
 
     try {
-      const result = await getAudienceCount()
+      const result = await getSegmentCount()
 
       if (!result.success) {
-        return ctx.badRequest(result.error || "Failed to get audience count")
+        return ctx.badRequest(result.error || "Failed to get subscriber count")
       }
 
       return ctx.send({
@@ -295,8 +295,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
     } catch (error) {
-      strapi.log.error(`[Newsletter] Failed to get audience count: ${error}`)
-      return ctx.internalServerError("Failed to get audience count")
+      strapi.log.error(`[Newsletter] Failed to get subscriber count: ${error}`)
+      return ctx.internalServerError("Failed to get subscriber count")
     }
   },
 
@@ -384,9 +384,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         } as any,
       })
 
-      // Get audience count first
-      const audienceResult = await getAudienceCount()
-      const recipientCount = audienceResult.success ? audienceResult.count : 0
+      // Get subscriber count from segment first
+      const segmentResult = await getSegmentCount()
+      const recipientCount = segmentResult.success ? segmentResult.count : 0
 
       // Render the email HTML
       const htmlContent = await renderNewsletterEmail({

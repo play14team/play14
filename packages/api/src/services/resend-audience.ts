@@ -26,15 +26,16 @@ interface ResendErrorResponse {
  *
  * @param email - Subscriber email address
  * @param firstName - Optional first name
- * @param source - Optional source indicator (e.g., "footer", "profile")
+ * @param source - Source indicator (defaults to "website")
  * @returns The created contact or error information
  */
 export async function addContactToAudience(
   email: string,
   firstName?: string,
-  source?: string
+  source: string = "website"
 ): Promise<{ success: boolean; data?: ResendContactResponse; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY
+  const newsletterSegmentId = process.env.RESEND_NEWSLETTER_SEGMENT_ID
 
   if (!apiKey) {
     strapi.log.error("[ResendContacts] RESEND_API_KEY is not configured")
@@ -52,7 +53,8 @@ export async function addContactToAudience(
         email,
         first_name: firstName || undefined,
         unsubscribed: false,
-        properties: source ? { source } : undefined,
+        properties: { source },
+        segments: newsletterSegmentId ? [newsletterSegmentId] : undefined,
       }),
     })
 
@@ -76,7 +78,7 @@ export async function addContactToAudience(
       }
     }
 
-    strapi.log.info(`[ResendContacts] Added contact ${email} (source: ${source || "unknown"})`)
+    strapi.log.info(`[ResendContacts] Added contact ${email} (source: ${source})`)
 
     return { success: true, data: data as ResendContactResponse }
   } catch (error) {

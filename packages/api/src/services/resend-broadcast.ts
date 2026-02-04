@@ -2,14 +2,14 @@
  * Resend Broadcast API service
  *
  * Handles newsletter broadcasting via Resend's Broadcast API.
- * Uses the configured audience to send newsletters to all subscribers.
+ * Uses the configured segment to send newsletters to all subscribers.
  */
 
 interface ResendBroadcastResponse {
   id: string
 }
 
-interface ResendAudienceResponse {
+interface ResendSegmentContactsResponse {
   object: string
   data: ResendContact[]
 }
@@ -30,28 +30,28 @@ interface ResendErrorResponse {
 }
 
 /**
- * Get the count of active (non-unsubscribed) contacts in the audience
+ * Get the count of active (non-unsubscribed) contacts in the newsletter segment
  */
-export async function getAudienceCount(): Promise<{
+export async function getSegmentCount(): Promise<{
   success: boolean
   count?: number
   error?: string
 }> {
   const apiKey = process.env.RESEND_API_KEY
-  const audienceId = process.env.RESEND_AUDIENCE_ID
+  const segmentId = process.env.RESEND_NEWSLETTER_SEGMENT_ID
 
   if (!apiKey) {
     strapi.log.error("[ResendBroadcast] RESEND_API_KEY is not configured")
     return { success: false, error: "Newsletter service is not configured" }
   }
 
-  if (!audienceId) {
-    strapi.log.error("[ResendBroadcast] RESEND_AUDIENCE_ID is not configured")
-    return { success: false, error: "Newsletter audience is not configured" }
+  if (!segmentId) {
+    strapi.log.error("[ResendBroadcast] RESEND_NEWSLETTER_SEGMENT_ID is not configured")
+    return { success: false, error: "Newsletter segment is not configured" }
   }
 
   try {
-    const response = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
+    const response = await fetch(`https://api.resend.com/segments/${segmentId}/contacts`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -60,24 +60,24 @@ export async function getAudienceCount(): Promise<{
 
     if (!response.ok) {
       const errorData = (await response.json()) as ResendErrorResponse
-      strapi.log.error(`[ResendBroadcast] Failed to get audience: ${errorData.message}`)
-      return { success: false, error: errorData.message || "Failed to get audience count" }
+      strapi.log.error(`[ResendBroadcast] Failed to get segment contacts: ${errorData.message}`)
+      return { success: false, error: errorData.message || "Failed to get segment count" }
     }
 
-    const data = (await response.json()) as ResendAudienceResponse
+    const data = (await response.json()) as ResendSegmentContactsResponse
     const activeContacts = data.data.filter((contact) => !contact.unsubscribed)
 
     return { success: true, count: activeContacts.length }
   } catch (error) {
     strapi.log.error(
-      `[ResendBroadcast] Error getting audience count: ${error instanceof Error ? error.message : String(error)}`
+      `[ResendBroadcast] Error getting segment count: ${error instanceof Error ? error.message : String(error)}`
     )
     return { success: false, error: "Failed to connect to newsletter service" }
   }
 }
 
 /**
- * Send a newsletter broadcast to all subscribers in the audience
+ * Send a newsletter broadcast to all subscribers in the segment
  */
 export async function sendBroadcast(
   subject: string,
@@ -88,7 +88,7 @@ export async function sendBroadcast(
   error?: string
 }> {
   const apiKey = process.env.RESEND_API_KEY
-  const audienceId = process.env.RESEND_AUDIENCE_ID
+  const segmentId = process.env.RESEND_NEWSLETTER_SEGMENT_ID
   const fromEmail = process.env.RESEND_DEFAULT_FROM || "noreply@play14.org"
   const replyTo = process.env.RESEND_REPLY_TO || "community@play14.org"
 
@@ -97,9 +97,9 @@ export async function sendBroadcast(
     return { success: false, error: "Newsletter service is not configured" }
   }
 
-  if (!audienceId) {
-    strapi.log.error("[ResendBroadcast] RESEND_AUDIENCE_ID is not configured")
-    return { success: false, error: "Newsletter audience is not configured" }
+  if (!segmentId) {
+    strapi.log.error("[ResendBroadcast] RESEND_NEWSLETTER_SEGMENT_ID is not configured")
+    return { success: false, error: "Newsletter segment is not configured" }
   }
 
   try {
@@ -110,7 +110,7 @@ export async function sendBroadcast(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        audience_id: audienceId,
+        segment_id: segmentId,
         from: fromEmail,
         reply_to: replyTo,
         subject,
