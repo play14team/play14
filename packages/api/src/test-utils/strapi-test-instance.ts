@@ -59,7 +59,7 @@ export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
   process.env.FRONTEND_URL = "http://localhost:3000"
 
   // Disable email sending in tests
-  process.env.RESEND_API_KEY = "re_test_mock"
+  process.env.SENDER_API_KEY = "test_mock_key"
 
   // Disable cron jobs in tests
   process.env.CRON_ENABLED = "false"

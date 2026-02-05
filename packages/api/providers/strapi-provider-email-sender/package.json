@@ -1,0 +1,8 @@
+{
+  "name": "strapi-provider-email-sender",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sender.net email provider for Strapi",
+  "main": "src/index.ts",
+  "type": "module"
+}

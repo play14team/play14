@@ -1,12 +1,12 @@
 /**
  * Newsletter subscription controller
  *
- * Handles newsletter subscription requests by adding contacts
- * to the Resend Audience.
+ * Handles newsletter subscription requests by adding subscribers
+ * to the Sender.net newsletter group.
  */
 
 import type { Core } from "@strapi/strapi"
-import { addContactToAudience } from "../../../services/resend-audience"
+import { addSubscriberToGroup } from "../../../services/sender-subscribers"
 
 // Simple email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -46,8 +46,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest("Invalid source")
     }
 
-    // Add contact to Resend Audience
-    const result = await addContactToAudience(trimmedEmail, trimmedFirstName, trimmedSource)
+    // Add subscriber to Sender.net group
+    const result = await addSubscriberToGroup(trimmedEmail, trimmedFirstName, trimmedSource)
 
     if (!result.success) {
       strapi.log.warn(`[Newsletter] Subscription failed for ${trimmedEmail}: ${result.error}`)

@@ -1,18 +1,18 @@
 export default ({ env }: { env: any }) => ({
   email: {
     config: {
-      provider: "strapi-provider-email-resend",
+      provider: "strapi-provider-email-sender",
       providerOptions: {
-        apiKey: env("RESEND_API_KEY"),
+        apiKey: env("SENDER_API_KEY"),
       },
       settings: {
         defaultFrom: (() => {
-          const rawDefaultFrom = env("RESEND_DEFAULT_FROM", "noreply@play14.org")
+          const rawDefaultFrom = env("EMAIL_DEFAULT_FROM", "noreply@play14.org")
           return rawDefaultFrom.includes("<")
             ? rawDefaultFrom
             : `#play14 community <${rawDefaultFrom}>`
         })(),
-        defaultReplyTo: env("RESEND_REPLY_TO", "community@play14.org"),
+        defaultReplyTo: env("EMAIL_REPLY_TO", "community@play14.org"),
       },
     },
   },

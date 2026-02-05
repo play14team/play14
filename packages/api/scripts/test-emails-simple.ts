@@ -1,13 +1,12 @@
 /**
- * Simple test script to send all email templates using Resend directly
- * Run with: RESEND_API_KEY=your_key bun run scripts/test-emails-simple.ts
+ * Simple test script to send all email templates using Sender.net directly
+ * Run with: SENDER_API_KEY=your_key bun run scripts/test-emails-simple.ts
  * Filter: bun run scripts/test-emails-simple.ts -- --only=ticket-sold-notification
  *
- * Make sure to set your RESEND_API_KEY environment variable
+ * Make sure to set your SENDER_API_KEY environment variable
  */
 
 import { render } from "@react-email/render"
-import { Resend } from "resend"
 
 import AttendanceClaimApprovedEmail from "../src/emails/attendance-claim-approved"
 import AttendanceClaimNewEmail from "../src/emails/attendance-claim-new"
@@ -24,20 +23,30 @@ import TicketSoldNotificationEmail from "../src/emails/ticket-sold-notification"
 
 const TEST_EMAIL = "cedric.pontet+test@gmail.com"
 const FRONTEND_URL = "https://play14.org"
-const FROM_EMAIL = process.env.RESEND_DEFAULT_FROM || "onboarding@resend.dev"
+const FROM_EMAIL = process.env.EMAIL_DEFAULT_FROM || "noreply@play14.org"
 const args = process.argv.slice(2)
 const onlyArg = args.find((arg) => arg.startsWith("--only="))?.split("=")[1]
 const filterArg = onlyArg || args.find((arg) => !arg.startsWith("--"))
 const emailFilter = filterArg || process.env.EMAIL_TEMPLATE || process.env.EMAIL_FILTER || ""
 
 // Check for API key
-if (!process.env.RESEND_API_KEY) {
-  console.error("❌ Error: RESEND_API_KEY environment variable is required")
-  console.error("   Set it with: export RESEND_API_KEY=your_key")
+if (!process.env.SENDER_API_KEY) {
+  console.error("❌ Error: SENDER_API_KEY environment variable is required")
+  console.error("   Set it with: export SENDER_API_KEY=your_key")
   process.exit(1)
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const SENDER_API_KEY = process.env.SENDER_API_KEY
+
+/**
+ * Parse "Name <email>" format into { email, name } for Sender.net.
+ * Sender.net requires from.name to always be present.
+ */
+function parseFromEmail(from: string): { email: string; name: string } {
+  const match = from.match(/^(.+?)\s*<([^>]+)>$/)
+  if (match) return { name: match[1].trim(), email: match[2].trim() }
+  return { email: from.trim(), name: "#play14 community" }
+}
 
 async function sendTestEmails() {
   console.log("🚀 Starting email template testing...")
@@ -274,19 +283,28 @@ async function sendTestEmails() {
       const html = await render(component)
       const text = await render(component, { plainText: true })
 
-      const result = await resend.emails.send({
-        from: FROM_EMAIL,
-        to: TEST_EMAIL,
-        subject: `${subjectPrefix} ${subject}`,
-        html,
-        text,
+      const response = await fetch("https://api.sender.net/v2/message/send", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${SENDER_API_KEY}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          from: parseFromEmail(FROM_EMAIL),
+          to: { email: TEST_EMAIL },
+          subject: `${subjectPrefix} ${subject}`,
+          html,
+          text,
+        }),
       })
 
-      if (result.data) {
-        console.log(`   ✅ Sent! (ID: ${result.data.id})`)
+      if (response.ok) {
+        console.log(`   ✅ Sent!`)
         successCount++
       } else {
-        console.log(`   ❌ Failed: ${result.error?.message || "Unknown error"}`)
+        const errorData = await response.text()
+        console.log(`   ❌ Failed: ${errorData}`)
         failedCount++
       }
     } catch (error: any) {

@@ -11,7 +11,7 @@ import UserInvitationEmail from "../../../emails/user-invitation"
 import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
 import { nameToUsername } from "../../../libs/strings"
 import { isValidEmail, isValidUrl } from "../../../libs/validation"
-import { addContactToAudience } from "../../../services/resend-audience"
+import { addSubscriberToGroup } from "../../../services/sender-subscribers"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 
 /**
@@ -1503,7 +1503,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Subscribe to newsletter if opted in - fire and forget
       if (subscribeNewsletter) {
-        addContactToAudience(email.toLowerCase(), targetPlayer.name, "invite").catch((err) => {
+        addSubscriberToGroup(email.toLowerCase(), targetPlayer.name, "invite").catch((err) => {
           strapi.log.warn(`[Player] Failed to subscribe ${email} to newsletter: ${err}`)
         })
       }

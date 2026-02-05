@@ -13,13 +13,13 @@ export default ({ env }: { env: any }) => ({
   // Disable email in tests (already using mock API key)
   email: {
     config: {
-      provider: "strapi-provider-email-resend",
+      provider: "strapi-provider-email-sender",
       providerOptions: {
-        apiKey: env("RESEND_API_KEY", "re_test_mock"),
+        apiKey: env("SENDER_API_KEY", "test_mock_key"),
       },
       settings: {
         defaultFrom: (() => {
-          const rawDefaultFrom = env("RESEND_DEFAULT_FROM", "noreply@play14.org")
+          const rawDefaultFrom = env("EMAIL_DEFAULT_FROM", "noreply@play14.org")
           return rawDefaultFrom.includes("<")
             ? rawDefaultFrom
             : `#play14 community <${rawDefaultFrom}>`

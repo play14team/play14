@@ -6,7 +6,11 @@
 import type { Core } from "@strapi/strapi"
 import { renderNewsletterEmail } from "../../../emails/newsletter-template"
 import { generateDraft, improveContent, suggestSubjects } from "../../../services/gemini-content"
-import { getSegmentCount, sendBroadcast, sendTestEmail } from "../../../services/resend-broadcast"
+import {
+  getGroupSubscriberCount,
+  sendBroadcast,
+  sendTestEmail,
+} from "../../../services/sender-broadcast"
 
 /**
  * Check if user is a founder
@@ -336,7 +340,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     if (!(await requireFounder(strapi, ctx))) return
 
     try {
-      const result = await getSegmentCount()
+      const result = await getGroupSubscriberCount()
 
       if (!result.success) {
         return ctx.badRequest(result.error || "Failed to get subscriber count")
@@ -438,7 +442,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       })
 
       // Get subscriber count from segment first
-      const segmentResult = await getSegmentCount()
+      const segmentResult = await getGroupSubscriberCount()
       const recipientCount = segmentResult.success ? segmentResult.count : 0
 
       // Render the email HTML

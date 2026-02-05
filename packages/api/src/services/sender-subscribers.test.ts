@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { addContactToAudience } from "./resend-audience"
+import { addSubscriberToGroup } from "./sender-subscribers"
 
 // Mock global strapi
 const mockStrapi = {
@@ -13,14 +13,14 @@ const mockStrapi = {
 // @ts-expect-error - mocking global strapi
 global.strapi = mockStrapi
 
-describe("addContactToAudience", () => {
+describe("addSubscriberToGroup", () => {
   const originalEnv = process.env
   const originalFetch = global.fetch
 
   beforeEach(() => {
     process.env = { ...originalEnv }
-    process.env.RESEND_API_KEY = "test-api-key"
-    process.env.RESEND_NEWSLETTER_SEGMENT_ID = "segment-123"
+    process.env.SENDER_API_KEY = "test-api-key"
+    process.env.SENDER_GROUP_ID = "group-123"
     vi.clearAllMocks()
   })
 
@@ -29,84 +29,86 @@ describe("addContactToAudience", () => {
     global.fetch = originalFetch
   })
 
-  it("returns error when RESEND_API_KEY is not configured", async () => {
-    process.env.RESEND_API_KEY = undefined
+  it("returns error when SENDER_API_KEY is not configured", async () => {
+    process.env.SENDER_API_KEY = undefined
 
-    const result = await addContactToAudience("test@example.com")
+    const result = await addSubscriberToGroup("test@example.com")
 
     expect(result.success).toBe(false)
     expect(result.error).toBe("Newsletter service is not configured")
     expect(mockStrapi.log.error).toHaveBeenCalledWith(
-      "[ResendContacts] RESEND_API_KEY is not configured"
+      "[SenderSubscribers] SENDER_API_KEY is not configured"
     )
   })
 
-  it("successfully adds a contact with email only", async () => {
+  it("successfully adds a subscriber with email only", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ id: "contact-123", email: "test@example.com" }),
+      json: () => Promise.resolve({ id: 123, email: "test@example.com" }),
     })
 
-    const result = await addContactToAudience("test@example.com")
+    const result = await addSubscriberToGroup("test@example.com")
 
     expect(result.success).toBe(true)
-    expect(result.data).toEqual({ id: "contact-123", email: "test@example.com" })
+    expect(result.data).toEqual({ id: 123, email: "test@example.com" })
     expect(global.fetch).toHaveBeenCalledWith(
-      "https://api.resend.com/contacts",
+      "https://api.sender.net/v2/subscribers",
       expect.objectContaining({
         method: "POST",
         headers: {
           Authorization: "Bearer test-api-key",
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify({
           email: "test@example.com",
-          first_name: undefined,
-          unsubscribed: false,
-          properties: { source: "website" },
-          segments: ["segment-123"],
+          trigger_automation: false,
+          groups: ["group-123"],
         }),
       })
     )
   })
 
-  it("successfully adds a contact with firstName and source", async () => {
+  it("successfully adds a subscriber with firstName and source", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () =>
         Promise.resolve({
-          id: "contact-456",
+          id: 456,
           email: "test@example.com",
-          first_name: "John",
+          firstname: "John",
         }),
     })
 
-    const result = await addContactToAudience("test@example.com", "John", "footer")
+    const result = await addSubscriberToGroup("test@example.com", "John", "footer")
 
     expect(result.success).toBe(true)
     expect(global.fetch).toHaveBeenCalledWith(
-      "https://api.resend.com/contacts",
+      "https://api.sender.net/v2/subscribers",
       expect.objectContaining({
         body: JSON.stringify({
           email: "test@example.com",
-          first_name: "John",
-          unsubscribed: false,
-          properties: { source: "footer" },
-          segments: ["segment-123"],
+          trigger_automation: false,
+          firstname: "John",
+          groups: ["group-123"],
         }),
       })
     )
   })
 
-  it("handles already existing contact (409 conflict)", async () => {
+  it("handles already existing subscriber (422 with 'already' message)", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
-      status: 409,
-      statusText: "Conflict",
-      json: () => Promise.resolve({ message: "Contact already exists" }),
+      status: 422,
+      statusText: "Unprocessable Entity",
+      json: () =>
+        Promise.resolve({
+          message: "Validation failed",
+          errors: { email: ["The email has already been taken"] },
+        }),
     })
 
-    const result = await addContactToAudience("existing@example.com")
+    const result = await addSubscriberToGroup("existing@example.com")
 
     expect(result.success).toBe(true)
     expect(result.data).toEqual({ email: "existing@example.com" })
@@ -120,7 +122,7 @@ describe("addContactToAudience", () => {
       json: () => Promise.resolve({ message: "Invalid email format" }),
     })
 
-    const result = await addContactToAudience("invalid-email")
+    const result = await addSubscriberToGroup("invalid-email")
 
     expect(result.success).toBe(false)
     expect(result.error).toBe("Invalid email format")
@@ -130,56 +132,44 @@ describe("addContactToAudience", () => {
   it("handles network error", async () => {
     global.fetch = vi.fn().mockRejectedValue(new Error("Network error"))
 
-    const result = await addContactToAudience("test@example.com")
+    const result = await addSubscriberToGroup("test@example.com")
 
     expect(result.success).toBe(false)
     expect(result.error).toBe("Failed to connect to newsletter service")
     expect(mockStrapi.log.error).toHaveBeenCalledWith(
-      "[ResendContacts] Error adding contact: Network error"
+      "[SenderSubscribers] Error adding subscriber: Network error"
     )
   })
 
   it("uses default source 'website' when source is not provided", async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ id: "contact-789", email: "test@example.com" }),
+      json: () => Promise.resolve({ id: 789, email: "test@example.com" }),
     })
 
-    await addContactToAudience("test@example.com", "Jane")
+    await addSubscriberToGroup("test@example.com", "Jane")
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      "https://api.resend.com/contacts",
-      expect.objectContaining({
-        body: JSON.stringify({
-          email: "test@example.com",
-          first_name: "Jane",
-          unsubscribed: false,
-          properties: { source: "website" },
-          segments: ["segment-123"],
-        }),
-      })
+    expect(mockStrapi.log.info).toHaveBeenCalledWith(
+      "[SenderSubscribers] Added subscriber test@example.com (source: website)"
     )
   })
 
-  it("does not include segments when RESEND_NEWSLETTER_SEGMENT_ID is not configured", async () => {
-    process.env.RESEND_NEWSLETTER_SEGMENT_ID = undefined
+  it("does not include groups when SENDER_GROUP_ID is not configured", async () => {
+    process.env.SENDER_GROUP_ID = undefined
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ id: "contact-999", email: "test@example.com" }),
+      json: () => Promise.resolve({ id: 999, email: "test@example.com" }),
     })
 
-    await addContactToAudience("test@example.com")
+    await addSubscriberToGroup("test@example.com")
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "https://api.resend.com/contacts",
+      "https://api.sender.net/v2/subscribers",
       expect.objectContaining({
         body: JSON.stringify({
           email: "test@example.com",
-          first_name: undefined,
-          unsubscribed: false,
-          properties: { source: "website" },
-          segments: undefined,
+          trigger_automation: false,
         }),
       })
     )
