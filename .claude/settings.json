@@ -87,7 +87,8 @@
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_snapshot",
-      "Bash(npx @biomejs/biome lint:*)"
+      "Bash(npx @biomejs/biome lint:*)",
+      "WebFetch(domain:api.sender.net)"
     ]
   },
   "enableAllProjectMcpServers": true,
