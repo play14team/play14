@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import {
   type PlayerUpdateData as AdminUpdateData,
   type PlayerForEdit,
   updatePlayer,
   updatePlayerPosition,
 } from "@/app/[locale]/(admin)/admin/players/players.action"
-import type { StripeAccountStatus } from "@/app/[locale]/(admin)/admin/stripe/stripe-connect.action"
 import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import SimpleEditor from "@/components/ui/simple-editor"
