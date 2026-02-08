@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react"
 import AdminSaveShortcut from "./admin-save-shortcut"
+import { MobileSidebarProvider } from "./mobile-sidebar-context"
 import { ToastContainer, ToastProvider } from "./toast"
 
 interface AdminProvidersProps {
@@ -11,9 +12,11 @@ interface AdminProvidersProps {
 export function AdminProviders({ children }: AdminProvidersProps) {
   return (
     <ToastProvider>
-      <AdminSaveShortcut />
-      {children}
-      <ToastContainer />
+      <MobileSidebarProvider>
+        <AdminSaveShortcut />
+        {children}
+        <ToastContainer />
+      </MobileSidebarProvider>
     </ToastProvider>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { AdminProviders } from "@/components/admin/admin-providers"
+import AdminMobileHeader from "@/components/admin/mobile-header"
 import AdminSidebar from "@/components/admin/sidebar"
 import { requireAuth } from "@/libs/auth"
 
@@ -23,6 +24,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="admin-layout">
         <AdminSidebar user={session.user} />
         <div className="admin-main">
+          <AdminMobileHeader />
           <main className="admin-content">{children}</main>
         </div>
       </div>

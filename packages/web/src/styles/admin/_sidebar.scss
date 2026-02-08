@@ -214,16 +214,183 @@
 }
 
 // ===========================================
-// Mobile Overlay
+// Mobile Header Bar & Backdrop (hidden on desktop)
+// ===========================================
+
+.admin-mobile-header {
+  display: none;
+}
+
+.admin-sidebar-close-toggle {
+  display: none;
+}
+
+.admin-sidebar-backdrop {
+  display: none;
+}
+
+// ===========================================
+// Mobile Responsive
 // ===========================================
 
 @media (max-width: 991px) {
+  .admin-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 56px;
+    padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+    background-color: var(--admin-surface);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .admin-mobile-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: none;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    color: var(--color-text);
+    flex-shrink: 0;
+
+    i {
+      font-size: 24px;
+    }
+
+    &:hover {
+      background-color: var(--color-bg-elevated);
+    }
+  }
+
+  .admin-mobile-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .admin-mobile-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    text-decoration: none;
+
+    i {
+      font-size: 22px;
+    }
+
+    &:hover {
+      color: var(--color-text);
+      background-color: var(--color-bg-elevated);
+    }
+  }
+
+  .admin-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
   .admin-sidebar {
     transform: translateX(-100%);
     box-shadow: var(--shadow-elevated);
+    transition: transform 0.3s ease;
+    width: 280px;
+    will-change: transform;
+    padding-bottom: env(safe-area-inset-bottom);
+
+    &.collapsed {
+      width: 280px;
+    }
 
     &.open {
       transform: translateX(0);
     }
+  }
+
+  // On mobile, hide the desktop collapse toggle and show the close button
+  .admin-sidebar-collapse-toggle {
+    display: none;
+  }
+
+  .admin-sidebar-close-toggle {
+    display: flex;
+
+    i {
+      font-size: 20px;
+    }
+  }
+
+  // On mobile, always show labels regardless of collapsed state
+  .admin-sidebar.collapsed {
+    .admin-sidebar-link {
+      justify-content: flex-start;
+      padding: 12px 16px;
+
+      span {
+        display: inline;
+      }
+    }
+
+    .admin-sidebar-user {
+      padding: 20px;
+      justify-content: flex-start;
+    }
+
+    .admin-sidebar-user-info {
+      display: flex;
+    }
+
+    .admin-sidebar-section {
+      margin-bottom: 20px;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .admin-sidebar-section-title {
+      display: block;
+    }
+  }
+}
+
+// ===========================================
+// Reduced Motion
+// ===========================================
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar {
+    transition: none;
+  }
+
+  .admin-sidebar-backdrop {
+    transition: none;
   }
 }

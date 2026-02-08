@@ -3,10 +3,11 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Logo from "@/components/layout/logo"
 import Avatar from "@/components/ui/avatar"
 import type { StrapiUser } from "@/libs/auth"
+import { useMobileSidebar } from "./mobile-sidebar-context"
 
 interface AdminSidebarProps {
   user: StrapiUser
@@ -32,10 +33,22 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
+  const { isOpen: mobileOpen, close: closeMobileSidebar } = useMobileSidebar()
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Move focus to close button when sidebar opens on mobile
+  useEffect(() => {
+    if (mobileOpen) {
+      // Small delay to allow the transition to start
+      requestAnimationFrame(() => {
+        closeButtonRef.current?.focus()
+      })
+    }
+  }, [mobileOpen])
 
   const isFounder = user.player?.position === "Founder"
   const isMentor = user.player?.position === "Mentor"
@@ -165,95 +178,115 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   }
 
   return (
-    <aside className={`admin-sidebar ${collapsed ? "collapsed" : ""}`}>
-      <div className="admin-sidebar-header">
-        {!collapsed && (
-          <Link href="/" className="admin-sidebar-logo">
-            <Logo width={120} height={40} />
-          </Link>
-        )}
-        <button
-          type="button"
-          className="admin-sidebar-toggle"
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <i className={`bx ${collapsed ? "bx-chevron-right" : "bx-chevron-left"}`} />
-        </button>
-      </div>
+    <>
+      {/* Backdrop overlay for mobile (always rendered, visibility controlled by CSS) */}
+      <div
+        className={`admin-sidebar-backdrop ${mobileOpen ? "visible" : ""}`}
+        onClick={closeMobileSidebar}
+        aria-hidden="true"
+      />
 
-      <div className="admin-sidebar-user">
-        <Avatar
-          src={user.player?.avatar?.url}
-          alt={user.username}
-          fallback={user.username}
-          size={collapsed ? "sm" : "md"}
-        />
-        {!collapsed && (
-          <div className="admin-sidebar-user-info">
-            <span className="admin-sidebar-user-name">{user.player?.name || user.username}</span>
-            <span className="admin-sidebar-user-email">{user.email}</span>
-          </div>
-        )}
-      </div>
-
-      <nav className="admin-sidebar-nav">
-        {visibleSections.map((section) => (
-          <div key={section.title} className="admin-sidebar-section">
-            {!collapsed && <h3 className="admin-sidebar-section-title">{section.title}</h3>}
-            <ul>
-              {section.items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`admin-sidebar-link ${isActive(item.href, item.exact) ? "active" : ""}`}
-                    title={collapsed ? item.label : undefined}
-                  >
-                    <i className={`bx ${item.icon}`} />
-                    {!collapsed && <span>{item.label}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </nav>
-
-      <div className="admin-sidebar-footer">
-        <button
-          type="button"
-          className="admin-sidebar-link"
-          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-          title={
-            collapsed
-              ? `Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`
-              : undefined
-          }
-          aria-label={`Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`}
-        >
-          <i className={`bx ${mounted && resolvedTheme === "dark" ? "bx-sun" : "bx-moon"}`} />
+      <aside
+        className={`admin-sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "open" : ""}`}
+      >
+        <div className="admin-sidebar-header">
           {!collapsed && (
-            <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+            <Link href="/" className="admin-sidebar-logo">
+              <Logo width={120} height={40} />
+            </Link>
           )}
-        </button>
-        <Link
-          href="/"
-          className="admin-sidebar-link"
-          title={collapsed ? "Back to Site" : undefined}
-        >
-          <i className="bx bx-home" />
-          {!collapsed && <span>Back to Site</span>}
-        </Link>
-        <button
-          type="button"
-          className="admin-sidebar-link admin-sidebar-signout"
-          onClick={handleSignOut}
-          title={collapsed ? "Sign Out" : undefined}
-        >
-          <i className="bx bx-log-out" />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
-      </div>
-    </aside>
+          <button
+            type="button"
+            className="admin-sidebar-toggle admin-sidebar-collapse-toggle"
+            onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <i className={`bx ${collapsed ? "bx-chevron-right" : "bx-chevron-left"}`} />
+          </button>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="admin-sidebar-toggle admin-sidebar-close-toggle"
+            onClick={closeMobileSidebar}
+            aria-label="Close navigation menu"
+          >
+            <i className="bx bx-x" />
+          </button>
+        </div>
+
+        <div className="admin-sidebar-user">
+          <Avatar
+            src={user.player?.avatar?.url}
+            alt={user.username}
+            fallback={user.username}
+            size={collapsed ? "sm" : "md"}
+          />
+          {!collapsed && (
+            <div className="admin-sidebar-user-info">
+              <span className="admin-sidebar-user-name">{user.player?.name || user.username}</span>
+              <span className="admin-sidebar-user-email">{user.email}</span>
+            </div>
+          )}
+        </div>
+
+        <nav className="admin-sidebar-nav" aria-label="Admin navigation">
+          {visibleSections.map((section) => (
+            <div key={section.title} className="admin-sidebar-section">
+              {!collapsed && <h3 className="admin-sidebar-section-title">{section.title}</h3>}
+              <ul>
+                {section.items.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`admin-sidebar-link ${isActive(item.href, item.exact) ? "active" : ""}`}
+                      title={collapsed ? item.label : undefined}
+                    >
+                      <i className={`bx ${item.icon}`} />
+                      {!collapsed && <span>{item.label}</span>}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        <div className="admin-sidebar-footer">
+          <button
+            type="button"
+            className="admin-sidebar-link"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+            title={
+              collapsed
+                ? `Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`
+                : undefined
+            }
+            aria-label={`Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`}
+          >
+            <i className={`bx ${mounted && resolvedTheme === "dark" ? "bx-sun" : "bx-moon"}`} />
+            {!collapsed && (
+              <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+            )}
+          </button>
+          <Link
+            href="/"
+            className="admin-sidebar-link"
+            title={collapsed ? "Back to Site" : undefined}
+          >
+            <i className="bx bx-home" />
+            {!collapsed && <span>Back to Site</span>}
+          </Link>
+          <button
+            type="button"
+            className="admin-sidebar-link admin-sidebar-signout"
+            onClick={handleSignOut}
+            title={collapsed ? "Sign Out" : undefined}
+          >
+            <i className="bx bx-log-out" />
+            {!collapsed && <span>Sign Out</span>}
+          </button>
+        </div>
+      </aside>
+    </>
   )
 }
