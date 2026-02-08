@@ -682,7 +682,6 @@ export async function runAudienceAttendeeImport(
     const fullName = buildFullName(firstName, lastName, email)
     const normalizedName = normalizeName(fullName)
     const normalizedLinkedIn = normalizeLinkedIn(contact.linkedinUrl)
-    const desiredVisible = contact.visible !== false
     const desiredTshirt = contact.tshirtSize
     const desiredFood = contact.foodPreferences
 
@@ -722,7 +721,7 @@ export async function runAudienceAttendeeImport(
         player = {
           name: uniqueName,
           slug: uniqueSlug,
-          visible: desiredVisible,
+          visible: false,
           socialNetworks: normalizedLinkedIn
             ? [{ type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn }]
             : [],
@@ -764,10 +763,6 @@ export async function runAudienceAttendeeImport(
     const canInspectPlayerPrefs =
       player?.defaultTshirtSize !== undefined || player?.defaultFoodPreferences !== undefined
     if (player) {
-      if (!desiredVisible && player.visible !== false) {
-        playerUpdates.visible = false
-      }
-
       if (normalizedLinkedIn) {
         const hasLinkedIn = (player.socialNetworks || []).some((network) => {
           const normalized = normalizeLinkedIn(network.url)
@@ -808,7 +803,7 @@ export async function runAudienceAttendeeImport(
       userStatus,
       playerStatus,
       linkedIn: contact.linkedinUrl || "",
-      visible: desiredVisible ? "true" : "false",
+      visible: createdPlayer ? "false" : player?.visible !== false ? "true" : "false",
       notes: notes.join(","),
     })
 
