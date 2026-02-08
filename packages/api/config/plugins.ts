@@ -1,7 +1,7 @@
 export default ({ env }: { env: any }) => ({
   email: {
     config: {
-      provider: "strapi-provider-email-sender",
+      provider: require.resolve("strapi-provider-email-sender"),
       providerOptions: {
         apiKey: env("SENDER_API_KEY"),
       },

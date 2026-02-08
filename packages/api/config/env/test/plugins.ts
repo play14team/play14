@@ -13,7 +13,7 @@ export default ({ env }: { env: any }) => ({
   // Disable email in tests (already using mock API key)
   email: {
     config: {
-      provider: "strapi-provider-email-sender",
+      provider: require.resolve("strapi-provider-email-sender"),
       providerOptions: {
         apiKey: env("SENDER_API_KEY", "test_mock_key"),
       },
