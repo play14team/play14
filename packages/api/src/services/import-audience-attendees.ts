@@ -83,6 +83,7 @@ export interface ImportAudienceAttendeesResult {
   summary: {
     contacts: number
     createPlayers: number
+    matchPlayers: number
     createUsers: number
     linkUsers: number
     updatePlayers: number
@@ -860,9 +861,12 @@ export async function runAudienceAttendeeImport(
     logInfo(`- Report CSV: ${csvPath}`)
   }
 
+  const matchPlayers = reportRows.filter((row) => row.playerStatus === "matched").length
+
   const summary = {
     contacts: contacts.length,
     createPlayers: actions.createPlayers.length,
+    matchPlayers,
     createUsers: actions.createUsers.length,
     linkUsers: actions.linkUsers.length,
     updatePlayers: actions.updatePlayers.length,

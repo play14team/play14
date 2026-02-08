@@ -5,6 +5,7 @@ import { strapiFetchFormData } from "@/libs/strapi-client"
 export interface ImportSummary {
   contacts: number
   createPlayers: number
+  matchPlayers: number
   createUsers: number
   linkUsers: number
   updatePlayers: number

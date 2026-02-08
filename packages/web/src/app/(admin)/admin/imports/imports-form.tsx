@@ -141,12 +141,12 @@ export default function ImportsForm() {
             <div className="admin-form-group">
               <p className="admin-form-help">Contacts processed: {result.summary.contacts}</p>
               <p className="admin-form-help">Players created: {result.summary.createPlayers}</p>
-              <p className="admin-form-help">Users created: {result.summary.createUsers}</p>
-              <p className="admin-form-help">Users linked: {result.summary.linkUsers}</p>
+              <p className="admin-form-help">Players matched: {result.summary.matchPlayers}</p>
+              <p className="admin-form-help">Players updated: {result.summary.updatePlayers}</p>
             </div>
             <div className="admin-form-group">
-              <p className="admin-form-help">Players updated: {result.summary.updatePlayers}</p>
-              <p className="admin-form-help">Users updated: {result.summary.updateUsers}</p>
+              <p className="admin-form-help">Users created: {result.summary.createUsers}</p>
+              <p className="admin-form-help">Users linked: {result.summary.linkUsers}</p>
               <p className="admin-form-help">Skipped: {result.summary.skipped}</p>
               <p className="admin-form-help">
                 Ambiguous matches: {result.summary.ambiguousMatches}

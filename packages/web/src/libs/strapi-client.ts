@@ -598,28 +598,42 @@ export async function strapiFetch<T>(
 }
 
 /**
- * Safe fetch for FormData uploads using @strapi/client.
+ * Safe fetch for FormData uploads.
+ * Uses fetchWithTimeout directly (bypassing @strapi/client's 10s default timeout)
+ * to support long-running uploads like CSV imports.
  * Does not set Content-Type header (let browser set it with boundary).
  *
  * @param pathTemplate - Path template with :param placeholders
  * @param params - Object mapping param names to values
  * @param formData - FormData to upload
+ * @param timeout - Timeout in milliseconds (default 120000 = 2 minutes)
  * @returns Promise with fetch result
  */
 export async function strapiFetchFormData<T>(
   pathTemplate: string,
   params: Record<string, string>,
-  formData: FormData
+  formData: FormData,
+  timeout = 120000
 ): Promise<StrapiFetchResult<T>> {
-  const client = await getStrapiClient()
   const path = buildSafePath(pathTemplate, params)
+  const jwt = await getAuthCookie()
+  if (!jwt) {
+    return { ok: false, status: 0, error: "Not authenticated" }
+  }
+
+  const url = `${STRAPI_URL}/api${path}`
 
   try {
-    const response = await client.fetch(path, {
-      method: "POST",
-      body: formData,
-      // Don't set Content-Type - browser will set it with boundary
-    })
+    const response = await fetchWithTimeout(
+      url,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${jwt}` },
+        body: formData,
+        // Don't set Content-Type - browser will set it with boundary
+      },
+      timeout
+    )
 
     if (!response.ok) {
       const errorData = (await response.json().catch(() => ({}))) as {
