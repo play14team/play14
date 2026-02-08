@@ -63,6 +63,7 @@ interface PlayerUpdateData {
   tagline?: string | null
   bio?: string | null
   website?: string | null
+  visible?: boolean
   location?: Record<string, unknown> | string | null
   socialNetworks?: Array<{
     id?: string
@@ -139,6 +140,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       "website",
       "location",
       "socialNetworks",
+      "visible",
     ]
 
     const sanitizedData: Record<string, unknown> = {}
@@ -884,6 +886,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       "website",
       "location",
       "socialNetworks",
+      "visible",
     ]
 
     const sanitizedData: Record<string, unknown> = {}

@@ -30,6 +30,7 @@ export interface PlayerUpdateData {
   tagline?: string
   bio?: string
   website?: string
+  visible?: boolean
   location?: GeoLocation | null
   socialNetworks?: SocialNetworkInput[]
 }
@@ -63,6 +64,10 @@ export async function updatePlayerProfile(
     bio: data.bio || null,
     website: data.website || null,
     socialNetworks: socialNetworks || [],
+  }
+
+  if (data.visible !== undefined) {
+    requestData.visible = data.visible
   }
 
   if ("location" in data) {

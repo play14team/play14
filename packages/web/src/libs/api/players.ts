@@ -28,6 +28,7 @@ export interface PlayerProfile {
   tagline?: string
   bio?: string
   website?: string
+  visible?: boolean
   location?: GeoLocation | string
   avatar?: UploadFile
   socialNetworks?: SocialNetwork[]

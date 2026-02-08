@@ -1184,6 +1184,65 @@ label.admin-btn {
 }
 
 // ===========================================
+// Toggle Switch
+// ===========================================
+
+.admin-toggle-option {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text);
+  margin-bottom: 0;
+
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .admin-toggle-track {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    min-width: 40px;
+    height: 22px;
+    background: var(--color-border);
+    border-radius: 11px;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+
+    .admin-toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+  }
+
+  input[type="checkbox"]:checked + .admin-toggle-track {
+    background: var(--color-orange);
+
+    .admin-toggle-thumb {
+      transform: translateX(18px);
+    }
+  }
+
+  input[type="checkbox"]:focus-visible + .admin-toggle-track {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px;
+  }
+}
+
+// ===========================================
 // Radio Card Group (for ticketing mode, etc.)
 // ===========================================
 

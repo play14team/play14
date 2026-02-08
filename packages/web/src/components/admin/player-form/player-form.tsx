@@ -7,8 +7,8 @@ import {
   type PlayerForEdit,
   updatePlayer,
   updatePlayerPosition,
-} from "@/app/(admin)/admin/players/players.action"
-import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
+} from "@/app/[locale]/(admin)/admin/players/players.action"
+import type { StripeAccountStatus } from "@/app/[locale]/(admin)/admin/stripe/stripe-connect.action"
 import LocationMapPicker, { type MapLocation } from "@/components/admin/location-map-picker"
 import UnsavedChangesDialog from "@/components/admin/unsaved-changes-dialog"
 import SimpleEditor from "@/components/ui/simple-editor"
@@ -185,6 +185,7 @@ export default function PlayerForm({
       url: sn.url,
     })) || []
   )
+  const [visible, setVisible] = useState(player.visible !== false)
   const [currentAvatar, setCurrentAvatar] = useState(player.avatar)
   const initialMapLocation = useMemo(() => normalizeMapLocation(player.location), [player.location])
   const initialMapLocationRef = useRef<MapLocation | null>(initialMapLocation)
@@ -201,8 +202,8 @@ export default function PlayerForm({
 
   // Track dirty state
   const formValues = useMemo(
-    () => ({ name, company, tagline, bio, website, socialNetworks, mapLocation }),
-    [name, company, tagline, bio, website, socialNetworks, mapLocation]
+    () => ({ name, company, tagline, bio, website, visible, socialNetworks, mapLocation }),
+    [name, company, tagline, bio, website, visible, socialNetworks, mapLocation]
   )
   const { isDirty, resetDirtyState } = useFormDirty(formValues)
 
@@ -357,6 +358,7 @@ export default function PlayerForm({
         tagline: tagline || undefined,
         bio: bio || undefined,
         website: website || undefined,
+        visible,
         socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
         ...locationPayload,
       }
@@ -367,6 +369,7 @@ export default function PlayerForm({
       tagline: tagline || undefined,
       bio: bio || undefined,
       website: website || undefined,
+      visible,
       socialNetworks: socialNetworks.filter((sn) => sn.url.trim() !== ""),
       ...locationPayload,
     }
@@ -378,6 +381,7 @@ export default function PlayerForm({
     tagline,
     bio,
     website,
+    visible,
     socialNetworks,
     mapLocation,
     locationTouched,
@@ -441,6 +445,7 @@ export default function PlayerForm({
     const initialTagline = player.tagline || ""
     const initialBio = player.bio || ""
     const initialWebsite = player.website || ""
+    const initialVisible = player.visible !== false
     const initialMapLocation = initialMapLocationRef.current
     const initialSocialNetworks =
       player.socialNetworks?.map((sn) => ({
@@ -454,6 +459,7 @@ export default function PlayerForm({
     setTagline(initialTagline)
     setBio(initialBio)
     setWebsite(initialWebsite)
+    setVisible(initialVisible)
     setMapLocation(initialMapLocation)
     setSocialNetworks(initialSocialNetworks)
     setLocationTouched(false)
@@ -465,6 +471,7 @@ export default function PlayerForm({
       tagline: initialTagline,
       bio: initialBio,
       website: initialWebsite,
+      visible: initialVisible,
       mapLocation: initialMapLocation,
       socialNetworks: initialSocialNetworks,
     })
@@ -489,6 +496,22 @@ export default function PlayerForm({
             <div className="player-form-content">
               <div className="admin-form-section">
                 <h2>Basic Information</h2>
+
+                <div className="admin-form-group">
+                  <label className="admin-toggle-option">
+                    <input
+                      type="checkbox"
+                      checked={visible}
+                      onChange={(e) => setVisible(e.target.checked)}
+                    />
+                    <span className="admin-toggle-track">
+                      <span className="admin-toggle-thumb" />
+                    </span>
+                    {visible
+                      ? "Profile visible on the public players page"
+                      : "Profile hidden from the public players page"}
+                  </label>
+                </div>
 
                 {/* 3-column header: fields | fields | avatar */}
                 <div className="player-form-header">
