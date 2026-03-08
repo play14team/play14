@@ -58,7 +58,6 @@ const SimpleEditor = forwardRef<SimpleEditorRef, SimpleEditorProps>(function Sim
           rel: "noopener noreferrer",
         },
       }),
-      // @ts-expect-error tiptap-markdown uses @tiptap/core 3.19.0 while project uses 3.20.1
       Markdown.configure({
         html: true,
         transformPastedText: true,
