@@ -300,7 +300,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           for (const sponsorship of event.sponsorships) {
             if (sponsorship.sponsors?.some((s: any) => s.documentId === sponsorId)) {
               eventsUsingSponsor.push({
-                id: event.id,
+                id: Number(event.id),
                 name: event.name,
                 slug: event.slug,
               })

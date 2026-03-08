@@ -234,7 +234,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     discountAmount = Math.round(discountAmount * 100) / 100
 
     return {
-      id: discountCode.id,
+      id: Number(discountCode.id),
       documentId: discountCode.documentId,
       code: discountCode.code,
       discountAmount,

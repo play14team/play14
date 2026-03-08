@@ -478,14 +478,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           addressDetails: newVenue.addressDetails || null,
         },
       })
-      venueNumericId = createdVenue.id
+      venueNumericId = Number(createdVenue.id)
 
       strapi.log.info(`[Event] New venue "${newVenue.name}" created by ${player.name}`)
     } else if (venueId) {
       const venue = await strapi.documents("api::venue.venue").findOne({
         documentId: venueId,
       })
-      venueNumericId = venue?.id || null
+      venueNumericId = venue ? Number(venue.id) : null
     }
 
     // Generate dynamic timetable based on actual dates
@@ -510,7 +510,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     })
 
     // Create default ticket types
-    await this.createDefaultTickets(event.id, startDate)
+    await this.createDefaultTickets(Number(event.id), startDate)
 
     strapi.log.info(
       `[Event] Event "${name}" (${event.slug}) created by ${player.name} (${player.position})`

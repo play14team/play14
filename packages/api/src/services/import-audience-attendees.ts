@@ -635,7 +635,7 @@ export async function runAudienceAttendeeImport(
   const rolesByType = new Map<string, { id: number; documentId: string }>()
   for (const role of allRoles) {
     if (role.type) {
-      rolesByType.set(role.type, { id: role.id, documentId: role.documentId })
+      rolesByType.set(role.type, { id: Number(role.id), documentId: role.documentId })
     }
   }
   const playerRole = rolesByType.get("player")
@@ -907,7 +907,7 @@ export async function runAudienceAttendeeImport(
           defaultFoodPreferences: playerRecord.defaultFoodPreferences || null,
         } as any,
       })
-      playerRecord.id = createdPlayer.id
+      playerRecord.id = Number(createdPlayer.id)
       playerRecord.documentId = createdPlayer.documentId
       playerRecord.planned = false
     } catch (error) {
@@ -948,7 +948,7 @@ export async function runAudienceAttendeeImport(
           invitationStatus: "pending",
         } as any,
       })
-      user.id = createdUser.id
+      user.id = Number(createdUser.id)
       user.documentId = createdUser.documentId
       user.planned = false
     } catch (error) {

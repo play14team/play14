@@ -123,7 +123,7 @@ export async function seedTestUser(
   })
 
   return {
-    id: user.id,
+    id: Number(user.id),
     documentId: user.documentId,
     email: user.email,
     username: user.username,
@@ -158,7 +158,7 @@ export async function seedTestPlayer(
   })
 
   return {
-    id: player.id,
+    id: Number(player.id),
     documentId: player.documentId,
     name: player.name,
     slug: player.slug,
@@ -212,7 +212,7 @@ export async function seedTestEvent(
   })
 
   const result: TestEvent = {
-    id: event.id,
+    id: Number(event.id),
     documentId: event.documentId,
     name: event.name,
     slug: event.slug,
@@ -223,7 +223,7 @@ export async function seedTestEvent(
   if (data.ticketTypes && data.ticketTypes.length > 0) {
     for (const tt of data.ticketTypes) {
       const ticketType = await seedTestTicketType(strapi, {
-        event: event.id,
+        event: Number(event.id),
         name: tt.name,
         price: tt.price,
         currency: tt.currency,
@@ -265,7 +265,7 @@ export async function seedTestTicketType(
   })
 
   return {
-    id: ticketType.id,
+    id: Number(ticketType.id),
     documentId: ticketType.documentId,
     name: ticketType.name,
     price: ticketType.price,
@@ -314,7 +314,7 @@ export async function seedTestOrder(
   })
 
   return {
-    id: order.id,
+    id: Number(order.id),
     documentId: order.documentId,
     orderNumber: order.orderNumber,
     status: order.status,
@@ -399,7 +399,7 @@ export async function seedStripeAccount(
   })
 
   return {
-    id: account.id,
+    id: Number(account.id),
     documentId: account.documentId,
     stripeAccountId: account.stripeAccountId,
     accountStatus: account.accountStatus,
@@ -434,7 +434,7 @@ export async function seedDiscountCode(
   })
 
   return {
-    id: discount.id,
+    id: Number(discount.id),
     documentId: discount.documentId,
     code: discount.code,
   }
