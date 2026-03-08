@@ -1521,4 +1521,184 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.internalServerError("Failed to send invitation. Please try again.")
     }
   },
+
+  /**
+   * Get a player's account settings (for organizers)
+   */
+  async getPlayerSettings(ctx) {
+    const user = ctx.state.user
+    if (!user) return ctx.unauthorized("You must be logged in")
+
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
+    if (!userWithPlayer?.player || userWithPlayer.player.position === "Player") {
+      return ctx.forbidden("Only organizers can access player settings")
+    }
+
+    const { id: playerId } = ctx.params
+    if (!playerId) return ctx.badRequest("Player ID is required")
+
+    try {
+      const player = await strapi.documents("api::player.player").findOne({
+        documentId: playerId,
+        populate: { user: true },
+      })
+      if (!player) return ctx.notFound("Player not found")
+
+      const linkedUser = player.user as any
+      return ctx.send({
+        data: {
+          defaultTshirtSize: player.defaultTshirtSize || "none",
+          defaultFoodPreferences: player.defaultFoodPreferences || "",
+        },
+        user: linkedUser
+          ? {
+              email: linkedUser.email,
+              username: linkedUser.username,
+              confirmed: linkedUser.confirmed,
+              blocked: linkedUser.blocked,
+              provider: linkedUser.provider,
+            }
+          : null,
+      })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to get player settings: ${error}`)
+      return ctx.internalServerError("Failed to get player settings")
+    }
+  },
+
+  /**
+   * Update a player's default settings (for organizers)
+   */
+  async updatePlayerSettings(ctx) {
+    const user = ctx.state.user
+    if (!user) return ctx.unauthorized("You must be logged in")
+
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
+    if (!userWithPlayer?.player || userWithPlayer.player.position === "Player") {
+      return ctx.forbidden("Only organizers can update player settings")
+    }
+
+    const { id: playerId } = ctx.params
+    if (!playerId) return ctx.badRequest("Player ID is required")
+
+    const { defaultTshirtSize, defaultFoodPreferences } = ctx.request.body?.data || {}
+
+    try {
+      const player = await strapi.documents("api::player.player").findOne({
+        documentId: playerId,
+      })
+      if (!player) return ctx.notFound("Player not found")
+
+      await strapi.documents("api::player.player").update({
+        documentId: playerId,
+        data: {
+          defaultTshirtSize: sanitizePlainText(defaultTshirtSize || "none"),
+          defaultFoodPreferences: sanitizePlainText(defaultFoodPreferences || ""),
+        } as any,
+      })
+
+      return ctx.send({ success: true })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to update player settings: ${error}`)
+      return ctx.internalServerError("Failed to update player settings")
+    }
+  },
+
+  /**
+   * Send password reset email for a player's linked user (for organizers)
+   */
+  async sendPasswordReset(ctx) {
+    const user = ctx.state.user
+    if (!user) return ctx.unauthorized("You must be logged in")
+
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
+    if (!userWithPlayer?.player || userWithPlayer.player.position === "Player") {
+      return ctx.forbidden("Only organizers can trigger password resets")
+    }
+
+    const { id: playerId } = ctx.params
+    if (!playerId) return ctx.badRequest("Player ID is required")
+
+    try {
+      const player = await strapi.documents("api::player.player").findOne({
+        documentId: playerId,
+        populate: { user: true },
+      })
+      if (!player) return ctx.notFound("Player not found")
+
+      const linkedUser = player.user as any
+      if (!linkedUser?.email) {
+        return ctx.badRequest("This player has no linked user account")
+      }
+
+      // Replicate Strapi's forgotPassword controller logic
+      const pluginStore = await strapi.store({
+        type: "plugin",
+        name: "users-permissions",
+      })
+      const emailSettings = (await pluginStore.get({ key: "email" })) as any
+      const advancedSettings = (await pluginStore.get({ key: "advanced" })) as any
+
+      const resetPasswordToken = randomBytes(64).toString("hex")
+      const resetPasswordSettings = emailSettings?.reset_password?.options || {}
+
+      const usersPermissionsService = strapi
+        .plugin("users-permissions")
+        .service("users-permissions")
+
+      const emailBody = await usersPermissionsService.template(
+        resetPasswordSettings.message || "",
+        {
+          URL: advancedSettings?.email_reset_password || "",
+          SERVER_URL: strapi.config.get("server.absoluteUrl"),
+          ADMIN_URL: strapi.config.get("admin.absoluteUrl"),
+          USER: { username: linkedUser.username, email: linkedUser.email },
+          TOKEN: resetPasswordToken,
+        }
+      )
+      const emailSubject = await usersPermissionsService.template(
+        resetPasswordSettings.object || "Reset password",
+        { USER: { username: linkedUser.username, email: linkedUser.email } }
+      )
+
+      // Update the user's reset token before sending the email
+      await strapi.plugin("users-permissions").service("user").edit(linkedUser.id, {
+        resetPasswordToken,
+      })
+
+      // Send the reset email
+      await strapi
+        .plugin("email")
+        .service("email")
+        .send({
+          to: linkedUser.email,
+          from:
+            resetPasswordSettings.from?.email || resetPasswordSettings.from?.name
+              ? `${resetPasswordSettings.from.name} <${resetPasswordSettings.from.email}>`
+              : undefined,
+          replyTo: resetPasswordSettings.response_email,
+          subject: emailSubject,
+          text: emailBody,
+          html: emailBody,
+        })
+
+      strapi.log.info(
+        `[Player] Password reset triggered for ${linkedUser.email} by ${userWithPlayer.player.name}`
+      )
+
+      return ctx.send({ success: true })
+    } catch (error) {
+      strapi.log.error(`[Player] Failed to send password reset: ${error}`)
+      return ctx.internalServerError("Failed to send password reset")
+    }
+  },
 })

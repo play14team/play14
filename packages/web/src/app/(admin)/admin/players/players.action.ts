@@ -192,6 +192,91 @@ export async function updatePlayerPosition(
   return { success: true }
 }
 
+// ===========================================
+// Player Settings (organizers only)
+// ===========================================
+
+export interface PlayerSettingsData {
+  email: string
+  username: string
+  confirmed: boolean
+  blocked: boolean
+  provider: string
+  defaultTshirtSize: string
+  defaultFoodPreferences: string
+}
+
+interface PlayerSettingsResponse {
+  data: {
+    defaultTshirtSize?: string
+    defaultFoodPreferences?: string
+  }
+  user: {
+    email: string
+    username: string
+    confirmed: boolean
+    blocked: boolean
+    provider: string
+  } | null
+}
+
+export async function getPlayerSettings(playerId: string): Promise<PlayerSettingsData | null> {
+  const result = await strapiFetch<PlayerSettingsResponse>(
+    "/admin/players/:playerId/settings",
+    { playerId },
+    { cache: "no-store" }
+  )
+
+  if (!result.ok || !result.data) return null
+
+  const { data: defaults, user } = result.data
+  return {
+    defaultTshirtSize: defaults?.defaultTshirtSize || "none",
+    defaultFoodPreferences: defaults?.defaultFoodPreferences || "",
+    email: user?.email || "",
+    username: user?.username || "",
+    confirmed: user?.confirmed ?? false,
+    blocked: user?.blocked ?? false,
+    provider: user?.provider || "",
+  }
+}
+
+export async function updatePlayerSettings(
+  playerId: string,
+  data: { defaultTshirtSize: string; defaultFoodPreferences: string }
+): Promise<{ success: boolean; error?: string }> {
+  const result = await strapiFetch(
+    "/admin/players/:playerId/settings",
+    { playerId },
+    {
+      method: "PUT",
+      body: { data },
+    }
+  )
+
+  if (!result.ok) {
+    return { success: false, error: result.error || "Failed to update settings" }
+  }
+
+  return { success: true }
+}
+
+export async function sendPlayerPasswordReset(
+  playerId: string
+): Promise<{ success: boolean; error?: string }> {
+  const result = await strapiFetch(
+    "/admin/players/:playerId/password-reset",
+    { playerId },
+    { method: "POST" }
+  )
+
+  if (!result.ok) {
+    return { success: false, error: result.error || "Failed to send password reset" }
+  }
+
+  return { success: true }
+}
+
 /**
  * Set a player's avatar from the media library (organizers only)
  */

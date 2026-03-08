@@ -104,6 +104,11 @@ export const PLAYER_ACTIONS = {
 
   // Single invite (organizers can send invites to players)
   SEND_SINGLE_INVITE: "api::player.custom-player.sendSingleInvite",
+
+  // Settings (organizers can view/edit player settings)
+  GET_PLAYER_SETTINGS: "api::player.custom-player.getPlayerSettings",
+  UPDATE_PLAYER_SETTINGS: "api::player.custom-player.updatePlayerSettings",
+  SEND_PASSWORD_RESET: "api::player.custom-player.sendPasswordReset",
 } as const
 
 // ==================== PLAYER CLAIMS ====================

@@ -176,6 +176,9 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Single invite (organizers can send invites to players)
   { action: PLAYER_ACTIONS.SEND_SINGLE_INVITE, minimumRole: ROLE_TYPES.HOST },
+  { action: PLAYER_ACTIONS.GET_PLAYER_SETTINGS, minimumRole: ROLE_TYPES.HOST },
+  { action: PLAYER_ACTIONS.UPDATE_PLAYER_SETTINGS, minimumRole: ROLE_TYPES.HOST },
+  { action: PLAYER_ACTIONS.SEND_PASSWORD_RESET, minimumRole: ROLE_TYPES.HOST },
 
   // Attendance claim management (for own events)
   { action: ATTENDANCE_CLAIM_ACTIONS.GET_PENDING_FOR_MY_EVENTS, minimumRole: ROLE_TYPES.HOST },

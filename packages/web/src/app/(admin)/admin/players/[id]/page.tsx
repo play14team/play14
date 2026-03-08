@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { PlayerForm } from "@/components/admin/player-form"
 import { requireOrganizer } from "@/libs/auth"
-import { getPlayerForEdit } from "../players.action"
+import { getPlayerForEdit, getPlayerSettings } from "../players.action"
 
 export const metadata: Metadata = {
   title: "Edit Player",
@@ -17,7 +17,7 @@ export default async function PlayerEditPage({ params }: PageProps) {
   const session = await requireOrganizer()
   const { id } = await params
 
-  const player = await getPlayerForEdit(id)
+  const [player, settings] = await Promise.all([getPlayerForEdit(id), getPlayerSettings(id)])
 
   if (!player) {
     notFound()
@@ -47,6 +47,7 @@ export default async function PlayerEditPage({ params }: PageProps) {
         player={player}
         mode="admin"
         currentUserPosition={session.player.position ?? "Player"}
+        adminSettings={settings}
       />
     </div>
   )

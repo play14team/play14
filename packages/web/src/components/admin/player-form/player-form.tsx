@@ -6,6 +6,7 @@ import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-conn
 import {
   type PlayerUpdateData as AdminUpdateData,
   type PlayerForEdit,
+  type PlayerSettingsData,
   updatePlayer,
   updatePlayerPosition,
 } from "@/app/[locale]/(admin)/admin/players/players.action"
@@ -20,9 +21,12 @@ import {
   updatePlayerProfile,
 } from "../player-profile.action"
 import { useToast } from "../toast"
+import AdminSettingsTab from "./admin-settings-tab"
 import PlayerAvatarManager from "./player-avatar-manager"
 import PlayerFormActions from "./player-form-actions"
 import ProfileTabs, { type ProfileTabId } from "./profile-tabs"
+import type { SettingsData } from "./settings.action"
+import SettingsTab from "./settings-tab"
 import StripeTab from "./stripe-tab"
 
 const SOCIAL_NETWORK_TYPES = [
@@ -71,6 +75,8 @@ interface Props {
   mode: "self" | "admin"
   currentUserPosition?: string
   stripeAccount?: StripeAccountStatus | null
+  settingsData?: SettingsData | null
+  adminSettings?: PlayerSettingsData | null
 }
 
 /**
@@ -162,6 +168,8 @@ export default function PlayerForm({
   mode,
   currentUserPosition = "Player",
   stripeAccount,
+  settingsData,
+  adminSettings,
 }: Props) {
   const router = useRouter()
   const toast = useToast()
@@ -479,16 +487,16 @@ export default function PlayerForm({
 
   // Show Stripe tab only in self mode for organizers
   const showStripeTab = mode === "self" && isOrganizer
+  const showSettingsTab = mode === "self" || (mode === "admin" && !!adminSettings)
 
   return (
     <>
-      {mode === "self" && (
-        <ProfileTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          showStripeTab={showStripeTab}
-        />
-      )}
+      <ProfileTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        showStripeTab={showStripeTab}
+        showSettingsTab={showSettingsTab}
+      />
 
       {activeTab === "profile" && (
         <form onSubmit={handleSubmit} className="admin-form">
@@ -692,6 +700,23 @@ export default function PlayerForm({
       {activeTab === "stripe" && showStripeTab && (
         <div className="admin-form">
           <StripeTab account={stripeAccount ?? null} />
+        </div>
+      )}
+
+      {activeTab === "settings" && mode === "self" && settingsData && (
+        <div className="admin-form">
+          <SettingsTab
+            email={settingsData.email}
+            username={settingsData.username}
+            defaultTshirtSize={settingsData.defaultTshirtSize}
+            defaultFoodPreferences={settingsData.defaultFoodPreferences}
+          />
+        </div>
+      )}
+
+      {activeTab === "settings" && mode === "admin" && adminSettings && (
+        <div className="admin-form">
+          <AdminSettingsTab playerId={player.documentId} settings={adminSettings} />
         </div>
       )}
     </>

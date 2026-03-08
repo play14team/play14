@@ -1,6 +1,6 @@
 "use client"
 
-export const TAB_IDS = ["profile", "stripe"] as const
+export const TAB_IDS = ["profile", "stripe", "settings"] as const
 export type ProfileTabId = (typeof TAB_IDS)[number]
 
 interface Tab {
@@ -12,16 +12,27 @@ interface Tab {
 const TABS: Tab[] = [
   { id: "profile", label: "Profile", icon: "bx-user" },
   { id: "stripe", label: "Stripe", icon: "bx-credit-card" },
+  { id: "settings", label: "Settings", icon: "bx-cog" },
 ]
 
 interface ProfileTabsProps {
   activeTab: ProfileTabId
   onTabChange: (tab: ProfileTabId) => void
   showStripeTab: boolean
+  showSettingsTab: boolean
 }
 
-export default function ProfileTabs({ activeTab, onTabChange, showStripeTab }: ProfileTabsProps) {
-  const visibleTabs = showStripeTab ? TABS : TABS.filter((tab) => tab.id !== "stripe")
+export default function ProfileTabs({
+  activeTab,
+  onTabChange,
+  showStripeTab,
+  showSettingsTab,
+}: ProfileTabsProps) {
+  const visibleTabs = TABS.filter((tab) => {
+    if (tab.id === "stripe") return showStripeTab
+    if (tab.id === "settings") return showSettingsTab
+    return true
+  })
 
   // Don't show tabs if there's only one
   if (visibleTabs.length <= 1) {

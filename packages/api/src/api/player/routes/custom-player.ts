@@ -171,5 +171,38 @@ export default {
         description: "Send invitation email to a player (organizers only)",
       },
     },
+    {
+      method: "GET",
+      path: "/admin/players/:id/settings",
+      handler: "custom-player.getPlayerSettings",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Get a player's account settings (organizers only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/admin/players/:id/settings",
+      handler: "custom-player.updatePlayerSettings",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Update a player's default settings (organizers only)",
+      },
+    },
+    {
+      method: "POST",
+      path: "/admin/players/:id/password-reset",
+      handler: "custom-player.sendPasswordReset",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Send password reset email for a player's linked user (organizers only)",
+      },
+    },
   ],
 }

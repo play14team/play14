@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { getStripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import { PlayerForm } from "@/components/admin/player-form"
+import { getMySettings } from "@/components/admin/player-form/settings.action"
 import { getPlayerByDocumentId } from "@/libs/api/players"
 import { requirePlayer } from "@/libs/auth"
 
@@ -23,9 +24,12 @@ export default async function ProfilePage() {
     )
   }
 
-  // Fetch Stripe account status for organizers (Host, Mentor, Founder)
+  // Fetch Stripe account status and settings in parallel
   const isOrganizer = player.position !== "Player"
-  const stripeAccount = isOrganizer ? await getStripeAccountStatus() : null
+  const [stripeAccount, settingsData] = await Promise.all([
+    isOrganizer ? getStripeAccountStatus() : null,
+    getMySettings(),
+  ])
 
   // Always use wide layout for profile page to accommodate the 3-column header layout
   const pageClassName = "admin-page admin-page-wide"
@@ -37,7 +41,12 @@ export default async function ProfilePage() {
         <p>Update your player profile information</p>
       </div>
 
-      <PlayerForm player={player} mode="self" stripeAccount={stripeAccount} />
+      <PlayerForm
+        player={player}
+        mode="self"
+        stripeAccount={stripeAccount}
+        settingsData={settingsData}
+      />
     </div>
   )
 }
