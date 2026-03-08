@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { getLinkedInAccountStatus } from "@/app/(admin)/admin/linkedin/linkedin.action"
 import { getStripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import { PlayerForm } from "@/components/admin/player-form"
 import { getMySettings } from "@/components/admin/player-form/settings.action"
@@ -26,10 +27,12 @@ export default async function ProfilePage() {
 
   // Fetch Stripe account status and settings in parallel
   const isOrganizer = player.position !== "Player"
-  const [stripeAccount, settingsData] = await Promise.all([
+  const [stripeAccount, settingsData, linkedInResult] = await Promise.all([
     isOrganizer ? getStripeAccountStatus() : null,
     getMySettings(),
+    isOrganizer ? getLinkedInAccountStatus() : null,
   ])
+  const linkedInAccount = linkedInResult?.data ?? null
 
   // Always use wide layout for profile page to accommodate the 3-column header layout
   const pageClassName = "admin-page admin-page-wide"
@@ -46,6 +49,7 @@ export default async function ProfilePage() {
         mode="self"
         stripeAccount={stripeAccount}
         settingsData={settingsData}
+        linkedInAccount={linkedInAccount}
       />
     </div>
   )

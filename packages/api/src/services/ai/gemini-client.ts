@@ -1,93 +1,94 @@
 /**
- * Google Gemini AI client for content generation
- * Uses Gemini 1.5 Flash model (free tier: 15 RPM, 1M tokens/day)
+ * Google Gemini AI client for LinkedIn post content generation
+ * Uses @google/generative-ai SDK with gemini-2.5-flash default model
  */
 
+import { GoogleGenerativeAI } from "@google/generative-ai"
 import { createLogger } from "../observability/logger"
 import {
   create7DayReminderPrompt,
   create30DayReminderPrompt,
   createAnnouncementPrompt,
 } from "./prompts"
-import type { EventContext, GeminiRequest, GeminiResponse, LinkedInPostContent } from "./types"
+import type { EventContext, LinkedInPostContent } from "./types"
 
 const log = createLogger("[Gemini]")
 
-export class GeminiClient {
-  private apiKey: string
-  private baseUrl = "https://generativelanguage.googleapis.com/v1beta"
-  private model: string
+const DEFAULT_MODEL = "gemini-2.5-flash"
+const GEMINI_TIMEOUT_MS = 60000
 
-  constructor(apiKey: string, model = "gemini-1.5-flash") {
+const SYSTEM_CONTEXT = `You are a content writer for #play14, a global community of agile game players and facilitators.
+The community organizes events called "unconferences" where participants play serious games to learn agile practices.
+
+Writing guidelines:
+- Use a friendly, inclusive, and enthusiastic tone
+- Keep content concise and engaging
+- Focus on community, learning, and fun
+- Use sentence case (only capitalize first word of sentences)
+- Avoid corporate jargon - be authentic and human
+- The audience includes agile coaches, scrum masters, facilitators, and anyone interested in serious games`
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number = GEMINI_TIMEOUT_MS
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout>
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error("AI generation timed out. Please try again."))
+    }, timeoutMs)
+  })
+
+  try {
+    const result = await Promise.race([promise, timeoutPromise])
+    clearTimeout(timeoutId!)
+    return result
+  } catch (error) {
+    clearTimeout(timeoutId!)
+    throw error
+  }
+}
+
+export class GeminiClient {
+  private client: GoogleGenerativeAI
+  private modelName: string
+
+  constructor(apiKey: string, model?: string) {
     if (!apiKey) {
       throw new Error("Gemini API key is required")
     }
-    this.apiKey = apiKey
-    this.model = model
+    this.client = new GoogleGenerativeAI(apiKey)
+    this.modelName = model || process.env.GEMINI_MODEL || DEFAULT_MODEL
   }
 
   /**
-   * Generate content using Gemini API
+   * Generate content using Gemini SDK
    */
   private async generateContent(prompt: string): Promise<string> {
-    const url = `${this.baseUrl}/models/${this.model}:generateContent?key=${this.apiKey}`
+    log.info("Generating content with Gemini", { model: this.modelName })
 
-    const requestBody: GeminiRequest = {
-      contents: [
-        {
-          parts: [
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 1024,
-      },
-    }
+    const model = this.client.getGenerativeModel({ model: this.modelName })
 
-    log.info("Generating content with Gemini", { model: this.model })
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
+    const result = await withTimeout(
+      model.generateContent({
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: `${SYSTEM_CONTEXT}\n\n${prompt}` }],
+          },
+        ],
       })
+    )
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        log.error("Gemini API error", { status: response.status, error: errorText })
-        throw new Error(`Gemini API error: ${response.status} - ${errorText}`)
-      }
+    const response = result.response
+    const text = response.text()
 
-      const data = (await response.json()) as GeminiResponse
-
-      if (!data.candidates || data.candidates.length === 0) {
-        throw new Error("No candidates returned from Gemini API")
-      }
-
-      const generatedText = data.candidates[0].content.parts[0].text
-
-      if (data.usageMetadata) {
-        log.info("Gemini API usage", {
-          promptTokens: data.usageMetadata.promptTokenCount,
-          completionTokens: data.usageMetadata.candidatesTokenCount,
-          totalTokens: data.usageMetadata.totalTokenCount,
-        })
-      }
-
-      return generatedText
-    } catch (error) {
-      log.error("Failed to generate content with Gemini", {}, error as Error)
-      throw error
+    if (!text) {
+      throw new Error("No content returned from Gemini API")
     }
+
+    log.info("Gemini content generated successfully")
+    return text
   }
 
   /**
@@ -117,7 +118,6 @@ export class GeminiClient {
       }
     } catch (error) {
       log.error("Failed to generate event announcement", { eventSlug: event.slug }, error as Error)
-      // Fallback to simple template
       return this.fallbackAnnouncement(event)
     }
   }
@@ -166,9 +166,6 @@ export class GeminiClient {
     }
   }
 
-  /**
-   * Fallback announcement template (if AI fails)
-   */
   private fallbackAnnouncement(event: EventContext): LinkedInPostContent {
     const startDate = new Date(event.start).toLocaleDateString("en-US", {
       month: "long",
@@ -176,13 +173,13 @@ export class GeminiClient {
       year: "numeric",
     })
 
-    const text = `📢 Exciting news! ${event.name} is coming to ${event.location.city}, ${event.location.country} on ${startDate}!
+    const text = `Exciting news! ${event.name} is coming to ${event.location.city}, ${event.location.country} on ${startDate}!
 
 Join us for an amazing gathering of agile practitioners and game facilitators. Learn, play, and connect with the #play14 community.
 
 Register now: ${process.env.FRONTEND_URL}/events/${event.slug}
 
-#play14 #agile #games #${event.location.city.toLowerCase().replace(/\s+/g, "")}`
+#play14 #agile #games`
 
     return {
       text,
@@ -192,14 +189,10 @@ Register now: ${process.env.FRONTEND_URL}/events/${event.slug}
     }
   }
 
-  /**
-   * Fallback reminder template (if AI fails)
-   */
   private fallbackReminder(event: EventContext, daysUntil: number): LinkedInPostContent {
     const urgency = daysUntil === 7 ? "Only 1 week left" : `${daysUntil} days to go`
-    const emoji = daysUntil === 7 ? "⏰" : "📅"
 
-    const text = `${emoji} ${urgency}! Don't miss ${event.name} in ${event.location.city}!
+    const text = `${urgency}! Don't miss ${event.name} in ${event.location.city}!
 
 ${daysUntil === 7 ? "Last chance to register!" : "Early bird registration available!"}
 
@@ -221,11 +214,10 @@ Learn more: ${process.env.FRONTEND_URL}/events/${event.slug}
  */
 export function createGeminiClient(): GeminiClient {
   const apiKey = process.env.GEMINI_API_KEY
-  const model = process.env.GEMINI_MODEL || "gemini-1.5-flash"
 
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is required")
   }
 
-  return new GeminiClient(apiKey, model)
+  return new GeminiClient(apiKey)
 }

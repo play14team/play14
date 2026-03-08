@@ -14,14 +14,14 @@ const log = createLogger("[PostComposer]")
 /**
  * Build event context from Strapi event document
  */
-function buildEventContext(event: any): EventContext {
+export function buildEventContext(event: any): EventContext {
   // Select best image (default image or first gallery image)
   let imageUrl: string | undefined
 
   if (event.defaultImage?.url) {
     imageUrl = event.defaultImage.url
-  } else if (event.gallery && event.gallery.length > 0) {
-    imageUrl = event.gallery[0].url
+  } else if (event.images && event.images.length > 0) {
+    imageUrl = event.images[0].url
   }
 
   // Build full image URL
@@ -53,14 +53,24 @@ function buildEventContext(event: any): EventContext {
  */
 export async function composeEventAnnouncement(
   strapi: Core.Strapi,
-  event: any
+  event: any,
+  customContent?: string
 ): Promise<LinkedInPostContent> {
   log.info("Composing event announcement", { eventSlug: event.slug })
 
+  const eventContext = buildEventContext(event)
+
+  if (customContent) {
+    return {
+      text: customContent,
+      imageUrl: eventContext.imageUrl,
+      link: `${process.env.FRONTEND_URL}/events/${event.slug}`,
+      hashtags: [],
+    }
+  }
+
   try {
     const geminiClient = createGeminiClient()
-    const eventContext = buildEventContext(event)
-
     const post = await geminiClient.generateEventAnnouncement(eventContext)
 
     log.info("Event announcement composed", { eventSlug: event.slug, textLength: post.text.length })
@@ -78,14 +88,24 @@ export async function composeEventAnnouncement(
 export async function composeEventReminder(
   strapi: Core.Strapi,
   event: any,
-  daysUntil: number
+  daysUntil: number,
+  customContent?: string
 ): Promise<LinkedInPostContent> {
   log.info("Composing event reminder", { eventSlug: event.slug, daysUntil })
 
+  const eventContext = buildEventContext(event)
+
+  if (customContent) {
+    return {
+      text: customContent,
+      imageUrl: eventContext.imageUrl,
+      link: `${process.env.FRONTEND_URL}/events/${event.slug}`,
+      hashtags: [],
+    }
+  }
+
   try {
     const geminiClient = createGeminiClient()
-    const eventContext = buildEventContext(event)
-
     const post =
       daysUntil === 30
         ? await geminiClient.generateReminder30Days(eventContext)

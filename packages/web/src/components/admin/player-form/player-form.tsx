@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import type { LinkedInAccountStatus } from "@/app/(admin)/admin/linkedin/linkedin.action"
 import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
 import {
   type PlayerUpdateData as AdminUpdateData,
@@ -77,6 +78,7 @@ interface Props {
   stripeAccount?: StripeAccountStatus | null
   settingsData?: SettingsData | null
   adminSettings?: PlayerSettingsData | null
+  linkedInAccount?: LinkedInAccountStatus | null
 }
 
 /**
@@ -170,6 +172,7 @@ export default function PlayerForm({
   stripeAccount,
   settingsData,
   adminSettings,
+  linkedInAccount,
 }: Props) {
   const router = useRouter()
   const toast = useToast()
@@ -710,6 +713,7 @@ export default function PlayerForm({
             username={settingsData.username}
             defaultTshirtSize={settingsData.defaultTshirtSize}
             defaultFoodPreferences={settingsData.defaultFoodPreferences}
+            linkedInAccount={isOrganizer ? (linkedInAccount ?? null) : null}
           />
         </div>
       )}

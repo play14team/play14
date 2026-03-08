@@ -106,6 +106,12 @@
       "target": "api::stripe-account.stripe-account",
       "mappedBy": "player"
     },
+    "linkedinAccount": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::linkedin-account.linkedin-account",
+      "mappedBy": "player"
+    },
     "defaultTshirtSize": {
       "type": "enumeration",
       "enum": ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "none"],

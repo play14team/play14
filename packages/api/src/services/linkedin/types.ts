@@ -13,33 +13,35 @@ export interface OAuthTokens {
   accessToken: string
   refreshToken?: string
   expiresAt: Date
-  organizationId: string
+  linkedinUserId: string
 }
 
-export interface LinkedInUGCPost {
-  author: string // URN format: urn:li:organization:{id}
-  lifecycleState: "PUBLISHED"
-  specificContent: {
-    "com.linkedin.ugc.ShareContent": {
-      shareCommentary: {
-        text: string
-      }
-      shareMediaCategory: "NONE" | "IMAGE" | "ARTICLE"
-      media?: Array<{
-        status: "READY"
-        description?: {
-          text: string
-        }
-        media: string // URN of uploaded media
-        title?: {
-          text: string
-        }
-      }>
+/**
+ * LinkedIn Posts API payload (v202401+)
+ * Used with /rest/posts endpoint
+ */
+export interface LinkedInPostPayload {
+  author: string // urn:li:person:{linkedinUserId}
+  commentary: string
+  visibility: "PUBLIC" | "CONNECTIONS"
+  distribution: {
+    feedDistribution: "MAIN_FEED"
+    targetEntities: []
+    thirdPartyDistributionChannels: []
+  }
+  content?: {
+    media?: {
+      title?: string
+      id: string // urn:li:image:{assetId}
+    }
+    article?: {
+      source: string // URL
+      title?: string
+      description?: string
     }
   }
-  visibility: {
-    "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
-  }
+  lifecycleState: "PUBLISHED"
+  isReshareDisabledByAuthor: false
 }
 
 export interface LinkedInImageUploadRequest {

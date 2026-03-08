@@ -1315,6 +1315,52 @@ export interface ApiLikedItemLikedItem extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiLinkedinAccountLinkedinAccount
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'linkedin_accounts';
+  info: {
+    description: 'Connected LinkedIn accounts for event hosts';
+    displayName: 'LinkedIn Account';
+    pluralName: 'linkedin-accounts';
+    singularName: 'linkedin-account';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    accessToken: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private;
+    accountStatus: Schema.Attribute.Enumeration<
+      ['pending', 'active', 'expired', 'revoked']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
+    connectedAt: Schema.Attribute.DateTime;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    displayName: Schema.Attribute.String;
+    linkedinUserId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::linkedin-account.linkedin-account'
+    > &
+      Schema.Attribute.Private;
+    player: Schema.Attribute.Relation<'oneToOne', 'api::player.player'>;
+    profileUrl: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    refreshToken: Schema.Attribute.Text & Schema.Attribute.Private;
+    tokenExpiresAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiLinkedinPostLinkedinPost
   extends Struct.CollectionTypeSchema {
   collectionName: 'linkedin_posts';
@@ -1517,6 +1563,10 @@ export interface ApiPlayerPlayer extends Struct.CollectionTypeSchema {
     likedItems: Schema.Attribute.Relation<
       'manyToMany',
       'api::liked-item.liked-item'
+    >;
+    linkedinAccount: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::linkedin-account.linkedin-account'
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -2741,6 +2791,7 @@ declare module '@strapi/strapi' {
       'api::history.history': ApiHistoryHistory;
       'api::home.home': ApiHomeHome;
       'api::liked-item.liked-item': ApiLikedItemLikedItem;
+      'api::linkedin-account.linkedin-account': ApiLinkedinAccountLinkedinAccount;
       'api::linkedin-post.linkedin-post': ApiLinkedinPostLinkedinPost;
       'api::linkedin-token.linkedin-token': ApiLinkedinTokenLinkedinToken;
       'api::newsletter-send.newsletter-send': ApiNewsletterSendNewsletterSend;

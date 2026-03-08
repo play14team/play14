@@ -395,9 +395,18 @@ export const NEWSLETTER_ACTIONS = {
 } as const
 
 // ==================== LINKEDIN ====================
+export const LINKEDIN_ACCOUNT_ACTIONS = {
+  GET_AUTH_URL: "api::linkedin-account.custom-linkedin-account.getAuthorizationUrl",
+  HANDLE_CALLBACK: "api::linkedin-account.custom-linkedin-account.handleCallback",
+  GET_STATUS: "api::linkedin-account.custom-linkedin-account.getAccountStatus",
+  DISCONNECT: "api::linkedin-account.custom-linkedin-account.disconnectAccount",
+} as const
+
 export const LINKEDIN_POST_ACTIONS = {
   PREVIEW: "api::linkedin-post.custom-linkedin-post.previewPost",
   POST_MANUALLY: "api::linkedin-post.custom-linkedin-post.postManually",
+  GET_HISTORY: "api::linkedin-post.custom-linkedin-post.getPostHistory",
+  REGENERATE: "api::linkedin-post.custom-linkedin-post.regenerateContent",
 } as const
 
 // ==================== NEWSLETTER SEND ====================

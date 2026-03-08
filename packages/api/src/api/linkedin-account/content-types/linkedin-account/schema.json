@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "linkedin_accounts",
+  "info": {
+    "singularName": "linkedin-account",
+    "pluralName": "linkedin-accounts",
+    "displayName": "LinkedIn Account",
+    "description": "Connected LinkedIn accounts for event hosts"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "linkedinUserId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "player": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::player.player",
+      "inversedBy": "linkedinAccount"
+    },
+    "accessToken": {
+      "type": "text",
+      "required": true,
+      "private": true
+    },
+    "refreshToken": {
+      "type": "text",
+      "private": true
+    },
+    "tokenExpiresAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "accountStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "active", "expired", "revoked"],
+      "default": "pending",
+      "required": true
+    },
+    "displayName": {
+      "type": "string"
+    },
+    "profileUrl": {
+      "type": "string"
+    },
+    "connectedAt": {
+      "type": "datetime"
+    }
+  }
+}

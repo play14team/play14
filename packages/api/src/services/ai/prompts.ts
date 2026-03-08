@@ -29,7 +29,7 @@ function formatDateRange(start: string, end: string): string {
  */
 export function createAnnouncementPrompt(event: EventContext): string {
   const dateRange = formatDateRange(event.start, event.end)
-  const hosts = event.hosts.map((h) => `${h.firstName} ${h.lastName}`).join(", ")
+  const hosts = event.hosts.map((h) => h.name).join(", ")
 
   return `Create an engaging LinkedIn post announcing a #play14 event with the following details:
 

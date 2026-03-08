@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import type { LinkedInAccountStatus } from "@/app/(admin)/admin/linkedin/linkedin.action"
+import LinkedInConnect from "@/components/admin/linkedin-connect"
 import { subscribeToNewsletter } from "@/components/newsletter/subscribe.action"
 import { useToast } from "../toast"
 import { changePassword, updateMySettings } from "./settings.action"
@@ -12,6 +14,7 @@ interface SettingsTabProps {
   username: string
   defaultTshirtSize: string
   defaultFoodPreferences: string
+  linkedInAccount?: LinkedInAccountStatus | null
 }
 
 export default function SettingsTab({
@@ -19,6 +22,7 @@ export default function SettingsTab({
   username,
   defaultTshirtSize: initialTshirtSize,
   defaultFoodPreferences: initialFoodPreferences,
+  linkedInAccount,
 }: SettingsTabProps) {
   const toast = useToast()
 
@@ -238,6 +242,18 @@ export default function SettingsTab({
           </button>
         </form>
       </div>
+
+      {/* LinkedIn */}
+      {linkedInAccount !== undefined && (
+        <div className="admin-form-section">
+          <h2>LinkedIn</h2>
+          <p className="admin-form-section-description">
+            Connect your LinkedIn account to post event announcements and reminders from your
+            personal profile.
+          </p>
+          <LinkedInConnect account={linkedInAccount ?? null} />
+        </div>
+      )}
 
       {/* Newsletter */}
       <div className="admin-form-section">

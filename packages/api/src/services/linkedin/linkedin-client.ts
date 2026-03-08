@@ -1,105 +1,86 @@
 /**
- * LinkedIn Marketing API client for organization page posting
- * OAuth 2.0 authentication with refresh token support
+ * LinkedIn Posts API client for personal account posting
+ * Uses the Posts API (/rest/posts) with LinkedIn-Version: 202401 header
  */
 
-import type { Core } from "@strapi/strapi"
 import { createLogger } from "../observability/logger"
-import { getAccessToken, getOrganizationId } from "./oauth"
-import type {
-  LinkedInImageUploadRequest,
-  LinkedInImageUploadResponse,
-  LinkedInPostContent,
-  LinkedInUGCPost,
-} from "./types"
+import type { LinkedInPostContent } from "./types"
 
 const log = createLogger("[LinkedIn]")
 
 export class LinkedInClient {
-  private strapi: Core.Strapi
-  private baseUrl = "https://api.linkedin.com/v2"
+  private accessToken: string
+  private linkedinUserId: string
+  private baseUrl = "https://api.linkedin.com"
+  private apiVersion = "202401"
 
-  constructor(strapi: Core.Strapi) {
-    this.strapi = strapi
+  constructor(accessToken: string, linkedinUserId: string) {
+    this.accessToken = accessToken
+    this.linkedinUserId = linkedinUserId
   }
 
   /**
-   * Get authorization headers
+   * Get authorization headers for Posts API
    */
-  private async getHeaders(): Promise<Record<string, string>> {
-    const accessToken = await getAccessToken(this.strapi)
-
+  private getHeaders(): Record<string, string> {
     return {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${this.accessToken}`,
       "Content-Type": "application/json",
+      "LinkedIn-Version": this.apiVersion,
       "X-Restli-Protocol-Version": "2.0.0",
     }
   }
 
   /**
-   * Upload image to LinkedIn
+   * Upload image to LinkedIn for use in posts
    */
   private async uploadImage(imageUrl: string): Promise<string> {
     log.info("Uploading image to LinkedIn", { imageUrl })
 
     try {
-      const organizationId = await getOrganizationId(this.strapi)
-      const ownerUrn = `urn:li:organization:${organizationId}`
+      const ownerUrn = `urn:li:person:${this.linkedinUserId}`
 
-      // Step 1: Register upload
-      const registerRequest: LinkedInImageUploadRequest = {
-        registerUploadRequest: {
-          recipes: ["urn:li:digitalmediaRecipe:feedshare-image"],
-          owner: ownerUrn,
-          serviceRelationships: [
-            {
-              relationshipType: "OWNER",
-              identifier: "urn:li:userGeneratedContent",
-            },
-          ],
-        },
-      }
-
-      const headers = await this.getHeaders()
-      const registerResponse = await fetch(`${this.baseUrl}/assets?action=registerUpload`, {
+      // Step 1: Initialize upload
+      const initResponse = await fetch(`${this.baseUrl}/rest/images?action=initializeUpload`, {
         method: "POST",
-        headers,
-        body: JSON.stringify(registerRequest),
+        headers: this.getHeaders(),
+        body: JSON.stringify({
+          initializeUploadRequest: {
+            owner: ownerUrn,
+          },
+        }),
       })
 
-      if (!registerResponse.ok) {
-        const errorText = await registerResponse.text()
-        log.error("Failed to register image upload", {
-          status: registerResponse.status,
+      if (!initResponse.ok) {
+        const errorText = await initResponse.text()
+        log.error("Failed to initialize image upload", {
+          status: initResponse.status,
           error: errorText,
         })
-        throw new Error(`LinkedIn upload registration failed: ${registerResponse.status}`)
+        throw new Error(`LinkedIn image upload init failed: ${initResponse.status}`)
       }
 
-      const registerData = (await registerResponse.json()) as LinkedInImageUploadResponse
+      const initData = (await initResponse.json()) as {
+        value: {
+          uploadUrl: string
+          image: string // urn:li:image:{id}
+        }
+      }
 
-      // Step 2: Download image from URL
+      // Step 2: Download image from source URL
       const imageResponse = await fetch(imageUrl)
       if (!imageResponse.ok) {
         throw new Error(`Failed to fetch image from ${imageUrl}`)
       }
-
-      const imageBlob = await imageResponse.blob()
-      const imageBuffer = await imageBlob.arrayBuffer()
+      const imageBuffer = await imageResponse.arrayBuffer()
 
       // Step 3: Upload image binary
-      const uploadUrl =
-        registerData.value.uploadMechanism[
-          "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
-        ].uploadUrl
-      const uploadHeaders =
-        registerData.value.uploadMechanism[
-          "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest"
-        ].headers
-
-      const uploadResponse = await fetch(uploadUrl, {
+      const uploadResponse = await fetch(initData.value.uploadUrl, {
         method: "PUT",
-        headers: uploadHeaders,
+        headers: {
+          Authorization: `Bearer ${this.accessToken}`,
+          "Content-Type": "application/octet-stream",
+        },
         body: imageBuffer,
       })
 
@@ -112,11 +93,10 @@ export class LinkedInClient {
         throw new Error(`LinkedIn image upload failed: ${uploadResponse.status}`)
       }
 
-      const assetUrn = registerData.value.asset
+      const imageUrn = initData.value.image
+      log.info("Image uploaded successfully", { imageUrn })
 
-      log.info("Image uploaded successfully", { assetUrn })
-
-      return assetUrn
+      return imageUrn
     } catch (error) {
       log.error("Failed to upload image to LinkedIn", { imageUrl }, error as Error)
       throw error
@@ -124,53 +104,52 @@ export class LinkedInClient {
   }
 
   /**
-   * Create a post on LinkedIn organization page
+   * Create a post on the user's personal LinkedIn profile
+   * Uses the Posts API (/rest/posts)
    */
   async createPost(content: LinkedInPostContent): Promise<string> {
     log.info("Creating LinkedIn post", { hasImage: !!content.imageUrl })
 
     try {
-      const organizationId = await getOrganizationId(this.strapi)
-      const authorUrn = `urn:li:organization:${organizationId}`
+      const authorUrn = `urn:li:person:${this.linkedinUserId}`
 
       // Upload image if provided
-      let mediaUrn: string | undefined
+      let imageUrn: string | undefined
       if (content.imageUrl) {
-        mediaUrn = await this.uploadImage(content.imageUrl)
+        try {
+          imageUrn = await this.uploadImage(content.imageUrl)
+        } catch (error) {
+          log.warn("Image upload failed, posting without image", {}, error as Error)
+        }
       }
 
-      // Build UGC post payload
-      const postPayload: LinkedInUGCPost = {
+      // Build Posts API payload
+      const postPayload: Record<string, unknown> = {
         author: authorUrn,
+        commentary: content.text,
+        visibility: "PUBLIC",
+        distribution: {
+          feedDistribution: "MAIN_FEED",
+          targetEntities: [],
+          thirdPartyDistributionChannels: [],
+        },
         lifecycleState: "PUBLISHED",
-        specificContent: {
-          "com.linkedin.ugc.ShareContent": {
-            shareCommentary: {
-              text: content.text,
-            },
-            shareMediaCategory: mediaUrn ? "IMAGE" : content.link ? "ARTICLE" : "NONE",
-            ...(mediaUrn && {
-              media: [
-                {
-                  status: "READY",
-                  media: mediaUrn,
-                  title: {
-                    text: "Event Image",
-                  },
-                },
-              ],
-            }),
-          },
-        },
-        visibility: {
-          "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
-        },
+        isReshareDisabledByAuthor: false,
       }
 
-      const headers = await this.getHeaders()
-      const response = await fetch(`${this.baseUrl}/ugcPosts`, {
+      // Add image content if uploaded
+      if (imageUrn) {
+        postPayload.content = {
+          media: {
+            title: "Event image",
+            id: imageUrn,
+          },
+        }
+      }
+
+      const response = await fetch(`${this.baseUrl}/rest/posts`, {
         method: "POST",
-        headers,
+        headers: this.getHeaders(),
         body: JSON.stringify(postPayload),
       })
 
@@ -183,8 +162,8 @@ export class LinkedInClient {
         throw new Error(`LinkedIn post creation failed: ${response.status} - ${errorText}`)
       }
 
-      const responseData = (await response.json()) as { id: string }
-      const postId = responseData.id
+      // The Posts API returns the post ID in the x-restli-id header
+      const postId = response.headers.get("x-restli-id") || "unknown"
 
       log.info("LinkedIn post created successfully", { postId })
 
@@ -197,14 +176,12 @@ export class LinkedInClient {
 }
 
 /**
- * Create a LinkedIn client instance
+ * Create a LinkedIn client instance for a specific player
  */
-export function createLinkedInClient(strapi: Core.Strapi): LinkedInClient {
-  const enabled = process.env.LINKEDIN_ENABLED !== "false"
-
-  if (!enabled) {
-    throw new Error("LinkedIn integration is disabled (LINKEDIN_ENABLED=false)")
+export function createLinkedInClient(accessToken: string, linkedinUserId: string): LinkedInClient {
+  if (process.env.LINKEDIN_ENABLED !== "true") {
+    throw new Error("LinkedIn integration is disabled (LINKEDIN_ENABLED != true)")
   }
 
-  return new LinkedInClient(strapi)
+  return new LinkedInClient(accessToken, linkedinUserId)
 }

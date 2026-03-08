@@ -20,6 +20,7 @@ import {
   cleanAbandonedDraftOrders,
   cleanExpiredTicketOrders,
   processEventResultsReminders,
+  processLinkedInReminders,
   reservationHealthCheck,
   updateEventStatus,
   updatePlayerPositions,
@@ -198,6 +199,19 @@ const cronTasks = {
       })
     ),
     options: { rule: "0 */5 * * * *" },
+  },
+
+  // Daily at 07:00 - Post LinkedIn reminders for upcoming events
+  linkedInReminders: {
+    task: withLock(
+      "linkedInReminders",
+      withSentry("linkedInReminders", async ({ strapi }) => {
+        if (process.env.LINKEDIN_ENABLED !== "true") return
+        await processLinkedInReminders(strapi!)
+      }),
+      10 * 60 * 1000
+    ),
+    options: { rule: "0 0 7 * * *" },
   },
 
   // Daily at 06:00 - Send event results reminders

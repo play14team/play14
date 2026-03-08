@@ -2,42 +2,8 @@
  * Type definitions for AI services
  */
 
-export interface LinkedInPostContent {
-  text: string
-  imageUrl?: string
-  link?: string
-  hashtags: string[]
-}
-
-export interface GeminiRequest {
-  contents: {
-    parts: {
-      text: string
-    }[]
-  }[]
-  generationConfig?: {
-    temperature?: number
-    topK?: number
-    topP?: number
-    maxOutputTokens?: number
-  }
-}
-
-export interface GeminiResponse {
-  candidates: {
-    content: {
-      parts: {
-        text: string
-      }[]
-    }
-    finishReason: string
-  }[]
-  usageMetadata?: {
-    promptTokenCount: number
-    candidatesTokenCount: number
-    totalTokenCount: number
-  }
-}
+// Re-export from LinkedIn types for backwards compatibility
+export type { LinkedInPostContent } from "../linkedin/types"
 
 export interface EventContext {
   name: string
@@ -50,8 +16,7 @@ export interface EventContext {
     country: string
   }
   hosts: Array<{
-    firstName: string
-    lastName: string
+    name: string
   }>
   description?: string
   imageUrl?: string

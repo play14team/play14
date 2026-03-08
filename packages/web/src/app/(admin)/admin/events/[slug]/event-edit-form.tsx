@@ -28,6 +28,7 @@ import BasicsTab from "./tabs/basics-tab"
 import BudgetTab from "./tabs/budget-tab"
 import ContentTab from "./tabs/content-tab"
 import FinanceTab from "./tabs/finance-tab"
+import LinkedInTab from "./tabs/linkedin-tab"
 import MediaTab from "./tabs/media-tab"
 import ParticipantsTab from "./tabs/participants-tab"
 import ResultsTab from "./tabs/results-tab"
@@ -397,6 +398,8 @@ export default function EventEditForm({
           )}
 
           {activeTab === "finance" && <FinanceTab eventDocumentId={event.documentId} />}
+
+          {activeTab === "linkedin" && <LinkedInTab eventSlug={event.slug} />}
         </div>
 
         <EventEditActions

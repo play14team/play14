@@ -17,6 +17,11 @@
       "relation": "manyToOne",
       "target": "api::event.event"
     },
+    "player": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::player.player"
+    },
     "postType": {
       "type": "enumeration",
       "enum": ["announcement", "reminder30days", "reminder7days", "manual"],

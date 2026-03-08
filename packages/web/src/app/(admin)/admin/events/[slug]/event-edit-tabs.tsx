@@ -10,6 +10,7 @@ export const TAB_IDS = [
   "budget",
   "actuals",
   "finance",
+  "linkedin",
 ] as const
 export type TabId = (typeof TAB_IDS)[number]
 
@@ -29,6 +30,7 @@ const TABS: Tab[] = [
   { id: "budget", label: "Budget", icon: "bx-calculator" },
   { id: "actuals", label: "Results", icon: "bx-receipt" },
   { id: "finance", label: "Summary", icon: "bx-dollar-circle" },
+  { id: "linkedin", label: "LinkedIn", icon: "bxl-linkedin-square" },
 ]
 
 interface EventEditTabsProps {

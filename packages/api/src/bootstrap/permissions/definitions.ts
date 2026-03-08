@@ -29,6 +29,7 @@ import {
   I18N_ACTIONS,
   IMPORT_ACTIONS,
   LIKED_ITEM_ACTIONS,
+  LINKEDIN_ACCOUNT_ACTIONS,
   LINKEDIN_POST_ACTIONS,
   MEDIA_FILE_ACTIONS,
   MEDIA_FOLDER_ACTIONS,
@@ -72,9 +73,17 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   // Newsletter subscription (public)
   { action: NEWSLETTER_ACTIONS.SUBSCRIBE, minimumRole: ROLE_TYPES.PUBLIC },
 
+  // LinkedIn account management (Host+ can connect/manage)
+  { action: LINKEDIN_ACCOUNT_ACTIONS.GET_AUTH_URL, minimumRole: ROLE_TYPES.HOST },
+  { action: LINKEDIN_ACCOUNT_ACTIONS.HANDLE_CALLBACK, minimumRole: ROLE_TYPES.PUBLIC },
+  { action: LINKEDIN_ACCOUNT_ACTIONS.GET_STATUS, minimumRole: ROLE_TYPES.HOST },
+  { action: LINKEDIN_ACCOUNT_ACTIONS.DISCONNECT, minimumRole: ROLE_TYPES.HOST },
+
   // LinkedIn post management (Host+ can preview/post)
   { action: LINKEDIN_POST_ACTIONS.PREVIEW, minimumRole: ROLE_TYPES.HOST },
   { action: LINKEDIN_POST_ACTIONS.POST_MANUALLY, minimumRole: ROLE_TYPES.HOST },
+  { action: LINKEDIN_POST_ACTIONS.GET_HISTORY, minimumRole: ROLE_TYPES.HOST },
+  { action: LINKEDIN_POST_ACTIONS.REGENERATE, minimumRole: ROLE_TYPES.HOST },
 
   // User me (needed for auth flow)
   { action: USER_ACTIONS.ME, minimumRole: ROLE_TYPES.PUBLIC },
