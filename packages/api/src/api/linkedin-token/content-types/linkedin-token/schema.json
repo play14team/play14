@@ -1,0 +1,33 @@
+{
+  "kind": "singleType",
+  "collectionName": "linkedin_token",
+  "info": {
+    "singularName": "linkedin-token",
+    "pluralName": "linkedin-tokens",
+    "displayName": "LinkedIn Token",
+    "description": "OAuth tokens for LinkedIn integration"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "accessToken": {
+      "type": "text",
+      "required": true,
+      "private": true
+    },
+    "refreshToken": {
+      "type": "text",
+      "private": true
+    },
+    "expiresAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "organizationId": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

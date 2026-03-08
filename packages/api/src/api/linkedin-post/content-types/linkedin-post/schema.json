@@ -1,0 +1,47 @@
+{
+  "kind": "collectionType",
+  "collectionName": "linkedin_posts",
+  "info": {
+    "singularName": "linkedin-post",
+    "pluralName": "linkedin-posts",
+    "displayName": "LinkedIn Post",
+    "description": "Audit trail for LinkedIn posts"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "event": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::event.event"
+    },
+    "postType": {
+      "type": "enumeration",
+      "enum": ["announcement", "reminder30days", "reminder7days", "manual"],
+      "required": true
+    },
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "linkedInPostId": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "string"
+    },
+    "postStatus": {
+      "type": "enumeration",
+      "enum": ["draft", "published", "failed"],
+      "default": "draft"
+    },
+    "postedAt": {
+      "type": "datetime"
+    },
+    "errorMessage": {
+      "type": "text"
+    }
+  }
+}
