@@ -447,3 +447,58 @@
     }
   }
 }
+
+// ===========================================
+// Settings Tab
+// ===========================================
+
+.settings-account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+
+  > i {
+    font-size: 20px;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+.settings-info-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-info-value {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.settings-password-row,
+.settings-defaults-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}

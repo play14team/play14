@@ -88,7 +88,8 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_snapshot",
       "Bash(npx @biomejs/biome lint:*)",
-      "WebFetch(domain:api.sender.net)"
+      "WebFetch(domain:api.sender.net)",
+      "Bash(bunx biome:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
@@ -100,7 +101,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/biome-hook.mjs"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && node .claude/biome-hook.mjs'"
           }
         ]
       },
@@ -109,7 +110,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/play-sound.sh question"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && .claude/play-sound.sh question'"
           }
         ]
       }
@@ -119,7 +120,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/play-sound.sh done"
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && .claude/play-sound.sh done'"
           }
         ]
       }
