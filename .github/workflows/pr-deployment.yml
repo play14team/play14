@@ -237,7 +237,7 @@ jobs:
         run: az acr login --name play14containerregistry
 
       - name: Build and push container image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: |
@@ -479,7 +479,7 @@ jobs:
         run: az acr login --name play14containerregistry
 
       - name: Build and push container image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: |

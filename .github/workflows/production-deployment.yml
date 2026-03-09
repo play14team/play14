@@ -174,7 +174,7 @@ jobs:
       - name: Build and push container image
         env:
           COMMIT_SHA: ${{ github.sha }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: |
@@ -378,7 +378,7 @@ jobs:
       - name: Build and push container image
         env:
           COMMIT_SHA: ${{ github.sha }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           tags: |
