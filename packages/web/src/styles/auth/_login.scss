@@ -231,6 +231,22 @@
   }
 }
 
+.auth-forgot-password-link {
+  margin: 8px 0 0;
+  font-size: 13px;
+  text-align: right;
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-orange);
+      text-decoration: underline;
+    }
+  }
+}
+
 .auth-register-link {
   margin: 16px 0 0;
   font-size: 14px;

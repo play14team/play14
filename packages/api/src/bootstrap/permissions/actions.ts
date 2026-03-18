@@ -73,6 +73,8 @@ export const EVENT_ACTIONS = {
   GET_PARTICIPANT_STATS: "api::event.custom-event.getParticipantStats",
   CHECK_IN_PARTICIPANT: "api::event.custom-event.checkInParticipant",
   UNDO_CHECK_IN: "api::event.custom-event.undoCheckIn",
+  GET_TRANSLATION: "api::event.custom-event.getTranslation",
+  UPDATE_TRANSLATION: "api::event.custom-event.updateTranslation",
 } as const
 
 // ==================== PLAYERS ====================
@@ -231,12 +233,6 @@ export const EVENT_LOCATION_ACTIONS = {
   CREATE_ADMIN: "api::event-location.custom-event-location.create",
   UPDATE_ADMIN: "api::event-location.custom-event-location.update",
   DELETE_ADMIN: "api::event-location.custom-event-location.delete",
-} as const
-
-export const FORMAT_ACTIONS = {
-  FIND: "api::format.format.find",
-  UPDATE: "api::format.format.update",
-  DELETE: "api::format.format.delete",
 } as const
 
 export const GAME_ACTIONS = {
@@ -420,4 +416,9 @@ export const NEWSLETTER_SEND_ACTIONS = {
   AI_GENERATE: "api::newsletter-send.custom-newsletter-send.aiGenerate",
   AI_IMPROVE: "api::newsletter-send.custom-newsletter-send.aiImprove",
   AI_SUGGEST_SUBJECTS: "api::newsletter-send.custom-newsletter-send.aiSuggestSubjects",
+} as const
+
+// ==================== TRANSLATION ====================
+export const TRANSLATE_ACTIONS = {
+  TRANSLATE: "api::translate.translate.translate",
 } as const

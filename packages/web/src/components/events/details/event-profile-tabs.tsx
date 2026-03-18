@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useMemo } from "react"
 import type {
   ComponentEventsSponsorship,
@@ -28,6 +29,7 @@ export default function EventProfileTabs({
   hosts,
   mentors,
 }: EventProfileTabsProps) {
+  const t = useTranslations("events")
   // Runtime validation: Strapi API may return null/undefined instead of empty arrays
   // for unpopulated relations, despite TypeScript types suggesting otherwise.
   const timetable = Array.isArray(event.timetable)
@@ -77,22 +79,22 @@ export default function EventProfileTabs({
         <TabsList>
           <TabsTrigger value="overview">
             <i className="bx bx-info-circle" />
-            Overview
+            {t("tabs.overview")}
           </TabsTrigger>
           <TabsTrigger value="schedule">
             <i className="bx bx-time" />
-            Schedule
+            {t("tabs.schedule")}
           </TabsTrigger>
           <TabsTrigger value="players">
             <i className="bx bx-group" />
-            Players
+            {t("tabs.players")}
             {participantCount > 0 && (
               <span className="event-profile-content__tab-count">{participantCount}</span>
             )}
           </TabsTrigger>
           <TabsTrigger value="photos">
             <i className="bx bx-images" />
-            Photos
+            {t("tabs.photos")}
             {imageCount > 0 && (
               <span className="event-profile-content__tab-count">{imageCount}</span>
             )}
@@ -114,14 +116,14 @@ export default function EventProfileTabs({
             {/* Team (Hosts) */}
             {hosts && hosts.length > 0 && (
               <div className="event-profile-content__section">
-                <PlayerGrid title="Team" players={hosts} />
+                <PlayerGrid title={t("playerGrid.team")} players={hosts} />
               </div>
             )}
 
             {/* Mentors */}
             {mentors && mentors.length > 0 && (
               <div className="event-profile-content__section">
-                <PlayerGrid title="Mentors" players={mentors} />
+                <PlayerGrid title={t("playerGrid.mentors")} players={mentors} />
               </div>
             )}
 
@@ -141,19 +143,16 @@ export default function EventProfileTabs({
           {hasSchedule ? (
             <EventSchedule timetable={timetable} />
           ) : (
-            <EmptyState
-              icon="bx-time"
-              text="The schedule for this event has not been published yet."
-            />
+            <EmptyState icon="bx-time" text={t("empty.schedule")} />
           )}
         </TabsContent>
 
         {/* Players Tab */}
         <TabsContent value="players">
           {participantCount > 0 ? (
-            <PlayerGrid title="Players" players={participants} />
+            <PlayerGrid title={t("playerGrid.players")} players={participants} />
           ) : (
-            <EmptyState icon="bx-group" text="No players have registered for this event yet." />
+            <EmptyState icon="bx-group" text={t("empty.players")} />
           )}
         </TabsContent>
 
@@ -162,7 +161,7 @@ export default function EventProfileTabs({
           {imageCount > 0 ? (
             <Gallery images={images} />
           ) : (
-            <EmptyState icon="bx-images" text="No photos have been uploaded for this event yet." />
+            <EmptyState icon="bx-images" text={t("empty.photos")} />
           )}
         </TabsContent>
       </Tabs>

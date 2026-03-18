@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
 
 interface EventTimerProps {
@@ -27,6 +28,7 @@ function calculateTimeLeft(targetDate: Date | string): TimeLeft {
 }
 
 export default function EventTimer({ date }: EventTimerProps) {
+  const t = useTranslations("events")
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => calculateTimeLeft(date))
   const [mounted, setMounted] = useState(false)
 
@@ -45,13 +47,13 @@ export default function EventTimer({ date }: EventTimerProps) {
   if (!mounted) {
     return (
       <div className="event-timer event-timer--loading">
-        <TimerUnit value={0} label="days" />
+        <TimerUnit value={0} label={t("timer.days")} />
         <span className="event-timer__separator">:</span>
-        <TimerUnit value={0} label="hours" />
+        <TimerUnit value={0} label={t("timer.hours")} />
         <span className="event-timer__separator">:</span>
-        <TimerUnit value={0} label="min" />
+        <TimerUnit value={0} label={t("timer.min")} />
         <span className="event-timer__separator">:</span>
-        <TimerUnit value={0} label="sec" />
+        <TimerUnit value={0} label={t("timer.sec")} />
       </div>
     )
   }
@@ -63,20 +65,20 @@ export default function EventTimer({ date }: EventTimerProps) {
     return (
       <span className="event-profile-hero__status event-profile-hero__status--in-progress">
         <i className="bx bx-play-circle" />
-        In progress
+        {t("timer.inProgress")}
       </span>
     )
   }
 
   return (
     <div className="event-timer">
-      <TimerUnit value={days} label="days" />
+      <TimerUnit value={days} label={t("timer.days")} />
       <span className="event-timer__separator">:</span>
-      <TimerUnit value={hours} label="hours" />
+      <TimerUnit value={hours} label={t("timer.hours")} />
       <span className="event-timer__separator">:</span>
-      <TimerUnit value={minutes} label="min" />
+      <TimerUnit value={minutes} label={t("timer.min")} />
       <span className="event-timer__separator">:</span>
-      <TimerUnit value={seconds} label="sec" />
+      <TimerUnit value={seconds} label={t("timer.sec")} />
     </div>
   )
 }

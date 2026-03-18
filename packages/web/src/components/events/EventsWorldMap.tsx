@@ -1,8 +1,11 @@
 "use client"
 
 import countries from "i18n-iso-countries"
-import en from "i18n-iso-countries/langs/en.json"
+import enCountries from "i18n-iso-countries/langs/en.json"
+import esCountries from "i18n-iso-countries/langs/es.json"
+import frCountries from "i18n-iso-countries/langs/fr.json"
 import { useRouter } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import WorldMap from "@/components/map/WorldMap"
@@ -13,8 +16,10 @@ import {
 } from "./get-events-grouped-by-country.action"
 import "./EventsWorldMap.scss"
 
-// Register English locale for country names
-countries.registerLocale(en)
+// Register locales for country names
+countries.registerLocale(enCountries)
+countries.registerLocale(frCountries)
+countries.registerLocale(esCountries)
 
 interface EventsWorldMapProps {
   interactive?: boolean
@@ -25,6 +30,8 @@ export default function EventsWorldMap({
   interactive = true,
   onCountryClick,
 }: EventsWorldMapProps) {
+  const t = useTranslations("events")
+  const locale = useLocale()
   const router = useRouter()
   const [selectedCountries, setSelectedCountries] = useState<string[]>([])
   const [eventsByCountry, setEventsByCountry] = useState<EventsByCountry>({})
@@ -178,7 +185,7 @@ export default function EventsWorldMap({
 
   // Format date for display
   function formatDate(timestamp: number): string {
-    return new Date(timestamp).toLocaleDateString("en-US", {
+    return new Date(timestamp).toLocaleDateString(locale, {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -200,12 +207,12 @@ export default function EventsWorldMap({
       startDate.getMonth() === endDate.getMonth() &&
       startDate.getFullYear() === endDate.getFullYear()
     ) {
-      return `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${endDate.getDate()}, ${endDate.getFullYear()}`
+      return `${startDate.toLocaleDateString(locale, { month: "short", day: "numeric" })} - ${endDate.getDate()}, ${endDate.getFullYear()}`
     }
 
     // If same year, show abbreviated format
     if (startDate.getFullYear() === endDate.getFullYear()) {
-      return `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${endDate.getFullYear()}`
+      return `${startDate.toLocaleDateString(locale, { month: "short", day: "numeric" })} - ${endDate.toLocaleDateString(locale, { month: "short", day: "numeric" })}, ${endDate.getFullYear()}`
     }
 
     // Different years, show full format
@@ -214,7 +221,7 @@ export default function EventsWorldMap({
 
   // Get country name from ISO code
   function getCountryName(code: string): string {
-    return countries.getName(code, "en") || code.toUpperCase()
+    return countries.getName(code, locale) || countries.getName(code, "en") || code.toUpperCase()
   }
 
   // Handle country click
@@ -296,21 +303,20 @@ export default function EventsWorldMap({
                     <div className="event-date">{formatDateRange(event.start, event.end)}</div>
                   </div>
                   <span className={`event-status status-${event.status.toLowerCase()}`}>
-                    {event.status}
+                    {t(`status.${event.status.toLowerCase()}` as Parameters<typeof t>[0])}
                   </span>
                 </div>
               ))}
 
               {eventsByCountry[hoveredCountry].length > 5 && (
                 <div className="more-events">
-                  +{eventsByCountry[hoveredCountry].length - 5} more event
-                  {eventsByCountry[hoveredCountry].length - 5 !== 1 ? "s" : ""}
+                  {t("map.moreEvents", { count: eventsByCountry[hoveredCountry].length - 5 })}
                 </div>
               )}
             </div>
           </>
         ) : (
-          <div className="no-events">No #play14 events</div>
+          <div className="no-events">{t("map.noEvents")}</div>
         )}
       </div>
     </div>
@@ -329,7 +335,7 @@ export default function EventsWorldMap({
           </div>
         ) : isLoading ? (
           <div className="loading-message" role="status" aria-live="polite">
-            Loading event locations...
+            {t("map.loading")}
           </div>
         ) : (
           <div className="map-wrapper">
@@ -365,7 +371,7 @@ export default function EventsWorldMap({
                       <input
                         type="text"
                         className="search-input"
-                        placeholder="Search countries..."
+                        placeholder={t("map.searchPlaceholder")}
                         value={searchQuery}
                         onChange={handleSearchChange}
                         aria-label="Search countries with events"
@@ -395,13 +401,12 @@ export default function EventsWorldMap({
                     </div>
                     {showNoResults && (
                       <div className="no-search-results">
-                        No countries found matching &quot;{searchQuery}&quot;
+                        {t("map.noCountriesFound", { query: searchQuery })}
                       </div>
                     )}
                     {filteredCountries.length > 0 && (
                       <div className="search-results-count">
-                        {filteredCountries.length} countr
-                        {filteredCountries.length === 1 ? "y" : "ies"}
+                        {t("map.countryCount", { count: filteredCountries.length })}
                       </div>
                     )}
                   </div>
@@ -415,19 +420,19 @@ export default function EventsWorldMap({
       <div className="map-legend">
         <span className="legend-item">
           <span className="legend-color" style={{ backgroundColor: "#7ac143" }} />
-          Over
+          {t("map.legendOver")}
         </span>
         <span className="legend-item">
           <span className="legend-color" style={{ backgroundColor: "#ffc20e" }} />
-          Announced
+          {t("map.legendAnnounced")}
         </span>
         <span className="legend-item">
           <span className="legend-color" style={{ backgroundColor: "#f47920" }} />
-          Open
+          {t("map.legendOpen")}
         </span>
         <span className="legend-item">
           <span className="legend-color" style={{ backgroundColor: "#ed1c24" }} />
-          Cancelled
+          {t("map.legendCancelled")}
         </span>
       </div>
 

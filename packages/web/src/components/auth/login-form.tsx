@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import Turnstile from "@/components/ui/turnstile"
 import { loginWithCredentials } from "./login.action"
@@ -10,6 +11,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ callbackUrl }: LoginFormProps) {
+  const t = useTranslations("auth.form")
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -26,13 +28,13 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
     const password = formData.get("password") as string
 
     if (!identifier || !password) {
-      setError("Please enter your email/username and password")
+      setError(t("enterCredentials"))
       return
     }
 
     // Check Turnstile verification if enabled
     if (turnstileSiteKey && !turnstileToken) {
-      setError("Please complete the CAPTCHA verification")
+      setError(t("completeCaptcha"))
       return
     }
 
@@ -43,7 +45,7 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
         router.push(callbackUrl)
         router.refresh()
       } else {
-        setError(result.error || "Unable to sign in. Please check your credentials and try again.")
+        setError(result.error || t("signInFailed"))
       }
     })
   }
@@ -57,7 +59,7 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
           type="text"
           id="identifier"
           name="identifier"
-          placeholder="Email or username"
+          placeholder={t("emailOrUsername")}
           autoComplete="username"
           disabled={isPending}
         />
@@ -68,14 +70,14 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
           type="password"
           id="password"
           name="password"
-          placeholder="Password"
+          placeholder={t("password")}
           autoComplete="current-password"
           disabled={isPending}
         />
       </div>
 
       <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
-        {isPending ? "Signing in..." : "Sign in"}
+        {isPending ? t("signingIn") : t("signIn")}
       </button>
 
       {turnstileSiteKey && (
@@ -85,11 +87,11 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
             onVerify={(token) => setTurnstileToken(token)}
             onError={() => {
               setTurnstileToken(null)
-              setError("CAPTCHA verification failed. Please try again.")
+              setError(t("captchaFailed"))
             }}
             onExpire={() => {
               setTurnstileToken(null)
-              setError("CAPTCHA expired. Please verify again.")
+              setError(t("captchaExpired"))
             }}
           />
         </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { DeckState, LensId } from "@/models/debriefing-cube"
 import { lenses } from "./data/debriefing-cube-data"
 
@@ -9,13 +10,14 @@ interface ProgressTrackerProps {
 }
 
 export default function ProgressTracker({ deckState, onLensClick }: ProgressTrackerProps) {
+  const t = useTranslations("debriefingCube")
   const totalCards = 42
   const totalDrawn = Object.values(deckState).reduce((sum, deck) => sum + deck.drawn.length, 0)
 
   return (
     <div className="debriefing-cube-progress">
       <h3 className="debriefing-cube-progress__title">
-        Progress: {totalDrawn} of {totalCards} cards drawn
+        {t("progress", { drawn: totalDrawn, total: totalCards })}
       </h3>
 
       <div className="debriefing-cube-progress__grid">
@@ -49,7 +51,9 @@ export default function ProgressTracker({ deckState, onLensClick }: ProgressTrac
               role="button"
               tabIndex={isEmpty ? -1 : 0}
               aria-label={
-                isEmpty ? `${lens.name} deck is empty` : `Draw a card from ${lens.name} deck`
+                isEmpty
+                  ? t("deckEmpty", { name: lens.name })
+                  : t("drawFromDeck", { name: lens.name })
               }
               aria-disabled={isEmpty}
             >

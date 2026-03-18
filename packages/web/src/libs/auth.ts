@@ -1,6 +1,8 @@
 import "server-only"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { getLocale } from "next-intl/server"
+import { routing } from "@/i18n/routing"
 import type { Player } from "@/models/strapi"
 
 // ============================================================================
@@ -37,6 +39,15 @@ export interface AuthState {
 
 const AUTH_COOKIE_NAME = "play14_auth"
 const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+
+/**
+ * Get the locale prefix for URLs.
+ * With localePrefix "as-needed", the default locale has no prefix.
+ */
+async function getLocalePrefix(): Promise<string> {
+  const locale = await getLocale()
+  return locale === routing.defaultLocale ? "" : `/${locale}`
+}
 
 // ============================================================================
 // COOKIE MANAGEMENT
@@ -159,14 +170,16 @@ export async function getSession(): Promise<Session> {
 export async function requireAuth(callbackUrl?: string): Promise<Session> {
   const jwt = await getAuthCookie()
   if (!jwt) {
+    const prefix = await getLocalePrefix()
     const params = callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""
-    redirect(`/auth/login${params}`)
+    redirect(`${prefix}/auth/login${params}`)
   }
 
   const user = await getCurrentUser()
   if (!user) {
+    const prefix = await getLocalePrefix()
     const params = callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""
-    redirect(`/auth/login${params}`)
+    redirect(`${prefix}/auth/login${params}`)
   }
 
   return { jwt, user }
@@ -179,7 +192,8 @@ export async function requirePlayer(callbackUrl?: string): Promise<Session & { p
   const session = await requireAuth(callbackUrl)
 
   if (!session.user.player) {
-    redirect("/auth/no-player")
+    const prefix = await getLocalePrefix()
+    redirect(`${prefix}/auth/no-player`)
   }
 
   return {
@@ -195,7 +209,8 @@ export async function requireFounder(callbackUrl?: string): Promise<Session & { 
   const session = await requirePlayer(callbackUrl)
 
   if (session.player.position !== "Founder") {
-    redirect("/admin")
+    const prefix = await getLocalePrefix()
+    redirect(`${prefix}/admin`)
   }
 
   return session
@@ -213,7 +228,8 @@ export async function requireOrganizer(
   const isOrganizer = ["Host", "Mentor", "Founder"].includes(position)
 
   if (!isOrganizer) {
-    redirect("/admin")
+    const prefix = await getLocalePrefix()
+    redirect(`${prefix}/admin`)
   }
 
   return session
@@ -226,20 +242,19 @@ export async function requireOrganizer(
 /**
  * Handle OAuth callback - store JWT and redirect
  */
-export async function handleOAuthCallback(
-  accessToken: string,
-  redirectTo = "/admin"
-): Promise<void> {
+export async function handleOAuthCallback(accessToken: string, redirectTo?: string): Promise<void> {
   await setAuthCookie(accessToken)
-  redirect(redirectTo)
+  const prefix = await getLocalePrefix()
+  redirect(redirectTo || `${prefix}/admin`)
 }
 
 /**
  * Sign out - clear cookie and redirect
  */
-export async function signOut(redirectTo = "/"): Promise<void> {
+export async function signOut(redirectTo?: string): Promise<void> {
   await clearAuthCookie()
-  redirect(redirectTo)
+  const prefix = await getLocalePrefix()
+  redirect(redirectTo || `${prefix}/`)
 }
 
 // ============================================================================

@@ -1,5 +1,6 @@
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
+import { getTranslations } from "next-intl/server"
 import type { Article, UploadFile } from "@/models/strapi"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
@@ -20,7 +21,8 @@ interface ArticleDetailsProps {
  * - Full-width content area below hero
  * - Gallery and related articles at bottom
  */
-export default function ArticleDetails({ article }: ArticleDetailsProps) {
+export default async function ArticleDetails({ article }: ArticleDetailsProps) {
+  const t = await getTranslations("articles")
   const image = article.defaultImage as UploadFile
   const hasGallery = article.images && article.images.length > 0
 
@@ -75,7 +77,7 @@ export default function ArticleDetails({ article }: ArticleDetailsProps) {
               {article.publishedAt && (
                 <div className="article-profile-hero__date">
                   <i className="bx bx-calendar" aria-hidden="true" />
-                  <span>Published</span>
+                  <span>{t("published")}</span>
                   <time dateTime={article.publishedAt}>
                     {format(parseISO(article.publishedAt), "MMMM d, yyyy")}
                   </time>
@@ -84,7 +86,7 @@ export default function ArticleDetails({ article }: ArticleDetailsProps) {
               {article.updatedAt && article.updatedAt !== article.publishedAt && (
                 <div className="article-profile-hero__date">
                   <i className="bx bx-revision" aria-hidden="true" />
-                  <span>Updated</span>
+                  <span>{t("updated")}</span>
                   <time dateTime={article.updatedAt}>
                     {format(parseISO(article.updatedAt), "MMMM d, yyyy")}
                   </time>
@@ -106,7 +108,7 @@ export default function ArticleDetails({ article }: ArticleDetailsProps) {
             {article.author && (
               <section className="article-profile-author" aria-labelledby="about-author-heading">
                 <h2 id="about-author-heading" className="visually-hidden">
-                  About the author
+                  {t("aboutAuthor")}
                 </h2>
                 <AuthorCard author={article.author} />
               </section>
@@ -117,7 +119,7 @@ export default function ArticleDetails({ article }: ArticleDetailsProps) {
               <section className="article-profile-gallery" aria-labelledby="gallery-heading">
                 <h2 id="gallery-heading" className="article-profile-gallery__title">
                   <i className="bx bx-images" aria-hidden="true" />
-                  Photo gallery
+                  {t("photoGallery")}
                 </h2>
                 <Gallery
                   images={

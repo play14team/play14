@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { Popup } from "react-map-gl/mapbox"
@@ -39,6 +40,7 @@ const getThemeColors = (isDark: boolean) => ({
 })
 
 const EventPopup = ({ events, onClose }: { events: Event[]; onClose: () => void }) => {
+  const t = useTranslations("events")
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
 
@@ -130,7 +132,7 @@ const EventPopup = ({ events, onClose }: { events: Event[]; onClose: () => void 
               <span>
                 <EventDate start={start} end={end} timezone={timezone!} />
               </span>
-              {status}
+              {status ? t(`status.${status.toLowerCase()}` as Parameters<typeof t>[0]) : ""}
             </div>
           </div>
         )

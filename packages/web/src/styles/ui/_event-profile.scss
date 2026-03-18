@@ -477,6 +477,7 @@
   &__schedule-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 16px 0;
     border-bottom: 1px dashed var(--color-border-light);
     gap: 24px;
@@ -491,13 +492,13 @@
     font-weight: 500;
     color: var(--color-text-muted);
     flex-shrink: 0;
-    min-width: 100px;
   }
 
   &__schedule-value {
     font-size: 1.35rem;
     font-weight: 700;
     color: var(--color-text);
+    text-align: right;
   }
 
   // Resources section
@@ -813,6 +814,8 @@
     background: var(--color-surface);
     border-radius: 16px;
     border: 1px solid var(--color-border-light);
+    font-size: 1rem;
+    font-weight: 400;
     line-height: 1.7;
     color: var(--color-text-secondary);
 
@@ -821,7 +824,7 @@
       font-size: 1.5rem;
       font-weight: 700;
       color: var(--color-text);
-      margin: 2rem 0 1rem 0;
+      margin: 2rem 0 0.75rem 0;
 
       &:first-child {
         margin-top: 0;
@@ -829,10 +832,10 @@
     }
 
     h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
+      font-size: 1.3rem;
+      font-weight: 700;
       color: var(--color-text);
-      margin: 1.5rem 0 0.75rem 0;
+      margin: 1.75rem 0 0.625rem 0;
 
       &:first-child {
         margin-top: 0;
@@ -840,7 +843,18 @@
     }
 
     h3 {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin: 1.5rem 0 0.5rem 0;
+
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+
+    h4 {
+      font-size: 1.05rem;
       font-weight: 600;
       color: var(--color-text);
       margin: 1.25rem 0 0.5rem 0;
@@ -850,18 +864,9 @@
       }
     }
 
-    h4 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--color-text);
-      margin: 1rem 0 0.5rem 0;
-
-      &:first-child {
-        margin-top: 0;
-      }
-    }
-
     p {
+      font-size: 1rem;
+      font-weight: 400;
       margin-bottom: 12px;
 
       &:last-child {
@@ -884,6 +889,8 @@
     }
 
     li {
+      font-size: 1rem;
+      font-weight: 400;
       margin-bottom: 6px;
     }
   }

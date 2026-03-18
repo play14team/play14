@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import ArticleGrid from "@/components/articles/grid"
 import EventGrid from "@/components/events/grid"
 import GameGrid from "@/components/games/grid"
@@ -7,15 +8,18 @@ import { search } from "./get.action"
 export default async function Search({ input }: { input: string | undefined }) {
   if (!input) return
 
-  const { events, players, articles, games } = await search(input)
+  const [{ events, players, articles, games }, t] = await Promise.all([
+    search(input),
+    getTranslations("search"),
+  ])
 
   return (
     <div className="pt-70">
       {events && events.length > 0 && (
         <div>
           <div className="d-flex justify-content-between">
-            <h3>Events</h3>
-            <p>{events.length} found</p>
+            <h3>{t("events")}</h3>
+            <p>{t("found", { count: events.length })}</p>
           </div>
           <EventGrid events={events} />
         </div>
@@ -23,8 +27,8 @@ export default async function Search({ input }: { input: string | undefined }) {
       {players && players.length > 0 && (
         <div>
           <div className="d-flex justify-content-between pb-70">
-            <h3>Players</h3>
-            <p>{players.length} found</p>
+            <h3>{t("players")}</h3>
+            <p>{t("found", { count: players.length })}</p>
           </div>
           <PlayerGrid players={players} />
         </div>
@@ -32,8 +36,8 @@ export default async function Search({ input }: { input: string | undefined }) {
       {games && games.length > 0 && (
         <div>
           <div className="d-flex justify-content-between">
-            <h3>Games</h3>
-            <p>{games.length} found</p>
+            <h3>{t("games")}</h3>
+            <p>{t("found", { count: games.length })}</p>
           </div>
           <GameGrid games={games} />
         </div>
@@ -41,8 +45,8 @@ export default async function Search({ input }: { input: string | undefined }) {
       {articles && articles.length > 0 && (
         <div>
           <div className="d-flex justify-content-between">
-            <h3>Articles</h3>
-            <p>{articles.length} found</p>
+            <h3>{t("articles")}</h3>
+            <p>{t("found", { count: articles.length })}</p>
           </div>
           <ArticleGrid articles={articles} />
         </div>
@@ -50,7 +54,7 @@ export default async function Search({ input }: { input: string | undefined }) {
       {events.length === 0 &&
         players.length === 0 &&
         games.length === 0 &&
-        articles.length === 0 && <h5 className="pb-70">No search result found</h5>}
+        articles.length === 0 && <h5 className="pb-70">{t("noResults")}</h5>}
     </div>
   )
 }

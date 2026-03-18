@@ -1,11 +1,12 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
-import type { MediaLink } from "@/app/(admin)/admin/events/[slug]/media-links.action"
+import type { MediaLink } from "@/app/[locale]/(admin)/admin/events/[slug]/media-links.action"
 
 const MEDIA_TYPES = [
-  { value: "Photos", label: "Photos", icon: "bx-images" },
-  { value: "Videos", label: "Videos", icon: "bx-video" },
+  { value: "Photos", labelKey: "photos" as const, icon: "bx-images" },
+  { value: "Videos", labelKey: "videos" as const, icon: "bx-video" },
 ] as const
 
 interface Props {
@@ -20,6 +21,7 @@ interface EditingLink {
 }
 
 export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
+  const t = useTranslations("adminEvents.mediaLinks")
   const [editing, setEditing] = useState<EditingLink | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,12 +63,12 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
 
     // Validate URL
     if (!editing.url.trim()) {
-      setError("URL is required")
+      setError(t("urlEmpty"))
       return
     }
 
     if (!isValidUrl(editing.url.trim())) {
-      setError("Please enter a valid URL")
+      setError(t("urlInvalid"))
       return
     }
 
@@ -90,7 +92,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
   }
 
   const handleDelete = (index: number) => {
-    if (!confirm("Are you sure you want to remove this link?")) {
+    if (!confirm(t("confirmDelete"))) {
       return
     }
     onChange(mediaLinks.filter((_, i) => i !== index))
@@ -118,17 +120,17 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
               <div className="media-link-form">
                 <div className="admin-form-row">
                   <div className="admin-form-group admin-form-group-wide">
-                    <label>URL *</label>
+                    <label>{t("urlRequired")}</label>
                     <input
                       type="url"
                       value={editing.url}
                       onChange={(e) => setEditing({ ...editing, url: e.target.value })}
                       className="admin-input"
-                      placeholder="https://photos.google.com/..."
+                      placeholder={t("urlPlaceholder")}
                     />
                   </div>
                   <div className="admin-form-group admin-form-group-narrow">
-                    <label>Type</label>
+                    <label>{t("type")}</label>
                     <select
                       value={editing.type}
                       onChange={(e) =>
@@ -138,7 +140,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     >
                       {MEDIA_TYPES.map((type) => (
                         <option key={type.value} value={type.value}>
-                          {type.label}
+                          {t(type.labelKey)}
                         </option>
                       ))}
                     </select>
@@ -150,14 +152,14 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     onClick={handleSave}
                     className="admin-btn admin-btn-primary admin-btn-sm"
                   >
-                    Done
+                    {t("done")}
                   </button>
                   <button
                     type="button"
                     onClick={cancelEditing}
                     className="admin-btn admin-btn-secondary admin-btn-sm"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                 </div>
               </div>
@@ -167,7 +169,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                 <div className="media-link-info">
                   <div className="media-link-type">
                     <i className={`bx ${getTypeInfo(link.type).icon}`} />
-                    <span>{link.type}</span>
+                    <span>{t(link.type === "Photos" ? "photos" : "videos")}</span>
                   </div>
                   <a
                     href={link.url}
@@ -184,7 +186,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     type="button"
                     onClick={() => startEditing(index)}
                     className="admin-btn admin-btn-icon"
-                    title="Edit"
+                    title={t("edit")}
                     disabled={editing !== null}
                   >
                     <i className="bx bx-edit" />
@@ -193,7 +195,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                     type="button"
                     onClick={() => handleDelete(index)}
                     className="admin-btn admin-btn-icon admin-btn-danger"
-                    title="Delete"
+                    title={t("delete")}
                     disabled={editing !== null}
                   >
                     <i className="bx bx-trash" />
@@ -209,21 +211,21 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
       {editing?.index === null && (
         <div className="media-link-card media-link-new">
           <div className="media-link-form">
-            <h4>Add Media Link</h4>
+            <h4>{t("addMediaLink")}</h4>
             <div className="admin-form-row">
               <div className="admin-form-group admin-form-group-wide">
-                <label>URL *</label>
+                <label>{t("urlRequired")}</label>
                 <input
                   type="url"
                   value={editing.url}
                   onChange={(e) => setEditing({ ...editing, url: e.target.value })}
                   className="admin-input"
-                  placeholder="https://photos.google.com/... or https://youtube.com/..."
+                  placeholder={t("urlPlaceholderFull")}
                 />
-                <p className="admin-form-help">Link to an external photo album or video playlist</p>
+                <p className="admin-form-help">{t("urlHelp")}</p>
               </div>
               <div className="admin-form-group admin-form-group-narrow">
-                <label>Type</label>
+                <label>{t("type")}</label>
                 <select
                   value={editing.type}
                   onChange={(e) =>
@@ -233,7 +235,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                 >
                   {MEDIA_TYPES.map((type) => (
                     <option key={type.value} value={type.value}>
-                      {type.label}
+                      {t(type.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -245,14 +247,14 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                 onClick={handleSave}
                 className="admin-btn admin-btn-primary admin-btn-sm"
               >
-                Add Media Link
+                {t("addMediaLink")}
               </button>
               <button
                 type="button"
                 onClick={cancelEditing}
                 className="admin-btn admin-btn-secondary admin-btn-sm"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -263,15 +265,12 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
       {!editing && (
         <button type="button" onClick={startAdding} className="admin-btn admin-btn-secondary">
           <i className="bx bx-plus" />
-          Add Media Link
+          {t("addMediaLink")}
         </button>
       )}
 
       {mediaLinks.length === 0 && !editing && (
-        <p className="media-links-empty">
-          No external photo or video links added yet. Add links to Google Photos, Flickr, YouTube
-          playlists, etc.
-        </p>
+        <p className="media-links-empty">{t("noMediaLinks")}</p>
       )}
     </div>
   )

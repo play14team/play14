@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import type { Event } from "@/models/strapi"
 import HtmlContent from "../layout/html-content"
 import { TicketPurchaseFlow } from "../tickets"
@@ -15,6 +16,7 @@ interface EventRegistrationProps {
  * - External registration (when ticketingMode === "external" with link or widgetCode)
  */
 export default function EventRegistration({ event }: EventRegistrationProps) {
+  const t = useTranslations("tickets")
   const ticketingMode = event.ticketingMode || "none"
 
   // No registration when ticketing is disabled
@@ -29,7 +31,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         <div className="col-12">
           <section className="events-registration-section" aria-labelledby="registration-heading">
             <h3 id="registration-heading" className="mb-3" style={{ scrollMarginTop: "150px" }}>
-              Registration
+              {t("registration")}
             </h3>
             <div className="registration-tickets mb-4">
               <TicketPurchaseFlow eventId={event.documentId!} />
@@ -73,7 +75,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 className="default-btn"
               >
                 <i className="flaticon-user" />
-                Register Now
+                {t("registerNow")}
               </Link>
             </div>
           )}

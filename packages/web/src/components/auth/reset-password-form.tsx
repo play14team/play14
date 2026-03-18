@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import { resetPasswordWithCode } from "./reset-password.action"
 
@@ -10,6 +11,7 @@ interface ResetPasswordFormProps {
 }
 
 export default function ResetPasswordForm({ code, callbackUrl }: ResetPasswordFormProps) {
+  const t = useTranslations("auth.form")
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -19,7 +21,7 @@ export default function ResetPasswordForm({ code, callbackUrl }: ResetPasswordFo
     setError(null)
 
     if (!code) {
-      setError("Missing reset link. Please use the invite email.")
+      setError(t("missingResetLink"))
       return
     }
 
@@ -28,12 +30,12 @@ export default function ResetPasswordForm({ code, callbackUrl }: ResetPasswordFo
     const passwordConfirmation = formData.get("passwordConfirmation") as string
 
     if (!password || password.length < 6) {
-      setError("Password must be at least 6 characters")
+      setError(t("passwordMinLength"))
       return
     }
 
     if (password !== passwordConfirmation) {
-      setError("Passwords do not match")
+      setError(t("passwordsNoMatch"))
       return
     }
 
@@ -44,7 +46,7 @@ export default function ResetPasswordForm({ code, callbackUrl }: ResetPasswordFo
         router.push(callbackUrl)
         router.refresh()
       } else {
-        setError(result.error || "Reset failed")
+        setError(result.error || t("resetFailed"))
       }
     })
   }
@@ -54,31 +56,31 @@ export default function ResetPasswordForm({ code, callbackUrl }: ResetPasswordFo
       {error && <div className="auth-form-error">{error}</div>}
 
       <div className="auth-form-field">
-        <label htmlFor="password">New Password</label>
+        <label htmlFor="password">{t("newPassword")}</label>
         <input
           type="password"
           id="password"
           name="password"
-          placeholder="Create a password"
+          placeholder={t("createPassword")}
           autoComplete="new-password"
           disabled={isPending}
         />
       </div>
 
       <div className="auth-form-field">
-        <label htmlFor="passwordConfirmation">Confirm Password</label>
+        <label htmlFor="passwordConfirmation">{t("confirmPassword")}</label>
         <input
           type="password"
           id="passwordConfirmation"
           name="passwordConfirmation"
-          placeholder="Confirm your password"
+          placeholder={t("confirmYourPassword")}
           autoComplete="new-password"
           disabled={isPending}
         />
       </div>
 
       <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
-        {isPending ? "Setting password..." : "Set password"}
+        {isPending ? t("settingPassword") : t("setPassword")}
       </button>
     </form>
   )

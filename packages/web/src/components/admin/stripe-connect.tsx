@@ -6,7 +6,7 @@ import {
   getDashboardUrl,
   getOnboardingUrl,
   type StripeAccountStatus,
-} from "@/app/(admin)/admin/stripe/stripe-connect.action"
+} from "@/app/[locale]/(admin)/admin/stripe/stripe-connect.action"
 
 interface Props {
   account: StripeAccountStatus | null

@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { camelPad } from "@/libs/camelPad"
 import type { Game, UploadFile } from "@/models/strapi"
 import GamesNavigator from "./nav"

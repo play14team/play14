@@ -6,7 +6,7 @@ import {
   type SponsorLogo,
   setSponsorLogoFromLibrary,
   uploadSponsorLogo,
-} from "@/app/(admin)/admin/sponsors/logo.action"
+} from "@/app/[locale]/(admin)/admin/sponsors/logo.action"
 import { useToast } from "@/components/admin/toast"
 import ImageManager from "./image-manager"
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import Turnstile from "@/components/ui/turnstile"
 import { registerWithCredentials } from "./register.action"
@@ -10,6 +11,7 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
+  const t = useTranslations("auth.form")
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -28,19 +30,19 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
     const errors: Record<string, string> = {}
 
     if (!username || username.length < 3) {
-      errors.username = "Username must be at least 3 characters"
+      errors.username = t("usernameMinLength")
     }
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email address"
+      errors.email = t("invalidEmail")
     }
 
     if (!password || password.length < 6) {
-      errors.password = "Password must be at least 6 characters"
+      errors.password = t("passwordMinLength")
     }
 
     if (password !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match"
+      errors.confirmPassword = t("passwordsNoMatch")
     }
 
     setFieldErrors(errors)
@@ -64,7 +66,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
 
     // Check Turnstile verification if enabled
     if (turnstileSiteKey && !turnstileToken) {
-      setError("Please complete the CAPTCHA verification")
+      setError(t("completeCaptcha"))
       return
     }
 
@@ -83,7 +85,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
         router.push(callbackUrl)
         router.refresh()
       } else {
-        setError(result.error || "Registration failed")
+        setError(result.error || t("registrationFailed"))
       }
     })
   }
@@ -93,12 +95,12 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
       {error && <div className="auth-form-error">{error}</div>}
 
       <div className="auth-form-field">
-        <label htmlFor="username">Username</label>
+        <label htmlFor="username">{t("username")}</label>
         <input
           type="text"
           id="username"
           name="username"
-          placeholder="Choose a username"
+          placeholder={t("chooseUsername")}
           autoComplete="username"
           disabled={isPending}
         />
@@ -106,12 +108,12 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
       </div>
 
       <div className="auth-form-field">
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">{t("email")}</label>
         <input
           type="email"
           id="email"
           name="email"
-          placeholder="Enter your email address"
+          placeholder={t("enterEmail")}
           autoComplete="email"
           disabled={isPending}
         />
@@ -119,12 +121,12 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
       </div>
 
       <div className="auth-form-field">
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">{t("password")}</label>
         <input
           type="password"
           id="password"
           name="password"
-          placeholder="Create a password"
+          placeholder={t("createPassword")}
           autoComplete="new-password"
           disabled={isPending}
         />
@@ -132,12 +134,12 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
       </div>
 
       <div className="auth-form-field">
-        <label htmlFor="confirmPassword">Confirm Password</label>
+        <label htmlFor="confirmPassword">{t("confirmPassword")}</label>
         <input
           type="password"
           id="confirmPassword"
           name="confirmPassword"
-          placeholder="Confirm your password"
+          placeholder={t("confirmYourPassword")}
           autoComplete="new-password"
           disabled={isPending}
         />
@@ -154,7 +156,7 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
             onChange={(e) => setSubscribeNewsletter(e.target.checked)}
             disabled={isPending}
           />
-          <span>Subscribe to our newsletter</span>
+          <span>{t("subscribeNewsletter")}</span>
         </label>
       </div>
 
@@ -165,18 +167,18 @@ export default function RegisterForm({ callbackUrl }: RegisterFormProps) {
             onVerify={(token) => setTurnstileToken(token)}
             onError={() => {
               setTurnstileToken(null)
-              setError("CAPTCHA verification failed. Please try again.")
+              setError(t("captchaFailed"))
             }}
             onExpire={() => {
               setTurnstileToken(null)
-              setError("CAPTCHA expired. Please verify again.")
+              setError(t("captchaExpired"))
             }}
           />
         </div>
       )}
 
       <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
-        {isPending ? "Creating account..." : "Create account"}
+        {isPending ? t("creatingAccount") : t("createAccount")}
       </button>
     </form>
   )

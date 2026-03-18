@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState } from "react"
 import styles from "./discount-code-input.module.scss"
 import type { DiscountValidationResult } from "./purchase.action"
@@ -27,6 +28,7 @@ export default function DiscountCodeInput({
   validateDiscountCode,
   initialCode,
 }: DiscountCodeInputProps) {
+  const t = useTranslations("tickets")
   const [code, setCode] = useState(initialCode || "")
   const [isValidating, setIsValidating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +47,7 @@ export default function DiscountCodeInput({
           onValidCode(result)
           setCode("")
         } else {
-          setError(result.error || "Invalid discount code")
+          setError(result.error || t("invalidDiscount"))
         }
         setIsValidating(false)
       })()
@@ -54,7 +56,7 @@ export default function DiscountCodeInput({
 
   const handleApply = async () => {
     if (!code.trim()) {
-      setError("Please enter a discount code")
+      setError(t("enterDiscountPlaceholder"))
       return
     }
 
@@ -67,7 +69,7 @@ export default function DiscountCodeInput({
       onValidCode(result)
       setCode("")
     } else {
-      setError(result.error || "Invalid discount code")
+      setError(result.error || t("invalidDiscount"))
     }
 
     setIsValidating(false)
@@ -91,7 +93,7 @@ export default function DiscountCodeInput({
       <div className={styles.appliedContainer}>
         <div className={styles.appliedCode}>
           <div className={styles.codeInfo}>
-            <span className={styles.codeLabel}>Discount applied:</span>
+            <span className={styles.codeLabel}>{t("discountApplied")}</span>
             <span className={styles.codeValue}>{appliedDiscount.code}</span>
             {appliedDiscount.description && (
               <span className={styles.codeDescription}>{appliedDiscount.description}</span>
@@ -107,7 +109,7 @@ export default function DiscountCodeInput({
               type="button"
               className={styles.removeButton}
               onClick={handleRemove}
-              aria-label="Remove discount code"
+              aria-label={t("removeDiscount")}
             >
               ×
             </button>
@@ -129,7 +131,7 @@ export default function DiscountCodeInput({
             setError(null)
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Enter discount code"
+          placeholder={t("enterDiscountCode")}
           className={`${styles.input} ${error ? styles.inputError : ""}`}
           disabled={isValidating}
         />
@@ -139,7 +141,7 @@ export default function DiscountCodeInput({
           onClick={handleApply}
           disabled={isValidating || !code.trim()}
         >
-          {isValidating ? "Checking..." : "Apply"}
+          {isValidating ? t("checking") : t("apply")}
         </button>
       </div>
       {error && <p className={styles.error}>{error}</p>}

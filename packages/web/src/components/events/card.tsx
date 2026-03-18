@@ -1,6 +1,7 @@
 import clm from "country-locale-map"
 import Image from "next/image"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import ReactCountryFlag from "react-country-flag"
 import type { Event } from "@/models/strapi"
 import defaultEvent from "@/styles/images/events/event1.jpg"
@@ -13,6 +14,7 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event, isPending }: EventCardProps) => {
+  const t = useTranslations("events")
   const url = `/events/${encodeURIComponent(event.slug)}`
   const image = event.defaultImage || "#"
   const countryCode = event.location?.country || "LU"
@@ -93,7 +95,7 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
               <span className="location">
                 {isPending ? (
                   <span className="event-status event-status-pending">
-                    <i className="bx bx-time-five" aria-hidden="true" /> Pending
+                    <i className="bx bx-time-five" aria-hidden="true" /> {t("status.pending")}
                   </span>
                 ) : (
                   <EventStatus status={event.eventStatus} />

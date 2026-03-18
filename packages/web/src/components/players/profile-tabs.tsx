@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useMemo } from "react"
 import { deduplicateBy } from "@/libs/arrays"
 import type { Event as EventType } from "@/models/strapi"
@@ -22,6 +23,8 @@ function sortByDateDesc(events: EventType[]): EventType[] {
 }
 
 export default function PlayerProfileTabs({ attended, hosted, mentored }: PlayerProfileTabsProps) {
+  const t = useTranslations("players")
+
   // Merge all events (attended + hosted + mentored) with deduplication, sorted by date
   const allEvents = useMemo(() => {
     const deduplicated = deduplicateBy(
@@ -42,19 +45,19 @@ export default function PlayerProfileTabs({ attended, hosted, mentored }: Player
       <Tabs defaultValue="attended" className="player-profile-content__tabs">
         <TabsList>
           <TabsTrigger value="attended">
-            Attended
+            {t("tabs.attended")}
             {allEvents.length > 0 && (
               <span className="player-profile-content__tab-count">{allEvents.length}</span>
             )}
           </TabsTrigger>
           <TabsTrigger value="hosted">
-            Hosted
+            {t("tabs.hosted")}
             {sortedHosted.length > 0 && (
               <span className="player-profile-content__tab-count">{sortedHosted.length}</span>
             )}
           </TabsTrigger>
           <TabsTrigger value="mentored">
-            Mentored
+            {t("tabs.mentored")}
             {sortedMentored.length > 0 && (
               <span className="player-profile-content__tab-count">{sortedMentored.length}</span>
             )}
@@ -65,10 +68,7 @@ export default function PlayerProfileTabs({ attended, hosted, mentored }: Player
           {allEvents.length > 0 ? (
             <EventGrid events={allEvents} />
           ) : (
-            <EmptyState
-              icon="bx-calendar-check"
-              text="No events attended yet. The adventure is just beginning!"
-            />
+            <EmptyState icon="bx-calendar-check" text={t("empty.attended")} />
           )}
         </TabsContent>
 
@@ -76,7 +76,7 @@ export default function PlayerProfileTabs({ attended, hosted, mentored }: Player
           {sortedHosted.length > 0 ? (
             <EventGrid events={sortedHosted} />
           ) : (
-            <EmptyState icon="bx-microphone" text="No events hosted yet. Maybe someday?" />
+            <EmptyState icon="bx-microphone" text={t("empty.hosted")} />
           )}
         </TabsContent>
 
@@ -84,7 +84,7 @@ export default function PlayerProfileTabs({ attended, hosted, mentored }: Player
           {sortedMentored.length > 0 ? (
             <EventGrid events={sortedMentored} />
           ) : (
-            <EmptyState icon="bx-bulb" text="No events mentored yet. The wisdom is building up!" />
+            <EmptyState icon="bx-bulb" text={t("empty.mentored")} />
           )}
         </TabsContent>
       </Tabs>

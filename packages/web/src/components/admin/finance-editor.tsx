@@ -1,7 +1,8 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
-import type { FinanceData } from "@/app/(admin)/admin/events/[slug]/finance.action"
+import type { FinanceData } from "@/app/[locale]/(admin)/admin/events/[slug]/finance.action"
 
 interface Props {
   financeData: FinanceData | null
@@ -10,6 +11,8 @@ interface Props {
 }
 
 export default function FinanceEditor({ financeData, onChange, defaultRevenue = 0 }: Props) {
+  const t = useTranslations("adminEvents.finance")
+  const locale = useLocale()
   const [isEditing, setIsEditing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,7 +38,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
 
   // Auto-calculated values
   const resultAmount = Math.abs(revenue - expenses)
-  const result: "Profit" | "Loss" = revenue >= expenses ? "Profit" : "Loss"
+  const resultType: "profit" | "loss" = revenue >= expenses ? "profit" : "loss"
 
   const resetForm = () => {
     setRevenue(financeData?.revenue ?? 0)
@@ -48,12 +51,12 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
   const handleSave = () => {
     // Validate
     if (revenue < 0 || expenses < 0) {
-      setError("Revenue and expenses must be positive numbers")
+      setError(t("revenueExpensesPositive"))
       return
     }
 
-    if (result === "Profit" && !destination.trim()) {
-      setError("Please specify where the surplus goes")
+    if (resultType === "profit" && !destination.trim()) {
+      setError(t("destinationRequired"))
       return
     }
 
@@ -69,7 +72,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
   }
 
   const handleClear = () => {
-    if (!confirm("Are you sure you want to clear the finance data?")) {
+    if (!confirm(t("confirmClear"))) {
       return
     }
     onChange(null)
@@ -81,7 +84,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "EUR",
     }).format(amount)
@@ -101,7 +104,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
         <div className="finance-form">
           <div className="admin-form-row">
             <div className="admin-form-group">
-              <label>Revenue</label>
+              <label>{t("revenue")}</label>
               <div className="input-with-prefix">
                 <span className="input-prefix">EUR</span>
                 <input
@@ -114,11 +117,11 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
                   placeholder="0.00"
                 />
               </div>
-              <p className="admin-form-help">Total income from tickets and sponsorships</p>
+              <p className="admin-form-help">{t("revenueHelp")}</p>
             </div>
 
             <div className="admin-form-group">
-              <label>Expenses</label>
+              <label>{t("expenses")}</label>
               <div className="input-with-prefix">
                 <span className="input-prefix">EUR</span>
                 <input
@@ -131,31 +134,33 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
                   placeholder="0.00"
                 />
               </div>
-              <p className="admin-form-help">Total costs including venue, catering, etc.</p>
+              <p className="admin-form-help">{t("expensesHelp")}</p>
             </div>
           </div>
 
           <div className="admin-form-group">
-            <label>Destination {result === "Profit" && <span className="required">*</span>}</label>
+            <label>
+              {t("destination")} {resultType === "profit" && <span className="required">*</span>}
+            </label>
             <input
               type="text"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               className="admin-input"
-              placeholder="e.g., Community fund for future events"
+              placeholder={t("destinationPlaceholder")}
             />
-            <p className="admin-form-help">
-              Where the surplus goes (required if there is a profit)
-            </p>
+            <p className="admin-form-help">{t("destinationHelp")}</p>
           </div>
 
           {/* Auto-calculated result preview */}
-          <div className={`finance-result-preview ${result.toLowerCase()}`}>
+          <div className={`finance-result-preview ${resultType}`}>
             <div className="finance-result-icon">
-              <i className={`bx ${result === "Profit" ? "bx-trending-up" : "bx-trending-down"}`} />
+              <i
+                className={`bx ${resultType === "profit" ? "bx-trending-up" : "bx-trending-down"}`}
+              />
             </div>
             <div className="finance-result-info">
-              <span className="finance-result-label">{result}</span>
+              <span className="finance-result-label">{t(resultType)}</span>
               <span className="finance-result-amount">{formatCurrency(resultAmount)}</span>
             </div>
           </div>
@@ -166,14 +171,14 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
               onClick={handleSave}
               className="admin-btn admin-btn-primary admin-btn-sm"
             >
-              Done
+              {t("done")}
             </button>
             <button
               type="button"
               onClick={resetForm}
               className="admin-btn admin-btn-secondary admin-btn-sm"
             >
-              Cancel
+              {t("cancel")}
             </button>
           </div>
         </div>
@@ -184,27 +189,27 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
             <>
               <div className="finance-summary">
                 <div className="finance-item">
-                  <span className="finance-label">Revenue</span>
+                  <span className="finance-label">{t("revenue")}</span>
                   <span className="finance-value">{formatCurrency(financeData.revenue)}</span>
                 </div>
                 <div className="finance-item">
-                  <span className="finance-label">Expenses</span>
+                  <span className="finance-label">{t("expenses")}</span>
                   <span className="finance-value">{formatCurrency(financeData.expenses)}</span>
                 </div>
-                <div className={`finance-item finance-result ${result.toLowerCase()}`}>
-                  <span className="finance-label">{result}</span>
+                <div className={`finance-item finance-result ${resultType}`}>
+                  <span className="finance-label">{t(resultType)}</span>
                   <span className="finance-value">{formatCurrency(resultAmount)}</span>
                 </div>
               </div>
               {financeData.destination && (
                 <div className="finance-destination">
-                  <span className="finance-label">Destination</span>
+                  <span className="finance-label">{t("destination")}</span>
                   <span className="finance-value">{financeData.destination}</span>
                 </div>
               )}
             </>
           ) : (
-            <p className="finance-empty">No financial data recorded yet.</p>
+            <p className="finance-empty">{t("noFinanceData")}</p>
           )}
 
           <div className="finance-view-actions">
@@ -214,7 +219,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
               className="admin-btn admin-btn-secondary"
             >
               <i className="bx bx-edit" />
-              {financeData ? "Edit Finance Data" : "Add Finance Data"}
+              {financeData ? t("editFinanceData") : t("addFinanceData")}
             </button>
             {financeData && (
               <button
@@ -223,7 +228,7 @@ export default function FinanceEditor({ financeData, onChange, defaultRevenue = 
                 className="admin-btn admin-btn-danger admin-btn-sm"
               >
                 <i className="bx bx-trash" />
-                Clear
+                {t("clear")}
               </button>
             )}
           </div>

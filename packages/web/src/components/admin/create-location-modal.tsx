@@ -1,8 +1,9 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
-import { createLocation } from "@/app/(admin)/admin/locations/locations.action"
+import { createLocation } from "@/app/[locale]/(admin)/admin/locations/locations.action"
 import CountrySelector from "./country-selector"
 import LocationMapPicker, { type MapLocation } from "./location-map-picker"
 import { useToast } from "./toast"
@@ -20,6 +21,7 @@ export default function CreateLocationModal({
 }: CreateLocationModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const toast = useToast()
+  const t = useTranslations("adminCrud")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -94,13 +96,13 @@ export default function CreateLocationModal({
     setIsSubmitting(true)
 
     if (!name.trim()) {
-      toast.error("Name is required")
+      toast.error(t("common.nameRequired"))
       setIsSubmitting(false)
       return
     }
 
     if (!country) {
-      toast.error("Please select a country")
+      toast.error(t("locations.form.selectCountry"))
       setIsSubmitting(false)
       return
     }
@@ -112,12 +114,12 @@ export default function CreateLocationModal({
     })
 
     if (!result.success) {
-      toast.error(result.error || "Failed to create location")
+      toast.error(result.error || t("common.failedToCreate", { entity: t("locations.entityName") }))
       setIsSubmitting(false)
       return
     }
 
-    toast.success("Location created successfully!")
+    toast.success(t("common.createdSuccess", { entity: t("locations.entityName") }))
 
     // Call the callback with the new location
     onLocationCreated({
@@ -139,7 +141,7 @@ export default function CreateLocationModal({
         <div className="create-location-modal-header">
           <h2>
             <i className="bx bx-map-pin" />
-            Create New Location
+            {t("locations.modal.title")}
           </h2>
           <button
             type="button"
@@ -154,7 +156,7 @@ export default function CreateLocationModal({
         <form onSubmit={handleSubmit}>
           <div className="create-location-modal-body">
             <div className="admin-form-group">
-              <label htmlFor="modal-location-name">Location Name *</label>
+              <label htmlFor="modal-location-name">{t("locations.form.nameLabel")}</label>
               <input
                 type="text"
                 id="modal-location-name"
@@ -163,25 +165,20 @@ export default function CreateLocationModal({
                 required
                 minLength={2}
                 className="admin-input"
-                placeholder="e.g., Paris, Luxembourg, Berlin"
+                placeholder={t("locations.form.namePlaceholder")}
               />
-              <p className="admin-form-help">The city or region name where events take place</p>
+              <p className="admin-form-help">{t("locations.form.nameHelp")}</p>
             </div>
 
             <div className="admin-form-group">
-              <label>Country *</label>
-              <CountrySelector
-                value={country}
-                onChange={setCountry}
-                placeholder="Select a country..."
-                required
-              />
+              <label>{t("locations.form.countryLabel")}</label>
+              <CountrySelector value={country} onChange={setCountry} required />
             </div>
 
             <div className="admin-form-group">
-              <label>Map Location (optional)</label>
+              <label>{t("locations.modal.mapLabel")}</label>
               <p className="admin-form-help" style={{ marginBottom: "12px" }}>
-                Set the coordinates for displaying events on maps.
+                {t("locations.modal.mapHelp")}
               </p>
               <LocationMapPicker
                 value={mapLocation}
@@ -201,7 +198,7 @@ export default function CreateLocationModal({
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -212,12 +209,12 @@ export default function CreateLocationModal({
               {isSubmitting ? (
                 <>
                   <i className="bx bx-loader-alt bx-spin" />
-                  Creating...
+                  {t("common.creating")}
                 </>
               ) : (
                 <>
                   <i className="bx bx-plus" />
-                  Create Location
+                  {t("locations.create.submitButton")}
                 </>
               )}
             </button>

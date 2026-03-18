@@ -1,4 +1,5 @@
-import Link from "next/link"
+import { getTranslations } from "next-intl/server"
+import { Link } from "@/i18n/navigation"
 import type { Article, Tag } from "@/models/strapi"
 import SocialLinks from "../layout/social-links"
 import { getArticleSidebar } from "./get.action"
@@ -12,7 +13,8 @@ interface ArticleInfoSidebarProps {
  * Author and dates are now displayed in the hero section.
  */
 export default async function ArticleInfoSidebar({ article }: ArticleInfoSidebarProps) {
-  const text = encodeURI("Take a look at this #play14 article")
+  const t = await getTranslations("articles")
+  const text = encodeURI(t("shareText"))
   const articleTags = (article.tags?.filter(Boolean) || []) as Tag[]
 
   // Fetch all categories and tags for the sidebar
@@ -53,7 +55,7 @@ export default async function ArticleInfoSidebar({ article }: ArticleInfoSidebar
           <div className="article-profile-tags__section article-profile-tags__section--first">
             <h4 className="article-profile-tags__title">
               <i className="bx bx-purchase-tag" aria-hidden="true" />
-              Tags
+              {t("tags")}
             </h4>
             <div className="article-profile-tags__list" role="list" aria-label="Article tags">
               {articleTags.map((tag) => (
@@ -74,7 +76,7 @@ export default async function ArticleInfoSidebar({ article }: ArticleInfoSidebar
         <div className="article-profile-share">
           <h4 className="article-profile-share__title">
             <i className="bx bx-share-alt" aria-hidden="true" />
-            Share this article
+            {t("shareArticle")}
           </h4>
           <div className="article-profile-share__links">
             <SocialLinks text={text} className="social-link" />
@@ -87,7 +89,7 @@ export default async function ArticleInfoSidebar({ article }: ArticleInfoSidebar
         <div className="article-profile-info__card">
           <h4 className="article-profile-tags__title">
             <i className="bx bx-folder-open" aria-hidden="true" />
-            Categories
+            {t("categories")}
           </h4>
           <ul className="article-profile-categories__list">
             {Object.entries(categoryCount).map(([category, count]) => (
@@ -115,7 +117,7 @@ export default async function ArticleInfoSidebar({ article }: ArticleInfoSidebar
         <div className="article-profile-info__card">
           <h4 className="article-profile-tags__title">
             <i className="bx bx-purchase-tag" aria-hidden="true" />
-            Popular tags
+            {t("popularTags")}
           </h4>
           <div className="article-profile-tags__list">
             {Object.entries(tagsCount).map(([tag]) => (

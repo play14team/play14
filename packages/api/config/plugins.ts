@@ -148,6 +148,9 @@ export default ({ env }: { env: any }) => ({
       options: {},
     },
   },
+  "strapi-ai-translator": {
+    enabled: true,
+  },
   "fuzzy-search": {
     enabled: true,
     config: {

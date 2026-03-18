@@ -5,6 +5,7 @@ interface ErrorMessageProps {
   message: string
   details?: string
   showReload?: boolean
+  retryLabel?: string
   onRetry?: () => void
 }
 
@@ -13,6 +14,7 @@ export default function ErrorMessage({
   message,
   details,
   showReload = true,
+  retryLabel = "Retry",
   onRetry,
 }: ErrorMessageProps) {
   const handleRetry = () => {
@@ -54,7 +56,7 @@ export default function ErrorMessage({
         {showReload && (
           <div style={{ marginTop: "1.5rem" }}>
             <button type="button" className="btn btn-primary" onClick={handleRetry}>
-              Retry
+              {retryLabel}
             </button>
           </div>
         )}

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import { subscribeToNewsletter } from "./subscribe.action"
 
@@ -8,6 +9,7 @@ interface NewsletterSignupProps {
 }
 
 export default function NewsletterSignup({ source = "footer" }: NewsletterSignupProps) {
+  const t = useTranslations("newsletter")
   const [email, setEmail] = useState("")
   const [firstName, setFirstName] = useState("")
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
@@ -19,7 +21,7 @@ export default function NewsletterSignup({ source = "footer" }: NewsletterSignup
 
     if (!email.trim()) {
       setStatus("error")
-      setErrorMessage("Please enter your email address")
+      setErrorMessage(t("errorEmpty"))
       return
     }
 
@@ -32,7 +34,7 @@ export default function NewsletterSignup({ source = "footer" }: NewsletterSignup
         setFirstName("")
       } else {
         setStatus("error")
-        setErrorMessage(result.error || "Something went wrong. Please try again.")
+        setErrorMessage(result.error || t("errorGeneric"))
       }
     })
   }
@@ -42,7 +44,7 @@ export default function NewsletterSignup({ source = "footer" }: NewsletterSignup
       <div className="newsletter-signup">
         <div className="newsletter-success">
           <i className="bx bx-check-circle" aria-hidden="true" />
-          <p>Thanks for subscribing!</p>
+          <p>{t("success")}</p>
         </div>
       </div>
     )
@@ -50,23 +52,21 @@ export default function NewsletterSignup({ source = "footer" }: NewsletterSignup
 
   return (
     <div className="newsletter-signup">
-      <p className="newsletter-description">
-        Get updates about upcoming events and community news.
-      </p>
+      <p className="newsletter-description">{t("description")}</p>
       <form onSubmit={handleSubmit} className="newsletter-form">
         <div className="newsletter-fields">
           <input
             type="text"
-            placeholder="First name (optional)"
+            placeholder={t("firstName")}
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             className="newsletter-input newsletter-input-name"
             disabled={isPending}
-            aria-label="First name"
+            aria-label={t("firstName")}
           />
           <input
             type="email"
-            placeholder="Email address"
+            placeholder={t("email")}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value)
@@ -78,7 +78,7 @@ export default function NewsletterSignup({ source = "footer" }: NewsletterSignup
             className="newsletter-input newsletter-input-email"
             disabled={isPending}
             required
-            aria-label="Email address"
+            aria-label={t("email")}
             aria-invalid={status === "error"}
           />
         </div>
@@ -91,10 +91,10 @@ export default function NewsletterSignup({ source = "footer" }: NewsletterSignup
           {isPending ? (
             <>
               <i className="bx bx-loader-alt bx-spin" aria-hidden="true" />
-              <span>Subscribing...</span>
+              <span>{t("subscribing")}</span>
             </>
           ) : (
-            <span>Subscribe</span>
+            <span>{t("subscribe")}</span>
           )}
         </button>
       </form>

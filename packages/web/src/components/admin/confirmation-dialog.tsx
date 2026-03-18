@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef } from "react"
 import "./confirmation-dialog.scss"
 
@@ -18,12 +19,15 @@ export default function ConfirmationDialog({
   isOpen,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   variant = "warning",
   onConfirm,
   onCancel,
 }: ConfirmationDialogProps) {
+  const t = useTranslations("admin")
+  const resolvedConfirmLabel = confirmLabel ?? t("confirmationDialog.confirm")
+  const resolvedCancelLabel = cancelLabel ?? t("confirmationDialog.cancel")
   const dialogRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -85,14 +89,14 @@ export default function ConfirmationDialog({
         </div>
         <div className="confirmation-dialog-footer">
           <button type="button" onClick={onCancel} className="admin-btn admin-btn-secondary">
-            {cancelLabel}
+            {resolvedCancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className={`admin-btn ${variant === "danger" ? "admin-btn-danger" : "admin-btn-primary"}`}
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </button>
         </div>
       </div>

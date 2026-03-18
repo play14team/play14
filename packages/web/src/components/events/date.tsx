@@ -1,3 +1,4 @@
+import { useLocale } from "next-intl"
 import { formatDate } from "@/libs/dates"
 import type { Maybe } from "@/models/strapi"
 
@@ -9,7 +10,8 @@ interface EventDatesProps {
 }
 
 const EventDate = ({ start, end, timezone, displayYear }: EventDatesProps) => {
-  return <>{formatDate(start, end, timezone, displayYear)}</>
+  const locale = useLocale()
+  return <>{formatDate(start, end, timezone, displayYear, locale)}</>
 }
 
 export default EventDate

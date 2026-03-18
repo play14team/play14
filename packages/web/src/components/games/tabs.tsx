@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { Game } from "@/models/strapi"
 import Gallery from "../layout/gallery"
 import HtmlContent from "../layout/html-content"
@@ -10,6 +11,7 @@ interface GameTabsProps {
 }
 
 export default function GameTabs({ game }: GameTabsProps) {
+  const t = useTranslations("games")
   const hasImages = game.images && game.images.length > 1
   const hasMaterials = game.materials && game.materials.length > 0
   const hasPreparation = game.preparationSteps && game.preparationSteps.length > 0
@@ -24,27 +26,27 @@ export default function GameTabs({ game }: GameTabsProps) {
       <TabsList role="tablist" aria-label="Game information tabs">
         <TabsTrigger value="overview">
           <i className="bx bx-info-circle" aria-hidden="true" />
-          Overview
+          {t("tabs.overview")}
         </TabsTrigger>
 
         {(hasMaterials || hasPreparation) && (
           <TabsTrigger value="howto">
             <i className="bx bx-list-check" aria-hidden="true" />
-            How to play
+            {t("tabs.howToPlay")}
           </TabsTrigger>
         )}
 
         {hasSafety && (
           <TabsTrigger value="safety">
             <i className="bx bx-shield" aria-hidden="true" />
-            Safety
+            {t("tabs.safety")}
           </TabsTrigger>
         )}
 
         {hasImages && (
           <TabsTrigger value="photos">
             <i className="bx bx-images" aria-hidden="true" />
-            Photos
+            {t("tabs.photos")}
             <span className="ui-tabs-badge">{imageCount}</span>
           </TabsTrigger>
         )}
@@ -59,7 +61,7 @@ export default function GameTabs({ game }: GameTabsProps) {
         ) : (
           <div className="game-details-empty">
             <i className="bx bx-file-blank" aria-hidden="true" />
-            <p>No detailed description available for this game yet.</p>
+            <p>{t("empty.description")}</p>
           </div>
         )}
       </TabsContent>
@@ -73,7 +75,7 @@ export default function GameTabs({ game }: GameTabsProps) {
                 <div className="game-details-info-card">
                   <h3 className="game-details-section-title">
                     <i className="bx bx-box" aria-hidden="true" />
-                    Materials needed
+                    {t("details.materialsNeeded")}
                   </h3>
                   <ul>
                     {game.materials?.map((m) => (
@@ -89,7 +91,7 @@ export default function GameTabs({ game }: GameTabsProps) {
                 <div className="game-details-info-card">
                   <h3 className="game-details-section-title">
                     <i className="bx bx-task" aria-hidden="true" />
-                    Preparation steps
+                    {t("details.preparationSteps")}
                   </h3>
                   <ul>
                     {game.preparationSteps?.map((p) => (
@@ -109,7 +111,7 @@ export default function GameTabs({ game }: GameTabsProps) {
           <div className="game-details-info-card game-details-safety-card">
             <h3 className="game-details-section-title">
               <i className="bx bx-error" aria-hidden="true" />
-              Safety considerations
+              {t("details.safetyConsiderations")}
             </h3>
             <ul>
               {game.safety?.map((s) => (

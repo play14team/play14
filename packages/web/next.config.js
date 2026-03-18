@@ -1,7 +1,10 @@
 /** @type {import('next').NextConfig} */
 
 const { withSentryConfig } = require("@sentry/nextjs")
+const createNextIntlPlugin = require("next-intl/plugin")
 const path = require("node:path")
+
+const withNextIntl = createNextIntlPlugin()
 
 const nextConfig = {
   reactStrictMode: true,
@@ -75,5 +78,8 @@ const sentryConfig = {
   },
 }
 
-// Only wrap with Sentry if DSN is configured
-module.exports = process.env.SENTRY_DSN ? withSentryConfig(nextConfig, sentryConfig) : nextConfig
+// Chain plugins: next-intl -> (optionally) Sentry
+const configWithIntl = withNextIntl(nextConfig)
+module.exports = process.env.SENTRY_DSN
+  ? withSentryConfig(configWithIntl, sentryConfig)
+  : configWithIntl

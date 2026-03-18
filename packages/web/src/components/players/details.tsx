@@ -1,5 +1,6 @@
 import Image from "next/image"
-import Link from "next/link"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 import { deduplicateBy } from "@/libs/arrays"
 import type { Event as EventType, GeoLocation, Player, UploadFile } from "@/models/strapi"
 import HtmlContent from "../layout/html-content"
@@ -40,6 +41,7 @@ function mapSocialIcon(type: string): string {
 }
 
 export default function PlayerDetails({ player }: { player: Player }) {
+  const t = useTranslations("players")
   const avatar =
     player.avatar && typeof player.avatar === "object" ? (player.avatar as UploadFile) : undefined
   const locationName = getLocationName(player.location)
@@ -156,16 +158,16 @@ export default function PlayerDetails({ player }: { player: Player }) {
             {totalUniqueEvents > 0 && (
               <div className="player-profile-info__stats">
                 <span className="player-profile-info__stat">
-                  <strong>{totalUniqueEvents}</strong> events
+                  <strong>{totalUniqueEvents}</strong> {t("stats.events")}
                 </span>
                 {hosted.length > 0 && (
                   <span className="player-profile-info__stat">
-                    <strong>{hosted.length}</strong> hosted
+                    <strong>{hosted.length}</strong> {t("stats.hosted")}
                   </span>
                 )}
                 {mentored.length > 0 && (
                   <span className="player-profile-info__stat">
-                    <strong>{mentored.length}</strong> mentored
+                    <strong>{mentored.length}</strong> {t("stats.mentored")}
                   </span>
                 )}
               </div>

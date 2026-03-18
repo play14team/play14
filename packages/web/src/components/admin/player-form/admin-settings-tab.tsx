@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { sendSingleInvite } from "@/app/(admin)/admin/players/invite.action"
+import { sendSingleInvite } from "@/app/[locale]/(admin)/admin/players/invite.action"
 import {
   type PlayerSettingsData,
   sendPlayerPasswordReset,

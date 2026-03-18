@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import type { Event } from "@/models/strapi"
 import HtmlContent from "../../layout/html-content"
 import { TicketPurchaseFlow } from "../../tickets"
@@ -10,6 +11,7 @@ interface EventRegistrationProps {
 }
 
 export default function EventRegistration({ event }: EventRegistrationProps) {
+  const t = useTranslations("events")
   const ticketingMode = event.ticketingMode || "none"
 
   // No registration when ticketing is disabled
@@ -23,7 +25,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
       <section className="event-profile-registration" aria-labelledby="registration-heading">
         <h2 id="registration-heading" className="event-profile-registration__title">
           <i className="bx bx-purchase-tag" />
-          Get your tickets
+          {t("details.getYourTickets")}
         </h2>
         <div className="event-profile-registration__content">
           <TicketPurchaseFlow eventId={event.documentId!} />
@@ -44,7 +46,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     <section className="event-profile-registration" aria-labelledby="registration-heading">
       <h2 id="registration-heading" className="event-profile-registration__title">
         <i className="bx bx-user-plus" />
-        Register for this event
+        {t("details.registerForEvent")}
       </h2>
 
       <div className="event-profile-registration__content">
@@ -65,7 +67,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
               className="event-profile-info__action-btn event-profile-info__action-btn--primary"
             >
               <i className="bx bx-user-plus" />
-              Register now
+              {t("details.registerNow")}
             </Link>
           </div>
         )}

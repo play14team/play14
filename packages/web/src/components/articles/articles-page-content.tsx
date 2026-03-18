@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
 import { FilterBar, type FilterConfig, type FilterOption, useFilters } from "@/components/filters"
 import { useIntersection } from "@/hooks/useIntersection"
@@ -28,6 +29,7 @@ export default function ArticlesPageContent({
   initialArticles,
   filterOptions,
 }: ArticlesPageContentProps) {
+  const t = useTranslations("articles")
   const { activeFilters, setFilter, clearAllFilters } = useFilters(["category", "tag"])
 
   // Client-side pagination state
@@ -89,7 +91,7 @@ export default function ArticlesPageContent({
   const filters: FilterConfig[] = [
     {
       id: "category",
-      label: "Category",
+      label: t("filters.category"),
       icon: "bx bx-collection",
       options: filterOptions.categories,
       displayMode: "pills",
@@ -97,7 +99,7 @@ export default function ArticlesPageContent({
     },
     {
       id: "tag",
-      label: "Tags",
+      label: t("filters.tags"),
       icon: "bx bx-purchase-tag",
       options: filterOptions.tags,
       displayMode: "dropdown",
@@ -111,14 +113,14 @@ export default function ArticlesPageContent({
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <h1>Articles</h1>
+        <h1>{t("title")}</h1>
         <FilterBar
           filters={activeFilterConfigs}
           activeFilters={activeFilters}
           onFilterChange={setFilter}
           onClearAll={clearAllFilters}
           totalCount={filteredArticles.length}
-          countLabel="articles"
+          countLabel={t("filters.countLabel")}
         />
       </div>
 

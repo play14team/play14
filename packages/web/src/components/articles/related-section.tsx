@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
-import Link from "next/link"
+import { getTranslations } from "next-intl/server"
+import { Link } from "@/i18n/navigation"
 import type { Article } from "@/models/strapi"
 import { getArticleSidebar } from "./get.action"
 
@@ -12,6 +13,7 @@ import { getArticleSidebar } from "./get.action"
  * - Modern hover effects and styling
  */
 export default async function RelatedSection() {
+  const t = await getTranslations("articles")
   const response = await getArticleSidebar()
 
   const latest = (response.latest?.nodes || []) as Article[]
@@ -25,12 +27,12 @@ export default async function RelatedSection() {
         <header className="article-profile-related__header">
           <h2 id="related-heading" className="article-profile-related__title">
             <i className="bx bx-news" />
-            Latest articles
+            {t("latestArticles")}
           </h2>
         </header>
         <div className="article-profile-related__empty">
           <i className="bx bx-file" />
-          <p>No articles available yet.</p>
+          <p>{t("noArticles")}</p>
         </div>
       </section>
     )
@@ -42,10 +44,10 @@ export default async function RelatedSection() {
       <header className="article-profile-related__header">
         <h2 id="related-heading" className="article-profile-related__title">
           <i className="bx bx-news" />
-          Latest articles
+          {t("latestArticles")}
         </h2>
         <Link href="/articles" className="article-profile-related__link">
-          View all articles →
+          {t("viewAllArticles")} →
         </Link>
       </header>
 

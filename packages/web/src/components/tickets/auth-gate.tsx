@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useEffect, useState, useTransition } from "react"
 import { loginWithCredentials } from "@/components/auth/login.action"
 import LoginButtons from "@/components/auth/login-buttons"
@@ -15,6 +16,7 @@ interface AuthGateProps {
 }
 
 export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
+  const t = useTranslations("tickets")
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +47,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
     const password = formData.get("password") as string
 
     if (!identifier || !password) {
-      setError("Please enter your email and password")
+      setError(t("emailAndPasswordRequired"))
       return
     }
 
@@ -56,7 +58,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
         onDismiss()
         router.refresh()
       } else {
-        setError(result.error || "Login failed")
+        setError(result.error || t("loginFailed"))
       }
     })
   }
@@ -75,18 +77,16 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
         </button>
 
         <div className={styles.content}>
-          <h2>Sign in to Purchase Tickets</h2>
-          <p className={styles.subtitle}>
-            Create an account or sign in to complete your ticket purchase.
-          </p>
+          <h2>{t("signInTitle")}</h2>
+          <p className={styles.subtitle}>{t("signInSubtitle")}</p>
 
           <div className={styles.benefits}>
-            <h3>Why sign in?</h3>
+            <h3>{t("whySignIn")}</h3>
             <ul>
-              <li>Your tickets are linked to your profile</li>
-              <li>Easy check-in at the event</li>
-              <li>Access your tickets anytime</li>
-              <li>Join the #play14 community</li>
+              <li>{t("benefitProfile")}</li>
+              <li>{t("benefitCheckIn")}</li>
+              <li>{t("benefitAccess")}</li>
+              <li>{t("benefitCommunity")}</li>
             </ul>
           </div>
 
@@ -100,7 +100,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
           />
 
           <div className={styles.divider}>
-            <span>or sign in with email</span>
+            <span>{t("orSignInWithEmail")}</span>
           </div>
 
           <form className="auth-login-form" onSubmit={handleEmailSubmit}>
@@ -110,7 +110,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
               <input
                 type="text"
                 name="identifier"
-                placeholder="Email or username"
+                placeholder={t("emailOrUsername")}
                 autoComplete="username"
                 disabled={isPending}
               />
@@ -120,7 +120,7 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
               <input
                 type="password"
                 name="password"
-                placeholder="Password"
+                placeholder={t("password")}
                 autoComplete="current-password"
                 disabled={isPending}
               />
@@ -131,19 +131,19 @@ export default function AuthGate({ callbackUrl, onDismiss }: AuthGateProps) {
               className="auth-login-btn auth-login-btn-submit"
               disabled={isPending}
             >
-              {isPending ? "Signing in..." : "Sign in"}
+              {isPending ? t("signingIn") : t("signIn")}
             </button>
           </form>
 
           <p className={styles.registerLink}>
-            Don&apos;t have an account?{" "}
+            {t("noAccount")}{" "}
             <Link
               href={`/auth/register?callbackUrl=${encodeURIComponent(callbackUrl)}`}
               onClick={() => {
                 sessionStorage.setItem("auth_callback_url", callbackUrl)
               }}
             >
-              Create one
+              {t("createOne")}
             </Link>
           </p>
         </div>

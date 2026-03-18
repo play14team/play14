@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import Avatar from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ interface UserMenuProps {
 
 export default function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
+  const t = useTranslations("admin.sidebar")
 
   const handleSignOut = async () => {
     // Call signout endpoint
@@ -50,7 +52,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuItem asChild>
           <Link href="/admin">
             <i className="bx bx-grid-alt" />
-            Admin Dashboard
+            {t("dashboard")}
           </Link>
         </DropdownMenuItem>
 
@@ -58,7 +60,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           <DropdownMenuItem asChild>
             <Link href={`/players/${playerSlug}`}>
               <i className="bx bx-user" />
-              My Profile
+              {t("myProfile")}
             </Link>
           </DropdownMenuItem>
         )}
@@ -67,7 +69,7 @@ export default function UserMenu({ user }: UserMenuProps) {
 
         <DropdownMenuItem destructive onClick={handleSignOut}>
           <i className="bx bx-log-out" />
-          Sign Out
+          {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

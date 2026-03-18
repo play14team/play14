@@ -5,7 +5,7 @@ import {
   removePlayerAvatar,
   setPlayerAvatarFromLibrary,
   uploadPlayerAvatar,
-} from "@/app/(admin)/admin/players/players.action"
+} from "@/app/[locale]/(admin)/admin/players/players.action"
 import { deletePlayerPicture, uploadPlayerPicture } from "@/libs/api/players"
 import ImageManager from "../image-manager"
 import { useToast } from "../toast"

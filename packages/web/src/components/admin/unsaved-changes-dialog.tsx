@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef } from "react"
 
 interface UnsavedChangesDialogProps {
@@ -21,6 +22,7 @@ export default function UnsavedChangesDialog({
   onCancel,
   isSaving = false,
 }: UnsavedChangesDialogProps) {
+  const t = useTranslations("admin")
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   // Handle dialog open/close with native dialog API
@@ -77,12 +79,9 @@ export default function UnsavedChangesDialog({
           <i className="bx bx-error-circle" />
         </div>
 
-        <h2>Unsaved Changes</h2>
+        <h2>{t("unsavedChangesDialog.title")}</h2>
 
-        <p>
-          You have unsaved changes that will be lost if you navigate away. What would you like to
-          do?
-        </p>
+        <p>{t("unsavedChangesDialog.description")}</p>
 
         <div className="unsaved-changes-actions">
           <button
@@ -94,12 +93,12 @@ export default function UnsavedChangesDialog({
             {isSaving ? (
               <>
                 <i className="bx bx-loader-alt bx-spin" />
-                Saving...
+                {t("unsavedChangesDialog.saving")}
               </>
             ) : (
               <>
                 <i className="bx bx-save" />
-                Save changes
+                {t("unsavedChangesDialog.saveChanges")}
               </>
             )}
           </button>
@@ -111,7 +110,7 @@ export default function UnsavedChangesDialog({
             disabled={isSaving}
           >
             <i className="bx bx-trash" />
-            Discard changes
+            {t("unsavedChangesDialog.discardChanges")}
           </button>
 
           <button
@@ -121,7 +120,7 @@ export default function UnsavedChangesDialog({
             disabled={isSaving}
           >
             <i className="bx bx-x" />
-            Cancel
+            {t("unsavedChangesDialog.cancel")}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import {
@@ -8,7 +9,7 @@ import {
   getAvailableSponsors,
   type Sponsor,
   type Sponsorship,
-} from "@/app/(admin)/admin/events/[slug]/sponsor.action"
+} from "@/app/[locale]/(admin)/admin/events/[slug]/sponsor.action"
 
 const DEFAULT_CATEGORIES = ["Gold", "Silver", "Bronze", "Partner"]
 
@@ -287,6 +288,7 @@ interface CreateSponsorModalProps {
 }
 
 function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
+  const t = useTranslations("adminCrud")
   const [name, setName] = useState("")
   const [url, setUrl] = useState("")
   const [isCreating, setIsCreating] = useState(false)
@@ -322,7 +324,7 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
     <div className="admin-modal-overlay" onClick={onClose}>
       <div className="admin-modal sponsor-modal" onClick={(e) => e.stopPropagation()}>
         <div className="admin-modal-header">
-          <h3>Create New Sponsor</h3>
+          <h3>{t("adminCrud.sponsors.create.title")}</h3>
           <button type="button" className="admin-modal-close" onClick={onClose}>
             <i className="bx bx-x" />
           </button>
@@ -337,14 +339,14 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
           )}
 
           <div className="admin-form-group">
-            <label htmlFor="sponsorName">Name *</label>
+            <label htmlFor="sponsorName">{t("adminCrud.sponsors.form.nameLabel")}</label>
             <input
               type="text"
               id="sponsorName"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="admin-input"
-              placeholder="Sponsor name"
+              placeholder={t("adminCrud.sponsors.form.namePlaceholder")}
             />
           </div>
 
@@ -379,12 +381,12 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
             {isCreating ? (
               <>
                 <i className="bx bx-loader-alt bx-spin" />
-                Creating...
+                {t("adminCrud.common.creating")}...
               </>
             ) : (
               <>
                 <i className="bx bx-plus" />
-                Create Sponsor
+                {t("adminCrud.sponsors.create.submitButton")}
               </>
             )}
           </button>

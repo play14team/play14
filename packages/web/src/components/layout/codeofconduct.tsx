@@ -1,9 +1,16 @@
+import { getTranslations } from "next-intl/server"
+
 interface CodeOfConductProps {
   showCard?: boolean
 }
 
-const CodeOfConduct = ({ showCard = true }: CodeOfConductProps) => {
+const CodeOfConduct = async ({ showCard = true }: CodeOfConductProps) => {
+  const t = await getTranslations("home")
   const wrapperClass = showCard ? "single-funfacts-box values-card" : "values-content"
+
+  const richOptions = {
+    strong: (chunks: React.ReactNode) => <strong>{chunks}</strong>,
+  }
 
   return (
     <div className={wrapperClass}>
@@ -14,64 +21,41 @@ const CodeOfConduct = ({ showCard = true }: CodeOfConductProps) => {
       ) : (
         <div className="values-header">
           <i className="bx bx-shield-quarter blue" aria-hidden="true" />
-          <h3>Code of Conduct</h3>
+          <h3>{t("codeOfConduct.title")}</h3>
         </div>
       )}
-      {showCard && <h3>Code of Conduct</h3>}
+      {showCard && <h3>{t("codeOfConduct.title")}</h3>}
       <ul>
         <li>
           <i className="bx bx-brain orange" aria-hidden="true" />
-          <span>
-            You shall be <strong>open minded</strong> and ready to <strong>listen and learn</strong>{" "}
-            from others
-          </span>
+          <span>{t.rich("codeOfConduct.openMinded", richOptions)}</span>
         </li>
         <li>
           <i className="bx bx-bulb green" aria-hidden="true" />
-          <span>
-            You shall feel free to <strong>propose, experiment and explain</strong> what you have in
-            mind
-          </span>
+          <span>{t.rich("codeOfConduct.propose", richOptions)}</span>
         </li>
         <li>
           <i className="bx bx-block blue" aria-hidden="true" />
-          <span>
-            You shall <strong>not high-jack, sabotage or ruin</strong> the learning experience of
-            others
-          </span>
+          <span>{t.rich("codeOfConduct.noHighjack", richOptions)}</span>
         </li>
         <li>
           <i className="bx bx-time orange" aria-hidden="true" />
-          <span>
-            You shall <strong>manage your own timebox</strong> when facilitating so that other
-            sessions can start on time
-          </span>
+          <span>{t.rich("codeOfConduct.timebox", richOptions)}</span>
         </li>
         <li>
           <i className="bx bx-user-check green" aria-hidden="true" />
-          <span>
-            You shall <strong>behave appropriately</strong> and be a{" "}
-            <strong>decent human being</strong>
-          </span>
+          <span>{t.rich("codeOfConduct.behave", richOptions)}</span>
         </li>
         <li>
           <i className="bx bx-leaf blue" aria-hidden="true" />
-          <span>
-            You shall always <strong>leave the playground clean</strong> (boy scout rule),{" "}
-            <strong>avoid waste</strong> and try to reduce your <strong>carbon footprint</strong>
-          </span>
+          <span>{t.rich("codeOfConduct.clean", richOptions)}</span>
         </li>
         <li>
           <i className="bx bx-happy-heart-eyes orange" aria-hidden="true" />
-          <span>
-            You shall be ready to <strong>get serious fun and good laughs</strong> and should try
-            not be shy about that
-          </span>
+          <span>{t.rich("codeOfConduct.fun", richOptions)}</span>
         </li>
       </ul>
-      <p className={showCard ? "pt-3" : "values-summary"}>
-        To summarize: &ldquo;You shall not be an a**hole&rdquo;.
-      </p>
+      <p className={showCard ? "pt-3" : "values-summary"}>{t("codeOfConduct.summary")}</p>
     </div>
   )
 }

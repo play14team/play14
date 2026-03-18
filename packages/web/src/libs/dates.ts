@@ -1,12 +1,26 @@
 import { TZDate } from "@date-fns/tz"
-import { format } from "date-fns"
+import { format, type Locale } from "date-fns"
+import { de, enUS, es, fr, it } from "date-fns/locale"
 import type { Maybe } from "@/models/strapi"
+
+const dateFnsLocales: Record<string, Locale> = {
+  en: enUS,
+  fr,
+  es,
+  de,
+  it,
+}
+
+export function getDateFnsLocale(locale?: string): Locale {
+  return dateFnsLocales[locale || "en"] || enUS
+}
 
 export function formatDate(
   start: Date | string,
   end: Date | string,
   timezone: Maybe<string> | undefined,
-  displayYear?: boolean
+  displayYear?: boolean,
+  locale?: string
 ) {
   const firstFormat = "MMMM dd"
   const tz = timezone || "UTC"
@@ -16,5 +30,7 @@ export function formatDate(
     startDate.getMonth() !== endDate.getMonth() ? "MMMM " : ""
   }dd ${displayYear ? "yyyy" : ""}`
 
-  return `${format(startDate, firstFormat)}-${format(endDate, secondFormat)}`
+  const loc = getDateFnsLocale(locale)
+
+  return `${format(startDate, firstFormat, { locale: loc })}-${format(endDate, secondFormat, { locale: loc })}`
 }

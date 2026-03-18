@@ -21,7 +21,6 @@ import {
   EVENT_ACTIONS,
   EVENT_LOCATION_ACTIONS,
   EXPECTATION_ACTIONS,
-  FORMAT_ACTIONS,
   FUZZY_SEARCH_ACTIONS,
   GAME_ACTIONS,
   HISTORY_ACTIONS,
@@ -46,6 +45,7 @@ import {
   TICKET_ACTIONS,
   TICKET_ORDER_ACTIONS,
   TICKET_TYPE_ACTIONS,
+  TRANSLATE_ACTIONS,
   UPLOAD_ACTIONS,
   USER_ACTIONS,
   VENUE_ACTIONS,
@@ -65,6 +65,7 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Content (public)
   { action: EXPECTATION_ACTIONS.FIND, minimumRole: ROLE_TYPES.PUBLIC },
+  { action: HISTORY_ACTIONS.FIND, minimumRole: ROLE_TYPES.PUBLIC },
 
   // Liked items showcase (public - for public showcase page)
   { action: LIKED_ITEM_ACTIONS.LIST_PUBLIC, minimumRole: ROLE_TYPES.PUBLIC },
@@ -162,6 +163,8 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: EVENT_ACTIONS.GET_PARTICIPANT_STATS, minimumRole: ROLE_TYPES.HOST },
   { action: EVENT_ACTIONS.CHECK_IN_PARTICIPANT, minimumRole: ROLE_TYPES.HOST },
   { action: EVENT_ACTIONS.UNDO_CHECK_IN, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.GET_TRANSLATION, minimumRole: ROLE_TYPES.HOST },
+  { action: EVENT_ACTIONS.UPDATE_TRANSLATION, minimumRole: ROLE_TYPES.HOST },
 
   // Player management (for event organizers)
   { action: PLAYER_ACTIONS.LIST_PLAYERS, minimumRole: ROLE_TYPES.HOST },
@@ -309,11 +312,6 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: EVENT_LOCATION_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: EVENT_LOCATION_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
 
-  // Format management
-  { action: FORMAT_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },
-  { action: FORMAT_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
-  { action: FORMAT_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
-
   // Games full CRUD
   { action: GAME_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },
   { action: GAME_ACTIONS.FIND_ONE, minimumRole: ROLE_TYPES.FOUNDER },
@@ -321,8 +319,7 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: GAME_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: GAME_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
 
-  // History management
-  { action: HISTORY_ACTIONS.FIND, minimumRole: ROLE_TYPES.FOUNDER },
+  // History management (FIND is public, see above)
   { action: HISTORY_ACTIONS.UPDATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: HISTORY_ACTIONS.DELETE, minimumRole: ROLE_TYPES.FOUNDER },
 
@@ -425,4 +422,8 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
   { action: NEWSLETTER_SEND_ACTIONS.AI_GENERATE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: NEWSLETTER_SEND_ACTIONS.AI_IMPROVE, minimumRole: ROLE_TYPES.FOUNDER },
   { action: NEWSLETTER_SEND_ACTIONS.AI_SUGGEST_SUBJECTS, minimumRole: ROLE_TYPES.FOUNDER },
+
+  // ==================== TRANSLATION ====================
+  // AI-powered translation for content (Host+)
+  { action: TRANSLATE_ACTIONS.TRANSLATE, minimumRole: ROLE_TYPES.HOST },
 ]

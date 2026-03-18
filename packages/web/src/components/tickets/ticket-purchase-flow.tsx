@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
 import {
   trackAttendeeInfoSubmitted,
@@ -45,6 +46,7 @@ interface TicketPurchaseFlowProps {
 }
 
 export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps) {
+  const t = useTranslations("tickets")
   const router = useRouter()
   const pathname = usePathname()
   const [ticketData, setTicketData] = useState<EventTicketsResponse | null>(null)
@@ -149,7 +151,7 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
 
     if (!result.success) {
       trackCheckoutError(eventId, "draft_creation", result.error?.message)
-      setError(result.error?.message || "Failed to create order")
+      setError(result.error?.message || t("failedToCreate"))
       setFlowStep("select")
       setIsSubmitting(false)
       return
@@ -202,7 +204,7 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
 
     if (!updateResult.success) {
       trackCheckoutError(eventId, "attendee_info", updateResult.error)
-      setError(updateResult.error || "Failed to save attendee information")
+      setError(updateResult.error || t("failedToSaveAttendee"))
       setIsSubmitting(false)
       return
     }
@@ -217,7 +219,7 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
 
     if (!checkoutResult.success) {
       trackCheckoutError(eventId, "finalize", checkoutResult.error)
-      setError(checkoutResult.error || "Failed to create checkout session")
+      setError(checkoutResult.error || t("failedToCheckout"))
       setIsSubmitting(false)
       return
     }
@@ -250,7 +252,7 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
     return (
       <div className={styles.loading}>
         <div className={styles.spinner} />
-        <p>Loading tickets...</p>
+        <p>{t("loading")}</p>
       </div>
     )
   }
@@ -269,19 +271,19 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
           <div className={styles.stepIndicator}>
             <div className={`${styles.step} ${styles.completed}`}>
               <span className={styles.stepNumber}>1</span>
-              <span className={styles.stepLabel}>Tickets</span>
+              <span className={styles.stepLabel}>{t("stepTickets")}</span>
             </div>
             <div className={styles.stepDivider} />
             <div
               className={`${styles.step} ${flowStep === "attendees" || flowStep === "processing" ? styles.active : ""}`}
             >
               <span className={styles.stepNumber}>2</span>
-              <span className={styles.stepLabel}>Attendees</span>
+              <span className={styles.stepLabel}>{t("stepAttendees")}</span>
             </div>
             <div className={styles.stepDivider} />
             <div className={styles.step}>
               <span className={styles.stepNumber}>3</span>
-              <span className={styles.stepLabel}>Payment</span>
+              <span className={styles.stepLabel}>{t("stepPayment")}</span>
             </div>
           </div>
         )}
@@ -322,7 +324,7 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
         {flowStep === "processing" && (
           <div className={styles.processing}>
             <div className={styles.spinner} />
-            <p>Processing your order...</p>
+            <p>{t("processing")}</p>
           </div>
         )}
       </div>

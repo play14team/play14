@@ -1,12 +1,13 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import {
   DAYS_OF_WEEK,
   type DayOfWeek,
   type Timeslot,
   type TimetableDay,
-} from "@/app/(admin)/admin/events/[slug]/schedule.types"
+} from "@/app/[locale]/(admin)/admin/events/[slug]/schedule.types"
 
 interface Props {
   schedule: TimetableDay[]
@@ -21,6 +22,7 @@ interface EditingDay {
 }
 
 export default function ScheduleEditor({ schedule, onChange }: Props) {
+  const t = useTranslations("adminEvents.schedule")
   const [editing, setEditing] = useState<EditingDay | null>(null)
   const [expandedDays, setExpandedDays] = useState<Set<number>>(new Set())
   const [error, setError] = useState<string | null>(null)
@@ -41,14 +43,14 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
   const startAdding = () => {
     const nextAvailableDay = DAYS_OF_WEEK.find((d) => !usedDays.has(d))
     if (!nextAvailableDay) {
-      setError("All days of the week are already scheduled")
+      setError(t("allDaysScheduled"))
       return
     }
     setEditing({
       index: null,
       day: nextAvailableDay,
       description: "",
-      timeslots: [{ time: "09:00", description: "Start" }],
+      timeslots: [{ time: "09:00", description: t("start") }],
     })
     setError(null)
   }
@@ -94,7 +96,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
   const removeTimeslot = (index: number) => {
     if (!editing) return
     if (editing.timeslots.length <= 1) {
-      setError("A day must have at least one timeslot")
+      setError(t("atLeastOneTimeslot"))
       return
     }
     const newTimeslots = editing.timeslots.filter((_, i) => i !== index)
@@ -106,18 +108,18 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
 
     // Validate
     if (!editing.description.trim()) {
-      setError("Day description is required")
+      setError(t("dayDescriptionRequired"))
       return
     }
 
     for (let i = 0; i < editing.timeslots.length; i++) {
       const slot = editing.timeslots[i]
       if (!slot.time) {
-        setError(`Time is required for timeslot ${i + 1}`)
+        setError(t("timeRequired", { index: i + 1 }))
         return
       }
       if (!slot.description.trim()) {
-        setError(`Description is required for timeslot ${i + 1}`)
+        setError(t("timeslotDescriptionRequired", { index: i + 1 }))
         return
       }
     }
@@ -150,7 +152,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
   }
 
   const handleDelete = (index: number) => {
-    if (!confirm("Are you sure you want to remove this day from the schedule?")) {
+    if (!confirm(t("confirmRemoveDay"))) {
       return
     }
     onChange(schedule.filter((_, i) => i !== index))
@@ -178,7 +180,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
               <div className="schedule-day-form">
                 <div className="admin-form-row">
                   <div className="admin-form-group">
-                    <label>Day *</label>
+                    <label>{t("dayRequired")}</label>
                     <select
                       value={editing.day}
                       onChange={(e) => setEditing({ ...editing, day: e.target.value as DayOfWeek })}
@@ -192,19 +194,19 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     </select>
                   </div>
                   <div className="admin-form-group" style={{ flex: 2 }}>
-                    <label>Description *</label>
+                    <label>{t("descriptionRequired")}</label>
                     <input
                       type="text"
                       value={editing.description}
                       onChange={(e) => setEditing({ ...editing, description: e.target.value })}
                       className="admin-input"
-                      placeholder="e.g., Main event day"
+                      placeholder={t("descriptionPlaceholder")}
                     />
                   </div>
                 </div>
 
                 <div className="schedule-timeslots">
-                  <label>Timeslots</label>
+                  <label>{t("timeslots")}</label>
                   {editing.timeslots.map((slot, slotIndex) => (
                     <div key={slotIndex} className="schedule-timeslot-row">
                       <input
@@ -218,13 +220,13 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                         value={slot.description}
                         onChange={(e) => updateTimeslot(slotIndex, "description", e.target.value)}
                         className="admin-input"
-                        placeholder="Activity description"
+                        placeholder={t("activityDescription")}
                       />
                       <button
                         type="button"
                         onClick={() => removeTimeslot(slotIndex)}
                         className="admin-btn admin-btn-icon admin-btn-danger"
-                        title="Remove timeslot"
+                        title={t("removeTimeslot")}
                         disabled={editing.timeslots.length <= 1}
                       >
                         <i className="bx bx-x" />
@@ -237,7 +239,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     className="admin-btn admin-btn-secondary admin-btn-sm"
                   >
                     <i className="bx bx-plus" />
-                    Add Timeslot
+                    {t("addTimeslot")}
                   </button>
                 </div>
 
@@ -247,14 +249,14 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     onClick={handleSave}
                     className="admin-btn admin-btn-primary admin-btn-sm"
                   >
-                    Done
+                    {t("done")}
                   </button>
                   <button
                     type="button"
                     onClick={cancelEditing}
                     className="admin-btn admin-btn-secondary admin-btn-sm"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                 </div>
               </div>
@@ -270,7 +272,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     <span className="schedule-day-name">{day.day}</span>
                     <span className="schedule-day-description">{day.description}</span>
                     <span className="schedule-day-slots-count">
-                      {day.timeslots?.length || 0} activities
+                      {day.timeslots?.length || 0} {t("activities")}
                     </span>
                   </div>
                   <div className="schedule-day-toggle">
@@ -298,7 +300,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                         disabled={editing !== null}
                       >
                         <i className="bx bx-edit" />
-                        Edit
+                        {t("edit")}
                       </button>
                       <button
                         type="button"
@@ -307,7 +309,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                         disabled={editing !== null}
                       >
                         <i className="bx bx-trash" />
-                        Remove
+                        {t("remove")}
                       </button>
                     </div>
                   </div>
@@ -322,10 +324,10 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
       {editing?.index === null && (
         <div className="schedule-day-card schedule-day-new">
           <div className="schedule-day-form">
-            <h4>Add Day to Schedule</h4>
+            <h4>{t("addDay")}</h4>
             <div className="admin-form-row">
               <div className="admin-form-group">
-                <label>Day *</label>
+                <label>{t("dayRequired")}</label>
                 <select
                   value={editing.day}
                   onChange={(e) => setEditing({ ...editing, day: e.target.value as DayOfWeek })}
@@ -339,19 +341,19 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                 </select>
               </div>
               <div className="admin-form-group" style={{ flex: 2 }}>
-                <label>Description *</label>
+                <label>{t("descriptionRequired")}</label>
                 <input
                   type="text"
                   value={editing.description}
                   onChange={(e) => setEditing({ ...editing, description: e.target.value })}
                   className="admin-input"
-                  placeholder="e.g., Workshop day, Main event, etc."
+                  placeholder={t("descriptionPlaceholderNew")}
                 />
               </div>
             </div>
 
             <div className="schedule-timeslots">
-              <label>Timeslots</label>
+              <label>{t("timeslots")}</label>
               {editing.timeslots.map((slot, slotIndex) => (
                 <div key={slotIndex} className="schedule-timeslot-row">
                   <input
@@ -365,13 +367,13 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                     value={slot.description}
                     onChange={(e) => updateTimeslot(slotIndex, "description", e.target.value)}
                     className="admin-input"
-                    placeholder="Activity description"
+                    placeholder={t("activityDescription")}
                   />
                   <button
                     type="button"
                     onClick={() => removeTimeslot(slotIndex)}
                     className="admin-btn admin-btn-icon admin-btn-danger"
-                    title="Remove timeslot"
+                    title={t("removeTimeslot")}
                     disabled={editing.timeslots.length <= 1}
                   >
                     <i className="bx bx-x" />
@@ -384,7 +386,7 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                 className="admin-btn admin-btn-secondary admin-btn-sm"
               >
                 <i className="bx bx-plus" />
-                Add Timeslot
+                {t("addTimeslot")}
               </button>
             </div>
 
@@ -394,14 +396,14 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
                 onClick={handleSave}
                 className="admin-btn admin-btn-primary admin-btn-sm"
               >
-                Add Day
+                {t("addDay")}
               </button>
               <button
                 type="button"
                 onClick={cancelEditing}
                 className="admin-btn admin-btn-secondary admin-btn-sm"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           </div>
@@ -412,15 +414,11 @@ export default function ScheduleEditor({ schedule, onChange }: Props) {
       {!editing && availableDays.length > 0 && (
         <button type="button" onClick={startAdding} className="admin-btn admin-btn-secondary">
           <i className="bx bx-plus" />
-          Add Day to Schedule
+          {t("addDay")}
         </button>
       )}
 
-      {schedule.length === 0 && !editing && (
-        <p className="schedule-empty">
-          No schedule defined yet. Add days and timeslots to create the event schedule.
-        </p>
-      )}
+      {schedule.length === 0 && !editing && <p className="schedule-empty">{t("noSchedule")}</p>}
     </div>
   )
 }

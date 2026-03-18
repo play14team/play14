@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
 import { FilterBar, type FilterConfig, type FilterOption, useFilters } from "@/components/filters"
 import { useIntersection } from "@/hooks/useIntersection"
@@ -28,6 +29,7 @@ export default function PlayersPageContent({
   initialPlayers,
   filterOptions,
 }: PlayersPageContentProps) {
+  const t = useTranslations("players")
   const { activeFilters, setFilter, clearAllFilters } = useFilters(["letter", "position"])
 
   // Client-side pagination state
@@ -86,7 +88,7 @@ export default function PlayersPageContent({
   const filters: FilterConfig[] = [
     {
       id: "letter",
-      label: "Name",
+      label: t("filters.name"),
       icon: "bx bx-sort-a-z",
       options: filterOptions.letters.map((opt) => ({
         ...opt,
@@ -97,7 +99,7 @@ export default function PlayersPageContent({
     },
     {
       id: "position",
-      label: "Position",
+      label: t("filters.position"),
       icon: "bx bx-user",
       options: filterOptions.positions,
       displayMode: "pills",
@@ -111,14 +113,14 @@ export default function PlayersPageContent({
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <h1>Players</h1>
+        <h1>{t("title")}</h1>
         <FilterBar
           filters={activeFilterConfigs}
           activeFilters={activeFilters}
           onFilterChange={setFilter}
           onClearAll={clearAllFilters}
           totalCount={filteredPlayers.length}
-          countLabel="players"
+          countLabel={t("filters.countLabel")}
         />
       </div>
 

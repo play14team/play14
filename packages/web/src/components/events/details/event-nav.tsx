@@ -1,6 +1,8 @@
 import { format, parseISO } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
+import { getLocale } from "next-intl/server"
+import { getDateFnsLocale } from "@/libs/dates"
 import type { Event, UploadFile } from "@/models/strapi"
 import { getEventNav } from "../get.action"
 
@@ -12,6 +14,7 @@ interface NavEvent {
 }
 
 export default async function EventNav({ current }: { current: string }) {
+  const locale = await getLocale()
   const events = (await getEventNav()) as Event[]
   const index = events.findIndex((e) => e.slug === current)
 
@@ -44,7 +47,7 @@ export default async function EventNav({ current }: { current: string }) {
           <div className="event-profile-nav__info">
             <span className="event-profile-nav__name">{previous.name}</span>
             {previous.date && (
-              <span className="event-profile-nav__date">{formatDate(previous.date)}</span>
+              <span className="event-profile-nav__date">{formatDate(previous.date, locale)}</span>
             )}
           </div>
         </Link>
@@ -59,7 +62,9 @@ export default async function EventNav({ current }: { current: string }) {
         >
           <div className="event-profile-nav__info">
             <span className="event-profile-nav__name">{next.name}</span>
-            {next.date && <span className="event-profile-nav__date">{formatDate(next.date)}</span>}
+            {next.date && (
+              <span className="event-profile-nav__date">{formatDate(next.date, locale)}</span>
+            )}
           </div>
           {next.image && (
             <Image
@@ -89,7 +94,7 @@ function mapToNavEvent(event: Event): NavEvent {
   }
 }
 
-function formatDate(date: Date | string): string {
+function formatDate(date: Date | string, locale?: string): string {
   const parsed = typeof date === "string" ? parseISO(date) : date
-  return format(parsed, "MMM d, yyyy")
+  return format(parsed, "MMM d, yyyy", { locale: getDateFnsLocale(locale) })
 }

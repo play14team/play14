@@ -1,9 +1,11 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import { forgotPassword } from "./forgot-password.action"
 
 export default function ForgotPasswordForm() {
+  const t = useTranslations("auth.forgotPassword")
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -17,7 +19,7 @@ export default function ForgotPasswordForm() {
     const email = formData.get("email") as string
 
     if (!email) {
-      setError("Please enter your email address")
+      setError(t("emailRequired"))
       return
     }
 
@@ -27,17 +29,13 @@ export default function ForgotPasswordForm() {
       if (result.success) {
         setSuccess(true)
       } else {
-        setError(result.error || "Something went wrong. Please try again.")
+        setError(result.error || t("genericError"))
       }
     })
   }
 
   if (success) {
-    return (
-      <div className="auth-success-message">
-        If an account exists with that email, we've sent a password reset link. Check your inbox.
-      </div>
-    )
+    return <div className="auth-success-message">{t("successMessage")}</div>
   }
 
   return (
@@ -49,14 +47,14 @@ export default function ForgotPasswordForm() {
           type="email"
           id="email"
           name="email"
-          placeholder="Email address"
+          placeholder={t("emailPlaceholder")}
           autoComplete="email"
           disabled={isPending}
         />
       </div>
 
       <button type="submit" className="auth-login-btn auth-login-btn-submit" disabled={isPending}>
-        {isPending ? "Sending..." : "Send reset link"}
+        {isPending ? t("sending") : t("submit")}
       </button>
     </form>
   )

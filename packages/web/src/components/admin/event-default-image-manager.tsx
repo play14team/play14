@@ -6,7 +6,7 @@ import {
   removeEventImage,
   setEventImageFromLibrary,
   uploadEventImage,
-} from "@/app/(admin)/admin/events/[slug]/images.action"
+} from "@/app/[locale]/(admin)/admin/events/[slug]/images.action"
 import { useToast } from "@/components/admin/toast"
 import ImageManager from "./image-manager"
 

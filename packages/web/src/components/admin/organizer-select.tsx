@@ -1,7 +1,8 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState } from "react"
-import type { OrganizerOption } from "@/app/(admin)/admin/events/[slug]/event-edit.action"
+import type { OrganizerOption } from "@/app/[locale]/(admin)/admin/events/[slug]/event-edit.action"
 import Avatar from "@/components/ui/avatar"
 
 interface OrganizerSelectProps {
@@ -16,9 +17,10 @@ export default function OrganizerSelect({
   organizers,
   selectedIds,
   onSelect,
-  placeholder = "Add...",
+  placeholder,
   filterFn,
 }: OrganizerSelectProps) {
+  const t = useTranslations("adminEvents.teamSponsors")
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const containerRef = useRef<HTMLDivElement>(null)
@@ -70,7 +72,7 @@ export default function OrganizerSelect({
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
-        <span className="organizer-select-placeholder">{placeholder}</span>
+        <span className="organizer-select-placeholder">{placeholder ?? t("add")}</span>
         <i className={`bx bx-chevron-${isOpen ? "up" : "down"}`} />
       </button>
 
@@ -81,7 +83,7 @@ export default function OrganizerSelect({
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search..."
+              placeholder={t("search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -90,7 +92,7 @@ export default function OrganizerSelect({
           <ul className="organizer-select-list">
             {availableOrganizers.length === 0 ? (
               <li className="organizer-select-empty">
-                {search ? "No matches found" : "No organizers available"}
+                {search ? t("noMatchesFound") : t("noOrganizersAvailable")}
               </li>
             ) : (
               availableOrganizers.map((organizer) => (
@@ -126,6 +128,7 @@ interface SelectedOrganizerProps {
 }
 
 export function SelectedOrganizer({ organizer, onRemove }: SelectedOrganizerProps) {
+  const t = useTranslations("adminEvents.teamSponsors")
   if (!organizer) return null
 
   return (
@@ -139,7 +142,7 @@ export function SelectedOrganizer({ organizer, onRemove }: SelectedOrganizerProp
         />
         <span>{organizer.name}</span>
       </div>
-      <button type="button" className="organizer-remove" onClick={onRemove} title="Remove">
+      <button type="button" className="organizer-remove" onClick={onRemove} title={t("remove")}>
         <i className="bx bx-x" />
       </button>
     </li>

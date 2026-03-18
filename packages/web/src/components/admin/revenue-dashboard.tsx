@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import {
   Area,
@@ -16,7 +17,7 @@ import {
 import {
   getRevenueAnalytics,
   type RevenueAnalytics,
-} from "@/app/(admin)/admin/events/[slug]/revenue-analytics.action"
+} from "@/app/[locale]/(admin)/admin/events/[slug]/revenue-analytics.action"
 import styles from "./revenue-dashboard.module.scss"
 
 interface Props {
@@ -33,6 +34,8 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) {
+  const t = useTranslations("adminEvents.financeTab")
+  const locale = useLocale()
   const [analytics, setAnalytics] = useState<RevenueAnalytics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +48,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
       const data = await getRevenueAnalytics(eventId)
 
       if (!data) {
-        setError("Failed to load revenue analytics")
+        setError(t("failedToLoad"))
         setLoading(false)
         return
       }
@@ -63,7 +66,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
   }, [eventId, onAnalyticsLoaded])
 
   const formatCurrency = (amount: number, currency = "EUR") => {
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
       minimumFractionDigits: 0,
@@ -73,7 +76,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    return date.toLocaleDateString(locale, { month: "short", day: "numeric" })
   }
 
   if (loading) {
@@ -81,7 +84,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
       <div className={styles.dashboard}>
         <div className={styles.loading}>
           <i className="bx bx-loader-alt bx-spin" />
-          Loading revenue analytics...
+          {t("loading")}
         </div>
       </div>
     )
@@ -127,7 +130,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
             <i className="bx bx-dollar-circle" />
           </div>
           <div className={styles.summaryContent}>
-            <span className={styles.summaryLabel}>Total Revenue</span>
+            <span className={styles.summaryLabel}>{t("totalRevenue")}</span>
             <span className={styles.summaryValue}>
               {formatCurrency(summary.totalRevenue, summary.currency)}
             </span>
@@ -139,13 +142,13 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
             <i className="bx bx-trending-up" />
           </div>
           <div className={styles.summaryContent}>
-            <span className={styles.summaryLabel}>Net Revenue</span>
+            <span className={styles.summaryLabel}>{t("netRevenue")}</span>
             <span className={styles.summaryValue}>
               {formatCurrency(summary.netRevenue, summary.currency)}
             </span>
             {summary.totalRefunded > 0 && (
               <span className={styles.summarySubtext}>
-                -{formatCurrency(summary.totalRefunded, summary.currency)} refunded
+                {t("refunded", { amount: formatCurrency(summary.totalRefunded, summary.currency) })}
               </span>
             )}
           </div>
@@ -156,11 +159,11 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
             <i className="bx bx-receipt" />
           </div>
           <div className={styles.summaryContent}>
-            <span className={styles.summaryLabel}>Paid Orders</span>
+            <span className={styles.summaryLabel}>{t("paidOrders")}</span>
             <span className={styles.summaryValue}>{summary.totalOrders}</span>
             {summary.averageOrderValue > 0 && (
               <span className={styles.summarySubtext}>
-                Avg: {formatCurrency(summary.averageOrderValue, summary.currency)}
+                {t("avg", { amount: formatCurrency(summary.averageOrderValue, summary.currency) })}
               </span>
             )}
           </div>
@@ -171,7 +174,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
             <i className="bx bxs-coupon" />
           </div>
           <div className={styles.summaryContent}>
-            <span className={styles.summaryLabel}>Tickets Sold</span>
+            <span className={styles.summaryLabel}>{t("ticketsSold")}</span>
             <span className={styles.summaryValue}>{summary.totalTickets}</span>
           </div>
         </div>
@@ -180,14 +183,14 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
       {!hasOrders ? (
         <div className={styles.emptyState}>
           <i className="bx bx-chart" />
-          <p>No ticket sales yet. Charts will appear once orders are placed.</p>
+          <p>{t("noSalesYet")}</p>
         </div>
       ) : (
         <>
           {/* Revenue Timeline */}
           {hasTimeline && (
             <div className={styles.chartSection}>
-              <h3 className={styles.chartTitle}>Revenue Over Time</h3>
+              <h3 className={styles.chartTitle}>{t("revenueOverTime")}</h3>
               <div className={styles.chartContainer}>
                 <ResponsiveContainer width="100%" height={250}>
                   <AreaChart data={timeline}>
@@ -213,7 +216,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
                     <Tooltip
                       formatter={(value) => [
                         formatCurrency(Number(value) || 0, summary.currency),
-                        "Revenue",
+                        t("revenue"),
                       ]}
                       labelFormatter={(label) => formatDate(String(label))}
                       contentStyle={{
@@ -240,17 +243,17 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
             {/* Revenue by Ticket Type */}
             {byTicketType.length > 0 && (
               <div className={styles.chartSection}>
-                <h3 className={styles.chartTitle}>Revenue by Ticket Type</h3>
+                <h3 className={styles.chartTitle}>{t("revenueByTicketType")}</h3>
                 <div className={styles.ticketTypeList}>
                   {byTicketType.map((ticket) => {
-                    const maxRevenue = Math.max(...byTicketType.map((t) => t.revenue))
+                    const maxRevenue = Math.max(...byTicketType.map((tt) => tt.revenue))
                     const percentage = maxRevenue > 0 ? (ticket.revenue / maxRevenue) * 100 : 0
                     return (
                       <div key={ticket.ticketTypeId} className={styles.ticketTypeItem}>
                         <div className={styles.ticketTypeInfo}>
                           <span className={styles.ticketTypeName}>{ticket.ticketTypeName}</span>
                           <span className={styles.ticketTypeMeta}>
-                            {ticket.quantity} sold &middot;{" "}
+                            {t("sold", { count: ticket.quantity })} &middot;{" "}
                             {formatCurrency(ticket.revenue, summary.currency)}
                           </span>
                         </div>
@@ -270,7 +273,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
             {/* Order Status Breakdown */}
             {statusData.length > 0 && (
               <div className={styles.chartSection}>
-                <h3 className={styles.chartTitle}>Order Status</h3>
+                <h3 className={styles.chartTitle}>{t("orderStatus")}</h3>
                 <div className={styles.statusChartWrapper}>
                   <div className={styles.chartContainer}>
                     <ResponsiveContainer width="100%" height={180}>
@@ -291,7 +294,7 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
                         </Pie>
                         <Tooltip
                           formatter={(value, name, entry) => [
-                            `${value} orders (${formatCurrency(
+                            `${t("ordersCount", { count: Number(value) })} (${formatCurrency(
                               (entry.payload as { amount: number }).amount,
                               summary.currency
                             )})`,
@@ -326,17 +329,17 @@ export default function RevenueDashboard({ eventId, onAnalyticsLoaded }: Props) 
           {/* Discount Usage */}
           {discountUsage.codesUsed > 0 && (
             <div className={styles.discountSection}>
-              <h3 className={styles.chartTitle}>Discount Usage</h3>
+              <h3 className={styles.chartTitle}>{t("discountUsage")}</h3>
               <div className={styles.discountStats}>
                 <div className={styles.discountStat}>
                   <span className={styles.discountValue}>{discountUsage.codesUsed}</span>
-                  <span className={styles.discountLabel}>Codes Used</span>
+                  <span className={styles.discountLabel}>{t("codesUsed")}</span>
                 </div>
                 <div className={styles.discountStat}>
                   <span className={styles.discountValue}>
                     {formatCurrency(discountUsage.totalDiscounted, summary.currency)}
                   </span>
-                  <span className={styles.discountLabel}>Total Discounted</span>
+                  <span className={styles.discountLabel}>{t("totalDiscounted")}</span>
                 </div>
               </div>
             </div>

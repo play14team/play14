@@ -2,9 +2,11 @@
 
 import { createEvent, type EventAttributes } from "ics"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Enum_Event_Eventstatus, type Event } from "@/models/strapi"
 
 const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boolean }) => {
+  const t = useTranslations("events")
   const start = new Date(event.start)
   const end = new Date(event.end)
 
@@ -52,7 +54,7 @@ const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boole
       ? `${event.venue.name}${event.venue.location ? " - " : ""}${
           event.venue.location ? event.venue.location.place_name : ""
         }`
-      : "No venue yet"
+      : t("noVenue")
   }
 
   function getUrl(event: Event) {
@@ -96,9 +98,7 @@ const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boole
       URL.revokeObjectURL(url)
     } catch (error) {
       console.error("Failed to download calendar event:", error)
-      alert(
-        "Failed to download calendar event. Please try again or contact support if the problem persists."
-      )
+      alert(t("details.calendarDownloadError"))
     }
   }
 
@@ -108,17 +108,21 @@ const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boole
         href="#"
         onClick={handleDownload}
         className="event-profile-info__action-btn event-profile-info__action-btn--secondary"
-        aria-label="Add event to your calendar"
+        aria-label={t("details.addToCalendarLabel")}
       >
         <i className="bx bx-calendar" />
-        Add to calendar
+        {t("details.addToCalendar")}
       </Link>
     )
   }
 
   return (
     <Link href="#" onClick={handleDownload}>
-      <i className="bx bx-calendar" title="Add to your calendar" style={{ fontSize: "25px" }} />
+      <i
+        className="bx bx-calendar"
+        title={t("details.addToCalendarLabel")}
+        style={{ fontSize: "25px" }}
+      />
     </Link>
   )
 }

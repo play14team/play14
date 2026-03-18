@@ -2,6 +2,7 @@
 
 import countries from "i18n-iso-countries"
 import en from "i18n-iso-countries/langs/en.json"
+import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ReactCountryFlag from "react-country-flag"
 
@@ -26,11 +27,9 @@ interface CountrySelectorProps {
   required?: boolean
 }
 
-export default function CountrySelector({
-  value,
-  onChange,
-  placeholder = "Select a country...",
-}: CountrySelectorProps) {
+export default function CountrySelector({ value, onChange, placeholder }: CountrySelectorProps) {
+  const t = useTranslations("adminCrud")
+  const resolvedPlaceholder = placeholder || t("countrySelector.placeholder")
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState("")
   const containerRef = useRef<HTMLDivElement>(null)
@@ -100,7 +99,7 @@ export default function CountrySelector({
             </>
           ) : (
             <span className="country-selector-text country-selector-placeholder">
-              {placeholder}
+              {resolvedPlaceholder}
             </span>
           )}
         </div>
@@ -115,7 +114,7 @@ export default function CountrySelector({
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search countries..."
+              placeholder={t("countrySelector.searchPlaceholder")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="admin-input"
@@ -145,7 +144,7 @@ export default function CountrySelector({
                 </button>
               ))
             ) : (
-              <div className="country-selector-empty">No countries found</div>
+              <div className="country-selector-empty">{t("countrySelector.noCountries")}</div>
             )}
           </div>
         </div>

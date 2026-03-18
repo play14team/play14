@@ -6,7 +6,7 @@ import {
   linkStripeAccountToEvent,
   type StripeAccountStatus,
   unlinkStripeAccountFromEvent,
-} from "@/app/(admin)/admin/stripe/stripe-connect.action"
+} from "@/app/[locale]/(admin)/admin/stripe/stripe-connect.action"
 import ConfirmationDialog from "@/components/admin/confirmation-dialog"
 
 interface EventStripeAccount {

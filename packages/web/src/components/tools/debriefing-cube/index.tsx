@@ -1,6 +1,8 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useCallback, useMemo, useReducer } from "react"
+import { Link } from "@/i18n/navigation"
 import type { DeckState, GameAction, GameMode, GameState, LensId } from "@/models/debriefing-cube"
 import Card from "./card"
 import { cards, getCardById, getLensById, lenses } from "./data/debriefing-cube-data"
@@ -179,6 +181,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 }
 
 export default function DebriefingCube() {
+  const t = useTranslations("debriefingCube")
   const [state, dispatch] = useReducer(gameReducer, initialState)
 
   const handleModeChange = useCallback((mode: GameMode) => {
@@ -220,11 +223,8 @@ export default function DebriefingCube() {
   return (
     <div className="debriefing-cube-page">
       <header className="debriefing-cube-header">
-        <h1>Debriefing cube</h1>
-        <p>
-          Six perspectives for powerful reflection. Roll the dice to pick a lens, or draw a random
-          card from the deck.
-        </p>
+        <h1>{t("title")}</h1>
+        <p>{t("subtitle")}</p>
       </header>
 
       <div className="debriefing-cube-content">
@@ -246,7 +246,7 @@ export default function DebriefingCube() {
               disabled={allCardsDrawn}
             >
               <i className="bx bx-shuffle" />
-              {allCardsDrawn ? "All cards drawn" : "Draw random card"}
+              {allCardsDrawn ? t("allCardsDrawn") : t("drawRandomCard")}
             </button>
           )}
 
@@ -255,12 +255,8 @@ export default function DebriefingCube() {
           ) : (
             <div className="debriefing-cube-empty">
               <i className="bx bx-card" />
-              <h3>Ready to reflect</h3>
-              <p>
-                {state.mode === "dice"
-                  ? "Click the dice to roll and pick a lens"
-                  : "Click the button to draw a random card"}
-              </p>
+              <h3>{t("readyToReflect")}</h3>
+              <p>{state.mode === "dice" ? t("diceHint") : t("randomHint")}</p>
             </div>
           )}
         </div>
@@ -270,13 +266,15 @@ export default function DebriefingCube() {
 
       <button type="button" className="debriefing-cube-reset" onClick={handleReset}>
         <i className="bx bx-reset" />
-        Reset all decks
+        {t("resetAllDecks")}
       </button>
 
       <footer className="debriefing-cube-attribution">
         <p>
-          Created by <a href="/players/chris-caswell">Chris Caswell</a> and{" "}
-          <a href="/players/julian-kea">Julian Kea</a>
+          {t.rich("createdBy", {
+            chris: (chunks) => <Link href="/players/chris-caswell">{chunks}</Link>,
+            julian: (chunks) => <Link href="/players/julian-kea">{chunks}</Link>,
+          })}
         </p>
         <p>
           <a
@@ -285,7 +283,7 @@ export default function DebriefingCube() {
             rel="noopener noreferrer"
           >
             <i className="bx bx-link-external" />
-            Original PDF
+            {t("originalPdf")}
           </a>
           <span className="debriefing-cube-attribution__license">
             <i className="bx bxl-creative-commons" />

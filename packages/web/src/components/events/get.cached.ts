@@ -117,7 +117,9 @@ function computeTicketingMode(
  * This prevents double-fetching when both generateMetadata and the page component
  * need the same event data.
  */
-export const getEventBySlug = cache(async (slug: string) => {
+export const getEventBySlug = cache(async (slug: string, locale?: string) => {
+  // Always fetch in default locale to get all images and relations
+  // (Strapi treats media relations as localized, so non-default locale entries lack them)
   const response = await restQuery<(Event & { stripeAccount?: { documentId?: string } })[]>(
     "events",
     {
@@ -131,8 +133,27 @@ export const getEventBySlug = cache(async (slug: string) => {
   const event = response.data?.[0]
   if (!event) return null
 
-  return {
+  const result = {
     ...event,
     ticketingMode: computeTicketingMode(event),
   }
+
+  // Overlay localized description for non-default locales
+  if (locale && locale !== "en") {
+    try {
+      const localeResponse = await restQuery<(Event & { description?: string })[]>("events", {
+        filters: { slug: { $eq: slug } },
+        fields: ["description"],
+        locale,
+      })
+      const localeEvent = localeResponse.data?.[0]
+      if (localeEvent?.description) {
+        result.description = localeEvent.description
+      }
+    } catch {
+      // Fall back to English description if locale query fails
+    }
+  }
+
+  return result
 })

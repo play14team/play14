@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import TestimonialItem from "@/components/events/testimonial"
 import type { Testimonial } from "@/models/strapi"
@@ -11,6 +12,7 @@ interface TestimonialsRefreshProps {
 }
 
 const TestimonialsRefresh = ({ initialTestimonials }: TestimonialsRefreshProps) => {
+  const t = useTranslations("home")
   const [testimonials, setTestimonials] = useState(initialTestimonials)
   const [isPending, startTransition] = useTransition()
 
@@ -35,8 +37,8 @@ const TestimonialsRefresh = ({ initialTestimonials }: TestimonialsRefreshProps) 
           onClick={handleRefresh}
           disabled={isPending}
           className="testimonials-refresh-button"
-          aria-label="Show different testimonials"
-          title="Show different testimonials"
+          aria-label={t("testimonials.refreshLabel")}
+          title={t("testimonials.refreshLabel")}
         >
           <svg
             width="20"

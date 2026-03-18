@@ -8,7 +8,7 @@ import {
   listMediaLibraryFiles,
   listMediaLibraryFolders,
   type MediaFolder,
-} from "@/app/(admin)/admin/events/[slug]/images.action"
+} from "@/app/[locale]/(admin)/admin/events/[slug]/images.action"
 
 interface MediaLibraryBrowserProps {
   isOpen: boolean
@@ -422,21 +422,23 @@ export default function MediaLibraryBrowser({
                   onClick={() => setSelectedImage(file)}
                   title={file.name}
                 >
-                  {isDisplayable ? (
-                    <Image
-                      src={thumbnailUrl}
-                      alt={file.name}
-                      fill
-                      sizes="120px"
-                      style={{ objectFit: "cover" }}
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="media-library-item-placeholder">
-                      <i className="bx bx-image" />
-                      <span>{file.ext || file.mime?.split("/")[1] || "image"}</span>
-                    </div>
-                  )}
+                  <div className="media-library-item-image">
+                    {isDisplayable ? (
+                      <Image
+                        src={thumbnailUrl}
+                        alt={file.name}
+                        fill
+                        sizes="150px"
+                        style={{ objectFit: "cover" }}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="media-library-item-placeholder">
+                        <i className="bx bx-image" />
+                        <span>{file.ext || file.mime?.split("/")[1] || "image"}</span>
+                      </div>
+                    )}
+                  </div>
                   {selectedImage?.id === file.id && (
                     <div className="media-library-item-check">
                       <i className="bx bx-check" />

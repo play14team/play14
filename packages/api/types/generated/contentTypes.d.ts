@@ -941,95 +941,6 @@ export interface ApiExpectationExpectation extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiFormatFormat extends Struct.SingleTypeSchema {
-  collectionName: 'formats';
-  info: {
-    description: '';
-    displayName: 'Format';
-    pluralName: 'formats';
-    singularName: 'format';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  pluginOptions: {
-    i18n: {
-      localized: true;
-    };
-  };
-  attributes: {
-    bumblebee: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    butterfly: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    lawOfTwoFeet: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    locale: Schema.Attribute.String;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::format.format'>;
-    openspace: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    publishedAt: Schema.Attribute.DateTime;
-    schedule: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      > &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiGameGame extends Struct.CollectionTypeSchema {
   collectionName: 'games';
   info: {
@@ -1312,81 +1223,6 @@ export interface ApiLikedItemLikedItem extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     url: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
-export interface ApiLinkedinPostLinkedinPost
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'linkedin_posts';
-  info: {
-    description: 'Audit trail for LinkedIn posts';
-    displayName: 'LinkedIn Post';
-    pluralName: 'linkedin-posts';
-    singularName: 'linkedin-post';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    content: Schema.Attribute.Text & Schema.Attribute.Required;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    errorMessage: Schema.Attribute.Text;
-    event: Schema.Attribute.Relation<'manyToOne', 'api::event.event'>;
-    imageUrl: Schema.Attribute.String;
-    linkedInPostId: Schema.Attribute.String;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::linkedin-post.linkedin-post'
-    > &
-      Schema.Attribute.Private;
-    postedAt: Schema.Attribute.DateTime;
-    postStatus: Schema.Attribute.Enumeration<['draft', 'published', 'failed']> &
-      Schema.Attribute.DefaultTo<'draft'>;
-    postType: Schema.Attribute.Enumeration<
-      ['announcement', 'reminder30days', 'reminder7days', 'manual']
-    > &
-      Schema.Attribute.Required;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiLinkedinTokenLinkedinToken extends Struct.SingleTypeSchema {
-  collectionName: 'linkedin_token';
-  info: {
-    description: 'OAuth tokens for LinkedIn integration';
-    displayName: 'LinkedIn Token';
-    pluralName: 'linkedin-tokens';
-    singularName: 'linkedin-token';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    accessToken: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.Private;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    expiresAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::linkedin-token.linkedin-token'
-    > &
-      Schema.Attribute.Private;
-    organizationId: Schema.Attribute.String & Schema.Attribute.Required;
-    publishedAt: Schema.Attribute.DateTime;
-    refreshToken: Schema.Attribute.Text & Schema.Attribute.Private;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
   };
 }
 
@@ -2736,13 +2572,10 @@ declare module '@strapi/strapi' {
       'api::event-location.event-location': ApiEventLocationEventLocation;
       'api::event.event': ApiEventEvent;
       'api::expectation.expectation': ApiExpectationExpectation;
-      'api::format.format': ApiFormatFormat;
       'api::game.game': ApiGameGame;
       'api::history.history': ApiHistoryHistory;
       'api::home.home': ApiHomeHome;
       'api::liked-item.liked-item': ApiLikedItemLikedItem;
-      'api::linkedin-post.linkedin-post': ApiLinkedinPostLinkedinPost;
-      'api::linkedin-token.linkedin-token': ApiLinkedinTokenLinkedinToken;
       'api::newsletter-send.newsletter-send': ApiNewsletterSendNewsletterSend;
       'api::player-claim.player-claim': ApiPlayerClaimPlayerClaim;
       'api::player.player': ApiPlayerPlayer;

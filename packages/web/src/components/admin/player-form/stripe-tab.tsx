@@ -1,6 +1,6 @@
 "use client"
 
-import type { StripeAccountStatus } from "@/app/(admin)/admin/stripe/stripe-connect.action"
+import type { StripeAccountStatus } from "@/app/[locale]/(admin)/admin/stripe/stripe-connect.action"
 import StripeConnect from "@/components/admin/stripe-connect"
 
 interface StripeTabProps {

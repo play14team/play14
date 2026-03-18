@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
 import { FilterBar, type FilterConfig, type FilterOption, useFilters } from "@/components/filters"
 import { useIntersection } from "@/hooks/useIntersection"
@@ -25,6 +26,7 @@ const PAGE_SIZE = 18
  * - URL params are synced for shareable links
  */
 export default function GamesPageContent({ initialGames, filterOptions }: GamesPageContentProps) {
+  const t = useTranslations("games")
   const { activeFilters, setFilter, clearAllFilters } = useFilters(["category", "tag"])
 
   // Client-side pagination state
@@ -86,7 +88,7 @@ export default function GamesPageContent({ initialGames, filterOptions }: GamesP
   const filters: FilterConfig[] = [
     {
       id: "category",
-      label: "Category",
+      label: t("filters.category"),
       icon: "bx bx-collection",
       options: filterOptions.categories,
       displayMode: "pills",
@@ -94,7 +96,7 @@ export default function GamesPageContent({ initialGames, filterOptions }: GamesP
     },
     {
       id: "tag",
-      label: "Tags",
+      label: t("filters.tags"),
       icon: "bx bx-purchase-tag",
       options: filterOptions.tags,
       displayMode: "dropdown",
@@ -108,14 +110,14 @@ export default function GamesPageContent({ initialGames, filterOptions }: GamesP
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <h1>Games</h1>
+        <h1>{t("title")}</h1>
         <FilterBar
           filters={activeFilterConfigs}
           activeFilters={activeFilters}
           onFilterChange={setFilter}
           onClearAll={clearAllFilters}
           totalCount={filteredGames.length}
-          countLabel="games"
+          countLabel={t("filters.countLabel")}
         />
       </div>
 

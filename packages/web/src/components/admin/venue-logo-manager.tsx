@@ -6,7 +6,7 @@ import {
   setVenueLogoFromLibrary,
   uploadVenueLogo,
   type VenueLogo,
-} from "@/app/(admin)/admin/venues/logo.action"
+} from "@/app/[locale]/(admin)/admin/venues/logo.action"
 import { useToast } from "@/components/admin/toast"
 import ImageManager from "./image-manager"
 

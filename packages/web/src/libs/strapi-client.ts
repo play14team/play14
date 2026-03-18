@@ -180,6 +180,7 @@ export interface StrapiParams {
   }
   populate?: string | string[] | Record<string, unknown>
   fields?: string[]
+  locale?: string
 }
 
 /**

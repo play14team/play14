@@ -1,19 +1,11 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import styles from "./attendee-form.module.scss"
 import type { AttendeeInfo, DraftOrderResponse } from "./purchase.action"
 
-const TSHIRT_SIZES = [
-  { value: "none", label: "No t-shirt" },
-  { value: "XS", label: "XS" },
-  { value: "S", label: "S" },
-  { value: "M", label: "M" },
-  { value: "L", label: "L" },
-  { value: "XL", label: "XL" },
-  { value: "XXL", label: "XXL" },
-  { value: "XXXL", label: "XXXL" },
-] as const
+const TSHIRT_SIZE_VALUES = ["none", "XS", "S", "M", "L", "XL", "XXL", "XXXL"] as const
 
 interface AttendeeFormProps {
   draftOrder: DraftOrderResponse
@@ -34,6 +26,7 @@ export default function AttendeeForm({
   isSubmitting,
   error,
 }: AttendeeFormProps) {
+  const t = useTranslations("tickets")
   const { ticketCount, playerDefaults, ticketDetails, totalAmount, currency, discountAmount } =
     draftOrder
 
@@ -93,16 +86,16 @@ export default function AttendeeForm({
     const attendee = attendees[index]
     switch (field) {
       case "firstName":
-        if (!attendee.firstName.trim()) return "First name is required"
-        if (attendee.firstName.length < 2) return "First name must be at least 2 characters"
+        if (!attendee.firstName.trim()) return t("firstNameRequired")
+        if (attendee.firstName.length < 2) return t("firstNameMinLength")
         break
       case "lastName":
-        if (!attendee.lastName.trim()) return "Last name is required"
-        if (attendee.lastName.length < 2) return "Last name must be at least 2 characters"
+        if (!attendee.lastName.trim()) return t("lastNameRequired")
+        if (attendee.lastName.length < 2) return t("lastNameMinLength")
         break
       case "email":
-        if (!attendee.email.trim()) return "Email is required"
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(attendee.email)) return "Invalid email format"
+        if (!attendee.email.trim()) return t("emailRequired")
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(attendee.email)) return t("emailInvalid")
         break
     }
     return null
@@ -150,13 +143,10 @@ export default function AttendeeForm({
           disabled={isSubmitting}
         >
           <i className="bx bx-arrow-back" />
-          Back to ticket selection
+          {t("backToTickets")}
         </button>
-        <h3>Attendee Information</h3>
-        <p className={styles.subtitle}>
-          Please provide information for each ticket holder. This information will be used for
-          check-in and event communications.
-        </p>
+        <h3>{t("attendeeInfo")}</h3>
+        <p className={styles.subtitle}>{t("attendeeInfoDescription")}</p>
       </div>
 
       {error && (
@@ -190,7 +180,7 @@ export default function AttendeeForm({
                     <strong>
                       {attendee.firstName && attendee.lastName
                         ? `${attendee.firstName} ${attendee.lastName}`
-                        : `Attendee ${index + 1}`}
+                        : t("attendee", { number: index + 1 })}
                     </strong>
                     <span className={styles.ticketType}>{ticketTypeName}</span>
                   </div>
@@ -202,7 +192,7 @@ export default function AttendeeForm({
                 <div className={styles.attendeeBody}>
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label htmlFor={`firstName-${index}`}>First Name *</label>
+                      <label htmlFor={`firstName-${index}`}>{t("firstName")} *</label>
                       <input
                         type="text"
                         id={`firstName-${index}`}
@@ -211,7 +201,7 @@ export default function AttendeeForm({
                         onBlur={() =>
                           setTouchedFields((prev) => ({ ...prev, [`${index}-firstName`]: true }))
                         }
-                        placeholder="Enter first name"
+                        placeholder={t("enterFirstName")}
                         className={getFieldError(index, "firstName") ? styles.inputError : ""}
                       />
                       {getFieldError(index, "firstName") && (
@@ -222,7 +212,7 @@ export default function AttendeeForm({
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label htmlFor={`lastName-${index}`}>Last Name *</label>
+                      <label htmlFor={`lastName-${index}`}>{t("lastName")} *</label>
                       <input
                         type="text"
                         id={`lastName-${index}`}
@@ -231,7 +221,7 @@ export default function AttendeeForm({
                         onBlur={() =>
                           setTouchedFields((prev) => ({ ...prev, [`${index}-lastName`]: true }))
                         }
-                        placeholder="Enter last name"
+                        placeholder={t("enterLastName")}
                         className={getFieldError(index, "lastName") ? styles.inputError : ""}
                       />
                       {getFieldError(index, "lastName") && (
@@ -243,7 +233,7 @@ export default function AttendeeForm({
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label htmlFor={`email-${index}`}>Email *</label>
+                    <label htmlFor={`email-${index}`}>{t("email")} *</label>
                     <input
                       type="email"
                       id={`email-${index}`}
@@ -258,14 +248,12 @@ export default function AttendeeForm({
                     {getFieldError(index, "email") && (
                       <span className={styles.fieldError}>{getFieldError(index, "email")}</span>
                     )}
-                    <span className={styles.helpText}>
-                      Ticket confirmation will be sent to this email
-                    </span>
+                    <span className={styles.helpText}>{t("ticketConfirmationEmail")}</span>
                   </div>
 
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label htmlFor={`tshirtSize-${index}`}>T-Shirt Size</label>
+                      <label htmlFor={`tshirtSize-${index}`}>{t("tshirtSize")}</label>
                       <select
                         id={`tshirtSize-${index}`}
                         value={attendee.tshirtSize}
@@ -277,24 +265,22 @@ export default function AttendeeForm({
                           )
                         }
                       >
-                        {TSHIRT_SIZES.map((size) => (
-                          <option key={size.value} value={size.value}>
-                            {size.label}
+                        {TSHIRT_SIZE_VALUES.map((size) => (
+                          <option key={size} value={size}>
+                            {size === "none" ? t("noTshirt") : size}
                           </option>
                         ))}
                       </select>
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label htmlFor={`foodPreferences-${index}`}>
-                        Food Preferences / Allergies
-                      </label>
+                      <label htmlFor={`foodPreferences-${index}`}>{t("foodPreferences")}</label>
                       <input
                         type="text"
                         id={`foodPreferences-${index}`}
                         value={attendee.foodPreferences}
                         onChange={(e) => updateAttendee(index, "foodPreferences", e.target.value)}
-                        placeholder="Vegetarian, vegan, allergies..."
+                        placeholder={t("foodPlaceholder")}
                       />
                     </div>
                   </div>
@@ -306,14 +292,9 @@ export default function AttendeeForm({
                         checked={attendee.photoConsent}
                         onChange={(e) => updateAttendee(index, "photoConsent", e.target.checked)}
                       />
-                      <span>I consent to being photographed and filmed during the event</span>
+                      <span>{t("photoConsent")}</span>
                     </label>
-                    <p className={styles.consentDescription}>
-                      Photos and videos taken during the event may be published on the #play14
-                      website and social media channels. If you prefer not to appear in photos or
-                      videos, leave this unchecked and we will make reasonable efforts to
-                      accommodate your preference.
-                    </p>
+                    <p className={styles.consentDescription}>{t("photoConsentDescription")}</p>
                   </div>
                 </div>
               )}
@@ -324,7 +305,7 @@ export default function AttendeeForm({
 
       {/* Order Summary */}
       <div className={styles.orderSummary}>
-        <h4>Order Summary</h4>
+        <h4>{t("orderSummary")}</h4>
         <div className={styles.summaryItems}>
           {ticketDetails.map((detail, i) => (
             <div key={i} className={styles.summaryItem}>
@@ -338,7 +319,7 @@ export default function AttendeeForm({
           ))}
           {discountAmount > 0 && (
             <div className={styles.summaryDiscount}>
-              <span>Discount</span>
+              <span>{t("discountLabel")}</span>
               <span>
                 -{currency} {discountAmount.toFixed(2)}
               </span>
@@ -346,7 +327,7 @@ export default function AttendeeForm({
           )}
         </div>
         <div className={styles.summaryTotal}>
-          <span>Total</span>
+          <span>{t("totalLabel")}</span>
           <span>
             {currency} {totalAmount.toFixed(2)}
           </span>
@@ -355,7 +336,7 @@ export default function AttendeeForm({
 
       {/* Legal Consents */}
       <div className={styles.legalConsents}>
-        <h4>Terms and Conditions</h4>
+        <h4>{t("termsAndConditions")}</h4>
 
         <label className={styles.checkboxLabel}>
           <input
@@ -364,11 +345,13 @@ export default function AttendeeForm({
             onChange={(e) => setGdprConsent(e.target.checked)}
           />
           <span>
-            I consent to the processing of my personal data in accordance with the{" "}
-            <a href="/privacy" target="_blank" rel="noopener noreferrer">
-              Privacy Policy
-            </a>{" "}
-            *
+            {t.rich("gdprConsent", {
+              privacy: (chunks) => (
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  {chunks}
+                </a>
+              ),
+            })}
           </span>
         </label>
 
@@ -379,15 +362,18 @@ export default function AttendeeForm({
             onChange={(e) => setTermsAccepted(e.target.checked)}
           />
           <span>
-            I accept the{" "}
-            <a href="/terms-of-sale" target="_blank" rel="noopener noreferrer">
-              General Terms and Conditions of Sale
-            </a>{" "}
-            and the{" "}
-            <a href="/terms" target="_blank" rel="noopener noreferrer">
-              Terms of Service
-            </a>{" "}
-            *
+            {t.rich("termsConsent", {
+              sale: (chunks) => (
+                <a href="/terms-of-sale" target="_blank" rel="noopener noreferrer">
+                  {chunks}
+                </a>
+              ),
+              terms: (chunks) => (
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  {chunks}
+                </a>
+              ),
+            })}
           </span>
         </label>
       </div>
@@ -399,18 +385,18 @@ export default function AttendeeForm({
           onClick={onBack}
           disabled={isSubmitting}
         >
-          Cancel
+          {t("cancel")}
         </button>
         <button type="submit" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
           {isSubmitting ? (
             <>
               <i className="bx bx-loader-alt bx-spin" />
-              Processing...
+              {t("processingButton")}
             </>
           ) : totalAmount === 0 ? (
-            "Complete Registration"
+            t("completeRegistration")
           ) : (
-            `Proceed to Payment - ${currency} ${totalAmount.toFixed(2)}`
+            t("proceedToPaymentAmount", { currency, amount: totalAmount.toFixed(2) })
           )}
         </button>
       </div>

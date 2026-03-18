@@ -257,6 +257,29 @@ export default {
         description: "Undo check-in for a participant (organizer only)",
       },
     },
+    // Translation management routes
+    {
+      method: "GET",
+      path: "/admin/events/:slug/translation",
+      handler: "custom-event.getTranslation",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Get event description for a specific locale (organizer only)",
+      },
+    },
+    {
+      method: "PUT",
+      path: "/admin/events/:slug/translation",
+      handler: "custom-event.updateTranslation",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Update event translation for a specific locale (organizer only)",
+      },
+    },
     // Public route to find event by slug - MUST be last (catch-all pattern)
     {
       method: "GET",

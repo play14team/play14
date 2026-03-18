@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { GameMode } from "@/models/debriefing-cube"
 
 interface ModeSelectorProps {
@@ -8,6 +9,8 @@ interface ModeSelectorProps {
 }
 
 export default function ModeSelector({ mode, onChange }: ModeSelectorProps) {
+  const t = useTranslations("debriefingCube")
+
   return (
     <div className="debriefing-cube-mode-selector">
       <button
@@ -19,7 +22,7 @@ export default function ModeSelector({ mode, onChange }: ModeSelectorProps) {
         aria-pressed={mode === "dice"}
       >
         <i className="bx bx-dice-5" />
-        Roll dice
+        {t("rollDice")}
       </button>
       <button
         type="button"
@@ -30,7 +33,7 @@ export default function ModeSelector({ mode, onChange }: ModeSelectorProps) {
         aria-pressed={mode === "random"}
       >
         <i className="bx bx-shuffle" />
-        Random card
+        {t("randomCard")}
       </button>
     </div>
   )

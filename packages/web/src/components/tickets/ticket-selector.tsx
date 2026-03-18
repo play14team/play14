@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
 import DiscountCodeInput from "./discount-code-input"
@@ -46,6 +47,7 @@ export default function TicketSelector({
   initialQuantities,
   initialDiscountCode,
 }: TicketSelectorProps) {
+  const t = useTranslations("tickets")
   const [quantities, setQuantities] = useState<Record<string, number>>(initialQuantities || {})
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -140,7 +142,7 @@ export default function TicketSelector({
       .map(([ticketTypeId, quantity]) => ({ ticketTypeId, quantity }))
 
     if (selectedTickets.length === 0) {
-      setError("Please select at least one ticket")
+      setError(t("selectAtLeast"))
       return
     }
 
@@ -150,7 +152,7 @@ export default function TicketSelector({
     try {
       await onPurchase(selectedTickets, appliedDiscount?.code)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to process order")
+      setError(err instanceof Error ? err.message : t("failedToProcess"))
     } finally {
       setIsProcessing(false)
     }
@@ -178,16 +180,20 @@ export default function TicketSelector({
    */
   function getAvailabilityStatus(tt: TicketTypeInfo): React.ReactNode {
     if (tt.soldOut) {
-      return <span className={styles.statusBadge}>Sold out</span>
+      return <span className={styles.statusBadge}>{t("soldOut")}</span>
     }
     if (tt.notYetAvailable && tt.validFrom) {
-      return <span className={styles.statusBadge}>Available from {formatDate(tt.validFrom)}</span>
+      return (
+        <span className={styles.statusBadge}>
+          {t("availableFrom", { date: formatDate(tt.validFrom) })}
+        </span>
+      )
     }
     if (tt.expired) {
-      return <span className={styles.statusBadge}>Sales ended</span>
+      return <span className={styles.statusBadge}>{t("salesEnded")}</span>
     }
     if (tt.available !== null) {
-      return <span className={styles.availability}>{tt.available} remaining</span>
+      return <span className={styles.availability}>{t("remaining", { count: tt.available })}</span>
     }
     return null
   }
@@ -195,8 +201,8 @@ export default function TicketSelector({
   if (!hasPaymentProvider) {
     return (
       <div className={styles.unavailable}>
-        <p>Online ticketing is not available for this event.</p>
-        <p>Please contact the organizers for registration details.</p>
+        <p>{t("noTicketing")}</p>
+        <p>{t("contactOrganizers")}</p>
       </div>
     )
   }
@@ -204,14 +210,14 @@ export default function TicketSelector({
   if (ticketTypes.length === 0) {
     return (
       <div className={styles.unavailable}>
-        <p>No tickets are currently available for this event.</p>
+        <p>{t("noTickets")}</p>
       </div>
     )
   }
 
   return (
     <div className={styles.selector}>
-      <h3>Get Your Tickets</h3>
+      <h3>{t("getYourTickets")}</h3>
 
       <div className={styles.ticketTypes}>
         {ticketTypes.map((tt) => {
@@ -237,7 +243,7 @@ export default function TicketSelector({
                   type="button"
                   onClick={() => handleQuantityChange(tt.documentId, -1)}
                   disabled={!quantities[tt.documentId] || disabled}
-                  aria-label="Decrease quantity"
+                  aria-label={t("decreaseQuantity")}
                 >
                   −
                 </button>
@@ -249,7 +255,7 @@ export default function TicketSelector({
                     disabled ||
                     (tt.available !== null && (quantities[tt.documentId] || 0) >= tt.available)
                   }
-                  aria-label="Increase quantity"
+                  aria-label={t("increaseQuantity")}
                 >
                   +
                 </button>
@@ -279,15 +285,13 @@ export default function TicketSelector({
         {appliedDiscount?.valid && finalDiscountAmount > 0 && (
           <>
             <div className={styles.subtotalRow}>
-              <span>
-                Subtotal ({totalQuantity} {totalQuantity === 1 ? "ticket" : "tickets"}):
-              </span>
+              <span>{t("subtotal", { count: totalQuantity })}</span>
               <span>
                 {currency} {subtotal.toFixed(2)}
               </span>
             </div>
             <div className={styles.discountRow}>
-              <span>Discount ({appliedDiscount.code}):</span>
+              <span>{t("discount", { code: appliedDiscount.code ?? "" })}</span>
               <span className={styles.discountAmount}>
                 -{currency} {finalDiscountAmount.toFixed(2)}
               </span>
@@ -298,8 +302,8 @@ export default function TicketSelector({
         <div className={styles.total}>
           <span>
             {appliedDiscount?.valid && finalDiscountAmount > 0
-              ? "Total:"
-              : `Total (${totalQuantity} ${totalQuantity === 1 ? "ticket" : "tickets"}):`}
+              ? t("total")
+              : t("totalWithCount", { count: totalQuantity })}
           </span>
           <span className={styles.totalAmount}>
             {currency} {totalAmount.toFixed(2)}
@@ -309,17 +313,15 @@ export default function TicketSelector({
         {/* Auth status indicator */}
         <div className={styles.authStatus}>
           {!authStatus?.isAuthenticated && (
-            <p className={styles.authWarning}>
-              You&apos;ll need to sign in to complete your purchase
-            </p>
+            <p className={styles.authWarning}>{t("signInWarning")}</p>
           )}
           {authStatus?.isAuthenticated && !authStatus.hasPlayer && (
-            <p className={styles.authWarning}>
-              You&apos;ll need to set up your player profile to continue
-            </p>
+            <p className={styles.authWarning}>{t("profileWarning")}</p>
           )}
           {authStatus?.isAuthenticated && authStatus.hasPlayer && (
-            <p className={styles.authReady}>Purchasing as {authStatus.player?.name}</p>
+            <p className={styles.authReady}>
+              {t("purchasingAs", { name: authStatus.player?.name ?? "" })}
+            </p>
           )}
         </div>
 
@@ -330,10 +332,10 @@ export default function TicketSelector({
           disabled={totalQuantity === 0 || isProcessing}
         >
           {isProcessing
-            ? "Processing..."
+            ? t("processingButton")
             : !authStatus?.isAuthenticated
-              ? "Sign in to Purchase"
-              : "Proceed to Payment"}
+              ? t("signInToPurchase")
+              : t("proceedToPayment")}
         </button>
       </div>
     </div>

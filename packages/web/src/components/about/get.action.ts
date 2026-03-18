@@ -11,14 +11,6 @@ interface UploadFile {
   height?: number
 }
 
-interface Format {
-  openspace?: string
-  lawOfTwoFeet?: string
-  butterfly?: string
-  bumblebee?: string
-  schedule?: string
-}
-
 interface HistoryItem {
   id: string
   date?: string
@@ -50,35 +42,52 @@ interface Player {
 }
 
 /**
- * Get format page data
- * REST equivalent of: about/format.graphql
- */
-export async function getFormat() {
-  const response = await restQuery<Format>("format", {})
-  return normalizeEntity(response)
-}
-
-/**
  * Get story page data (history + founders)
  * REST equivalent of: about/story.graphql
  * Note: This query fetches from two endpoints
  */
-export async function getStory() {
-  const [historyResponse, foundersResponse] = await Promise.all([
-    restQuery<History>("history", {
-      populate: storyPopulate,
-    }),
-    restQuery<Player[]>("players", {
-      sort: ["name:asc"],
-      filters: {
-        position: { $eq: "Founder" },
-      },
-      populate: playerItemPopulate,
-    }),
-  ])
+export async function getStory(locale?: string) {
+  try {
+    const [historyResponse, foundersResponse] = await Promise.all([
+      restQuery<History>("history", {
+        populate: storyPopulate,
+        locale,
+      }),
+      restQuery<Player[]>("players", {
+        sort: ["name:asc"],
+        filters: {
+          position: { $eq: "Founder" },
+        },
+        populate: playerItemPopulate,
+      }),
+    ])
 
-  return {
-    history: normalizeEntity(historyResponse),
-    founders: foundersResponse.data || [],
+    return {
+      history: normalizeEntity(historyResponse),
+      founders: foundersResponse.data || [],
+    }
+  } catch (error) {
+    // If the requested locale doesn't exist, fall back to default (omit locale param)
+    if (locale) {
+      console.warn(`[getStory] Locale "${locale}" not found, falling back to default locale`)
+      const [historyResponse, foundersResponse] = await Promise.all([
+        restQuery<History>("history", {
+          populate: storyPopulate,
+        }),
+        restQuery<Player[]>("players", {
+          sort: ["name:asc"],
+          filters: {
+            position: { $eq: "Founder" },
+          },
+          populate: playerItemPopulate,
+        }),
+      ])
+
+      return {
+        history: normalizeEntity(historyResponse),
+        founders: foundersResponse.data || [],
+      }
+    }
+    throw error
   }
 }

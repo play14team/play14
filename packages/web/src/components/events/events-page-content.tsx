@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
 import ReactCountryFlag from "react-country-flag"
 import { FilterBar, type FilterConfig, type FilterOption, useFilters } from "@/components/filters"
@@ -32,6 +33,7 @@ export default function EventsPageContent({
   initialEvents,
   filterOptions,
 }: EventsPageContentProps) {
+  const t = useTranslations("events")
   const { activeFilters, setFilter, clearAllFilters } = useFilters([...FILTER_IDS])
 
   // Client-side pagination state
@@ -106,7 +108,7 @@ export default function EventsPageContent({
   const filters: FilterConfig[] = [
     {
       id: "year",
-      label: "Year",
+      label: t("filters.year"),
       icon: "bx bx-calendar",
       options: filterOptions.years,
       displayMode: "dropdown",
@@ -114,15 +116,18 @@ export default function EventsPageContent({
     },
     {
       id: "status",
-      label: "Status",
+      label: t("filters.status"),
       icon: "bx bx-info-circle",
-      options: filterOptions.statuses,
+      options: filterOptions.statuses.map((opt) => ({
+        ...opt,
+        label: t(`status.${opt.value.toLowerCase()}` as Parameters<typeof t>[0]),
+      })),
       displayMode: "pills",
       multiSelect: true,
     },
     {
       id: "country",
-      label: "Country",
+      label: t("filters.country"),
       icon: "bx bx-globe",
       options: filterOptions.countries.map((opt) => ({
         ...opt,
@@ -139,7 +144,7 @@ export default function EventsPageContent({
     },
     {
       id: "location",
-      label: "Location",
+      label: t("filters.location"),
       icon: "bx bx-map-pin",
       options: filterOptions.locations,
       displayMode: "dropdown",
@@ -153,14 +158,14 @@ export default function EventsPageContent({
   return (
     <>
       <div className="centered pt-5 pb-5">
-        <h1>Events</h1>
+        <h1>{t("title")}</h1>
         <FilterBar
           filters={activeFilterConfigs}
           activeFilters={activeFilters}
           onFilterChange={setFilter}
           onClearAll={clearAllFilters}
           totalCount={filteredEvents.length}
-          countLabel="events"
+          countLabel={t("filters.countLabel")}
         />
       </div>
 

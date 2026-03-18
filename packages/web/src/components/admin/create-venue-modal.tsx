@@ -1,7 +1,8 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState } from "react"
-import { createVenue } from "@/app/(admin)/admin/venues/venues.action"
+import { createVenue } from "@/app/[locale]/(admin)/admin/venues/venues.action"
 import LocationMapPicker, { type MapLocation } from "./location-map-picker"
 import { useToast } from "./toast"
 
@@ -18,6 +19,7 @@ export default function CreateVenueModal({
 }: CreateVenueModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const toast = useToast()
+  const t = useTranslations("adminCrud")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Form state
@@ -87,7 +89,7 @@ export default function CreateVenueModal({
     setIsSubmitting(true)
 
     if (!name.trim()) {
-      toast.error("Name is required")
+      toast.error(t("common.nameRequired"))
       setIsSubmitting(false)
       return
     }
@@ -100,12 +102,12 @@ export default function CreateVenueModal({
     })
 
     if (!result.success) {
-      toast.error(result.error || "Failed to create venue")
+      toast.error(result.error || t("common.failedToCreate", { entity: t("venues.entityName") }))
       setIsSubmitting(false)
       return
     }
 
-    toast.success("Venue created successfully!")
+    toast.success(t("common.createdSuccess", { entity: t("venues.entityName") }))
 
     // Call the callback with the new venue
     onVenueCreated({
@@ -124,7 +126,7 @@ export default function CreateVenueModal({
         <div className="create-venue-modal-header">
           <h2>
             <i className="bx bx-building-house" />
-            Create New Venue
+            {t("venues.modal.title")}
           </h2>
           <button
             type="button"
@@ -138,46 +140,46 @@ export default function CreateVenueModal({
 
         <div className="create-venue-modal-body">
           <div className="admin-form-group">
-            <label htmlFor="modal-venue-name">Venue Name *</label>
+            <label htmlFor="modal-venue-name">{t("venues.modal.nameLabel")}</label>
             <input
               type="text"
               id="modal-venue-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="admin-input"
-              placeholder="e.g., Hilton Conference Center"
+              placeholder={t("venues.form.namePlaceholder")}
             />
-            <p className="admin-form-help">The name of the hosting facility or organization</p>
+            <p className="admin-form-help">{t("venues.modal.nameHelp")}</p>
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="modal-venue-address">Address Details</label>
+            <label htmlFor="modal-venue-address">{t("venues.modal.addressLabel")}</label>
             <input
               type="text"
               id="modal-venue-address"
               value={addressDetails}
               onChange={(e) => setAddressDetails(e.target.value)}
               className="admin-input"
-              placeholder="e.g., 123 Main Street, Suite 100"
+              placeholder={t("venues.form.addressPlaceholder")}
             />
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="modal-venue-website">Website</label>
+            <label htmlFor="modal-venue-website">{t("venues.modal.websiteLabel")}</label>
             <input
               type="url"
               id="modal-venue-website"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               className="admin-input"
-              placeholder="https://example.com"
+              placeholder={t("venues.form.websitePlaceholder")}
             />
           </div>
 
           <div className="admin-form-group">
-            <label>Map Location (optional)</label>
+            <label>{t("venues.modal.mapLabel")}</label>
             <p className="admin-form-help" style={{ marginBottom: "12px" }}>
-              Set the coordinates for displaying the venue on maps.
+              {t("venues.modal.mapHelp")}
             </p>
             <LocationMapPicker
               value={mapLocation}
@@ -196,7 +198,7 @@ export default function CreateVenueModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            Cancel
+            {t("common.cancel")}
           </button>
           <button
             type="button"
@@ -208,12 +210,12 @@ export default function CreateVenueModal({
             {isSubmitting ? (
               <>
                 <i className="bx bx-loader-alt bx-spin" />
-                Creating...
+                {t("common.creating")}...
               </>
             ) : (
               <>
                 <i className="bx bx-plus" />
-                Create Venue
+                {t("venues.modal.submitButton")}
               </>
             )}
           </button>

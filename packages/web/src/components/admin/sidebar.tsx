@@ -1,11 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { useTheme } from "next-themes"
 import { useEffect, useRef, useState } from "react"
 import Logo from "@/components/layout/logo"
 import Avatar from "@/components/ui/avatar"
+import { usePathname as useI18nPathname, useRouter as useI18nRouter } from "@/i18n/navigation"
+import { routing } from "@/i18n/routing"
 import type { StrapiUser } from "@/libs/auth"
 import { useMobileSidebar } from "./mobile-sidebar-context"
 
@@ -16,29 +19,53 @@ interface AdminSidebarProps {
 interface NavItem {
   href: string
   icon: string
-  label: string
+  labelKey: string
   exact?: boolean
   founderOnly?: boolean
   organizerOnly?: boolean
 }
 
 interface NavSection {
-  title: string
+  titleKey: string
   items: NavItem[]
 }
 
+const localeLabels: Record<string, string> = {
+  en: "English",
+  fr: "Français",
+  es: "Español",
+  de: "Deutsch",
+}
+
 export default function AdminSidebar({ user }: AdminSidebarProps) {
-  const pathname = usePathname()
+  const pathname = useI18nPathname()
   const router = useRouter()
+  const locale = useLocale()
+  const i18nRouter = useI18nRouter()
+  const t = useTranslations("admin")
   const [collapsed, setCollapsed] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [localeMenuOpen, setLocaleMenuOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const { isOpen: mobileOpen, close: closeMobileSidebar } = useMobileSidebar()
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const localeMenuRef = useRef<HTMLDivElement>(null)
 
+  // Load collapsed state from localStorage on mount
   useEffect(() => {
     setMounted(true)
+    const savedCollapsed = localStorage.getItem("admin-sidebar-collapsed")
+    if (savedCollapsed !== null) {
+      setCollapsed(savedCollapsed === "true")
+    }
   }, [])
+
+  // Persist collapsed state to localStorage
+  const toggleCollapsed = () => {
+    const newCollapsed = !collapsed
+    setCollapsed(newCollapsed)
+    localStorage.setItem("admin-sidebar-collapsed", String(newCollapsed))
+  }
 
   // Move focus to close button when sidebar opens on mobile
   useEffect(() => {
@@ -61,97 +88,124 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     router.refresh()
   }
 
+  const handleLocaleChange = (newLocale: string) => {
+    i18nRouter.replace(pathname, { locale: newLocale })
+    setLocaleMenuOpen(false)
+  }
+
+  // Close locale menu on outside click
+  useEffect(() => {
+    if (!localeMenuOpen) return
+    function handleClick(e: MouseEvent) {
+      if (localeMenuRef.current && !localeMenuRef.current.contains(e.target as Node)) {
+        setLocaleMenuOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [localeMenuOpen])
+
+  // Close locale menu on Escape
+  useEffect(() => {
+    if (!localeMenuOpen) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setLocaleMenuOpen(false)
+    }
+    document.addEventListener("keydown", handleKey)
+    return () => document.removeEventListener("keydown", handleKey)
+  }, [localeMenuOpen])
+
   const navSections: NavSection[] = [
     {
-      title: "General",
+      titleKey: "sidebar.sections.general",
       items: [
         {
           href: "/admin",
           icon: "bx-grid-alt",
-          label: "Dashboard",
+          labelKey: "sidebar.dashboard",
           exact: true,
         },
         {
           href: "/admin/profile",
           icon: "bx-user",
-          label: "My Profile",
+          labelKey: "sidebar.myProfile",
         },
       ],
     },
     {
-      title: "Management",
+      titleKey: "sidebar.sections.management",
       items: [
         {
           href: "/admin/events",
           icon: "bx-calendar",
-          label: "Events",
+          labelKey: "sidebar.events",
         },
         {
           href: "/admin/locations",
           icon: "bx-map-alt",
-          label: "Locations",
+          labelKey: "sidebar.locations",
           organizerOnly: true,
         },
         {
           href: "/admin/venues",
           icon: "bx-building-house",
-          label: "Venues",
+          labelKey: "sidebar.venues",
           organizerOnly: true,
         },
         {
           href: "/admin/sponsors",
           icon: "bx-diamond",
-          label: "Sponsors",
+          labelKey: "sidebar.sponsors",
           organizerOnly: true,
         },
         {
           href: "/admin/players",
           icon: "bx-group",
-          label: "Players",
+          labelKey: "sidebar.players",
           organizerOnly: true,
         },
         {
           href: "/admin/likes",
           icon: "bx-heart",
-          label: "Things we like",
+          labelKey: "sidebar.thingsWeLike",
           founderOnly: true,
         },
         {
           href: "/admin/orders",
           icon: "bx-receipt",
-          label: "Orders",
+          labelKey: "sidebar.orders",
         },
         {
           href: "/admin/tickets",
           icon: "bx-barcode",
-          label: "Tickets",
+          labelKey: "sidebar.tickets",
         },
       ],
     },
     {
-      title: "Communication",
+      titleKey: "sidebar.sections.communication",
       items: [
         {
           href: "/admin/newsletter",
           icon: "bx-envelope",
-          label: "Newsletter",
+          labelKey: "sidebar.newsletter",
           founderOnly: true,
         },
       ],
     },
     {
-      title: "Claims",
+      titleKey: "sidebar.sections.claims",
       items: [
         {
           href: "/admin/attendance-claims",
           icon: "bx-calendar-check",
-          label: "Attendance Claims",
+          labelKey: "sidebar.attendanceClaims",
           organizerOnly: true,
         },
         {
           href: "/admin/claims",
           icon: "bx-user-check",
-          label: "Player Claims",
+          labelKey: "sidebar.playerClaims",
           founderOnly: true,
         },
       ],
@@ -198,8 +252,8 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           <button
             type="button"
             className="admin-sidebar-toggle admin-sidebar-collapse-toggle"
-            onClick={() => setCollapsed(!collapsed)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            onClick={toggleCollapsed}
+            aria-label={collapsed ? t("sidebar.expandSidebar") : t("sidebar.collapseSidebar")}
           >
             <i className={`bx ${collapsed ? "bx-chevron-right" : "bx-chevron-left"}`} />
           </button>
@@ -208,7 +262,7 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             type="button"
             className="admin-sidebar-toggle admin-sidebar-close-toggle"
             onClick={closeMobileSidebar}
-            aria-label="Close navigation menu"
+            aria-label={t("sidebar.closeMenu")}
           >
             <i className="bx bx-x" />
           </button>
@@ -229,20 +283,20 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
           )}
         </div>
 
-        <nav className="admin-sidebar-nav" aria-label="Admin navigation">
+        <nav className="admin-sidebar-nav" aria-label={t("sidebar.ariaLabel")}>
           {visibleSections.map((section) => (
-            <div key={section.title} className="admin-sidebar-section">
-              {!collapsed && <h3 className="admin-sidebar-section-title">{section.title}</h3>}
+            <div key={section.titleKey} className="admin-sidebar-section">
+              {!collapsed && <h3 className="admin-sidebar-section-title">{t(section.titleKey)}</h3>}
               <ul>
                 {section.items.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
                       className={`admin-sidebar-link ${isActive(item.href, item.exact) ? "active" : ""}`}
-                      title={collapsed ? item.label : undefined}
+                      title={collapsed ? t(item.labelKey) : undefined}
                     >
                       <i className={`bx ${item.icon}`} />
-                      {!collapsed && <span>{item.label}</span>}
+                      {!collapsed && <span>{t(item.labelKey)}</span>}
                     </Link>
                   </li>
                 ))}
@@ -258,32 +312,69 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             title={
               collapsed
-                ? `Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`
+                ? mounted && resolvedTheme === "dark"
+                  ? t("sidebar.lightMode")
+                  : t("sidebar.darkMode")
                 : undefined
             }
-            aria-label={`Switch to ${mounted && resolvedTheme === "dark" ? "light" : "dark"} mode`}
+            aria-label={
+              mounted && resolvedTheme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")
+            }
           >
             <i className={`bx ${mounted && resolvedTheme === "dark" ? "bx-sun" : "bx-moon"}`} />
             {!collapsed && (
-              <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+              <span>
+                {mounted && resolvedTheme === "dark"
+                  ? t("sidebar.lightMode")
+                  : t("sidebar.darkMode")}
+              </span>
             )}
           </button>
+          <div ref={localeMenuRef} className="admin-locale-wrapper">
+            <button
+              type="button"
+              className="admin-sidebar-link"
+              onClick={() => setLocaleMenuOpen(!localeMenuOpen)}
+              title={collapsed ? localeLabels[locale] : undefined}
+              aria-label={`${t("sidebar.language")}: ${localeLabels[locale]}`}
+              aria-expanded={localeMenuOpen}
+              aria-haspopup="listbox"
+            >
+              <i className="bx bx-globe" />
+              {!collapsed && <span>{localeLabels[locale]}</span>}
+            </button>
+            {localeMenuOpen && (
+              <ul className="admin-locale-menu" role="listbox" aria-label={t("sidebar.language")}>
+                {routing.locales.map((l) => (
+                  <li key={l} role="option">
+                    <button
+                      type="button"
+                      onClick={() => handleLocaleChange(l)}
+                      aria-selected={l === locale}
+                    >
+                      {localeLabels[l] ?? l.toUpperCase()}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <Link
             href="/"
             className="admin-sidebar-link"
-            title={collapsed ? "Back to Site" : undefined}
+            title={collapsed ? t("sidebar.backToSite") : undefined}
           >
             <i className="bx bx-home" />
-            {!collapsed && <span>Back to Site</span>}
+            {!collapsed && <span>{t("sidebar.backToSite")}</span>}
           </Link>
           <button
             type="button"
             className="admin-sidebar-link admin-sidebar-signout"
             onClick={handleSignOut}
-            title={collapsed ? "Sign Out" : undefined}
+            title={collapsed ? t("sidebar.signOut") : undefined}
           >
             <i className="bx bx-log-out" />
-            {!collapsed && <span>Sign Out</span>}
+            {!collapsed && <span>{t("sidebar.signOut")}</span>}
           </button>
         </div>
       </aside>

@@ -6,6 +6,7 @@ import ckeditor5 from "@_sh/strapi-plugin-ckeditor/strapi-admin";
 import documentation from "@strapi/plugin-documentation/strapi-admin";
 import sentry from "@strapi/plugin-sentry/strapi-admin";
 import usersPermissions from "@strapi/plugin-users-permissions/strapi-admin";
+import strapiAiTranslator from "strapi-ai-translator/strapi-admin";
 import strapiCache from "strapi-cache/strapi-admin";
 import configSync from "strapi-plugin-config-sync/strapi-admin";
 import countrySelect from "strapi-plugin-country-select/strapi-admin";
@@ -24,6 +25,7 @@ renderAdmin(document.getElementById("strapi"), {
     documentation: documentation,
     sentry: sentry,
     "users-permissions": usersPermissions,
+    "strapi-ai-translator": strapiAiTranslator,
     "strapi-cache": strapiCache,
     "config-sync": configSync,
     "country-select": countrySelect,

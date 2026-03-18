@@ -1,9 +1,9 @@
 "use client"
 
 import clsx from "clsx"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
+import { Link, usePathname } from "@/i18n/navigation"
 import { MobileMenu, type NavItem } from "../ui/mobile-menu"
 import {
   NavigationMenu,
@@ -14,65 +14,70 @@ import {
   NavigationMenuTrigger,
 } from "../ui/navigation-menu"
 import AuthStatusClient from "./auth-status-client"
+import LocaleSwitcher from "./locale-switcher"
 import Logo from "./logo"
 import SearchBox from "./searchbox"
 import ThemeToggle from "./theme-toggle"
 
-const navigationItems: NavItem[] = [
-  {
-    label: "Home",
-    href: "/",
-    items: [
-      { label: "Home", href: "/" },
-      { label: "Power of play", href: "/#power-of-play" },
-      { label: "Upcoming events", href: "/#upcoming-events" },
-      { label: "Statistics", href: "/#statistics" },
-      { label: "World map", href: "/#world-map" },
-      { label: "The experience", href: "/#activities" },
-      { label: "Manifesto & code of conduct", href: "/#manifesto-and-code-of-conduct" },
-      { label: "Testimonials", href: "/#testimonials" },
-      { label: "Gallery", href: "/#gallery" },
-      { label: "Benefits", href: "/#benefits" },
-      { label: "FAQ", href: "/#faq" },
-    ],
-  },
-  {
-    label: "Events",
-    href: "/events",
-    items: [
-      { label: "Events", href: "/events" },
-      { label: "Calendar", href: "/events/calendar" },
-      { label: "Map", href: "/events/map" },
-      { label: "Hosting an event", href: "/events/hosting" },
-    ],
-  },
-  {
-    label: "Community",
-    href: "/community",
-    items: [
-      { label: "Players", href: "/players" },
-      { label: "Games", href: "/games" },
-      { label: "Articles", href: "/articles" },
-      { label: "Testimonials", href: "/events/testimonials" },
-      { label: "Things we like", href: "/likes" },
-      { label: "Debriefing cube", href: "/tools/debriefing-cube" },
-    ],
-  },
-  {
-    label: "About",
-    href: "/about",
-    items: [
-      { label: "Our story", href: "/about/story" },
-      { label: "Our values", href: "/about/values" },
-      { label: "Our format", href: "/about/format" },
-    ],
-  },
-  {
-    label: "Contact",
-    href: "/contact",
-    items: null,
-  },
-]
+function useNavigationItems(): NavItem[] {
+  const t = useTranslations("nav")
+
+  return [
+    {
+      label: t("home"),
+      href: "/",
+      items: [
+        { label: t("home"), href: "/" },
+        { label: t("powerOfPlay"), href: "/#power-of-play" },
+        { label: t("upcomingEvents"), href: "/#upcoming-events" },
+        { label: t("statistics"), href: "/#statistics" },
+        { label: t("worldMap"), href: "/#world-map" },
+        { label: t("theExperience"), href: "/#activities" },
+        { label: t("manifestoAndCodeOfConduct"), href: "/#manifesto-and-code-of-conduct" },
+        { label: t("testimonials"), href: "/#testimonials" },
+        { label: t("gallery"), href: "/#gallery" },
+        { label: t("benefits"), href: "/#benefits" },
+        { label: t("faq"), href: "/#faq" },
+      ],
+    },
+    {
+      label: t("events"),
+      href: "/events",
+      items: [
+        { label: t("events"), href: "/events" },
+        { label: t("calendar"), href: "/events/calendar" },
+        { label: t("map"), href: "/events/map" },
+        { label: t("hostingAnEvent"), href: "/events/hosting" },
+      ],
+    },
+    {
+      label: t("community"),
+      href: "/community",
+      items: [
+        { label: t("players"), href: "/players" },
+        { label: t("games"), href: "/games" },
+        { label: t("articles"), href: "/articles" },
+        { label: t("testimonials"), href: "/events/testimonials" },
+        { label: t("thingsWeLike"), href: "/likes" },
+        { label: t("debriefingCube"), href: "/tools/debriefing-cube" },
+      ],
+    },
+    {
+      label: t("about"),
+      href: "/about",
+      items: [
+        { label: t("ourStory"), href: "/about/story" },
+        { label: t("ourValues"), href: "/about/values" },
+        { label: t("ourFormat"), href: "/about/format" },
+      ],
+    },
+    {
+      label: t("contact"),
+      href: "/contact",
+      items: null,
+    },
+  ]
+}
 
 interface NavLinkProps {
   href: string
@@ -110,6 +115,7 @@ function NavLink({ href, children, className }: NavLinkProps) {
 
 export default function Navbar() {
   const [isSticky, setIsSticky] = useState(false)
+  const navigationItems = useNavigationItems()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,7 +139,7 @@ export default function Navbar() {
               <NavigationMenuList>
                 {navigationItems.map((item) =>
                   item.items ? (
-                    <NavigationMenuItem key={item.label}>
+                    <NavigationMenuItem key={item.href}>
                       <NavigationMenuTrigger>{item.label}</NavigationMenuTrigger>
                       <NavigationMenuContent>
                         {item.items.map((subItem) => (
@@ -144,7 +150,7 @@ export default function Navbar() {
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                   ) : (
-                    <NavigationMenuItem key={item.label}>
+                    <NavigationMenuItem key={item.href}>
                       <NavigationMenuLink asChild>
                         <NavLink href={item.href} className="ui-navigation-menu-link">
                           {item.label}
@@ -158,6 +164,7 @@ export default function Navbar() {
 
             <div className="ui-navbar-actions">
               <SearchBox />
+              <LocaleSwitcher />
               <ThemeToggle />
               <AuthStatusClient />
             </div>

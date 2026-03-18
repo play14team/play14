@@ -62,6 +62,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.3",
     "slugify": "^1.6.6",
+    "strapi-ai-translator": "^0.14.0",
     "strapi-cache": "^1.8.3",
     "strapi-plugin-config-sync": "^3.2.0",
     "strapi-plugin-country-select": "^2.1.0",

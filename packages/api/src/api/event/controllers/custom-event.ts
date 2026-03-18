@@ -2332,6 +2332,141 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
+   * Update event translation for a specific locale (organizer only)
+   * Uses the Document Service directly to create/update locale entries.
+   */
+  async updateTranslation(ctx) {
+    const { slug } = ctx.params
+    const user = ctx.state.user
+    const { locale, description } = ctx.request.body?.data || {}
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    if (!locale || typeof locale !== "string") {
+      return ctx.badRequest("locale is required")
+    }
+
+    if (typeof description !== "string") {
+      return ctx.badRequest("description is required")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Fetch event to verify access
+    const event = await strapi.documents("api::event.event").findFirst({
+      filters: { slug: { $eq: slug } },
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    // Verify organizer access
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to edit this event")
+    }
+
+    // Check if event is published (to maintain correct status)
+    const publishedEvent = await strapi.documents("api::event.event").findOne({
+      documentId: event.documentId,
+      fields: ["documentId"],
+      status: "published",
+    })
+
+    // Include name and slug to satisfy required field validation when Strapi creates
+    // a new locale entry. copyNonLocalizedFields skips localized+required fields (name)
+    // and uid fields (slug), so we must supply them explicitly.
+    const updateData: any = { name: event.name, slug: event.slug, description }
+    strapi.log.info(
+      `[Event] Updating translation for documentId=${event.documentId} locale=${locale} status=${publishedEvent ? "published" : "draft"}`
+    )
+
+    try {
+      // Single update call with correct status — avoids a separate publish() step
+      // which can re-publish all locales and disrupt image relations
+      const updated = await strapi.documents("api::event.event").update({
+        documentId: event.documentId,
+        locale,
+        data: updateData,
+        status: publishedEvent ? "published" : "draft",
+      } as any)
+
+      strapi.log.info(
+        `[Event] Translation updated for "${event.name}" (${event.slug}) locale=${locale} resultLocale=${(updated as any).locale} by ${player.name}`
+      )
+
+      return ctx.send({
+        data: {
+          documentId: updated.documentId,
+          locale: (updated as any).locale,
+          description: updated.description,
+        },
+      })
+    } catch (error) {
+      strapi.log.error(
+        `[Event] Translation update failed for "${event.name}" (${event.slug}) locale=${locale}: ${error}`
+      )
+      return ctx.badRequest("Failed to save translation")
+    }
+  },
+
+  /**
+   * Get event description for a specific locale (organizer only)
+   */
+  async getTranslation(ctx) {
+    const { slug } = ctx.params
+    const user = ctx.state.user
+    const locale = ctx.query.locale as string
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    if (!locale) {
+      return ctx.badRequest("locale query param is required")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Fetch event in the requested locale
+    const event = await strapi.documents("api::event.event").findFirst({
+      filters: { slug: { $eq: slug } },
+      fields: ["documentId", "description", "locale"],
+      locale,
+    })
+
+    if (!event) {
+      return ctx.send({ data: { description: "", exists: false } })
+    }
+
+    // Check if we actually got the requested locale or a fallback
+    const exists = (event as any).locale === locale
+
+    return ctx.send({
+      data: {
+        description: exists ? event.description || "" : "",
+        exists,
+      },
+    })
+  },
+
+  /**
    * Undo check-in for a participant (organizer only)
    */
   async undoCheckIn(ctx) {

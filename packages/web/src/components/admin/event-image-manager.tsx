@@ -7,7 +7,7 @@ import {
   removeEventImage,
   setEventImageFromLibrary,
   uploadEventImage,
-} from "@/app/(admin)/admin/events/[slug]/images.action"
+} from "@/app/[locale]/(admin)/admin/events/[slug]/images.action"
 import EventDefaultImageManager from "./event-default-image-manager"
 import ImageCropper from "./image-cropper"
 import MediaLibraryBrowser from "./media-library-browser"

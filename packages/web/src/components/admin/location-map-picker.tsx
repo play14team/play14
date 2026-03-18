@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css"
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
 import mapboxgl from "mapbox-gl"
+import { useTranslations } from "next-intl"
 import { useTheme } from "next-themes"
 import { useCallback, useEffect, useRef, useState } from "react"
 import Map, {
@@ -127,6 +128,7 @@ export default function LocationMapPicker({
 }: LocationMapPickerProps) {
   const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
+  const t = useTranslations("adminCrud")
   const zoomLevels = ZOOM_LEVELS[precision]
   const [viewState, setViewState] = useState({
     longitude: value?.geometry?.coordinates?.[0] ?? 10,
@@ -322,7 +324,7 @@ export default function LocationMapPicker({
             <div className="location-map-picker-details">
               <div className="location-map-picker-place">
                 <i className="bx bx-map-pin" />
-                <span>{value.place_name || "Location selected"}</span>
+                <span>{value.place_name || t("mapPicker.locationSelected")}</span>
               </div>
               <div className="location-map-picker-coords">
                 <span>
