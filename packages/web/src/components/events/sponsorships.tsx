@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server"
+import { useTranslations } from "next-intl"
 import type { ComponentEventsSponsorship, Sponsor } from "@/models/strapi"
 import EventSponsor from "./sponsor"
 
@@ -7,8 +7,8 @@ interface GroupedSponsorship {
   sponsors: Sponsor[]
 }
 
-const EventSponsorships = async (props: { sponsorships: Array<ComponentEventsSponsorship> }) => {
-  const t = await getTranslations("events")
+const EventSponsorships = (props: { sponsorships: Array<ComponentEventsSponsorship> }) => {
+  const t = useTranslations("events")
   const { sponsorships } = props
 
   // Group sponsors by category name
