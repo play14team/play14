@@ -9,8 +9,8 @@
     "typecheck": "bunx tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.26.0",
-    "apify-client": "^2.22.1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "apify-client": "^2.22.2",
     "dotenv": "^17.3.1"
   }
 }
