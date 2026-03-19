@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react"
 import Logo from "@/components/layout/logo"
 import Avatar from "@/components/ui/avatar"
 import { usePathname as useI18nPathname, useRouter as useI18nRouter } from "@/i18n/navigation"
-import { routing } from "@/i18n/routing"
+import { localeLabels, routing } from "@/i18n/routing"
 import type { StrapiUser } from "@/libs/auth"
 import { useMobileSidebar } from "./mobile-sidebar-context"
 
@@ -28,13 +28,6 @@ interface NavItem {
 interface NavSection {
   titleKey: string
   items: NavItem[]
-}
-
-const localeLabels: Record<string, string> = {
-  en: "English",
-  fr: "Français",
-  es: "Español",
-  de: "Deutsch",
 }
 
 export default function AdminSidebar({ user }: AdminSidebarProps) {

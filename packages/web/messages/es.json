@@ -1917,7 +1917,19 @@
       "undo": "Deshacer",
       "checkIn": "Registrar",
       "loadingParticipants": "Cargando participantes...",
-      "unknown": "Desconocido"
+      "unknown": "Desconocido",
+      "refund": "Reembolsar",
+      "refundOrder": "Reembolsar pedido",
+      "refundWarning": "Esta acción es irreversible. El importe total del pedido será reembolsado al comprador.",
+      "refundMultipleTicketsWarning": "Este pedido contiene {count} entradas. Todas las entradas de este pedido serán reembolsadas.",
+      "refundReason": "Motivo del reembolso",
+      "refundReasonPlaceholder": "Por favor, explique por qué se reembolsa este pedido...",
+      "refundReasonRequired": "Por favor, indique un motivo para el reembolso.",
+      "refundConfirm": "Confirmar reembolso",
+      "refundProcessing": "Procesando...",
+      "refundCancel": "Cancelar",
+      "refundFailed": "Error al procesar el reembolso. Inténtelo de nuevo.",
+      "refundOrderNumber": "Pedido n.º {orderNumber}"
     },
     "media": {
       "title": "Galerías de fotos y vídeos",

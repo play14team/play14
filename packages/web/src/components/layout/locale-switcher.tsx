@@ -3,15 +3,7 @@
 import { useLocale } from "next-intl"
 import { useEffect, useRef, useState } from "react"
 import { usePathname } from "@/i18n/navigation"
-import { routing } from "@/i18n/routing"
-
-const localeLabels: Record<string, string> = {
-  en: "EN",
-  fr: "FR",
-  es: "ES",
-  de: "DE",
-  it: "IT",
-}
+import { localeLabels, localeShortLabels, routing } from "@/i18n/routing"
 
 export default function LocaleSwitcher() {
   const locale = useLocale()
@@ -57,7 +49,7 @@ export default function LocaleSwitcher() {
         type="button"
       >
         <span className="locale-switcher-current">
-          {localeLabels[locale] ?? locale.toUpperCase()}
+          {localeShortLabels[locale] ?? locale.toUpperCase()}
         </span>
       </button>
       {open && (

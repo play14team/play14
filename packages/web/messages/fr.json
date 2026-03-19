@@ -1917,7 +1917,19 @@
       "undo": "Annuler",
       "checkIn": "Enregistrer",
       "loadingParticipants": "Chargement des participants...",
-      "unknown": "Inconnu"
+      "unknown": "Inconnu",
+      "refund": "Rembourser",
+      "refundOrder": "Rembourser la commande",
+      "refundWarning": "Cette action est irréversible. Le montant total de la commande sera remboursé à l'acheteur.",
+      "refundMultipleTicketsWarning": "Cette commande contient {count} billets. Tous les billets de cette commande seront remboursés.",
+      "refundReason": "Motif du remboursement",
+      "refundReasonPlaceholder": "Veuillez expliquer pourquoi cette commande est remboursée...",
+      "refundReasonRequired": "Veuillez fournir un motif pour le remboursement.",
+      "refundConfirm": "Confirmer le remboursement",
+      "refundProcessing": "Traitement en cours...",
+      "refundCancel": "Annuler",
+      "refundFailed": "Échec du remboursement. Veuillez réessayer.",
+      "refundOrderNumber": "Commande n°{orderNumber}"
     },
     "media": {
       "title": "Galeries photos et vidéos",

@@ -1917,7 +1917,19 @@
       "undo": "Undo",
       "checkIn": "Check in",
       "loadingParticipants": "Loading participants...",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "refund": "Refund",
+      "refundOrder": "Refund order",
+      "refundWarning": "This action is irreversible. The full order amount will be refunded to the buyer.",
+      "refundMultipleTicketsWarning": "This order contains {count} tickets. All tickets in this order will be refunded.",
+      "refundReason": "Reason for refund",
+      "refundReasonPlaceholder": "Please explain why this order is being refunded...",
+      "refundReasonRequired": "Please provide a reason for the refund.",
+      "refundConfirm": "Confirm refund",
+      "refundProcessing": "Processing...",
+      "refundCancel": "Cancel",
+      "refundFailed": "Failed to process refund. Please try again.",
+      "refundOrderNumber": "Order #{orderNumber}"
     },
     "media": {
       "title": "Photo & video galleries",

@@ -1467,7 +1467,19 @@
       "undo": "Rückgängig",
       "checkIn": "Einchecken",
       "loadingParticipants": "Teilnehmer werden geladen...",
-      "unknown": "Unbekannt"
+      "unknown": "Unbekannt",
+      "refund": "Erstatten",
+      "refundOrder": "Bestellung erstatten",
+      "refundWarning": "Diese Aktion ist unwiderruflich. Der gesamte Bestellbetrag wird dem Käufer erstattet.",
+      "refundMultipleTicketsWarning": "Diese Bestellung enthält {count} Tickets. Alle Tickets dieser Bestellung werden erstattet.",
+      "refundReason": "Grund der Erstattung",
+      "refundReasonPlaceholder": "Bitte erklären Sie, warum diese Bestellung erstattet wird...",
+      "refundReasonRequired": "Bitte geben Sie einen Grund für die Erstattung an.",
+      "refundConfirm": "Erstattung bestätigen",
+      "refundProcessing": "Wird verarbeitet...",
+      "refundCancel": "Abbrechen",
+      "refundFailed": "Erstattung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "refundOrderNumber": "Bestellung Nr. {orderNumber}"
     },
     "media": {
       "title": "Foto- & Videogalerien",

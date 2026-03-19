@@ -1917,7 +1917,19 @@
       "undo": "Annulla",
       "checkIn": "Check-in",
       "loadingParticipants": "Caricamento partecipanti...",
-      "unknown": "Sconosciuto"
+      "unknown": "Sconosciuto",
+      "refund": "Rimborsa",
+      "refundOrder": "Rimborsa ordine",
+      "refundWarning": "Questa azione è irreversibile. L'intero importo dell'ordine verrà rimborsato all'acquirente.",
+      "refundMultipleTicketsWarning": "Questo ordine contiene {count} biglietti. Tutti i biglietti di questo ordine verranno rimborsati.",
+      "refundReason": "Motivo del rimborso",
+      "refundReasonPlaceholder": "Spiega perché questo ordine viene rimborsato...",
+      "refundReasonRequired": "Fornisci un motivo per il rimborso.",
+      "refundConfirm": "Conferma rimborso",
+      "refundProcessing": "Elaborazione...",
+      "refundCancel": "Annulla",
+      "refundFailed": "Rimborso non riuscito. Riprova.",
+      "refundOrderNumber": "Ordine n. {orderNumber}"
     },
     "media": {
       "title": "Gallerie foto & video",

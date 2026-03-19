@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
+import { requestRefund } from "@/components/tickets/purchase.action"
 import {
   checkInParticipant,
   getEventParticipants,
@@ -28,6 +29,10 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<"all" | "checked-in" | "pending">("all")
   const [checkingIn, setCheckingIn] = useState<string | null>(null)
+  const [refundingOrderId, setRefundingOrderId] = useState<string | null>(null)
+  const [refundReason, setRefundReason] = useState("")
+  const [refundError, setRefundError] = useState<string | null>(null)
+  const [isRefunding, setIsRefunding] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -92,6 +97,52 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
     }
 
     setCheckingIn(null)
+  }
+
+  const handleRefundClick = (participant: Participant) => {
+    if (!participant.order?.documentId) return
+    setRefundingOrderId(participant.order.documentId)
+    setRefundReason("")
+    setRefundError(null)
+  }
+
+  const handleRefundCancel = () => {
+    setRefundingOrderId(null)
+    setRefundReason("")
+    setRefundError(null)
+  }
+
+  const handleRefundConfirm = async () => {
+    if (!refundingOrderId) return
+    if (!refundReason.trim()) {
+      setRefundError(t("refundReasonRequired"))
+      return
+    }
+
+    setIsRefunding(true)
+    setRefundError(null)
+
+    const result = await requestRefund(refundingOrderId, refundReason.trim())
+
+    if (result.success) {
+      setRefundingOrderId(null)
+      setRefundReason("")
+      fetchData()
+    } else {
+      setRefundError(result.error || t("refundFailed"))
+    }
+
+    setIsRefunding(false)
+  }
+
+  const getRefundingOrder = () => {
+    if (!refundingOrderId) return null
+    const participant = participants.find((p) => p.order?.documentId === refundingOrderId)
+    return participant?.order || null
+  }
+
+  const getOrderTicketCount = (orderDocumentId: string): number => {
+    return participants.filter((p) => p.order?.documentId === orderDocumentId).length
   }
 
   const getDisplayName = (participant: Participant): string => {
@@ -332,28 +383,40 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                       )}
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        className={`${styles.actionButton} ${
-                          participant.ticketStatus === "used" ? styles.undo : styles.checkIn
-                        }`}
-                        onClick={() => handleCheckIn(participant)}
-                        disabled={checkingIn === participant.documentId}
-                      >
-                        {checkingIn === participant.documentId ? (
-                          <i className="bx bx-loader-alt bx-spin" />
-                        ) : participant.ticketStatus === "used" ? (
-                          <>
-                            <i className="bx bx-undo" />
-                            {t("undo")}
-                          </>
-                        ) : (
-                          <>
-                            <i className="bx bx-check" />
-                            {t("checkIn")}
-                          </>
+                      <div className={styles.actionsCell}>
+                        <button
+                          type="button"
+                          className={`${styles.actionButton} ${
+                            participant.ticketStatus === "used" ? styles.undo : styles.checkIn
+                          }`}
+                          onClick={() => handleCheckIn(participant)}
+                          disabled={checkingIn === participant.documentId}
+                        >
+                          {checkingIn === participant.documentId ? (
+                            <i className="bx bx-loader-alt bx-spin" />
+                          ) : participant.ticketStatus === "used" ? (
+                            <>
+                              <i className="bx bx-undo" />
+                              {t("undo")}
+                            </>
+                          ) : (
+                            <>
+                              <i className="bx bx-check" />
+                              {t("checkIn")}
+                            </>
+                          )}
+                        </button>
+                        {participant.order?.status === "paid" && (
+                          <button
+                            type="button"
+                            className={`${styles.actionButton} ${styles.refund}`}
+                            onClick={() => handleRefundClick(participant)}
+                          >
+                            <i className="bx bx-credit-card" />
+                            {t("refund")}
+                          </button>
                         )}
-                      </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -362,6 +425,74 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
           </div>
         )}
       </div>
+
+      {/* Refund Modal */}
+      {refundingOrderId && (
+        <div className={styles.refundModal} onClick={handleRefundCancel}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3>{t("refundOrder")}</h3>
+
+            {getRefundingOrder() && (
+              <p>{t("refundOrderNumber", { orderNumber: getRefundingOrder()!.orderNumber })}</p>
+            )}
+
+            <div className={styles.warning}>
+              <i className="bx bx-error" />
+              <span>{t("refundWarning")}</span>
+            </div>
+
+            {getOrderTicketCount(refundingOrderId) > 1 && (
+              <div className={styles.warning}>
+                <i className="bx bx-group" />
+                <span>
+                  {t("refundMultipleTicketsWarning", {
+                    count: getOrderTicketCount(refundingOrderId),
+                  })}
+                </span>
+              </div>
+            )}
+
+            <div className={styles.formGroup}>
+              <label>{t("refundReason")}</label>
+              <textarea
+                className={styles.textarea}
+                value={refundReason}
+                onChange={(e) => {
+                  setRefundReason(e.target.value)
+                  setRefundError(null)
+                }}
+                placeholder={t("refundReasonPlaceholder")}
+              />
+              {refundError && <div className={styles.error}>{refundError}</div>}
+            </div>
+
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={handleRefundCancel}
+                disabled={isRefunding}
+              >
+                {t("refundCancel")}
+              </button>
+              <button
+                type="button"
+                className={styles.confirmButton}
+                onClick={handleRefundConfirm}
+                disabled={isRefunding}
+              >
+                {isRefunding ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin" /> {t("refundProcessing")}
+                  </>
+                ) : (
+                  t("refundConfirm")
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
