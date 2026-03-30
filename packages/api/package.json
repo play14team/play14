@@ -74,7 +74,7 @@
     "strapi-prometheus": "^2.6.0",
     "strapi-provider-email-sender": "file:providers/strapi-provider-email-sender",
     "strapi-provider-upload-azure-storage": "^3.5.0",
-    "stripe": "^20.4.1",
+    "stripe": "^21.0.1",
     "styled-components": "^6.3.11",
     "zod": "^4.3.6"
   },
