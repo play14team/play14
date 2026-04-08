@@ -83,7 +83,7 @@
       "srTitle": "Eventi nel mondo"
     },
     "experience": {
-      "title": "L'<span>esperienza</span>",
+      "title": "L''<span>esperienza</span>",
       "subtitle": "Per due giorni e mezzo, <players>persone con profili molto diversi</players> condividono <games>giochi e attività</games>, conoscenze e risate. <strong>Tutti sono benvenuti</strong>.",
       "activitiesIntro": "Ecco alcuni esempi di attività che proponiamo:",
       "seriousGame": "Un <link>serious game</link> che usi come metafora per comprendere un nuovo concetto",
@@ -334,7 +334,7 @@
     "format": {
       "title": "Il nostro formato",
       "whatIsUnconference": "Cos'è una unconference?",
-      "unconferenceIntro": "#play14 è organizzato come una unconference, un formato di conferenza che segue l'<link>Open Space Technology</link>",
+      "unconferenceIntro": "#play14 è organizzato come una unconference, un formato di conferenza che segue l''<link>Open Space Technology</link>",
       "unconferenceContributors": "In questo formato, <strong>i partecipanti sono anche contributori delle sessioni</strong>. Chiunque voglia avviare un argomento può rivendicare uno slot temporale nell'agenda, e il programma viene creato ogni mattina, sul momento, come spiegheremo più avanti.",
       "unconferenceParticipant": "Una volta che sei lì, il lavoro degli organizzatori è finito. Hanno fornito un luogo, cibo e bevande per il resto dell'evento, poi <strong>spetta a te come partecipante renderlo un grande evento</strong>.",
       "funnyDrawings": "Dai un'occhiata ai <drawings>disegni divertenti</drawings> di <author>Claudio Perrone</author>",
@@ -752,7 +752,7 @@
     "discountLabel": "Sconto",
     "totalLabel": "Totale",
     "termsAndConditions": "Termini e condizioni",
-    "gdprConsent": "Acconsento al trattamento dei miei dati personali in conformità con l'<privacy>Informativa sulla privacy</privacy> *",
+    "gdprConsent": "Acconsento al trattamento dei miei dati personali in conformità con l''<privacy>Informativa sulla privacy</privacy> *",
     "termsConsent": "Accetto le <sale>Condizioni generali di vendita</sale> e i <terms>Termini di servizio</terms> *",
     "cancel": "Annulla",
     "completeRegistration": "Completa registrazione",

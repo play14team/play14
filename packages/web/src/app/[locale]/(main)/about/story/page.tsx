@@ -28,9 +28,9 @@ export default async function Story() {
           <div className="section-title">
             {history && <h3>{history.founders || t("founders")}</h3>}
           </div>
-          {history && (
+          {history?.intro && (
             <div className="px-5">
-              <HtmlContent>{history.intro!}</HtmlContent>
+              <HtmlContent>{history.intro}</HtmlContent>
             </div>
           )}
           <div className="pt-5">{founders && <PlayerGrid players={founders} />}</div>

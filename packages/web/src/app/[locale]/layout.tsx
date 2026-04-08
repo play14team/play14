@@ -1,15 +1,10 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import { notFound } from "next/navigation"
 import { hasLocale, NextIntlClientProvider } from "next-intl"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import NextTopLoader from "nextjs-toploader"
 import ScrollToTop from "@/components/utils/scroll-to-top"
-import { ThemeProvider } from "@/components/utils/theme-provider"
 import { routing } from "@/i18n/routing"
-import "@/styles/main.scss"
-
-const inter = Inter({ subsets: ["latin"] })
 
 type Props = {
   children: React.ReactNode
@@ -67,24 +62,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// Avoid the dev-only performance.measure negative timestamp errors for some routes.
-const shouldPatchPerformanceMeasure = process.env.NODE_ENV === "development"
-const performanceMeasurePatch = [
-  "(function () {",
-  "  const perf = window.performance",
-  '  if (!perf || typeof perf.measure !== "function") { return }',
-  "  const originalMeasure = perf.measure",
-  "  perf.measure = function () {",
-  "    try { return originalMeasure.apply(this, arguments) }",
-  "    catch (error) {",
-  '      if (error && typeof error.message === "string" &&',
-  '        error.message.includes("cannot have a negative time stamp")) { return }',
-  "      throw error",
-  "    }",
-  "  }",
-  "})()",
-].join("\n")
-
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params
 
@@ -95,25 +72,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale)
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <head>
-        {/* Boxicons from CDN for full icon set */}
-        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-        {shouldPatchPerformanceMeasure && (
-          <script
-            // Static dev-only patch for performance.measure negative timestamp errors
-            dangerouslySetInnerHTML={{ __html: performanceMeasurePatch }}
-            key="performance-patch"
-          />
-        )}
-      </head>
-      <body className={inter.className}>
-        <ThemeProvider>
-          <NextTopLoader color="#FF5200" showSpinner={false} />
-          <ScrollToTop />
-          <NextIntlClientProvider locale={locale}>{children}</NextIntlClientProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <>
+      <NextTopLoader color="#FF5200" showSpinner={false} />
+      <ScrollToTop />
+      <NextIntlClientProvider locale={locale}>{children}</NextIntlClientProvider>
+    </>
   )
 }

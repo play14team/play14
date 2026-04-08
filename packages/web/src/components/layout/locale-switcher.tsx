@@ -2,7 +2,7 @@
 
 import { useLocale } from "next-intl"
 import { useEffect, useRef, useState } from "react"
-import { usePathname } from "@/i18n/navigation"
+import { Link, usePathname } from "@/i18n/navigation"
 import { localeLabels, localeShortLabels, routing } from "@/i18n/routing"
 
 export default function LocaleSwitcher() {
@@ -33,11 +33,6 @@ export default function LocaleSwitcher() {
     return () => document.removeEventListener("keydown", handleKey)
   }, [open])
 
-  function buildHref(targetLocale: string) {
-    if (targetLocale === routing.defaultLocale) return pathname
-    return `/${targetLocale}${pathname}`
-  }
-
   return (
     <div ref={ref} className="locale-switcher">
       <button
@@ -56,21 +51,14 @@ export default function LocaleSwitcher() {
         <ul className="locale-switcher-dropdown" role="listbox" aria-label="Language">
           {routing.locales.map((l) => (
             <li key={l} role="option" aria-selected={l === locale}>
-              <a
-                href={buildHref(l)}
+              <Link
+                href={pathname}
+                locale={l}
                 className={`locale-switcher-option${l === locale ? " active" : ""}`}
-                onClick={() => {
-                  globalThis.cookieStore?.set({
-                    name: "NEXT_LOCALE",
-                    value: l,
-                    path: "/",
-                    expires: Date.now() + 365 * 24 * 60 * 60 * 1000,
-                  })
-                  setOpen(false)
-                }}
+                onClick={() => setOpen(false)}
               >
                 {localeLabels[l] ?? l.toUpperCase()}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

@@ -70,22 +70,27 @@ export async function getStory(locale?: string) {
     // If the requested locale doesn't exist, fall back to default (omit locale param)
     if (locale) {
       console.warn(`[getStory] Locale "${locale}" not found, falling back to default locale`)
-      const [historyResponse, foundersResponse] = await Promise.all([
-        restQuery<History>("history", {
-          populate: storyPopulate,
-        }),
-        restQuery<Player[]>("players", {
-          sort: ["name:asc"],
-          filters: {
-            position: { $eq: "Founder" },
-          },
-          populate: playerItemPopulate,
-        }),
-      ])
+      try {
+        const [historyResponse, foundersResponse] = await Promise.all([
+          restQuery<History>("history", {
+            populate: storyPopulate,
+          }),
+          restQuery<Player[]>("players", {
+            sort: ["name:asc"],
+            filters: {
+              position: { $eq: "Founder" },
+            },
+            populate: playerItemPopulate,
+          }),
+        ])
 
-      return {
-        history: normalizeEntity(historyResponse),
-        founders: foundersResponse.data || [],
+        return {
+          history: normalizeEntity(historyResponse),
+          founders: foundersResponse.data || [],
+        }
+      } catch {
+        // Even default locale failed, return empty data rather than crashing
+        return { history: null, founders: [] }
       }
     }
     throw error

@@ -272,7 +272,19 @@
       "sec": "Sek",
       "inProgress": "Läuft"
     },
-    "noVenue": "Noch kein Veranstaltungsort"
+    "noVenue": "Noch kein Veranstaltungsort",
+    "map": {
+      "loading": "Veranstaltungsorte werden geladen...",
+      "noEvents": "Keine #play14-Veranstaltungen",
+      "moreEvents": "+{count} weitere Veranstaltung(en)",
+      "searchPlaceholder": "Länder suchen...",
+      "noCountriesFound": "Keine Länder gefunden, die \"{query}\" entsprechen",
+      "countryCount": "{count, plural, one {# Land} other {# Länder}}",
+      "legendOver": "Vorbei",
+      "legendAnnounced": "Angekündigt",
+      "legendOpen": "Offen",
+      "legendCancelled": "Abgesagt"
+    }
   },
   "games": {
     "title": "Spiele",
@@ -720,7 +732,10 @@
     "backToHome": "Zurück zur Startseite",
     "viewAll": "Alle anzeigen",
     "readMore": "Mehr lesen",
-    "noResults": "Keine Ergebnisse gefunden"
+    "noResults": "Keine Ergebnisse gefunden",
+    "serverUnavailable": "Verbindung zum Server nicht möglich",
+    "serverUnavailableDescription": "Der Inhaltsserver ist derzeit nicht verfügbar. Dies bedeutet in der Regel, dass das Backend nicht läuft oder nicht erreichbar ist.",
+    "tryAgain": "Erneut versuchen"
   },
   "nav": {
     "home": "Startseite",
@@ -1418,7 +1433,12 @@
       "hosts": "Gastgeber",
       "mentors": "Mentoren",
       "sponsors": "Sponsoren",
-      "sponsorsDescription": "Fügen Sie Unternehmen oder Organisationen hinzu, die diese Veranstaltung sponsern."
+      "sponsorsDescription": "Fügen Sie Unternehmen oder Organisationen hinzu, die diese Veranstaltung sponsern.",
+      "add": "Hinzufügen...",
+      "search": "Suchen...",
+      "noMatchesFound": "Keine Treffer gefunden",
+      "noOrganizersAvailable": "Keine Organisatoren verfügbar",
+      "remove": "Entfernen"
     },
     "scheduleTickets": {
       "ticketingMode": "Ticketing-Modus",
@@ -1518,7 +1538,25 @@
     },
     "financeTab": {
       "ticketSalesRevenue": "Ticketverkaufserlöse",
-      "ticketSalesDescription": "Umsatzanalysen aus über Stripe verarbeiteten Ticketverkäufen."
+      "ticketSalesDescription": "Umsatzanalysen aus über Stripe verarbeiteten Ticketverkäufen.",
+      "loading": "Umsatzanalysen werden geladen...",
+      "failedToLoad": "Fehler beim Laden der Umsatzanalysen",
+      "totalRevenue": "Gesamtumsatz",
+      "netRevenue": "Nettoumsatz",
+      "refunded": "-{amount} erstattet",
+      "paidOrders": "Bezahlte Bestellungen",
+      "avg": "Durchschn.: {amount}",
+      "ticketsSold": "Verkaufte Tickets",
+      "noSalesYet": "Noch keine Ticketverkäufe. Diagramme erscheinen, sobald Bestellungen eingehen.",
+      "revenueOverTime": "Umsatz im Zeitverlauf",
+      "revenue": "Umsatz",
+      "revenueByTicketType": "Umsatz nach Tickettyp",
+      "sold": "{count} verkauft",
+      "orderStatus": "Bestellstatus",
+      "ordersCount": "{count} Bestellungen",
+      "discountUsage": "Rabattnutzung",
+      "codesUsed": "Verwendete Codes",
+      "totalDiscounted": "Gesamt rabattiert"
     },
     "results": {
       "financialResults": "Finanzergebnisse",
@@ -1619,7 +1657,18 @@
       "deleteConfirm": "Sind Sie sicher, dass Sie den Tickettyp \"{name}\" löschen möchten?",
       "yesDelete": "Ja, löschen",
       "deleting": "Löschen...",
-      "dragToReorder": "Zum Neuordnen ziehen"
+      "dragToReorder": "Zum Neuordnen ziehen",
+      "dragToReorderAriaLabel": "Zum Neuordnen des Tickettyps ziehen",
+      "namePlaceholder": "z.B. Frühbucher",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "unlimitedPlaceholder": "Unbegrenzt",
+      "nameRequired": "Name ist erforderlich",
+      "priceMustBePositive": "Preis muss 0 oder größer sein",
+      "failedToSave": "Fehler beim Speichern des Tickettyps",
+      "failedToDelete": "Fehler beim Löschen des Tickettyps",
+      "failedToUpdate": "Fehler beim Aktualisieren des Tickettyps",
+      "failedToReorder": "Fehler beim Neuordnen der Tickettypen",
+      "cannotDeleteSold": "Kann nicht gelöscht werden: Tickets verkauft"
     },
     "schedule": {
       "allDaysScheduled": "Alle Wochentage sind bereits geplant",
@@ -1636,7 +1685,14 @@
       "remove": "Entfernen",
       "activities": "Aktivitäten",
       "addDay": "Tag zum Zeitplan hinzufügen",
-      "noSchedule": "Noch kein Zeitplan definiert. Fügen Sie Tage hinzu, um Ihren Veranstaltungszeitplan zu erstellen."
+      "noSchedule": "Noch kein Zeitplan definiert. Fügen Sie Tage hinzu, um Ihren Veranstaltungszeitplan zu erstellen.",
+      "atLeastOneTimeslot": "Ein Tag muss mindestens ein Zeitfenster haben",
+      "dayDescriptionRequired": "Tagesbeschreibung ist erforderlich",
+      "timeRequired": "Zeit ist erforderlich für Zeitfenster {index}",
+      "timeslotDescriptionRequired": "Beschreibung ist erforderlich für Zeitfenster {index}",
+      "confirmRemoveDay": "Sind Sie sicher, dass Sie diesen Tag aus dem Zeitplan entfernen möchten?",
+      "descriptionPlaceholder": "z.B. Hauptveranstaltungstag",
+      "descriptionPlaceholderNew": "z.B. Workshop-Tag, Hauptveranstaltung usw."
     },
     "sponsorEditor": {
       "addSponsor": "Sponsor hinzufügen...",
