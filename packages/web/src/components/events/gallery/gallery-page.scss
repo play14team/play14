@@ -1,0 +1,264 @@
+// Gallery wall page styles
+
+.gallery-wall {
+  padding-bottom: 4rem;
+
+  // Highlights section
+  &__highlights {
+    padding: 0 1.5rem 2rem;
+  }
+
+  &__highlights-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: var(--primary-color, #f57c00);
+
+    i {
+      margin-right: 0.25rem;
+    }
+  }
+
+  &__highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+
+    @media (max-width: 992px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__video-embed {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: var(--bg-muted, #f0f0f0);
+
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  }
+
+  // Year quick navigation
+  &__year-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg-color, #fff);
+    border-bottom: 1px solid var(--border-color, #eee);
+  }
+
+  &__year-link {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-color, #333);
+    text-decoration: none;
+    background: var(--bg-muted, #f5f5f5);
+    transition: background-color 0.2s, color 0.2s;
+
+    &:hover {
+      background: var(--primary-color, #f57c00);
+      color: #fff;
+    }
+  }
+
+  // Year sections
+  &__section {
+    margin-bottom: 3rem;
+    padding: 0 1.5rem;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-color, #f57c00);
+  }
+
+  &__year {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--primary-color, #f57c00);
+  }
+
+  &__count {
+    font-size: 0.875rem;
+    color: var(--text-muted, #888);
+  }
+
+  // Photo wall
+  &__photos {
+    margin-bottom: 2rem;
+
+    // Style the react-photo-album container
+    .react-photo-album {
+      cursor: pointer;
+    }
+  }
+
+  // External media links section
+  &__media-links {
+    margin-top: 1.5rem;
+  }
+
+  &__media-links-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-color, #333);
+
+    i {
+      margin-right: 0.25rem;
+    }
+  }
+
+  &__media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// Media link card
+.gallery-media-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &__image {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: var(--bg-muted, #f0f0f0);
+    overflow: hidden;
+  }
+
+  &__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 3rem;
+    color: var(--text-muted, #ccc);
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 2.5rem;
+    color: #fff;
+  }
+
+  &:hover &__overlay {
+    opacity: 1;
+  }
+
+  &__info {
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__type {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary-color, #f57c00);
+
+    i {
+      margin-right: 0.25rem;
+    }
+  }
+
+  &__event {
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    a {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__location {
+    font-size: 0.8rem;
+    color: var(--text-muted, #888);
+  }
+}
+
+// Dark mode adjustments
+[data-theme="dark"] {
+  .gallery-wall {
+    &__year-nav {
+      background: var(--bg-color, #1a1a1a);
+      border-bottom-color: var(--border-color, #333);
+    }
+
+    &__year-link {
+      background: var(--bg-muted, #2a2a2a);
+      color: var(--text-color, #ddd);
+    }
+  }
+
+  .gallery-media-card {
+    background: var(--card-bg, #2a2a2a);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+  }
+}

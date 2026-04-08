@@ -254,28 +254,28 @@
     color: #1a1a1a;
 
     &--open {
-      background: #92c900; // Bright green
-      color: #1a1a1a;
+      background: #22c55e;
+      color: white;
     }
 
     &--announced {
-      background: #ffc900; // Yellow
-      color: #1a1a1a;
+      background: #3b82f6;
+      color: white;
     }
 
     &--over {
-      background: #6b7280; // Gray
+      background: #64748b;
       color: white;
     }
 
     &--cancelled {
-      background: #d80000; // Red
+      background: #dc2626;
       color: white;
     }
 
     &--in-progress {
-      background: #92c900; // Bright green (same as open)
-      color: #1a1a1a;
+      background: #22c55e;
+      color: white;
     }
   }
 

@@ -100,6 +100,17 @@
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["playwright"],
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && .claude/play-sound.sh question'"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
@@ -107,15 +118,6 @@
           {
             "type": "command",
             "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && node .claude/biome-hook.mjs'"
-          }
-        ]
-      },
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && .claude/play-sound.sh question'"
           }
         ]
       }

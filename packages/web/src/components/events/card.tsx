@@ -6,7 +6,6 @@ import ReactCountryFlag from "react-country-flag"
 import type { Event } from "@/models/strapi"
 import defaultEvent from "@/styles/images/events/event1.jpg"
 import EventDate from "./date"
-import EventStatus from "./status"
 
 interface EventCardProps {
   event: Event
@@ -94,11 +93,15 @@ const EventCard = ({ event, isPending }: EventCardProps) => {
             <li>
               <span className="location">
                 {isPending ? (
-                  <span className="event-status event-status-pending">
+                  <span className="event-status event-status--pending">
                     <i className="bx bx-time-five" aria-hidden="true" /> {t("status.pending")}
                   </span>
                 ) : (
-                  <EventStatus status={event.eventStatus} />
+                  <span
+                    className={`event-status event-status--${event.eventStatus?.toLowerCase()}`}
+                  >
+                    {t(`status.${event.eventStatus?.toLowerCase()}` as Parameters<typeof t>[0])}
+                  </span>
                 )}
               </span>
             </li>

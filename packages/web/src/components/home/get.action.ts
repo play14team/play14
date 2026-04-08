@@ -65,6 +65,7 @@ export async function getUpcomingEvents(today: string) {
     sort: ["start:asc"],
     filters: {
       end: { $gte: today },
+      eventStatus: { $ne: "Cancelled" },
     },
     populate: eventItemPopulate,
   })

@@ -2308,5 +2308,17 @@
   "terms": {
     "title": "Terms of service",
     "description": "Terms and conditions for using the #play14 website and services"
+  },
+  "gallery": {
+    "title": "Gallery",
+    "description": "Photos and videos from #play14 events around the world",
+    "noContent": "No gallery content available yet.",
+    "events": "{count, plural, one {# event} other {# events}}",
+    "photos": "{count, plural, one {# photo} other {# photos}}",
+    "albumsAndCollections": "Albums & collections",
+    "watchVideos": "Watch videos",
+    "viewPhotos": "View photos",
+    "jumpToYear": "Jump to year",
+    "highlights": "Highlights"
   }
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 import { getAllPlayers } from "@/components/players/get.action"
 import { getPlayerFilterOptions } from "@/components/players/get-filter-options.action"
 import PlayersPageContent from "@/components/players/players-page-content"
@@ -16,6 +16,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-static"
 export const revalidate = 3600
 
+type Props = {
+  params: Promise<{ locale: string }>
+}
+
 /**
  * Players page with pure client-side filtering
  *
@@ -24,7 +28,9 @@ export const revalidate = 3600
  * - Filtering happens entirely client-side (instant, no loading)
  * - URL params are used for shareable filter states
  */
-export default async function Players() {
+export default async function Players({ params }: Props) {
+  const { locale } = await params
+  setRequestLocale(locale)
   // Fetch ALL players and filter options in parallel at build time
   const [filterOptions, players] = await Promise.all([
     getPlayerFilterOptions(),

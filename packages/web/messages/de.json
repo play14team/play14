@@ -2252,5 +2252,17 @@
       "addDay": "Tag zum Zeitplan hinzufügen",
       "addTimeslot": "Zeitslot hinzufügen"
     }
+  },
+  "gallery": {
+    "title": "Galerie",
+    "description": "Fotos und Videos von #play14-Veranstaltungen auf der ganzen Welt",
+    "noContent": "Noch keine Galerieinhalte verfügbar.",
+    "events": "{count, plural, one {# Veranstaltung} other {# Veranstaltungen}}",
+    "photos": "{count, plural, one {# Foto} other {# Fotos}}",
+    "albumsAndCollections": "Alben und Sammlungen",
+    "watchVideos": "Videos ansehen",
+    "viewPhotos": "Fotos ansehen",
+    "jumpToYear": "Zum Jahr springen",
+    "highlights": "Höhepunkte"
   }
 }

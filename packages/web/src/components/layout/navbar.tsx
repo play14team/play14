@@ -45,6 +45,7 @@ function useNavigationItems(): NavItem[] {
       href: "/events",
       items: [
         { label: t("events"), href: "/events" },
+        { label: t("gallery"), href: "/events/gallery" },
         { label: t("calendar"), href: "/events/calendar" },
         { label: t("map"), href: "/events/map" },
         { label: t("hostingAnEvent"), href: "/events/hosting" },

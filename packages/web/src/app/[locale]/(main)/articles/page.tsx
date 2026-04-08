@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 import ArticlesPageContent from "@/components/articles/articles-page-content"
 import { getAllArticles } from "@/components/articles/get.action"
 import { getArticleFilterOptions } from "@/components/articles/get-filter-options.action"
@@ -16,6 +16,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-static"
 export const revalidate = 3600
 
+type Props = {
+  params: Promise<{ locale: string }>
+}
+
 /**
  * Articles page with pure client-side filtering
  *
@@ -24,7 +28,9 @@ export const revalidate = 3600
  * - Filtering happens entirely client-side (instant, no loading)
  * - URL params are used for shareable filter states
  */
-export default async function Articles() {
+export default async function Articles({ params }: Props) {
+  const { locale } = await params
+  setRequestLocale(locale)
   // Fetch ALL articles and filter options in parallel at build time
   const [filterOptions, articles] = await Promise.all([
     getArticleFilterOptions(),

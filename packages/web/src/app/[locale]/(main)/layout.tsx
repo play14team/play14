@@ -1,4 +1,5 @@
 import Script from "next/script"
+import { setRequestLocale } from "next-intl/server"
 import { Suspense } from "react"
 import Footer from "@/components/layout/footer"
 import Loader from "@/components/layout/loader"
@@ -8,7 +9,14 @@ import { WebVitals } from "@/components/utils/web-vitals"
 
 const displayWebVitals = process.env.NEXT_PUBLIC_WEB_VITALS === "true"
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+type Props = {
+  children: React.ReactNode
+  params: Promise<{ locale: string }>
+}
+
+export default async function MainLayout({ children, params }: Props) {
+  const { locale } = await params
+  setRequestLocale(locale)
   return (
     <>
       <Script src="https://widget.weezevent.com/weez.js" />
