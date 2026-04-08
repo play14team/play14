@@ -40,12 +40,12 @@ jobs:
       web-changed: ${{ steps.result.outputs.web }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Detect changed paths
         id: changes
         if: github.event_name != 'workflow_dispatch'
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             api:
@@ -104,7 +104,7 @@ jobs:
       WEB_CHANGED: ${{ needs.detect-changes.outputs.web-changed }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -198,7 +198,7 @@ jobs:
       api_url: ${{ steps.get-url.outputs.url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -417,7 +417,7 @@ jobs:
       web_url: ${{ steps.get-url.outputs.url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
