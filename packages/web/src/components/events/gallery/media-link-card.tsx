@@ -6,7 +6,6 @@ interface MediaLinkCardProps {
   url: string
   type: string
   eventName: string
-  eventSlug: string
   locationName?: string
   previewImageUrl?: string
   watchVideosLabel: string
@@ -17,7 +16,6 @@ export default function MediaLinkCard({
   url,
   type,
   eventName,
-  eventSlug,
   locationName,
   previewImageUrl,
   watchVideosLabel,

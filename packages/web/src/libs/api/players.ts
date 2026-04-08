@@ -47,7 +47,7 @@ export async function getPlayerByDocumentId(documentId: string): Promise<PlayerP
   })
 
   const player = response.data?.[0]
-  if (!player || !player.documentId) {
+  if (!player?.documentId) {
     return null
   }
 

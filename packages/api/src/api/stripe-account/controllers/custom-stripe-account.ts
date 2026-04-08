@@ -15,14 +15,29 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
     if (!secretKey) {
       throw new Error("STRIPE_SECRET_KEY environment variable is not set")
     }
-    return new Stripe(secretKey)
+    return Stripe(secretKey)
   }
 
   /**
    * Extract detailed error information from Stripe errors
    */
+  const isStripeError = (
+    error: unknown
+  ): error is {
+    type: string
+    code?: string
+    message: string
+    param?: string
+    statusCode?: number
+    requestId?: string
+    doc_url?: string
+    raw?: unknown
+  } => {
+    return error instanceof Error && "type" in error && "statusCode" in error
+  }
+
   const getStripeErrorDetails = (error: unknown) => {
-    if (error instanceof Stripe.errors.StripeError) {
+    if (isStripeError(error)) {
       return {
         type: error.type,
         code: error.code,

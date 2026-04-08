@@ -257,7 +257,7 @@ export default function TicketPurchaseFlow({ eventId }: TicketPurchaseFlowProps)
     )
   }
 
-  if (!ticketData || !ticketData.ticketingEnabled) {
+  if (!ticketData?.ticketingEnabled) {
     return null
   }
 

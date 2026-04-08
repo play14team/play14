@@ -117,7 +117,7 @@ function recordMetrics(operation: string, status: "success" | "error", durationM
 }
 
 export class StripeProvider implements ConnectPaymentProvider {
-  private stripe: Stripe
+  private stripe: ReturnType<typeof Stripe>
   private webhookSecret: string
   private webhookSecretConnect: string
 
@@ -127,7 +127,7 @@ export class StripeProvider implements ConnectPaymentProvider {
       throw new Error("STRIPE_SECRET_KEY environment variable is not set")
     }
 
-    this.stripe = new Stripe(secretKey)
+    this.stripe = Stripe(secretKey)
 
     // Allow passing secrets as parameters for testing, otherwise use env vars
     // Use ?? for nullish coalescing so empty strings are preserved (for testing)
@@ -371,7 +371,7 @@ export class StripeProvider implements ConnectPaymentProvider {
       )
     }
 
-    let event: Stripe.Event | null = null
+    let event: any = null
     const errors: string[] = []
     let verifiedWith: "platform" | "connect" | null = null
 

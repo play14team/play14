@@ -99,7 +99,7 @@ export function getHighlightSegments(
   }
 
   const match = matches.find((m) => m.key === key)
-  if (!match || !match.indices || match.indices.length === 0) {
+  if (!match?.indices || match.indices.length === 0) {
     return [{ text, highlighted: false }]
   }
 

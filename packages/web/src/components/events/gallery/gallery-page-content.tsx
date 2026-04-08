@@ -35,7 +35,6 @@ interface YearGroup {
     url: string
     type: string
     eventName: string
-    eventSlug: string
     locationName?: string
     previewImageUrl?: string
   }>
@@ -83,7 +82,6 @@ function groupEventsByYear(events: GalleryEvent[]): YearGroup[] {
               url: link.url,
               type: link.type,
               eventName: event.name,
-              eventSlug: event.slug,
               locationName: event.location?.name,
               previewImageUrl: event.defaultImage?.url,
             })
@@ -181,7 +179,7 @@ export default function GalleryPageContent({ events }: { events: GalleryEvent[] 
               <div className="gallery-wall__media-grid">
                 {mediaLinks.map((link, i) => (
                   <MediaLinkCard
-                    key={`${link.eventSlug}-${link.type}-${i}`}
+                    key={`${link.eventName}-${link.type}-${i}`}
                     {...link}
                     watchVideosLabel={t("watchVideos")}
                     viewPhotosLabel={t("viewPhotos")}
