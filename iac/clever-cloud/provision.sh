@@ -23,7 +23,9 @@ set -euo pipefail
 # --- Configuration -----------------------------------------------------------
 
 REGION="${CC_REGION:-par}"            # par = Paris; mtl = Montreal; etc.
-ORG="${CC_ORG:-}"                     # Optional org alias; empty = personal account
+# Clever Cloud organization. Defaults to the play14 org; override with
+# CC_ORG=<other-org> ./provision.sh, or CC_ORG="" to target the personal account.
+ORG="${CC_ORG-play14}"
 
 # App definitions: alias|type|description
 APPS=(
