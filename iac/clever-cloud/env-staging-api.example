@@ -1,0 +1,116 @@
+# Strapi API — STAGING environment on Clever Cloud
+#
+# Copy this file to env-staging-api.env and fill in the secrets, then:
+#   ./set-env.sh play14-api-staging env-staging-api.env
+#
+# DO NOT commit env-staging-api.env — it's gitignored.
+#
+# Notes:
+# - POSTGRESQL_ADDON_*, CELLAR_ADDON_*, REDIS_* are auto-injected by linked
+#   add-ons; do not set them here.
+# - The DATABASE_* and REDIS_URL values reference those auto-injected vars,
+#   which Clever Cloud expands at runtime.
+
+# --- Clever Cloud runtime ---------------------------------------------------
+CC_NODE_VERSION=22
+CC_NODE_BUILD_TOOL=bun
+CC_RUN_COMMAND=bun run start
+
+# --- Strapi core ------------------------------------------------------------
+NODE_ENV=production
+HOST=0.0.0.0
+PUBLIC_URL=https://api-staging.play14.org
+
+# Generate fresh values: openssl rand -base64 32 (run 5 times)
+APP_KEYS=REPLACE_KEY1,REPLACE_KEY2,REPLACE_KEY3,REPLACE_KEY4
+API_TOKEN_SALT=REPLACE_ME
+ADMIN_JWT_SECRET=REPLACE_ME
+JWT_SECRET=REPLACE_ME
+TRANSFER_TOKEN_SALT=REPLACE_ME
+
+# --- Database (mapped from auto-injected POSTGRESQL_ADDON_*) ---------------
+DATABASE_CLIENT=postgres
+DATABASE_HOST=$POSTGRESQL_ADDON_HOST
+DATABASE_PORT=$POSTGRESQL_ADDON_PORT
+DATABASE_NAME=$POSTGRESQL_ADDON_DB
+DATABASE_USERNAME=$POSTGRESQL_ADDON_USER
+DATABASE_PASSWORD=$POSTGRESQL_ADDON_PASSWORD
+DATABASE_SCHEMA=public
+DATABASE_SSL=true
+DATABASE_SSL_SELF=false
+DATABASE_DEBUG=false
+
+# --- Object storage (Cellar via @strapi/provider-upload-aws-s3) -----------
+UPLOAD_PROVIDER=s3
+CELLAR_BUCKET=play14-uploads-staging
+CELLAR_REGION=us-east-1
+# CDN URL — pre-cutover this can be the direct Cellar URL; post-cutover it
+# becomes the Cloudflare-fronted cdn.play14.org for production.
+STORAGE_CDN_URL=https://play14-uploads-staging.cellar-c2.services.clever-cloud.com
+
+# --- Redis (cron lock + strapi-cache) --------------------------------------
+# REDIS_URL is composed from the auto-injected add-on vars. The Redis add-on
+# may inject REDIS_URL directly — check `clever env play14-api-staging` and
+# adjust if so.
+REDIS_URL=redis://:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT
+CACHE_PROVIDER=redis
+CACHE_ENABLED=true
+
+# --- Email (Sender.net) -----------------------------------------------------
+SENDER_API_KEY=REPLACE_ME
+SENDER_GROUP_ID=REPLACE_ME
+EMAIL_DEFAULT_FROM=noreply@play14.org
+EMAIL_DEFAULT_FROM_NAME=#play14 community
+EMAIL_REPLY_TO=community@play14.org
+EMAIL_ADMIN_RECIPIENTS=admin@play14.org
+
+# --- Invitations ------------------------------------------------------------
+INVITATION_EMAILS_ENABLED=true
+INVITATION_CALLBACK_URL=/admin
+INVITATION_SEND_LIMIT=50
+INVITATION_REMINDER_DAYS=7
+INVITATION_SEND_DELAY_MS=1000
+INVITATION_SEND_MAX_RETRIES=3
+INVITATION_SEND_RETRY_DELAY_MS=5000
+
+# --- Stripe -----------------------------------------------------------------
+STRIPE_SECRET_KEY=sk_test_REPLACE_ME
+STRIPE_PUBLISHABLE_KEY=pk_test_REPLACE_ME
+STRIPE_WEBHOOK_SECRET=whsec_REPLACE_ME
+STRIPE_WEBHOOK_SECRET_CONNECT=whsec_REPLACE_ME
+STRIPE_PLATFORM_FEE_PERCENT=0
+STRIPE_DEFAULT_COUNTRY=FR
+TICKETING_MAX_PENDING_DRAFTS=5
+TICKETING_MAX_DRAFTS_PER_HOUR=10
+
+# --- GitHub trigger ---------------------------------------------------------
+GITHUB_TOKEN=ghp_REPLACE_ME
+GITHUB_OWNER=play14team
+GITHUB_REPO=play14-web
+GITHUB_WORKFLOW_ID=217740349
+GITHUB_BRANCH=main
+
+# --- Frontend integration --------------------------------------------------
+FRONTEND_URL=https://staging.play14.org
+REVALIDATE_SECRET=REPLACE_ME
+
+# --- Observability ----------------------------------------------------------
+SENTRY_DSN=
+LOG_LEVEL=info
+METRICS_ENABLED=true
+METRICS_SEPARATE_SERVER=true
+METRICS_PORT=9000
+METRICS_HOST=0.0.0.0
+METRICS_PATH=/metrics
+
+# --- Security / CORS --------------------------------------------------------
+ALLOWED_ORIGINS=https://staging.play14.org,https://api-staging.play14.org,http://localhost:3000
+RATE_LIMIT_MAX=30
+RATE_LIMIT_WINDOW_MS=60000
+
+# --- Misc -------------------------------------------------------------------
+CRON_ENABLED=false
+EVENT_RESULTS_REMINDERS_ENABLED=true
+GEMINI_API_KEY=REPLACE_ME
+GEMINI_MODEL=gemini-2.0-flash
+STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=pk.REPLACE_ME
