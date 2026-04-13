@@ -32,12 +32,17 @@ gitignored (`iac/clever-cloud/*.env`) — they contain secrets.
 
 ## One-time setup (top to bottom)
 
+All resources are provisioned under the **`play14` Clever Cloud organization**
+by default. Override with `CC_ORG=<other>` or unset with `CC_ORG=""` to target
+your personal account.
+
 ### 1. Provision apps and add-ons
 
 ```bash
 cd iac/clever-cloud
-./provision.sh                # creates 4 apps + 6 add-ons (idempotent)
+./provision.sh                # creates 4 apps + 6 add-ons in the play14 org
 DRY_RUN=1 ./provision.sh      # preview without creating
+CC_ORG=other-org ./provision.sh   # target a different organization
 ```
 
 After it finishes:
@@ -140,8 +145,10 @@ known. Staging stays small.
 
 ## Troubleshooting
 
-**`clever applications` is empty after provision** — check you ran with the
-correct org: `CC_ORG=<your-org-alias> ./provision.sh`.
+**`clever applications` is empty after provision** — confirm the resources
+went into the right org. The scripts default to `CC_ORG=play14`; if you
+provisioned to your personal account, list with `clever applications` (no
+`--org`) or override `CC_ORG`.
 
 **`clever addon env` returns nothing** — the add-on may not be linked to an
 app yet. Re-run `clever service link-addon <app> <addon>` or re-run

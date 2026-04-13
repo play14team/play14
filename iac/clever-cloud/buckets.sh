@@ -17,22 +17,60 @@
 #
 # Usage:
 #   # staging
-#   eval $(clever addon env play14-cellar-staging | grep CELLAR_)
-#   ./buckets.sh play14-uploads-staging
-#
+#   ./buckets.sh play14-uploads-staging --addon play14-cellar-staging
 #   # production
-#   eval $(clever addon env play14-cellar | grep CELLAR_)
-#   ./buckets.sh play14-uploads-prod
+#   ./buckets.sh play14-uploads-prod --addon play14-cellar
+#
+#   # Or pass the addon ID directly (avoids the by-name lookup issue):
+#   ./buckets.sh play14-uploads-staging --addon addon_205a7840-4de1-4970-b4f6-daa68b9a8190
+#
+#   # Or pre-export and skip the --addon flag entirely:
+#   eval $(clever addon env <addon-id-or-name> | grep CELLAR_)
+#   ./buckets.sh play14-uploads-staging
 
 set -euo pipefail
 
 BUCKET="${1:-}"
+ADDON=""
+shift || true
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --addon) ADDON="$2"; shift 2 ;;
+    *) echo "Unknown arg: $1" >&2; exit 1 ;;
+  esac
+done
+
 if [[ -z "$BUCKET" ]]; then
-  echo "Usage: $0 <bucket-name>" >&2
+  echo "Usage: $0 <bucket-name> [--addon <addon-id-or-name>]" >&2
   exit 1
 fi
 
-: "${CELLAR_ADDON_HOST:?CELLAR_ADDON_HOST not set (run: eval \$(clever addon env play14-cellar))}"
+# If --addon is given, source its env into our shell. Otherwise rely on the
+# CELLAR_* vars already being exported by the caller.
+if [[ -n "$ADDON" ]]; then
+  ORG_DEFAULT="${CC_ORG-play14}"
+  echo "==> Loading Cellar credentials from add-on $ADDON (org: ${ORG_DEFAULT:-personal})"
+
+  # Try with --org first, then without; first one returning non-empty output wins.
+  ADDON_ENV=""
+  if [[ -n "$ORG_DEFAULT" ]]; then
+    ADDON_ENV="$(clever addon env "$ADDON" --org "$ORG_DEFAULT" 2>/dev/null || true)"
+  fi
+  if [[ -z "$ADDON_ENV" ]]; then
+    ADDON_ENV="$(clever addon env "$ADDON" 2>/dev/null || true)"
+  fi
+  if [[ -z "$ADDON_ENV" ]]; then
+    echo "ERROR: 'clever addon env $ADDON' returned no output." >&2
+    echo "       Try passing the add-on ID instead of the name (e.g. addon_xxxx)." >&2
+    echo "       List addons:  clever addon list --org ${ORG_DEFAULT:-<your-org>}" >&2
+    exit 1
+  fi
+
+  # shellcheck disable=SC1090
+  eval "$(printf '%s\n' "$ADDON_ENV" | grep -E '^(export )?CELLAR_')"
+fi
+
+: "${CELLAR_ADDON_HOST:?CELLAR_ADDON_HOST not set — pass --addon <id-or-name> or eval clever addon env first}"
 : "${CELLAR_ADDON_KEY_ID:?CELLAR_ADDON_KEY_ID not set}"
 : "${CELLAR_ADDON_KEY_SECRET:?CELLAR_ADDON_KEY_SECRET not set}"
 

@@ -111,6 +111,10 @@ coverage
 # secrets and must never be committed.
 iac/clever-cloud/*.env
 
+# Clever Cloud local link metadata (created by `clever create` / `clever link`).
+# Holds app IDs per shell — those are managed via repo secrets in CI.
+**/.clever.json
+
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
 
