@@ -1,0 +1,48 @@
+# Next.js Web — STAGING environment on Clever Cloud
+#
+# Copy to env-staging-web.env, fill in secrets, then:
+#   ./set-env.sh play14-web-staging env-staging-web.env
+
+# --- Clever Cloud runtime ---------------------------------------------------
+CC_NODE_VERSION=22
+CC_NODE_BUILD_TOOL=bun
+CC_RUN_COMMAND=node packages/web/server.js
+
+# --- Backend ----------------------------------------------------------------
+NODE_ENV=production
+STRAPI_API_URL=https://api-staging.play14.org
+STRAPI_API_SECRET=REPLACE_ME
+
+# Optional fallback API for incident-time switching.
+# STRAPI_FALLBACK_API_URL=
+# STRAPI_FALLBACK_API_SECRET=
+
+# --- Public URLs (NEXT_PUBLIC_* are baked at build time) -------------------
+NEXT_PUBLIC_SITE_URL=https://staging.play14.org
+NEXT_PUBLIC_STRAPI_URL=https://api-staging.play14.org
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.REPLACE_ME
+NEXT_PUBLIC_WEB_VITALS=true
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=REPLACE_ME
+
+# --- Auth -------------------------------------------------------------------
+TURNSTILE_SECRET_KEY=REPLACE_ME
+
+# --- Frontend revalidation (must match API value) -------------------------
+REVALIDATE_SECRET=REPLACE_ME
+
+# --- Feature flags ----------------------------------------------------------
+FEATURE_LOGIN_ENABLED=true
+NEXT_PUBLIC_FEATURE_LOGIN_ENABLED=true
+
+# --- Observability ----------------------------------------------------------
+SENTRY_DSN=
+SENTRY_ENVIRONMENT=staging
+SENTRY_TRACES_SAMPLE_RATE=0.1
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_ENVIRONMENT=staging
+SENTRY_ORG=REPLACE_ME
+SENTRY_PROJECT=play14-web
+
+# --- Misc -------------------------------------------------------------------
+DEFAULT_BLURHASH=L4SY{q-;~q-;t7t7M{Rj~q-;~q-;
+METRICS_TOKEN=
