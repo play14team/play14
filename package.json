@@ -15,6 +15,8 @@
     "build": "bun --cwd packages/api build && bun --cwd packages/web build",
     "build:api": "bun --cwd packages/api build",
     "build:web": "bun --cwd packages/web build",
+    "start:api": "bun --cwd packages/api start",
+    "start:web": "bun --cwd packages/web start",
     "lint": "bun --cwd packages/api lint && bun --cwd packages/web lint",
     "lint:fix": "bun --cwd packages/api lint:fix && bun --cwd packages/web lint:fix",
     "check": "bun --cwd packages/api check && bun --cwd packages/web check",
