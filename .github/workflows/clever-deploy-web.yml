@@ -1,0 +1,42 @@
+name: Clever Cloud — Deploy Web (production)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/web/**"
+      - ".github/workflows/clever-deploy-web.yml"
+      - "!packages/web/.github/**"
+  workflow_dispatch:
+
+concurrency:
+  group: clever-deploy-web-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy play14-web to Clever Cloud
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install clever-tools
+        run: npm install -g clever-tools
+
+      - name: Authenticate with Clever Cloud
+        env:
+          CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+          CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+        run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+
+      - name: Link Clever Cloud app
+        env:
+          CC_WEB_APP_ID: ${{ secrets.CC_WEB_APP_ID }}
+        run: clever link --alias play14-web "$CC_WEB_APP_ID"
+
+      - name: Deploy
+        run: clever deploy --alias play14-web --force

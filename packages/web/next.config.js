@@ -37,6 +37,14 @@ const nextConfig = {
         port: "",
         pathname: "/strapi-uploads/assets/**",
       },
+      // Clever Cloud Cellar direct origin (covers any bucket under cellar-c2).
+      // cdn.play14.org pattern above already handles the Cloudflare-fronted CDN URLs.
+      {
+        protocol: "https",
+        hostname: "*.cellar-c2.services.clever-cloud.com",
+        port: "",
+        pathname: "/**",
+      },
       {
         protocol: "http",
         hostname: "localhost",

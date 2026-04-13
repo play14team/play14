@@ -1,4 +1,13 @@
 #!/bin/bash
+# -----------------------------------------------------------------------------
+# SUPERSEDED — Azure → Clever Cloud migration (2026-04-13).
+#
+# Redis is now provisioned as a managed Clever Cloud Redis add-on linked to
+# the play14-api-cc app (auto-injects REDIS_HOST/_PORT/_PASSWORD/_URL).
+# This script remains in-tree only as an emergency Azure-rollback aid during
+# the 7-day post-cutover retirement window. It will be deleted in the
+# Azure-decommissioning cleanup PR (see the migration plan).
+# -----------------------------------------------------------------------------
 
 ENV="-acc"
 APP=play14-redis$ENV
