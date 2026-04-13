@@ -1675,21 +1675,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         resetPasswordToken,
       })
 
-      // Send the reset email
-      await strapi
-        .plugin("email")
-        .service("email")
-        .send({
-          to: linkedUser.email,
-          from:
-            resetPasswordSettings.from?.email || resetPasswordSettings.from?.name
-              ? `${resetPasswordSettings.from.name} <${resetPasswordSettings.from.email}>`
-              : undefined,
-          replyTo: resetPasswordSettings.response_email,
-          subject: emailSubject,
-          text: emailBody,
-          html: emailBody,
-        })
+      // Send the reset email.
+      // Note: we intentionally do NOT pass `from` from the users-permissions store,
+      // because Strapi's default reset_password template uses `no-reply@strapi.io`,
+      // which is not a verified sending domain on Sender.net and causes a 404
+      // ("Sending domain not found"). Omitting `from` lets the email provider
+      // fall back to `settings.defaultFrom` (configured in config/plugins.ts),
+      // which uses our verified `noreply@play14.org` domain.
+      await strapi.plugin("email").service("email").send({
+        to: linkedUser.email,
+        replyTo: resetPasswordSettings.response_email,
+        subject: emailSubject,
+        text: emailBody,
+        html: emailBody,
+      })
 
       strapi.log.info(
         `[Player] Password reset triggered for ${linkedUser.email} by ${userWithPlayer.player.name}`
