@@ -64,7 +64,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <h2>{t("emailOrUsername")}</h2>
             <LoginForm callbackUrl={callbackUrl} />
             <p className="auth-forgot-password-link">
-              <Link href="/auth/reset-password">{t("forgotPassword")}</Link>
+              <Link href="/auth/forgot-password">{t("forgotPassword")}</Link>
             </p>
           </div>
 
