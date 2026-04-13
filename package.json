@@ -28,7 +28,7 @@
     "verify": "bun run lint && bun run check && bun run typecheck && bun run test:all",
     "playwright:install": "cd packages/web && bunx playwright install --with-deps chromium",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/.next packages/*/build packages/*/dist",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
