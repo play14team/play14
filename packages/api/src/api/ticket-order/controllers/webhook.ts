@@ -3,7 +3,6 @@
  *
  * This controller processes Stripe webhooks with comprehensive observability:
  * - Prometheus metrics for monitoring
- * - Sentry error reporting
  * - Structured logging with timing information
  * - Correlation IDs for request tracing
  */
@@ -220,7 +219,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         `[Webhook] Error processing event ${eventId}: ${error.message} | durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
 
-      // Report to Sentry
       reportSentryError(strapi, error, {
         tags: { event_type: eventType, module: "webhook", correlationId },
         extra: { eventId, durationMs },
@@ -509,7 +507,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         `[Webhook] Failed to process order ${orderNumber}: ${error.message} | event=${eventName}, durationMs=${handlerDurationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
 
-      // Report to Sentry
       reportSentryError(strapi, error, {
         tags: { handler: "checkout_completed", module: "webhook", correlationId },
         extra: { orderNumber, eventName, sessionId, handlerDurationMs },
@@ -1476,7 +1473,6 @@ The #play14 Team
         `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message} | order=${order.orderNumber}`
       )
 
-      // Report to Sentry for immediate alerting
       reportSentryError(strapi, error, {
         tags: { email_type: "confirmation", module: "webhook", severity: "critical" },
         extra: { orderNumber: order.orderNumber, recipientEmail: order.purchaserEmail },

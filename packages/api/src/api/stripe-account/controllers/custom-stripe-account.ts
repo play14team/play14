@@ -56,7 +56,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
   }
 
   /**
-   * Log and report Stripe errors to Sentry with full context
+   * Log and report Stripe errors with full context
    */
   const handleStripeError = (
     operation: string,
@@ -388,7 +388,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
           },
         })
       } catch (error: unknown) {
-        // Log and report to Sentry, but don't fail - return cached status
+        // Log and report error, but don't fail - return cached status
         handleStripeError("getAccountStatus", error, {
           userId: user.id,
           playerId: player.id,

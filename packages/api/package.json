@@ -47,7 +47,6 @@
     "@strapi/design-system": "^2.2.0",
     "@strapi/icons": "^2.2.0",
     "@strapi/plugin-documentation": "^5.41.1",
-    "@strapi/plugin-sentry": "^5.41.1",
     "@strapi/plugin-users-permissions": "5.41.1",
     "@strapi/strapi": "5.41.1",
     "@types/pdfkit": "^0.17.5",

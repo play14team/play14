@@ -34,9 +34,9 @@ type TaskContext = { strapi?: Core.Strapi }
 type TaskFn = (context: TaskContext) => Promise<void> | void
 
 /**
- * Wrapper that catches errors and reports them to Sentry
+ * Wrapper that catches errors and reports them via structured logging
  */
-const withSentry = (taskName: string, taskFn: TaskFn) => async (context: TaskContext) => {
+const withErrorReporting = (taskName: string, taskFn: TaskFn) => async (context: TaskContext) => {
   try {
     return await taskFn(context)
   } catch (error) {
@@ -81,14 +81,14 @@ const withLock =
  *
  * All tasks are wrapped with:
  * - withLock: Distributed locking via Redis (prevents duplicate runs across containers)
- * - withSentry: Error reporting to Sentry
+ * - withErrorReporting: Error reporting via structured logging
  */
 const cronTasks = {
   // Every 5 minutes - Collect business metrics for Prometheus
   collectMetrics: {
     task: withLock(
       "collectMetrics",
-      withSentry("collectMetrics", async ({ strapi }) => {
+      withErrorReporting("collectMetrics", async ({ strapi }) => {
         if (process.env.METRICS_ENABLED === "false") return
         await collectBusinessMetrics(strapi)
       })
@@ -100,7 +100,7 @@ const cronTasks = {
   cleanExpiredTicketOrders: {
     task: withLock(
       "cleanExpiredTicketOrders",
-      withSentry("cleanExpiredTicketOrders", async ({ strapi }) => {
+      withErrorReporting("cleanExpiredTicketOrders", async ({ strapi }) => {
         await cleanExpiredTicketOrders(strapi!)
       })
     ),
@@ -111,7 +111,7 @@ const cronTasks = {
   inviteNewUsers: {
     task: withLock(
       "inviteNewUsers",
-      withSentry("inviteNewUsers", async ({ strapi }) => {
+      withErrorReporting("inviteNewUsers", async ({ strapi }) => {
         if (process.env.INVITATION_EMAILS_ENABLED === "false") {
           console.log("User invitation job skipped (INVITATION_EMAILS_ENABLED=false)")
           return
@@ -127,7 +127,7 @@ const cronTasks = {
   cleanAbandonedDraftOrders: {
     task: withLock(
       "cleanAbandonedDraftOrders",
-      withSentry("cleanAbandonedDraftOrders", async ({ strapi }) => {
+      withErrorReporting("cleanAbandonedDraftOrders", async ({ strapi }) => {
         await cleanAbandonedDraftOrders(strapi!)
       })
     ),
@@ -138,7 +138,7 @@ const cronTasks = {
   reservationHealthCheck: {
     task: withLock(
       "reservationHealthCheck",
-      withSentry("reservationHealthCheck", async ({ strapi }) => {
+      withErrorReporting("reservationHealthCheck", async ({ strapi }) => {
         await reservationHealthCheck(strapi!)
       }),
       10 * 60 * 1000 // 10 minute TTL for longer-running health checks
@@ -150,7 +150,7 @@ const cronTasks = {
   eventStatus: {
     task: withLock(
       "eventStatus",
-      withSentry("eventStatus", async ({ strapi }) => {
+      withErrorReporting("eventStatus", async ({ strapi }) => {
         await updateEventStatus(strapi!)
       })
     ),
@@ -161,7 +161,7 @@ const cronTasks = {
   playerPosition: {
     task: withLock(
       "playerPosition",
-      withSentry("playerPosition", async ({ strapi }) => {
+      withErrorReporting("playerPosition", async ({ strapi }) => {
         await updatePlayerPositions(strapi!)
       })
     ),
@@ -172,7 +172,7 @@ const cronTasks = {
   cleanProcessedWebhooks: {
     task: withLock(
       "cleanProcessedWebhooks",
-      withSentry("cleanProcessedWebhooks", async ({ strapi }) => {
+      withErrorReporting("cleanProcessedWebhooks", async ({ strapi }) => {
         console.log("Running processed webhooks cleanup job")
         const deletedCount = await cleanupOldWebhookRecords(strapi, 7)
         console.log(`Cleaned up ${deletedCount} old webhook records`)
@@ -187,7 +187,7 @@ const cronTasks = {
   cleanAccountLockouts: {
     task: withLock(
       "cleanAccountLockouts",
-      withSentry("cleanAccountLockouts", async () => {
+      withErrorReporting("cleanAccountLockouts", async () => {
         const sizeBefore = getLockoutStoreSize()
         const cleanedCount = cleanupLockoutStore()
         if (cleanedCount > 0) {
@@ -205,7 +205,7 @@ const cronTasks = {
   eventResultsReminders: {
     task: withLock(
       "eventResultsReminders",
-      withSentry("eventResultsReminders", async ({ strapi }) => {
+      withErrorReporting("eventResultsReminders", async ({ strapi }) => {
         await processEventResultsReminders(strapi!)
       })
     ),

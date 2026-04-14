@@ -4,7 +4,6 @@
  *
  * Enhanced with comprehensive observability:
  * - Prometheus metrics for monitoring
- * - Sentry error reporting
  * - Structured logging with timing
  * - Correlation IDs for request tracing
  */
@@ -1628,7 +1627,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         `[Ticketing] Failed to create checkout session: ${error.message} | orderId=${orderId}, durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
 
-      // Report to Sentry
       reportSentryError(strapi, error, {
         tags: { operation, module: "ticketing", correlationId },
         extra: { orderId, durationMs },
