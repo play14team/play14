@@ -17,6 +17,9 @@ migration. Designed for a **fully-isolated staging + production** topology:
 | `env-staging-web.example` | Next.js staging env-var template |
 | `env-production-api.example` | Strapi API production env-var template |
 | `env-production-web.example` | Next.js production env-var template |
+| `transfer.sh` | Wrapper around `bun run strapi transfer` (Stage 4) |
+| `validate-transfer.sh` | Compare row counts source vs target + HEAD-check Cellar URLs |
+| `transfer-runbook.md` | Step-by-step `strapi transfer` procedure + pg_dump+rclone fallback |
 
 The `*.example` files are committed. The filled-in `*.env` copies are
 gitignored (`iac/clever-cloud/*.env`) — they contain secrets.
