@@ -2,7 +2,7 @@ name: Clever Cloud — Deploy staging (api + web)
 
 on:
   push:
-    branches: [feat/clever-cloud-migration]
+    branches-ignore: [main]
     paths:
       - "packages/api/**"
       - "packages/web/**"
@@ -10,6 +10,9 @@ on:
       - "bun.lock"
       - ".github/workflows/clever-deploy-staging.yml"
       - "!packages/**/.github/**"
+  pull_request:
+    types: [closed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -20,8 +23,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # --- Stop staging apps when PR is merged or closed -------------------------
+  stop-staging:
+    name: Stop staging apps
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Install clever-tools
+        run: npm install -g clever-tools@3
+
+      - name: Authenticate with Clever Cloud
+        env:
+          CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+          CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+        run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+
+      - name: Stop staging API
+        env:
+          CC_API_STAGING_APP_ID: ${{ secrets.CC_API_STAGING_APP_ID }}
+        run: |
+          clever link --alias play14-api-staging "$CC_API_STAGING_APP_ID"
+          clever stop --alias play14-api-staging || true
+
+      - name: Stop staging Web
+        env:
+          CC_WEB_STAGING_APP_ID: ${{ secrets.CC_WEB_STAGING_APP_ID }}
+        run: |
+          clever link --alias play14-web-staging "$CC_WEB_STAGING_APP_ID"
+          clever stop --alias play14-web-staging || true
+
+  # --- Deploy staging apps on push -------------------------------------------
   detect-changes:
     name: Detect changes
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.changes.outputs.api || steps.force.outputs.api }}
