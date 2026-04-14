@@ -39,7 +39,6 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toggle-group": "^1.1.11",
-    "@sentry/nextjs": "^10.47.0",
     "@strapi/client": "^1.6.1",
     "@tiptap/extension-blockquote": "^3.22.3",
     "@tiptap/extension-heading": "^3.22.3",

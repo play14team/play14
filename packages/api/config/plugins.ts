@@ -74,13 +74,6 @@ export default ({ env }: { env: any }) => ({
       ],
     },
   },
-  sentry: {
-    enabled: true,
-    config: {
-      dsn: env("NODE_ENV") === "production" ? env("SENTRY_DSN") : null,
-      sendMetadata: true,
-    },
-  },
   prometheus: {
     enabled: env.bool("METRICS_ENABLED", true),
     config: {

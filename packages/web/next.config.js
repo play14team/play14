@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 
-const { withSentryConfig } = require("@sentry/nextjs")
 const createNextIntlPlugin = require("next-intl/plugin")
 const path = require("node:path")
 
@@ -17,8 +16,6 @@ const nextConfig = {
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_WEB_VITALS: process.env.NEXT_PUBLIC_WEB_VITALS,
-    NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    NEXT_PUBLIC_SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   },
   // Empty turbopack config to acknowledge we're using Turbopack
@@ -67,33 +64,4 @@ const nextConfig = {
   },
 }
 
-// Sentry configuration for source map uploads and build-time options
-const sentryConfig = {
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
-
-  // Upload a larger set of source maps for prettier stack traces
-  widenClientFileUpload: true,
-
-  // Hide source maps from generated client bundles
-  hideSourceMaps: true,
-
-  webpack: {
-    treeshake: {
-      removeDebugLogging: true, // replaces disableLogger
-    },
-    automaticVercelMonitors: true, // moved under webpack
-  },
-}
-
-// Chain plugins: next-intl -> (optionally) Sentry
-const configWithIntl = withNextIntl(nextConfig)
-module.exports = process.env.SENTRY_DSN
-  ? withSentryConfig(configWithIntl, sentryConfig)
-  : configWithIntl
+module.exports = withNextIntl(nextConfig)

@@ -83,25 +83,6 @@ function reportInvitationError(
     `[Invitations] Failed to send ${action} to ${user.email}: ${errorMessage}`,
     error
   )
-
-  const sentryConfig = strapi.config.get("plugin::sentry") as { dsn?: string | null }
-  if (!sentryConfig?.dsn) {
-    return
-  }
-
-  const sentryService = strapi.plugin("sentry")?.service("sentry")
-  if (!sentryService) {
-    return
-  }
-
-  sentryService.sendError(error, (scope: any) => {
-    scope.setTag("module", "user-invitations")
-    scope.setContext("invitation", {
-      action,
-      userId: user.documentId,
-      email: user.email,
-    })
-  })
 }
 
 function getErrorStatusCode(error: unknown): number | undefined {

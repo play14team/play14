@@ -4,7 +4,6 @@
  */
 import ckeditor5 from "@_sh/strapi-plugin-ckeditor/strapi-admin";
 import documentation from "@strapi/plugin-documentation/strapi-admin";
-import sentry from "@strapi/plugin-sentry/strapi-admin";
 import usersPermissions from "@strapi/plugin-users-permissions/strapi-admin";
 import strapiAiTranslator from "strapi-ai-translator/strapi-admin";
 import strapiCache from "strapi-cache/strapi-admin";
@@ -23,7 +22,6 @@ renderAdmin(document.getElementById("strapi"), {
   plugins: {
     ckeditor5: ckeditor5,
     documentation: documentation,
-    sentry: sentry,
     "users-permissions": usersPermissions,
     "strapi-ai-translator": strapiAiTranslator,
     "strapi-cache": strapiCache,

@@ -24,9 +24,6 @@ services:
     environment:
       - NODE_ENV=development
       - STRAPI_API_URL=http://play14-api:1337
-      # Observability (optional - set in .env.local to enable)
-      - SENTRY_DSN=${SENTRY_DSN:-}
-      - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN:-}
     command: bun run develop
     networks:
       - play14-api
@@ -66,9 +63,6 @@ services:
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       NODE_ENV: ${NODE_ENV}
-      # Observability (optional - set in .env to enable)
-      SENTRY_DSN: ${SENTRY_DSN:-}
-      SENTRY_ENABLED: ${SENTRY_ENABLED:-false}
       METRICS_ENABLED: ${METRICS_ENABLED:-true}
       # Redis for distributed cron locking
       REDIS_URL: redis://play14-redis:6379
