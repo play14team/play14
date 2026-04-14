@@ -44,4 +44,4 @@ jobs:
 
       - name: Deploy
         # --force tolerates non-fast-forward pushes (e.g. rebased main).
-        run: clever deploy --alias play14-api --force
+        run: clever deploy --alias play14-api --force --same-commit-policy rebuild

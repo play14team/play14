@@ -72,7 +72,7 @@ jobs:
         run: clever link --alias play14-api-staging "$CC_API_STAGING_APP_ID"
 
       - name: Deploy
-        run: clever deploy --alias play14-api-staging --force
+        run: clever deploy --alias play14-api-staging --force --same-commit-policy rebuild
 
   deploy-web-staging:
     name: Deploy play14-web-staging
@@ -100,4 +100,4 @@ jobs:
         run: clever link --alias play14-web-staging "$CC_WEB_STAGING_APP_ID"
 
       - name: Deploy
-        run: clever deploy --alias play14-web-staging --force
+        run: clever deploy --alias play14-web-staging --force --same-commit-policy rebuild
