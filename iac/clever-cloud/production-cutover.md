@@ -231,7 +231,7 @@ In the Stripe Dashboard:
 
 - `clever logs --alias play14-api -f`
 - `clever logs --alias play14-web -f`
-- Check Sentry for new errors
+- Check Grafana dashboards for errors and anomalies
 - Watch Prometheus metrics on `:9000/metrics`
 
 ## T+7 days — Decommission Azure

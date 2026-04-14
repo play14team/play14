@@ -8,8 +8,8 @@
 # Notes:
 # - POSTGRESQL_ADDON_*, CELLAR_ADDON_*, REDIS_* are auto-injected by linked
 #   add-ons; do not set them here.
-# - The DATABASE_* and REDIS_URL values reference those auto-injected vars,
-#   which Clever Cloud expands at runtime.
+# - database.ts falls back to POSTGRESQL_ADDON_* automatically; no need to
+#   duplicate DB credentials as env vars.
 
 # --- Clever Cloud runtime ---------------------------------------------------
 CC_NODE_VERSION=22
@@ -51,11 +51,12 @@ DATABASE_DEBUG=false
 
 # --- Object storage (Cellar via @strapi/provider-upload-aws-s3) -----------
 UPLOAD_PROVIDER=s3
-CELLAR_BUCKET=play14-uploads-staging
+# Bucket name must match the CDN hostname (CNAME bucket pattern).
+# Cloudflare proxies with Host: cdn-staging.play14.org → Cellar matches
+# the bucket by name, no Host header rewrite needed.
+CELLAR_BUCKET=cdn-staging.play14.org
 CELLAR_REGION=us-east-1
-# CDN URL — pre-cutover this can be the direct Cellar URL; post-cutover it
-# becomes the Cloudflare-fronted cdn.play14.org for production.
-STORAGE_CDN_URL=https://play14-uploads-staging.cellar-c2.services.clever-cloud.com
+STORAGE_CDN_URL=https://cdn-staging.play14.org
 
 # --- Redis (cron lock + strapi-cache) --------------------------------------
 # The Clever Cloud Redis add-on injects REDIS_URL directly (along with
@@ -63,13 +64,17 @@ STORAGE_CDN_URL=https://play14-uploads-staging.cellar-c2.services.clever-cloud.c
 # Clever Cloud does not perform $VAR expansion on env values.
 CACHE_PROVIDER=redis
 CACHE_ENABLED=true
+CACHE_DEBUG=false
+# The web app sends a Bearer token on every request. Without this, all
+# authenticated requests bypass the cache entirely.
+CACHE_AUTHORIZED_REQUESTS=true
 
 # --- Email (Sender.net) -----------------------------------------------------
 SENDER_API_KEY=REPLACE_ME
 SENDER_GROUP_ID=REPLACE_ME
 EMAIL_DEFAULT_FROM=noreply@play14.org
 EMAIL_DEFAULT_FROM_NAME=#play14 community
-EMAIL_REPLY_TO=community@play14.org
+EMAIL_REPLY_TO=admin@play14.org
 EMAIL_ADMIN_RECIPIENTS=admin@play14.org
 
 # --- Invitations ------------------------------------------------------------
@@ -94,31 +99,41 @@ TICKETING_MAX_DRAFTS_PER_HOUR=10
 # --- GitHub trigger ---------------------------------------------------------
 GITHUB_TOKEN=ghp_REPLACE_ME
 GITHUB_OWNER=play14team
-GITHUB_REPO=play14-web
-GITHUB_WORKFLOW_ID=217740349
+GITHUB_REPO=play14
+GITHUB_WORKFLOW_ID=218106378
 GITHUB_BRANCH=main
 
 # --- Frontend integration --------------------------------------------------
 FRONTEND_URL=https://staging.play14.org
 REVALIDATE_SECRET=REPLACE_ME
+LOGO_URL=https://staging.play14.org/logo/play14_600x200_transparent-dark.png
 
 # --- Observability ----------------------------------------------------------
-SENTRY_DSN=
+STRAPI_LOG_LEVEL=info
 LOG_LEVEL=info
 METRICS_ENABLED=true
 METRICS_SEPARATE_SERVER=true
 METRICS_PORT=9000
 METRICS_HOST=0.0.0.0
 METRICS_PATH=/metrics
+METRICS_TOKEN=REPLACE_ME
+CC_METRICS_PROMETHEUS_PORT=9000
+CC_METRICS_PROMETHEUS_PATH=/metrics
 
 # --- Security / CORS --------------------------------------------------------
 ALLOWED_ORIGINS=https://staging.play14.org,https://api-staging.play14.org,http://localhost:3000
 RATE_LIMIT_MAX=30
 RATE_LIMIT_WINDOW_MS=60000
 
+# --- AI Translator (strapi-ai-translator plugin) ---------------------------
+# These env var names are what the plugin reads — NOT the same as GEMINI_*.
+LLM_TRANSLATOR_LLM_API_KEY=REPLACE_ME
+STRAPI_ADMIN_LLM_TRANSLATOR_LLM_MODEL=gemini-2.5-flash
+STRAPI_ADMIN_LLM_TRANSLATOR_LLM_PROVIDER=gemini
+
 # --- Misc -------------------------------------------------------------------
 CRON_ENABLED=false
 EVENT_RESULTS_REMINDERS_ENABLED=true
 GEMINI_API_KEY=REPLACE_ME
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-2.5-flash
 STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN=pk.REPLACE_ME
