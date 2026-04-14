@@ -80,7 +80,11 @@
     "sharp": "^0.34.5",
     "tiptap-markdown": "^0.9.0",
     "yet-another-react-lightbox": "^3.30.1",
-    "zod": "^4.3.5"
+    "zod": "^4.3.5",
+    "typescript": "^6.0.2",
+    "@types/node": "^25.2.2",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
@@ -89,11 +93,8 @@
     "@types/mapbox-gl": "^3.5.0",
     "@types/mapbox__mapbox-gl-geocoder": "^5.1.1",
     "@types/mapbox__mapbox-sdk": "^0.16.5",
-    "@types/node": "^25.2.2",
     "@types/qs": "^6.15.0",
-    "@types/react": "19.2.14",
     "@types/react-big-calendar": "^1.16.3",
-    "@types/react-dom": "19.2.3",
     "@types/react-html-parser": "^2.0.7",
     "@types/react-map-gl": "^6.1.8",
     "@vitest/coverage-v8": "^4.0.16",
