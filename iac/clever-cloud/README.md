@@ -20,6 +20,7 @@ migration. Designed for a **fully-isolated staging + production** topology:
 | `transfer.sh` | Wrapper around `bun run strapi transfer` (Stage 4) |
 | `validate-transfer.sh` | Compare row counts source vs target + HEAD-check Cellar URLs |
 | `transfer-runbook.md` | Step-by-step `strapi transfer` procedure + pg_dump+rclone fallback |
+| `production-cutover.md` | Final cutover checklist (pg_dump + rclone + DNS flip) with lessons learned |
 
 The `*.example` files are committed. The filled-in `*.env` copies are
 gitignored (`iac/clever-cloud/*.env`) — they contain secrets.
