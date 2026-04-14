@@ -89,12 +89,7 @@ export function buildApiUrl(pathTemplate: string, params: Record<string, string>
   return `${STRAPI_URL}${path.startsWith("/api") ? path : `/api${path}`}`
 }
 
-const STRAPI_REST_ENDPOINT = `${(process.env.STRAPI_API_URL || "").replace(/\/$/, "")}/api`
-
-// Fallback to production if primary endpoint is unavailable
-const STRAPI_FALLBACK_ENDPOINT = process.env.STRAPI_FALLBACK_API_URL
-  ? `${process.env.STRAPI_FALLBACK_API_URL.replace(/\/$/, "")}/api`
-  : "https://community.play14.org/api"
+const STRAPI_REST_ENDPOINT = `${(process.env.STRAPI_API_URL || "http://localhost:1337").replace(/\/$/, "")}/api`
 
 /**
  * Fetch with timeout to prevent hanging connections
@@ -306,47 +301,23 @@ async function parseJsonResponse<T>(response: Response, url: string): Promise<St
 /**
  * Main REST query function
  * Executes a GET request to the Strapi REST API with the provided parameters
- * Falls back to production endpoint if primary is unavailable
  */
 export async function restQuery<T>(
   endpoint: string,
   params?: StrapiParams
 ): Promise<StrapiResponse<T>> {
   const queryString = params ? `?${qs.stringify(params, { encodeValuesOnly: true })}` : ""
+  const token = process.env.STRAPI_API_SECRET
 
-  const primaryToken = process.env.STRAPI_API_SECRET
-  const fallbackToken = process.env.STRAPI_FALLBACK_API_SECRET || process.env.STRAPI_API_SECRET
+  const result = await tryFetch(STRAPI_REST_ENDPOINT, endpoint, queryString, token)
 
-  // Try primary endpoint first
-  const primaryResult = await tryFetch(STRAPI_REST_ENDPOINT, endpoint, queryString, primaryToken)
-
-  if (primaryResult) {
-    return parseJsonResponse<T>(primaryResult.response, primaryResult.url)
+  if (result) {
+    return parseJsonResponse<T>(result.response, result.url)
   }
 
-  // Fallback to production if primary failed and fallback is different
-  if (STRAPI_REST_ENDPOINT !== STRAPI_FALLBACK_ENDPOINT) {
-    console.log(
-      `[Strapi] Primary endpoint unavailable, trying fallback: ${STRAPI_FALLBACK_ENDPOINT}`
-    )
-
-    const fallbackResult = await tryFetch(
-      STRAPI_FALLBACK_ENDPOINT,
-      endpoint,
-      queryString,
-      fallbackToken
-    )
-
-    if (fallbackResult) {
-      return parseJsonResponse<T>(fallbackResult.response, fallbackResult.url)
-    }
-  }
-
-  // Both endpoints failed
   const url = `${STRAPI_REST_ENDPOINT}/${endpoint}${queryString}`
   console.error("==================== REST API Error ====================")
   console.error("Endpoint:", url)
-  console.error("Both primary and fallback endpoints failed")
   console.error("=========================================================")
   throw new Error("REST API Error: Unable to reach Strapi API")
 }

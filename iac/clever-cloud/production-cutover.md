@@ -20,12 +20,11 @@ the staging rehearsal (2026-04-14). Uses **pg_dump + rclone + URL rewrite**
 ### 1. Lower DNS TTL
 
 In Cloudflare, for each of these records set TTL to **60 seconds**:
-- `community.play14.org`
-- `play14.org`
-- `www.play14.org`
+- `api.play14.org`
+- `new.play14.org`
 - `cdn.play14.org`
 
-Wait for the old TTL to expire (check `dig +short community.play14.org` from
+Wait for the old TTL to expire (check `dig +short api.play14.org` from
 multiple resolvers to confirm propagation).
 
 ### 2. Set production env vars
@@ -199,9 +198,8 @@ In Cloudflare:
 
 | Record | Type | Target | Proxy |
 |---|---|---|---|
-| `community.play14.org` | CNAME | `<play14-api cleverapps domain>` | Proxied (orange) |
-| `play14.org` | CNAME (flattened) | `<play14-web cleverapps domain>` | Proxied (orange) |
-| `www.play14.org` | CNAME | `<play14-web cleverapps domain>` | Proxied (orange) |
+| `api.play14.org` | CNAME | `<play14-api cleverapps domain>` | Proxied (orange) |
+| `new.play14.org` | CNAME | `<play14-web cleverapps domain>` | Proxied (orange) |
 
 SSL/TLS mode: **Full** (not strict) — same as staging.
 
@@ -212,19 +210,18 @@ STAGE=production ./domains.sh
 
 ### 17. Post-flip verification
 
-- [ ] `https://play14.org` loads the homepage
-- [ ] `https://play14.org/events/<any-event>` detail page works
-- [ ] `https://community.play14.org/admin` Strapi admin loads
+- [ ] `https://new.play14.org` loads the homepage
+- [ ] `https://new.play14.org/events/<any-event>` detail page works
+- [ ] `https://api.play14.org/admin` Strapi admin loads
 - [ ] Images render from Cellar (inspect an `<img>` src in browser devtools)
 - [ ] Login flow works (test with a known account)
 - [ ] Stripe webhook test: trigger a test event in Stripe dashboard, verify it
-      arrives at `https://community.play14.org/api/webhooks/stripe`
+      arrives at `https://api.play14.org/api/webhooks/stripe`
 
 ### 18. Update Stripe webhook endpoints
 
 In the Stripe Dashboard:
-- Verify webhook endpoint URL is still `https://community.play14.org/api/webhooks/stripe`
-  (if the hostname didn't change, no action needed)
+- Update webhook endpoint URL to `https://api.play14.org/api/webhooks/stripe`
 - Send a test webhook to confirm delivery
 
 ## T+2h — Monitor

@@ -60,7 +60,7 @@ const getLogoUrl = (): string => {
   if (process.env.LOGO_URL) {
     return process.env.LOGO_URL
   }
-  const publicUrl = process.env.PUBLIC_URL || "https://community.play14.org"
+  const publicUrl = process.env.PUBLIC_URL || "http://localhost:1337"
   const baseUrl = publicUrl.endsWith("/") ? publicUrl.slice(0, -1) : publicUrl
   return `${baseUrl}/images/play14_600x200_transparent-light.png`
 }
