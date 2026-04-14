@@ -1,7 +1,0 @@
-{
-  "//": "Local typecheck config. Extends tsconfig.json (used by `strapi build` with bundled TypeScript 5.x) and bumps ignoreDeprecations to '6.0' so the workspace TypeScript 6.0 used by `bun run typecheck` stops complaining about the moduleResolution=node10 deprecation inherited from @strapi/typescript-utils.",
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "ignoreDeprecations": "6.0"
-  }
-}

@@ -20,11 +20,7 @@ done
 # Run TypeScript check on packages with staged TS files
 if [ "$API_HAS_TS" = true ]; then
   echo "Running TypeScript check on packages/api..."
-  # tsconfig.dev.json bumps ignoreDeprecations to "6.0" so the local
-  # TypeScript 6.x is happy with the moduleResolution=node10 inherited
-  # from @strapi/typescript-utils (tsconfig.json keeps "5.0" because
-  # Strapi build runs its bundled TypeScript 5.x).
-  cd packages/api && bunx tsc --noEmit -p tsconfig.dev.json
+  cd packages/api && bunx tsc --noEmit
   if [ $? -ne 0 ]; then
     echo "TypeScript errors found in packages/api"
     exit 1
