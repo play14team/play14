@@ -241,7 +241,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Validate that files were provided
     const files = ctx.request.files
 
-    if (!files || !files.files) {
+    if (!files?.files) {
       return ctx.badRequest("No file provided")
     }
 
@@ -1139,7 +1139,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Validate that files were provided
     const files = ctx.request.files
 
-    if (!files || !files.files) {
+    if (!files?.files) {
       return ctx.badRequest("No file provided")
     }
 

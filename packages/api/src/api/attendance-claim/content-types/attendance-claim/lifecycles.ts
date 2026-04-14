@@ -51,7 +51,7 @@ export default {
       },
     })
 
-    if (!claim || !claim.player || !claim.event) {
+    if (!claim?.player || !claim.event) {
       strapi.log.warn("[AttendanceClaim] Could not send email: claim data incomplete")
       return
     }
@@ -164,7 +164,7 @@ export default {
       },
     })
 
-    if (!claim || !claim.player || !claim.event) {
+    if (!claim?.player || !claim.event) {
       strapi.log.warn("[AttendanceClaim] Could not send email: data incomplete")
       return
     }

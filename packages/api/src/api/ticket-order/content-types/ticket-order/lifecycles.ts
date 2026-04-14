@@ -50,7 +50,7 @@ export default {
       },
     })
 
-    if (!order || !order.purchaserEmail) {
+    if (!order?.purchaserEmail) {
       strapi.log.warn("[TicketOrder] Could not send refund email: order data incomplete")
       return
     }
