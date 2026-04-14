@@ -1,16 +1,23 @@
-export default ({ env }: { env: any }) => ({
-  host: env("HOST", "0.0.0.0"),
-  port: env.int("PORT", 1337),
-  url: env("PUBLIC_URL"),
+export default ({ env }: { env: any }) => {
+  const publicUrl = env("PUBLIC_URL")
+  if (!publicUrl) {
+    throw new Error("PUBLIC_URL is required in production")
+  }
 
-  proxy: {
-    koa: true,
-  },
+  return {
+    host: env("HOST", "0.0.0.0"),
+    port: env.int("PORT", 1337),
+    url: publicUrl,
 
-  app: {
-    keys: env.array("APP_KEYS"),
-  },
-  cron: {
-    enabled: env.bool("CRON_ENABLED", true),
-  },
-})
+    proxy: {
+      koa: true,
+    },
+
+    app: {
+      keys: env.array("APP_KEYS"),
+    },
+    cron: {
+      enabled: env.bool("CRON_ENABLED", true),
+    },
+  }
+}
