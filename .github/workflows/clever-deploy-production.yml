@@ -24,8 +24,8 @@ jobs:
     name: Detect changes
     runs-on: ubuntu-latest
     outputs:
-      api: ${{ steps.changes.outputs.api }}
-      web: ${{ steps.changes.outputs.web }}
+      api: ${{ steps.changes.outputs.api || steps.force.outputs.api }}
+      web: ${{ steps.changes.outputs.web || steps.force.outputs.web }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -44,6 +44,7 @@ jobs:
               - 'packages/web/**'
 
       - name: Force both on manual run
+        id: force
         if: github.event_name == 'workflow_dispatch'
         run: |
           echo "api=true" >> "$GITHUB_OUTPUT"
@@ -61,7 +62,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install clever-tools
-        run: npm install -g clever-tools
+        run: npm install -g clever-tools@3
 
       - name: Authenticate with Clever Cloud
         env:
@@ -92,7 +93,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install clever-tools
-        run: npm install -g clever-tools
+        run: npm install -g clever-tools@3
 
       - name: Authenticate with Clever Cloud
         env:
