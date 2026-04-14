@@ -8,6 +8,7 @@
         "https://staging.play14.org",
         "https://api-staging.play14.org",
         "https://cdn.play14.org",
+        "https://cdn-staging.play14.org",
         "http://localhost:1337",
         "http://localhost:3000"
       ],
