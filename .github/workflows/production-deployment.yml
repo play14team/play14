@@ -1,12 +1,13 @@
 name: Production Deployment
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "packages/api/**"
-      - "packages/web/**"
-      - "!packages/**/.github/**"
+  # DISABLED: Azure deployment replaced by clever-deploy-production.yml
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - "packages/api/**"
+  #     - "packages/web/**"
+  #     - "!packages/**/.github/**"
   workflow_dispatch:
     inputs:
       force_rebuild:
