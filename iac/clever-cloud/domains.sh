@@ -30,6 +30,8 @@ STAGING_DOMAINS=(
 
 PRODUCTION_DOMAINS=(
   "play14-api|api.play14.org"
+  "play14-web|play14.org"
+  "play14-web|www.play14.org"
   "play14-web|new.play14.org"
 )
 
@@ -45,7 +47,7 @@ echo "==> Attaching $STAGE domains (DRY_RUN=$DRY_RUN)"
 
 for entry in "${DOMAINS[@]}"; do
   IFS='|' read -r alias hostname <<<"$entry"
-  if clever domain --alias "$alias" 2>/dev/null | grep -qE "(^|[[:space:]])${hostname}([[:space:]]|$)"; then
+  if clever domain --alias "$alias" 2>/dev/null | sed 's|/\s*$||' | grep -qxF "$hostname"; then
     echo "  [skip] $hostname already attached to $alias"
     continue
   fi

@@ -1,8 +1,9 @@
 name: Clever Cloud — Deploy staging (api + web)
 
 on:
-  push:
-    branches: [feat/clever-cloud-migration]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
     paths:
       - "packages/api/**"
       - "packages/web/**"
@@ -20,8 +21,64 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # --- Stop staging apps when PR is merged ------------------------------------
+  stop-staging:
+    name: Stop staging apps
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Install clever-tools
+        run: npm install -g clever-tools@3
+
+      - name: Authenticate with Clever Cloud
+        env:
+          CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+          CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+        run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+
+      - name: Stop staging API
+        env:
+          CC_API_STAGING_APP_ID: ${{ secrets.CC_API_STAGING_APP_ID }}
+        run: |
+          clever link --alias play14-api-staging "$CC_API_STAGING_APP_ID"
+          clever stop --alias play14-api-staging || echo "::warning::clever stop failed for play14-api-staging"
+
+      - name: Stop staging Web
+        env:
+          CC_WEB_STAGING_APP_ID: ${{ secrets.CC_WEB_STAGING_APP_ID }}
+        run: |
+          clever link --alias play14-web-staging "$CC_WEB_STAGING_APP_ID"
+          clever stop --alias play14-web-staging || echo "::warning::clever stop failed for play14-web-staging"
+
+  # --- Lint and typecheck on PR open/update ------------------------------------
+  lint:
+    name: Lint and typecheck
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bun lint
+
+      - name: Typecheck API
+        run: bun --cwd packages/api typecheck
+
+      - name: Typecheck Web
+        run: bun --cwd packages/web typecheck
+
+  # --- Deploy staging apps on PR open/update ----------------------------------
   detect-changes:
     name: Detect changes
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.changes.outputs.api || steps.force.outputs.api }}
@@ -52,13 +109,14 @@ jobs:
 
   deploy-api-staging:
     name: Deploy play14-api-staging
-    needs: detect-changes
+    needs: [lint, detect-changes]
     if: needs.detect-changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
 
       - name: Install clever-tools
@@ -80,15 +138,16 @@ jobs:
 
   deploy-web-staging:
     name: Deploy play14-web-staging
-    needs: [detect-changes, deploy-api-staging]
+    needs: [lint, detect-changes, deploy-api-staging]
     # Run when web changed. The API job dependency is soft — if the API job
     # was skipped (no API changes), GitHub Actions still lets this run.
-    if: ${{ always() && needs.detect-changes.outputs.web == 'true' && needs.deploy-api-staging.result != 'failure' }}
+    if: ${{ always() && needs.lint.result == 'success' && needs.detect-changes.outputs.web == 'true' && needs.deploy-api-staging.result != 'failure' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
 
       - name: Install clever-tools

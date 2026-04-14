@@ -925,7 +925,7 @@ export async function runAudienceAttendeeImport(
   // Create users
   for (const action of actions.createUsers) {
     const user = usersByEmail.get(action.email)
-    if (!user || !user.planned) continue
+    if (!user?.planned) continue
 
     try {
       const password = `${crypto.randomBytes(16).toString("hex")}!`
@@ -966,7 +966,7 @@ export async function runAudienceAttendeeImport(
   // Link users to players
   for (const action of actions.linkUsers) {
     const user = usersByEmail.get(action.email)
-    if (!user || !user.player || !user.documentId || !user.player.id) continue
+    if (!user?.player || !user.documentId || !user.player.id) continue
 
     try {
       await strapi.documents("plugin::users-permissions.user").update({

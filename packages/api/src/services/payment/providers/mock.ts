@@ -146,7 +146,7 @@ export function simulateMockCheckoutExpired(sessionId: string): void {
 export function simulateMockPaymentFailed(sessionId: string): void {
   const state = getMockPaymentState()
   const session = state.sessions.get(sessionId)
-  if (!session || !session.paymentIntent) {
+  if (!session?.paymentIntent) {
     throw new Error(`Mock session or payment intent not found: ${sessionId}`)
   }
 

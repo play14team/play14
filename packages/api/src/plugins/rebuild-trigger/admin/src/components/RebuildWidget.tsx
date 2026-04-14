@@ -236,7 +236,7 @@ const RebuildWidget = () => {
   }
 
   const handleCancel = async () => {
-    if (!currentRun || !currentRun.id) return
+    if (!currentRun?.id) return
 
     setCancelling(true)
     try {

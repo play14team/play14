@@ -277,7 +277,7 @@ export function simulatePaymentFailed(
   errorMessage = "Your card was declined"
 ): { type: string; data: { object: any } } {
   const session = state.sessions.get(sessionId)
-  if (!session || !session.payment_intent) {
+  if (!session?.payment_intent) {
     throw new Error(`Session or payment intent not found: ${sessionId}`)
   }
 

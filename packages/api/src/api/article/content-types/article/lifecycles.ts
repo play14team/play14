@@ -8,7 +8,7 @@ import { triggerContentRevalidation } from "../../../../services/frontend-revali
  */
 
 function validate(data: { title?: string; slug?: string }) {
-  if (!data || !data.title) return
+  if (!data?.title) return
   const slug = toSlug(data.title)
   if (data.slug !== slug) {
     data.slug = slug
