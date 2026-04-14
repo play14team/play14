@@ -82,21 +82,21 @@
     "yet-another-react-lightbox": "^3.30.1",
     "zod": "^4.3.5",
     "typescript": "^6.0.2",
-    "@types/node": "^25.2.2",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.59.1",
     "@types/country-data": "^0.0.5",
     "@types/lodash": "^4.17.24",
     "@types/mapbox-gl": "^3.5.0",
     "@types/mapbox__mapbox-gl-geocoder": "^5.1.1",
     "@types/mapbox__mapbox-sdk": "^0.16.5",
+    "@types/node": "^25.2.2",
     "@types/qs": "^6.15.0",
+    "@types/react": "19.2.14",
     "@types/react-big-calendar": "^1.16.3",
+    "@types/react-dom": "19.2.3",
     "@types/react-html-parser": "^2.0.7",
-    "@types/react-map-gl": "^6.1.8",
+    "@types/react-map-gl": "^6.1.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "@vitest/coverage-v8": "^4.0.16",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
