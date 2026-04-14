@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - "packages/web/**"
+      - "package.json"
+      - "bun.lock"
       - ".github/workflows/clever-deploy-web.yml"
       - "!packages/web/.github/**"
   workflow_dispatch:
