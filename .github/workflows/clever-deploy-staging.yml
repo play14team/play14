@@ -1,8 +1,9 @@
 name: Clever Cloud — Deploy staging (api + web)
 
 on:
-  push:
-    branches-ignore: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
     paths:
       - "packages/api/**"
       - "packages/web/**"
@@ -10,9 +11,6 @@ on:
       - "bun.lock"
       - ".github/workflows/clever-deploy-staging.yml"
       - "!packages/**/.github/**"
-  pull_request:
-    types: [closed]
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -53,10 +51,10 @@ jobs:
           clever link --alias play14-web-staging "$CC_WEB_STAGING_APP_ID"
           clever stop --alias play14-web-staging || true
 
-  # --- Deploy staging apps on push -------------------------------------------
+  # --- Deploy staging apps on PR open/update ----------------------------------
   detect-changes:
     name: Detect changes
-    if: github.event_name != 'pull_request'
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.changes.outputs.api || steps.force.outputs.api }}
@@ -94,6 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
 
       - name: Install clever-tools
@@ -124,6 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
 
       - name: Install clever-tools
