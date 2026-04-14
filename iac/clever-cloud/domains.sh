@@ -47,7 +47,7 @@ echo "==> Attaching $STAGE domains (DRY_RUN=$DRY_RUN)"
 
 for entry in "${DOMAINS[@]}"; do
   IFS='|' read -r alias hostname <<<"$entry"
-  if clever domain --alias "$alias" 2>/dev/null | grep -qF "$hostname"; then
+  if clever domain --alias "$alias" 2>/dev/null | sed 's|/\s*$||' | grep -qxF "$hostname"; then
     echo "  [skip] $hostname already attached to $alias"
     continue
   fi

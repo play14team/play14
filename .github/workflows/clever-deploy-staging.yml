@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # --- Stop staging apps when PR is merged or closed -------------------------
+  # --- Stop staging apps when PR is merged ------------------------------------
   stop-staging:
     name: Stop staging apps
     if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
@@ -42,14 +42,14 @@ jobs:
           CC_API_STAGING_APP_ID: ${{ secrets.CC_API_STAGING_APP_ID }}
         run: |
           clever link --alias play14-api-staging "$CC_API_STAGING_APP_ID"
-          clever stop --alias play14-api-staging || true
+          clever stop --alias play14-api-staging || echo "::warning::clever stop failed for play14-api-staging"
 
       - name: Stop staging Web
         env:
           CC_WEB_STAGING_APP_ID: ${{ secrets.CC_WEB_STAGING_APP_ID }}
         run: |
           clever link --alias play14-web-staging "$CC_WEB_STAGING_APP_ID"
-          clever stop --alias play14-web-staging || true
+          clever stop --alias play14-web-staging || echo "::warning::clever stop failed for play14-web-staging"
 
   # --- Deploy staging apps on PR open/update ----------------------------------
   detect-changes:
