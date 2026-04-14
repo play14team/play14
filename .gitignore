@@ -119,4 +119,7 @@ iac/clever-cloud/*.env
 .github\instructions\codacy.instructions.md
 
 docs/BACKLOG.md
-.playwright-mcppackages/api/play14-prod.dump
+.playwright-mcp
+
+# Database dump files from migration
+*.dump
