@@ -14,7 +14,16 @@
 # --- Clever Cloud runtime ---------------------------------------------------
 CC_NODE_VERSION=22
 CC_NODE_BUILD_TOOL=bun
-CC_RUN_COMMAND=bun run start
+# This is a Bun workspace monorepo deployed from the repo root.
+# Clever Cloud's Bun runtime swallows --cwd flags when parsing
+# CC_RUN_COMMAND, so use a root-level alias script instead. start:api
+# in the root package.json delegates to packages/api.
+CC_RUN_COMMAND=bun run start:api
+# NOTE: Strapi admin-panel build needs >1GB RAM. The build instance flavor
+# is NOT an env var — set it via `clever scale --build-flavor M --alias <app>`.
+# Build the API package after install. The default buildpack only runs
+# `bun install`; Strapi needs an explicit admin-panel build.
+CC_POST_BUILD_HOOK=bun run build:api
 
 # --- Strapi core ------------------------------------------------------------
 NODE_ENV=production
@@ -28,13 +37,13 @@ ADMIN_JWT_SECRET=REPLACE_ME
 JWT_SECRET=REPLACE_ME
 TRANSFER_TOKEN_SALT=REPLACE_ME
 
-# --- Database (mapped from auto-injected POSTGRESQL_ADDON_*) ---------------
+# --- Database --------------------------------------------------------------
+# DO NOT set DATABASE_HOST/PORT/NAME/USERNAME/PASSWORD here — Clever Cloud
+# does not perform shell-style $VAR expansion on env values, so a literal
+# "$POSTGRESQL_ADDON_HOST" string would be passed straight to Knex.
+# packages/api/config/database.ts falls back to the POSTGRESQL_ADDON_*
+# vars that the linked add-on auto-injects, so leave these unset.
 DATABASE_CLIENT=postgres
-DATABASE_HOST=$POSTGRESQL_ADDON_HOST
-DATABASE_PORT=$POSTGRESQL_ADDON_PORT
-DATABASE_NAME=$POSTGRESQL_ADDON_DB
-DATABASE_USERNAME=$POSTGRESQL_ADDON_USER
-DATABASE_PASSWORD=$POSTGRESQL_ADDON_PASSWORD
 DATABASE_SCHEMA=public
 DATABASE_SSL=true
 DATABASE_SSL_SELF=false
@@ -49,10 +58,9 @@ CELLAR_REGION=us-east-1
 STORAGE_CDN_URL=https://play14-uploads-staging.cellar-c2.services.clever-cloud.com
 
 # --- Redis (cron lock + strapi-cache) --------------------------------------
-# REDIS_URL is composed from the auto-injected add-on vars. The Redis add-on
-# may inject REDIS_URL directly — check `clever env play14-api-staging` and
-# adjust if so.
-REDIS_URL=redis://:$REDIS_PASSWORD@$REDIS_HOST:$REDIS_PORT
+# The Clever Cloud Redis add-on injects REDIS_URL directly (along with
+# REDIS_HOST / REDIS_PORT / REDIS_PASSWORD). DO NOT set REDIS_URL here —
+# Clever Cloud does not perform $VAR expansion on env values.
 CACHE_PROVIDER=redis
 CACHE_ENABLED=true
 
