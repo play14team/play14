@@ -12,6 +12,9 @@ on:
       - "!packages/**/.github/**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: clever-deploy-production
   cancel-in-progress: false
