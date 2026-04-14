@@ -20,7 +20,7 @@
 #
 #   # Production cutover (no throttle, faster)
 #   ./transfer.sh \
-#     --to https://community.play14.org \
+#     --to https://api.play14.org \
 #     --token "$STRAPI_TRANSFER_TOKEN" \
 #     --force
 #

@@ -1,19 +1,19 @@
-name: Clever Cloud — Deploy staging (api + web)
+name: Clever Cloud — Deploy production (api + web)
 
 on:
   push:
-    branches: [feat/clever-cloud-migration]
+    branches: [main]
     paths:
       - "packages/api/**"
       - "packages/web/**"
       - "package.json"
       - "bun.lock"
-      - ".github/workflows/clever-deploy-staging.yml"
+      - ".github/workflows/clever-deploy-production.yml"
       - "!packages/**/.github/**"
   workflow_dispatch:
 
 concurrency:
-  group: clever-deploy-staging
+  group: clever-deploy-production
   cancel-in-progress: false
 
 jobs:
@@ -43,11 +43,11 @@ jobs:
       - name: Force both on manual run
         if: github.event_name == 'workflow_dispatch'
         run: |
-          echo "api=true" >> $GITHUB_OUTPUT
-          echo "web=true" >> $GITHUB_OUTPUT
+          echo "api=true" >> "$GITHUB_OUTPUT"
+          echo "web=true" >> "$GITHUB_OUTPUT"
 
-  deploy-api-staging:
-    name: Deploy play14-api-staging
+  deploy-api:
+    name: Deploy play14-api
     needs: detect-changes
     if: needs.detect-changes.outputs.api == 'true'
     runs-on: ubuntu-latest
@@ -66,20 +66,21 @@ jobs:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
         run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
 
-      - name: Link Clever Cloud staging app
+      - name: Link Clever Cloud app
         env:
-          CC_API_STAGING_APP_ID: ${{ secrets.CC_API_STAGING_APP_ID }}
-        run: clever link --alias play14-api-staging "$CC_API_STAGING_APP_ID"
+          CC_API_APP_ID: ${{ secrets.CC_API_APP_ID }}
+        run: clever link --alias play14-api "$CC_API_APP_ID"
 
       - name: Deploy
-        run: clever deploy --alias play14-api-staging --force --same-commit-policy rebuild
+        run: clever deploy --alias play14-api --force --same-commit-policy rebuild
 
-  deploy-web-staging:
-    name: Deploy play14-web-staging
-    needs: [detect-changes, deploy-api-staging]
-    # Run when web changed. The API job dependency is soft — if the API job
-    # was skipped (no API changes), GitHub Actions still lets this run.
-    if: ${{ always() && needs.detect-changes.outputs.web == 'true' && needs.deploy-api-staging.result != 'failure' }}
+  deploy-web:
+    name: Deploy play14-web
+    needs: [detect-changes, deploy-api]
+    # Web waits for API (generateStaticParams needs the API at build time).
+    # If the API job was skipped (no API changes), the web still runs.
+    # If the API job failed, the web is blocked.
+    if: ${{ always() && needs.detect-changes.outputs.web == 'true' && needs.deploy-api.result != 'failure' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -96,10 +97,10 @@ jobs:
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
         run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
 
-      - name: Link Clever Cloud staging app
+      - name: Link Clever Cloud app
         env:
-          CC_WEB_STAGING_APP_ID: ${{ secrets.CC_WEB_STAGING_APP_ID }}
-        run: clever link --alias play14-web-staging "$CC_WEB_STAGING_APP_ID"
+          CC_WEB_APP_ID: ${{ secrets.CC_WEB_APP_ID }}
+        run: clever link --alias play14-web "$CC_WEB_APP_ID"
 
       - name: Deploy
-        run: clever deploy --alias play14-web-staging --force --same-commit-policy rebuild
+        run: clever deploy --alias play14-web --force --same-commit-policy rebuild

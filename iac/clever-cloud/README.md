@@ -126,11 +126,11 @@ When ready to flip production:
 
 1. Run `./set-env.sh play14-api env-production-api.env` and
    `./set-env.sh play14-web env-production-web.env`.
-2. Push to `main` — the `clever-deploy-api.yml` and `clever-deploy-web.yml`
-   workflows deploy to the production apps.
-3. Run `STAGE=production ./domains.sh` to attach `community.play14.org`,
-   `play14.org`, `www.play14.org` to the production apps.
-4. Lower DNS TTL to 60s 24h before cutover, then flip the CNAMEs.
+2. Push to `main` — the `clever-deploy-production.yml` workflow deploys
+   API first, then web.
+3. Run `STAGE=production ./domains.sh` to attach `api.play14.org` and
+   `new.play14.org` to the production apps.
+4. Lower DNS TTL to 60s 24h before cutover, then create the CNAMEs.
 5. After 7-day stability window, run the Azure decommissioning cleanup PR
    that strips the legacy provider, env branching, and Bicep templates.
 

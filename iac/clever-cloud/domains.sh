@@ -29,9 +29,8 @@ STAGING_DOMAINS=(
 )
 
 PRODUCTION_DOMAINS=(
-  "play14-api|community.play14.org"
-  "play14-web|play14.org"
-  "play14-web|www.play14.org"
+  "play14-api|api.play14.org"
+  "play14-web|new.play14.org"
 )
 
 case "$STAGE" in
@@ -74,14 +73,10 @@ EOF
     ;;
   production)
     cat <<'EOF'
-  community.play14.org     CNAME  → <play14-api Clever Cloud domain>
-  play14.org               ALIAS/ANAME (apex) → <play14-web Clever Cloud domain>
-                           (or use Cloudflare CNAME flattening)
-  www.play14.org           CNAME  → <play14-web Clever Cloud domain>
-  cdn.play14.org           CNAME  → play14-uploads-prod.cellar-c2.services.clever-cloud.com
+  api.play14.org           CNAME  → <play14-api Clever Cloud domain>
+  new.play14.org           CNAME  → <play14-web Clever Cloud domain>
+  cdn.play14.org           CNAME  → cdn.play14.org.cellar-c2.services.clever-cloud.com
                            (proxied through Cloudflare)
-
-Reduce TTL to 60s 24h before cutover. After verification, raise back to 3600s.
 EOF
     ;;
 esac

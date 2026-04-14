@@ -261,7 +261,7 @@ Same `./validate-transfer.sh` invocation as in the primary path.
 
 This runbook describes the **rehearsal** to staging. For the final cutover:
 
-1. Use the production destination: `https://community.play14.org/admin` (after
+1. Use the production destination: `https://api.play14.org/admin` (after
    DNS flip) or the auto-assigned URL pre-flip.
 2. Use the production transfer token, not the staging one.
 3. Scale Azure API to 0 replicas BEFORE running the final delta transfer to

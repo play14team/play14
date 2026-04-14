@@ -17,7 +17,7 @@ CC_POST_BUILD_HOOK=bun run build:api
 # --- Strapi core ------------------------------------------------------------
 NODE_ENV=production
 HOST=0.0.0.0
-PUBLIC_URL=https://community.play14.org
+PUBLIC_URL=https://api.play14.org
 
 APP_KEYS=REPLACE_KEY1,REPLACE_KEY2,REPLACE_KEY3,REPLACE_KEY4
 API_TOKEN_SALT=REPLACE_ME
@@ -86,9 +86,9 @@ GITHUB_WORKFLOW_ID=218106378
 GITHUB_BRANCH=main
 
 # --- Frontend integration --------------------------------------------------
-FRONTEND_URL=https://play14.org
+FRONTEND_URL=https://new.play14.org
 REVALIDATE_SECRET=REPLACE_ME
-LOGO_URL=https://play14.org/logo/play14_600x200_transparent-dark.png
+LOGO_URL=https://new.play14.org/logo/play14_600x200_transparent-dark.png
 
 # --- Observability ----------------------------------------------------------
 STRAPI_LOG_LEVEL=info
@@ -103,9 +103,7 @@ CC_METRICS_PROMETHEUS_PORT=9000
 CC_METRICS_PROMETHEUS_PATH=/metrics
 
 # --- Security / CORS --------------------------------------------------------
-# Azure prod uses: https://play14.org,https://www.play14.org
-# Add community.play14.org if the admin panel makes cross-origin requests.
-ALLOWED_ORIGINS=https://play14.org,https://www.play14.org,https://community.play14.org
+ALLOWED_ORIGINS=https://new.play14.org,https://api.play14.org
 RATE_LIMIT_MAX=30
 RATE_LIMIT_WINDOW_MS=60000
 

@@ -13,14 +13,12 @@ CC_POST_BUILD_HOOK=bun run build:web
 
 # --- Backend ----------------------------------------------------------------
 NODE_ENV=production
-STRAPI_API_URL=https://community.play14.org
+STRAPI_API_URL=https://api.play14.org
 STRAPI_API_SECRET=REPLACE_ME
-# STRAPI_FALLBACK_API_URL=
-# STRAPI_FALLBACK_API_SECRET=
 
 # --- Public URLs ------------------------------------------------------------
-NEXT_PUBLIC_SITE_URL=https://play14.org
-NEXT_PUBLIC_STRAPI_URL=https://community.play14.org
+NEXT_PUBLIC_SITE_URL=https://new.play14.org
+NEXT_PUBLIC_STRAPI_URL=https://api.play14.org
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.REPLACE_ME
 NEXT_PUBLIC_WEB_VITALS=true
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=REPLACE_ME
