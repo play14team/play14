@@ -3,35 +3,21 @@ import { getContentType, getMetrics } from "@/libs/metrics"
 
 /**
  * GET /api/metrics
- * Returns Prometheus metrics for the Next.js application
+ * Returns Prometheus metrics for the Next.js application.
  *
- * Security: In production, only allows internal requests or token authentication
+ * On Clever Cloud, Warp10 scrapes this endpoint over localhost using the
+ * CC_METRICS_PROMETHEUS_PORT / CC_METRICS_PROMETHEUS_PATH env vars. When
+ * CC_METRICS_PROMETHEUS_USER / CC_METRICS_PROMETHEUS_PASSWORD are set, the
+ * scraper authenticates with HTTP Basic Auth. If no credentials are set,
+ * the endpoint stays open (Clever Cloud network isolation keeps it private).
+ *
+ * The legacy METRICS_TOKEN / x-metrics-token header is also still accepted
+ * for backwards compatibility and for scrapers running outside Clever Cloud.
  */
 export async function GET(request: Request) {
-  // Security: In production, only allow internal requests or token auth
-  if (process.env.NODE_ENV === "production") {
-    const forwardedFor = request.headers.get("x-forwarded-for")
-    const ip = forwardedFor?.split(",")[0]?.trim() || "unknown"
-    const metricsToken = request.headers.get("x-metrics-token")
-    const expectedToken = process.env.METRICS_TOKEN
-
-    const isInternal =
-      ip === "127.0.0.1" ||
-      ip === "::1" ||
-      ip.startsWith("10.") ||
-      ip.startsWith("172.16.") ||
-      ip.startsWith("172.17.") ||
-      ip.startsWith("172.18.") ||
-      ip.startsWith("172.19.") ||
-      ip.startsWith("172.2") ||
-      ip.startsWith("172.3") ||
-      ip.startsWith("192.168.")
-
-    // Allow if internal OR if valid token provided
-    if (!isInternal && (!expectedToken || metricsToken !== expectedToken)) {
-      console.warn(`[Metrics] Unauthorized access attempt from ${ip}`)
-      return NextResponse.json({ error: "Metrics endpoint is internal only" }, { status: 403 })
-    }
+  if (process.env.NODE_ENV === "production" && !isAuthorized(request)) {
+    console.warn("[Metrics] Unauthorized access attempt")
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
@@ -44,5 +30,48 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error("[Metrics] Failed to collect metrics:", error)
     return NextResponse.json({ error: "Failed to collect metrics" }, { status: 500 })
+  }
+}
+
+function isAuthorized(request: Request): boolean {
+  const basicUser = process.env.CC_METRICS_PROMETHEUS_USER
+  const basicPassword = process.env.CC_METRICS_PROMETHEUS_PASSWORD
+  const token = process.env.METRICS_TOKEN
+
+  // No auth configured → rely on Clever Cloud network isolation.
+  // Warp10 scrapes from localhost, not the public edge, so the endpoint
+  // is not reachable externally as long as no public route exposes it.
+  if (!basicUser && !basicPassword && !token) {
+    return true
+  }
+
+  if (basicUser && basicPassword && matchesBasicAuth(request, basicUser, basicPassword)) {
+    return true
+  }
+
+  if (token && request.headers.get("x-metrics-token") === token) {
+    return true
+  }
+
+  return false
+}
+
+function matchesBasicAuth(request: Request, user: string, password: string): boolean {
+  const header = request.headers.get("authorization")
+  if (!header?.toLowerCase().startsWith("basic ")) {
+    return false
+  }
+
+  try {
+    const decoded = atob(header.slice("basic ".length).trim())
+    const separator = decoded.indexOf(":")
+    if (separator === -1) {
+      return false
+    }
+    const providedUser = decoded.slice(0, separator)
+    const providedPassword = decoded.slice(separator + 1)
+    return providedUser === user && providedPassword === password
+  } catch {
+    return false
   }
 }
