@@ -397,8 +397,8 @@ podman run --env STRAPI_API_URL=https://example.com ...
 3. **Scale horizontally** with multiple containers
 4. **Monitor metrics:**
    ```bash
-   # Prometheus metrics endpoint
-   curl http://localhost:3000/api/metrics
+   # Prometheus metrics (separate server on port 9000)
+   curl http://localhost:9000/metrics
    ```
 5. **Adjust resource limits** based on load testing
 

@@ -36,6 +36,14 @@ export async function register() {
       }
     })
 
+    server.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        console.warn(`[Metrics] Port ${port} already in use, skipping metrics server`)
+      } else {
+        console.error("[Metrics] Server error:", err)
+      }
+    })
+
     server.listen(port, host, () => {
       console.log(`[Metrics] Prometheus server listening on ${host}:${port}${path}`)
     })
