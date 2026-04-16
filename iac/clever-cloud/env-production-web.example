@@ -37,6 +37,8 @@ NEXT_PUBLIC_FEATURE_LOGIN_ENABLED=true
 # A separate Prometheus HTTP server is started on METRICS_PORT (default 9000)
 # by instrumentation.ts — same approach as strapi-prometheus on the API side.
 # Port 9000 is not routed to the public edge, so no auth is needed.
+# CC_METRICS_PROMETHEUS_USER / CC_METRICS_PROMETHEUS_PASSWORD are NOT required;
+# the server ignores Basic Auth headers since the port is already private.
 LOG_LEVEL=info
 METRICS_PORT=9000
 METRICS_HOST=0.0.0.0

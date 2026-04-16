@@ -19,8 +19,10 @@ export async function register() {
     const host = process.env.METRICS_HOST || "0.0.0.0"
     const path = process.env.METRICS_PATH || "/metrics"
 
+    // Port 9000 is not routed to the public edge on Clever Cloud — no auth needed.
     const server = createServer(async (req, res) => {
-      if (req.url === path && req.method === "GET") {
+      const url = new URL(req.url ?? "/", `http://${host}:${port}`)
+      if (url.pathname === path && req.method === "GET") {
         try {
           const metrics = await getMetrics()
           res.writeHead(200, { "Content-Type": getContentType() })
