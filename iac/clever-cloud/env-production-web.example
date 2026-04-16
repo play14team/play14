@@ -34,19 +34,15 @@ FEATURE_LOGIN_ENABLED=true
 NEXT_PUBLIC_FEATURE_LOGIN_ENABLED=true
 
 # --- Observability ----------------------------------------------------------
-# Clever Cloud's Warp10 scrapes the /api/metrics endpoint over localhost, on
-# the port exposed to the edge (PORT env var, defaults to 8080 on the Node.js
-# runtime — NOT 3000). Setting the wrong port results in empty Grafana
-# dashboards because the scrape silently fails with connection refused.
-#
-# Authentication is HTTP Basic Auth. Set both USER and PASSWORD below to
-# lock the endpoint down. Leaving them unset is also safe — the endpoint is
-# only reachable from inside Clever Cloud's private network.
+# A separate Prometheus HTTP server is started on METRICS_PORT (default 9000)
+# by instrumentation.ts — same approach as strapi-prometheus on the API side.
+# Port 9000 is not routed to the public edge, so no auth is needed.
 LOG_LEVEL=info
-CC_METRICS_PROMETHEUS_PORT=8080
-CC_METRICS_PROMETHEUS_PATH=/api/metrics
-CC_METRICS_PROMETHEUS_USER=metrics
-CC_METRICS_PROMETHEUS_PASSWORD=REPLACE_ME
+METRICS_PORT=9000
+METRICS_HOST=0.0.0.0
+METRICS_PATH=/metrics
+CC_METRICS_PROMETHEUS_PORT=9000
+CC_METRICS_PROMETHEUS_PATH=/metrics
 
 # --- Misc -------------------------------------------------------------------
 DEFAULT_BLURHASH=L4SY{q-;~q-;t7t7M{Rj~q-;~q-;
