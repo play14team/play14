@@ -109,6 +109,10 @@ REVALIDATE_SECRET=REPLACE_ME
 LOGO_URL=https://staging.play14.org/logo/play14_600x200_transparent-dark.png
 
 # --- Observability ----------------------------------------------------------
+# The strapi-prometheus plugin exposes metrics on a separate internal server
+# (METRICS_PORT, defaults to 9000) which Clever Cloud's Warp10 scrapes via
+# localhost. The separate server has no auth — port 9000 is not routed to
+# the public edge, so it's only reachable from inside the instance.
 STRAPI_LOG_LEVEL=info
 LOG_LEVEL=info
 METRICS_ENABLED=true
@@ -116,7 +120,6 @@ METRICS_SEPARATE_SERVER=true
 METRICS_PORT=9000
 METRICS_HOST=0.0.0.0
 METRICS_PATH=/metrics
-METRICS_TOKEN=REPLACE_ME
 CC_METRICS_PROMETHEUS_PORT=9000
 CC_METRICS_PROMETHEUS_PATH=/metrics
 
