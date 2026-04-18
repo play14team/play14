@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # required to push `deployed/api` and `deployed/web` tags
 
 concurrency:
   group: clever-deploy-production
@@ -46,31 +46,67 @@ jobs:
     name: Detect changes
     runs-on: ubuntu-latest
     outputs:
-      api: ${{ steps.changes.outputs.api || steps.force.outputs.api }}
-      web: ${{ steps.changes.outputs.web || steps.force.outputs.web }}
+      api: ${{ steps.changes.outputs.api }}
+      web: ${{ steps.changes.outputs.web }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Detect changed paths
+      # Compare the current commit against the `deployed/<service>` tag that
+      # points at the last commit we successfully shipped for that service.
+      # This ensures changes stranded on `main` by a previously-failed run are
+      # still detected on the next push. A missing tag (fresh repo, service
+      # never deployed through this workflow) falls back to "deploy it".
+      - name: Detect changes vs last successful deploy
         id: changes
-        if: github.event_name != 'workflow_dispatch'
-        uses: dorny/paths-filter@v4
-        with:
-          filters: |
-            api:
-              - 'packages/api/**'
-            web:
-              - 'packages/web/**'
-
-      - name: Force both on manual run
-        id: force
-        if: github.event_name == 'workflow_dispatch'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_SHA: ${{ github.sha }}
         run: |
-          echo "api=true" >> "$GITHUB_OUTPUT"
-          echo "web=true" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+
+          needs_deploy() {
+            local service="$1"
+            local path="$2"
+            local tag="deployed/${service}"
+
+            if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+              echo "manual dispatch → ${service}=true" >&2
+              echo "true"
+              return
+            fi
+
+            if ! git rev-parse --verify --quiet "refs/tags/${tag}" >/dev/null 2>&1; then
+              echo "tag ${tag} missing → ${service}=true (bootstrap)" >&2
+              echo "true"
+              return
+            fi
+
+            if git diff --name-only "refs/tags/${tag}" "$HEAD_SHA" -- "${path}" | grep -q .; then
+              echo "changes under ${path} since ${tag} → ${service}=true" >&2
+              echo "true"
+            else
+              echo "no changes under ${path} since ${tag} → ${service}=false" >&2
+              echo "false"
+            fi
+          }
+
+          api=$(needs_deploy api packages/api)
+          web=$(needs_deploy web packages/web)
+
+          {
+            echo "api=${api}"
+            echo "web=${web}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### Change detection"
+            echo "- api: **${api}**"
+            echo "- web: **${web}**"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-api:
     name: Deploy play14-api
@@ -99,6 +135,14 @@ jobs:
 
       - name: Deploy
         run: clever deploy --alias play14-api --force --same-commit-policy rebuild
+
+      - name: Mark commit as deployed (api)
+        env:
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git tag -f deployed/api "$HEAD_SHA"
+          git push origin -f "refs/tags/deployed/api"
 
   deploy-web:
     name: Deploy play14-web
@@ -130,3 +174,11 @@ jobs:
 
       - name: Deploy
         run: clever deploy --alias play14-web --force --same-commit-policy rebuild
+
+      - name: Mark commit as deployed (web)
+        env:
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git tag -f deployed/web "$HEAD_SHA"
+          git push origin -f "refs/tags/deployed/web"
