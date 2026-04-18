@@ -23,7 +23,6 @@ import {
   ticketOrderOperationDuration,
   ticketOrderOperationsTotal,
 } from "../../../services/observability/metrics"
-import { reportSentryError } from "../../../services/observability/sentry-reporter"
 import { getPaymentProvider } from "../../../services/payment"
 import type { ConnectPaymentProvider } from "../../../services/payment/types"
 import {
@@ -1624,13 +1623,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Clean up all allocated resources in reverse order
       strapi.log.error(
-        `[Ticketing] Failed to create checkout session: ${error.message} | orderId=${orderId}, durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
+        `[Ticketing] Failed to create checkout session: ${error.message} | orderId=${orderId}, operation=${operation}, durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
-
-      reportSentryError(strapi, error, {
-        tags: { operation, module: "ticketing", correlationId },
-        extra: { orderId, durationMs },
-      })
 
       // Release reservations if they were created
       if (reservationsCreated) {

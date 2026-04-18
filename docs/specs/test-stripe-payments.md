@@ -643,7 +643,7 @@ Users: UserA and UserB (concurrent)
 - Retry logic for webhooks
 - Transaction rollback on failure
 - User can retry safely
-- Errors logged to Sentry
+- Errors captured in application logs
 
 ---
 

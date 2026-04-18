@@ -28,7 +28,6 @@ import {
   webhookProcessingDuration,
   webhookProcessingTotal,
 } from "../../../services/observability/metrics"
-import { reportSentryError } from "../../../services/observability/sentry-reporter"
 import { getPaymentProvider } from "../../../services/payment"
 import type { WebhookEvent } from "../../../services/payment/types"
 import {
@@ -216,13 +215,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     } catch (error: any) {
       const durationMs = webhookTimer.elapsed()
       strapi.log.error(
-        `[Webhook] Error processing event ${eventId}: ${error.message} | durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
+        `[Webhook] Error processing event ${eventId}: ${error.message} | event_type=${eventType}, durationMs=${durationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
-
-      reportSentryError(strapi, error, {
-        tags: { event_type: eventType, module: "webhook", correlationId },
-        extra: { eventId, durationMs },
-      })
 
       // For retryable errors, release the claim so Stripe can retry
       // For non-retryable errors, mark as failed to prevent endless retries
@@ -504,13 +498,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Processing failed - revert status back to pending so webhook can be retried
       const handlerDurationMs = handlerTimer.elapsed()
       strapi.log.error(
-        `[Webhook] Failed to process order ${orderNumber}: ${error.message} | event=${eventName}, durationMs=${handlerDurationMs}, correlationId=${correlationId}, stack=${error.stack}`
+        `[Webhook] Failed to process order ${orderNumber}: ${error.message} | handler=checkout_completed, event=${eventName}, sessionId=${sessionId}, durationMs=${handlerDurationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
-
-      reportSentryError(strapi, error, {
-        tags: { handler: "checkout_completed", module: "webhook", correlationId },
-        extra: { orderNumber, eventName, sessionId, handlerDurationMs },
-      })
 
       await knex("ticket_orders")
         .where("document_id", order.documentId)
@@ -997,12 +986,8 @@ The #play14 Team
       emailSendTotal.inc({ email_type: "payment_failed", status: "error" })
       emailSendDuration.observe({ email_type: "payment_failed" }, durationMs / 1000)
       strapi.log.error(
-        `[Webhook] Failed to send payment failed email: ${error.message} | order=${order.orderNumber}, to=${order.purchaserEmail}, durationMs=${durationMs}, correlationId=${correlationId}`
+        `[Webhook] Failed to send payment failed email: ${error.message} | email_type=payment_failed, order=${order.orderNumber}, to=${order.purchaserEmail}, durationMs=${durationMs}, correlationId=${correlationId}`
       )
-      reportSentryError(strapi, error, {
-        tags: { email_type: "payment_failed", module: "webhook", correlationId },
-        extra: { orderNumber: order.orderNumber, recipientEmail: order.purchaserEmail },
-      })
     }
   },
 
@@ -1470,13 +1455,8 @@ The #play14 Team
       // This is a serious issue as the customer paid but won't receive confirmation.
       emailSendTotal.inc({ email_type: "confirmation", status: "error" })
       strapi.log.error(
-        `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message} | order=${order.orderNumber}`
+        `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message} | email_type=confirmation, severity=critical, order=${order.orderNumber}`
       )
-
-      reportSentryError(strapi, error, {
-        tags: { email_type: "confirmation", module: "webhook", severity: "critical" },
-        extra: { orderNumber: order.orderNumber, recipientEmail: order.purchaserEmail },
-      })
     }
   },
 

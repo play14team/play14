@@ -10,7 +10,6 @@
  */
 
 import type { Core } from "@strapi/strapi"
-import { reportSentryError } from "../../services/observability/sentry-reporter"
 import { syncPermissions } from "./sync"
 
 export async function bootstrapPermissions(strapi: Core.Strapi): Promise<void> {
@@ -21,10 +20,6 @@ export async function bootstrapPermissions(strapi: Core.Strapi): Promise<void> {
     strapi.log.info("[Permission Bootstrap] Permission synchronization complete")
   } catch (error) {
     strapi.log.error(`[Permission Bootstrap] Failed to sync permissions: ${error}`)
-    reportSentryError(strapi, error, {
-      tags: { phase: "bootstrap", module: "permission-bootstrap" },
-      extra: { task: "syncPermissions" },
-    })
     // Don't throw - allow Strapi to start even if permission sync fails
     // This prevents a broken permission config from blocking the entire app
   }

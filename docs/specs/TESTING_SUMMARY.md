@@ -168,7 +168,7 @@ This document provides an index of all manual testing scenarios generated from t
 - Authorization and access control
 - File upload security
 - Webhook security
-- Sentry error tracking
+- Error logging (structured logs)
 - Prometheus metrics
 - Secrets management
 - HTTPS enforcement
@@ -252,7 +252,7 @@ This document provides an index of all manual testing scenarios generated from t
 ### Acceptance Environment
 - Connected to acceptance Stripe account
 - Test emails sent to inbox
-- Sentry configured for acceptance
+- Structured logs captured for acceptance
 - Deployed on Azure Container Apps (acceptance)
 - URL: `community-acc.play14.org`
 
@@ -260,7 +260,7 @@ This document provides an index of all manual testing scenarios generated from t
 - **Exercise extreme caution**
 - Use production Stripe (test mode initially)
 - Real emails sent
-- Sentry tracks production errors
+- Structured logs capture production errors
 - Do not create test data
 - Coordinate with team before testing
 

@@ -32,8 +32,4 @@ export default ({ env }: { env: any }) => ({
   "strapi-cache": {
     enabled: false,
   },
-  // Disable Sentry in tests
-  sentry: {
-    enabled: false,
-  },
 })

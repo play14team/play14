@@ -261,7 +261,6 @@ configure_api_env_vars() {
   echo "   - RESEND_API_KEY"
   echo "   - GITHUB_TOKEN"
   echo "   - STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_WEBHOOK_SECRET_CONNECT"
-  echo "   - SENTRY_DSN"
 }
 ```
 
@@ -713,7 +712,7 @@ Test on **https://new.api.play14.org** and **https://new.play14.org**:
 - [ ] Mapbox maps display correctly
 - [ ] Event listing and detail pages load
 - [ ] Player profiles display with avatars from Cellar
-- [ ] No errors in Sentry dashboard
+- [ ] No errors in Strapi / app logs
 - [ ] Prometheus metrics available (port 9000 via clever logs)
 
 **5.3 Performance Comparison (Staging vs Azure Production)**
@@ -724,7 +723,7 @@ Compare metrics between:
 
 Metrics to compare:
 - [ ] Page load times (use WebPageTest or Lighthouse)
-- [ ] API response times (check Sentry performance monitoring)
+- [ ] API response times (check Prometheus metrics / app logs)
 - [ ] Database query performance (Strapi query logs)
 - [ ] Memory usage (Clever Cloud metrics vs Azure Container Apps)
 - [ ] CPU usage
@@ -736,7 +735,7 @@ Metrics to compare:
 
 - [ ] Week 1: Internal team testing only on staging domains
 - [ ] Week 2: Selected beta users testing on staging domains
-- [ ] Monitor error rates daily (Azure vs Clever Cloud Sentry environments)
+- [ ] Monitor error rates daily (Azure vs Clever Cloud app logs)
 - [ ] Fix any issues discovered during testing
 - [ ] Update environment variables if needed
 - [ ] Verify Stripe webhooks work with production keys
@@ -780,7 +779,7 @@ But internal URLs/CORS will be ready for production domains.
 - [ ] Apps restarted with new env vars (apps still on staging domains)
 - [ ] Final Strapi export from Azure (verified backup)
 - [ ] Clever Cloud apps healthy on staging domains
-- [ ] Sentry, Stripe, GitHub integrations configured for production
+- [ ] Stripe, GitHub integrations configured for production
 - [ ] Set DNS TTL to 300s (5 minutes) in CloudFlare 24h before cutover
 - [ ] Announce maintenance window to users (30 minutes)
 - [ ] Team on standby for rollback
@@ -851,14 +850,14 @@ watch -n 5 curl -I https://play14.org/api/health
 - [ ] Update status page
 
 **6.3 Post-Cutover Monitoring (First 24 Hours)**
-- [ ] Monitor Sentry error rates (compare to pre-migration baseline)
+- [ ] Monitor app log error rates (compare to pre-migration baseline)
 - [ ] Check Clever Cloud logs for errors (`clever logs -f`)
 - [ ] Verify cron jobs running on schedule
 - [ ] Monitor database connection pool (`psql -c "SELECT count(*) FROM pg_stat_activity"`)
 - [ ] Check Redis cache hit rates (`redis-cli INFO stats`)
 - [ ] Test Stripe webhooks with real payments (if any occur)
 - [ ] Monitor page load times via RUM (Real User Monitoring)
-- [ ] Verify Sentry performance traces show Clever Cloud infrastructure
+- [ ] Verify Prometheus metrics show Clever Cloud infrastructure
 - [ ] Check for any CORS errors in browser console
 
 **6.4 Update Stripe Webhook URLs (Critical!)**
@@ -884,7 +883,7 @@ watch -n 5 curl -I https://play14.org/api/health
 **7.1 Observation Period (Week 5)**
 - [ ] Monitor Clever Cloud production for 1 week (no critical issues)
 - [ ] Compare costs: Azure vs Clever Cloud (weekly spend)
-- [ ] Verify all integrations working (Stripe, Resend, GitHub, Sentry)
+- [ ] Verify all integrations working (Stripe, Resend, GitHub)
 - [ ] Confirm no DNS resolution issues
 - [ ] Validate cron jobs running reliably
 - [ ] Check for any unexpected errors in logs
@@ -1384,7 +1383,7 @@ See section 4.2 "Create PR Deployment Workflow" for the complete backup/restore 
 - [ ] File uploads work via Cellar
 - [ ] Cron jobs run on schedule
 - [ ] Stripe webhooks received
-- [ ] No increase in error rates (Sentry)
+- [ ] No increase in error rates (app logs)
 - [ ] Page load times comparable to Azure
 - [ ] Team trained on Clever Cloud console and CLI
 - [ ] Documentation updated

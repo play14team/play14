@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
-import { trackDiscountCodeValidation } from "@/libs/sentry-metrics"
 import DiscountCodeInput from "./discount-code-input"
 import type {
   AuthStatus,
@@ -159,8 +158,6 @@ export default function TicketSelector({
   }
 
   const handleDiscountApplied = (result: DiscountValidationResult) => {
-    // Track discount code validation
-    trackDiscountCodeValidation(eventId, result.valid, result.discountType)
     setAppliedDiscount(result)
   }
 

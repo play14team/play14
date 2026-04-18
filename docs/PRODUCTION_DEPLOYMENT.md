@@ -22,7 +22,6 @@
 | **Database** | PostgreSQL 17.6 | Azure Database for PostgreSQL |
 | **Storage** | Azure Blob Storage | CDN-enabled |
 | **Registry** | Azure Container Registry | `play14containerregistry.azurecr.io` |
-| **Monitoring** | Sentry | Error tracking & performance |
 | **Cache** | Azure Cache for Redis | Shared cache across replicas |
 
 ### 1.2 Environments
@@ -207,9 +206,6 @@
 | `NEXT_PUBLIC_SITE_URL` | Frontend URL | Build-time |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile key | Build-time |
 | `FEATURE_LOGIN_ENABLED` | Enable login feature | Build-time |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry DSN | Build-time |
-| `SENTRY_AUTH_TOKEN` | Sentry auth token | Build-time |
-| `SENTRY_ORG` | Sentry organization | Build-time |
 
 **Note**: `NEXT_PUBLIC_*` variables are bundled at build time by Next.js and baked into the Docker image.
 
@@ -228,8 +224,6 @@
 | `STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN` | API build |
 | `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` | Web build |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Web build (acceptance) |
-| `SENTRY_AUTH_TOKEN` | Sentry source maps |
-| `NEXT_PUBLIC_SENTRY_DSN` | Sentry error tracking |
 
 ### 4.2 Repository Variables
 
@@ -237,8 +231,6 @@
 |----------|-------------|-------|
 | `STRAPI_API_URL` | Production | `https://community.play14.org` |
 | `STRAPI_API_URL` | Acceptance | Acceptance API URL |
-| `SENTRY_ENVIRONMENT` | Production | `production` |
-| `SENTRY_ENVIRONMENT` | Acceptance | `acceptance` |
 
 ---
 
@@ -442,13 +434,7 @@ az containerapp logs show -n play14-api -g play14-community --follow | grep -i p
 
 ## 11. Monitoring
 
-### 11.1 Sentry
-
-- **Organization**: Configured via `SENTRY_ORG`
-- **Projects**: `play14-web`
-- **Features**: Error tracking, performance monitoring, source maps
-
-### 11.2 Azure
+### 11.1 Azure
 
 - Container Apps built-in metrics
 - Log Analytics workspace integration
@@ -562,4 +548,3 @@ const value = await redis.get('key');
 | Stripe Support | https://support.stripe.com |
 | Resend Support | https://resend.com/support |
 | Azure Support | Azure Portal → Help + Support |
-| Sentry Support | https://sentry.io/support |

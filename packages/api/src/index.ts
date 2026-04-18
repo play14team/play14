@@ -1,7 +1,6 @@
 import type { Core } from "@strapi/strapi"
 import { bootstrapLikedItemImages } from "./bootstrap/liked-items"
 import { bootstrapPermissions } from "./bootstrap/permissions"
-import { reportSentryError } from "./services/observability/sentry-reporter"
 
 /**
  * Validate CORS configuration for security.
@@ -298,10 +297,10 @@ export default {
         return result
       })
     } catch (error) {
-      reportSentryError(strapi, error, {
-        tags: { phase: "register", module: "app-register" },
-        extra: { task: "register" },
-      })
+      const err = error instanceof Error ? error : new Error(String(error))
+      strapi.log.error(
+        `[app-register] register failed: ${err.message}${err.stack ? `\n${err.stack}` : ""}`
+      )
       throw error
     }
   },
@@ -372,10 +371,10 @@ export default {
       // Bootstrap liked items images (uploads images from data folder if missing)
       await bootstrapLikedItemImages(strapi)
     } catch (error) {
-      reportSentryError(strapi, error, {
-        tags: { phase: "bootstrap", module: "app-bootstrap" },
-        extra: { task: "bootstrap" },
-      })
+      const err = error instanceof Error ? error : new Error(String(error))
+      strapi.log.error(
+        `[app-bootstrap] bootstrap failed: ${err.message}${err.stack ? `\n${err.stack}` : ""}`
+      )
       throw error
     }
   },

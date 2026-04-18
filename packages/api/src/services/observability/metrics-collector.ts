@@ -26,7 +26,6 @@ import {
   ticketTypesCapacity,
   ticketTypesSold,
 } from "./metrics"
-import { reportSentryError } from "./sentry-reporter"
 
 /**
  * Collect all business metrics
@@ -49,10 +48,6 @@ export async function collectBusinessMetrics(strapi: Core.Strapi): Promise<void>
     strapi.log.debug(`[MetricsCollector] Business metrics collection completed in ${duration}ms`)
   } catch (error) {
     strapi.log.error(`[MetricsCollector] Failed to collect metrics: ${error}`)
-    reportSentryError(strapi, error, {
-      tags: { cron_task: "collectMetrics", module: "metrics-collector" },
-      extra: { task: "collectBusinessMetrics" },
-    })
   }
 }
 

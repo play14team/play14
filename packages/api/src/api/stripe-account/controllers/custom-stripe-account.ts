@@ -5,7 +5,6 @@
 
 import type { Core } from "@strapi/strapi"
 import Stripe from "stripe"
-import { reportSentryError } from "../../../services/observability/sentry-reporter"
 import { STRIPE_DEFAULTS } from "../../../services/ticketing"
 
 export default ({ strapi }: { strapi: Core.Strapi }) => {
@@ -56,7 +55,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
   }
 
   /**
-   * Log and report Stripe errors with full context
+   * Log Stripe errors with full context
    */
   const handleStripeError = (
     operation: string,
@@ -66,21 +65,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
     const errorDetails = getStripeErrorDetails(error)
 
     strapi.log.error(
-      `[Stripe Connect] ${operation} failed: ${JSON.stringify(errorDetails, null, 2)}`
+      `[Stripe Connect] ${operation} failed: ${JSON.stringify({ ...errorDetails, ...context }, null, 2)}`
     )
-
-    reportSentryError(strapi, error, {
-      tags: {
-        service: "stripe-connect",
-        operation,
-        errorType: errorDetails.type,
-        errorCode: errorDetails.code || "unknown",
-      },
-      extra: {
-        ...errorDetails,
-        ...context,
-      },
-    })
 
     return errorDetails
   }

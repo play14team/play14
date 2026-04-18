@@ -26,7 +26,6 @@ import {
 } from "../src/services/cron"
 import { acquireLock, releaseLock } from "../src/services/cron/distributed-lock"
 import { collectBusinessMetrics } from "../src/services/observability/metrics-collector"
-import { reportSentryError } from "../src/services/observability/sentry-reporter"
 import { processUserInvitations } from "../src/services/user-invitations"
 import { cleanupOldWebhookRecords } from "../src/services/webhook"
 
@@ -42,10 +41,10 @@ const withErrorReporting = (taskName: string, taskFn: TaskFn) => async (context:
   } catch (error) {
     const strapi = context?.strapi
     if (strapi) {
-      reportSentryError(strapi, error, {
-        tags: { cron_task: taskName },
-        extra: { task: taskName },
-      })
+      const err = error instanceof Error ? error : new Error(String(error))
+      strapi.log.error(
+        `[Cron:${taskName}] failed: ${err.message}${err.stack ? `\n${err.stack}` : ""}`
+      )
     }
     throw error
   }

@@ -77,10 +77,6 @@
       "Bash(podman-compose ps:*)",
       "Bash(bunx tsc:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "mcp__plugin_sentry_sentry__get_issue_details",
-      "mcp__plugin_sentry_sentry__find_organizations",
-      "mcp__plugin_sentry_sentry__get_issue_tag_values",
-      "mcp__plugin_sentry_sentry__search_issue_events",
       "Bash(npx vitest:*)",
       "Bash(bunx biome check:*)",
       "mcp__playwright__browser_click",
@@ -134,8 +130,6 @@
     ]
   },
   "enabledPlugins": {
-    "voltagent-biz@voltagent-subagents": true,
-    "voltagent-core-dev@voltagent-subagents": true,
     "voltagent-data-ai@voltagent-subagents": true,
     "voltagent-dev-exp@voltagent-subagents": true,
     "voltagent-domains@voltagent-subagents": true,

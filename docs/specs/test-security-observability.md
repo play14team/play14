@@ -11,17 +11,17 @@ Security validations, error tracking, metrics, and monitoring
 - `9a074d4` - fix(web,api): address CodeQL security vulnerabilities
 - `722db3c` - fix(api,ci): address CodeQL security alerts
 - `e26a905` - fix(web,api): migrate all fetch calls to strapiFetch and fix security issues
-- `a045fcc` - feat: add Sentry error tracking and Prometheus metrics for observability
+- `a045fcc` - feat: add error tracking and Prometheus metrics for observability
 - `2c84216` - feat(api): use strapi-prometheus plugin
-- `55a9088` - fix(api): capture 5xx errors in Sentry even when handled by Strapi
+- `55a9088` - fix(api): ensure 5xx errors are logged even when handled by Strapi
 - `bcbc6fc` - feat(api): add configurable CORS and expand rate limiting coverage
 - `74e8ec7` - fix(api): address security issues with rate limiting and secure randomness
 - `16a1a3f` - fix(api): use cryptographically secure random IDs in test factories
 - `0573502` - fix(api): improve webhook logging and CORS security documentation
 
 ## Prerequisites
-- Access to Sentry dashboard
 - Access to Prometheus/Grafana (if configured)
+- Access to application logs (Clever Cloud `clever logs`, local stdout)
 - Security testing tools (OWASP ZAP, Burp Suite)
 - Valid and invalid test data
 - Admin access for configuration
@@ -381,7 +381,7 @@ curl -X POST https://api.play14.org/api/webhooks/stripe \
 
 ---
 
-## Test Case 10: Sentry Error Tracking
+## Test Case 10: Error Logging
 
 ### Steps
 1. Trigger various errors:
@@ -390,39 +390,18 @@ curl -X POST https://api.play14.org/api/webhooks/stripe \
    - JavaScript errors
    - API errors
    - Database errors
-2. Check Sentry dashboard
-3. Verify error captured
-4. Review error details:
+2. Check application logs (Clever Cloud `clever logs -f` in production,
+   stdout locally) for each error
+3. Verify error captured with:
    - Stack trace
-   - User context
-   - Request context
-   - Breadcrumbs
-5. Test error grouping
-6. Test error alerts
+   - Request context / correlation ID
+   - Relevant identifiers (orderId, eventId, etc.)
 
 ### Expected Results
-- All errors captured in Sentry
+- All errors captured in structured logs via `strapi.log.error` / `createLogger`
 - Handled errors reported (5xx even when handled)
-- JavaScript errors tracked
-- Source maps uploaded
-- User context included (non-PII)
-- Environment tags correct
-- Release versions tracked
-- Error alerts configured
-- No sensitive data in error logs
-
-### Sentry Configuration to Verify
-```javascript
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV,
-  release: process.env.SENTRY_RELEASE,
-  beforeSend(event) {
-    // Remove sensitive data
-    return event;
-  }
-});
-```
+- No sensitive data (tokens, secrets, PII) in error logs
+- Correlation IDs propagated so related log entries can be correlated
 
 ---
 
@@ -499,7 +478,6 @@ rate(http_request_errors_total[5m])
 ✓ STRIPE_SECRET_KEY (env)
 ✓ DATABASE_PASSWORD (env)
 ✓ JWT_SECRET (env)
-✓ SENTRY_DSN (env)
 ✗ STRIPE_SECRET_KEY="sk_test_..." (hardcoded - bad)
 ```
 
@@ -683,9 +661,8 @@ Content-Security-Policy:
 ### Steps
 1. Simulate security incident
 2. Verify detection:
-   - Sentry alerts
    - Prometheus alerts
-   - Log monitoring
+   - Log monitoring / log-based alerts
 3. Test notification system
 4. Verify incident documentation
 5. Test recovery procedures
@@ -788,7 +765,7 @@ Content-Security-Policy:
 - Security is a continuous process
 - Regular security audits required
 - CodeQL scans run in CI/CD
-- Sentry captures all errors including handled 5xx
+- Structured logging captures all errors including handled 5xx
 - Prometheus metrics for real-time monitoring
 - CORS configured per environment
 - Rate limiting uses cryptographically secure tokens
