@@ -28,7 +28,6 @@ import {
   I18N_ACTIONS,
   IMPORT_ACTIONS,
   LIKED_ITEM_ACTIONS,
-  LINKEDIN_POST_ACTIONS,
   MEDIA_FILE_ACTIONS,
   MEDIA_FOLDER_ACTIONS,
   NEWSLETTER_ACTIONS,
@@ -72,10 +71,6 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Newsletter subscription (public)
   { action: NEWSLETTER_ACTIONS.SUBSCRIBE, minimumRole: ROLE_TYPES.PUBLIC },
-
-  // LinkedIn post management (Host+ can preview/post)
-  { action: LINKEDIN_POST_ACTIONS.PREVIEW, minimumRole: ROLE_TYPES.HOST },
-  { action: LINKEDIN_POST_ACTIONS.POST_MANUALLY, minimumRole: ROLE_TYPES.HOST },
 
   // User me (needed for auth flow)
   { action: USER_ACTIONS.ME, minimumRole: ROLE_TYPES.PUBLIC },

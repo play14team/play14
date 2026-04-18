@@ -390,12 +390,6 @@ export const NEWSLETTER_ACTIONS = {
   SUBSCRIBE: "api::newsletter.newsletter.subscribe",
 } as const
 
-// ==================== LINKEDIN ====================
-export const LINKEDIN_POST_ACTIONS = {
-  PREVIEW: "api::linkedin-post.custom-linkedin-post.previewPost",
-  POST_MANUALLY: "api::linkedin-post.custom-linkedin-post.postManually",
-} as const
-
 // ==================== NEWSLETTER SEND ====================
 export const NEWSLETTER_SEND_ACTIONS = {
   // CRUD (founders only)
