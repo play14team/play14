@@ -5,6 +5,8 @@
  * Uses the configured group to send newsletters to all subscribers.
  */
 
+import { fetchWithTimeout, parseFromAddress, safeJson } from "./sender-common"
+
 interface SenderGroupResponse {
   data?: {
     id: string
@@ -23,6 +25,23 @@ interface SenderCampaignResponse {
 interface SenderErrorResponse {
   message?: string
   errors?: Record<string, string[]>
+  _raw?: string
+}
+
+/**
+ * Best-effort extraction of a human-readable error message from a Sender.net
+ * error response body. Falls back to a trimmed `_raw` snippet when the body
+ * is HTML/non-JSON (common on 5xx / upstream proxy errors).
+ */
+function errorMessageFrom(body: unknown, fallback: string): string {
+  if (!body || typeof body !== "object") return fallback
+  const asError = body as SenderErrorResponse
+  if (asError.message) return asError.message
+  if (asError._raw) {
+    const snippet = asError._raw.trim().slice(0, 200)
+    return snippet ? `Sender.net error: ${snippet}` : fallback
+  }
+  return fallback
 }
 
 /**
@@ -47,7 +66,7 @@ export async function getGroupSubscriberCount(): Promise<{
   }
 
   try {
-    const response = await fetch(`https://api.sender.net/v2/groups/${groupId}`, {
+    const response = await fetchWithTimeout(`https://api.sender.net/v2/groups/${groupId}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -55,13 +74,18 @@ export async function getGroupSubscriberCount(): Promise<{
       },
     })
 
+    // Parse body once via safeJson — previous implementation called
+    // response.json() on both branches, which throws "body already consumed"
+    // on the error path.
+    const body = await safeJson(response)
+
     if (!response.ok) {
-      const errorData = (await response.json()) as SenderErrorResponse
-      strapi.log.error(`[SenderBroadcast] Failed to get group info: ${errorData.message}`)
-      return { success: false, error: errorData.message || "Failed to get subscriber count" }
+      const message = errorMessageFrom(body, "Failed to get subscriber count")
+      strapi.log.error(`[SenderBroadcast] Failed to get group info: ${message}`)
+      return { success: false, error: message }
     }
 
-    const data = (await response.json()) as SenderGroupResponse
+    const data = body as SenderGroupResponse
     const count = data.data?.active_subscribers_count ?? data.data?.subscribers_count ?? 0
 
     return { success: true, count }
@@ -86,7 +110,6 @@ export async function sendBroadcast(
 }> {
   const apiKey = process.env.SENDER_API_KEY
   const groupId = process.env.SENDER_GROUP_ID
-  const fromEmail = process.env.EMAIL_DEFAULT_FROM || "noreply@play14.org"
   const replyTo = process.env.EMAIL_REPLY_TO || "community@play14.org"
 
   if (!apiKey) {
@@ -99,9 +122,16 @@ export async function sendBroadcast(
     return { success: false, error: "Newsletter group is not configured" }
   }
 
+  // Sender.net campaign API quirk: on POST /v2/campaigns, the `from` field is
+  // the display NAME only — NOT an email address. The sender address is set
+  // per verified-domain in the Sender.net account and surfaced to recipients
+  // via the `reply_to` field. Passing an email in `from` silently mis-renders
+  // the From header. Do not "simplify" this by swapping fromName for an email.
+  const { name: fromName } = parseFromAddress()
+
   try {
     // Step 1: Create the campaign
-    const createResponse = await fetch("https://api.sender.net/v2/campaigns", {
+    const createResponse = await fetchWithTimeout("https://api.sender.net/v2/campaigns", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -111,7 +141,7 @@ export async function sendBroadcast(
       body: JSON.stringify({
         title: subject,
         subject,
-        from: fromEmail,
+        from: fromName,
         reply_to: replyTo,
         html_content: htmlContent,
         groups: [groupId],
@@ -119,12 +149,13 @@ export async function sendBroadcast(
     })
 
     if (!createResponse.ok) {
-      const errorData = (await createResponse.json()) as SenderErrorResponse
-      strapi.log.error(`[SenderBroadcast] Failed to create campaign: ${errorData.message}`)
-      return { success: false, error: errorData.message || "Failed to create newsletter campaign" }
+      const errorData = await safeJson(createResponse)
+      const message = errorMessageFrom(errorData, "Failed to create newsletter campaign")
+      strapi.log.error(`[SenderBroadcast] Failed to create campaign: ${message}`)
+      return { success: false, error: message }
     }
 
-    const campaignData = (await createResponse.json()) as SenderCampaignResponse
+    const campaignData = (await safeJson(createResponse)) as SenderCampaignResponse
     const campaignId = campaignData.data?.id
 
     if (!campaignId) {
@@ -132,20 +163,26 @@ export async function sendBroadcast(
       return { success: false, error: "Failed to create newsletter campaign" }
     }
 
-    // Step 2: Send the campaign
-    const sendResponse = await fetch(`https://api.sender.net/v2/campaigns/${campaignId}/send`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
+    // Step 2: Send the campaign — only reached when step 1 returned an id.
+    const sendResponse = await fetchWithTimeout(
+      `https://api.sender.net/v2/campaigns/${campaignId}/send`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    )
 
     if (!sendResponse.ok) {
-      const errorData = (await sendResponse.json()) as SenderErrorResponse
-      strapi.log.error(`[SenderBroadcast] Failed to send campaign: ${errorData.message}`)
-      return { success: false, error: errorData.message || "Failed to send newsletter" }
+      const errorData = await safeJson(sendResponse)
+      const message = errorMessageFrom(errorData, "Failed to send newsletter")
+      strapi.log.error(`[SenderBroadcast] Failed to send campaign: ${message}`)
+      // Return the campaign id anyway so the caller can persist it and the
+      // reconciliation cron can pick up / retry / mark as failed later.
+      return { success: false, broadcastId: campaignId, error: message }
     }
 
     strapi.log.info(`[SenderBroadcast] Campaign sent successfully: ${campaignId}`)
@@ -155,7 +192,11 @@ export async function sendBroadcast(
     strapi.log.error(
       `[SenderBroadcast] Error sending broadcast: ${error instanceof Error ? error.message : String(error)}`
     )
-    return { success: false, error: "Failed to connect to newsletter service" }
+    const message =
+      error instanceof Error && error.message === "Sender.net request timed out"
+        ? error.message
+        : "Failed to connect to newsletter service"
+    return { success: false, error: message }
   }
 }
 
@@ -171,7 +212,6 @@ export async function sendTestEmail(
   error?: string
 }> {
   const apiKey = process.env.SENDER_API_KEY
-  const fromEmail = process.env.EMAIL_DEFAULT_FROM || "noreply@play14.org"
   const replyTo = process.env.EMAIL_REPLY_TO || "community@play14.org"
 
   if (!apiKey) {
@@ -179,15 +219,13 @@ export async function sendTestEmail(
     return { success: false, error: "Newsletter service is not configured" }
   }
 
-  try {
-    // Parse from address for Sender.net's { email, name } format
-    // Sender.net requires from.name to always be present
-    const fromMatch = fromEmail.match(/^(.+?)\s*<([^>]+)>$/)
-    const fromObj = fromMatch
-      ? { name: fromMatch[1].trim(), email: fromMatch[2].trim() }
-      : { email: fromEmail, name: "#play14 community" }
+  // Transactional /v2/message/send takes `from: { email, name }` — both
+  // required. parseFromAddress centralises the same logic the email provider
+  // uses (packages/api/providers/strapi-provider-email-sender).
+  const fromObj = parseFromAddress()
 
-    const response = await fetch("https://api.sender.net/v2/message/send", {
+  try {
+    const response = await fetchWithTimeout("https://api.sender.net/v2/message/send", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -204,9 +242,10 @@ export async function sendTestEmail(
     })
 
     if (!response.ok) {
-      const errorData = (await response.json()) as SenderErrorResponse
-      strapi.log.error(`[SenderBroadcast] Failed to send test email: ${errorData.message}`)
-      return { success: false, error: errorData.message || "Failed to send test email" }
+      const errorData = await safeJson(response)
+      const message = errorMessageFrom(errorData, "Failed to send test email")
+      strapi.log.error(`[SenderBroadcast] Failed to send test email: ${message}`)
+      return { success: false, error: message }
     }
 
     strapi.log.info(`[SenderBroadcast] Test email sent to ${email}`)
@@ -215,6 +254,10 @@ export async function sendTestEmail(
     strapi.log.error(
       `[SenderBroadcast] Error sending test email: ${error instanceof Error ? error.message : String(error)}`
     )
-    return { success: false, error: "Failed to connect to newsletter service" }
+    const message =
+      error instanceof Error && error.message === "Sender.net request timed out"
+        ? error.message
+        : "Failed to connect to newsletter service"
+    return { success: false, error: message }
   }
 }
