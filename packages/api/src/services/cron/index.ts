@@ -12,6 +12,7 @@ export {
 } from "./distributed-lock"
 export { processEventResultsReminders } from "./event-results-reminders"
 export { updateEventStatus } from "./events"
+export { decideReconciliation, reconcileNewsletterSends } from "./newsletter-reconciliation"
 
 export { updatePlayerPositions } from "./players"
 export {

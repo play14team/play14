@@ -20,6 +20,7 @@ import {
   cleanAbandonedDraftOrders,
   cleanExpiredTicketOrders,
   processEventResultsReminders,
+  reconcileNewsletterSends,
   reservationHealthCheck,
   updateEventStatus,
   updatePlayerPositions,
@@ -209,6 +210,19 @@ const cronTasks = {
       })
     ),
     options: { rule: "0 0 6 * * *" },
+  },
+
+  // Every 5 minutes - Reconcile newsletters stuck in "sending"
+  // Resolves state for newsletters whose first send attempt was interrupted
+  // between campaign creation and dispatch, by polling Sender.net.
+  reconcileNewsletters: {
+    task: withLock(
+      "reconcileNewsletters",
+      withErrorReporting("reconcileNewsletters", async ({ strapi }) => {
+        await reconcileNewsletterSends(strapi!)
+      })
+    ),
+    options: { rule: "0 */5 * * * *" },
   },
 }
 
