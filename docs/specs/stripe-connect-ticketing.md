@@ -1226,7 +1226,7 @@ Each webhook has its own signing secret for security.
 **Purpose**: Handle payments made directly to the platform account (standard checkout sessions).
 
 **Stripe Dashboard Configuration**:
-- **Endpoint URL**: `https://community-acc.play14.org/api/webhooks/stripe` (production)
+- **Endpoint URL**: `https://api.play14.org/api/webhooks/stripe` (production) or `https://api-staging.play14.org/api/webhooks/stripe` (staging)
 - **Events from**: `Your account` (platform account)
 - **Events to listen for**:
   - `checkout.session.completed` - Payment successful, create tickets
@@ -1244,7 +1244,7 @@ STRIPE_WEBHOOK_SECRET=whsec_xxx  # Platform webhook signing secret
 **Purpose**: Handle events from Stripe Connect accounts (host payments and account status).
 
 **Stripe Dashboard Configuration**:
-- **Endpoint URL**: `https://community-acc.play14.org/api/webhooks/stripe` (same endpoint!)
+- **Endpoint URL**: `https://api-staging.play14.org/api/webhooks/stripe` (same endpoint!)
 - **Events from**: `Connected accounts`
 - **Events to listen for**:
   - `account.updated` - Host account status changed (onboarding, capabilities)
@@ -1290,7 +1290,7 @@ stripe events resend evt_xxx --webhook-endpoint we_xxx
 | Environment | URL |
 |-------------|-----|
 | Production | `https://api.play14.org/api/webhooks/stripe` |
-| Acceptance | `https://community-acc.play14.org/api/webhooks/stripe` |
+| Staging | `https://api-staging.play14.org/api/webhooks/stripe` |
 | Development | `http://localhost:1337/api/webhooks/stripe` |
 
 ### 8.7 Monitoring Webhook Deliveries

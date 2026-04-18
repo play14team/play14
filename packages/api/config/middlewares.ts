@@ -68,8 +68,6 @@ export default ({ env }: { env: any }) => [
             "*.strapi.io",
             "s3.amazonaws.com",
             "https://cdn.ckeditor.com",
-            // Azure (legacy — kept during overlap with Clever Cloud cutover).
-            toOrigin(process.env.STORAGE_URL),
             toOrigin(process.env.STORAGE_CDN_URL),
             // Clever Cloud Cellar direct origin + Cloudflare-fronted custom domain.
             "https://cdn.play14.org",
@@ -82,8 +80,6 @@ export default ({ env }: { env: any }) => [
             "data:",
             "blob:",
             "dl.airtable.com",
-            // Azure (legacy — kept during overlap with Clever Cloud cutover).
-            toOrigin(process.env.STORAGE_URL),
             toOrigin(process.env.STORAGE_CDN_URL),
             // Clever Cloud Cellar direct origin + Cloudflare-fronted custom domain.
             "https://cdn.play14.org",

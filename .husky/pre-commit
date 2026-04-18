@@ -20,7 +20,7 @@ done
 # Run TypeScript check on packages with staged TS files
 if [ "$API_HAS_TS" = true ]; then
   echo "Running TypeScript check on packages/api..."
-  cd packages/api && bunx tsc --noEmit
+  cd packages/api && bunx tsc --noEmit -p tsconfig.typecheck.json
   if [ $? -ne 0 ]; then
     echo "TypeScript errors found in packages/api"
     exit 1

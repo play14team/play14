@@ -8,7 +8,7 @@ A global community platform for agile game players and facilitators.
 - **API**: [Strapi 5](https://strapi.io/) headless CMS with GraphQL + REST
 - **Frontend**: [Next.js 16](https://nextjs.org/) with React 19, TypeScript, SCSS
 - **Database**: PostgreSQL 17.6
-- **Hosting**: Azure Container Apps
+- **Hosting**: Clever Cloud (Node.js apps + PostgreSQL + Cellar + Redis add-ons)
 
 ## Project Structure
 

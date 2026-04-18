@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**#play14 API** is a Strapi 5 headless CMS serving the #play14 global community platform for agile game players and facilitators. Currently on `migration-v5` branch after upgrading from Strapi 4 with Node 22.
+**#play14 API** is a Strapi 5 headless CMS serving the #play14 global community platform for agile game players and facilitators.
 
-**Tech Stack**: Strapi 5.33.0, Node.js 22, PostgreSQL 14.5, Azure Container Apps, Azure Blob Storage, GraphQL + REST APIs
+**Tech Stack**: Strapi 5.42.0, Node.js 22, TypeScript 6, PostgreSQL 17, React 18.3 (admin panel), Clever Cloud (Node.js app + PostgreSQL + Cellar + Redis add-ons), GraphQL + REST APIs
 
 ## Common Development Commands
 
@@ -48,18 +48,11 @@ podman run -p 1337:1337 -it --env-file=./.env --name play14-api play14-api
 
 **Note**: This project uses Podman instead of Docker. All commands use `podman` and `podman compose` instead of `docker` and `docker-compose`.
 
-### Infrastructure Deployment (Bicep)
+### Infrastructure Deployment (Clever Cloud)
 
-```powershell
-# Validate Bicep templates
-bicep build iac/main.bicep
-
-# Deploy to dev environment
-az deployment group create --resource-group play14-dev --template-file iac/main.bicep --parameters @iac/dev.parameters.json
-
-# Validate without executing
-az deployment group validate --resource-group play14-dev --template-file iac/main.bicep --parameters @iac/dev.parameters.json
-```
+Provisioning lives in `iac/clever-cloud/` at the repo root. See that README for
+the full workflow. Routine deploys go through GitHub Actions
+(`clever-deploy-staging.yml`, `clever-deploy-production.yml`).
 
 ## Architecture & Code Structure
 
@@ -71,7 +64,7 @@ All API resources in `src/api/*/` follow this Strapi structure:
 src/api/{resource}/
 ├── content-types/{resource}/
 │   ├── schema.json         # Data model with customType fields
-│   └── lifecycles.js       # Hooks for slug generation, etc.
+│   └── lifecycles.ts       # Hooks for slug generation, etc.
 ├── controllers/            # Request handlers
 ├── services/               # Business logic layer
 └── routes/                 # Route definitions (auto-generated + custom)
@@ -102,17 +95,17 @@ src/api/{resource}/
 
 ### Slug Generation Pattern
 
-All content types auto-generate slugs in `lifecycles.js` using `src/libs/strings.js`:
+All content types auto-generate slugs in `lifecycles.ts` using `src/libs/strings.ts`:
 
-```javascript
-const { eventToSlug } = require("../../../../libs/strings")
+```typescript
+import { eventToSlug } from "../../../../libs/strings"
 
-module.exports = {
-  beforeCreate(event) {
+export default {
+  beforeCreate(event: any) {
     // Events use "name-MM" format (name + start month)
     event.params.data.slug = eventToSlug(event.params.data.name, event.params.data.start)
   },
-  beforeUpdate(event) {
+  beforeUpdate(event: any) {
     if (event.params.data.name || event.params.data.start) {
       event.params.data.slug = eventToSlug(event.params.data.name, event.params.data.start)
     }
@@ -124,7 +117,9 @@ module.exports = {
 
 ### Automated Tasks (Cron Jobs)
 
-Located in `config/cron-tasks.js`, using Document Service API:
+Located in `config/cron-tasks.ts`, using Document Service API. Tasks use
+Redis-based distributed locking so they only run on one container at a time
+when scaled out (see `src/services/cron/distributed-lock.ts`).
 
 **Event Status Automation** (daily at 00:00 UTC):
 
@@ -137,33 +132,33 @@ Located in `config/cron-tasks.js`, using Document Service API:
 - Founders are immutable
 - Uses populated relations to check event counts
 
-**Note**: Cron is disabled in production by default (`CRON_ENABLED=false` in `config/env/production/server.js`). Enable with environment variable.
+**Note**: Cron is disabled in production by default (`CRON_ENABLED=false` in `config/env/production/server.ts`). Enable with environment variable.
 
 ### GitHub Actions Integration
 
-Custom service in `src/api/github-trigger/services/github-trigger.js` triggers frontend (`play14-web`) rebuilds on content changes:
+Custom service in `src/api/github-trigger/services/github-trigger.ts` triggers frontend (`play14-web`) rebuilds on content changes:
 
 - Listens for publish/unpublish/delete events on: Events, Players, Games, Articles, Home, Venues, Hostings
 - Debounces triggers (5-second window)
 - Calls GitHub Actions API via `GITHUB_TOKEN`
 - Workflow: `play14team/play14-web` workflow ID `52506304`
-- Hooks registered in `src/extensions/github-trigger-lifecycles.js` (uses DB lifecycle API, not Document Service)
 
 ### Plugin Configuration
 
-Key plugins in `config/plugins.js`:
+Key plugins in `config/plugins.ts`:
 
 **GraphQL**:
 
 - Enabled with introspection for development
 - `v4CompatibilityMode: true` for migration compatibility
 
-**Upload (Azure Storage)**:
+**Upload (Clever Cloud Cellar via `@strapi/provider-upload-aws-s3`)**:
 
-- Provider: `strapi-provider-upload-azure-storage`
-- Container: `strapi_uploads`
-- CDN: `STORAGE_CDN_URL` environment variable
-- `defaultPath: "assets"` - don't change without CDN updates
+- Provider: `aws-s3` (Cellar is S3-compatible)
+- Credentials: `CELLAR_ADDON_KEY_ID`, `CELLAR_ADDON_KEY_SECRET` (auto-injected by the Cellar add-on)
+- Endpoint: `CELLAR_ADDON_HOST`, bucket `CELLAR_BUCKET`
+- CDN: `STORAGE_CDN_URL` environment variable (e.g., `https://cdn.play14.org`)
+- `defaultPath: "assets"` — don't change without CDN updates
 
 **Fuzzy Search**:
 
@@ -172,16 +167,15 @@ Key plugins in `config/plugins.js`:
 
 **CKEditor 5**:
 
-- Custom rich text editor (@\_sh/strapi-plugin-ckeditor 6.0.2)
-- Note: CKEditor v6 uses different config approach than v2
+- Custom rich text editor (`@_sh/strapi-plugin-ckeditor` 7.x)
 
 ### Custom Routes
 
 Standard Strapi routes are auto-generated. Custom routes include:
 
-**Event by Slug**: `src/api/event/routes/custom-event.js`
+**Event by Slug**: `src/api/event/routes/custom-event.ts`
 
-```javascript
+```typescript
 {
   method: 'GET',
   path: '/events/:slug',
@@ -191,26 +185,21 @@ Standard Strapi routes are auto-generated. Custom routes include:
 
 ## Critical Constraints
 
-### Frozen Dependencies (Now Updated)
-
-**Historical note**: These were previously frozen but had to be updated for Strapi 5:
-
-- ~~`react-router-dom` (was 5.3.4)~~ → Now 6.28.0 (test admin panel compatibility)
-- ~~`styled-components` (was 5.3.11)~~ → Now 6.1.13 (test admin panel compatibility)
-
 ### Database Configuration
 
-PostgreSQL with SSL enabled (`config/database.js`):
+PostgreSQL with SSL enabled (`config/database.ts`):
 
-```javascript
+```typescript
 {
   client: 'postgres',
   connection: {
-    host: env('DATABASE_HOST'),
-    port: env.int('DATABASE_PORT'),
-    database: env('DATABASE_NAME'),
-    user: env('DATABASE_USERNAME'),
-    password: env('DATABASE_PASSWORD'),
+    // DATABASE_* wins for local dev; falls back to Clever Cloud's auto-injected
+    // POSTGRESQL_ADDON_* credentials in staging/production.
+    host: env('DATABASE_HOST') || env('POSTGRESQL_ADDON_HOST', '127.0.0.1'),
+    port: env.int('DATABASE_PORT') || env.int('POSTGRESQL_ADDON_PORT', 5432),
+    database: env('DATABASE_NAME') || env('POSTGRESQL_ADDON_DB', 'strapi'),
+    user: env('DATABASE_USERNAME') || env('POSTGRESQL_ADDON_USER', 'strapi'),
+    password: env('DATABASE_PASSWORD') || env('POSTGRESQL_ADDON_PASSWORD', 'strapi'),
     ssl: env.bool('DATABASE_SSL', true) && {
       rejectUnauthorized: env.bool('DATABASE_SSL_SELF', false),
     },
@@ -218,15 +207,14 @@ PostgreSQL with SSL enabled (`config/database.js`):
 }
 ```
 
-**Important**: SSL required for Azure Database for PostgreSQL. Set `DATABASE_SSL_SELF=true` for local development with self-signed certificates.
+**Important**: SSL is required in production (Clever Cloud PostgreSQL add-on). Set `DATABASE_SSL_SELF=true` for local development with self-signed certificates. Clever Cloud auto-injects `POSTGRESQL_ADDON_*`; the config falls back to those when `DATABASE_*` is unset.
 
 ### Security & CORS
 
-CSP configured in `config/middlewares.js`:
+CSP configured in `config/middlewares.ts`:
 
 - Allows Mapbox CDN (`api.mapbox.com`, `cdn.jsdelivr.net`)
-- Azure Storage domains from `STORAGE_URL`/`STORAGE_CDN_URL`
-- `upgradeInsecureRequests: null` for Azure App Service compatibility
+- Cellar/CDN origins from `STORAGE_CDN_URL` + `https://cdn.play14.org` + `https://*.cellar-c2.services.clever-cloud.com`
 
 ### Package Manager
 
@@ -255,55 +243,49 @@ nvm use 22
 
 ## Deployment Pipeline
 
-### PR Deployment (Acceptance Environment)
+### Staging Deployment
 
-GitHub Actions workflow (`.github/workflows/pr-deployment.yml`):
+GitHub Actions workflow (`.github/workflows/clever-deploy-staging.yml`):
 
-- **Triggers**: Pull request events (opened, synchronize, reopened, closed) targeting `main`
-- **Authentication**: Federated credentials (OIDC) - passwordless via `play14-github-actions` service principal
-- **Container App**: `play14-api-acc` (acceptance environment)
-- **Custom Domain**: `community-acc.play14.org`
-- **Lifecycle**:
-  1. On PR open/update: Build image → Push to ACR → Deploy to `play14-api-acc` → Scale up (1 replica)
-  2. On PR close: Scale down to 0 replicas (cost optimization)
-- **Image Tags**: `pr-{number}` and `pr-{number}-{sha}` for each PR
+1. Triggers on push to the staging branch
+2. Builds with Bun
+3. Deploys to Clever Cloud app `play14-api-staging` via `clever-tools`
+4. Exposes `api-staging.play14.org` (set via `domains.sh`)
 
 ### Production Deployment
 
-GitHub Actions workflow (`.github/workflows/production-deployment.yml`):
+GitHub Actions workflow (`.github/workflows/clever-deploy-production.yml`):
 
 1. Triggers on `main` branch push
-2. Builds Docker image with Mapbox token build arg
-3. Pushes to Azure Container Registry
-4. Deploys to Azure Container App `play14-api` in `play14-community` resource group
+2. Builds with Bun
+3. Deploys to Clever Cloud app `play14-api`
+4. Exposes `api.play14.org`
 
 ### Infrastructure as Code
 
-**Bicep Templates**: `iac/main.bicep` with environment-specific parameters in `iac/bicep/parameters/`
+Provisioning scripts in `iac/clever-cloud/` (at the repo root):
 
-- **Provisioning Script**: `iac/cli/provision-acc.ps1` - Creates container app and federated credentials
-- **Validation Script**: `iac/cli/validate-deployment.ps1` - Pre-deployment checks
-- **Federated Credentials**:
-  - `play14-api-pr`: For PR deployments (`repo:play14team/play14-api:pull_request`)
-  - `play14-api-main`: For production deployments (`repo:play14team/play14-api:ref:refs/heads/main`)
-
-See [iac/DEPLOYMENT_GUIDE.md](iac/DEPLOYMENT_GUIDE.md) for detailed deployment documentation.
+- `provision.sh` — creates the 4 apps + 6 add-ons (PG/Cellar/Redis × staging/prod)
+- `buckets.sh` — creates Cellar buckets and applies CORS
+- `set-env.sh` — applies env var files to a Clever Cloud app
+- `domains.sh` — attaches custom domains (staging + production)
 
 ## Environment Variables
 
 Critical variables (see `.env.example`):
 
-**Database**:
+**Database** (Clever Cloud auto-injects `POSTGRESQL_ADDON_*`; override with the
+`DATABASE_*` names for local dev):
 
 - `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
-- `DATABASE_SSL=true` (required for Azure)
+- `DATABASE_SSL=true` (required in production)
 - `DATABASE_DEBUG=false` (set true for query debugging)
 
-**Azure Storage**:
+**Storage (Cellar)** — auto-injected by the Cellar add-on:
 
-- `STORAGE_ACCOUNT`, `STORAGE_ACCOUNT_KEY`
-- `STORAGE_URL` (blob storage base URL)
-- `STORAGE_CDN_URL` (CDN endpoint)
+- `CELLAR_ADDON_HOST`, `CELLAR_ADDON_KEY_ID`, `CELLAR_ADDON_KEY_SECRET`
+- `CELLAR_BUCKET` (bucket name)
+- `STORAGE_CDN_URL` (public CDN URL, e.g., `https://cdn.play14.org`)
 
 **Security**:
 
@@ -562,7 +544,7 @@ players/
 1. **Slug Conflicts**: Don't manually set slugs - lifecycle hooks auto-generate them
 2. **GraphQL Cache**: Restart dev server after schema changes to refresh introspection
 3. **Custom Fields**: Current blocker - plugins installed but not registering with Strapi 5
-4. **Azure Upload**: `defaultPath: "assets"` required - don't change without CDN updates
+4. **Upload defaultPath**: `defaultPath: "assets"` required - don't change without CDN updates
 5. **Node Version**: Use Node 22 exactly (`.nvmrc`)
 6. **Bun Only**: Never use npm or yarn - package manager pinned to bun@1.3.5
 7. **Cron Jobs**: Disabled by default - enable with `CRON_ENABLED=true` in production
@@ -608,40 +590,35 @@ For Strapi 5 reference, use the official docs at https://docs.strapi.io:
 - `nodejs.instructions.md` - Node.js/JavaScript guidelines
 - `testing.instructions.md` - Testing standards
 - `security.instructions.md` - Security best practices
-- `bicep.instructions.md` - Infrastructure as Code
-- And 11 more domain-specific guides
+- Plus performance, code-review, documentation, and codacy guides
 
 **Reusable Prompts**: See `.github/prompts/` for common tasks:
 
 - `setup-strapi-component.prompt.md`
-- `deploy-azure-infrastructure.prompt.md`
 - `write-tests.prompt.md`
-- And 13 more task-specific prompts
+- `code-review.prompt.md`, `debug-issue.prompt.md`, `generate-docs.prompt.md`, `refactor-code.prompt.md`
 
 **Chat Modes**: See `.github/chatmodes/` for specialized AI roles:
 
 - `strapi-architect.chatmode.md` - Architecture planning
-- `azure-architect.chatmode.md` - Infrastructure design
+- `reviewer.chatmode.md` - Code review
 - `debugger.chatmode.md` - Bug hunting
-- And 4 more specialized modes
 
 ## Key File Locations
 
 | Component              | Path                                                   |
 | ---------------------- | ------------------------------------------------------ |
-| Main bootstrap         | `src/index.js`                                         |
+| Main bootstrap         | `src/index.ts`                                         |
 | API definitions        | `src/api/`                                             |
-| Slug utilities         | `src/libs/strings.js`                                  |
+| Slug utilities         | `src/libs/strings.ts`                                  |
 | Config files           | `config/`                                              |
-| Database config        | `config/database.js`                                   |
-| Cron tasks             | `config/cron-tasks.js`                                 |
-| Plugin config          | `config/plugins.js`                                    |
-| Middleware config      | `config/middlewares.js`                                |
-| GitHub trigger service | `src/api/github-trigger/services/github-trigger.js`    |
-| Lifecycle extensions   | `src/extensions/github-trigger-lifecycles.js`          |
+| Database config        | `config/database.ts`                                   |
+| Cron tasks             | `config/cron-tasks.ts`                                 |
+| Plugin config          | `config/plugins.ts`                                    |
+| Middleware config      | `config/middlewares.ts`                                |
+| GitHub trigger service | `src/api/github-trigger/services/github-trigger.ts`    |
 | Admin config           | `src/admin/app.tsx`                                    |
 | Components             | `src/components/`                                      |
-| Bootstrap data         | `bootstrap/`                                           |
-| Infrastructure         | `iac/bicep/`                                           |
-| Containers             | `Dockerfile`, `docker-compose.yml` (Podman compatible) |
-| Migration docs         | `MIGRATION_STATUS.md`, `MIGRATION_PLAN_STRAPI5.md`     |
+| Bootstrap hooks        | `src/bootstrap/`                                       |
+| Infrastructure         | `../../iac/clever-cloud/`                              |
+| Containers             | `Dockerfile`, `../../compose.yaml` (Podman compatible) |

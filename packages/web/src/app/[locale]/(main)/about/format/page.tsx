@@ -48,7 +48,7 @@ export default async function FormatPage() {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://play14-cdn.azureedge.net/strapi-uploads/assets/Open_Space_Principles_90f3d4c6a3.pdf?updated_at=2023-02-28T19:36:28.496Z"
+                href="https://cdn.play14.org/strapi-uploads/assets/Open_Space_Principles_90f3d4c6a3.pdf"
               >
                 {chunks}
               </a>

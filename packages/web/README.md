@@ -10,7 +10,7 @@ Next.js 16 frontend for the #play14 global community platform.
 - **Runtime**: React 19, TypeScript 5.9
 - **Styling**: SCSS
 - **Maps**: Mapbox GL
-- **Hosting**: Azure Container Apps
+- **Hosting**: Clever Cloud Node.js app
 
 ## Getting Started
 

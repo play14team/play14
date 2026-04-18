@@ -31,12 +31,6 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
-      {
-        protocol: "https",
-        hostname: "play14-cdn.azureedge.net",
-        port: "",
-        pathname: "/strapi-uploads/assets/**",
-      },
       // Clever Cloud Cellar direct origin (covers any bucket under cellar-c2).
       // cdn.play14.org pattern above already handles the Cloudflare-fronted CDN URLs.
       {

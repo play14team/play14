@@ -183,7 +183,6 @@ description: "Java Spring Boot development standards"
 - **C# .NET Development**: Testing, documentation, and best practices
 - **Java Development**: Spring Boot, Quarkus, testing, documentation
 - **Database Development**: PostgreSQL, SQL Server, and general database best practices
-- **Azure Development**: Infrastructure as Code, serverless functions
 - **Security & Performance**: Security frameworks, accessibility, performance optimization
 
 ## File Structure Standards
