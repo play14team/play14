@@ -7,24 +7,17 @@
  * - Correlation IDs for request tracing
  */
 
-import { randomBytes } from "node:crypto"
-import { join } from "node:path"
-import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
-import PlayerInvitationEmail from "../../../emails/player-invitation"
-import {
-  generateEventICS,
-  generateGoogleCalendarUrl,
-  generateOutlookCalendarUrl,
-} from "../../../libs/calendar"
-import { formatTicketItems, generateInvoicePDF, type InvoiceData } from "../../../libs/invoice"
-import { nameToUsername } from "../../../libs/strings"
 import { generateTicketCode } from "../../../libs/tickets"
-import { sendTicketSoldNotificationEmail as sendTicketSoldNotification } from "../../../services/email-templates"
+import {
+  sendOrderConfirmationEmail,
+  sendPaymentFailedEmail as sendPaymentFailedNotification,
+  sendPlayerInvitationEmail as sendPlayerInvitationNotification,
+  sendStripeAccountStatusEmail,
+  sendTicketSoldNotificationEmail as sendTicketSoldNotification,
+} from "../../../services/email-templates"
 import { generateCorrelationId, startTimer } from "../../../services/observability/logger"
 import {
-  emailSendDuration,
-  emailSendTotal,
   webhookProcessingDuration,
   webhookProcessingTotal,
 } from "../../../services/observability/metrics"
@@ -53,15 +46,6 @@ interface AttendeeInfo {
   foodPreferences?: string
   photoConsent: boolean
   photoConsentTimestamp?: string
-}
-
-const getLogoUrl = (): string => {
-  if (process.env.LOGO_URL) {
-    return process.env.LOGO_URL
-  }
-  const publicUrl = process.env.PUBLIC_URL || "http://localhost:1337"
-  const baseUrl = publicUrl.endsWith("/") ? publicUrl.slice(0, -1) : publicUrl
-  return `${baseUrl}/images/play14_600x200_transparent-light.png`
 }
 
 /**
@@ -516,7 +500,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
-   * Send invitation email to a newly created player with calendar attachment
+   * Send invitation email to a newly created player with calendar attachment.
+   * Delegates to the shared service so all email-sending logic (user creation,
+   * reset token, metrics) lives in one place.
    */
   async sendPlayerInvitationEmail(
     email: string,
@@ -525,190 +511,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     ticketCode: string,
     event: any
   ) {
-    const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-
-    const eventDate = new Date(event.start).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-
-    const eventTime = new Date(event.start).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-
-    const eventLocation = event.venue
-      ? `${event.venue.name}${event.venue.location?.place_name ? ` - ${event.venue.location.place_name}` : ""}`
-      : event.location
-        ? `${event.location.name}, ${event.location.country}`
-        : "Location TBA"
-
-    // Generate password reset token for the player's user account
-    const resetToken = randomBytes(64).toString("hex")
-
-    // Find or create the user associated with this player
-    let user = await strapi.documents("plugin::users-permissions.user").findFirst({
-      filters: { player: { documentId: player.documentId } },
-    })
-
-    if (!user) {
-      // No user exists - check if there's a user with this email (not linked to player yet)
-      user = await strapi.documents("plugin::users-permissions.user").findFirst({
-        filters: { email: { $eqi: email } },
-      })
-
-      if (user) {
-        // User exists but not linked to player - link them
-        await strapi.documents("plugin::users-permissions.user").update({
-          documentId: user.documentId,
-          data: {
-            player: player.id,
-            resetPasswordToken: resetToken,
-          } as any,
-        })
-        strapi.log.info(`[Webhook] Linked existing user ${email} to player ${player.documentId}`)
-      } else {
-        // Create a new user account
-        const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
-          filters: { type: "player" },
-        })
-
-        const password = `${randomBytes(16).toString("hex")}!`
-
-        user = await strapi.documents("plugin::users-permissions.user").create({
-          data: {
-            username: nameToUsername(playerName),
-            email,
-            password,
-            confirmed: true,
-            blocked: false,
-            provider: "local",
-            role: playerRole?.id,
-            player: player.id,
-            invitationStatus: "pending",
-            resetPasswordToken: resetToken,
-          } as any,
-        })
-        strapi.log.info(
-          `[Webhook] Created new user account for ${email} and linked to player ${player.documentId}`
-        )
-      }
-    } else {
-      // User already exists and is linked - just update the reset token
-      await strapi.documents("plugin::users-permissions.user").update({
-        documentId: user.documentId,
-        data: { resetPasswordToken: resetToken } as any,
-      })
-    }
-
-    // Build reset password URL (similar to user-invitations.ts)
-    const callbackUrl = encodeURIComponent("/admin")
-    const code = encodeURIComponent(resetToken)
-    const resetPasswordUrl = `${frontendUrl}/auth/reset-password?code=${code}&callbackUrl=${callbackUrl}`
-
-    // Generate calendar data
-    let icsContent: string | null = null
-    let googleCalendarUrl = ""
-    let outlookCalendarUrl = ""
-
-    try {
-      const eventData = {
-        name: event.name,
-        slug: event.slug,
-        description: event.description,
-        start: event.start,
-        end: event.end,
-        eventStatus: event.eventStatus,
-        contactEmail: event.contactEmail,
-        venue: event.venue,
-      }
-
-      icsContent = await generateEventICS(eventData)
-      googleCalendarUrl = generateGoogleCalendarUrl(eventData)
-      outlookCalendarUrl = generateOutlookCalendarUrl(eventData)
-    } catch (calError: any) {
-      // NON-CRITICAL FAILURE: Calendar generation failed but order processing continues.
-      // The user will still receive the email, just without calendar links/attachment.
-      // TODO: Integrate with monitoring system to track frequency of these failures
-      strapi.log.warn(`[Webhook] Failed to generate calendar for invitation: ${calError.message}`)
-    }
-
-    try {
-      const html = await render(
-        PlayerInvitationEmail({
-          playerName,
-          ticketCode,
-          eventName: event.name,
-          eventDate,
-          eventTime,
-          eventLocation,
-          resetPasswordUrl,
-          googleCalendarUrl,
-          outlookCalendarUrl,
-          frontendUrl,
-        })
-      )
-
-      const text = await render(
-        PlayerInvitationEmail({
-          playerName,
-          ticketCode,
-          eventName: event.name,
-          eventDate,
-          eventTime,
-          eventLocation,
-          resetPasswordUrl,
-          googleCalendarUrl,
-          outlookCalendarUrl,
-          frontendUrl,
-        }),
-        { plainText: true }
-      )
-
-      const emailOptions: any = {
-        to: email,
-        subject: `[#play14] Your ticket for ${event.name} - Create your profile`,
-        html,
-        text,
-      }
-
-      // Add ICS attachment if generated successfully
-      if (icsContent) {
-        emailOptions.attachments = [
-          {
-            filename: `${event.slug || "play14-event"}.ics`,
-            content: Buffer.from(icsContent),
-            contentType: "text/calendar",
-          },
-        ]
-      }
-
-      await strapi.plugin("email").service("email").send(emailOptions)
-
-      // Update invitation status to prevent duplicate emails from cron job
-      // This is critical for multi-container deployments where cron runs on all instances
-      await strapi.documents("plugin::users-permissions.user").update({
-        documentId: user.documentId,
-        data: {
-          invitationStatus: "sent",
-          invitationSentAt: new Date().toISOString(),
-        } as any,
-      })
-
-      strapi.log.info(`[Webhook] Player invitation email sent to ${email}`)
-    } catch (error: any) {
-      // NON-CRITICAL FAILURE: Email sending failed but order is still valid.
-      // The ticket was created successfully; user just won't receive their invitation email.
-      // TODO: Integrate with monitoring/alerting system for:
-      // 1. Immediate notification to support team
-      // 2. Retry mechanism for failed emails
-      // 3. Dashboard to track email delivery rates
-      strapi.log.error(
-        `[Webhook] Failed to send player invitation email to ${email}: ${error.message}`
-      )
-    }
+    await sendPlayerInvitationNotification(strapi, email, playerName, player, ticketCode, event)
   },
 
   /**
@@ -897,98 +700,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
-   * Send payment failure notification email with metrics tracking
+   * Send payment failure notification email.
+   * Delegates to the shared email template service which owns rendering,
+   * metrics, and error handling.
    */
   async sendPaymentFailedEmail(
     order: any,
     errorMessage: string,
     correlationId: string = generateCorrelationId()
   ) {
-    const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-    const logoUrl = getLogoUrl()
-    const emailTimer = startTimer()
-
-    try {
-      await strapi
-        .plugin("email")
-        .service("email")
-        .send({
-          to: order.purchaserEmail,
-          subject: `[#play14] Payment failed for ${order.event?.name || "your order"}`,
-          text: `
-Unfortunately, your payment could not be processed.
-
-Order: ${order.orderNumber}
-Event: ${order.event?.name || "Unknown"}
-Error: ${errorMessage}
-
-Please try again: ${frontendUrl}/events/${order.event?.slug || ""}
-
-If you continue to experience issues, please contact us.
-
-The #play14 Team
-        `.trim(),
-          html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .header { background: #1a1a1a; padding: 30px 20px; text-align: center; }
-    .header img { max-width: 200px; height: auto; }
-    .content { padding: 30px 20px; background: #ffffff; }
-    .error-box { background: #fff3f3; border-left: 4px solid #e53935; padding: 15px; margin: 20px 0; }
-    .footer { text-align: center; padding: 20px; background: #f5f5f5; color: #666; font-size: 12px; }
-    .btn { display: inline-block; background: #f47920; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="${logoUrl}" alt="#play14" />
-    </div>
-    <div class="content">
-      <h2>Payment Failed</h2>
-      <p>Unfortunately, your payment could not be processed.</p>
-
-      <p><strong>Order:</strong> ${order.orderNumber}</p>
-      <p><strong>Event:</strong> ${order.event?.name || "Unknown"}</p>
-
-      <div class="error-box">
-        <strong>Error:</strong> ${errorMessage}
-      </div>
-
-      <p>This can happen for various reasons, such as insufficient funds, incorrect card details, or a temporary issue with your bank.</p>
-
-      <a href="${frontendUrl}/events/${order.event?.slug || ""}" class="btn">Try Again</a>
-
-      <p style="margin-top: 30px;">If you continue to experience issues, please contact us.</p>
-    </div>
-    <div class="footer">
-      <p>The #play14 Team</p>
-      <p><a href="${frontendUrl}" style="color: #f47920;">play14.org</a></p>
-    </div>
-  </div>
-</body>
-</html>
-        `.trim(),
-        })
-
-      const durationMs = emailTimer.elapsed()
-      emailSendTotal.inc({ email_type: "payment_failed", status: "success" })
-      emailSendDuration.observe({ email_type: "payment_failed" }, durationMs / 1000)
-      strapi.log.info(
-        `[Webhook] Payment failed email sent to ${order.purchaserEmail} | order=${order.orderNumber}, durationMs=${durationMs}, correlationId=${correlationId}`
-      )
-    } catch (error: any) {
-      const durationMs = emailTimer.elapsed()
-      emailSendTotal.inc({ email_type: "payment_failed", status: "error" })
-      emailSendDuration.observe({ email_type: "payment_failed" }, durationMs / 1000)
-      strapi.log.error(
-        `[Webhook] Failed to send payment failed email: ${error.message} | email_type=payment_failed, order=${order.orderNumber}, to=${order.purchaserEmail}, durationMs=${durationMs}, correlationId=${correlationId}`
-      )
-    }
+    await sendPaymentFailedNotification(strapi, order, errorMessage, correlationId)
   },
 
   /**
@@ -999,7 +720,25 @@ The #play14 Team
     correlationId: string = generateCorrelationId()
   ) {
     const paymentIntent = chargeData.payment_intent as string
-    const amountRefunded = (chargeData.amount_refunded as number) / 100
+    // Amounts are in minor units (e.g. cents); keep them in that form for
+    // comparison, and only convert to major units for the stored refund amount.
+    const amountRefundedMinor = (chargeData.amount_refunded as number) || 0
+    const amountTotalMinor = (chargeData.amount as number) || 0
+    const isPartialRefund = amountRefundedMinor > 0 && amountRefundedMinor < amountTotalMinor
+    const newOrderStatus: "refunded" | "partially_refunded" = isPartialRefund
+      ? "partially_refunded"
+      : "refunded"
+    const amountRefunded = amountRefundedMinor / 100
+
+    // Resolve a refund reason from either the top-level `reason` (manual
+    // refunds from the Stripe dashboard often set this) or from the first
+    // entry of the `refunds.data[]` collection when available.
+    const topLevelReason =
+      typeof chargeData.reason === "string" && chargeData.reason ? chargeData.reason : null
+    const refundsList = (chargeData.refunds as { data?: Array<{ reason?: string | null }> }) || {}
+    const firstRefundReason =
+      refundsList.data && refundsList.data.length > 0 ? refundsList.data[0]?.reason || null : null
+    const refundReason = topLevelReason || firstRefundReason || null
 
     if (!paymentIntent) {
       strapi.log.warn(
@@ -1031,64 +770,76 @@ The #play14 Team
     const eventName = order.event?.name || "unknown"
     const ticketCount = order.tickets?.length || 0
 
-    if (order.status === "refunded") {
+    // Early-return guard: treat both fully- and partially-refunded orders as
+    // already processed to avoid duplicate ticket/attendee mutations when
+    // Stripe replays the webhook.
+    if (order.status === "refunded" || order.status === "partially_refunded") {
       strapi.log.info(
-        `[Webhook] Order ${orderNumber} already refunded | event=${eventName}, correlationId=${correlationId}`
+        `[Webhook] Order ${orderNumber} already ${order.status} | event=${eventName}, correlationId=${correlationId}`
       )
       return
     }
 
     // Update order status
+    const orderUpdateData: Record<string, unknown> = {
+      status: newOrderStatus,
+      refundedAt: new Date().toISOString(),
+      refundAmount: amountRefunded,
+    }
+    if (refundReason) {
+      orderUpdateData.refundReason = refundReason
+    }
+
     await strapi.documents("api::ticket-order.ticket-order").update({
       documentId: order.documentId,
-      data: {
-        status: "refunded",
-        refundedAt: new Date().toISOString(),
-        refundAmount: amountRefunded,
-      } as any,
+      data: orderUpdateData as any,
     })
 
-    // Update all tickets to refunded and decrement sold counts
-    const ticketTypeCounts = new Map<string, number>()
-    for (const ticket of order.tickets || []) {
-      await strapi.documents("api::ticket.ticket").update({
-        documentId: ticket.documentId,
-        data: { ticketStatus: "refunded" } as any,
-      })
-
-      // Count tickets per ticket type for sold_count decrement
-      if (ticket.ticketType?.documentId) {
-        const current = ticketTypeCounts.get(ticket.ticketType.documentId) || 0
-        ticketTypeCounts.set(ticket.ticketType.documentId, current + 1)
-      }
-    }
-
-    // Decrement sold_count for each ticket type
-    for (const [ticketTypeDocumentId, count] of ticketTypeCounts) {
-      await strapi.db
-        .connection("ticket_types")
-        .where("document_id", ticketTypeDocumentId)
-        .decrement("sold_count", count)
-    }
-
-    // Remove player from event attendees
-    if (order.player && order.event) {
-      const playerDoc = await strapi.documents("api::player.player").findOne({
-        documentId: order.player.documentId,
-        populate: { attended: { fields: ["id", "documentId"] } },
-      })
-
-      if (playerDoc) {
-        const updatedAttended = (playerDoc.attended || []).filter(
-          (e: any) => e.documentId !== order.event.documentId
-        )
-
-        await strapi.documents("api::player.player").update({
-          documentId: order.player.documentId,
-          data: {
-            attended: updatedAttended.map((e: any) => e.id),
-          } as any,
+    // For full refunds, update all tickets to refunded and decrement sold
+    // counts. Partial refunds don't map cleanly to per-ticket states, so we
+    // keep tickets as-is and just record the order-level state.
+    if (!isPartialRefund) {
+      const ticketTypeCounts = new Map<string, number>()
+      for (const ticket of order.tickets || []) {
+        await strapi.documents("api::ticket.ticket").update({
+          documentId: ticket.documentId,
+          data: { ticketStatus: "refunded" } as any,
         })
+
+        // Count tickets per ticket type for sold_count decrement
+        if (ticket.ticketType?.documentId) {
+          const current = ticketTypeCounts.get(ticket.ticketType.documentId) || 0
+          ticketTypeCounts.set(ticket.ticketType.documentId, current + 1)
+        }
+      }
+
+      // Decrement sold_count for each ticket type
+      for (const [ticketTypeDocumentId, count] of ticketTypeCounts) {
+        await strapi.db
+          .connection("ticket_types")
+          .where("document_id", ticketTypeDocumentId)
+          .decrement("sold_count", count)
+      }
+
+      // Remove player from event attendees
+      if (order.player && order.event) {
+        const playerDoc = await strapi.documents("api::player.player").findOne({
+          documentId: order.player.documentId,
+          populate: { attended: { fields: ["id", "documentId"] } },
+        })
+
+        if (playerDoc) {
+          const updatedAttended = (playerDoc.attended || []).filter(
+            (e: any) => e.documentId !== order.event.documentId
+          )
+
+          await strapi.documents("api::player.player").update({
+            documentId: order.player.documentId,
+            data: {
+              attended: updatedAttended.map((e: any) => e.id),
+            } as any,
+          })
+        }
       }
     }
 
@@ -1098,7 +849,7 @@ The #play14 Team
     }
 
     strapi.log.info(
-      `[Webhook] Order ${orderNumber} refunded via Stripe dashboard | event=${eventName}, ticketCount=${ticketCount}, refundedAmount=${amountRefunded}, correlationId=${correlationId}`
+      `[Webhook] Order ${orderNumber} ${newOrderStatus} via Stripe dashboard | event=${eventName}, ticketCount=${ticketCount}, refundedAmount=${amountRefunded}, correlationId=${correlationId}`
     )
   },
 
@@ -1133,6 +884,14 @@ The #play14 Team
       return
     }
 
+    // Snapshot the previous status before computing the new one so we can
+    // detect transitions and notify the host when the status changes.
+    const previousStatus = (stripeAccount.accountStatus || "pending") as
+      | "pending"
+      | "active"
+      | "restricted"
+      | "disabled"
+
     // Determine account status based on capabilities
     let accountStatus: "pending" | "active" | "restricted" | "disabled" = "pending"
     if (chargesEnabled && payoutsEnabled) {
@@ -1162,10 +921,23 @@ The #play14 Team
     strapi.log.info(
       `[Webhook] Stripe account ${stripeAccountId} updated | status=${accountStatus}, chargesEnabled=${chargesEnabled}, payoutsEnabled=${payoutsEnabled}, correlationId=${correlationId}`
     )
+
+    // Notify the host when the account status changes. The helper itself
+    // handles the `pending` landing state and missing host-email guards.
+    if (accountStatus !== previousStatus) {
+      await sendStripeAccountStatusEmail(
+        strapi,
+        { ...stripeAccount, ...updateData },
+        previousStatus,
+        accountStatus
+      )
+    }
   },
 
   /**
-   * Send order confirmation email with calendar attachment and invoice PDF
+   * Send order confirmation email with calendar attachment and invoice PDF.
+   * Delegates to the shared email template service which owns rendering,
+   * invoice generation, metrics, and error handling.
    */
   async sendConfirmationEmail(
     order: any,
@@ -1178,17 +950,11 @@ The #play14 Team
       isNewPlayer: boolean
     }>
   ) {
-    const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
-    // Logo URL must be publicly accessible for email clients
-    const logoUrl = getLogoUrl()
+    let tickets = createdTickets
 
-    let tickets: any[]
-
-    if (createdTickets) {
-      // Use pre-built ticket data
-      tickets = createdTickets
-    } else {
-      // Fetch tickets for the order (legacy path)
+    // Legacy path: no createdTickets passed in → fetch from the database so
+    // the service still receives a full list.
+    if (!tickets) {
       const dbTickets = await strapi.documents("api::ticket.ticket").findMany({
         filters: { order: { id: order.id } },
         populate: {
@@ -1200,264 +966,12 @@ The #play14 Team
         ticketTypeName: t.ticketType?.name || "Ticket",
         attendeeName: t.attendeeName,
         attendeeEmail: t.attendeeEmail,
+        player: null,
+        isNewPlayer: false,
       }))
     }
 
-    // Build ticket list for plain text
-    const ticketList = tickets
-      .map((t) => `- ${t.ticketTypeName}: ${t.ticketCode} (${t.attendeeName})`)
-      .join("\n")
-
-    // Build ticket list for HTML - show attendee names for each ticket
-    const ticketListHtml = tickets
-      .map(
-        (t) =>
-          `<li>
-            <strong>${t.ticketTypeName}</strong>: <code>${t.ticketCode}</code>
-            <br/><span style="color: #666; font-size: 13px;">Attendee: ${t.attendeeName}</span>
-          </li>`
-      )
-      .join("")
-
-    // Generate calendar data
-    let icsContent: string | null = null
-    let googleCalendarUrl = ""
-    let outlookCalendarUrl = ""
-
-    try {
-      const eventData = {
-        name: order.event.name,
-        slug: order.event.slug,
-        description: order.event.description,
-        start: order.event.start,
-        end: order.event.end,
-        eventStatus: order.event.eventStatus,
-        contactEmail: order.event.contactEmail,
-        venue: order.event.venue,
-      }
-
-      icsContent = await generateEventICS(eventData)
-      googleCalendarUrl = generateGoogleCalendarUrl(eventData)
-      outlookCalendarUrl = generateOutlookCalendarUrl(eventData)
-    } catch (calError: any) {
-      // NON-CRITICAL FAILURE: Calendar generation failed but email will still be sent.
-      // TODO: Integrate with monitoring system to track frequency of these failures
-      strapi.log.warn(`[Webhook] Failed to generate calendar data: ${calError.message}`)
-    }
-
-    // Generate invoice PDF
-    let invoicePDF: Buffer | null = null
-
-    try {
-      const invoiceData: InvoiceData = {
-        orderNumber: order.orderNumber,
-        invoiceNumber: order.orderNumber, // Use order number as invoice number
-        invoiceDate: order.paidAt || new Date().toISOString(),
-        purchaserName: order.purchaserName,
-        purchaserEmail: order.purchaserEmail,
-        eventName: order.event.name,
-        eventDate: new Date(order.event.start).toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        eventLocation: order.event.venue
-          ? `${order.event.venue.name}${order.event.venue.location?.place_name ? ` - ${order.event.venue.location.place_name}` : ""}`
-          : order.event.location
-            ? `${order.event.location.name}, ${order.event.location.country}`
-            : "Location TBA",
-        tickets: formatTicketItems(order.ticketDetails || []),
-        subtotal: order.originalAmount || order.totalAmount,
-        discountAmount: order.discountAmount || 0,
-        totalAmount: order.totalAmount,
-        currency: order.currency,
-        paymentMethod: "Stripe",
-        notes: order.notes || undefined,
-      }
-
-      // Logo path - anchor to app root so it works in both src and dist builds
-      const logoPath = join(process.cwd(), "public/images/play14_600x200_transparent-light.png")
-
-      invoicePDF = await generateInvoicePDF(invoiceData, {
-        organizationName: "#play14",
-        organizationWebsite: "https://play14.org",
-        // Use event contact email in invoice, fallback to team@play14.org
-        organizationEmail: order.event.contactEmail || "team@play14.org",
-        logoPath,
-      })
-
-      strapi.log.info(`[Webhook] Invoice PDF generated for order ${order.orderNumber}`)
-    } catch (invoiceError: any) {
-      // NON-CRITICAL FAILURE: Invoice generation failed but email will still be sent.
-      // The customer paid successfully and will receive ticket codes without invoice.
-      strapi.log.warn(`[Webhook] Failed to generate invoice PDF: ${invoiceError.message}`)
-    }
-
-    // Format event date for display
-    const eventDate = new Date(order.event.start).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    })
-
-    const eventTime = new Date(order.event.start).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-
-    const eventLocation = order.event.venue
-      ? `${order.event.venue.name}${order.event.venue.location?.place_name ? ` - ${order.event.venue.location.place_name}` : ""}`
-      : order.event.location
-        ? `${order.event.location.name}, ${order.event.location.country}`
-        : "Location TBA"
-
-    // Calendar section HTML
-    const calendarSectionHtml = `
-      <div style="background: #f0f7ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2196f3;">
-        <h3 style="margin-top: 0; color: #1976d2;">Add to Your Calendar</h3>
-        <p style="margin-bottom: 15px;">
-          <strong>Date:</strong> ${eventDate} at ${eventTime}<br/>
-          <strong>Location:</strong> ${eventLocation}
-        </p>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          ${googleCalendarUrl ? `<a href="${googleCalendarUrl}" target="_blank" style="display: inline-block; background: #4285f4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Google Calendar</a>` : ""}
-          ${outlookCalendarUrl ? `<a href="${outlookCalendarUrl}" target="_blank" style="display: inline-block; background: #0078d4; color: #ffffff !important; padding: 10px 16px; text-decoration: none; border-radius: 4px; font-size: 13px;">Outlook</a>` : ""}
-        </div>
-        <p style="margin-top: 12px; margin-bottom: 0; font-size: 12px; color: #666;">
-          An .ics calendar file is also attached to this email for other calendar apps.
-        </p>
-      </div>
-    `
-
-    try {
-      const emailOptions: any = {
-        to: order.purchaserEmail,
-        subject: `[#play14] Your tickets for ${order.event.name}`,
-        text: `
-Thank you for your purchase!
-
-Order: ${order.orderNumber}
-Event: ${order.event.name}
-Date: ${eventDate} at ${eventTime}
-Location: ${eventLocation}
-Amount: ${order.currency} ${order.totalAmount.toFixed(2)}
-
-Your tickets:
-${ticketList}
-
-Add to your calendar:
-- Google Calendar: ${googleCalendarUrl}
-- Outlook: ${outlookCalendarUrl}
-
-View your tickets: ${frontendUrl}/admin/tickets
-${order.event.contactEmail ? `\nQuestions about the event? Contact the organizers at ${order.event.contactEmail}` : ""}
-
-See you at the event!
-
-The #play14 Team
-        `.trim(),
-        html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .header { background: #1a1a1a; padding: 30px 20px; text-align: center; }
-    .header img { max-width: 200px; height: auto; }
-    .content { padding: 30px 20px; background: #ffffff; }
-    .tickets { background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .tickets ul { margin: 0; padding: 0; list-style: none; }
-    .tickets li { padding: 12px 0; border-bottom: 1px solid #eee; }
-    .tickets li:last-child { border-bottom: none; }
-    .footer { text-align: center; padding: 20px; background: #f5f5f5; color: #666; font-size: 12px; }
-    code { background: #fff3e0; padding: 4px 8px; border-radius: 4px; font-family: monospace; color: #f47920; }
-    .btn { display: inline-block; background: #f47920; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 6px; margin-top: 20px; font-weight: bold; }
-    h2 { color: #333; margin-top: 0; }
-    h3 { color: #333; margin-top: 0; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <img src="${logoUrl}" alt="#play14" />
-    </div>
-    <div class="content">
-      <h2>Thank you for your purchase!</h2>
-      <p><strong>Order:</strong> ${order.orderNumber}</p>
-      <p><strong>Event:</strong> ${order.event.name}</p>
-      <p><strong>Amount:</strong> ${order.currency} ${order.totalAmount.toFixed(2)}</p>
-
-      <div class="tickets">
-        <h3>Your Tickets</h3>
-        <ul>
-          ${ticketListHtml}
-        </ul>
-      </div>
-
-      ${calendarSectionHtml}
-
-      <p>Keep these ticket codes safe - you'll need them for check-in at the event.</p>
-
-      ${order.event.contactEmail ? `<p>If you have any questions about the event, contact the organizers at <a href="mailto:${order.event.contactEmail}" style="color: #f47920;">${order.event.contactEmail}</a></p>` : ""}
-
-      <a href="${frontendUrl}/admin/tickets" class="btn">View Your Tickets</a>
-    </div>
-    <div class="footer">
-      <p>See you at the event!</p>
-      <p>The #play14 Team</p>
-      <p><a href="${frontendUrl}" style="color: #f47920;">play14.org</a></p>
-    </div>
-  </div>
-</body>
-</html>
-        `.trim(),
-      }
-
-      // Add attachments if generated successfully
-      const attachments: any[] = []
-
-      if (icsContent) {
-        attachments.push({
-          filename: `${order.event.slug || "play14-event"}.ics`,
-          content: Buffer.from(icsContent),
-          contentType: "text/calendar",
-        })
-      }
-
-      if (invoicePDF) {
-        attachments.push({
-          filename: `invoice-${order.orderNumber}.pdf`,
-          content: invoicePDF,
-          contentType: "application/pdf",
-        })
-      }
-
-      if (attachments.length > 0) {
-        emailOptions.attachments = attachments
-      }
-
-      const emailStartTime = Date.now()
-      await strapi.plugin("email").service("email").send(emailOptions)
-      const emailDuration = Date.now() - emailStartTime
-
-      emailSendTotal.inc({ email_type: "confirmation", status: "success" })
-      emailSendDuration.observe({ email_type: "confirmation" }, emailDuration / 1000)
-      strapi.log.info(
-        `[Webhook] Confirmation email sent to ${order.purchaserEmail} | order=${order.orderNumber}, durationMs=${emailDuration}`
-      )
-    } catch (error: any) {
-      // NON-CRITICAL FAILURE: Email sending failed but order is still valid and tickets created.
-      // This is a serious issue as the customer paid but won't receive confirmation.
-      emailSendTotal.inc({ email_type: "confirmation", status: "error" })
-      strapi.log.error(
-        `[Webhook] ALERT: Failed to send confirmation email to ${order.purchaserEmail}: ${error.message} | email_type=confirmation, severity=critical, order=${order.orderNumber}`
-      )
-    }
+    await sendOrderConfirmationEmail(strapi, order, tickets)
   },
 
   /**
