@@ -27,10 +27,15 @@ bun run export        # Export database to ../backup/database/play14
 bun run import        # Import from ../backup/database/play14.tar.gz.enc
 ```
 
+### Testing
+
+- **Unit tests**: `bun --filter play14-api test` (Vitest, colocated `*.test.ts`).
+- **Integration tests**: `bun --filter play14-api test:integration` — spins up an ephemeral `play14-db-test` Postgres container on port 5433 (separate from the dev DB on 5432) so tests run against a real database without polluting dev data.
+
 ### Container Development
 
 ```bash
-# Local with PostgreSQL + Adminer (using Podman Compose)
+# Local with PostgreSQL + pgAdmin (using Podman Compose)
 bun run dev           # Starts containers and follows logs
 bun run down          # Stops and removes containers
 
@@ -92,6 +97,10 @@ src/api/{resource}/
 - Timezone: `plugin::timezone-select.timezone` (used in events)
 - Country: `plugin::country-select.country` (used in locations)
 - Map: `plugin::map-field.map` (used in venues, players)
+
+**Ticketing (Stripe Connect)**: `ticket-type` (offer), `ticket-order` (checkout session), `ticket` (issued ticket), `stripe-account` (host's connected account), `discount-code`, `processed-webhook` (idempotency). See `docs/specs/stripe-connect-ticketing.md`.
+
+**Other content types**: `article`, `game`, `home`, `venue`, `event-location`, `sponsor`, `tag`, `testimonial`, `newsletter`, `newsletter-send`, `attendance-claim`, `player-claim`, `liked-item`, `history`, `expectation`, `budget-line-item`, `result-line-item`, `import`, `translate`, `media-file`, `media-folder`, `github-trigger`. Run `ls src/api/` for the full list.
 
 ### Slug Generation Pattern
 
@@ -584,25 +593,8 @@ For Strapi 5 reference, use the official docs at https://docs.strapi.io:
 
 ### Project-Specific Documentation
 
-**Coding Standards & Instructions**: See `.github/instructions/` for:
-
-- `strapi5.instructions.md` - Strapi 5 best practices
-- `nodejs.instructions.md` - Node.js/JavaScript guidelines
-- `testing.instructions.md` - Testing standards
-- `security.instructions.md` - Security best practices
-- Plus performance, code-review, documentation, and codacy guides
-
-**Reusable Prompts**: See `.github/prompts/` for common tasks:
-
-- `setup-strapi-component.prompt.md`
-- `write-tests.prompt.md`
-- `code-review.prompt.md`, `debug-issue.prompt.md`, `generate-docs.prompt.md`, `refactor-code.prompt.md`
-
-**Chat Modes**: See `.github/chatmodes/` for specialized AI roles:
-
-- `strapi-architect.chatmode.md` - Architecture planning
-- `reviewer.chatmode.md` - Code review
-- `debugger.chatmode.md` - Bug hunting
+- Architecture decisions: `../../docs/adr/`
+- Feature specs (e.g. Stripe Connect ticketing): `../../docs/specs/`
 
 ## Key File Locations
 
