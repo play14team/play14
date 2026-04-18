@@ -88,6 +88,9 @@ export function MobileMenu({ items }: MobileMenuProps) {
         <Dialog.Overlay className="ui-mobile-menu-overlay" />
         <Dialog.Content className="ui-mobile-menu-content">
           <Dialog.Title className="sr-only">Navigation menu</Dialog.Title>
+          <Dialog.Description className="sr-only">
+            Primary site navigation and sign-in links
+          </Dialog.Description>
 
           <div className="ui-mobile-menu-header">
             <Dialog.Close asChild>

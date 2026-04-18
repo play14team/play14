@@ -51,6 +51,8 @@ const HistoryItem = (props: HistoryProps) => {
                   className="shadow"
                   style={{
                     borderRadius: "10px",
+                    height: "auto",
+                    maxWidth: "100%",
                   }}
                 />
               </div>

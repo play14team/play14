@@ -30,7 +30,7 @@ export default function EventMap({ events }: { events: Event[] }) {
 
   // Theme-aware map style
   // Use dark-v11 instead of navigation-night-v1 to maintain globe projection
-  const isDark = mounted && resolvedTheme === "dark"
+  const isDark = resolvedTheme === "dark"
   const mapStyle = isDark ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12"
 
   return (
@@ -38,25 +38,27 @@ export default function EventMap({ events }: { events: Event[] }) {
       <div className="centered pb-5">
         <p>Total: {events.length}</p>
       </div>
-      <div className="shadow">
-        <Map
-          initialViewState={{
-            latitude: 25,
-            longitude: 45,
-            zoom: 2,
-          }}
-          style={{ width: "100%", height: "800px" }}
-          mapStyle={mapStyle}
-          mapboxAccessToken={TOKEN}
-          attributionControl={false}
-        >
-          {/* Map Controls */}
-          <FullscreenControl />
-          <NavigationControl />
-          <GeolocateControl />
-          <GeocoderControl mapboxAccessToken={TOKEN} position="top-left" />
-          <EventMarkers events={events} />
-        </Map>
+      <div className="shadow" style={{ minHeight: "800px" }}>
+        {mounted && resolvedTheme && (
+          <Map
+            initialViewState={{
+              latitude: 25,
+              longitude: 45,
+              zoom: 2,
+            }}
+            style={{ width: "100%", height: "800px" }}
+            mapStyle={mapStyle}
+            mapboxAccessToken={TOKEN}
+            attributionControl={false}
+          >
+            {/* Map Controls */}
+            <FullscreenControl />
+            <NavigationControl />
+            <GeolocateControl />
+            <GeocoderControl mapboxAccessToken={TOKEN} position="top-left" />
+            <EventMarkers events={events} />
+          </Map>
+        )}
       </div>
     </>
   )

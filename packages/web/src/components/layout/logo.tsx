@@ -25,42 +25,17 @@ const Logo = ({ width = 180, height = 60, className, priority = false }: LogoPro
     ? "/logo/play14_600x200_transparent-dark.png"
     : "/logo/play14_600x200_transparent-light.png"
 
-  // Show a placeholder or the light logo during hydration to avoid flash
-  if (!mounted) {
-    return (
-      <Image
-        src="/logo/play14_600x200_transparent-light.png"
-        alt="play14 logo"
-        width={width}
-        height={height}
-        className={className}
-        priority={priority}
-        unoptimized
-        style={{
-          width: "auto",
-          height: "auto",
-          maxWidth: width,
-          maxHeight: height,
-        }}
-      />
-    )
-  }
+  const src = mounted ? logoSrc : "/logo/play14_600x200_transparent-light.png"
 
   return (
     <Image
-      src={logoSrc}
+      src={src}
       alt="play14 logo"
       width={width}
       height={height}
       className={className}
       priority={priority}
       unoptimized
-      style={{
-        width: "auto",
-        height: "auto",
-        maxWidth: width,
-        maxHeight: height,
-      }}
     />
   )
 }

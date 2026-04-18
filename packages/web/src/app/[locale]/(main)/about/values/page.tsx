@@ -37,6 +37,8 @@ export default async function Values() {
             height={800}
             style={{
               borderRadius: "10px",
+              height: "auto",
+              maxWidth: "100%",
             }}
             unoptimized
           />

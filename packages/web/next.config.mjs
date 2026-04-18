@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 
-const createNextIntlPlugin = require("next-intl/plugin")
-const path = require("node:path")
+import path from "node:path"
+import { fileURLToPath } from "node:url"
+import createNextIntlPlugin from "next-intl/plugin"
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const withNextIntl = createNextIntlPlugin()
 
 const nextConfig = {
@@ -21,6 +23,7 @@ const nextConfig = {
   // Empty turbopack config to acknowledge we're using Turbopack
   turbopack: {},
   images: {
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     remotePatterns: [
       {
         protocol: "https",
@@ -49,6 +52,12 @@ const nextConfig = {
         pathname: "/uploads/**",
       },
       {
+        protocol: "http",
+        hostname: "localhost",
+        port: "9100",
+        pathname: "/play14-uploads/**",
+      },
+      {
         protocol: "https",
         hostname: "img.youtube.com",
         port: "",
@@ -64,4 +73,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withNextIntl(nextConfig)
+export default withNextIntl(nextConfig)

@@ -1,4 +1,3 @@
-import parse from "html-react-parser"
 import DOMPurify from "isomorphic-dompurify"
 
 /**
@@ -107,7 +106,9 @@ const HtmlContent = ({
   const withoutStyles = preserveStyles ? sanitized : stripInlineStyles(sanitized)
   const content = normalizeAllCapsText(withoutStyles)
 
-  return <>{parse(content)}</>
+  // content is sanitized above via DOMPurify; dangerouslySetInnerHTML avoids SSR/CSR
+  // hydration mismatches caused by jsdom vs browser DOM sanitization differences.
+  return <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: content }} />
 }
 
 export default HtmlContent

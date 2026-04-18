@@ -101,6 +101,8 @@ export default async function FormatPage() {
             height={577}
             style={{
               borderRadius: "10px",
+              height: "auto",
+              maxWidth: "100%",
             }}
             unoptimized
           />
@@ -120,6 +122,8 @@ export default async function FormatPage() {
                 height={577}
                 style={{
                   borderRadius: "10px",
+                  height: "auto",
+                  maxWidth: "100%",
                 }}
                 unoptimized
               />
@@ -139,6 +143,8 @@ export default async function FormatPage() {
                 height={614}
                 style={{
                   borderRadius: "10px",
+                  height: "auto",
+                  maxWidth: "100%",
                 }}
                 unoptimized
               />
@@ -155,6 +161,8 @@ export default async function FormatPage() {
                 height={1033}
                 style={{
                   borderRadius: "10px",
+                  height: "auto",
+                  maxWidth: "100%",
                 }}
                 unoptimized
               />
@@ -176,6 +184,8 @@ export default async function FormatPage() {
               height={1033}
               style={{
                 borderRadius: "10px",
+                height: "auto",
+                maxWidth: "100%",
               }}
               unoptimized
             />
@@ -201,6 +211,8 @@ export default async function FormatPage() {
               height={1033}
               style={{
                 borderRadius: "10px",
+                height: "auto",
+                maxWidth: "100%",
               }}
               unoptimized
             />

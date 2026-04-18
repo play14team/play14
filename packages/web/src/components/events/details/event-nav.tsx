@@ -42,6 +42,8 @@ export default async function EventNav({ current }: { current: string }) {
               height={40}
               className="event-profile-nav__image"
               unoptimized
+              loading="eager"
+              fetchPriority="high"
             />
           )}
           <div className="event-profile-nav__info">
@@ -74,6 +76,8 @@ export default async function EventNav({ current }: { current: string }) {
               height={40}
               className="event-profile-nav__image"
               unoptimized
+              loading="eager"
+              fetchPriority="high"
             />
           )}
           <i className="bx bx-chevron-right event-profile-nav__icon" />

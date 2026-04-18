@@ -62,42 +62,44 @@ const MapView = ({ location, height, zoom, popup }: MapViewProps) => {
   const zoomLevel = location ? zoom || 15 : 1
 
   // Theme-aware map style and marker color
-  const isDark = mounted && resolvedTheme === "dark"
+  const isDark = resolvedTheme === "dark"
   const mapStyle = isDark
     ? "mapbox://styles/mapbox/navigation-night-v1"
     : "mapbox://styles/mapbox/streets-v12"
   const markerColor = isDark ? "#ffd633" : "#ffc900"
 
   return (
-    <div className="shadow">
-      <Map
-        initialViewState={{
-          latitude: latitude,
-          longitude: longitude,
-          zoom: zoomLevel,
-        }}
-        style={{ width: "100%", height: height || "500px" }}
-        mapStyle={mapStyle}
-        mapboxAccessToken={token}
-      >
-        <FullscreenControl />
-        <NavigationControl />
+    <div className="shadow" style={{ minHeight: height || "500px" }}>
+      {mounted && resolvedTheme && (
+        <Map
+          initialViewState={{
+            latitude: latitude,
+            longitude: longitude,
+            zoom: zoomLevel,
+          }}
+          style={{ width: "100%", height: height || "500px" }}
+          mapStyle={mapStyle}
+          mapboxAccessToken={token}
+        >
+          <FullscreenControl />
+          <NavigationControl />
 
-        {location && <Marker longitude={longitude} latitude={latitude} color={markerColor} />}
+          {location && <Marker longitude={longitude} latitude={latitude} color={markerColor} />}
 
-        {popup && (
-          <Popup
-            anchor="bottom-right"
-            longitude={longitude}
-            latitude={latitude}
-            offset={offset}
-            closeButton={false}
-            closeOnClick={false}
-          >
-            {address}
-          </Popup>
-        )}
-      </Map>
+          {popup && (
+            <Popup
+              anchor="bottom-right"
+              longitude={longitude}
+              latitude={latitude}
+              offset={offset}
+              closeButton={false}
+              closeOnClick={false}
+            >
+              {address}
+            </Popup>
+          )}
+        </Map>
+      )}
     </div>
   )
 }

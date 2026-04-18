@@ -18,7 +18,7 @@ const EventSponsor = (props: { sponsor: Sponsor }) => {
               alt={logo.name}
               width={500}
               height={500}
-              style={{ borderRadius: "10px" }}
+              style={{ borderRadius: "10px", height: "auto", maxWidth: "100%" }}
               unoptimized
             />
           </Link>

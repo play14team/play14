@@ -172,9 +172,9 @@ export default function SearchCommand({ isOpen, onOpenChange }: SearchCommandPro
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="ui-search-overlay" />
-        <Dialog.Content className="ui-search-content" aria-describedby="search-description">
+        <Dialog.Content className="ui-search-content">
           <Dialog.Title className="visually-hidden">Search</Dialog.Title>
-          <Dialog.Description className="visually-hidden" id="search-description">
+          <Dialog.Description className="visually-hidden">
             Search events, players, games, and articles
           </Dialog.Description>
           <div className="ui-search-header">
