@@ -805,7 +805,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       for (const ticket of order.tickets || []) {
         await strapi.documents("api::ticket.ticket").update({
           documentId: ticket.documentId,
-          data: { status: "refunded" } as any,
+          data: { ticketStatus: "refunded" } as any,
         })
       }
 
