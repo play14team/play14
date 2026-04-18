@@ -75,7 +75,7 @@ curl -H "Origin: https://malicious.com" https://api.play14.org/api/events
 cors: {
   origin: [
     'https://play14.org',
-    'https://community.play14.org',
+    'https://api.play14.org',
     /\.play14\.org$/
   ],
   credentials: true

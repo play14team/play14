@@ -158,7 +158,7 @@ bun --filter play14-api dev
 
 | Environment | Webhook URL |
 |-------------|-------------|
-| Production | `https://community.play14.org/api/webhooks/stripe` |
+| Production | `https://api.play14.org/api/webhooks/stripe` |
 | Acceptance | `https://community-acc.play14.org/api/webhooks/stripe` |
 | Development | `http://localhost:1337/api/webhooks/stripe` |
 

@@ -168,7 +168,7 @@ az containerapp create \
     strapi-api-secret=$STRAPI_API_SECRET_PROD \
     mapbox-token=$NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN \
   --env-vars \
-    STRAPI_API_URL=https://community.play14.org \
+    STRAPI_API_URL=https://api.play14.org \
     STRAPI_API_SECRET=secretref:strapi-api-secret \
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=secretref:mapbox-token
 ```

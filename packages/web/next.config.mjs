@@ -29,7 +29,7 @@ const nextConfig = {
         protocol: "https",
         hostname: "cdn.play14.org",
         port: "",
-        pathname: "/strapi-uploads/assets/**",
+        pathname: "/**",
       },
       {
         protocol: "https",

@@ -35,7 +35,7 @@
 
 | Environment | API URL | Web URL |
 |-------------|---------|---------|
-| **Production** | `https://community.play14.org` | `https://play14.org` |
+| **Production** | `https://api.play14.org` | `https://play14.org` |
 | **Acceptance** | Auto-assigned Azure URL | Auto-assigned Azure URL |
 
 ---
@@ -118,7 +118,7 @@
 | `NODE_ENV` | Environment mode | `production` |
 | `HOST` | Server host | `0.0.0.0` |
 | `PORT` | Server port | `1337` |
-| `PUBLIC_URL` | Public API URL | `https://community.play14.org` |
+| `PUBLIC_URL` | Public API URL | `https://api.play14.org` |
 | `CRON_ENABLED` | Enable scheduled tasks | `true` |
 
 #### Database
@@ -229,7 +229,7 @@
 
 | Variable | Environment | Value |
 |----------|-------------|-------|
-| `STRAPI_API_URL` | Production | `https://community.play14.org` |
+| `STRAPI_API_URL` | Production | `https://api.play14.org` |
 | `STRAPI_API_URL` | Acceptance | Acceptance API URL |
 
 ---

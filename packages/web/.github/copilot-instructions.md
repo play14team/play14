@@ -56,7 +56,7 @@ bun run format        # Prettier format
 ### Production
 
 ```
-STRAPI_API_URL=https://community.play14.org   # Strapi GraphQL endpoint
+STRAPI_API_URL=https://api.play14.org         # Strapi GraphQL endpoint
 STRAPI_API_SECRET=<token>                     # Auth token for server queries
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=<token>       # Mapbox API key for maps/geocoding
 NEXT_PUBLIC_WEB_VITALS=true                   # Optional: Enable Web Vitals reporting

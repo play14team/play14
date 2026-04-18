@@ -103,7 +103,7 @@ bun --filter design build-storybook   # Build Storybook
 
 ## API Environment Variables
 
-- `PUBLIC_URL` – base public URL for assets/OAuth callbacks (e.g., `https://community.play14.org`). Used to build the default email logo path (`/images/play14_600x200_transparent-light.png`).
+- `PUBLIC_URL` – base public URL for assets/OAuth callbacks (e.g., `https://api.play14.org`). Used to build the default email logo path (`/images/play14_600x200_transparent-light.png`).
 - `LOGO_URL` – optional override for the logo used in HTML emails; if unset, we fall back to `PUBLIC_URL/images/...` so you can keep pointing to `http://localhost:1337` in development.
 
 ## License

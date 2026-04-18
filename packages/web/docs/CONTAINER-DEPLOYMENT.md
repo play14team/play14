@@ -90,7 +90,7 @@ podman compose exec app sh  # Interactive shell
 2. **Edit `.env.production` with your production values:**
 
    ```bash
-   STRAPI_API_URL=https://community.play14.org
+   STRAPI_API_URL=https://api.play14.org
    STRAPI_API_SECRET=your-production-secret
    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-production-token
    NEXT_PUBLIC_WEB_VITALS=true
@@ -129,7 +129,7 @@ podman compose -f compose.prod.yaml down
 ```bash
 # Build image with build args
 podman build -t play14-web:latest \
-  --build-arg STRAPI_API_URL=https://community.play14.org \
+  --build-arg STRAPI_API_URL=https://api.play14.org \
   --build-arg STRAPI_API_SECRET=your-secret \
   --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token \
   -f Dockerfile .
@@ -274,7 +274,7 @@ az container create \
   --dns-name-label play14-web \
   --ports 3000 \
   --environment-variables \
-    STRAPI_API_URL=https://community.play14.org \
+    STRAPI_API_URL=https://api.play14.org \
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token \
   --secure-environment-variables \
     STRAPI_API_SECRET=your-secret
@@ -291,7 +291,7 @@ az containerapp create \
   --target-port 3000 \
   --ingress external \
   --env-vars \
-    STRAPI_API_URL=https://community.play14.org \
+    STRAPI_API_URL=https://api.play14.org \
     NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token \
   --secrets \
     strapi-secret=your-secret

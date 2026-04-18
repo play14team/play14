@@ -107,7 +107,7 @@ src/
 
 ```bash
 # Backend API
-STRAPI_API_URL=https://community.play14.org    # Production CMS endpoint
+STRAPI_API_URL=https://api.play14.org          # Production CMS endpoint
 STRAPI_API_SECRET=<token>                      # Server-side auth token
 
 # Map Integration
@@ -257,7 +257,7 @@ The application is deployed to **Azure Container Apps** which supports all Next.
   - Backend: `https://community-acc.play14.org/`
   - Workflow: `.github/workflows/azure-container-apps-acceptance.yml`
 - **Production (play14-web-prod):** Deployed from main branch
-  - Backend: `https://community.play14.org`
+  - Backend: `https://api.play14.org`
   - Workflow: TBD
 
 **Setup Guide:** See [`.azure/SETUP.md`](.azure/SETUP.md) for complete Azure Container Apps setup instructions.
@@ -311,7 +311,7 @@ docker compose -f compose.prod.yaml up --build
 ```bash
 # Build production image
 podman build -t play14-web:latest \
-  --build-arg STRAPI_API_URL=https://community.play14.org \
+  --build-arg STRAPI_API_URL=https://api.play14.org \
   --build-arg STRAPI_API_SECRET=your-secret \
   --build-arg NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your-token \
   -f Dockerfile .
