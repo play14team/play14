@@ -5,6 +5,8 @@
  * Sender.net is the source of truth for newsletter subscribers.
  */
 
+import { fetchWithTimeout, safeJson } from "./sender-common"
+
 interface SenderSubscriberResponse {
   id?: number
   email?: string
@@ -15,7 +17,16 @@ interface SenderSubscriberResponse {
 interface SenderErrorResponse {
   message?: string
   errors?: Record<string, string[]>
+  _raw?: string
 }
+
+/**
+ * Matches Sender.net validation messages that indicate the email address is
+ * already subscribed. Deliberately narrow: a stray "already in review" message
+ * must NOT satisfy this predicate, which it would have under the prior
+ * substring-based check.
+ */
+const DUPLICATE_EMAIL_REGEX = /already (?:been )?taken|already exists|exists/i
 
 /**
  * Add a subscriber to Sender.net for newsletter subscription
@@ -47,7 +58,7 @@ export async function addSubscriberToGroup(
     if (firstName) body.firstname = firstName
     if (groupId) body.groups = [groupId]
 
-    const response = await fetch("https://api.sender.net/v2/subscribers", {
+    const response = await fetchWithTimeout("https://api.sender.net/v2/subscribers", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -57,18 +68,24 @@ export async function addSubscriberToGroup(
       body: JSON.stringify(body),
     })
 
-    const data = (await response.json()) as SenderSubscriberResponse | SenderErrorResponse
+    const data = (await safeJson(response)) as SenderSubscriberResponse | SenderErrorResponse
 
     if (!response.ok) {
       const errorData = data as SenderErrorResponse
-      const errorMessage = errorData.message || response.statusText
+      const errorMessage =
+        errorData.message ||
+        (errorData._raw ? `Sender.net error: ${errorData._raw.trim().slice(0, 200)}` : "") ||
+        response.statusText
 
       strapi.log.warn(`[SenderSubscribers] Failed to add subscriber ${email}: ${errorMessage}`)
 
-      // Handle duplicate subscriber (already exists) as success
+      // Handle duplicate subscriber (already exists) as success. Match only
+      // phrases that actually mean "this email is already registered" — a
+      // loose substring check on "already" would incorrectly swallow errors
+      // like "already in review".
       if (response.status === 409 || response.status === 422) {
         const errors = errorData.errors
-        if (errors?.email?.some((e) => e.toLowerCase().includes("already"))) {
+        if (errors?.email?.some((e) => DUPLICATE_EMAIL_REGEX.test(e))) {
           return { success: true, data: { email } }
         }
       }
@@ -86,6 +103,10 @@ export async function addSubscriberToGroup(
     strapi.log.error(
       `[SenderSubscribers] Error adding subscriber: ${error instanceof Error ? error.message : String(error)}`
     )
-    return { success: false, error: "Failed to connect to newsletter service" }
+    const message =
+      error instanceof Error && error.message === "Sender.net request timed out"
+        ? error.message
+        : "Failed to connect to newsletter service"
+    return { success: false, error: message }
   }
 }
