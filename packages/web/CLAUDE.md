@@ -72,11 +72,14 @@ export async function getEvents(page: number, pageSize: number) {
 src/
 ├── app/[locale]/              # Next.js routes (locale-prefixed via next-intl)
 ├── app/api/                   # Route handlers (health, metrics, webhooks)
-├── components/{domain}/       # Domain components + get.action.ts
+├── components/                # Domain folders: about, admin, articles, auth, events,
+│                              #   filters, games, home, layout, legal, map, newsletter,
+│                              #   players, search, tickets, tools, ui, utils
+│                              # Each domain co-locates *.tsx + get.action.ts
 ├── libs/                      # Utilities (strapi-client, dates, auth, safe-actions, metrics, …)
 ├── models/                    # TypeScript types (strapi.ts, debriefing-cube.ts)
 ├── hooks/                     # Custom React hooks (useIntersection, use-debounce, …)
-├── messages/                  # next-intl locale JSON files (en, de, fr, …)
+├── messages/                  # next-intl locale JSON files: en, fr, de, es, it
 └── styles/                    # SCSS, CSS, fonts, images
 ```
 
@@ -223,6 +226,12 @@ All list pages use the `load-more.tsx` pattern:
 - Mapbox GL JS via `react-map-gl`
 - Components: `src/components/map/index.tsx`, `src/components/events/map.tsx`
 - Geocoding: `@mapbox/mapbox-sdk`
+
+## Internationalisation (next-intl)
+
+- **Locales**: `en` (default), `fr`, `de`, `es`, `it` — message files in `src/messages/`.
+- **Hard rule**: every key used in code must exist in **all five files**, or `next-intl` throws `MISSING_MESSAGE` at runtime in that locale. Keep the files structurally identical.
+- After any UI-copy change, run the `i18n-sync` skill to mirror the new keys across all locales.
 
 ## Common Pitfalls
 

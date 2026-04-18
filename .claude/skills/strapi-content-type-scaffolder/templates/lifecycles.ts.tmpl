@@ -1,0 +1,33 @@
+import { toSlug } from "../../../../libs/strings"
+import { triggerContentRevalidation } from "../../../../services/frontend-revalidation"
+
+/**
+ * Lifecycle hooks for {{DISPLAY_NAME}} content type.
+ * Uses the Strapi 5 Document Service API.
+ */
+
+function validate(data: { name?: string; slug?: string }) {
+  if (!data?.name) return
+  const slug = toSlug(data.name)
+  if (data.slug !== slug) {
+    data.slug = slug
+  }
+}
+
+export default {
+  beforeCreate(event: { params: { data: { name?: string; slug?: string } } }) {
+    validate(event.params.data)
+  },
+  beforeUpdate(event: { params: { data: { name?: string; slug?: string } } }) {
+    validate(event.params.data)
+  },
+  afterCreate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::{{SINGULAR}}.{{SINGULAR}}", event.result, "create")
+  },
+  afterUpdate(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::{{SINGULAR}}.{{SINGULAR}}", event.result, "update")
+  },
+  afterDelete(event: { result: { slug?: string } }) {
+    triggerContentRevalidation(strapi, "api::{{SINGULAR}}.{{SINGULAR}}", event.result, "delete")
+  },
+}
