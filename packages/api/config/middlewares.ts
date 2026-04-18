@@ -1,3 +1,18 @@
+// STORAGE_CDN_URL is used both as the S3 provider's baseUrl (needs the bucket
+// path) and as a CSP source. CSP paths without a trailing slash only match
+// that exact resource, so we strip to the origin (scheme://host:port) here.
+// For Cellar's `https://cdn.play14.org` this is a no-op; for local MinIO's
+// `http://localhost:9100/play14-uploads` it becomes `http://localhost:9100`,
+// which allows the whole bucket.
+const toOrigin = (raw?: string | null): string | undefined => {
+  if (!raw) return undefined
+  try {
+    return new URL(raw).origin
+  } catch {
+    return undefined
+  }
+}
+
 export default ({ env }: { env: any }) => [
   "strapi::errors",
   // Rate limiting for critical API endpoints
@@ -54,12 +69,12 @@ export default ({ env }: { env: any }) => [
             "s3.amazonaws.com",
             "https://cdn.ckeditor.com",
             // Azure (legacy — kept during overlap with Clever Cloud cutover).
-            process.env.STORAGE_URL,
-            process.env.STORAGE_CDN_URL,
+            toOrigin(process.env.STORAGE_URL),
+            toOrigin(process.env.STORAGE_CDN_URL),
             // Clever Cloud Cellar direct origin + Cloudflare-fronted custom domain.
             "https://cdn.play14.org",
             "https://*.cellar-c2.services.clever-cloud.com",
-          ],
+          ].filter(Boolean),
           "style-src": ["'self'", "'unsafe-inline'", "https://cdn.ckeditor.com"],
           "font-src": ["'self'", "https://cdn.ckeditor.com"],
           "media-src": [
@@ -68,12 +83,12 @@ export default ({ env }: { env: any }) => [
             "blob:",
             "dl.airtable.com",
             // Azure (legacy — kept during overlap with Clever Cloud cutover).
-            process.env.STORAGE_URL,
-            process.env.STORAGE_CDN_URL,
+            toOrigin(process.env.STORAGE_URL),
+            toOrigin(process.env.STORAGE_CDN_URL),
             // Clever Cloud Cellar direct origin + Cloudflare-fronted custom domain.
             "https://cdn.play14.org",
             "https://*.cellar-c2.services.clever-cloud.com",
-          ],
+          ].filter(Boolean),
           "worker-src": ["'self'", "blob:"],
           "frame-src": ["'self'", "https://ckeditor.com", "https://*.ckeditor.com"],
           "object-src": ["'none'"],

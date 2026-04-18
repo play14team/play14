@@ -82,7 +82,6 @@ services:
 
   play14-db:
     container_name: play14-db
-    platform: linux/arm64
     restart: unless-stopped
     env_file: ./packages/api/.env
     image: docker.io/library/postgres:17.6-alpine
@@ -101,7 +100,6 @@ services:
   # Used for integration tests
   play14-db-test:
     container_name: play14-db-test
-    platform: linux/arm64
     image: docker.io/library/postgres:17.6-alpine
     environment:
       POSTGRES_USER: test_user
@@ -131,6 +129,59 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  # S3-compatible local object storage — mirrors the Cellar add-on we use in
+  # Clever Cloud staging/prod. Host port 9100 (not 9000 — that collides with
+  # the Strapi Prometheus metrics server on play14-api).
+  play14-minio:
+    container_name: play14-minio
+    image: docker.io/minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - play14-api
+
+  # One-shot: creates the uploads bucket, opens it for anonymous read, and
+  # seeds it from the local prod asset dump on first boot. Idempotent — it
+  # skips the seed step once the bucket has any content. Blow away the
+  # minio-data volume to force a re-seed.
+  play14-minio-init:
+    container_name: play14-minio-init
+    image: docker.io/minio/mc:latest
+    depends_on:
+      - play14-minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET: ${CELLAR_BUCKET:-play14-uploads}
+    volumes:
+      - /home/cpontet/repos/perso/backups/strapi-assets-prod:/import:ro,z
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        until mc alias set local http://play14-minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do
+          echo "waiting for minio..."; sleep 2
+        done
+        mc mb --ignore-existing "local/$$MINIO_BUCKET"
+        mc anonymous set download "local/$$MINIO_BUCKET"
+        if [ -z "$$(mc ls "local/$$MINIO_BUCKET" 2>/dev/null | head -n1)" ]; then
+          echo "seeding $$MINIO_BUCKET from /import..."
+          mc mirror --overwrite /import "local/$$MINIO_BUCKET"
+        else
+          echo "$$MINIO_BUCKET already populated — skipping seed"
+        fi
+    networks:
+      - play14-api
+    restart: "no"
 
   stripe-webhook:
     container_name: stripe-webhook
@@ -178,6 +229,7 @@ volumes:
     external: true
   pgadmin-data:
   web-node_modules:
+  minio-data:
 
 networks:
   play14-api:
