@@ -4,7 +4,7 @@
 #   ./set-env.sh play14-api env-production-api.env
 #
 # IMPORTANT: APP_KEYS / *_SECRET / *_SALT values must be regenerated fresh
-# for production — DO NOT reuse the staging values or the legacy Azure values.
+# for production — DO NOT reuse the staging values.
 
 # --- Clever Cloud runtime ---------------------------------------------------
 CC_NODE_VERSION=22
@@ -37,7 +37,6 @@ DATABASE_SSL_SELF=false
 DATABASE_DEBUG=false
 
 # --- Object storage (Cellar) ------------------------------------------------
-UPLOAD_PROVIDER=s3
 # Bucket name must match the CDN hostname (CNAME bucket pattern).
 CELLAR_BUCKET=cdn.play14.org
 CELLAR_REGION=us-east-1

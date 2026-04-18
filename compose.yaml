@@ -5,10 +5,6 @@ services:
       context: .
       dockerfile: packages/web/Dockerfile.dev
       target: development
-      cache_from:
-        - type=registry,ref=play14containerregistry.azurecr.io/play14/play14-web:dev-cache
-      cache_to:
-        - type=inline
     env_file:
       - ./packages/web/.env.local
     ports:

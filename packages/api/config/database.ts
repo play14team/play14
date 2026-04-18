@@ -2,11 +2,10 @@ export default ({ env }: { env: any }) => ({
   connection: {
     client: "postgres",
     connection: {
-      // Prefer DATABASE_* (used in Azure prod and local dev) but fall back to
+      // Prefer DATABASE_* (used for local dev) but fall back to
       // POSTGRESQL_ADDON_* which Clever Cloud's PostgreSQL add-on auto-injects.
-      // This lets the same image deploy to both clouds without duplicating
-      // credentials in env vars or relying on shell-style ${VAR} expansion
-      // (which Clever Cloud does NOT perform on env values).
+      // Clever Cloud does NOT perform shell-style ${VAR} expansion on env
+      // values, so we resolve the fallback here rather than in the env file.
       host: env("DATABASE_HOST") || env("POSTGRESQL_ADDON_HOST", "127.0.0.1"),
       port: env.int("DATABASE_PORT") || env.int("POSTGRESQL_ADDON_PORT", 5432),
       database: env("DATABASE_NAME") || env("POSTGRESQL_ADDON_DB", "strapi"),

@@ -50,7 +50,6 @@ DATABASE_SSL_SELF=false
 DATABASE_DEBUG=false
 
 # --- Object storage (Cellar via @strapi/provider-upload-aws-s3) -----------
-UPLOAD_PROVIDER=s3
 # Bucket name must match the CDN hostname (CNAME bucket pattern).
 # Cloudflare proxies with Host: cdn-staging.play14.org → Cellar matches
 # the bucket by name, no Host header rewrite needed.

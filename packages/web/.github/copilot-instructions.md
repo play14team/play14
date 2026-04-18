@@ -152,7 +152,7 @@ All list pages (events, games, articles, players) use the `load-more.tsx` patter
 
 ## Deployment
 
-- Target: Azure Static Web Apps
-- Node runtime: 20 (see `staticwebapp.config.json`)
-- Build output: `standalone` (see `next.config.js`)
-- CI/CD: GitHub Actions (`.github/workflows/`)
+- Target: Clever Cloud Node.js app (`play14-web`, `play14-web-staging`)
+- Node runtime: 22 (see `.nvmrc`)
+- Build output: `standalone` (see `next.config.mjs`)
+- CI/CD: GitHub Actions (`.github/workflows/clever-deploy-*.yml`)

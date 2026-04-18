@@ -19,7 +19,7 @@ In Stripe Dashboard → Developers → Webhooks:
 
 1. Click **"Add endpoint"**
 2. Configure:
-   - **Endpoint URL**: `https://community-acc.play14.org/api/webhooks/stripe` (for acceptance)
+   - **Endpoint URL**: `https://api-staging.play14.org/api/webhooks/stripe` (for staging)
    - **Description**: Platform payments webhook
    - **Events from**: **Your account** (NOT "Connected accounts")
    - **API version**: `2025-12-15.clover` (or latest)
@@ -37,7 +37,7 @@ In Stripe Dashboard → Developers → Webhooks:
 
 1. Click **"Add endpoint"**
 2. Configure:
-   - **Endpoint URL**: `https://community-acc.play14.org/api/webhooks/stripe` (same URL!)
+   - **Endpoint URL**: `https://api-staging.play14.org/api/webhooks/stripe` (same URL!)
    - **Description**: Connected accounts webhook
    - **Events from**: **Connected accounts** (NOT "Your account")
    - **API version**: `2025-12-15.clover` (or latest)
@@ -159,7 +159,7 @@ bun --filter play14-api dev
 | Environment | Webhook URL |
 |-------------|-------------|
 | Production | `https://api.play14.org/api/webhooks/stripe` |
-| Acceptance | `https://community-acc.play14.org/api/webhooks/stripe` |
+| Staging | `https://api-staging.play14.org/api/webhooks/stripe` |
 | Development | `http://localhost:1337/api/webhooks/stripe` |
 
 ## Security Notes

@@ -117,17 +117,21 @@ function eventToSlug(name, start) {
 ```javascript
 // config/plugins.js
 module.exports = {
-  // Azure Storage configuration for file uploads
+  // Clever Cloud Cellar (S3-compatible) upload configuration
   upload: {
     config: {
-      provider: "azure-storage",
+      provider: "aws-s3",
       providerOptions: {
-        // Storage account name (required)
-        account: env("STORAGE_ACCOUNT"),
-        // Storage account key (required)
-        accountKey: env("STORAGE_ACCOUNT_KEY"),
-        // CDN URL for optimized delivery (optional)
-        cdnUrl: env("STORAGE_CDN_URL"),
+        s3Options: {
+          credentials: {
+            accessKeyId: env("CELLAR_ADDON_KEY_ID"),
+            secretAccessKey: env("CELLAR_ADDON_KEY_SECRET"),
+          },
+          endpoint: `https://${env("CELLAR_ADDON_HOST")}`,
+          region: env("CELLAR_REGION", "us-east-1"),
+          params: { Bucket: env("CELLAR_BUCKET") },
+        },
+        baseUrl: env("STORAGE_CDN_URL"),
       },
     },
   },

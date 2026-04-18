@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **play14-web** is a Next.js 16 App Router application for the #play14 global community platform. It fetches content from a **Strapi 5 CMS REST API** and displays events, games, articles, and player profiles with server-side rendering and client-side interactivity.
 
-**Tech Stack:** Next.js 16.0.8 (App Router) • React 19 • TypeScript 5.9 • Strapi 5 REST API • SCSS • Mapbox • Azure Static Web Apps
+**Tech Stack:** Next.js 16.2 (App Router) • React 19.2 • TypeScript 6.0 • Strapi 5 REST API • SCSS + Radix UI primitives • Mapbox GL • Clever Cloud
 
-**Package Manager:** `bun` (version 1.3.5 - pinned in package.json)
+**Package Manager:** `bun` (version 1.3.5 — pinned in package.json)
+
+**Runtime:** Node.js 20 (see `.nvmrc`)
 
 ## Essential Commands
 
@@ -28,8 +30,14 @@ bun run build               # Production build (standalone output)
 bun run start               # Run production server
 
 # Code Quality
-bun run lint                # ESLint check
-bun run format              # Prettier format all files
+bun run lint                # Biome lint
+bun run check               # Biome check (lint + format verification)
+bun run format              # Biome format (write)
+bun run typecheck           # tsc --noEmit
+
+# Tests
+bun run test                # Vitest unit tests
+bun run test:e2e            # Playwright end-to-end tests
 ```
 
 ## Architecture: REST API → Server Actions → Components
@@ -62,11 +70,13 @@ export async function getEvents(page: number, pageSize: number) {
 
 ```
 src/
-├── app/{domain}/              # Next.js routes (page.tsx, [slug]/page.tsx)
+├── app/[locale]/              # Next.js routes (locale-prefixed via next-intl)
+├── app/api/                   # Route handlers (health, metrics, webhooks)
 ├── components/{domain}/       # Domain components + get.action.ts
-├── libs/                      # Utilities (fetch helpers, dates, arrays, safe-actions)
-├── models/                    # TypeScript types and interfaces
-├── hooks/                     # Custom React hooks (useIntersection)
+├── libs/                      # Utilities (strapi-client, dates, auth, safe-actions, metrics, …)
+├── models/                    # TypeScript types (strapi.ts, debriefing-cube.ts)
+├── hooks/                     # Custom React hooks (useIntersection, use-debounce, …)
+├── messages/                  # next-intl locale JSON files (en, de, fr, …)
 └── styles/                    # SCSS, CSS, fonts, images
 ```
 
@@ -135,13 +145,13 @@ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=<token>        # Mapbox key
 **Quick Start:**
 
 1. Create `.env.local` file with your environment variables (see `.env.example` for reference)
-2. Start Strapi backend first (in play14-api directory): `podman compose up -d`
-3. Start Next.js UI: `pnpm up`
+2. Start backing services from the monorepo root: `podman compose up -d play14-api play14-db`
+3. Start Next.js UI: `bun run up`
 4. Access the applications:
    - Next.js UI: http://localhost:3000
-   - Strapi API: http://localhost:1337 (from play14-api)
-   - Database Admin (Adminer): http://localhost:9090 (from play14-api)
-5. Stop services: `pnpm down`
+   - Strapi API: http://localhost:1337
+   - Database admin (pgAdmin): http://localhost:5050
+5. Stop services: `bun run down`
 
 **The containerized setup includes:**
 
@@ -158,9 +168,9 @@ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=<token>        # Mapbox key
 - **Service discovery**: Next.js reaches Strapi via `http://play14-api:1337`
 - **Start order**: Start play14-api services first, then play14-web
 - **Scripts**:
-  - `pnpm up` - Start containerized Next.js
-  - `pnpm down` - Stop containerized Next.js
-  - `pnpm dev` - Run Next.js locally (no container)
+  - `bun run up` — Start containerized Next.js
+  - `bun run down` — Stop containerized Next.js
+  - `bun run dev` — Run Next.js locally (no container)
 
 ## Type Safety Helpers
 
@@ -218,7 +228,7 @@ All list pages use the `load-more.tsx` pattern:
 
 1. **Wrong directive** - Use `"use server"` in `*.action.ts`, `"use client"` for interactive components
 2. **Cache issues** - Server components cache by default; set `revalidate` or `dynamic` exports as needed
-3. **Image domains** - Remote images must be configured in `next.config.js` remotePatterns
+3. **Image domains** - Remote images must be configured in `next.config.mjs` remotePatterns
 4. **API errors** - Always handle fetch errors and check response status codes
 5. **Environment variables** - Server-side variables (without `NEXT_PUBLIC_`) only available in server components and actions
 
@@ -226,16 +236,17 @@ All list pages use the `load-more.tsx` pattern:
 
 ### Output Mode
 
-- `output: "standalone"` - Optimized for containerization/Azure deployment
+- `output: "standalone"` - Optimized for Clever Cloud's Node.js runtime
 - Produces minimal production build
 
 ### Image Configuration
 
 Remote patterns configured for:
 
-- `cdn.play14.org` (Azure CDN)
-- `play14-cdn.azureedge.net` (Azure CDN fallback)
+- `cdn.play14.org` (Cloudflare-fronted Cellar CDN)
+- `*.cellar-c2.services.clever-cloud.com` (Cellar direct origin)
 - `localhost:1337` (local development)
+- `localhost:9100` (local MinIO bucket)
 
 ### Development Mode
 
@@ -243,41 +254,35 @@ Uses **Turbopack** for faster builds (`next dev --turbopack`)
 
 ## Testing
 
-**Status:** No testing framework currently configured. No test files exist.
+- **Unit tests:** Vitest — colocated `*.test.ts` files next to source (see `src/libs/*.test.ts`). Run with `bun run test`.
+- **End-to-end tests:** Playwright — specs in `tests/` (navigation, events, players, etc.). Run with `bun run test:e2e` or the UI variant `bun run test:e2e:ui`. Run `bun run playwright:install` once to fetch browsers.
 
 ## Deployment
 
-### Azure Container Apps (Primary)
+### Clever Cloud (Primary)
 
-The application is deployed to **Azure Container Apps** which supports all Next.js features including SSR, ISR, and dynamic routes.
+The application is deployed as a **Clever Cloud Node.js app** which runs the
+Next.js standalone server directly — SSR, ISR, and dynamic routes all work.
 
 **Environments:**
 
-- **Acceptance (play14-web-acc):** Deployed automatically on PR creation/updates
-  - Backend: `https://community-acc.play14.org/`
-  - Workflow: `.github/workflows/azure-container-apps-acceptance.yml`
-- **Production (play14-web-prod):** Deployed from main branch
+- **Staging (`play14-web-staging`):** Deployed on push to the staging branch
+  - Frontend: `https://staging.play14.org`
+  - Backend: `https://api-staging.play14.org`
+  - Workflow: `.github/workflows/clever-deploy-staging.yml`
+- **Production (`play14-web`):** Deployed on push to `main`
+  - Frontend: `https://play14.org`
   - Backend: `https://api.play14.org`
-  - Workflow: TBD
+  - Workflow: `.github/workflows/clever-deploy-production.yml`
 
-**Setup Guide:** See [`.azure/SETUP.md`](.azure/SETUP.md) for complete Azure Container Apps setup instructions.
+**Provisioning:** See [`../../iac/clever-cloud/README.md`](../../iac/clever-cloud/README.md).
 
 **Deployment Flow:**
 
 1. Code quality checks (lint, typecheck)
-2. Build Docker image with Next.js standalone output
-3. Push to Azure Container Registry
-4. Deploy to Azure Container Apps
-5. Health check verification
-6. PR comment with deployment URL (for PRs)
-
-### Azure Static Web Apps (Legacy)
-
-**Note:** Azure SWA doesn't support Next.js SSR and is being phased out. Existing deployment:
-
-- **Production Workflow:** `.github/workflows/azure-static-web-apps-blue-stone-057ce2a03.yml`
-- **PR Preview Workflow:** `.github/workflows/azure-swa-pr-preview.yml`
-- **Limitation:** Incompatible with Next.js standalone output and dynamic routes
+2. Build the Next.js app with Bun
+3. Push the build to the target Clever Cloud app via `clever-tools`
+4. Clever Cloud runs the standalone server, health-checks on `/api/health`
 
 ### Local Container Development
 
@@ -326,22 +331,19 @@ podman run -d \
 
 **Deployment Targets:**
 
+- Clever Cloud Node.js apps (current production)
 - Container orchestration platforms (Kubernetes, OpenShift)
-- Azure Container Instances
-- Azure Container Apps
-- Azure Kubernetes Service (AKS)
 - Any container runtime (Podman, Docker, containerd)
 
 ## Git Workflow
 
 - **Default branch:** `main`
-- **Current branch:** `strapi5`
-- **Pre-commit:** Husky + lint-staged runs Prettier on all files
-- **Code quality:** ESLint + Prettier configured
+- **Pre-commit:** Husky + lint-staged runs Biome on staged files
+- **Code quality:** Biome (lint + format) configured at the repo root
 
 ## Authentication & Authorization
 
-**Status:** Not implemented yet. Placeholder exists in `src/libs/safe-actions.ts` for future session-based auth middleware using `next-safe-action`.
+Session-based auth is in place via `next-safe-action` middleware (`src/libs/safe-actions.ts`). Admin routes use the player-position → user-role mapping enforced by the API (Founder/Mentor/Host/Player).
 
 ## Admin Page Layout Classes
 

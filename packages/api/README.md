@@ -10,8 +10,8 @@ Strapi 5 headless CMS API for the #play14 global community platform.
 - **Runtime**: Node.js 22, Bun
 - **Database**: PostgreSQL 17.6
 - **APIs**: GraphQL + REST
-- **Hosting**: Azure Container Apps
-- **Storage**: Azure Blob Storage
+- **Hosting**: Clever Cloud (Node.js app + PostgreSQL + Redis add-ons)
+- **Storage**: Clever Cloud Cellar (S3-compatible), fronted by Cloudflare at `cdn.play14.org`
 
 ## Getting Started
 
@@ -73,7 +73,7 @@ Uses the `.env` file for environment variables (database configuration, etc.).
 
 ### Upload Provider
 
-Uses [Strapi Provider Upload Azure Storage](https://github.com/jakeFeldman/strapi-provider-upload-azure-storage) for file uploads.
+Uses [`@strapi/provider-upload-aws-s3`](https://www.npmjs.com/package/@strapi/provider-upload-aws-s3) to talk to Clever Cloud Cellar (S3-compatible). Credentials and endpoint come from the Cellar add-on (`CELLAR_ADDON_*` env vars); public URLs are served via `STORAGE_CDN_URL`.
 
 ### Plugins
 

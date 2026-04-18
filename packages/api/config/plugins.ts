@@ -99,62 +99,34 @@ export default ({ env }: { env: any }) => ({
   ckeditor5: {
     enabled: true,
   },
-  // upload: {
-  //   config: {
-  //     provider: 'strapi-provider-upload-local-url',
-  //     providerOptions: {
-  //       baseurl: "http://localhost:1337"
-  //     }
-  //   }
-  // },
-  // Upload provider is selected at runtime via UPLOAD_PROVIDER env var.
-  // Default "azure" preserves the Azure Blob Storage path while we run on Azure;
-  // "s3" switches to Clever Cloud Cellar (S3-compatible) via @strapi/provider-upload-aws-s3.
+  // Clever Cloud Cellar (S3-compatible) via @strapi/provider-upload-aws-s3.
   // CELLAR_ADDON_TLS and CELLAR_FORCE_PATH_STYLE let the same config target
   // a local MinIO (plain HTTP + path-style) without changing production.
-  // After Azure decommissioning the azure branch can be removed (cleanup PR).
-  upload:
-    env("UPLOAD_PROVIDER", "azure") === "s3"
-      ? {
-          config: {
-            provider: "aws-s3",
-            providerOptions: {
-              s3Options: {
-                credentials: {
-                  accessKeyId: env("CELLAR_ADDON_KEY_ID"),
-                  secretAccessKey: env("CELLAR_ADDON_KEY_SECRET"),
-                },
-                endpoint: `${env.bool("CELLAR_ADDON_TLS", true) ? "https" : "http"}://${env("CELLAR_ADDON_HOST")}`,
-                // Cellar ignores region but the SDK requires one.
-                region: env("CELLAR_REGION", "us-east-1"),
-                params: { Bucket: env("CELLAR_BUCKET") },
-                // Cellar uses virtual-hosted-style URLs; MinIO wants path-style.
-                forcePathStyle: env.bool("CELLAR_FORCE_PATH_STYLE", false),
-              },
-              baseUrl: env("STORAGE_CDN_URL"),
-            },
-            actionOptions: {
-              upload: {},
-              uploadStream: {},
-              delete: {},
-            },
+  upload: {
+    config: {
+      provider: "aws-s3",
+      providerOptions: {
+        s3Options: {
+          credentials: {
+            accessKeyId: env("CELLAR_ADDON_KEY_ID"),
+            secretAccessKey: env("CELLAR_ADDON_KEY_SECRET"),
           },
-        }
-      : {
-          config: {
-            provider: "strapi-provider-upload-azure-storage",
-            providerOptions: {
-              authType: "default",
-              account: env("STORAGE_ACCOUNT"),
-              accountKey: env("STORAGE_ACCOUNT_KEY"),
-              serviceBaseURL: env("STORAGE_URL"),
-              containerName: env("STORAGE_CONTAINER_NAME", "strapi_uploads"),
-              cdnBaseURL: env("STORAGE_CDN_URL"),
-              defaultPath: "assets",
-              maxConcurrent: 10,
-            },
-          },
+          endpoint: `${env.bool("CELLAR_ADDON_TLS", true) ? "https" : "http"}://${env("CELLAR_ADDON_HOST")}`,
+          // Cellar ignores region but the SDK requires one.
+          region: env("CELLAR_REGION", "us-east-1"),
+          params: { Bucket: env("CELLAR_BUCKET") },
+          // Cellar uses virtual-hosted-style URLs; MinIO wants path-style.
+          forcePathStyle: env.bool("CELLAR_FORCE_PATH_STYLE", false),
         },
+        baseUrl: env("STORAGE_CDN_URL"),
+      },
+      actionOptions: {
+        upload: {},
+        uploadStream: {},
+        delete: {},
+      },
+    },
+  },
   "map-field": {
     enabled: true,
   },

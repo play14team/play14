@@ -24,7 +24,7 @@ interface RateLimitConfig {
    * Number of trusted proxies in front of the application.
    * When set, only the Nth IP from the right in X-Forwarded-For is trusted.
    * Set to 0 to ignore X-Forwarded-For entirely (direct connections only).
-   * Set to 1 for a single proxy (e.g., Nginx, Azure Container Apps).
+   * Set to 1 for a single proxy (e.g., Nginx, Clever Cloud edge).
    * Default: 1 (assumes one reverse proxy)
    */
   trustProxy?: number

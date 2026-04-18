@@ -1,8 +1,8 @@
 # Clever Cloud IaC
 
-Provisioning scripts for the Clever Cloud target of the Azure → Clever Cloud
-migration. Designed for a **fully-isolated staging + production** topology:
-4 apps (api/web × staging/prod) and 6 add-ons (PG/Cellar/Redis × staging/prod).
+Provisioning scripts for the #play14 Clever Cloud deployment. Designed for a
+**fully-isolated staging + production** topology: 4 apps (api/web × staging/prod)
+and 6 add-ons (PG/Cellar/Redis × staging/prod).
 
 ## Files
 
@@ -17,10 +17,6 @@ migration. Designed for a **fully-isolated staging + production** topology:
 | `env-staging-web.example` | Next.js staging env-var template |
 | `env-production-api.example` | Strapi API production env-var template |
 | `env-production-web.example` | Next.js production env-var template |
-| `transfer.sh` | Wrapper around `bun run strapi transfer` (Stage 4) |
-| `validate-transfer.sh` | Compare row counts source vs target + HEAD-check Cellar URLs |
-| `transfer-runbook.md` | Step-by-step `strapi transfer` procedure + pg_dump+rclone fallback |
-| `production-cutover.md` | Final cutover checklist (pg_dump + rclone + DNS flip) with lessons learned |
 
 The `*.example` files are committed. The filled-in `*.env` copies are
 gitignored (`iac/clever-cloud/*.env`) — they contain secrets.
@@ -90,8 +86,8 @@ clever env --alias play14-api-staging
 ```
 
 Repeat for production when you're ready (use `env-production-*.example`).
-**Production secrets must be regenerated fresh** — never reuse the staging or
-legacy Azure values.
+**Production secrets must be regenerated fresh** — never reuse the staging
+values.
 
 ### 4. Attach staging domains
 
@@ -120,9 +116,7 @@ clever logs --alias play14-api-staging -f
 clever logs --alias play14-web-staging -f
 ```
 
-## Production cutover (later)
-
-When ready to flip production:
+## Deploying production
 
 1. Run `./set-env.sh play14-api env-production-api.env` and
    `./set-env.sh play14-web env-production-web.env`.
@@ -130,9 +124,6 @@ When ready to flip production:
    API first, then web.
 3. Run `STAGE=production ./domains.sh` to attach `api.play14.org` and
    `new.play14.org` to the production apps.
-4. Lower DNS TTL to 60s 24h before cutover, then create the CNAMEs.
-5. After 7-day stability window, run the Azure decommissioning cleanup PR
-   that strips the legacy provider, env branching, and Bicep templates.
 
 ## Cost notes
 
@@ -161,6 +152,6 @@ app yet. Re-run `clever service link-addon <app> <addon>` or re-run
 **Bucket CORS fails** — confirm the AWS CLI is using Cellar credentials, not
 your real AWS profile: `unset AWS_PROFILE` before running `buckets.sh`.
 
-**Strapi can't reach Cellar** — verify `UPLOAD_PROVIDER=s3` is set
-(`clever env --alias play14-api-staging | grep UPLOAD_PROVIDER`) and that the
-auto-injected `CELLAR_ADDON_*` vars are present.
+**Strapi can't reach Cellar** — verify the auto-injected `CELLAR_ADDON_*` vars
+are present: `clever env --alias play14-api-staging | grep CELLAR_`. If the
+add-on isn't linked to the app, re-run `clever service link-addon <app> <addon>`.

@@ -253,8 +253,8 @@ This document provides an index of all manual testing scenarios generated from t
 - Connected to acceptance Stripe account
 - Test emails sent to inbox
 - Structured logs captured for acceptance
-- Deployed on Azure Container Apps (acceptance)
-- URL: `community-acc.play14.org`
+- Deployed on Clever Cloud (staging)
+- URL: `api-staging.play14.org`
 
 ### Production Environment
 - **Exercise extreme caution**
