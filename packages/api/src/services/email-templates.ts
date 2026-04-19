@@ -7,6 +7,7 @@ import { randomBytes } from "node:crypto"
 import { join } from "node:path"
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
+import EventCancelledEmail from "../emails/event-cancelled"
 import PaymentFailedEmail from "../emails/payment-failed"
 import PlayerInvitationEmail from "../emails/player-invitation"
 import StripeAccountStatusEmail from "../emails/stripe-account-status"
@@ -695,4 +696,126 @@ export async function sendStripeAccountStatusEmail(
       `[EmailTemplates] Failed to send Stripe account status email to ${hostEmail}: ${error.message} | account=${stripeAccount?.stripeAccountId}`
     )
   }
+}
+
+/**
+ * Notify every paid purchaser that an event has been cancelled.
+ *
+ * Deduplicates by lowercase purchaser email so one purchaser with multiple
+ * orders receives a single notification. Metrics are recorded per successful
+ * send; a single failure is logged but does not abort the remaining sends.
+ */
+export async function sendEventCancellationEmails(
+  strapi: Core.Strapi,
+  event: {
+    documentId: string
+    name: string
+    start: string
+    location?: { name?: string; country?: string } | null
+    venue?: { name?: string; location?: { place_name?: string } | null } | null
+    cancellationReason?: string | null
+  }
+): Promise<{ sent: number; failed: number }> {
+  const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
+
+  const eventDate = new Date(event.start).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+
+  const eventLocation = event.venue
+    ? `${event.venue.name}${event.venue.location?.place_name ? ` - ${event.venue.location.place_name}` : ""}`
+    : event.location
+      ? `${event.location.name}, ${event.location.country}`
+      : "Location TBA"
+
+  // Pull paid orders for this event. Draft/expired/failed orders don't need a
+  // notice; refunded orders have already had their own email.
+  const paidOrders = (await strapi.documents("api::ticket-order.ticket-order").findMany({
+    filters: {
+      event: { documentId: event.documentId },
+      status: "paid",
+    },
+    fields: ["documentId", "purchaserEmail", "purchaserName"],
+    limit: 1000,
+  })) as Array<{ documentId: string; purchaserEmail?: string; purchaserName?: string }>
+
+  const uniqueRecipients = new Map<string, string>()
+  for (const order of paidOrders) {
+    const email = order.purchaserEmail?.trim().toLowerCase()
+    if (!email) continue
+    if (!uniqueRecipients.has(email)) {
+      uniqueRecipients.set(email, order.purchaserName || "there")
+    }
+  }
+
+  if (uniqueRecipients.size === 0) {
+    strapi.log.info(
+      `[EmailTemplates] No paid purchasers for cancelled event ${event.documentId} — no cancellation emails sent`
+    )
+    return { sent: 0, failed: 0 }
+  }
+
+  let sent = 0
+  let failed = 0
+
+  for (const [email, purchaserName] of uniqueRecipients) {
+    const emailStartTime = Date.now()
+
+    try {
+      const html = await render(
+        EventCancelledEmail({
+          eventName: event.name,
+          eventDate,
+          eventLocation,
+          purchaserName,
+          frontendUrl,
+          cancellationReason: event.cancellationReason || undefined,
+        })
+      )
+
+      const text = await render(
+        EventCancelledEmail({
+          eventName: event.name,
+          eventDate,
+          eventLocation,
+          purchaserName,
+          frontendUrl,
+          cancellationReason: event.cancellationReason || undefined,
+        }),
+        { plainText: true }
+      )
+
+      await strapi
+        .plugin("email")
+        .service("email")
+        .send({
+          to: email,
+          subject: `[#play14] ${event.name} has been cancelled`,
+          html,
+          text,
+        })
+
+      const durationMs = Date.now() - emailStartTime
+      emailSendTotal.inc({ email_type: "event_cancelled", status: "success" })
+      emailSendDuration.observe({ email_type: "event_cancelled" }, durationMs / 1000)
+      sent++
+    } catch (error: any) {
+      const durationMs = Date.now() - emailStartTime
+      emailSendTotal.inc({ email_type: "event_cancelled", status: "error" })
+      emailSendDuration.observe({ email_type: "event_cancelled" }, durationMs / 1000)
+      strapi.log.error(
+        `[EmailTemplates] Failed to send event cancellation email to ${email}: ${error.message} | event=${event.documentId}`
+      )
+      failed++
+    }
+  }
+
+  strapi.log.info(
+    `[EmailTemplates] Event cancellation dispatch complete | event=${event.documentId}, sent=${sent}, failed=${failed}`
+  )
+
+  return { sent, failed }
 }

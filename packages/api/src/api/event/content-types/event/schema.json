@@ -238,6 +238,14 @@
           "localized": false
         }
       }
+    },
+    "cancellationNotifiedAt": {
+      "type": "datetime",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
     }
   }
 }
