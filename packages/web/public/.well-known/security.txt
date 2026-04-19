@@ -1,0 +1,4 @@
+Contact: mailto:admin@play14.org
+Expires: 2027-04-19T00:00:00.000Z
+Preferred-Languages: en, fr, de, es, it
+Canonical: https://play14.org/.well-known/security.txt

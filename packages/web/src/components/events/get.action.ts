@@ -313,8 +313,8 @@ export async function getEvent({ params }: SlugParamsProps) {
  * REST equivalent of: events/slugs.graphql
  */
 export async function getEventSlugs() {
-  const response = await restQuery<Array<{ slug: string }>>("events", {
-    fields: ["slug"],
+  const response = await restQuery<Array<{ slug: string; updatedAt?: string }>>("events", {
+    fields: ["slug", "updatedAt"],
     pagination: { page: 1, pageSize: 5000 },
   })
 

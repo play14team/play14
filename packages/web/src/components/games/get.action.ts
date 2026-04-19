@@ -131,8 +131,8 @@ export async function getGame({ params }: SlugParamsProps) {
  * REST equivalent of: games/slugs.graphql
  */
 export async function getGameSlugs() {
-  const response = await restQuery<Array<{ slug: string }>>("games", {
-    fields: ["slug"],
+  const response = await restQuery<Array<{ slug: string; updatedAt?: string }>>("games", {
+    fields: ["slug", "updatedAt"],
     pagination: { page: 1, pageSize: 5000 },
   })
 
