@@ -1,0 +1,72 @@
+name: Security scan
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Gitleaks action posts a summary and annotations on PRs.
+  pull-requests: read
+
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # --- Gitleaks: scan history / PR diff for committed secrets ----------------
+  gitleaks:
+    name: Gitleaks secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          # Full history is needed so gitleaks can scan the PR diff range.
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GITLEAKS_LICENSE is only required for GitHub organisation repos.
+          # This repository is a personal account, so the action is free and
+          # no license env var is configured. If ownership moves to an org,
+          # add a repository secret named GITLEAKS_LICENSE and reference it
+          # here: GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
+          GITLEAKS_ENABLE_SUMMARY: "true"
+          # Fail the job on any finding (default behaviour of the action — we
+          # pin it explicitly so accidental future changes don't silently
+          # downgrade this gate).
+          GITLEAKS_EXIT_CODE: "1"
+
+  # --- bun audit: known vulnerability check on runtime deps ------------------
+  bun-audit:
+    name: Bun audit (prod deps)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        # Matches the pin used by the deploy workflows (oven-sh/setup-bun@v2
+        # with no explicit version input → installs the latest Bun, which
+        # the root package.json pins to 1.3.5 via packageManager).
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run bun audit on production dependencies
+        # `bun audit` ships in Bun 1.2.x+ (present in 1.3.5). Scans the root
+        # lockfile, which covers every workspace (api, web, design).
+        # `--prod` excludes devDependencies. `--audit-level=high` fails the
+        # job only on high/critical advisories — low/moderate still surface
+        # in the log but don't block PRs.
+        run: bun audit --prod --audit-level=high
