@@ -15,25 +15,53 @@ const toOrigin = (raw?: string | null): string | undefined => {
 
 export default ({ env }: { env: any }) => [
   "strapi::errors",
-  // Rate limiting for critical API endpoints
+  // Rate limiting — two buckets with different limits:
+  //   - auth: stricter, protects credential endpoints from brute force.
+  //     Default: 10 req / 5 min per IP. Tunable via AUTH_RATE_LIMIT_MAX /
+  //     AUTH_RATE_LIMIT_WINDOW_MS.
+  //   - orders: looser, protects checkout/cancel flows from abuse.
+  //     Default: 30 req / 10 min per IP. Tunable via ORDERS_RATE_LIMIT_MAX /
+  //     ORDERS_RATE_LIMIT_WINDOW_MS.
+  // Legacy envs RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_MS still work as fallbacks
+  // for ORDERS_* so existing deploys keep their current tuning.
+  // IMPORTANT: Webhook endpoints (/api/webhooks/*) are intentionally NOT
+  // rate-limited — Stripe retries with backoff and we must accept every event.
+  // Storage: Redis (via REDIS_URL, shared across containers) with in-memory
+  // fallback when Redis is unavailable. See src/middlewares/rate-limit.ts.
   {
     name: "global::rate-limit",
     config: {
-      max: Number.parseInt(env("RATE_LIMIT_MAX", "30"), 10),
-      windowMs: Number.parseInt(env("RATE_LIMIT_WINDOW_MS", "60000"), 10), // 1 minute
-      message: "Too many requests, please try again later.",
-      // Only apply rate limiting to these critical paths
+      bucket: "auth",
+      max: Number.parseInt(env("AUTH_RATE_LIMIT_MAX", "10"), 10),
+      windowMs: Number.parseInt(env("AUTH_RATE_LIMIT_WINDOW_MS", "300000"), 10), // 5 min
+      message: "Too many authentication attempts, please try again later.",
       onlyPaths: [
-        "^/api/ticket-orders$", // Ticket purchase initiation
-        "^/api/ticket-orders/initiate-checkout$",
-        "^/api/ticket-orders/initiate-free-checkout$",
-        "^/api/ticket-orders/.+/cancel$", // Ticket cancellation
-        "^/api/admin/players/me$", // Profile updates
         "^/api/auth/local$", // Login
         "^/api/auth/local/register$", // Registration
         "^/api/auth/forgot-password$", // Password reset
-        "^/api/webhooks/stripe$", // Stripe webhooks (DoS prevention)
+        "^/api/auth/reset-password$", // Password reset confirmation
+        "^/api/auth/send-email-confirmation$",
         "^/api/connect/.+/callback$", // OAuth callbacks
+      ],
+    },
+  },
+  {
+    name: "global::rate-limit",
+    config: {
+      bucket: "orders",
+      max: Number.parseInt(env("ORDERS_RATE_LIMIT_MAX", env("RATE_LIMIT_MAX", "30")), 10),
+      windowMs: Number.parseInt(
+        env("ORDERS_RATE_LIMIT_WINDOW_MS", env("RATE_LIMIT_WINDOW_MS", "600000")),
+        10
+      ), // 10 min
+      message: "Too many requests, please try again later.",
+      onlyPaths: [
+        "^/api/ticket-orders$", // Ticket purchase initiation
+        "^/api/ticket-orders/draft$", // Draft order creation
+        "^/api/ticket-orders/[^/]+/checkout$", // Finalize checkout
+        "^/api/ticket-orders/[^/]+/cancel$", // Ticket cancellation
+        "^/api/ticket-orders/[^/]+/refund$", // Refund request
+        "^/api/admin/players/me$", // Profile updates
       ],
     },
   },
@@ -104,7 +132,7 @@ export default ({ env }: { env: any }) => [
       origin: env("ALLOWED_ORIGINS")
         ? env("ALLOWED_ORIGINS")
             .split(",")
-            .map((o) => o.trim())
+            .map((o: string) => o.trim())
         : [], // Empty array = no origins allowed if not configured
       credentials: true,
       maxAge: 3600,
