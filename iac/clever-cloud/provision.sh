@@ -46,6 +46,35 @@ ADDONS=(
   "play14-redis|redis-addon|s_mono|play14-api"
 )
 
+# Scalability: alias|min-flavor|max-flavor|min-instances|max-instances|build-flavor
+#
+# Clever Cloud's default Node runtime flavor is XS (512 MB RAM, shared CPU),
+# which is too small for the Next.js web tier under real traffic — a single
+# XS instance of play14-web was hitting 95%+ RAM and triggering Node GC
+# stalls long enough to abort outbound fetches (undici kState crash, 10s
+# strapi-client timeouts).
+#
+# Production web runs with both scalers enabled:
+#   - Vertical S → M: headroom if S ever feels tight, no cost when not hit
+#     (Clever bills the flavor actually running).
+#   - Horizontal 1 → 2: HA + zero-downtime deploys + spike absorption. Web
+#     is stateless (JWT cookie) so no session affinity needed.
+# Clever's auto-scaler triggers on CPU, so keep the Grafana RAM% alert
+# separately — GC-driven stalls won't trip a CPU threshold.
+#
+# Staging and API stay pinned at XS (min=max) — no load, no need. Setting
+# min-flavor=max-flavor is equivalent to a fixed flavor but uses the same
+# CLI shape uniformly across apps.
+#
+# Build flavor M is kept for all apps because `next build` and `strapi
+# build` both routinely exceed XS memory during compile.
+APP_FLAVORS=(
+  "play14-api-staging|XS|XS|1|1|M"
+  "play14-web-staging|XS|XS|1|1|M"
+  "play14-api|XS|XS|1|1|M"
+  "play14-web|S|M|1|2|M"
+)
+
 # --- Helpers -----------------------------------------------------------------
 
 DRY_RUN="${DRY_RUN:-0}"
@@ -120,6 +149,34 @@ for entry in "${ADDONS[@]}"; do
 done
 echo
 
+# --- Scalability -------------------------------------------------------------
+#
+# Apply min/max flavor, instance range, and build flavor. `clever scale` is
+# idempotent (setting the same values is a no-op) so this block is safe on
+# every run. Using --min-flavor/--max-flavor + --min-instances/--max-instances
+# uniformly means we never implicitly disable a scaler that was manually
+# enabled in the console.
+#
+# Note: changing the flavor config does NOT move the running instance to the
+# new size — a `clever restart --app <name>` (or the next deploy) is required
+# to roll live. Intentional, so re-running provision.sh on a live stack
+# doesn't cause unattended restarts.
+#
+# `clever scale` has no --org flag; `--app <name-or-id>` takes the app name
+# directly, which works because our app names are unique within the org.
+
+echo "==> Setting app scalability"
+for entry in "${APP_FLAVORS[@]}"; do
+  IFS='|' read -r alias min_flavor max_flavor min_inst max_inst build <<<"$entry"
+  echo "  Setting $alias → flavor ${min_flavor}→${max_flavor}, instances ${min_inst}→${max_inst}, build ${build}"
+  # shellcheck disable=SC2046
+  run clever scale --app "$alias" \
+    --min-flavor "$min_flavor" --max-flavor "$max_flavor" \
+    --min-instances "$min_inst" --max-instances "$max_inst" \
+    --build-flavor "$build"
+done
+echo
+
 # --- Summary -----------------------------------------------------------------
 
 echo "==> Done. Next steps:"
@@ -135,3 +192,6 @@ echo
 echo "  3. Run ./buckets.sh to create Cellar buckets and apply CORS."
 echo "  4. Run ./set-env.sh play14-api-staging env-staging.env (etc.)."
 echo "  5. Run ./domains.sh to attach staging hostnames."
+echo "  6. If flavors were changed above, restart the affected apps so the"
+echo "     running instance picks up the new size, e.g."
+echo "       clever restart --app play14-web"

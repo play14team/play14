@@ -95,35 +95,21 @@ export async function clearAuthCookie(): Promise<void> {
  */
 export async function getCurrentUser(): Promise<StrapiUser | null> {
   const jwt = await getAuthCookie()
-  console.log("[Auth] getCurrentUser - JWT present:", !!jwt)
   if (!jwt) return null
 
   try {
-    const url = `${STRAPI_URL}/api/users/me?populate=player.avatar`
-    console.log("[Auth] Fetching user from:", url)
-    const response = await fetch(url, {
+    const response = await fetch(`${STRAPI_URL}/api/users/me?populate=player.avatar`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
       cache: "no-store",
     })
 
-    console.log("[Auth] Response status:", response.status)
-    if (!response.ok) {
-      // Token expired or invalid - return null (this is expected on pages like reset-password)
-      // Cookie clearing is handled by signout or middleware
-      console.log("[Auth] No valid session (status:", response.status, ")")
-      return null
-    }
+    // A non-OK status here is expected when the cookie's JWT has expired — it
+    // just means "no session", handled by the caller. Don't log it.
+    if (!response.ok) return null
 
-    const user = await response.json()
-    console.log(
-      "[Auth] User fetched successfully:",
-      user.email,
-      "- Player:",
-      user.player ? user.player.name : "none"
-    )
-    return user
+    return (await response.json()) as StrapiUser
   } catch (error) {
     console.error("[Auth] Failed to get current user:", error)
     return null

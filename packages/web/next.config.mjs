@@ -196,9 +196,16 @@ const nextConfig = {
         pathname: "/vi/**",
       },
     ],
-    formats: ["image/avif", "image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 200, 256, 384, 800],
+    // AVIF encoding is ~3–5× the transient RSS of WebP and dominated the
+    // web tier's peak memory on the XS flavor. The bandwidth win over WebP
+    // is ~10–20%, which is not worth the OOM risk or the CPU spent on a
+    // stateless Next.js box whose image cache is wiped on every deploy.
+    // Stick to WebP only; revisit if we move image optimization off-app.
+    formats: ["image/webp"],
+    // Dropped 3840 (4K) — near-zero real traffic, highest encode cost.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Dropped 16/32/48 — no <Image> usage below 64px in the codebase.
+    imageSizes: [64, 96, 128, 200, 256, 384, 800],
   },
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
