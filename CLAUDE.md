@@ -8,14 +8,14 @@ This is a Bun workspace monorepo with the following structure:
 
 - **Root**: Workspace configuration
 - **packages/api** (`play14-api`): Strapi 5.42 headless CMS
-  - **Tech Stack**: Strapi 5.42, Node.js 22, TypeScript 6, PostgreSQL 17, React 18.3 (admin), GraphQL + REST
+  - **Tech Stack**: Strapi 5.42, Node.js 24, TypeScript 6, PostgreSQL 17, React 18.3 (admin), GraphQL + REST
   - **Hosting**: Clever Cloud (Node.js app + PostgreSQL + Cellar + Redis add-ons)
   - **Purpose**: Serves the #play14 global community platform for agile game players and facilitators
   - **Key Features**: Content management, event scheduling, player profiles, Stripe Connect ticketing, automated cron jobs with Redis-based distributed locking
   - See `packages/api/CLAUDE.md` for detailed API documentation
 - **packages/web** (`play14-web`): Next.js 16 frontend application
   - **Tech Stack**: Next.js 16.2 App Router, React 19.2, TypeScript 6, SCSS + Radix UI primitives, Mapbox GL
-  - **Hosting**: Clever Cloud Node.js app (Node 20)
+  - **Hosting**: Clever Cloud Node.js app (Node 24)
   - **Purpose**: Frontend for the #play14 community platform, consuming the Strapi 5 REST API
   - **Key Features**: SSR, event calendar, player profiles, interactive maps, server actions, i18n via `next-intl`
   - See `packages/web/CLAUDE.md` for detailed web documentation
@@ -24,7 +24,7 @@ This is a Bun workspace monorepo with the following structure:
   - Includes a Storybook application in `storybook/` subdirectory
   - Assets organized in folders: `colors/`, `font/`, `logo/` (with multiple format subfolders: EPS, PNG, SVG, PDF, PSD)
 
-Root and both app packages run on **Bun 1.3.5** (pinned via `packageManager`) and use TypeScript with ES modules (`"type": "module"`). `.nvmrc` pins Node 22 for the API and Node 20 for the web app.
+Root and both app packages run on **Bun 1.3.5** (pinned via `packageManager`) and use TypeScript with ES modules (`"type": "module"`). `.nvmrc` pins Node 24 (the current LTS) for both the API and the web app.
 
 ## Common Commands
 

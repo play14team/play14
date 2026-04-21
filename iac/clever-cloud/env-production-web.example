@@ -4,7 +4,7 @@
 #   ./set-env.sh play14-web env-production-web.env
 
 # --- Clever Cloud runtime ---------------------------------------------------
-CC_NODE_VERSION=22
+CC_NODE_VERSION=24
 CC_NODE_BUILD_TOOL=bun
 CC_RUN_COMMAND=bun run start:web
 # NOTE: Build flavor is NOT an env var — set with:

@@ -238,7 +238,7 @@ Always prefer Strapi 5 idioms (Document Service, `documentId`, Document Service 
 **Repo**: `/home/cpontet/repos/perso/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM.
 
 **Packages & `bun --filter` names**
-- `packages/api` → `play14-api` — Strapi 5.42, Node 22, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
+- `packages/api` → `play14-api` — Strapi 5.42, Node 24, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
 - `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2 (consumes this API).
 - `packages/design` → `play14-design` — Storybook 9 on SvelteKit + Svelte 5.
 
@@ -249,7 +249,7 @@ Always prefer Strapi 5 idioms (Document Service, `documentId`, Document Service 
 - Pre-commit (`.husky/pre-commit`): `bunx lint-staged` + `tsc --noEmit`. API uses `tsconfig.typecheck.json` (TS 5.4.4 vs 6.0.2 split — keep it this way).
 
 **Hosting — Clever Cloud**
-- `play14-api` runs on Clever Cloud Node 22 with add-ons: PostgreSQL 17, Cellar (S3-compatible), Redis.
+- `play14-api` runs on Clever Cloud Node 24 with add-ons: PostgreSQL 17, Cellar (S3-compatible), Redis.
 - Uploads: `@strapi/provider-upload-aws-s3` against Cellar (prod) / MinIO (local). Env: `CELLAR_ADDON_*`, `STORAGE_CDN_URL`.
 - Redis powers Strapi cache + distributed cron locks (`src/services/cron/distributed-lock.ts`); cron disabled by default in prod (`CRON_ENABLED=false`).
 - Stripe Connect: dual-webhook pattern (`STRIPE_WEBHOOK_SECRET` + `STRIPE_WEBHOOK_SECRET_CONNECT`) in `src/api/ticket-order/controllers/webhook.ts`; provider abstraction under `src/services/payment/providers/`.

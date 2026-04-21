@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **#play14 API** is a Strapi 5 headless CMS serving the #play14 global community platform for agile game players and facilitators.
 
-**Tech Stack**: Strapi 5.42.0, Node.js 22, TypeScript 6, PostgreSQL 17, React 18.3 (admin panel), Clever Cloud (Node.js app + PostgreSQL + Cellar + Redis add-ons), GraphQL + REST APIs
+**Tech Stack**: Strapi 5.42.0, Node.js 24, TypeScript 6, PostgreSQL 17, React 18.3 (admin panel), Clever Cloud (Node.js app + PostgreSQL + Cellar + Redis add-ons), GraphQL + REST APIs
 
 ## Common Development Commands
 
@@ -244,10 +244,10 @@ Do not use npm or yarn commands - always use `bun` or `bun run`.
 
 ### Node Version
 
-Use Node 22 (`.nvmrc`):
+Use Node 24 (`.nvmrc`):
 
 ```bash
-nvm use 22
+nvm use 24
 ```
 
 ## Deployment Pipeline
@@ -554,7 +554,7 @@ players/
 2. **GraphQL Cache**: Restart dev server after schema changes to refresh introspection
 3. **Custom Fields**: Current blocker - plugins installed but not registering with Strapi 5
 4. **Upload defaultPath**: `defaultPath: "assets"` required - don't change without CDN updates
-5. **Node Version**: Use Node 22 exactly (`.nvmrc`)
+5. **Node Version**: Use Node 24 exactly (`.nvmrc`)
 6. **Bun Only**: Never use npm or yarn - package manager pinned to bun@1.3.5
 7. **Cron Jobs**: Disabled by default - enable with `CRON_ENABLED=true` in production
 8. **File Watching**: Admin panel ignores `config/sync/**`, `bootstrap/md/**`, `bootstrap/json/**`

@@ -729,6 +729,12 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::budget-line-item.budget-line-item'
     >;
+    cancellationNotifiedAt: Schema.Attribute.DateTime &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     contactEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'team@play14.org'>;
     createdAt: Schema.Attribute.DateTime;
@@ -2519,7 +2525,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.Private;
     invitationSentAt: Schema.Attribute.DateTime & Schema.Attribute.Private;
     invitationStatus: Schema.Attribute.Enumeration<
-      ['none', 'pending', 'sent', 'reminded', 'accepted']
+      ['none', 'pending', 'sent', 'reminded', 'accepted', 'suppressed']
     > &
       Schema.Attribute.Private &
       Schema.Attribute.DefaultTo<'none'>;

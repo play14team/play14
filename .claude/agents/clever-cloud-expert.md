@@ -82,7 +82,7 @@ Authenticated CI uses `CLEVER_TOKEN` + `CLEVER_SECRET` env vars (extracted from 
 
 ## Node.js / Bun runtime
 
-- `CC_NODE_VERSION` pins the Node major/minor. play14-api runs Node 22, play14-web Node 20.
+- `CC_NODE_VERSION` pins the Node major/minor. Both play14-api and play14-web run Node 24 (current LTS).
 - `CC_NODE_BUILD_TOOL`: one of `npm`, `npm-ci`, `pnpm`, `yarn-berry`, `bun`, `custom`. Auto-detected from lock file; pin explicitly in production.
 - `CC_NODE_DEV_DEPENDENCIES=install` keeps dev deps for the build step (needed when `build` scripts require TypeScript/Strapi CLI). Clever strips `node_modules` between build and run only when you set it back.
 - `CC_RUN_COMMAND` overrides the `package.json` `start` script. Use this for monorepos where the script must include a workspace filter (e.g. `bun --filter play14-api start`).
@@ -331,8 +331,8 @@ When producing plans, commands, or diagnostics:
 **Repo**: `/home/cpontet/repos/perso/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM.
 
 **Packages & `bun --filter` names**
-- `packages/api` → `play14-api` — Strapi 5.42, Node 22, PostgreSQL 17 + Cellar + Redis add-ons.
-- `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2, Node 20, `output: "standalone"`.
+- `packages/api` → `play14-api` — Strapi 5.42, Node 24, PostgreSQL 17 + Cellar + Redis add-ons.
+- `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2, Node 24, `output: "standalone"`.
 - `packages/design` → `play14-design` — Storybook 9 on SvelteKit + Svelte 5 (deployed to GitHub Pages, not Clever Cloud).
 
 **Tooling (non-negotiable)**

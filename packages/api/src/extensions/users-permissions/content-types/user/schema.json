@@ -58,7 +58,7 @@
     },
     "invitationStatus": {
       "type": "enumeration",
-      "enum": ["none", "pending", "sent", "reminded", "accepted"],
+      "enum": ["none", "pending", "sent", "reminded", "accepted", "suppressed"],
       "default": "none",
       "private": true
     },

@@ -7,18 +7,26 @@ const createMockStrapi = () => {
   const findMany = vi.fn()
   const update = vi.fn()
 
-  // Mock knex query builder for atomic claims
-  const knexUpdate = vi.fn().mockResolvedValue(1) // Return 1 to indicate successful claim
-  const knexWhere = vi
-    .fn()
-    .mockReturnValue({ where: vi.fn().mockReturnValue({ update: knexUpdate }) })
-  const knexConnection = vi.fn().mockReturnValue({ where: knexWhere })
+  // Knex is called in two shapes in user-invitations.ts:
+  //   - claim: .where(col, val).where(col, val).update({...})   (two chained wheres)
+  //   - revert/suppress: .where(col, val).update({...})         (single where)
+  // The claim mock always returns 1 so the claim succeeds; the shorter chain
+  // captures revert/suppress writes so tests can assert on them.
+  const claimUpdate = vi.fn().mockResolvedValue(1)
+  const terminalUpdate = vi.fn().mockResolvedValue(1)
+  const knexConnection = vi.fn().mockReturnValue({
+    where: vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({ update: claimUpdate }),
+      update: terminalUpdate,
+    }),
+  })
 
   const strapi = {
     documents: vi.fn(() => ({ findMany, update })),
     plugin: vi.fn(() => ({ service: vi.fn(() => ({ send })) })),
     log: {
       info: vi.fn(),
+      warn: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
     },
@@ -27,7 +35,7 @@ const createMockStrapi = () => {
     },
   } as unknown as Core.Strapi
 
-  return { strapi, send, findMany, update, knexUpdate }
+  return { strapi, send, findMany, update, claimUpdate, terminalUpdate }
 }
 
 describe("processUserInvitations", () => {
@@ -138,5 +146,55 @@ describe("processUserInvitations", () => {
       documentId: "user-2",
       data: expect.objectContaining({ invitationStatus: "reminded" }),
     })
+  })
+
+  it("marks the user as suppressed when the provider reports a permanent failure", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] })
+    vi.setSystemTime(new Date("2025-03-14T10:00:00Z"))
+    process.env.INVITATION_SEND_LIMIT = "10"
+    process.env.INVITATION_REMINDER_DAYS = "7"
+    process.env.INVITATION_SEND_DELAY_MS = "0"
+    process.env.INVITATION_SEND_MAX_RETRIES = "0"
+    process.env.INVITATION_SEND_RETRY_DELAY_MS = "0"
+
+    const { strapi, send, findMany, update, terminalUpdate } = createMockStrapi()
+
+    const suppressedUser = {
+      id: 3,
+      documentId: "user-3",
+      email: "suppressed@example.com",
+      username: "suppressed",
+      invitationStatus: "sent",
+      invitationSentAt: "2025-03-01T10:00:00Z",
+      player: { name: "Suppressed Player" },
+    }
+
+    findMany.mockResolvedValueOnce([]).mockResolvedValueOnce([suppressedUser])
+
+    const permanentError = Object.assign(
+      new Error(
+        'Sender.net API error (400): {"message":"email is on suppression list","success":false,"type":"mailer"}'
+      ),
+      { statusCode: 400, permanent: true }
+    )
+    send.mockRejectedValueOnce(permanentError)
+
+    await processUserInvitations(strapi)
+
+    // Suppression path writes via the single-where knex chain, not the documents API.
+    expect(terminalUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ invitation_status: "suppressed" })
+    )
+    // No status revert to "sent" and no "reminded" write should have happened.
+    expect(terminalUpdate).not.toHaveBeenCalledWith(
+      expect.objectContaining({ invitation_status: "sent" })
+    )
+    expect(update).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ invitationStatus: "reminded" }),
+      })
+    )
+    expect(strapi.log.warn).toHaveBeenCalledWith(expect.stringContaining("recipient suppressed"))
+    expect(strapi.log.error).not.toHaveBeenCalled()
   })
 })
