@@ -1,40 +1,50 @@
 /**
- * Migration: Rewrite legacy Azure CDN URLs to this environment's STORAGE_CDN_URL
+ * Migration: Normalize CDN URLs to this environment's STORAGE_CDN_URL
  *
- * The platform was previously hosted behind `play14-cdn.azureedge.net` (Azure
- * Blob + CDN). After the move to Clever Cloud Cellar the hostname no longer
- * resolves, so any stored URL that still points at it produces
- * `getaddrinfo ENOTFOUND` errors on SSR pages and 500s in Next.js `<Image>`.
+ * The platform has had two CDN hosts historically:
+ *   1. `play14-cdn.azureedge.net` (Azure Blob + CDN, pre-Cellar era — now
+ *      defunct, any remaining URL triggers `getaddrinfo ENOTFOUND`).
+ *   2. `cdn.play14.org` (Cellar prod CDN, fronted by Cloudflare).
  *
- * The Cellar bucket kept the same key layout (`strapi-uploads/assets/...`),
- * so swapping the origin is safe and sufficient:
- *   https://play14-cdn.azureedge.net/<key>  ->  ${STORAGE_CDN_URL}/<key>
+ * Both should resolve to the current environment's STORAGE_CDN_URL so every
+ * env serves files from its own bucket — prod from `cdn.play14.org`, staging
+ * from `cdn-staging.play14.org`, local dev from its MinIO base URL.
  *
- * Reading the target from STORAGE_CDN_URL (not a hardcoded host) means this
- * works on every environment: prod rewrites to `https://cdn.play14.org`,
- * staging to `https://cdn-staging.play14.org`, and local to the MinIO base
- * URL (e.g. `http://localhost:9100/play14-uploads`). Skips with a log when
- * the env var is unset to avoid corrupting URLs with `undefined`.
+ * Per-env behaviour:
+ *   - Prod (STORAGE_CDN_URL=https://cdn.play14.org): Azure references rewrite
+ *     to prod CDN, and any stray `http://cdn.play14.org` bumps to https.
+ *     `https://cdn.play14.org -> itself` is skipped as a no-op.
+ *   - Staging (STORAGE_CDN_URL=https://cdn-staging.play14.org): Azure + prod
+ *     references rewrite to staging's own bucket, ending the cross-env bleed
+ *     where staging DB rows (restored from prod dumps) served images from
+ *     prod's Cellar. Assumes staging's Cellar holds the referenced assets;
+ *     if the bucket is sparse, URLs will 404 after rewrite.
+ *   - Local (STORAGE_CDN_URL=http://localhost:9100/play14-uploads): rewrites
+ *     to the local MinIO path-style URL. Works because the `play14-minio-init`
+ *     container seeds MinIO from the prod asset dump.
  *
- * What this migration touches:
- *   1. `files.url` + `files.formats` (Strapi upload plugin) — direct rewrite
- *      using SQL REPLACE (text and jsonb).
+ * What this touches:
+ *   1. `files.url` + `files.formats` (Strapi upload plugin).
  *   2. A generic sweep across every `text` / `varchar` / `json` / `jsonb`
- *      column in the current schema (excluding migration bookkeeping and
- *      the already-handled `files` table), only touching rows that actually
- *      contain the legacy host. This covers rich-text bodies (CKEditor
- *      content in articles/games/home/about/etc.), component tables,
- *      `strapi_core_store_settings.value`, and anywhere else the host may
- *      have been embedded.
+ *      column in the current schema, minus migration bookkeeping and the
+ *      already-handled `files` table. This covers CKEditor rich-text embeds
+ *      in articles/events/games/home/etc., component tables, and
+ *      `strapi_core_store_settings.value`.
  *
- * Idempotent: re-running does nothing because matching rows no longer exist.
+ * Idempotent: once all OLD_BASES have been rewritten, re-running finds zero
+ * matches and is a no-op. Skips entirely when STORAGE_CDN_URL is unset
+ * rather than writing `undefined` into URLs.
  */
 
-const OLD_HOSTS = ["play14-cdn.azureedge.net"]
+const OLD_BASES = [
+  "https://play14-cdn.azureedge.net",
+  "http://play14-cdn.azureedge.net",
+  "https://cdn.play14.org",
+  "http://cdn.play14.org",
+]
 
-// Tables we never want to scan.
 const EXCLUDED_TABLES = new Set([
-  "files", // handled explicitly below
+  "files",
   "strapi_migrations",
   "strapi_migrations_internal",
   "strapi_database_schema",
@@ -43,12 +53,24 @@ const EXCLUDED_TABLES = new Set([
 const TEXTUAL_TYPES = ["text", "character varying", "json", "jsonb"]
 
 export async function up(knex) {
-  console.log("Starting migration: rewrite legacy Azure CDN URLs")
+  console.log("Starting migration: normalize CDN URLs to STORAGE_CDN_URL")
 
-  const substitutions = buildSubstitutions()
-  if (substitutions.length === 0) {
-    console.log("STORAGE_CDN_URL is not set — skipping migration to avoid corrupting URLs")
+  const newBase = process.env.STORAGE_CDN_URL?.replace(/\/+$/, "")
+  if (!newBase) {
+    console.log("STORAGE_CDN_URL is not set — skipping migration")
     return
+  }
+
+  const substitutions = OLD_BASES.filter((old) => old !== newBase).map((old) => [old, newBase])
+
+  if (substitutions.length === 0) {
+    console.log(`Target ${newBase} matches every known old base — nothing to do`)
+    return
+  }
+
+  console.log(`Target base: ${newBase}`)
+  for (const [old, next] of substitutions) {
+    console.log(`  will rewrite: ${old} -> ${next}`)
   }
 
   const filesRewritten = await rewriteFilesTable(knex, substitutions)
@@ -60,21 +82,7 @@ export async function up(knex) {
 }
 
 export async function down() {
-  console.log("Rollback skipped: host rewrite is non-destructive and not safely reversible")
-}
-
-// Build a list of [oldPrefix, newPrefix] pairs that replace the full URL
-// origin (scheme + host + any path component in STORAGE_CDN_URL). Replacing
-// the origin — not just the hostname — lets this work on envs where the
-// target protocol or path differs from Azure's, e.g. local MinIO at
-// `http://localhost:9100/play14-uploads`.
-function buildSubstitutions() {
-  const base = process.env.STORAGE_CDN_URL?.replace(/\/+$/, "")
-  if (!base) return []
-  return OLD_HOSTS.flatMap((host) => [
-    [`https://${host}`, base],
-    [`http://${host}`, base],
-  ])
+  console.log("Rollback skipped: CDN URL rewrite is not safely reversible")
 }
 
 async function rewriteFilesTable(knex, substitutions) {
