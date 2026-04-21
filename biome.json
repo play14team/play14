@@ -10,7 +10,6 @@
       "**",
       "!**/node_modules/",
       "!**/packages/design/",
-      "!**/packages/agents/",
       "!**/packages/web/.next/",
       "!**/packages/web/out/",
       "!**/packages/web/build/",
