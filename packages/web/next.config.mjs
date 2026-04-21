@@ -140,6 +140,14 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  // jsdom (used by isomorphic-dompurify for SSR sanitization) and its CSS
+  // parser css-tree both rely on CommonJS `require()` calls with relative
+  // paths to bundled JSON resources. Turbopack's `externalRequire` shim
+  // loses the caller's __dirname, so those resolve against an empty base
+  // and fail at runtime with `Cannot find module '../data/patch.json'`.
+  // Marking the package tree as a server external tells Next.js to use the
+  // native Node require, which handles relative paths correctly.
+  serverExternalPackages: ["jsdom", "isomorphic-dompurify"],
   async headers() {
     return [
       {
