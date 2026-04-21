@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified?: Date
       changeFrequency?: ChangeFrequency
       priority?: number
-    } = {},
+    } = {}
   ): MetadataRoute.Sitemap[number] => ({
     url: `${siteUrl}${pathname}`,
     lastModified: opts.lastModified ?? buildDate,
@@ -83,28 +83,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...STATIC_ROUTES.map(({ path, changeFrequency, priority }) =>
-      toEntry(path, { changeFrequency, priority }),
+      toEntry(path, { changeFrequency, priority })
     ),
     ...events.events.map((e) =>
       toEntry(`/events/${e.slug}`, {
         lastModified: e.updatedAt ? new Date(e.updatedAt) : buildDate,
         changeFrequency: "weekly",
         priority: 0.7,
-      }),
+      })
     ),
     ...games.games.map((g) =>
       toEntry(`/games/${g.slug}`, {
         lastModified: g.updatedAt ? new Date(g.updatedAt) : buildDate,
         changeFrequency: "monthly",
         priority: 0.7,
-      }),
+      })
     ),
     ...articles.articles.map((a) =>
       toEntry(`/articles/${a.slug}`, {
         lastModified: a.updatedAt ? new Date(a.updatedAt) : buildDate,
         changeFrequency: "monthly",
         priority: 0.6,
-      }),
+      })
     ),
   ]
 }

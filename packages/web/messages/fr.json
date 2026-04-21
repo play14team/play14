@@ -637,7 +637,8 @@
       "continueWithGoogle": "Continuer avec Google",
       "continueWithMicrosoft": "Continuer avec Microsoft",
       "continueWithGitHub": "Continuer avec GitHub",
-      "continueWithLinkedIn": "Continuer avec LinkedIn"
+      "continueWithLinkedIn": "Continuer avec LinkedIn",
+      "subscribeNewsletter": "S'abonner à notre newsletter"
     }
   },
   "hosting": {
