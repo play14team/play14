@@ -69,4 +69,12 @@ jobs:
         # `--prod` excludes devDependencies. `--audit-level=high` fails the
         # job only on high/critical advisories — low/moderate still surface
         # in the log but don't block PRs.
-        run: bun audit --prod --audit-level=high
+        # Ignored advisories:
+        #   GHSA-r5fr-rjxr-66jc — lodash `_.template` code injection. The only
+        #   fix bun's DB accepts is lodash >=4.17.24, which is an unofficial
+        #   republish; lodash/lodash maintainers have not tagged a release past
+        #   4.17.21 on GitHub. We pin canonical 4.17.21 via root `overrides`
+        #   and accept the warning — our code doesn't call `_.template`, and
+        #   the vulnerable path is only reachable from Strapi/CKEditor
+        #   admin-side internals with no user input.
+        run: bun audit --prod --audit-level=high --ignore=GHSA-r5fr-rjxr-66jc
