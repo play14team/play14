@@ -15,7 +15,6 @@ COPY package.json bun.lock ./
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
-COPY packages/agents/package.json ./packages/agents/
 
 # Install dependencies
 RUN bun install --frozen-lockfile
@@ -36,7 +35,6 @@ COPY --from=deps /app/bun.lock ./bun.lock
 COPY packages/api/package.json ./packages/api/
 COPY packages/web/package.json ./packages/web/
 COPY packages/design/package.json ./packages/design/
-COPY packages/agents/package.json ./packages/agents/
 
 # Copy API source code
 COPY packages/api ./packages/api

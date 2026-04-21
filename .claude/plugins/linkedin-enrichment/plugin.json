@@ -5,16 +5,5 @@
   "description": "LinkedIn profile enrichment for play14 players - scrape LinkedIn profiles and update Strapi player data",
   "author": "play14",
   "skills": ["skills/*.md"],
-  "agents": ["agents/*.md"],
-  "mcp": {
-    "linkedin-enrichment-tools": {
-      "command": "bun",
-      "args": ["run", "${CLAUDE_PLUGIN_ROOT}/../../../packages/agents/mcp-server.ts"],
-      "env": {
-        "STRAPI_URL": "${STRAPI_URL}",
-        "STRAPI_API_TOKEN": "${STRAPI_API_TOKEN}",
-        "APIFY_API_TOKEN": "${APIFY_API_TOKEN}"
-      }
-    }
-  }
+  "agents": ["agents/*.md"]
 }
