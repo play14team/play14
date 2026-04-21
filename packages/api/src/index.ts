@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi"
+import { bootstrapEmailTemplates } from "./bootstrap/email-templates"
 import { bootstrapLikedItemImages } from "./bootstrap/liked-items"
 import { bootstrapPermissions } from "./bootstrap/permissions"
 
@@ -367,6 +368,9 @@ export default {
 
       // Bootstrap user role permissions
       await bootstrapPermissions(strapi)
+
+      // Bootstrap users-permissions email templates (sender + reset-password URL)
+      await bootstrapEmailTemplates(strapi)
 
       // Bootstrap liked items images (uploads images from data folder if missing)
       await bootstrapLikedItemImages(strapi)

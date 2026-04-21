@@ -38,7 +38,12 @@ export async function bootstrapEmailTemplates(strapi: Core.Strapi): Promise<void
 
   // Fix email_reset_password URL in advanced settings
   const advancedSettings = (await advancedStore.get()) as Record<string, unknown> | null
-  if (advancedSettings) {
+  if (!advancedSettings) {
+    strapi.log.warn(
+      "[Email Templates] Advanced settings not found; reset password URL not configured. " +
+        "This usually self-heals on the next restart once users-permissions initialises core_store."
+    )
+  } else {
     const expectedResetUrl = `${frontendUrl}/auth/reset-password`
     if (advancedSettings.email_reset_password !== expectedResetUrl) {
       advancedSettings.email_reset_password = expectedResetUrl
