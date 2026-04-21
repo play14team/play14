@@ -97,6 +97,81 @@ function validateWebhookMiddlewareConfig(strapi: Core.Strapi): void {
 }
 
 /**
+ * Reconcile OAuth provider callback URLs with FRONTEND_URL on every boot.
+ *
+ * The users-permissions grant config lives in the DB (editable via the admin
+ * UI) and normally holds a full absolute callback like
+ * `https://play14.org/connect/github/redirect`. That URL changes per
+ * environment (prod → play14.org, staging → staging.play14.org, local →
+ * localhost:3000), so hard-coding it in the DB means every env swap requires
+ * a manual admin-UI edit or a SQL fix-up after each `pg_restore`.
+ *
+ * This bootstrap step keeps the origin in sync with the FRONTEND_URL env var,
+ * but only for callbacks that actually follow the frontend-redirect pattern
+ * `/connect/<provider>/redirect`. Providers configured to call back to the
+ * API directly (e.g. `api/auth/<provider>/callback`) are left untouched.
+ *
+ * If FRONTEND_URL is unset, the sync is skipped — we'd rather keep whatever
+ * the admin UI configured than overwrite it with a prod-default fallback.
+ */
+async function syncOAuthProviderCallbacks(strapi: Core.Strapi): Promise<void> {
+  const frontendUrl = process.env.FRONTEND_URL?.replace(/\/+$/, "")
+  if (!frontendUrl) {
+    strapi.log.info(
+      "[OAuth Callbacks] FRONTEND_URL not set, skipping provider callback reconciliation"
+    )
+    return
+  }
+
+  const grantStore = strapi.store({
+    type: "plugin",
+    name: "users-permissions",
+    key: "grant",
+  })
+
+  const grantConfig = (await grantStore.get()) as Record<string, Record<string, unknown>> | null
+
+  if (!grantConfig) {
+    strapi.log.info("[OAuth Callbacks] No grant config found, skipping")
+    return
+  }
+
+  let changed = false
+
+  for (const [providerName, providerConfig] of Object.entries(grantConfig)) {
+    const callback = providerConfig?.callback
+    if (typeof callback !== "string") continue
+
+    const expectedPath = `/connect/${providerName}/redirect`
+
+    let currentOrigin: string
+    try {
+      const parsed = new URL(callback)
+      if (parsed.pathname !== expectedPath) continue
+      currentOrigin = parsed.origin
+    } catch {
+      // Not an absolute URL (e.g. the default "api/auth/<provider>/callback"
+      // template string) — leave it alone.
+      continue
+    }
+
+    const desired = `${frontendUrl}${expectedPath}`
+    if (callback === desired) continue
+
+    providerConfig.callback = desired
+    strapi.log.info(`[OAuth Callbacks] ${providerName}: ${currentOrigin} -> ${frontendUrl}`)
+    changed = true
+  }
+
+  if (changed) {
+    await grantStore.set({ value: grantConfig })
+    strapi.log.info("[OAuth Callbacks] Grant config updated")
+  } else {
+    strapi.log.info("[OAuth Callbacks] All provider callbacks already in sync")
+  }
+}
+
+/**
  * Ensure unique index exists on processed_webhooks.event_id for idempotency.
  * Strapi's schema sync creates the table but doesn't enforce unique constraints at DB level.
  */
@@ -365,6 +440,9 @@ export default {
       } else {
         strapi.log.info("[LinkedIn OAuth] No LinkedIn configuration found in grant store")
       }
+
+      // Keep OAuth provider callback URLs aligned with FRONTEND_URL per env
+      await syncOAuthProviderCallbacks(strapi)
 
       // Bootstrap user role permissions
       await bootstrapPermissions(strapi)

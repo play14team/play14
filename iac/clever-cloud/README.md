@@ -122,8 +122,8 @@ clever logs --alias play14-web-staging -f
    `./set-env.sh play14-web env-production-web.env`.
 2. Push to `main` — the `clever-deploy-production.yml` workflow deploys
    API first, then web.
-3. Run `STAGE=production ./domains.sh` to attach `api.play14.org` and
-   `new.play14.org` to the production apps.
+3. Run `STAGE=production ./domains.sh` to attach `api.play14.org`,
+   `play14.org`, and `www.play14.org` to the production apps.
 
 ## Cost notes
 

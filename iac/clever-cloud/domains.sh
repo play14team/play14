@@ -32,7 +32,6 @@ PRODUCTION_DOMAINS=(
   "play14-api|api.play14.org"
   "play14-web|play14.org"
   "play14-web|www.play14.org"
-  "play14-web|new.play14.org"
 )
 
 case "$STAGE" in
@@ -76,7 +75,8 @@ EOF
   production)
     cat <<'EOF'
   api.play14.org           CNAME  → <play14-api Clever Cloud domain>
-  new.play14.org           CNAME  → <play14-web Clever Cloud domain>
+  play14.org               A/ALIAS  → <play14-web Clever Cloud domain>
+  www.play14.org           CNAME  → <play14-web Clever Cloud domain>
   cdn.play14.org           CNAME  → cdn.play14.org.cellar-c2.services.clever-cloud.com
                            (proxied through Cloudflare)
 EOF
