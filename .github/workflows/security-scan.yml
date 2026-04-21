@@ -33,11 +33,10 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # GITLEAKS_LICENSE is only required for GitHub organisation repos.
-          # This repository is a personal account, so the action is free and
-          # no license env var is configured. If ownership moves to an org,
-          # add a repository secret named GITLEAKS_LICENSE and reference it
-          # here: GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+          # Required for GitHub organisation repos (this repo lives under the
+          # play14team org). The secret is set at the repository level in
+          # GitHub settings - Secrets and variables - Actions.
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
           GITLEAKS_ENABLE_SUMMARY: "true"
           # Fail the job on any finding (default behaviour of the action — we
