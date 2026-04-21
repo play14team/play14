@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "develop": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "build": "next build && cp -R public .next/standalone/packages/web/ && cp -R .next/static .next/standalone/packages/web/.next/",
+    "start": "HOSTNAME=0.0.0.0 bun .next/standalone/packages/web/server.js",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "typecheck": "tsc --noEmit",

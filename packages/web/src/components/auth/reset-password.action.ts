@@ -1,7 +1,6 @@
 "use server"
 
 import { setAuthCookie } from "@/libs/auth"
-import { strapiFetch } from "@/libs/strapi-client"
 
 interface ResetPasswordResult {
   success: boolean
@@ -20,23 +19,41 @@ interface StrapiAuthResponse {
   }
 }
 
+interface StrapiErrorResponse {
+  error?: { message?: string }
+}
+
+const STRAPI_URL = process.env.STRAPI_API_URL || "http://localhost:1337"
+
+// Reset-password isn't safely retryable (the code can be single-use) so we
+// only get one shot. @strapi/client's default 10s timeout was too tight under
+// slow-API conditions and surfaced as "This operation was aborted" — bypass it
+// and use a direct fetch with a generous 30s window, matching the tryFetch
+// timeout used elsewhere in strapi-client.ts.
+const RESET_PASSWORD_TIMEOUT_MS = 30_000
+
 export async function resetPasswordWithCode(
   code: string,
   password: string,
   passwordConfirmation: string
 ): Promise<ResetPasswordResult> {
-  const result = await strapiFetch<StrapiAuthResponse>(
-    "/auth/reset-password",
-    {},
-    {
+  let response: Response
+  try {
+    response = await fetch(`${STRAPI_URL}/api/auth/reset-password`, {
       method: "POST",
-      body: { code, password, passwordConfirmation },
-      noAuth: true,
-    }
-  )
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ code, password, passwordConfirmation }),
+      signal: AbortSignal.timeout(RESET_PASSWORD_TIMEOUT_MS),
+      cache: "no-store",
+    })
+  } catch (error) {
+    console.error("[ResetPassword] Request failed:", error)
+    return { success: false, error: "Reset failed. Please try again." }
+  }
 
-  if (!result.ok) {
-    const errorMessage = result.error || "Reset failed"
+  if (!response.ok) {
+    const body = (await response.json().catch(() => ({}))) as StrapiErrorResponse
+    const errorMessage = body?.error?.message || `Reset failed (${response.status})`
     const normalizedMessage = errorMessage.toLowerCase()
 
     if (
@@ -73,11 +90,12 @@ export async function resetPasswordWithCode(
     return { success: false, error: errorMessage }
   }
 
-  if (!result.data?.jwt) {
+  const data = (await response.json().catch(() => null)) as StrapiAuthResponse | null
+  if (!data?.jwt) {
     return { success: false, error: "Reset failed - no token received" }
   }
 
-  await setAuthCookie(result.data.jwt)
+  await setAuthCookie(data.jwt)
 
   return { success: true }
 }
