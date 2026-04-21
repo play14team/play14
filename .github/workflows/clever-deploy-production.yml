@@ -42,6 +42,25 @@ jobs:
       - name: Typecheck Web
         run: bun --cwd packages/web typecheck
 
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test API
+        run: bun --filter play14-api test
+
+      - name: Test Web
+        run: bun --filter play14-web test
+
   detect-changes:
     name: Detect changes
     runs-on: ubuntu-latest
@@ -110,7 +129,7 @@ jobs:
 
   deploy-api:
     name: Deploy play14-api
-    needs: [lint, detect-changes]
+    needs: [lint, test, detect-changes]
     if: needs.detect-changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -146,11 +165,11 @@ jobs:
 
   deploy-web:
     name: Deploy play14-web
-    needs: [lint, detect-changes, deploy-api]
+    needs: [lint, test, detect-changes, deploy-api]
     # Web waits for API (generateStaticParams needs the API at build time).
     # If the API job was skipped (no API changes), the web still runs.
     # If the API job failed, the web is blocked.
-    if: ${{ always() && needs.lint.result == 'success' && needs.detect-changes.outputs.web == 'true' && needs.deploy-api.result != 'failure' }}
+    if: ${{ always() && needs.lint.result == 'success' && needs.test.result == 'success' && needs.detect-changes.outputs.web == 'true' && needs.deploy-api.result != 'failure' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

@@ -1,6 +1,19 @@
 const DEFAULT_FROM_NAME = "#play14 community"
 const SENDER_API_URL = "https://api.sender.net/v2/message/send"
-const REQUEST_TIMEOUT_MS = 15000
+const DEFAULT_REQUEST_TIMEOUT_MS = 15000
+
+/**
+ * Resolve the per-request timeout. Mirrors fetchWithTimeout in
+ * src/services/sender-common.ts so the transactional provider and the
+ * broadcast/subscribers clients honour the same SENDER_TIMEOUT_MS override.
+ */
+function resolveTimeoutMs() {
+  const parsed = Number.parseInt(process.env.SENDER_TIMEOUT_MS || "", 10)
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed
+  }
+  return DEFAULT_REQUEST_TIMEOUT_MS
+}
 
 /**
  * Parse a "Name <email>" or plain "email" string into { email, name } for Sender.net API.
@@ -90,8 +103,9 @@ module.exports = {
           body.attachments = toAttachments(attachments)
         }
 
+        const requestTimeoutMs = resolveTimeoutMs()
         const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+        const timeout = setTimeout(() => controller.abort(), requestTimeoutMs)
 
         let response
         try {
@@ -108,7 +122,7 @@ module.exports = {
         } catch (error) {
           if (error && (error.name === "AbortError" || controller.signal.aborted)) {
             const timeoutError = new Error(
-              `Sender.net request timed out after ${REQUEST_TIMEOUT_MS}ms`
+              `Sender.net request timed out after ${requestTimeoutMs}ms`
             )
             timeoutError.cause = error
             throw timeoutError

@@ -732,23 +732,32 @@ export async function sendEventCancellationEmails(
       : "Location TBA"
 
   // Pull paid orders for this event. Draft/expired/failed orders don't need a
-  // notice; refunded orders have already had their own email.
-  const paidOrders = (await strapi.documents("api::ticket-order.ticket-order").findMany({
-    filters: {
-      event: { documentId: event.documentId },
-      status: "paid",
-    },
-    fields: ["documentId", "purchaserEmail", "purchaserName"],
-    limit: 1000,
-  })) as Array<{ documentId: string; purchaserEmail?: string; purchaserName?: string }>
-
+  // notice; refunded orders have already had their own email. Paginated so a
+  // popular event with thousands of tickets doesn't silently drop recipients.
+  const ORDER_PAGE_SIZE = 500
   const uniqueRecipients = new Map<string, string>()
-  for (const order of paidOrders) {
-    const email = order.purchaserEmail?.trim().toLowerCase()
-    if (!email) continue
-    if (!uniqueRecipients.has(email)) {
-      uniqueRecipients.set(email, order.purchaserName || "there")
+
+  for (let offset = 0; ; offset += ORDER_PAGE_SIZE) {
+    const page = (await strapi.documents("api::ticket-order.ticket-order").findMany({
+      filters: {
+        event: { documentId: event.documentId },
+        status: "paid",
+      },
+      fields: ["documentId", "purchaserEmail", "purchaserName"],
+      sort: { createdAt: "asc" },
+      limit: ORDER_PAGE_SIZE,
+      start: offset,
+    })) as Array<{ documentId: string; purchaserEmail?: string; purchaserName?: string }>
+
+    for (const order of page) {
+      const email = order.purchaserEmail?.trim().toLowerCase()
+      if (!email) continue
+      if (!uniqueRecipients.has(email)) {
+        uniqueRecipients.set(email, order.purchaserName || "there")
+      }
     }
+
+    if (page.length < ORDER_PAGE_SIZE) break
   }
 
   if (uniqueRecipients.size === 0) {

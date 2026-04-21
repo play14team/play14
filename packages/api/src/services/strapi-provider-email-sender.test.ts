@@ -309,5 +309,45 @@ describe("strapi-provider-email-sender", () => {
       await vi.advanceTimersByTimeAsync(15_000)
       await assertion
     })
+
+    it("respects SENDER_TIMEOUT_MS env override", async () => {
+      vi.useFakeTimers()
+      const previous = process.env.SENDER_TIMEOUT_MS
+      process.env.SENDER_TIMEOUT_MS = "5000"
+
+      global.fetch = vi.fn(
+        (_url: string, init?: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            const signal = init?.signal
+            if (signal) {
+              signal.addEventListener("abort", () => {
+                const abortErr = new Error("aborted")
+                ;(abortErr as Error & { name: string }).name = "AbortError"
+                reject(abortErr)
+              })
+            }
+          })
+      ) as unknown as typeof fetch
+
+      const sender = createSender()
+
+      const pending = sender.send({
+        from: "sender@play14.org",
+        to: "player@example.com",
+        subject: "Hi",
+      })
+
+      const assertion = expect(pending).rejects.toThrow(/timed out after 5000ms/)
+
+      // Firing at 5s (the override) proves the hard-coded 15s is no longer in play.
+      await vi.advanceTimersByTimeAsync(5_000)
+      await assertion
+
+      if (previous === undefined) {
+        delete process.env.SENDER_TIMEOUT_MS
+      } else {
+        process.env.SENDER_TIMEOUT_MS = previous
+      }
+    })
   })
 })
