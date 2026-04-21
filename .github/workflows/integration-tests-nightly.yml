@@ -1,0 +1,85 @@
+name: Integration tests (nightly)
+
+on:
+  schedule:
+    # 03:00 UTC daily — avoids contention with deploy workflows and keeps
+    # failure email well before European morning standups.
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-tests-nightly
+  cancel-in-progress: false
+
+jobs:
+  integration:
+    name: API integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Postgres service container replaces the local `play14-db-test` podman
+    # service. Same image (17.6-alpine) and credentials as `compose.yaml`, but
+    # exposed on the runner's default 5432 (no port collision concerns in CI).
+    services:
+      postgres:
+        image: postgres:17.6-alpine
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: play14_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user -d play14_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      NODE_ENV: test
+
+      # Database — the API's test setup (src/test-utils/strapi-test-instance.ts)
+      # respects DATABASE_* when already set, so these win over the 5433 defaults.
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: localhost
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: play14_test
+      DATABASE_USERNAME: test_user
+      DATABASE_PASSWORD: test_password
+      DATABASE_SSL: "false"
+
+      # Strapi runtime secrets — dummy values are sufficient for ephemeral
+      # single-run CI; nothing persists between jobs.
+      APP_KEYS: ci-key1,ci-key2,ci-key3,ci-key4
+      ADMIN_JWT_SECRET: ci-admin-jwt-secret
+      JWT_SECRET: ci-jwt-secret
+      API_TOKEN_SALT: ci-api-token-salt
+      TRANSFER_TOKEN_SALT: ci-transfer-token-salt
+
+      # Required for the admin-panel build step. We don't hit Mapbox at test
+      # time; any non-empty value unblocks the build.
+      STRAPI_ADMIN_MAPBOX_ACCESS_TOKEN: ci-dummy-mapbox-token
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Strapi integration setup (src/__integration__/setup.ts) expects a
+      # compiled `dist/` tree. Build once up-front so the first test file
+      # doesn't pay the cost inside its hookTimeout window.
+      - name: Build Strapi
+        run: bun --filter play14-api build
+
+      # `test:integration:ci` skips the podman-compose pre/post hooks from the
+      # local-dev `test:integration` script — the Postgres service container
+      # above already provides the database.
+      - name: Run integration tests
+        run: bun --filter play14-api test:integration:ci
