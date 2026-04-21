@@ -292,7 +292,7 @@ Always prioritize maintainability, reliability, and efficiency while building te
 **Repo**: `/home/cpontet/repos/perso/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM (`"type": "module"`).
 
 **Packages & `bun --filter` names**
-- `packages/api` → `play14-api` — Strapi 5.42, Node 22, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
+- `packages/api` → `play14-api` — Strapi 5.42, Node 24, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
 - `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2, SCSS + Radix UI, Mapbox GL, next-intl (`packages/web/messages/{en,fr,de,es,it}.json`).
 - `packages/design` → `play14-design` — Storybook 9 on **SvelteKit + Svelte 5** (not React). Stories are `.svelte` files.
 

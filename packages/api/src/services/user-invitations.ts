@@ -85,6 +85,26 @@ function reportInvitationError(
   )
 }
 
+function isPermanentSendError(error: unknown): boolean {
+  return Boolean(
+    error && typeof error === "object" && (error as { permanent?: boolean }).permanent === true
+  )
+}
+
+function reportSuppressedRecipient(
+  strapi: Core.Strapi,
+  user: InvitationUser,
+  reminder: boolean,
+  error: unknown
+) {
+  const errorMessage = formatErrorMessage(error)
+  const action = reminder ? "reminder" : "invite"
+
+  strapi.log.warn(
+    `[Invitations] Skipping ${action} for ${user.email} (recipient suppressed): ${errorMessage}`
+  )
+}
+
 function getErrorStatusCode(error: unknown): number | undefined {
   if (!error || typeof error !== "object") {
     return undefined
@@ -294,6 +314,19 @@ async function revertUserStatus(
   })
 }
 
+/**
+ * Move a user to the terminal `suppressed` state. Used when the email provider
+ * signals a permanent delivery failure (suppression list, hard bounce, invalid
+ * address) so the cron job stops retrying on every tick.
+ */
+async function markUserSuppressed(strapi: Core.Strapi, userDocumentId: string): Promise<void> {
+  const knex = strapi.db.connection
+  await knex("up_users").where("document_id", userDocumentId).update({
+    invitation_status: "suppressed",
+    updated_at: new Date(),
+  })
+}
+
 export async function processUserInvitations(strapi: Core.Strapi): Promise<void> {
   if (process.env.INVITATION_EMAILS_ENABLED === "false") {
     return
@@ -357,9 +390,17 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
       })
       strapi.log.info(`[Invitations] Sent invite to ${user.email}`)
     } catch (error) {
-      // Revert status to pending so this user can be retried on next cron run
-      await revertUserStatus(strapi, user.documentId, "pending")
-      reportInvitationError(strapi, user, false, error)
+      if (isPermanentSendError(error)) {
+        // Recipient is on the email provider's suppression list (bounced,
+        // unsubscribed, complained, invalid). Retrying will never succeed, so
+        // move the user to a terminal state and stop.
+        await markUserSuppressed(strapi, user.documentId)
+        reportSuppressedRecipient(strapi, user, false, error)
+      } else {
+        // Revert status to pending so this user can be retried on next cron run
+        await revertUserStatus(strapi, user.documentId, "pending")
+        reportInvitationError(strapi, user, false, error)
+      }
     }
   }
 
@@ -407,9 +448,14 @@ export async function processUserInvitations(strapi: Core.Strapi): Promise<void>
       })
       strapi.log.info(`[Invitations] Sent reminder to ${user.email}`)
     } catch (error) {
-      // Revert status to sent so this user can be retried on next cron run
-      await revertUserStatus(strapi, user.documentId, "sent")
-      reportInvitationError(strapi, user, true, error)
+      if (isPermanentSendError(error)) {
+        await markUserSuppressed(strapi, user.documentId)
+        reportSuppressedRecipient(strapi, user, true, error)
+      } else {
+        // Revert status to sent so this user can be retried on next cron run
+        await revertUserStatus(strapi, user.documentId, "sent")
+        reportInvitationError(strapi, user, true, error)
+      }
     }
   }
 }

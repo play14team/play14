@@ -61,6 +61,21 @@ function toAttachments(attachments) {
 }
 
 /**
+ * Detect Sender.net failures that will never succeed on retry — recipient is on the
+ * suppression list (unsubscribed, hard-bounced, complained), email is malformed, etc.
+ * Sender.net flags these as HTTP 400 with `type: "mailer"` in the response body. Used
+ * by the cron job to stop retrying and mark the user as suppressed instead of logging
+ * errors forever.
+ */
+function isPermanentSendError(statusCode, body) {
+  if (statusCode !== 400) return false
+  if (!body || typeof body !== "object") return false
+  if (body.type !== "mailer") return false
+  const message = typeof body.message === "string" ? body.message : ""
+  return /suppress|unsubscrib|bounce|complaint|invalid/i.test(message)
+}
+
+/**
  * Safely parse a fetch response body, returning parsed JSON when possible or the raw text
  * otherwise. Guarantees we never throw inside the error-handling path of `send`.
  */
@@ -139,6 +154,7 @@ module.exports = {
           const error = new Error(`Sender.net API error (${response.status}): ${bodySnippet}`)
           error.statusCode = response.status
           error.responseBody = responseBody
+          error.permanent = isPermanentSendError(response.status, responseBody)
           throw error
         }
 

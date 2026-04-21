@@ -25,7 +25,7 @@ play14/
 
 - [Bun](https://bun.sh/) (latest)
 - [Podman](https://podman.io/) or Docker (for containerized development)
-- Node.js 22+
+- Node.js 24+
 
 ## Getting Started
 

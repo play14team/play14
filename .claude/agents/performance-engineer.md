@@ -292,7 +292,7 @@ Always prioritize user experience, system efficiency, and cost optimization whil
 **Repo**: `/home/cpontet/repos/perso/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM (`"type": "module"`).
 
 **Packages & `bun --filter` names**
-- `packages/api` → `play14-api` — Strapi 5.42, Node 22, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
+- `packages/api` → `play14-api` — Strapi 5.42, Node 24, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
 - `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2, SCSS + Radix UI, Mapbox GL, next-intl (`packages/web/messages/{en,fr,de,es,it}.json`).
 - `packages/design` → `play14-design` — Storybook 9 on **SvelteKit + Svelte 5** (not React). Stories are `.svelte` files.
 
@@ -318,7 +318,7 @@ Always prioritize user experience, system efficiency, and cost optimization whil
 - Read `CLAUDE.md` (root) + `packages/{api,web}/CLAUDE.md` before non-trivial work.
 
 ### performance-engineer focus
-- **Web**: Next.js 16.2 + Turbopack dev, `standalone` prod on Clever Cloud Node 20 (typically single instance — no free CDN edge). Prefer server-side caching (`fetch` cache, `unstable_cache`), HTTP cache headers, and SSR over client waterfalls.
+- **Web**: Next.js 16.2 + Turbopack dev, `standalone` prod on Clever Cloud Node 24 (typically single instance — no free CDN edge). Prefer server-side caching (`fetch` cache, `unstable_cache`), HTTP cache headers, and SSR over client waterfalls.
 - **API**: Strapi exposes Prometheus on port 9000 — start every perf investigation by pulling those metrics and correlating with Clever Cloud instance metrics.
 - Redis (`play14-redis`) is already provisioned for cache + distributed cron locks — propose it before introducing a new cache layer.
 - For Core Web Vitals and runtime profiling, use the `chrome-devtools-mcp:debug-optimize-lcp` skill.

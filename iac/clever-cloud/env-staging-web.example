@@ -4,7 +4,7 @@
 #   ./set-env.sh play14-web-staging env-staging-web.env
 
 # --- Clever Cloud runtime ---------------------------------------------------
-CC_NODE_VERSION=22
+CC_NODE_VERSION=24
 CC_NODE_BUILD_TOOL=bun
 # This is a Bun workspace monorepo deployed from the repo root.
 # Clever Cloud's Bun runtime swallows --cwd flags when parsing

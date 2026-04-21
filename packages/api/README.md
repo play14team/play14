@@ -7,7 +7,7 @@ Strapi 5 headless CMS API for the #play14 global community platform.
 ## Tech Stack
 
 - **Framework**: Strapi 5.33.0
-- **Runtime**: Node.js 22, Bun
+- **Runtime**: Node.js 24, Bun
 - **Database**: PostgreSQL 17.6
 - **APIs**: GraphQL + REST
 - **Hosting**: Clever Cloud (Node.js app + PostgreSQL + Redis add-ons)

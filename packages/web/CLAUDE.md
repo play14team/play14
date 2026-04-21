@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Package Manager:** `bun` (version 1.3.5 — pinned in package.json)
 
-**Runtime:** Node.js 20 (see `.nvmrc`)
+**Runtime:** Node.js 24 (see `.nvmrc`)
 
 ## Essential Commands
 
