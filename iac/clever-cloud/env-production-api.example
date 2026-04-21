@@ -106,8 +106,14 @@ CC_METRICS_PROMETHEUS_PATH=/metrics
 
 # --- Security / CORS --------------------------------------------------------
 ALLOWED_ORIGINS=https://new.play14.org,https://api.play14.org
-RATE_LIMIT_MAX=30
-RATE_LIMIT_WINDOW_MS=60000
+
+# Rate limiting (per IP, Redis-backed when REDIS_URL is set, in-memory otherwise).
+# Auth bucket covers /api/auth/* and OAuth callbacks.
+AUTH_RATE_LIMIT_MAX=10
+AUTH_RATE_LIMIT_WINDOW_MS=300000
+# Orders bucket covers /api/ticket-orders and its draft/checkout/cancel/refund paths.
+ORDERS_RATE_LIMIT_MAX=30
+ORDERS_RATE_LIMIT_WINDOW_MS=600000
 
 # --- AI Translator (strapi-ai-translator plugin) ---------------------------
 # These env var names are what the plugin reads — NOT the same as GEMINI_*.
