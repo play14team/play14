@@ -1,4 +1,5 @@
 import { eventToSlug } from "../../../../libs/strings"
+import { acquireLock, releaseLock } from "../../../../services/cron/distributed-lock"
 import { sendEventCancellationEmails } from "../../../../services/email-templates"
 import { triggerContentRevalidation } from "../../../../services/frontend-revalidation"
 
@@ -24,6 +25,12 @@ function validate(data: { name?: string; start?: string; slug?: string }) {
  * written via raw Knex to bypass the lifecycle and avoid recursion. Work runs
  * fire-and-forget — any send failure is logged inside the service helper, not
  * re-thrown, so a flaky outbound call never blocks the admin update.
+ *
+ * A per-event Redis lock closes the remaining window where two Strapi
+ * containers receiving the same afterUpdate concurrently could both start
+ * dispatching before the timestamp is written. When Redis is not configured
+ * (dev), acquireLock returns a fallback token so behaviour degrades to the
+ * single-container case.
  */
 async function notifyEventCancellation(result: {
   documentId: string
@@ -31,6 +38,10 @@ async function notifyEventCancellation(result: {
   cancellationNotifiedAt?: string | null
 }): Promise<void> {
   if (result.eventStatus !== "Cancelled" || result.cancellationNotifiedAt) return
+
+  const lockName = `event-cancellation:${result.documentId}`
+  const lockToken = await acquireLock(lockName, 5 * 60 * 1000)
+  if (!lockToken) return
 
   try {
     const event = (await strapi.documents("api::event.event").findOne({
@@ -50,7 +61,9 @@ async function notifyEventCancellation(result: {
     } | null
 
     if (!event) return
-    // Re-check after fetch — guards against concurrent updates racing the hook.
+    // Re-check after fetch — guards against the same container racing itself
+    // before the distributed lock was introduced, and against any window where
+    // a peer completed its run while we were waiting for the lock to free.
     if (event.cancellationNotifiedAt) return
 
     await sendEventCancellationEmails(strapi, event)
@@ -64,6 +77,8 @@ async function notifyEventCancellation(result: {
     strapi.log.error(
       `[EventLifecycle] Event cancellation dispatch failed for ${result.documentId}: ${error.message}`
     )
+  } finally {
+    await releaseLock(lockName, lockToken)
   }
 }
 

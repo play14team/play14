@@ -46,11 +46,7 @@ const mockStripeInstance = {
 }
 
 vi.mock("stripe", () => ({
-  default: class StripeMock {
-    constructor() {
-      return mockStripeInstance
-    }
-  },
+  default: vi.fn(() => mockStripeInstance),
 }))
 
 // Set environment variables before importing the provider

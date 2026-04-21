@@ -98,16 +98,23 @@ export async function getGroupSubscriberCount(): Promise<{
 }
 
 /**
- * Send a newsletter broadcast to all subscribers in the group
+ * Send a newsletter broadcast to all subscribers in the group.
+ *
+ * The return value is structured so the reconciliation cron can persist the
+ * Sender.net campaign id even when the second /send step fails: in that case
+ * we return `{ success: false, broadcastId, error }` so the caller can later
+ * retry or mark the broadcast as failed. Keep the explicit union type — the
+ * inferred one hides the fact that `broadcastId` is present on the send-step
+ * failure branch too.
  */
+export type SendBroadcastResult =
+  | { success: true; broadcastId: string; error?: undefined }
+  | { success: false; broadcastId?: string; error: string }
+
 export async function sendBroadcast(
   subject: string,
   htmlContent: string
-): Promise<{
-  success: boolean
-  broadcastId?: string
-  error?: string
-}> {
+): Promise<SendBroadcastResult> {
   const apiKey = process.env.SENDER_API_KEY
   const groupId = process.env.SENDER_GROUP_ID
   const replyTo = process.env.EMAIL_REPLY_TO || "community@play14.org"

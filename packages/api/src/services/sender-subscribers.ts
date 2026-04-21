@@ -22,11 +22,10 @@ interface SenderErrorResponse {
 
 /**
  * Matches Sender.net validation messages that indicate the email address is
- * already subscribed. Deliberately narrow: a stray "already in review" message
- * must NOT satisfy this predicate, which it would have under the prior
- * substring-based check.
+ * already subscribed. Deliberately narrow: a stray "already in review" or
+ * "domain exists but is suspended" message must NOT satisfy this predicate.
  */
-const DUPLICATE_EMAIL_REGEX = /already (?:been )?taken|already exists|exists/i
+const DUPLICATE_EMAIL_REGEX = /already (?:been )?taken|already exists/i
 
 /**
  * Add a subscriber to Sender.net for newsletter subscription

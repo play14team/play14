@@ -75,6 +75,27 @@ jobs:
       - name: Typecheck Web
         run: bun --cwd packages/web typecheck
 
+  # --- Unit tests on PR open/update -------------------------------------------
+  test:
+    name: Unit tests
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test API
+        run: bun --filter play14-api test
+
+      - name: Test Web
+        run: bun --filter play14-web test
+
   # --- Deploy staging apps on PR open/update ----------------------------------
   detect-changes:
     name: Detect changes
@@ -109,7 +130,7 @@ jobs:
 
   deploy-api-staging:
     name: Deploy play14-api-staging
-    needs: [lint, detect-changes]
+    needs: [lint, test, detect-changes]
     if: needs.detect-changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -138,10 +159,10 @@ jobs:
 
   deploy-web-staging:
     name: Deploy play14-web-staging
-    needs: [lint, detect-changes, deploy-api-staging]
+    needs: [lint, test, detect-changes, deploy-api-staging]
     # Run when web changed. The API job dependency is soft — if the API job
     # was skipped (no API changes), GitHub Actions still lets this run.
-    if: ${{ always() && needs.lint.result == 'success' && needs.detect-changes.outputs.web == 'true' && needs.deploy-api-staging.result != 'failure' }}
+    if: ${{ always() && needs.lint.result == 'success' && needs.test.result == 'success' && needs.detect-changes.outputs.web == 'true' && needs.deploy-api-staging.result != 'failure' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
