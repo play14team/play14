@@ -49,7 +49,11 @@ function buildContentSecurityPolicy() {
 
   const strapiApis = ["https://api.play14.org", "https://api-staging.play14.org"]
 
-  const cellar = ["https://cdn.play14.org", "https://*.cellar-c2.services.clever-cloud.com"]
+  const cellar = [
+    "https://cdn.play14.org",
+    "https://cdn-staging.play14.org",
+    "https://*.cellar-c2.services.clever-cloud.com",
+  ]
 
   const youtubeFrame = ["https://www.youtube.com", "https://www.youtube-nocookie.com"]
   const youtubeImg = ["https://img.youtube.com", "https://i.ytimg.com"]
@@ -169,8 +173,14 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "cdn-staging.play14.org",
+        port: "",
+        pathname: "/**",
+      },
       // Clever Cloud Cellar direct origin (covers any bucket under cellar-c2).
-      // cdn.play14.org pattern above already handles the Cloudflare-fronted CDN URLs.
+      // The cdn(-staging).play14.org patterns above already handle the Cloudflare-fronted CDN URLs.
       {
         protocol: "https",
         hostname: "*.cellar-c2.services.clever-cloud.com",
