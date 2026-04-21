@@ -25,6 +25,7 @@
     "pretest:integration": "podman-compose -f ../../compose.yaml up -d play14-db-test",
     "test:integration": "vitest run -c vitest.integration.config.mts",
     "posttest:integration": "podman-compose -f ../../compose.yaml stop play14-db-test",
+    "test:integration:ci": "vitest run -c vitest.integration.config.mts",
     "pretest:integration:watch": "podman-compose -f ../../compose.yaml up -d play14-db-test",
     "test:integration:watch": "vitest -c vitest.integration.config.mts",
     "posttest:integration:watch": "podman-compose -f ../../compose.yaml stop play14-db-test",
