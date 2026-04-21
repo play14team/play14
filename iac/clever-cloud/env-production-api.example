@@ -85,9 +85,9 @@ GITHUB_WORKFLOW_ID=218106378
 GITHUB_BRANCH=main
 
 # --- Frontend integration --------------------------------------------------
-FRONTEND_URL=https://new.play14.org
+FRONTEND_URL=https://play14.org
 REVALIDATE_SECRET=REPLACE_ME
-LOGO_URL=https://new.play14.org/logo/play14_600x200_transparent-dark.png
+LOGO_URL=https://play14.org/logo/play14_600x200_transparent-dark.png
 
 # --- Observability ----------------------------------------------------------
 # The strapi-prometheus plugin exposes metrics on a separate internal server
@@ -105,7 +105,7 @@ CC_METRICS_PROMETHEUS_PORT=9000
 CC_METRICS_PROMETHEUS_PATH=/metrics
 
 # --- Security / CORS --------------------------------------------------------
-ALLOWED_ORIGINS=https://new.play14.org,https://api.play14.org
+ALLOWED_ORIGINS=https://play14.org,https://www.play14.org,https://api.play14.org
 
 # Rate limiting (per IP, Redis-backed when REDIS_URL is set, in-memory otherwise).
 # Auth bucket covers /api/auth/* and OAuth callbacks.

@@ -17,7 +17,7 @@ STRAPI_API_URL=https://api.play14.org
 STRAPI_API_SECRET=REPLACE_ME
 
 # --- Public URLs ------------------------------------------------------------
-NEXT_PUBLIC_SITE_URL=https://new.play14.org
+NEXT_PUBLIC_SITE_URL=https://play14.org
 NEXT_PUBLIC_STRAPI_URL=https://api.play14.org
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.REPLACE_ME
 NEXT_PUBLIC_WEB_VITALS=true
