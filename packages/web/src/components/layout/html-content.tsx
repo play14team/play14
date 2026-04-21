@@ -1,11 +1,6 @@
-import DOMPurify from "isomorphic-dompurify"
+import sanitizeHtml, { type IOptions } from "sanitize-html"
 
-/**
- * Allowed HTML tags for user-generated content
- * Matches CKEditor5/Tiptap output
- */
 const ALLOWED_TAGS = [
-  // Text formatting
   "p",
   "br",
   "strong",
@@ -14,32 +9,31 @@ const ALLOWED_TAGS = [
   "s",
   "sub",
   "sup",
-  // Headings
   "h1",
   "h2",
   "h3",
   "h4",
-  // Lists
   "ul",
   "ol",
   "li",
-  // Links
   "a",
-  // Blockquote
   "blockquote",
-  // Code
   "code",
   "pre",
 ]
 
-/**
- * Allowed HTML attributes
- */
-const ALLOWED_ATTR = ["href", "target", "rel", "class"]
+const LINK_ATTRS = ["href", "target", "rel", "class"]
 
-// Strip inline styles from HTML to allow theme colors to apply
-function stripInlineStyles(html: string): string {
-  return html.replace(/\s*style="[^"]*"/gi, "")
+function buildAllowedAttributes(preserveStyles: boolean): IOptions["allowedAttributes"] {
+  const styleAttrs = preserveStyles ? ["style"] : []
+  const attrs: Record<string, string[]> = {
+    a: [...LINK_ATTRS, ...styleAttrs],
+  }
+  for (const tag of ALLOWED_TAGS) {
+    if (tag === "a") continue
+    attrs[tag] = ["class", ...styleAttrs]
+  }
+  return attrs
 }
 
 // Transform all-caps text to sentence case in HTML
@@ -66,29 +60,23 @@ function normalizeAllCapsText(html: string): string {
   })
 }
 
-/**
- * Sanitize HTML content to prevent XSS attacks
- */
-function sanitizeHtml(html: string): string {
-  // DOMPurify works both on client and server (via jsdom in SSR)
-  const sanitized = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    // Remove dangerous URI schemes
-    ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
-  })
-
-  // Post-process: ensure all links have safe attributes
-  return sanitized.replace(/<a\s+([^>]*href=["'][^"']*["'][^>]*)>/gi, (_match, attrs) => {
-    // Add target="_blank" if not present
-    if (!attrs.includes("target=")) {
-      attrs += ' target="_blank"'
-    }
-    // Add rel="noopener noreferrer" if not present
-    if (!attrs.includes("rel=")) {
-      attrs += ' rel="noopener noreferrer"'
-    }
-    return `<a ${attrs}>`
+function sanitize(html: string, preserveStyles: boolean): string {
+  return sanitizeHtml(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: buildAllowedAttributes(preserveStyles),
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowedSchemesAppliedToAttributes: ["href"],
+    allowProtocolRelative: true,
+    transformTags: {
+      a: (tagName, attribs) => ({
+        tagName,
+        attribs: {
+          ...attribs,
+          target: "_blank",
+          rel: "noopener noreferrer",
+        },
+      }),
+    },
   })
 }
 
@@ -101,13 +89,12 @@ const HtmlContent = ({
 }) => {
   if (!children) return null
 
-  // Sanitize first to prevent XSS, then optionally strip styles, then normalize all-caps
-  const sanitized = sanitizeHtml(children)
-  const withoutStyles = preserveStyles ? sanitized : stripInlineStyles(sanitized)
-  const content = normalizeAllCapsText(withoutStyles)
+  const sanitized = sanitize(children, preserveStyles)
+  const content = normalizeAllCapsText(sanitized)
 
-  // content is sanitized above via DOMPurify; dangerouslySetInnerHTML avoids SSR/CSR
-  // hydration mismatches caused by jsdom vs browser DOM sanitization differences.
+  // content is sanitized by sanitize-html above. suppressHydrationWarning
+  // guards against minor whitespace/attribute-ordering drift between the
+  // server-rendered HTML string and the client's parsed DOM.
   return <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: content }} />
 }
 
