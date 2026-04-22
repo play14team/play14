@@ -31,16 +31,30 @@
  *      in articles/events/games/home/etc., component tables, and
  *      `strapi_core_store_settings.value`.
  *
+ * Scope safety: the rewrite is anchored on `<scheme>://<host>/strapi-uploads/`
+ * rather than just the hostname. That excludes prose mentions of the bare
+ * domain (e.g. "our assets live at cdn.play14.org") from being rewritten
+ * while still matching every stored asset URL, which always carries the
+ * `/strapi-uploads/` prefix per Strapi's upload-provider layout.
+ *
+ * Runs inside a single `knex.transaction` so a mid-migration failure leaves
+ * the DB unchanged rather than half-rewritten.
+ *
  * Idempotent: once all OLD_BASES have been rewritten, re-running finds zero
  * matches and is a no-op. Skips entirely when STORAGE_CDN_URL is unset
  * rather than writing `undefined` into URLs.
  */
 
+// Scoped to the upload path prefix so the rewrite only touches asset URLs,
+// never a prose mention of the bare domain in a CKEditor article. `/strapi-uploads/`
+// is Strapi's consistent bucket prefix (defaultPath="assets" beneath it).
+const UPLOAD_PATH = "/strapi-uploads/"
+
 const OLD_BASES = [
-  "https://play14-cdn.azureedge.net",
-  "http://play14-cdn.azureedge.net",
-  "https://cdn.play14.org",
-  "http://cdn.play14.org",
+  `https://play14-cdn.azureedge.net${UPLOAD_PATH}`,
+  `http://play14-cdn.azureedge.net${UPLOAD_PATH}`,
+  `https://cdn.play14.org${UPLOAD_PATH}`,
+  `http://cdn.play14.org${UPLOAD_PATH}`,
 ]
 
 const EXCLUDED_TABLES = new Set([
@@ -55,30 +69,40 @@ const TEXTUAL_TYPES = ["text", "character varying", "json", "jsonb"]
 export async function up(knex) {
   console.log("Starting migration: normalize CDN URLs to STORAGE_CDN_URL")
 
-  const newBase = process.env.STORAGE_CDN_URL?.replace(/\/+$/, "")
-  if (!newBase) {
+  const cdnBase = process.env.STORAGE_CDN_URL?.replace(/\/+$/, "")
+  if (!cdnBase) {
     console.log("STORAGE_CDN_URL is not set — skipping migration")
     return
   }
 
-  const substitutions = OLD_BASES.filter((old) => old !== newBase).map((old) => [old, newBase])
+  // Compose the canonical asset prefix for this environment. OLD_BASES include
+  // the /strapi-uploads/ suffix too, so the REPLACE operation swaps the full
+  // scheme+host+upload-path atomically while preserving the key tail.
+  const newPrefix = `${cdnBase}${UPLOAD_PATH}`
+  const substitutions = OLD_BASES.filter((old) => old !== newPrefix).map((old) => [old, newPrefix])
 
   if (substitutions.length === 0) {
-    console.log(`Target ${newBase} matches every known old base — nothing to do`)
+    console.log(`Target ${newPrefix} matches every known old base — nothing to do`)
     return
   }
 
-  console.log(`Target base: ${newBase}`)
+  console.log(`Target prefix: ${newPrefix}`)
   for (const [old, next] of substitutions) {
     console.log(`  will rewrite: ${old} -> ${next}`)
   }
 
-  const filesRewritten = await rewriteFilesTable(knex, substitutions)
-  const sweepRewritten = await sweepTextualColumns(knex, substitutions)
+  // Wrap the whole migration in a single transaction so a mid-run failure
+  // can't leave the DB half-rewritten. Strapi's migrator typically wraps
+  // migrations in a transaction already, but being explicit is cheap
+  // insurance and makes the guarantee self-documenting.
+  await knex.transaction(async (trx) => {
+    const filesRewritten = await rewriteFilesTable(trx, substitutions)
+    const sweepRewritten = await sweepTextualColumns(trx, substitutions)
 
-  console.log(
-    `Migration complete: ${filesRewritten} file row column(s) rewritten, ${sweepRewritten} other row(s) rewritten`
-  )
+    console.log(
+      `Migration complete: ${filesRewritten} file row column(s) rewritten, ${sweepRewritten} other row(s) rewritten`
+    )
+  })
 }
 
 export async function down() {
