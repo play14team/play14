@@ -351,8 +351,11 @@ describe("webhook controller", () => {
         data: { id: "cs_test_123" },
       })
 
-      // Mock a non-retryable validation error
+      // Mock a non-retryable validation error — isRetryableError now keys on
+      // the structured `name` property (Strapi ValidationError) rather than
+      // substring-matching the message.
       const validationError = new Error("Invalid attendee email format")
+      ;(validationError as any).name = "ValidationError"
       controller.handleCheckoutCompleted = vi.fn().mockRejectedValue(validationError)
 
       await controller.handleStripeWebhook(ctx)
@@ -394,34 +397,54 @@ describe("webhook controller", () => {
       expect(controller.isRetryableError(error)).toBe(true)
     })
 
-    it("returns true for network errors", () => {
-      const error = new Error("network request failed")
+    it("returns true for PostgreSQL lock_not_available errors (55P03)", () => {
+      const error = new Error("Lock not available")
+      ;(error as any).code = "55P03"
       expect(controller.isRetryableError(error)).toBe(true)
     })
 
-    it("returns true for timeout errors in message", () => {
-      const error = new Error("Request timeout after 30s")
+    it("returns true for transient DNS errors (EAI_AGAIN)", () => {
+      const error = new Error("getaddrinfo EAI_AGAIN")
+      ;(error as any).code = "EAI_AGAIN"
       expect(controller.isRetryableError(error)).toBe(true)
     })
 
-    it("returns false for email/SMTP errors", () => {
-      const error = new Error("SMTP connection failed")
-      expect(controller.isRetryableError(error)).toBe(false)
+    it("returns true for AbortError (network abort)", () => {
+      const error = new Error("The operation was aborted")
+      ;(error as any).name = "AbortError"
+      expect(controller.isRetryableError(error)).toBe(true)
     })
 
-    it("returns false for email sending errors", () => {
-      const error = new Error("Failed to send email to user")
-      expect(controller.isRetryableError(error)).toBe(false)
-    })
-
-    it("returns false for validation errors", () => {
+    it("returns false for Strapi ValidationError", () => {
       const error = new Error("Invalid email format")
+      ;(error as any).name = "ValidationError"
       expect(controller.isRetryableError(error)).toBe(false)
     })
 
-    it("returns false for Invalid data errors", () => {
-      const error = new Error("Invalid attendee data")
+    it("returns false for Strapi ApplicationError", () => {
+      const error = new Error("Bad state")
+      ;(error as any).name = "ApplicationError"
       expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("returns false for email-send failures (SendMailError)", () => {
+      const error = new Error("SMTP connection failed")
+      ;(error as any).name = "SendMailError"
+      expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("returns false for mailer-prefixed error names", () => {
+      const error = new Error("Provider bounced")
+      ;(error as any).name = "MailerTransientError"
+      expect(controller.isRetryableError(error)).toBe(false)
+    })
+
+    it("does NOT swallow DB errors whose message mentions 'email' (regression)", () => {
+      // Previously, substring matching on error.message meant a DB constraint
+      // error on an `email` column was treated as a non-retryable email-send
+      // failure. Structural checks now defer to the default (retryable).
+      const error = new Error('duplicate key value violates unique constraint "users_email_key"')
+      expect(controller.isRetryableError(error)).toBe(true)
     })
 
     it("returns true for unknown errors (default to retryable)", () => {
