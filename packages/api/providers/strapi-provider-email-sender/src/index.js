@@ -49,9 +49,10 @@ function toRecipients(value) {
  */
 function toAttachments(attachments) {
   return attachments.map((attachment) => {
-    const content = attachment.content
-    const base64 =
-      content && typeof content.toString === "function" ? content.toString("base64") : ""
+    // Guard on Buffer specifically — `typeof x.toString === "function"` is
+    // truthy for any non-null value, so a stray string content would silently
+    // pass through un-encoded (String.prototype.toString ignores the radix).
+    const base64 = Buffer.isBuffer(attachment.content) ? attachment.content.toString("base64") : ""
     return {
       name: attachment.filename,
       content: base64,
