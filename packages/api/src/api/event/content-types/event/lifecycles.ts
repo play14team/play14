@@ -46,7 +46,7 @@ async function notifyEventCancellation(result: {
   try {
     const event = (await strapi.documents("api::event.event").findOne({
       documentId: result.documentId,
-      fields: ["documentId", "name", "start", "cancellationNotifiedAt"],
+      fields: ["documentId", "name", "start", "cancellationNotifiedAt", "cancellationReason"],
       populate: {
         location: { fields: ["name", "country"] },
         venue: { fields: ["name", "location"] },
@@ -56,6 +56,7 @@ async function notifyEventCancellation(result: {
       name: string
       start: string
       cancellationNotifiedAt?: string | null
+      cancellationReason?: string | null
       location?: { name?: string; country?: string } | null
       venue?: { name?: string; location?: { place_name?: string } | null } | null
     } | null

@@ -821,24 +821,42 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           .decrement("sold_count", count)
       }
 
-      // Remove player from event attendees
+      // Remove player from event attendees — but only if this refund zeroes out
+      // their attendance. A purchaser who holds multiple paid orders for the
+      // same event (e.g. bought seats in separate sessions) must stay on the
+      // attendees list until the last one is refunded.
       if (order.player && order.event) {
-        const playerDoc = await strapi.documents("api::player.player").findOne({
-          documentId: order.player.documentId,
-          populate: { attended: { fields: ["id", "documentId"] } },
+        const otherPaidOrders = await strapi.documents("api::ticket-order.ticket-order").count({
+          filters: {
+            event: { documentId: order.event.documentId },
+            player: { documentId: order.player.documentId },
+            status: "paid",
+            documentId: { $ne: order.documentId },
+          },
         })
 
-        if (playerDoc) {
-          const updatedAttended = (playerDoc.attended || []).filter(
-            (e: any) => e.documentId !== order.event.documentId
-          )
-
-          await strapi.documents("api::player.player").update({
+        if (otherPaidOrders === 0) {
+          const playerDoc = await strapi.documents("api::player.player").findOne({
             documentId: order.player.documentId,
-            data: {
-              attended: updatedAttended.map((e: any) => e.id),
-            } as any,
+            populate: { attended: { fields: ["id", "documentId"] } },
           })
+
+          if (playerDoc) {
+            const updatedAttended = (playerDoc.attended || []).filter(
+              (e: any) => e.documentId !== order.event.documentId
+            )
+
+            await strapi.documents("api::player.player").update({
+              documentId: order.player.documentId,
+              data: {
+                attended: updatedAttended.map((e: any) => e.id),
+              } as any,
+            })
+          }
+        } else {
+          strapi.log.info(
+            `[Webhook] Keeping player ${order.player.documentId} on event ${order.event.documentId} — ${otherPaidOrders} other paid order(s) remain | correlationId=${correlationId}`
+          )
         }
       }
     }
