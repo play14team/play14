@@ -17,6 +17,7 @@ import type { Core } from "@strapi/strapi"
 import { fetchWithTimeout, safeJson } from "../sender-common"
 
 const DEFAULT_STALE_MS = 300_000
+const DEFAULT_RECONCILE_BATCH_SIZE = 50
 
 type SendStatus = "draft" | "sending" | "sent" | "failed"
 
@@ -152,9 +153,19 @@ export async function reconcileNewsletterSends(strapi: Core.Strapi): Promise<voi
   )
   const resolvedStale = Number.isFinite(staleMs) && staleMs > 0 ? staleMs : DEFAULT_STALE_MS
 
+  const batchSize = Number.parseInt(
+    process.env.NEWSLETTER_RECONCILE_BATCH_SIZE || String(DEFAULT_RECONCILE_BATCH_SIZE),
+    10
+  )
+  const resolvedBatch =
+    Number.isFinite(batchSize) && batchSize > 0 ? batchSize : DEFAULT_RECONCILE_BATCH_SIZE
+
   const now = new Date()
   const cutoff = new Date(now.getTime() - resolvedStale)
 
+  // Cap the query so a large backlog (e.g. after a Sender.net outage) doesn't
+  // push a single cron tick past its 5-minute window. Subsequent ticks drain
+  // the rest.
   const stuck = (await strapi.documents("api::newsletter-send.newsletter-send").findMany({
     fields: ["documentId", "subject", "sendStatus", "resendBroadcastId", "updatedAt"],
     filters: {
@@ -162,6 +173,7 @@ export async function reconcileNewsletterSends(strapi: Core.Strapi): Promise<voi
       updatedAt: { $lt: cutoff.toISOString() },
     },
     sort: { updatedAt: "asc" },
+    limit: resolvedBatch,
   })) as unknown as NewsletterForReconciliation[]
 
   if (stuck.length === 0) {

@@ -798,6 +798,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // For full refunds, update all tickets to refunded and decrement sold
     // counts. Partial refunds don't map cleanly to per-ticket states, so we
     // keep tickets as-is and just record the order-level state.
+    //
+    // TODO(ticketing): partial refunds leave sold_count inflated for the
+    // affected ticket types. For low-capacity events this could block future
+    // sales. Revisit by either (a) requiring the refund flow to void specific
+    // tickets before partially refunding, or (b) reconciling sold_count from
+    // non-refunded tickets on a cron.
     if (!isPartialRefund) {
       const ticketTypeCounts = new Map<string, number>()
       for (const ticket of order.tickets || []) {
