@@ -924,10 +924,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Notify the host when the account status changes. The helper itself
     // handles the `pending` landing state and missing host-email guards.
+    // Build the payload explicitly — spreading the full Strapi document
+    // (with createdAt / publishedAt / id / etc.) leaks internals and would
+    // quietly regress if the helper's accepted shape ever narrows.
     if (accountStatus !== previousStatus) {
       await sendStripeAccountStatusEmail(
         strapi,
-        { ...stripeAccount, ...updateData },
+        {
+          documentId: stripeAccount.documentId,
+          stripeAccountId: stripeAccount.stripeAccountId,
+          chargesEnabled: updateData.chargesEnabled,
+          payoutsEnabled: updateData.payoutsEnabled,
+          detailsSubmitted: updateData.detailsSubmitted,
+        },
         previousStatus,
         accountStatus
       )
@@ -975,36 +984,60 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
   },
 
   /**
-   * Determine if an error is retryable (Stripe should retry the webhook)
-   * Non-retryable errors are logged and prevent endless retry loops
+   * Determine if an error is retryable (Stripe should retry the webhook).
+   * Prefers structured signals (error.code, constructor name) over substring
+   * matches on human-readable messages — the old "email"/"SMTP" message
+   * checks would silently swallow any DB error mentioning those words
+   * (e.g. a constraint error on an `email` column).
    */
   isRetryableError(error: any): boolean {
-    // Database connection errors are retryable
-    if (error.code === "ECONNREFUSED" || error.code === "ETIMEDOUT") {
+    // Database connection / deadlock codes — always retryable.
+    const RETRYABLE_CODES = new Set([
+      "ECONNREFUSED",
+      "ECONNRESET",
+      "ETIMEDOUT",
+      "EAI_AGAIN",
+      // Postgres: deadlock_detected, serialization_failure, lock_not_available
+      "40P01",
+      "40001",
+      "55P03",
+    ])
+    if (typeof error?.code === "string" && RETRYABLE_CODES.has(error.code)) {
       return true
     }
 
-    // Database deadlock/lock timeout errors are retryable
-    if (error.code === "40P01" || error.code === "40001") {
-      return true
-    }
-
-    // Network errors are retryable
-    if (error.message?.includes("network") || error.message?.includes("timeout")) {
-      return true
-    }
-
-    // Email sending failures are NOT retryable (order is still valid)
-    if (error.message?.includes("email") || error.message?.includes("SMTP")) {
+    // Strapi validation / application errors — non-retryable. Strapi raises
+    // ValidationError / ApplicationError with a stable `name` property, so
+    // we can identify them without grepping error.message.
+    const NON_RETRYABLE_NAMES = new Set([
+      "ValidationError",
+      "ApplicationError",
+      "YupValidationError",
+      "NotFoundError",
+      "ForbiddenError",
+    ])
+    if (typeof error?.name === "string" && NON_RETRYABLE_NAMES.has(error.name)) {
       return false
     }
 
-    // Validation errors are NOT retryable (bad data won't fix itself)
-    if (error.message?.includes("Invalid") || error.message?.includes("validation")) {
+    // Email-send failures come through Strapi's email plugin, which wraps
+    // provider errors in a SendMailError (nodemailer) or raises its own
+    // error name. Treat them as non-retryable — the order is already paid
+    // and recoverable, and retrying a broken transport won't help.
+    if (
+      typeof error?.name === "string" &&
+      (error.name === "SendMailError" || error.name.startsWith("Mailer"))
+    ) {
       return false
     }
 
-    // Default to retryable for unknown errors (safer to retry)
+    // Generic network-layer errors (fetch AbortError, undici timeout) —
+    // retryable. Match on error class names, not message text.
+    if (error?.name === "AbortError" || error?.name === "TimeoutError") {
+      return true
+    }
+
+    // Default to retryable for unknown errors (safer to retry).
     return true
   },
 })
