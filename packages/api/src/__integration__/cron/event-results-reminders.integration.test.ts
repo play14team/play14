@@ -53,6 +53,7 @@ describe("Event Results Reminders Integration", () => {
     eventStatus?: string
     resultsReminderCount?: number
     resultsReminderLastSentAt?: string | null
+    cancellationNotifiedAt?: string | null
     hosts?: number[]
   }) {
     const event = await strapi.documents("api::event.event").create({
@@ -66,10 +67,22 @@ describe("Event Results Reminders Integration", () => {
         contactEmail: options.contactEmail,
         resultsReminderCount: options.resultsReminderCount ?? 0,
         resultsReminderLastSentAt: options.resultsReminderLastSentAt ?? null,
+        cancellationNotifiedAt: options.cancellationNotifiedAt ?? null,
         hosts: options.hosts,
-      },
+      } as any,
     })
     return event
+  }
+
+  async function addResultLineItem(eventDocumentId: string) {
+    await strapi.documents("api::result-line-item.result-line-item").create({
+      data: {
+        category: "other_income",
+        name: "Seed amount",
+        amount: 100,
+        event: eventDocumentId,
+      } as any,
+    })
   }
 
   describe("reminder eligibility", () => {
@@ -149,6 +162,49 @@ describe("Event Results Reminders Integration", () => {
         eventStatus: "Open", // Not "Over"
         resultsReminderCount: 0,
       })
+
+      await processEventResultsReminders(strapi)
+
+      expect(emailSendSpy).not.toHaveBeenCalled()
+    })
+
+    it("does not send reminder for events that were cancelled", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] })
+      vi.setSystemTime(new Date("2025-02-20T10:00:00Z"))
+
+      // Simulates an event that was cancelled and later auto-transitioned to
+      // "Over" (e.g. by the updateEventStatus cron if its status was flipped
+      // back, or by a manual admin edit). The cancellation timestamp is the
+      // durable signal that the event never happened.
+      await createTestEventWithDetails({
+        name: "Cancelled Event",
+        slug: "cancelled-event",
+        end: "2025-02-01T18:00:00Z",
+        contactEmail: "organizer@example.com",
+        eventStatus: "Over",
+        cancellationNotifiedAt: "2025-01-20T10:00:00Z",
+        resultsReminderCount: 0,
+      })
+
+      await processEventResultsReminders(strapi)
+
+      expect(emailSendSpy).not.toHaveBeenCalled()
+    })
+
+    it("does not send reminder for events that already have result line items", async () => {
+      vi.useFakeTimers({ toFake: ["Date"] })
+      vi.setSystemTime(new Date("2025-02-20T10:00:00Z"))
+
+      const event = await createTestEventWithDetails({
+        name: "Event With Results",
+        slug: "event-with-results",
+        end: "2025-02-01T18:00:00Z",
+        contactEmail: "organizer@example.com",
+        eventStatus: "Over",
+        resultsReminderCount: 0,
+      })
+
+      await addResultLineItem(event.documentId)
 
       await processEventResultsReminders(strapi)
 
