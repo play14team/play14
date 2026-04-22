@@ -17,6 +17,7 @@ import {
   sendOrderConfirmationEmail,
   sendPlayerInvitationEmail,
   sendTicketSoldNotificationEmail,
+  type TicketOrderForEmail,
 } from "../../../services/email-templates"
 import { generateCorrelationId, startTimer } from "../../../services/observability/logger"
 import {
@@ -1818,7 +1819,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Send confirmation email to purchaser
-    await sendOrderConfirmationEmail(strapi, order, createdTickets)
+    await sendOrderConfirmationEmail(
+      strapi,
+      order as unknown as TicketOrderForEmail,
+      createdTickets
+    )
 
     // Send invitation emails to new players (attendees who got a new profile created)
     for (const ticket of createdTickets) {
@@ -1838,7 +1843,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Notify event organizers about the sale
-    await sendTicketSoldNotificationEmail(strapi, order, createdTickets)
+    await sendTicketSoldNotificationEmail(
+      strapi,
+      order as unknown as TicketOrderForEmail,
+      createdTickets
+    )
 
     strapi.log.info(
       `[Ticketing] Order ${order.orderNumber} processed successfully with ${createdTickets.length} tickets`

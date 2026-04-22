@@ -5,7 +5,7 @@
  * Uses the configured group to send newsletters to all subscribers.
  */
 
-import { fetchWithTimeout, parseFromAddress, safeJson } from "./sender-common"
+import { fetchWithTimeout, parseFromAddress, SenderTimeoutError, safeJson } from "./sender-common"
 
 interface SenderGroupResponse {
   data?: {
@@ -200,7 +200,7 @@ export async function sendBroadcast(
       `[SenderBroadcast] Error sending broadcast: ${error instanceof Error ? error.message : String(error)}`
     )
     const message =
-      error instanceof Error && error.message === "Sender.net request timed out"
+      error instanceof SenderTimeoutError
         ? error.message
         : "Failed to connect to newsletter service"
     return { success: false, error: message }
@@ -262,7 +262,7 @@ export async function sendTestEmail(
       `[SenderBroadcast] Error sending test email: ${error instanceof Error ? error.message : String(error)}`
     )
     const message =
-      error instanceof Error && error.message === "Sender.net request timed out"
+      error instanceof SenderTimeoutError
         ? error.message
         : "Failed to connect to newsletter service"
     return { success: false, error: message }

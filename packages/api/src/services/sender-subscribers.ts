@@ -5,7 +5,7 @@
  * Sender.net is the source of truth for newsletter subscribers.
  */
 
-import { fetchWithTimeout, safeJson } from "./sender-common"
+import { fetchWithTimeout, SenderTimeoutError, safeJson } from "./sender-common"
 
 interface SenderSubscriberResponse {
   id?: number
@@ -103,7 +103,7 @@ export async function addSubscriberToGroup(
       `[SenderSubscribers] Error adding subscriber: ${error instanceof Error ? error.message : String(error)}`
     )
     const message =
-      error instanceof Error && error.message === "Sender.net request timed out"
+      error instanceof SenderTimeoutError
         ? error.message
         : "Failed to connect to newsletter service"
     return { success: false, error: message }
