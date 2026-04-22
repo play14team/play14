@@ -72,9 +72,9 @@ export default function EventCancelledEmail({
       )}
 
       <Text>
-        If you purchased tickets for this event, a refund will be processed automatically to the
-        original payment method. Refunds typically appear on your statement within 5-10 business
-        days.
+        If you purchased tickets for this event, please reply to this email and our team will
+        arrange a refund to your original payment method. Refunds typically appear on your statement
+        within 5-10 business days once processed.
       </Text>
 
       <Text>
