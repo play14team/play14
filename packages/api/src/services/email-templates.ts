@@ -23,6 +23,49 @@ import { nameToUsername } from "../libs/strings"
 import { emailSendDuration, emailSendTotal } from "./observability/metrics"
 
 /**
+ * Shape of the ticket-order entity consumed by the send helpers below.
+ *
+ * Intentionally structural (not a Strapi-generated type) so callers can pass
+ * either a populated Document Service result or a lifecycle `result` without
+ * fighting the types. Every field is what the helpers actually read — if the
+ * upstream shape grows, extend this interface rather than reintroducing
+ * `order: any`.
+ */
+export interface TicketOrderForEmail {
+  documentId?: string
+  orderNumber: string
+  purchaserName?: string
+  purchaserEmail: string
+  currency?: string
+  totalAmount?: number
+  originalAmount?: number
+  discountAmount?: number
+  notes?: string | null
+  paidAt?: string | null
+  ticketDetails?: Array<{
+    ticketTypeName?: string
+    quantity?: number
+    unitAmount?: number
+    currency?: string
+  }>
+  event?: {
+    documentId?: string
+    name?: string
+    slug?: string
+    start?: string
+    end?: string
+    description?: string
+    eventStatus?: string
+    contactEmail?: string
+    location?: { name?: string; country?: string } | null
+    venue?: {
+      name?: string
+      location?: { place_name?: string } | null
+    } | null
+  }
+}
+
+/**
  * Render a React Email component to both HTML and plain-text variants in
  * parallel. Halves the time spent in @react-email/render per send and
  * removes the prop-duplication that was common to every send helper.
@@ -42,7 +85,7 @@ async function renderEmail(
  */
 export async function sendOrderConfirmationEmail(
   strapi: Core.Strapi,
-  order: any,
+  order: TicketOrderForEmail,
   createdTickets: Array<{
     ticketCode: string
     ticketTypeName: string
@@ -54,7 +97,6 @@ export async function sendOrderConfirmationEmail(
 ) {
   const frontendUrl = process.env.FRONTEND_URL || "https://play14.org"
 
-  // Format event date for display
   const eventDate = new Date(order.event.start).toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
@@ -73,7 +115,6 @@ export async function sendOrderConfirmationEmail(
       ? `${order.event.location.name}, ${order.event.location.country}`
       : "Location TBA"
 
-  // Generate calendar data
   let icsContent: string | null = null
   let googleCalendarUrl = ""
   let outlookCalendarUrl = ""
@@ -97,7 +138,8 @@ export async function sendOrderConfirmationEmail(
     strapi.log.warn(`[EmailTemplates] Failed to generate calendar data: ${calError.message}`)
   }
 
-  // Generate invoice PDF (non-critical - email is sent even if PDF fails)
+  // Invoice PDF is non-critical: swallow failures so the confirmation email
+  // still goes out.
   let invoicePDF: Buffer | null = null
 
   try {
@@ -139,11 +181,9 @@ export async function sendOrderConfirmationEmail(
 
     strapi.log.info(`[EmailTemplates] Invoice PDF generated for order ${order.orderNumber}`)
   } catch (invoiceError: any) {
-    // NON-CRITICAL FAILURE: Invoice generation failed but email will still be sent.
     strapi.log.warn(`[EmailTemplates] Failed to generate invoice PDF: ${invoiceError.message}`)
   }
 
-  // Build ticket list for email
   const tickets = createdTickets.map((t) => ({
     ticketTypeName: t.ticketTypeName,
     ticketCode: t.ticketCode,
@@ -219,7 +259,7 @@ export async function sendOrderConfirmationEmail(
  */
 export async function sendTicketSoldNotificationEmail(
   strapi: Core.Strapi,
-  order: any,
+  order: TicketOrderForEmail,
   createdTickets: Array<{
     ticketCode: string
     ticketTypeName: string
@@ -316,22 +356,18 @@ export async function sendPlayerInvitationEmail(
       ? `${event.location.name}, ${event.location.country}`
       : "Location TBA"
 
-  // Generate password reset token for the player's user account
   const resetToken = randomBytes(64).toString("hex")
 
-  // Find or create the user associated with this player
   let user = await strapi.documents("plugin::users-permissions.user").findFirst({
     filters: { player: { documentId: player.documentId } },
   })
 
   if (!user) {
-    // No user exists - check if there's a user with this email (not linked to player yet)
     user = await strapi.documents("plugin::users-permissions.user").findFirst({
       filters: { email: { $eqi: email } },
     })
 
     if (user) {
-      // User exists but not linked to player - link them
       await strapi.documents("plugin::users-permissions.user").update({
         documentId: user.documentId,
         data: {
@@ -343,12 +379,9 @@ export async function sendPlayerInvitationEmail(
         `[EmailTemplates] Linked existing user ${email} to player ${player.documentId}`
       )
     } else {
-      // Create a new user account. Wrapped in try/catch to close the TOCTOU
-      // window where two concurrent webhooks for the same attendee email both
-      // pass the findFirst above and race to create. Postgres rejects the
-      // second insert on the email unique constraint; we recover by re-reading
-      // the row the winner inserted and treating it as the "existing user"
-      // branch above.
+      // Try/catch closes a TOCTOU: two concurrent webhooks for the same email
+      // can both pass the findFirst above. The second insert fails on the
+      // email unique constraint; we re-read the winner and reuse it.
       const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
         filters: { type: "player" },
       })
@@ -395,19 +428,16 @@ export async function sendPlayerInvitationEmail(
       }
     }
   } else {
-    // User already exists and is linked - just update the reset token
     await strapi.documents("plugin::users-permissions.user").update({
       documentId: user.documentId,
       data: { resetPasswordToken: resetToken } as any,
     })
   }
 
-  // Build reset password URL (similar to user-invitations.ts)
   const callbackUrl = encodeURIComponent("/admin")
   const code = encodeURIComponent(resetToken)
   const resetPasswordUrl = `${frontendUrl}/auth/reset-password?code=${code}&callbackUrl=${callbackUrl}`
 
-  // Generate calendar data
   let icsContent: string | null = null
   let googleCalendarUrl = ""
   let outlookCalendarUrl = ""
@@ -458,7 +488,6 @@ export async function sendPlayerInvitationEmail(
       text,
     }
 
-    // Add ICS attachment if generated successfully
     if (icsContent) {
       emailOptions.attachments = [
         {
@@ -471,8 +500,8 @@ export async function sendPlayerInvitationEmail(
 
     await strapi.plugin("email").service("email").send(emailOptions)
 
-    // Update invitation status to prevent duplicate emails from cron job
-    // This is critical for multi-container deployments where cron runs on all instances
+    // Flip invitationStatus so the nightly invitation cron — which runs on
+    // every container — doesn't re-send this email.
     if (user) {
       await strapi.documents("plugin::users-permissions.user").update({
         documentId: user.documentId,
@@ -504,7 +533,7 @@ export async function sendPlayerInvitationEmail(
  */
 export async function sendPaymentFailedEmail(
   strapi: Core.Strapi,
-  order: any,
+  order: TicketOrderForEmail,
   errorMessage: string,
   correlationId?: string
 ) {

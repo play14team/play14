@@ -71,10 +71,23 @@ export async function safeJson(response: Response): Promise<unknown> {
 }
 
 /**
+ * Raised by `fetchWithTimeout` when the request exceeds its timeout.
+ *
+ * Callers branch on `instanceof SenderTimeoutError` — keep the class stable
+ * even if the human-readable message changes.
+ */
+export class SenderTimeoutError extends Error {
+  constructor(message = "Sender.net request timed out") {
+    super(message)
+    this.name = "SenderTimeoutError"
+  }
+}
+
+/**
  * `fetch` with a configurable AbortController timeout.
  *
- * On timeout, rejects with `Error("Sender.net request timed out")` so the
- * calling code can surface a uniform message and log / fail the newsletter.
+ * On timeout, rejects with a `SenderTimeoutError` so callers can detect it
+ * without string-matching the message.
  */
 export async function fetchWithTimeout(
   url: string,
@@ -96,7 +109,7 @@ export async function fetchWithTimeout(
       error instanceof Error &&
       (error.name === "AbortError" || (error as { code?: string }).code === "ABORT_ERR")
     ) {
-      throw new Error("Sender.net request timed out")
+      throw new SenderTimeoutError()
     }
     throw error
   } finally {
