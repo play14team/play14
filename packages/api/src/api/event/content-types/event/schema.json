@@ -246,6 +246,14 @@
           "localized": false
         }
       }
+    },
+    "cancellationReason": {
+      "type": "text",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
     }
   }
 }

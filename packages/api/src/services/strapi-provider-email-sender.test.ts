@@ -7,7 +7,7 @@ type SendOptions = {
   subject: string
   text?: string
   html?: string
-  attachments?: Array<{ filename: string; content: Buffer; contentType: string }>
+  attachments?: Array<{ filename: string; content: Buffer | string | unknown; contentType: string }>
 }
 
 // The provider package is CommonJS with a single `init(providerOptions, settings)` export
@@ -198,6 +198,53 @@ describe("strapi-provider-email-sender", () => {
 
       const body = lastRequestBody(fetchFn)
       expect("attachments" in body).toBe(false)
+    })
+
+    it("encodes string content as UTF-8 so ICS text isn't silently truncated", async () => {
+      const fetchFn = mockOkFetch()
+      const sender = createSender()
+
+      await sender.send({
+        from: "sender@play14.org",
+        to: "player@example.com",
+        subject: "Hi",
+        attachments: [
+          {
+            filename: "event.ics",
+            content: "BEGIN:VCALENDAR",
+            contentType: "text/calendar",
+          },
+        ],
+      })
+
+      const body = lastRequestBody(fetchFn)
+      expect(body.attachments[0].content).toBe(
+        Buffer.from("BEGIN:VCALENDAR", "utf8").toString("base64")
+      )
+    })
+
+    it("warns and emits an empty payload for unsupported content types", async () => {
+      const fetchFn = mockOkFetch()
+      const sender = createSender()
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+
+      await sender.send({
+        from: "sender@play14.org",
+        to: "player@example.com",
+        subject: "Hi",
+        attachments: [
+          {
+            filename: "broken.bin",
+            content: { unexpected: true },
+            contentType: "application/octet-stream",
+          },
+        ],
+      })
+
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("broken.bin"))
+      const body = lastRequestBody(fetchFn)
+      expect(body.attachments[0].content).toBe("")
+      warnSpy.mockRestore()
     })
 
     it("omits the attachments key when the array is empty", async () => {

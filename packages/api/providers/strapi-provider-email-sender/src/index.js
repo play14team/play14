@@ -49,13 +49,22 @@ function toRecipients(value) {
  */
 function toAttachments(attachments) {
   return attachments.map((attachment) => {
-    // Guard on Buffer specifically — `typeof x.toString === "function"` is
-    // truthy for any non-null value, so a stray string content would silently
-    // pass through un-encoded (String.prototype.toString ignores the radix).
-    const base64 = Buffer.isBuffer(attachment.content) ? attachment.content.toString("base64") : ""
+    let buffer
+    if (Buffer.isBuffer(attachment.content)) {
+      buffer = attachment.content
+    } else if (typeof attachment.content === "string") {
+      // Callers sometimes forget to wrap ICS/text content in Buffer.from(); do
+      // it here so the attachment isn't silently truncated to an empty payload.
+      buffer = Buffer.from(attachment.content, "utf8")
+    } else {
+      console.warn(
+        `[strapi-provider-email-sender] Dropping attachment "${attachment.filename}" — content must be a Buffer or string, got ${typeof attachment.content}`
+      )
+      buffer = Buffer.alloc(0)
+    }
     return {
       name: attachment.filename,
-      content: base64,
+      content: buffer.toString("base64"),
       content_type: attachment.contentType,
     }
   })

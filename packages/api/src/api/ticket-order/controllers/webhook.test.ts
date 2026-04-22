@@ -868,6 +868,7 @@ describe("webhook controller", () => {
       const orderDocs = {
         findFirst: vi.fn().mockResolvedValue(mockOrder),
         update: vi.fn().mockResolvedValue({}),
+        count: vi.fn().mockResolvedValue(0),
       }
       const ticketDocs = {
         update: vi.fn().mockResolvedValue({}),
@@ -921,6 +922,51 @@ describe("webhook controller", () => {
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
         expect.stringContaining("refunded via Stripe dashboard")
       )
+    })
+
+    it("keeps player on event when another paid order still exists for the same event", async () => {
+      const mockOrder = {
+        documentId: "order-doc-123",
+        orderNumber: "ORD-001",
+        status: "paid",
+        tickets: [{ documentId: "ticket-1" }],
+        player: { documentId: "player-doc-123" },
+        event: { documentId: "event-doc-123" },
+      }
+
+      const orderDocs = {
+        findFirst: vi.fn().mockResolvedValue(mockOrder),
+        update: vi.fn().mockResolvedValue({}),
+        count: vi.fn().mockResolvedValue(1),
+      }
+      const ticketDocs = { update: vi.fn().mockResolvedValue({}) }
+      const playerDocs = {
+        findOne: vi.fn(),
+        update: vi.fn(),
+      }
+
+      mockStrapi.documents.mockImplementation((type: string) => {
+        if (type === "api::ticket-order.ticket-order") return orderDocs
+        if (type === "api::ticket.ticket") return ticketDocs
+        if (type === "api::player.player") return playerDocs
+        return {}
+      })
+
+      await controller.handleChargeRefunded({
+        payment_intent: "pi_test",
+        amount_refunded: 5000,
+      })
+
+      expect(orderDocs.count).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filters: expect.objectContaining({
+            status: "paid",
+            documentId: { $ne: "order-doc-123" },
+          }),
+        })
+      )
+      expect(playerDocs.findOne).not.toHaveBeenCalled()
+      expect(playerDocs.update).not.toHaveBeenCalled()
     })
   })
 
