@@ -23,6 +23,21 @@ import { nameToUsername } from "../libs/strings"
 import { emailSendDuration, emailSendTotal } from "./observability/metrics"
 
 /**
+ * Render a React Email component to both HTML and plain-text variants in
+ * parallel. Halves the time spent in @react-email/render per send and
+ * removes the prop-duplication that was common to every send helper.
+ */
+async function renderEmail(
+  component: Parameters<typeof render>[0]
+): Promise<{ html: string; text: string }> {
+  const [html, text] = await Promise.all([
+    render(component),
+    render(component, { plainText: true }),
+  ])
+  return { html, text }
+}
+
+/**
  * Send order confirmation email with calendar attachment and invoice PDF
  */
 export async function sendOrderConfirmationEmail(
@@ -138,7 +153,7 @@ export async function sendOrderConfirmationEmail(
   const emailStartTime = Date.now()
 
   try {
-    const html = await render(
+    const { html, text } = await renderEmail(
       TicketConfirmationEmail({
         orderNumber: order.orderNumber,
         eventName: order.event.name,
@@ -153,24 +168,6 @@ export async function sendOrderConfirmationEmail(
         outlookCalendarUrl,
         frontendUrl,
       })
-    )
-
-    const text = await render(
-      TicketConfirmationEmail({
-        orderNumber: order.orderNumber,
-        eventName: order.event.name,
-        eventDate,
-        eventTime,
-        eventLocation,
-        currency: order.currency,
-        totalAmount: order.totalAmount,
-        contactEmail: order.event.contactEmail,
-        tickets,
-        googleCalendarUrl,
-        outlookCalendarUrl,
-        frontendUrl,
-      }),
-      { plainText: true }
     )
 
     const emailOptions: any = {
@@ -248,7 +245,7 @@ export async function sendTicketSoldNotificationEmail(
   const emailStartTime = Date.now()
 
   try {
-    const html = await render(
+    const { html, text } = await renderEmail(
       TicketSoldNotificationEmail({
         eventName: order.event?.name || "Event",
         eventSlug: order.event?.slug,
@@ -260,21 +257,6 @@ export async function sendTicketSoldNotificationEmail(
         tickets,
         frontendUrl,
       })
-    )
-
-    const text = await render(
-      TicketSoldNotificationEmail({
-        eventName: order.event?.name || "Event",
-        eventSlug: order.event?.slug,
-        orderNumber: order.orderNumber,
-        purchaserName: order.purchaserName,
-        purchaserEmail: order.purchaserEmail,
-        currency: order.currency,
-        totalAmount: order.totalAmount,
-        tickets,
-        frontendUrl,
-      }),
-      { plainText: true }
     )
 
     await strapi
@@ -454,7 +436,7 @@ export async function sendPlayerInvitationEmail(
   const emailStartTime = Date.now()
 
   try {
-    const html = await render(
+    const { html, text } = await renderEmail(
       PlayerInvitationEmail({
         playerName,
         ticketCode,
@@ -467,22 +449,6 @@ export async function sendPlayerInvitationEmail(
         outlookCalendarUrl,
         frontendUrl,
       })
-    )
-
-    const text = await render(
-      PlayerInvitationEmail({
-        playerName,
-        ticketCode,
-        eventName: event.name,
-        eventDate,
-        eventTime,
-        eventLocation,
-        resetPasswordUrl,
-        googleCalendarUrl,
-        outlookCalendarUrl,
-        frontendUrl,
-      }),
-      { plainText: true }
     )
 
     const emailOptions: any = {
@@ -546,7 +512,7 @@ export async function sendPaymentFailedEmail(
   const emailStartTime = Date.now()
 
   try {
-    const html = await render(
+    const { html, text } = await renderEmail(
       PaymentFailedEmail({
         orderNumber: order.orderNumber,
         eventName: order.event?.name || "your order",
@@ -554,17 +520,6 @@ export async function sendPaymentFailedEmail(
         errorMessage,
         frontendUrl,
       })
-    )
-
-    const text = await render(
-      PaymentFailedEmail({
-        orderNumber: order.orderNumber,
-        eventName: order.event?.name || "your order",
-        eventSlug: order.event?.slug || "",
-        errorMessage,
-        frontendUrl,
-      }),
-      { plainText: true }
     )
 
     await strapi
@@ -633,20 +588,17 @@ export async function sendStripeAccountStatusEmail(
   // webhook processing.
   let account: any = null
   try {
-    const docs: any = strapi.documents("api::stripe-account.stripe-account")
-    if (typeof docs.findOne === "function") {
-      account = await docs.findOne({
-        documentId: stripeAccount.documentId,
-        populate: {
-          player: {
-            fields: ["name"],
-            populate: {
-              user: { fields: ["email", "firstname", "lastname"] },
-            },
+    account = await strapi.documents("api::stripe-account.stripe-account").findOne({
+      documentId: stripeAccount.documentId,
+      populate: {
+        player: {
+          fields: ["name"],
+          populate: {
+            user: { fields: ["email", "firstname", "lastname"] },
           },
         },
-      })
-    }
+      },
+    })
   } catch (lookupError: any) {
     strapi.log.warn(
       `[EmailTemplates] Failed to resolve host for Stripe account status email: ${lookupError.message} | account=${stripeAccount?.stripeAccountId}`
@@ -676,7 +628,7 @@ export async function sendStripeAccountStatusEmail(
   const emailStartTime = Date.now()
 
   try {
-    const html = await render(
+    const { html, text } = await renderEmail(
       StripeAccountStatusEmail({
         hostName,
         previousStatus,
@@ -686,19 +638,6 @@ export async function sendStripeAccountStatusEmail(
         payoutsEnabled: Boolean(stripeAccount.payoutsEnabled),
         detailsSubmitted: Boolean(stripeAccount.detailsSubmitted),
       })
-    )
-
-    const text = await render(
-      StripeAccountStatusEmail({
-        hostName,
-        previousStatus,
-        currentStatus,
-        frontendUrl,
-        chargesEnabled: Boolean(stripeAccount.chargesEnabled),
-        payoutsEnabled: Boolean(stripeAccount.payoutsEnabled),
-        detailsSubmitted: Boolean(stripeAccount.detailsSubmitted),
-      }),
-      { plainText: true }
     )
 
     await strapi.plugin("email").service("email").send({
@@ -812,7 +751,7 @@ export async function sendEventCancellationEmails(
     const emailStartTime = Date.now()
 
     try {
-      const html = await render(
+      const { html, text } = await renderEmail(
         EventCancelledEmail({
           eventName: event.name,
           eventDate,
@@ -821,18 +760,6 @@ export async function sendEventCancellationEmails(
           frontendUrl,
           cancellationReason: event.cancellationReason || undefined,
         })
-      )
-
-      const text = await render(
-        EventCancelledEmail({
-          eventName: event.name,
-          eventDate,
-          eventLocation,
-          purchaserName,
-          frontendUrl,
-          cancellationReason: event.cancellationReason || undefined,
-        }),
-        { plainText: true }
       )
 
       await strapi

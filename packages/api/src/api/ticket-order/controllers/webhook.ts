@@ -8,6 +8,7 @@
  */
 
 import type { Core } from "@strapi/strapi"
+import { TABLES } from "../../../libs/tables"
 import { generateTicketCode } from "../../../libs/tickets"
 import {
   sendOrderConfirmationEmail,
@@ -822,7 +823,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Decrement sold_count for each ticket type
       for (const [ticketTypeDocumentId, count] of ticketTypeCounts) {
         await strapi.db
-          .connection("ticket_types")
+          .connection(TABLES.ticketTypes)
           .where("document_id", ticketTypeDocumentId)
           .decrement("sold_count", count)
       }

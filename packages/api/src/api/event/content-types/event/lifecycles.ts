@@ -1,4 +1,5 @@
 import { eventToSlug } from "../../../../libs/strings"
+import { TABLES } from "../../../../libs/tables"
 import { acquireLock, releaseLock } from "../../../../services/cron/distributed-lock"
 import { sendEventCancellationEmails } from "../../../../services/email-templates"
 import { triggerContentRevalidation } from "../../../../services/frontend-revalidation"
@@ -71,7 +72,7 @@ async function notifyEventCancellation(result: {
 
     // Raw update to avoid re-entering afterUpdate.
     await strapi.db
-      .connection("events")
+      .connection(TABLES.events)
       .where("document_id", event.documentId)
       .update({ cancellation_notified_at: new Date(), updated_at: new Date() })
   } catch (error: any) {
