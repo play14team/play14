@@ -64,10 +64,12 @@ describe("processEventResultsReminders", () => {
     await processEventResultsReminders(strapi)
 
     // Verify the filter includes the feature launch date constraint
+    // and excludes events flagged as cancelled.
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         filters: expect.objectContaining({
           eventStatus: "Over",
+          cancellationNotifiedAt: { $null: true },
           end: expect.objectContaining({
             $gt: "2025-01-20T00:00:00.000Z",
           }),
@@ -221,6 +223,64 @@ describe("processEventResultsReminders", () => {
         }),
       })
     )
+
+    expect(send).not.toHaveBeenCalled()
+    expect(update).not.toHaveBeenCalled()
+  })
+
+  it("skips events that were cancelled (cancellationNotifiedAt set)", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] })
+    const now = new Date("2025-02-20T10:00:00Z")
+    vi.setSystemTime(now)
+
+    const { strapi, send, findMany, update } = createMockStrapi()
+
+    // Defence-in-depth: the DB filter already excludes these, but if one slips
+    // through (e.g. eventStatus flipped back to "Over" after cancellation) the
+    // in-code check must still skip it.
+    const event = {
+      documentId: "event-1",
+      name: "Cancelled Event",
+      slug: "cancelled-event",
+      end: "2025-02-01T18:00:00Z",
+      contactEmail: "host@example.com",
+      resultsReminderCount: 0,
+      resultsReminderLastSentAt: null,
+      cancellationNotifiedAt: "2025-01-15T10:00:00Z",
+      hosts: [{ name: "Test Host" }],
+    }
+
+    findMany.mockResolvedValue([event])
+
+    await processEventResultsReminders(strapi)
+
+    expect(send).not.toHaveBeenCalled()
+    expect(update).not.toHaveBeenCalled()
+  })
+
+  it("skips events whose host already entered result line items", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] })
+    const now = new Date("2025-02-20T10:00:00Z")
+    vi.setSystemTime(now)
+
+    const { strapi, send, findMany, update } = createMockStrapi()
+
+    const event = {
+      documentId: "event-1",
+      name: "Already Reported Event",
+      slug: "already-reported-event",
+      end: "2025-02-01T18:00:00Z",
+      contactEmail: "host@example.com",
+      resultsReminderCount: 0,
+      resultsReminderLastSentAt: null,
+      cancellationNotifiedAt: null,
+      hosts: [{ name: "Test Host" }],
+      resultItems: [{ id: 42 }],
+    }
+
+    findMany.mockResolvedValue([event])
+
+    await processEventResultsReminders(strapi)
 
     expect(send).not.toHaveBeenCalled()
     expect(update).not.toHaveBeenCalled()

@@ -18,7 +18,9 @@ interface EventForReminder {
   contactEmail: string
   resultsReminderCount: number
   resultsReminderLastSentAt: string | null
+  cancellationNotifiedAt: string | null
   hosts?: Array<{ name?: string }>
+  resultItems?: Array<{ id: number }>
 }
 
 const REMINDER_INTERVAL_DAYS = 15
@@ -58,6 +60,19 @@ function isEligibleForReminder(event: EventForReminder, now: Date): boolean {
 
   // Must have a contact email
   if (!event.contactEmail) {
+    return false
+  }
+
+  // The event never happened — skip it. `cancellationNotifiedAt` is set by the
+  // cancellation lifecycle hook, so it remains a reliable signal even if
+  // `eventStatus` is later flipped back to "Over" (manually or by the
+  // updateEventStatus cron on a post-end-date event that was cancelled).
+  if (event.cancellationNotifiedAt) {
+    return false
+  }
+
+  // Host already started entering financial results — no reason to nag.
+  if (event.resultItems && event.resultItems.length > 0) {
     return false
   }
 
@@ -152,9 +167,11 @@ export async function processEventResultsReminders(strapi: Core.Strapi): Promise
       "contactEmail",
       "resultsReminderCount",
       "resultsReminderLastSentAt",
+      "cancellationNotifiedAt",
     ],
     filters: {
       eventStatus: "Over",
+      cancellationNotifiedAt: { $null: true },
       end: {
         $lt: cutoffDate.toISOString(),
         $gt: FEATURE_LAUNCH_DATE.toISOString(),
@@ -166,6 +183,7 @@ export async function processEventResultsReminders(strapi: Core.Strapi): Promise
     },
     populate: {
       hosts: { fields: ["name"] },
+      resultItems: { fields: ["id"] },
     },
     sort: [{ end: "asc" }, { name: "asc" }],
   })) as unknown as EventForReminder[]
