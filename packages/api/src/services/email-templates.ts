@@ -361,30 +361,56 @@ export async function sendPlayerInvitationEmail(
         `[EmailTemplates] Linked existing user ${email} to player ${player.documentId}`
       )
     } else {
-      // Create a new user account
+      // Create a new user account. Wrapped in try/catch to close the TOCTOU
+      // window where two concurrent webhooks for the same attendee email both
+      // pass the findFirst above and race to create. Postgres rejects the
+      // second insert on the email unique constraint; we recover by re-reading
+      // the row the winner inserted and treating it as the "existing user"
+      // branch above.
       const playerRole = await strapi.documents("plugin::users-permissions.role").findFirst({
         filters: { type: "player" },
       })
 
       const password = `${randomBytes(16).toString("hex")}!`
 
-      user = await strapi.documents("plugin::users-permissions.user").create({
-        data: {
-          username: nameToUsername(playerName),
-          email,
-          password,
-          confirmed: true,
-          blocked: false,
-          provider: "local",
-          role: playerRole?.id,
-          player: player.id,
-          invitationStatus: "pending",
-          resetPasswordToken: resetToken,
-        } as any,
-      })
-      strapi.log.info(
-        `[EmailTemplates] Created new user account for ${email} and linked to player ${player.documentId}`
-      )
+      try {
+        user = await strapi.documents("plugin::users-permissions.user").create({
+          data: {
+            username: nameToUsername(playerName),
+            email,
+            password,
+            confirmed: true,
+            blocked: false,
+            provider: "local",
+            role: playerRole?.id,
+            player: player.id,
+            invitationStatus: "pending",
+            resetPasswordToken: resetToken,
+          } as any,
+        })
+        strapi.log.info(
+          `[EmailTemplates] Created new user account for ${email} and linked to player ${player.documentId}`
+        )
+      } catch (createError: any) {
+        const raced = await strapi.documents("plugin::users-permissions.user").findFirst({
+          filters: { email: { $eqi: email } },
+        })
+        if (!raced) {
+          // Not a duplicate — re-throw so the caller sees the real failure.
+          throw createError
+        }
+        user = raced
+        await strapi.documents("plugin::users-permissions.user").update({
+          documentId: user.documentId,
+          data: {
+            player: player.id,
+            resetPasswordToken: resetToken,
+          } as any,
+        })
+        strapi.log.warn(
+          `[EmailTemplates] Lost race creating user ${email}; reusing existing user ${user.documentId} and linking to player ${player.documentId}`
+        )
+      }
     }
   } else {
     // User already exists and is linked - just update the reset token
@@ -770,7 +796,19 @@ export async function sendEventCancellationEmails(
   let sent = 0
   let failed = 0
 
+  // Pace sends so a large event (hundreds of purchasers) doesn't slam
+  // Sender.net's transactional endpoint and trip its rate limit. Override via
+  // CANCELLATION_SEND_DELAY_MS; set to 0 in tests or for small lists.
+  const delayMs = Number.parseInt(process.env.CANCELLATION_SEND_DELAY_MS || "100", 10)
+  const interSendDelayMs = Number.isFinite(delayMs) && delayMs >= 0 ? delayMs : 100
+  let isFirst = true
+
   for (const [email, purchaserName] of uniqueRecipients) {
+    if (!isFirst && interSendDelayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, interSendDelayMs))
+    }
+    isFirst = false
+
     const emailStartTime = Date.now()
 
     try {
