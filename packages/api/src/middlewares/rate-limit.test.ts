@@ -108,6 +108,31 @@ describe("Rate Limit Middleware", () => {
     expect(next).toHaveBeenCalled()
   })
 
+  it("should share a counter across parametrised paths matching the same onlyPaths pattern", async () => {
+    // Without pattern-keyed buckets, an attacker could cycle order IDs to
+    // dodge the per-endpoint limit. Two requests on different IDs but the
+    // same pattern must count against the same bucket.
+    const middleware = rateLimitMiddleware(
+      {
+        max: 1,
+        windowMs: 60000,
+        onlyPaths: ["^/api/ticket-orders/[^/]+/checkout$"],
+        bucket: "param-test",
+      },
+      { strapi: mockStrapi }
+    )
+
+    const ctx1 = createMockContext("/api/ticket-orders/abc123/checkout", "1.2.3.4")
+    const ctx2 = createMockContext("/api/ticket-orders/xyz789/checkout", "1.2.3.4")
+    const next = vi.fn()
+
+    await middleware(ctx1, next)
+    await middleware(ctx2, next)
+
+    expect(next).toHaveBeenCalledTimes(1)
+    expect(ctx2.status).toBe(429)
+  })
+
   it("should set Retry-After header when rate limited", async () => {
     const middleware = rateLimitMiddleware(
       { max: 1, windowMs: 60000, onlyPaths: ["^/api/limited2$"] },

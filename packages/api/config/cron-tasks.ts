@@ -113,10 +113,10 @@ const cronTasks = {
       "inviteNewUsers",
       withErrorReporting("inviteNewUsers", async ({ strapi }) => {
         if (process.env.INVITATION_EMAILS_ENABLED === "false") {
-          console.log("User invitation job skipped (INVITATION_EMAILS_ENABLED=false)")
+          strapi?.log.info("[Cron:inviteNewUsers] Skipped (INVITATION_EMAILS_ENABLED=false)")
           return
         }
-        console.log("Running user invitation job")
+        strapi?.log.info("[Cron:inviteNewUsers] Running user invitation job")
         await processUserInvitations(strapi)
       })
     ),

@@ -33,7 +33,7 @@ function validate(data: { name?: string; start?: string; slug?: string }) {
  * (dev), acquireLock returns a fallback token so behaviour degrades to the
  * single-container case.
  */
-async function notifyEventCancellation(result: {
+export async function notifyEventCancellation(result: {
   documentId: string
   eventStatus?: string
   cancellationNotifiedAt?: string | null
@@ -105,7 +105,14 @@ export default {
     }
   }) {
     triggerContentRevalidation(strapi, "api::event.event", event.result, "update")
-    notifyEventCancellation(event.result)
+    // Fire-and-forget: explicit `.catch` keeps an unhandled rejection from
+    // crashing the Strapi process if the dispatch throws before the inner
+    // try/catch can swallow it (e.g. acquireLock blowing up).
+    notifyEventCancellation(event.result).catch((error: any) => {
+      strapi.log.error(
+        `[EventLifecycle] notifyEventCancellation failed for ${event.result.documentId}: ${error?.message ?? error}`
+      )
+    })
   },
   afterDelete(event: { result: { slug?: string } }) {
     triggerContentRevalidation(strapi, "api::event.event", event.result, "delete")

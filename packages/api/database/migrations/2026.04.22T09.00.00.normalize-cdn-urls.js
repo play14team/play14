@@ -105,6 +105,12 @@ export async function up(knex) {
   })
 }
 
+/**
+ * Intentionally a no-op. The forward rewrite collapses every historical
+ * CDN host onto STORAGE_CDN_URL, so we can't reconstruct which rows were
+ * originally Azure vs. cdn.play14.org vs. localhost. Operators rolling
+ * back must restore from backup.
+ */
 export async function down() {
   console.log("Rollback skipped: CDN URL rewrite is not safely reversible")
 }
@@ -193,12 +199,10 @@ async function rewriteColumn(knex, { table, column, dataType, oldPrefix, newPref
     ? `REPLACE(${quotedColumn}::text, ?, ?)::${dataType}`
     : `REPLACE(${quotedColumn}, ?, ?)`
 
-  try {
-    return await knex(table)
-      .whereRaw(matchClause, [pattern])
-      .update({ [column]: knex.raw(replaceExpr, [oldPrefix, newPrefix]) })
-  } catch (error) {
-    console.log(`  SKIP ${table}.${column}: ${error.message}`)
-    return 0
-  }
+  // Errors propagate so the wrapping `knex.transaction(...)` in `up()` rolls
+  // back cleanly. Swallowing them here would let Strapi mark the migration as
+  // run with a half-rewritten DB — leaving stale Azure URLs that 404 in prod.
+  return await knex(table)
+    .whereRaw(matchClause, [pattern])
+    .update({ [column]: knex.raw(replaceExpr, [oldPrefix, newPrefix]) })
 }

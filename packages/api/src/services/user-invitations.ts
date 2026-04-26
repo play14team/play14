@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto"
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
 import UserInvitationEmail from "../emails/user-invitation"
+import { sendEmail } from "./email-send"
 
 interface InvitationUser {
   id: number
@@ -198,7 +199,7 @@ async function sendInvitationEmail(
   resetToken: string
 ) {
   const payload = await buildEmailPayload(user, reminder, resetToken)
-  await strapi.plugin("email").service("email").send({
+  await sendEmail(strapi, "user_invitation", {
     to: user.email,
     subject: payload.subject,
     html: payload.html,
@@ -249,7 +250,7 @@ export async function sendUserInvitationAndUpdateStatus(
       { plainText: true }
     )
 
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "user_invitation", {
       to: user.email,
       subject: "You're invited to #play14",
       html,

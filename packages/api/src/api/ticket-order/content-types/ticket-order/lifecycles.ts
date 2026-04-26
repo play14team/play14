@@ -9,6 +9,7 @@
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
 import TicketOrderRefundEmail from "../../../../emails/ticket-order-refund"
+import { sendEmail } from "../../../../services/email-send"
 
 const getFrontendUrl = (): string => {
   return process.env.FRONTEND_URL || "https://play14.org"
@@ -94,15 +95,12 @@ export default {
         { plainText: true }
       )
 
-      await strapi
-        .plugin("email")
-        .service("email")
-        .send({
-          to: order.purchaserEmail,
-          subject: `[#play14] Your order has been ${isPartialRefund ? "partially " : ""}refunded`,
-          html,
-          text,
-        })
+      await sendEmail(strapi, "ticket_refund", {
+        to: order.purchaserEmail,
+        subject: `[#play14] Your order has been ${isPartialRefund ? "partially " : ""}refunded`,
+        html,
+        text,
+      })
 
       strapi.log.info(
         `[TicketOrder] Sent refund notification email to ${order.purchaserEmail} for order ${order.orderNumber}`

@@ -351,7 +351,10 @@ describe("strapi-provider-email-sender", () => {
 
       // Attach a rejection handler synchronously so the pending promise doesn't
       // register as unhandled while fake timers advance.
-      const assertion = expect(pending).rejects.toThrow(/Sender\.net request timed out/)
+      const assertion = expect(pending).rejects.toMatchObject({
+        name: "SenderTimeoutError",
+        message: expect.stringMatching(/Sender\.net request timed out/),
+      })
 
       await vi.advanceTimersByTimeAsync(15_000)
       await assertion

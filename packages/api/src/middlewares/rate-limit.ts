@@ -213,42 +213,78 @@ function matchesPath(path: string, patterns: string[]): boolean {
   })
 }
 
+/**
+ * Return the first pattern in `patterns` that matches `path`, or `null`.
+ * Used to derive a stable rate-limit key for parametrised routes — without
+ * this, /api/ticket-orders/abc/checkout and /api/ticket-orders/xyz/checkout
+ * get separate counters and an attacker can cycle order IDs to dodge the
+ * per-endpoint limit.
+ */
+function firstMatchingPattern(path: string, patterns: string[]): string | null {
+  for (const pattern of patterns) {
+    if (new RegExp(pattern).test(path)) return pattern
+  }
+  return null
+}
+
 export default (config: Partial<RateLimitConfig>, { strapi }: { strapi: Core.Strapi }) => {
   const finalConfig = { ...defaultConfig, ...config }
 
   return async (ctx: any, next: () => Promise<void>) => {
     const path = ctx.request.path
 
-    // Check if path should be skipped
+    // Check if path should be skipped, and resolve the matched onlyPaths
+    // pattern so we can use it as the rate-limit key segment instead of the
+    // raw URL path (see firstMatchingPattern for the reason).
+    let routeKey: string = path
     if (finalConfig.onlyPaths) {
-      if (!matchesPath(path, finalConfig.onlyPaths)) {
+      const matched = firstMatchingPattern(path, finalConfig.onlyPaths)
+      if (!matched) {
         return next()
       }
+      routeKey = matched
     } else if (finalConfig.skipPaths && matchesPath(path, finalConfig.skipPaths)) {
       return next()
     }
 
-    // Generate rate limit key (IP + path scoped to bucket)
+    // Generate rate limit key (IP + route pattern scoped to bucket). For
+    // onlyPaths-configured limiters the key collapses parametrised routes
+    // (e.g. /api/ticket-orders/<id>/checkout) into a single bucket per
+    // endpoint pattern.
     const clientKey = finalConfig.keyGenerator
       ? finalConfig.keyGenerator(ctx)
       : getClientIp(ctx, finalConfig.trustProxy ?? 1)
     const bucket = finalConfig.bucket ?? "default"
-    const storeKey = `ratelimit:${bucket}:${clientKey}:${path}`
+    const storeKey = `ratelimit:${bucket}:${clientKey}:${routeKey}`
 
     // Try Redis first; fall back to in-memory on any failure.
+    //
+    // SECURITY NOTE: when Redis is configured but unreachable mid-flight, we
+    // fall back to a per-process in-memory counter. That counter starts fresh
+    // on each container, and the Redis counter resumes from zero once it
+    // reconnects — so a burst attacker who can trip a Redis blip effectively
+    // resets their window. Tolerable for the orders bucket; the auth bucket
+    // pairs with the account-lockout middleware which is unaffected by Redis.
+    // We log a single warn per request that hit the fallback so operators can
+    // correlate auth-bucket fallback windows with anomaly spikes.
     const client = getRedisClient()
+    const redisAvailable = Boolean(client && client.status !== "end")
     let count: number
     let resetAt: number
 
-    const redisResult =
-      client && client.status !== "end"
-        ? await redisIncrement(client, storeKey, finalConfig.windowMs)
-        : null
+    const redisResult = redisAvailable
+      ? await redisIncrement(client as Redis, storeKey, finalConfig.windowMs)
+      : null
 
     if (redisResult) {
       count = redisResult.count
       resetAt = redisResult.resetAt
     } else {
+      if (process.env.REDIS_URL && !redisAvailable) {
+        strapi.log.warn(
+          `[RateLimit] Redis unavailable, using in-memory fallback (counter resets on reconnect) | bucket=${bucket}, route=${routeKey}`
+        )
+      }
       const now = Date.now()
       let entry = rateLimitStore.get(storeKey)
       if (!entry || entry.resetAt < now) {

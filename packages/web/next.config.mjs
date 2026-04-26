@@ -18,6 +18,10 @@ const isProduction = process.env.NODE_ENV === "production"
  * `Content-Security-Policy` to enforce. Tightening (nonces / strict-dynamic,
  * dropping `'unsafe-inline'`) is a separate follow-up.
  *
+ * Tracking issue: https://github.com/play14team/play14/issues/csp-enforcement
+ * (open the follow-up before merging — Report-Only without a tracker tends to
+ * stay Report-Only forever).
+ *
  * Origins included per integration:
  *  - Stripe Connect checkout  -> js.stripe.com, checkout.stripe.com, api.stripe.com
  *  - Mapbox GL + Geocoder     -> api.mapbox.com, events.mapbox.com, *.tiles.mapbox.com

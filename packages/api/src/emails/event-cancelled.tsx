@@ -1,4 +1,4 @@
-import { Button, Heading, Text } from "@react-email/components"
+import { Button, Heading, Section, Text } from "@react-email/components"
 import { Layout } from "./components/layout"
 
 interface EventCancelledEmailProps {
@@ -53,7 +53,7 @@ export default function EventCancelledEmail({
         We're sorry to share that <strong>{eventName}</strong> has been cancelled.
       </Text>
 
-      <div style={noticeBoxStyle}>
+      <Section style={noticeBoxStyle}>
         <Text style={{ margin: 0 }}>
           <strong>Event:</strong> {eventName}
           <br />
@@ -61,14 +61,14 @@ export default function EventCancelledEmail({
           <br />
           <strong>Location:</strong> {eventLocation}
         </Text>
-      </div>
+      </Section>
 
       {cancellationReason && (
-        <div style={reasonBoxStyle}>
+        <Section style={reasonBoxStyle}>
           <Text style={{ margin: 0 }}>
             <strong>Reason:</strong> {cancellationReason}
           </Text>
-        </div>
+        </Section>
       )}
 
       <Text>

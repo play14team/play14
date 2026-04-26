@@ -20,6 +20,7 @@ import {
 } from "../libs/calendar"
 import { formatTicketItems, generateInvoicePDF, type InvoiceData } from "../libs/invoice"
 import { nameToUsername } from "../libs/strings"
+import { sendEmail } from "./email-send"
 import { emailSendDuration, emailSendTotal } from "./observability/metrics"
 
 /**
@@ -30,6 +31,12 @@ import { emailSendDuration, emailSendTotal } from "./observability/metrics"
  * fighting the types. Every field is what the helpers actually read — if the
  * upstream shape grows, extend this interface rather than reintroducing
  * `order: any`.
+ *
+ * `event` is required: every send path here renders event-specific copy
+ * (date, location, calendar links, invoice line items) and an order without
+ * an event would produce a meaningless email. Helpers that tolerate a
+ * missing event (e.g. payment-failure templates) accept it via a narrower
+ * local type.
  */
 export interface TicketOrderForEmail {
   documentId?: string
@@ -48,7 +55,7 @@ export interface TicketOrderForEmail {
     unitAmount?: number
     currency?: string
   }>
-  event?: {
+  event: {
     documentId?: string
     name?: string
     slug?: string
@@ -236,7 +243,7 @@ export async function sendOrderConfirmationEmail(
       emailOptions.attachments = attachments
     }
 
-    await strapi.plugin("email").service("email").send(emailOptions)
+    await sendEmail(strapi, "confirmation", emailOptions)
 
     const durationMs = Date.now() - emailStartTime
     emailSendTotal.inc({ email_type: "confirmation", status: "success" })
@@ -299,15 +306,12 @@ export async function sendTicketSoldNotificationEmail(
       })
     )
 
-    await strapi
-      .plugin("email")
-      .service("email")
-      .send({
-        to: contactEmail,
-        subject: `[#play14] New ticket order for ${order.event?.name || "an event"}`,
-        html,
-        text,
-      })
+    await sendEmail(strapi, "ticket_sold", {
+      to: contactEmail,
+      subject: `[#play14] New ticket order for ${order.event?.name || "an event"}`,
+      html,
+      text,
+    })
 
     const durationMs = Date.now() - emailStartTime
     emailSendTotal.inc({ email_type: "ticket_sold", status: "success" })
@@ -498,7 +502,7 @@ export async function sendPlayerInvitationEmail(
       ]
     }
 
-    await strapi.plugin("email").service("email").send(emailOptions)
+    await sendEmail(strapi, "player_invitation", emailOptions)
 
     // Flip invitationStatus so the nightly invitation cron — which runs on
     // every container — doesn't re-send this email.
@@ -551,15 +555,12 @@ export async function sendPaymentFailedEmail(
       })
     )
 
-    await strapi
-      .plugin("email")
-      .service("email")
-      .send({
-        to: order.purchaserEmail,
-        subject: `[#play14] Payment failed for ${order.event?.name || "your order"}`,
-        html,
-        text,
-      })
+    await sendEmail(strapi, "payment_failed", {
+      to: order.purchaserEmail,
+      subject: `[#play14] Payment failed for ${order.event?.name || "your order"}`,
+      html,
+      text,
+    })
 
     const durationMs = Date.now() - emailStartTime
     emailSendTotal.inc({ email_type: "payment_failed", status: "success" })
@@ -669,7 +670,7 @@ export async function sendStripeAccountStatusEmail(
       })
     )
 
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "stripe_account_status", {
       to: hostEmail,
       subject,
       html,
@@ -728,6 +729,13 @@ export async function sendEventCancellationEmails(
   // Pull paid orders for this event. Draft/expired/failed orders don't need a
   // notice; refunded orders have already had their own email. Paginated so a
   // popular event with thousands of tickets doesn't silently drop recipients.
+  //
+  // Field name note: `status` here is the ticket-order's payment-lifecycle
+  // enum (draft|pending|processing|paid|cancelled|refunded|...), NOT Strapi's
+  // reserved draft/publish status. Ticket-orders set `draftAndPublish: false`
+  // in their schema, so the custom `status` attribute is the live value. The
+  // separate `ticketStatus` field belongs to `api::ticket.ticket` (per-seat
+  // valid/used/cancelled/refunded). Don't conflate the two.
   const ORDER_PAGE_SIZE = 500
   const uniqueRecipients = new Map<string, string>()
 
@@ -767,6 +775,13 @@ export async function sendEventCancellationEmails(
   // Pace sends so a large event (hundreds of purchasers) doesn't slam
   // Sender.net's transactional endpoint and trip its rate limit. Override via
   // CANCELLATION_SEND_DELAY_MS; set to 0 in tests or for small lists.
+  //
+  // Lock-TTL budget: notifyEventCancellation in event/lifecycles.ts holds a
+  // 5-minute Redis lock around this dispatch. At the default 100 ms cadence
+  // that allows ~3,000 sends before the lock expires — well above any single
+  // play14 event. If you increase the per-event cap or raise the delay, bump
+  // the lock TTL there too, or a peer container could pick up the lock mid
+  // dispatch and re-queue duplicates.
   const delayMs = Number.parseInt(process.env.CANCELLATION_SEND_DELAY_MS || "100", 10)
   const interSendDelayMs = Number.isFinite(delayMs) && delayMs >= 0 ? delayMs : 100
   let isFirst = true
@@ -791,15 +806,12 @@ export async function sendEventCancellationEmails(
         })
       )
 
-      await strapi
-        .plugin("email")
-        .service("email")
-        .send({
-          to: email,
-          subject: `[#play14] ${event.name} has been cancelled`,
-          html,
-          text,
-        })
+      await sendEmail(strapi, "event_cancelled", {
+        to: email,
+        subject: `[#play14] ${event.name} has been cancelled`,
+        html,
+        text,
+      })
 
       const durationMs = Date.now() - emailStartTime
       emailSendTotal.inc({ email_type: "event_cancelled", status: "success" })

@@ -3,6 +3,19 @@ const SENDER_API_URL = "https://api.sender.net/v2/message/send"
 const DEFAULT_REQUEST_TIMEOUT_MS = 15000
 
 /**
+ * Provider-side mirror of `SenderTimeoutError` in
+ * src/services/sender-common.ts. Callers detect timeouts by `error.name`
+ * (the TS-side class can't be imported from this CommonJS provider), so the
+ * name MUST stay in sync with the class definition there.
+ */
+class SenderTimeoutError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "SenderTimeoutError"
+  }
+}
+
+/**
  * Resolve the per-request timeout. Mirrors fetchWithTimeout in
  * src/services/sender-common.ts so the transactional provider and the
  * broadcast/subscribers clients honour the same SENDER_TIMEOUT_MS override.
@@ -146,7 +159,7 @@ module.exports = {
           })
         } catch (error) {
           if (error && (error.name === "AbortError" || controller.signal.aborted)) {
-            const timeoutError = new Error(
+            const timeoutError = new SenderTimeoutError(
               `Sender.net request timed out after ${requestTimeoutMs}ms`
             )
             timeoutError.cause = error

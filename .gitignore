@@ -118,7 +118,7 @@ iac/clever-cloud/*.env
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
 
-docs/BACKLOG.md
+BACKLOG.md
 .playwright-mcp
 
 # Database dump files from migration
