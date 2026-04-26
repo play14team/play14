@@ -17,6 +17,7 @@ and 6 add-ons (PG/Cellar/Redis × staging/prod).
 | `env-staging-web.example` | Next.js staging env-var template |
 | `env-production-api.example` | Strapi API production env-var template |
 | `env-production-web.example` | Next.js production env-var template |
+| [`alerting/`](./alerting/) | Slack alerting runbook for managed Grafana |
 
 The `*.example` files are committed. The filled-in `*.env` copies are
 gitignored (`iac/clever-cloud/*.env`) — they contain secrets.
