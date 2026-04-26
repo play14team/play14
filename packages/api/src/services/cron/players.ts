@@ -24,6 +24,7 @@ export async function updatePlayerPositions(strapi: Core.Strapi): Promise<void> 
     filters: {
       position: { $nei: "Founder" },
     },
+    status: "published",
   })) as unknown as PlayerWithRelations[]
 
   console.log("Players found:", players.length)
@@ -76,8 +77,11 @@ async function setPosition(
   player: PlayerWithRelations,
   position: string
 ): Promise<void> {
+  // Strapi 5: update() targets the draft unless status: "published" is passed,
+  // so without this the public API would keep showing the old position.
   await strapi.documents(apiName as any).update({
     documentId: player.documentId,
     data: { position } as any,
+    status: "published",
   })
 }

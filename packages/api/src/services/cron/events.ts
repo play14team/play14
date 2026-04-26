@@ -31,6 +31,7 @@ export async function updateEventStatus(strapi: Core.Strapi): Promise<void> {
         },
       ],
     },
+    status: "published",
   })
 
   console.log("'Open' or 'Announced' events in the past found:", events.length)
@@ -38,9 +39,12 @@ export async function updateEventStatus(strapi: Core.Strapi): Promise<void> {
   await Promise.all(
     events.map(async (event) => {
       console.log("Changing eventStatus of event to 'Over'", event)
+      // Strapi 5: update() targets the draft unless status: "published" is passed,
+      // so without this the public API would keep serving the old eventStatus.
       await strapi.documents(apiName).update({
         documentId: event.documentId,
         data: { eventStatus: "Over" } as any,
+        status: "published",
       })
     })
   )
