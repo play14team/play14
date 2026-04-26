@@ -61,6 +61,7 @@ export async function getEventsGroupedByCountry(): Promise<EventsByCountry> {
 
     // Group events by country code
     const grouped: EventsByCountry = {}
+    const now = Date.now()
 
     events.forEach((event) => {
       const countryCode = event.location?.country?.toUpperCase()
@@ -70,12 +71,22 @@ export async function getEventsGroupedByCountry(): Promise<EventsByCountry> {
         grouped[countryCode] = []
       }
 
+      const startTs = new Date(event.start).getTime()
+      const endTs = new Date(event.end).getTime()
+      // Mirror the API's daily cron locally: an event past its end date is effectively Over,
+      // even if its eventStatus was never transitioned. Keeps the world map honest when the
+      // cron is delayed, paused, or disabled.
+      const effectiveStatus =
+        endTs < now && (event.eventStatus === "Open" || event.eventStatus === "Announced")
+          ? "Over"
+          : event.eventStatus
+
       grouped[countryCode].push({
         slug: event.slug,
         name: event.name,
-        start: new Date(event.start).getTime(), // Convert to Unix timestamp
-        end: new Date(event.end).getTime(), // Convert to Unix timestamp
-        status: event.eventStatus,
+        start: startTs,
+        end: endTs,
+        status: effectiveStatus,
         locationName: event.location?.name || "Unknown",
       })
     })

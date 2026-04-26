@@ -29,14 +29,25 @@ updates:
           - "minor"
           - "patch"
     ignore:
+      # Strapi 5 admin panel pins React 18 and react-router-dom 6 as peers.
+      # React 19 support is still RFC (strapi/strapi#25739), so block major
+      # and minor bumps until upstream lands the upgrade. Patches still flow.
       - dependency-name: "react"
-        update-types: ["version-update:semver-minor"]
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
       - dependency-name: "react-dom"
-        update-types: ["version-update:semver-minor"]
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
       - dependency-name: "react-router-dom"
-        update-types: ["version-update:semver-minor"]
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
       - dependency-name: "styled-components"
-        update-types: ["version-update:semver-minor"]
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
 
   # GitHub Actions used across workflows
   - package-ecosystem: "github-actions"
