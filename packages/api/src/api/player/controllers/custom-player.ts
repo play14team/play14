@@ -11,6 +11,7 @@ import UserInvitationEmail from "../../../emails/user-invitation"
 import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
 import { nameToUsername } from "../../../libs/strings"
 import { isValidEmail, isValidUrl } from "../../../libs/validation"
+import { sendEmail } from "../../../services/email-send"
 import { addSubscriberToGroup } from "../../../services/sender-subscribers"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 
@@ -1484,7 +1485,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         { plainText: true }
       )
 
-      await strapi.plugin("email").service("email").send({
+      await sendEmail(strapi, "user_invitation", {
         to: email.toLowerCase(),
         subject: "You're invited to #play14",
         html,
@@ -1682,7 +1683,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // ("Sending domain not found"). Omitting `from` lets the email provider
       // fall back to `settings.defaultFrom` (configured in config/plugins.ts),
       // which uses our verified `noreply@play14.org` domain.
-      await strapi.plugin("email").service("email").send({
+      await sendEmail(strapi, "password_reset", {
         to: linkedUser.email,
         replyTo: resetPasswordSettings.response_email,
         subject: emailSubject,

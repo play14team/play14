@@ -288,7 +288,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // IDEMPOTENCY: Use atomic conditional update to prevent duplicate processing
     // If two webhooks arrive simultaneously, only one will succeed in changing status
     const knex = strapi.db.connection
-    const updateResult = await knex("ticket_orders")
+    const updateResult = await knex(TABLES.ticketOrders)
       .where("document_id", order.documentId)
       .where("status", "pending")
       .update({ status: "processing" })
@@ -486,7 +486,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         `[Webhook] Failed to process order ${orderNumber}: ${error.message} | handler=checkout_completed, event=${eventName}, sessionId=${sessionId}, durationMs=${handlerDurationMs}, correlationId=${correlationId}, stack=${error.stack}`
       )
 
-      await knex("ticket_orders")
+      await knex(TABLES.ticketOrders)
         .where("document_id", order.documentId)
         .where("status", "processing")
         .update({ status: "pending" })

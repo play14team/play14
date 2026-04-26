@@ -9,6 +9,7 @@
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
 import EventResultsReminderEmail, { getSubject } from "../../emails/event-results-reminder"
+import { sendEmail } from "../email-send"
 
 interface EventForReminder {
   documentId: string
@@ -125,7 +126,7 @@ async function sendResultsReminderEmail(
 
   const subject = `[#play14] ${getSubject(event.name, reminderNumber)}`
 
-  await strapi.plugin("email").service("email").send({
+  await sendEmail(strapi, "event_results_reminder", {
     to: event.contactEmail,
     subject,
     html,

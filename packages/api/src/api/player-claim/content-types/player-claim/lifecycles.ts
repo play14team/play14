@@ -6,6 +6,7 @@
 import { render } from "@react-email/render"
 import type { Core } from "@strapi/strapi"
 import PlayerClaimNewEmail from "../../../../emails/player-claim-new"
+import { sendEmail } from "../../../../services/email-send"
 
 // Get environment variables for email config
 const getAdminRecipients = (): string[] => {
@@ -80,7 +81,7 @@ export default {
         { plainText: true }
       )
 
-      await strapi.plugin("email").service("email").send({
+      await sendEmail(strapi, "player_claim_request", {
         to: adminRecipients,
         subject: "[#play14] New Player Claim Request",
         html,
@@ -149,7 +150,7 @@ export default {
           { plainText: true }
         )
 
-        await strapi.plugin("email").service("email").send({
+        await sendEmail(strapi, "player_claim_decision", {
           to: claim.user.email,
           subject: "[#play14] Your Player Profile Has Been Linked!",
           html,
@@ -185,7 +186,7 @@ export default {
           { plainText: true }
         )
 
-        await strapi.plugin("email").service("email").send({
+        await sendEmail(strapi, "player_claim_decision", {
           to: claim.user.email,
           subject: "[#play14] Player Claim Update",
           html,

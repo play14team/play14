@@ -4,7 +4,7 @@
  */
 
 import { render } from "@react-email/render"
-import { createStrapi } from "@strapi/strapi"
+import { compileStrapi, createStrapi } from "@strapi/strapi"
 
 import AttendanceClaimApprovedEmail from "../src/emails/attendance-claim-approved"
 import AttendanceClaimNewEmail from "../src/emails/attendance-claim-new"
@@ -18,6 +18,7 @@ import PlayerInvitationEmail from "../src/emails/player-invitation"
 import TicketConfirmationEmail from "../src/emails/ticket-confirmation"
 import TicketOrderRefundEmail from "../src/emails/ticket-order-refund"
 import TicketSoldNotificationEmail from "../src/emails/ticket-sold-notification"
+import { sendEmail } from "../src/services/email-send"
 
 const TEST_EMAIL = "cedric.pontet+test@gmail.com"
 const FRONTEND_URL = "https://play14.org"
@@ -26,8 +27,15 @@ async function sendTestEmails() {
   console.log("🚀 Starting email template testing...")
   console.log(`📧 Sending all emails to: ${TEST_EMAIL}\n`)
 
-  // Initialize Strapi
-  const strapi = await createStrapi().load()
+  // Initialize Strapi.
+  //
+  // Strapi 5's config-loader only accepts .js / .json — running this script
+  // directly against the source tree would surface "Config file not loaded"
+  // for every config/*.ts. compileStrapi() runs the same TS compile that
+  // `strapi develop` does, then returns { appDir, distDir } so createStrapi
+  // reads its config from dist/. This is the canonical scripting pattern.
+  const { appDir, distDir } = await compileStrapi()
+  const strapi = await createStrapi({ appDir, distDir }).load()
 
   try {
     // 1. Player Claim New (to admins)
@@ -57,7 +65,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "player_claim_request", {
       to: TEST_EMAIL,
       subject: "[TEST 1/11] New Player Claim Request",
       html: html1,
@@ -80,7 +88,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "player_claim_decision", {
       to: TEST_EMAIL,
       subject: "[TEST 2/11] Your Player Profile Has Been Linked!",
       html: html2,
@@ -107,7 +115,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "player_claim_decision", {
       to: TEST_EMAIL,
       subject: "[TEST 3/11] Player Claim Update",
       html: html3,
@@ -142,7 +150,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "attendance_claim_request", {
       to: TEST_EMAIL,
       subject: "[TEST 4/11] New Attendance Claim for #play14 Luxembourg 2024",
       html: html4,
@@ -171,7 +179,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "attendance_claim_decision", {
       to: TEST_EMAIL,
       subject: "[TEST 5/11] Your Attendance Claim Has Been Approved!",
       html: html5,
@@ -202,7 +210,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "attendance_claim_decision", {
       to: TEST_EMAIL,
       subject: "[TEST 6/11] Attendance Claim Update",
       html: html6,
@@ -271,7 +279,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "confirmation", {
       to: TEST_EMAIL,
       subject: "[TEST 7/11] Your tickets for #play14 Luxembourg 2025",
       html: html7,
@@ -326,7 +334,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "ticket_refund", {
       to: TEST_EMAIL,
       subject: "[TEST 8/11] Your order has been refunded",
       html: html8,
@@ -369,7 +377,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "player_invitation", {
       to: TEST_EMAIL,
       subject: "[TEST 9/11] Your ticket for #play14 Luxembourg 2025 - Create your profile",
       html: html9,
@@ -398,7 +406,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "payment_failed", {
       to: TEST_EMAIL,
       subject: "[TEST 10/11] Payment failed for #play14 Luxembourg 2025",
       html: html10,
@@ -457,7 +465,7 @@ async function sendTestEmails() {
       }),
       { plainText: true }
     )
-    await strapi.plugin("email").service("email").send({
+    await sendEmail(strapi, "ticket_sold", {
       to: TEST_EMAIL,
       subject: "[TEST 11/11] New ticket order for #play14 Luxembourg 2025",
       html: html11,

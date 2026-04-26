@@ -10,6 +10,8 @@
 export const TABLES = {
   /** `api::event.event` → `packages/api/src/api/event/content-types/event/schema.json` */
   events: "events",
+  /** `api::ticket-order.ticket-order` → `packages/api/src/api/ticket-order/content-types/ticket-order/schema.json` */
+  ticketOrders: "ticket_orders",
   /** `api::ticket-type.ticket-type` → `packages/api/src/api/ticket-type/content-types/ticket-type/schema.json` */
   ticketTypes: "ticket_types",
 } as const

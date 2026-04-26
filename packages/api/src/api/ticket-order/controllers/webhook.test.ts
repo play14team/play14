@@ -5,6 +5,25 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from "vitest"
 import webhookFactory from "./webhook"
 
+// Hoisted mock spy so we can assert the exact payload the webhook controller
+// hands to `sendStripeAccountStatusEmail`. The other email helpers stay real
+// because the existing `sendConfirmationEmail` / `sendPaymentFailedEmail`
+// tests below verify behaviour through `strapi.plugin("email")` and need the
+// helpers to call through.
+const emailMocks = vi.hoisted(() => ({
+  sendStripeAccountStatusEmail: vi.fn(),
+}))
+
+vi.mock("../../../services/email-templates", async () => {
+  const actual = await vi.importActual<typeof import("../../../services/email-templates")>(
+    "../../../services/email-templates"
+  )
+  return {
+    ...actual,
+    sendStripeAccountStatusEmail: emailMocks.sendStripeAccountStatusEmail,
+  }
+})
+
 // Mock dependencies
 vi.mock("../../../libs/calendar", () => ({
   generateEventICS: vi.fn().mockResolvedValue("BEGIN:VCALENDAR\nEND:VCALENDAR"),
@@ -1053,6 +1072,58 @@ describe("webhook controller", () => {
           }),
         })
       )
+    })
+
+    it("passes only the documented payload to sendStripeAccountStatusEmail", async () => {
+      // Locks the contract: the helper receives the 5 fields it actually
+      // uses, not the full Strapi document. Spreading the document would
+      // leak internals (createdAt, publishedAt, locale, etc.) and quietly
+      // regress if the helper's accepted shape ever narrows.
+      emailMocks.sendStripeAccountStatusEmail.mockReset()
+      emailMocks.sendStripeAccountStatusEmail.mockResolvedValue(undefined)
+
+      const fullStripeAccount = {
+        id: 42, // Strapi numeric id — must NOT leak through
+        documentId: "stripe-account-doc-123",
+        stripeAccountId: "acct_test",
+        accountStatus: "pending", // Triggers a transition → email path
+        onboardingCompletedAt: null,
+        createdAt: "2026-01-01T00:00:00.000Z",
+        updatedAt: "2026-04-01T00:00:00.000Z",
+        publishedAt: "2026-01-01T00:00:00.000Z",
+        locale: null,
+        somethingPrivate: "should-not-leak",
+      }
+
+      const accountDocs = {
+        findFirst: vi.fn().mockResolvedValue(fullStripeAccount),
+        update: vi.fn().mockResolvedValue({}),
+      }
+      mockStrapi.documents.mockReturnValue(accountDocs)
+
+      await controller.handleAccountUpdated({
+        id: "acct_test",
+        charges_enabled: true,
+        payouts_enabled: true,
+        details_submitted: true,
+      })
+
+      expect(emailMocks.sendStripeAccountStatusEmail).toHaveBeenCalledTimes(1)
+      const [, payload, prev, next] = emailMocks.sendStripeAccountStatusEmail.mock.calls[0]
+      expect(prev).toBe("pending")
+      expect(next).toBe("active")
+      expect(payload).toEqual({
+        documentId: "stripe-account-doc-123",
+        stripeAccountId: "acct_test",
+        chargesEnabled: true,
+        payoutsEnabled: true,
+        detailsSubmitted: true,
+      })
+      // Belt-and-braces: explicitly assert the leak-prone fields are absent.
+      expect(payload).not.toHaveProperty("id")
+      expect(payload).not.toHaveProperty("createdAt")
+      expect(payload).not.toHaveProperty("publishedAt")
+      expect(payload).not.toHaveProperty("somethingPrivate")
     })
 
     it("updates account status to pending when nothing submitted", async () => {

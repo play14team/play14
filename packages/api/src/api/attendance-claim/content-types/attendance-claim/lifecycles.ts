@@ -8,6 +8,7 @@ import type { Core } from "@strapi/strapi"
 import AttendanceClaimApprovedEmail from "../../../../emails/attendance-claim-approved"
 import AttendanceClaimNewEmail from "../../../../emails/attendance-claim-new"
 import AttendanceClaimRejectedEmail from "../../../../emails/attendance-claim-rejected"
+import { sendEmail } from "../../../../services/email-send"
 
 const getFrontendUrl = (): string => {
   return process.env.FRONTEND_URL || "https://play14.org"
@@ -115,15 +116,12 @@ export default {
         { plainText: true }
       )
 
-      await strapi
-        .plugin("email")
-        .service("email")
-        .send({
-          to: Array.from(organizerEmails),
-          subject: `[#play14] New Attendance Claim for ${claim.event.name}`,
-          html,
-          text,
-        })
+      await sendEmail(strapi, "attendance_claim_request", {
+        to: Array.from(organizerEmails),
+        subject: `[#play14] New Attendance Claim for ${claim.event.name}`,
+        html,
+        text,
+      })
 
       strapi.log.info(
         `[AttendanceClaim] Sent notification email to organizers for claim ${result.documentId}`
@@ -207,7 +205,7 @@ export default {
           { plainText: true }
         )
 
-        await strapi.plugin("email").service("email").send({
+        await sendEmail(strapi, "attendance_claim_decision", {
           to: playerEmail,
           subject: "[#play14] Your Attendance Claim Has Been Approved!",
           html,
@@ -244,7 +242,7 @@ export default {
           { plainText: true }
         )
 
-        await strapi.plugin("email").service("email").send({
+        await sendEmail(strapi, "attendance_claim_decision", {
           to: playerEmail,
           subject: "[#play14] Attendance Claim Update",
           html,
