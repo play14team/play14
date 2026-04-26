@@ -11,6 +11,7 @@ vi.mock("prom-client", () => {
       Registry: class MockRegistry {
         metrics = mockMetrics
         contentType = mockContentType
+        setDefaultLabels = vi.fn()
       },
       collectDefaultMetrics: vi.fn(),
       Histogram: vi.fn(),

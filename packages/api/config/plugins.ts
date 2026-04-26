@@ -81,6 +81,9 @@ export default ({ env }: { env: any }) => ({
       labels: {
         app: "play14-api",
         environment: env("NODE_ENV", "development"),
+        // Clever Cloud auto-injects APP_ID; the Grafana dashboards filter
+        // on {app_id=~"$APP_ID"}, so every scraped series must carry it.
+        app_id: env("APP_ID", "play14-api"),
       },
       server: env.bool("METRICS_SEPARATE_SERVER", true)
         ? {

@@ -13,6 +13,14 @@ export function getRegistry(): client.Registry {
 
   registry = new client.Registry()
 
+  // Clever Cloud auto-injects APP_ID; the Grafana dashboards filter on
+  // {app_id=~"$APP_ID"}, so every series must carry it.
+  registry.setDefaultLabels({
+    app: "play14-web",
+    app_id: process.env.APP_ID ?? "play14-web",
+    environment: process.env.NODE_ENV ?? "development",
+  })
+
   // Add default metrics (CPU, memory, event loop lag, etc.)
   client.collectDefaultMetrics({ register: registry })
 
