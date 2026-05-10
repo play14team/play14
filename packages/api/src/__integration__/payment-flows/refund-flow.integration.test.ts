@@ -247,9 +247,10 @@ describe("Refund Flow", () => {
         populate: { tickets: true },
       })
 
-      expect(updatedOrder.status).toBe("refunded")
-      expect(updatedOrder.tickets).toHaveLength(2)
-      expect(updatedOrder.tickets.every((t: any) => t.ticketStatus === "refunded")).toBe(true)
+      expect(updatedOrder).not.toBeNull()
+      expect(updatedOrder!.orderStatus).toBe("refunded")
+      expect(updatedOrder!.tickets).toHaveLength(2)
+      expect(updatedOrder!.tickets.every((t: any) => t.ticketStatus === "refunded")).toBe(true)
     })
 
     it("handles partial refund", async () => {
@@ -285,7 +286,8 @@ describe("Refund Flow", () => {
       })
 
       // Partial refund should mark as partially_refunded
-      expect(["partially_refunded", "refunded"]).toContain(updatedOrder.status)
+      expect(updatedOrder).not.toBeNull()
+      expect(["partially_refunded", "refunded"]).toContain(updatedOrder!.orderStatus)
     })
   })
 

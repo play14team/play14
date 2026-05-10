@@ -41,13 +41,16 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
 
   // Process each order sequentially to properly release reservations
   for (const order of expiredOrders) {
-    // ATOMIC CLAIM: Try to claim this order for processing
-    // This prevents duplicate processing in multi-container deployments
+    // ATOMIC CLAIM: transition pending → processing as a per-row lock.
+    // "processing" is the same intermediate state the webhook claims with, so
+    // a delayed webhook racing this cron will see the row already locked and
+    // skip via the skipped_terminal branch. "expiring" is not in the schema
+    // enum and would fail the CHECK constraint.
     const claimResult = await knex("ticket_orders")
       .where("document_id", order.documentId)
       .where("order_status", "pending")
       .update({
-        order_status: "expiring",
+        order_status: "processing",
         updated_at: new Date(),
       })
 
@@ -100,7 +103,7 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
       console.error(`Failed to process expired order ${order.orderNumber}:`, error)
       await knex("ticket_orders")
         .where("document_id", order.documentId)
-        .where("order_status", "expiring")
+        .where("order_status", "processing")
         .update({
           order_status: "pending",
           updated_at: new Date(),

@@ -61,7 +61,16 @@ vi.mock("slugify", () => ({
   default: vi.fn((str: string) => str.toLowerCase().replace(/\s+/g, "-")),
 }))
 
+vi.mock("../../../services/observability/metrics", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../services/observability/metrics")>()
+  return {
+    ...actual,
+    webhookProcessingTotal: { inc: vi.fn() },
+  }
+})
+
 import { generateTicketCode } from "../../../libs/tickets"
+import { webhookProcessingTotal } from "../../../services/observability/metrics"
 import { getPaymentProvider } from "../../../services/payment"
 import {
   confirmDiscountCode,
@@ -583,6 +592,10 @@ describe("webhook controller", () => {
       expect(mockStrapi.log.warn).toHaveBeenCalledWith(
         expect.stringContaining("skipped - current status: paid")
       )
+      expect(webhookProcessingTotal.inc).toHaveBeenCalledWith({
+        event_type: "checkout.session.completed",
+        status: "skipped_terminal",
+      })
     })
 
     it("creates tickets and updates order status on successful checkout", async () => {

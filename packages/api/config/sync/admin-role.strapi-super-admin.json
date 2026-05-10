@@ -565,7 +565,7 @@
       "action": "plugin::content-manager.explorer.create",
       "subject": "api::expectation.expectation",
       "properties": {
-        "fields": ["title", "type", "icon", "content"],
+        "fields": ["title", "expectationType", "icon", "content"],
         "locales": ["en", "fr"]
       },
       "conditions": [],
@@ -599,7 +599,7 @@
       "action": "plugin::content-manager.explorer.read",
       "subject": "api::expectation.expectation",
       "properties": {
-        "fields": ["title", "type", "icon", "content"],
+        "fields": ["title", "expectationType", "icon", "content"],
         "locales": ["en", "fr"]
       },
       "conditions": [],
@@ -611,7 +611,7 @@
       "action": "plugin::content-manager.explorer.update",
       "subject": "api::expectation.expectation",
       "properties": {
-        "fields": ["title", "type", "icon", "content"],
+        "fields": ["title", "expectationType", "icon", "content"],
         "locales": ["en", "fr"]
       },
       "conditions": [],
@@ -1180,7 +1180,7 @@
       "action": "plugin::content-manager.explorer.create",
       "subject": "api::processed-webhook.processed-webhook",
       "properties": {
-        "fields": ["eventId", "eventType", "provider", "status", "processedAt", "metadata"]
+        "fields": ["eventId", "eventType", "provider", "webhookStatus", "processedAt", "metadata"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -1209,7 +1209,7 @@
       "action": "plugin::content-manager.explorer.read",
       "subject": "api::processed-webhook.processed-webhook",
       "properties": {
-        "fields": ["eventId", "eventType", "provider", "status", "processedAt", "metadata"]
+        "fields": ["eventId", "eventType", "provider", "webhookStatus", "processedAt", "metadata"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -1220,7 +1220,7 @@
       "action": "plugin::content-manager.explorer.update",
       "subject": "api::processed-webhook.processed-webhook",
       "properties": {
-        "fields": ["eventId", "eventType", "provider", "status", "processedAt", "metadata"]
+        "fields": ["eventId", "eventType", "provider", "webhookStatus", "processedAt", "metadata"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -1521,7 +1521,7 @@
       "properties": {
         "fields": [
           "orderNumber",
-          "status",
+          "orderStatus",
           "totalAmount",
           "currency",
           "paymentProvider",
@@ -1580,7 +1580,7 @@
       "properties": {
         "fields": [
           "orderNumber",
-          "status",
+          "orderStatus",
           "totalAmount",
           "currency",
           "paymentProvider",
@@ -1621,7 +1621,7 @@
       "properties": {
         "fields": [
           "orderNumber",
-          "status",
+          "orderStatus",
           "totalAmount",
           "currency",
           "paymentProvider",
