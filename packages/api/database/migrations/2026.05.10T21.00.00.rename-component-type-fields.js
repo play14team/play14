@@ -52,49 +52,55 @@ const RENAMES = [
 export async function up(knex) {
   console.log("Starting migration: Rename component type fields")
 
-  for (const { table, oldColumn, newColumn, fallbackEnum, fallbackNotNull } of RENAMES) {
-    const hasTable = await knex.schema.hasTable(table)
-    if (!hasTable) {
-      console.log(`${table} does not exist yet, skipping (will be created by schema sync)`)
-      continue
-    }
+  await knex.transaction(async (trx) => {
+    for (const { table, oldColumn, newColumn, fallbackEnum, fallbackNotNull } of RENAMES) {
+      const hasTable = await trx.schema.hasTable(table)
+      if (!hasTable) {
+        console.log(`${table} does not exist yet, skipping (will be created by schema sync)`)
+        continue
+      }
 
-    const hasOld = await knex.schema.hasColumn(table, oldColumn)
-    const hasNew = await knex.schema.hasColumn(table, newColumn)
+      const hasOld = await trx.schema.hasColumn(table, oldColumn)
+      const hasNew = await trx.schema.hasColumn(table, newColumn)
 
-    if (hasOld && !hasNew) {
-      console.log(`Renaming ${oldColumn} -> ${newColumn} on ${table}`)
-      await knex.schema.alterTable(table, (t) => {
-        t.renameColumn(oldColumn, newColumn)
-      })
-      console.log(`Successfully renamed ${oldColumn} -> ${newColumn} on ${table}`)
-    } else if (hasNew) {
-      console.log(`${newColumn} already exists on ${table}, skipping`)
-    } else {
-      console.log(`${oldColumn} not found on ${table}, creating ${newColumn}`)
-      await knex.schema.alterTable(table, (t) => {
-        const col = t.enu(newColumn, fallbackEnum)
-        if (fallbackNotNull) col.notNullable()
-      })
+      if (hasOld && !hasNew) {
+        console.log(`Renaming ${oldColumn} -> ${newColumn} on ${table}`)
+        await trx.schema.alterTable(table, (t) => {
+          t.renameColumn(oldColumn, newColumn)
+        })
+        console.log(`Successfully renamed ${oldColumn} -> ${newColumn} on ${table}`)
+      } else if (hasNew) {
+        console.log(`${newColumn} already exists on ${table}, skipping`)
+      } else {
+        console.log(`${oldColumn} not found on ${table}, creating ${newColumn}`)
+        await trx.schema.alterTable(table, (t) => {
+          const col = t.enu(newColumn, fallbackEnum)
+          if (fallbackNotNull) col.notNullable()
+        })
+      }
     }
-  }
+  })
 }
 
 export async function down(knex) {
   console.log("Rolling back migration: Rename component type fields")
 
-  for (const { table, oldColumn, newColumn } of RENAMES) {
-    const hasNew = await knex.schema.hasColumn(table, newColumn)
-    const hasOld = await knex.schema.hasColumn(table, oldColumn)
+  await knex.transaction(async (trx) => {
+    for (const { table, oldColumn, newColumn } of RENAMES) {
+      const hasNew = await trx.schema.hasColumn(table, newColumn)
+      const hasOld = await trx.schema.hasColumn(table, oldColumn)
 
-    if (hasNew && !hasOld) {
-      console.log(`Renaming ${newColumn} -> ${oldColumn} on ${table}`)
-      await knex.schema.alterTable(table, (t) => {
-        t.renameColumn(newColumn, oldColumn)
-      })
-      console.log(`Successfully reverted ${newColumn} -> ${oldColumn} on ${table}`)
-    } else {
-      console.log(`Cannot rollback ${table}: ${oldColumn} already exists or ${newColumn} not found`)
+      if (hasNew && !hasOld) {
+        console.log(`Renaming ${newColumn} -> ${oldColumn} on ${table}`)
+        await trx.schema.alterTable(table, (t) => {
+          t.renameColumn(newColumn, oldColumn)
+        })
+        console.log(`Successfully reverted ${newColumn} -> ${oldColumn} on ${table}`)
+      } else {
+        console.log(
+          `Cannot rollback ${table}: ${oldColumn} already exists or ${newColumn} not found`
+        )
+      }
     }
-  }
+  })
 }
