@@ -280,10 +280,20 @@ Stores completed purchases.
       "type": "string",
       "required": true
     },
-    "status": {
+    "orderStatus": {
       "type": "enumeration",
-      "enum": ["pending", "paid", "failed", "refunded", "partially_refunded", "cancelled"],
-      "default": "pending",
+      "enum": [
+        "draft",
+        "pending",
+        "processing",
+        "paid",
+        "cancelled",
+        "refunded",
+        "partially_refunded",
+        "expired",
+        "failed"
+      ],
+      "default": "draft",
       "required": true
     },
     "stripeCheckoutSessionId": {
