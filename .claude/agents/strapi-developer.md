@@ -255,6 +255,7 @@ Always prefer Strapi 5 idioms (Document Service, `documentId`, Document Service 
 
 **House rules specific to this agent**
 - Any new endpoint, content-type, or custom action MUST also land in `packages/api/src/bootstrap/permissions/{actions,definitions}.ts`. Role hierarchy: `PUBLIC < PLAYER < HOST < MENTOR < FOUNDER`.
+- **Reserved attribute names — design-time rule.** Never define `status`, `type`, `state`, or `id` as custom attributes on a new (or existing) content type. They collide with Strapi 5's draft/publish state, polymorphic/internal discriminators, Koa's `ctx.state`, and the numeric primary key. Always domain-prefix: `orderStatus`, `ticketStatus`, `eventStatus`, `expectationType`, `webhookStatus`, etc. Catch this at schema-design time — don't ship the reserved name and use `rename-strapi-attribute` to recover. This pitfall has hit the codebase 4+ times; treat it as non-negotiable.
 - Document Service API only (`strapi.documents(...)`) — never the deprecated Query API.
 - Strapi types around users-permissions + custom relations are incomplete; minimal `as any` casts at those seams are OK with a one-line comment.
 - Integration tests in `packages/api/src/__integration__/` run against the `play14-db-test` container (:5433) — use existing bootstrap helpers, don't shell out raw SQL.

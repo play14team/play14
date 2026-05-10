@@ -71,7 +71,7 @@ Create these files under `packages/api/src/api/<singular>/` by substituting plac
 }
 ```
 
-**Never** use `status` as a custom field name on content types that also have `draftAndPublish: true` — Strapi 5 reserves `status` internally for the draft/publish state. If the user wants a status-like field on a draft/publish type, propose `<domain>Status` (e.g. `eventStatus`, `orderStatus`).
+**Never** use `status`, `type`, `state`, or `id` as custom attribute names on any content type — these are Strapi 5 reserved names. `status` collides with the draft/publish state, `type` with polymorphic/internal discriminators, `state` with the Koa request context, and `id` with the numeric primary key. Symptoms range from silent admin-UI validation errors ("Validation error: Invalid status") to runtime breakage on the frontend. During the **fields** intake loop, if the user proposes any of these names, refuse and propose a domain-prefixed alternative (`orderStatus`, `ticketStatus`, `eventStatus`, `expectationType`, `webhookStatus`, etc.) before writing any file. Catching this at design time avoids the rename-later cycle that has hit this codebase repeatedly.
 
 ### 3. Update the permissions bootstrap
 
