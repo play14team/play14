@@ -96,7 +96,7 @@ async function collectTicketingMetrics(strapi: Core.Strapi): Promise<void> {
   ]
   for (const status of orderStatuses) {
     const count = await db.query("api::ticket-order.ticket-order").count({
-      where: { status },
+      where: { orderStatus: status },
     })
     ticketOrdersTotal.set({ status }, count)
   }
@@ -104,7 +104,7 @@ async function collectTicketingMetrics(strapi: Core.Strapi): Promise<void> {
   // Ticket order amounts - only for paid orders
   // Group by currency
   const paidOrders = await db.query("api::ticket-order.ticket-order").findMany({
-    where: { status: "paid" },
+    where: { orderStatus: "paid" },
     select: ["totalAmount", "currency"],
   })
 
@@ -187,7 +187,7 @@ async function collectDiscountMetrics(strapi: Core.Strapi): Promise<void> {
   const ordersWithDiscount = await db.query("api::ticket-order.ticket-order").findMany({
     where: {
       discountAmount: { $gt: 0 },
-      status: "paid",
+      orderStatus: "paid",
     },
     select: ["discountAmount", "currency"],
   })

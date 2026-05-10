@@ -1232,7 +1232,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       const paidOrders = await strapi.documents("api::ticket-order.ticket-order").findMany({
         filters: {
           player: { documentId: player.documentId },
-          status: "paid",
+          orderStatus: "paid",
         },
         populate: {
           event: {
