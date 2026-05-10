@@ -17,7 +17,7 @@ interface Props {
 interface EditingLink {
   index: number | null // null means adding new
   url: string
-  type: "Photos" | "Videos"
+  mediaType: "Photos" | "Videos"
 }
 
 export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
@@ -29,7 +29,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
     setEditing({
       index: null,
       url: "",
-      type: "Photos",
+      mediaType: "Photos",
     })
     setError(null)
   }
@@ -39,7 +39,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
     setEditing({
       index,
       url: link.url,
-      type: link.type,
+      mediaType: link.mediaType,
     })
     setError(null)
   }
@@ -74,7 +74,7 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
 
     const newLink: MediaLink = {
       url: editing.url.trim(),
-      type: editing.type,
+      mediaType: editing.mediaType,
     }
 
     let updatedLinks: MediaLink[]
@@ -132,9 +132,12 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
                   <div className="admin-form-group admin-form-group-narrow">
                     <label>{t("type")}</label>
                     <select
-                      value={editing.type}
+                      value={editing.mediaType}
                       onChange={(e) =>
-                        setEditing({ ...editing, type: e.target.value as "Photos" | "Videos" })
+                        setEditing({
+                          ...editing,
+                          mediaType: e.target.value as "Photos" | "Videos",
+                        })
                       }
                       className="admin-select"
                     >
@@ -168,8 +171,8 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
               <>
                 <div className="media-link-info">
                   <div className="media-link-type">
-                    <i className={`bx ${getTypeInfo(link.type).icon}`} />
-                    <span>{t(link.type === "Photos" ? "photos" : "videos")}</span>
+                    <i className={`bx ${getTypeInfo(link.mediaType).icon}`} />
+                    <span>{t(link.mediaType === "Photos" ? "photos" : "videos")}</span>
                   </div>
                   <a
                     href={link.url}
@@ -227,9 +230,12 @@ export default function MediaLinksEditor({ mediaLinks, onChange }: Props) {
               <div className="admin-form-group admin-form-group-narrow">
                 <label>{t("type")}</label>
                 <select
-                  value={editing.type}
+                  value={editing.mediaType}
                   onChange={(e) =>
-                    setEditing({ ...editing, type: e.target.value as "Photos" | "Videos" })
+                    setEditing({
+                      ...editing,
+                      mediaType: e.target.value as "Photos" | "Videos",
+                    })
                   }
                   className="admin-select"
                 >

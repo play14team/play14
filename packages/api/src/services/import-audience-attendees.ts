@@ -27,7 +27,7 @@ interface PlayerRecord {
   visible?: boolean
   position?: string
   userEmail?: string
-  socialNetworks?: Array<{ type: string; url: string }>
+  socialNetworks?: Array<{ socialNetworkType: string; url: string }>
   defaultTshirtSize?: string
   defaultFoodPreferences?: string
   planned?: boolean
@@ -723,7 +723,12 @@ export async function runAudienceAttendeeImport(
           slug: uniqueSlug,
           visible: false,
           socialNetworks: normalizedLinkedIn
-            ? [{ type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn }]
+            ? [
+                {
+                  socialNetworkType: "LinkedIn",
+                  url: contact.linkedinUrl || normalizedLinkedIn,
+                },
+              ]
             : [],
           defaultTshirtSize: desiredTshirt || "none",
           defaultFoodPreferences: desiredFood,
@@ -771,7 +776,10 @@ export async function runAudienceAttendeeImport(
         if (!hasLinkedIn) {
           playerUpdates.socialNetworks = [
             ...(player.socialNetworks || []),
-            { type: "LinkedIn", url: contact.linkedinUrl || normalizedLinkedIn },
+            {
+              socialNetworkType: "LinkedIn",
+              url: contact.linkedinUrl || normalizedLinkedIn,
+            },
           ]
         }
       }

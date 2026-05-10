@@ -13,7 +13,7 @@ interface UploadFile {
 interface SocialNetwork {
   id: string
   url: string
-  type: string
+  socialNetworkType: string
 }
 
 interface EventItem {

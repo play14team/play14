@@ -31,7 +31,7 @@ export interface SponsorsListResponse {
 export interface SocialNetwork {
   id?: number
   url: string
-  type: string
+  socialNetworkType: string
 }
 
 export interface SponsorForEdit {

@@ -4,7 +4,7 @@ import { getYouTubeThumbnail } from "./youtube"
 
 interface MediaLinkCardProps {
   url: string
-  type: string
+  mediaType: string
   eventName: string
   locationName?: string
   previewImageUrl?: string
@@ -14,14 +14,14 @@ interface MediaLinkCardProps {
 
 export default function MediaLinkCard({
   url,
-  type,
+  mediaType,
   eventName,
   locationName,
   previewImageUrl,
   watchVideosLabel,
   viewPhotosLabel,
 }: MediaLinkCardProps) {
-  const isVideo = type === "Videos"
+  const isVideo = mediaType === "Videos"
   const youtubeThumbnail = isVideo ? getYouTubeThumbnail(url) : null
   const thumbnailUrl = youtubeThumbnail || previewImageUrl
 
@@ -37,7 +37,7 @@ export default function MediaLinkCard({
         {thumbnailUrl ? (
           <Image
             src={thumbnailUrl}
-            alt={`${eventName} ${type.toLowerCase()}`}
+            alt={`${eventName} ${mediaType.toLowerCase()}`}
             fill
             sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, 33vw"
             style={{ objectFit: "cover" }}
@@ -55,7 +55,7 @@ export default function MediaLinkCard({
       <div className="gallery-media-card__info">
         <span className="gallery-media-card__type">
           <i className={`bx ${isVideo ? "bx-video" : "bx-images"}`} />
-          {type}
+          {mediaType}
         </span>
         <span className="gallery-media-card__event">{eventName}</span>
         {locationName && <span className="gallery-media-card__location">{locationName}</span>}

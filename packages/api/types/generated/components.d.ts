@@ -31,7 +31,7 @@ export interface ContactSocialNetwork extends Struct.ComponentSchema {
     icon: 'address-card';
   };
   attributes: {
-    type: Schema.Attribute.Enumeration<
+    socialNetworkType: Schema.Attribute.Enumeration<
       [
         'Twitter',
         'LinkedIn',
@@ -80,7 +80,7 @@ export interface EventsMedia extends Struct.ComponentSchema {
     icon: 'photo-video';
   };
   attributes: {
-    type: Schema.Attribute.Enumeration<['Photos', 'Videos']> &
+    mediaType: Schema.Attribute.Enumeration<['Photos', 'Videos']> &
       Schema.Attribute.Required;
     url: Schema.Attribute.String & Schema.Attribute.Required;
   };

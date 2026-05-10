@@ -19,7 +19,7 @@ function revalidatePlayerPages(slug?: string) {
 
 export interface SocialNetworkInput {
   id?: string
-  type: string
+  socialNetworkType: string
   url: string
 }
 
@@ -52,7 +52,7 @@ export async function updatePlayerProfile(
   // Format social networks for Strapi component
   const socialNetworks = data.socialNetworks?.map((sn) => ({
     ...(sn.id ? { id: sn.id } : {}),
-    type: sn.type,
+    socialNetworkType: sn.socialNetworkType,
     url: sn.url,
   }))
 

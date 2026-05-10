@@ -31,10 +31,10 @@ export default function EventInfo({ event, venue, country }: EventInfoProps) {
 
   // Media links
   const photosAlbum = event.media?.find(
-    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos
+    (medium) => medium?.mediaType === Enum_Componenteventsmedia_Type.Photos
   )
   const videosLibrary = event.media?.find(
-    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Videos
+    (medium) => medium?.mediaType === Enum_Componenteventsmedia_Type.Videos
   )
 
   const isOpen = event.eventStatus === Enum_Event_Eventstatus.Open
@@ -47,8 +47,8 @@ export default function EventInfo({ event, venue, country }: EventInfoProps) {
   const resourceLinks = (event.media || []).filter(
     (medium) =>
       medium?.url &&
-      medium.type !== Enum_Componenteventsmedia_Type.Photos &&
-      medium.type !== Enum_Componenteventsmedia_Type.Videos
+      medium.mediaType !== Enum_Componenteventsmedia_Type.Photos &&
+      medium.mediaType !== Enum_Componenteventsmedia_Type.Videos
   )
 
   return (
@@ -102,7 +102,7 @@ export default function EventInfo({ event, venue, country }: EventInfoProps) {
                   rel="noopener noreferrer"
                   className="event-profile-info__resource-link"
                 >
-                  {medium.type}
+                  {medium.mediaType}
                 </Link>
               ))}
             </div>

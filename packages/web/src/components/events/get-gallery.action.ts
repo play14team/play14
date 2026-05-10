@@ -9,7 +9,7 @@ import { imageFields } from "@/libs/strapi-populate"
 const eventGalleryPopulate = {
   defaultImage: { fields: imageFields },
   images: { fields: imageFields },
-  media: { fields: ["id", "url", "type"] },
+  media: { fields: ["id", "url", "mediaType"] },
   location: { fields: ["name", "country"] },
 }
 
@@ -19,7 +19,7 @@ export interface GalleryEvent {
   start: string
   defaultImage?: { url: string; width?: number; height?: number; name?: string }
   images?: Array<{ url: string; width?: number; height?: number; name?: string }>
-  media?: Array<{ id: string; url: string; type: string }>
+  media?: Array<{ id: string; url: string; mediaType: string }>
   location?: { name: string; country: string }
 }
 

@@ -125,7 +125,7 @@ interface SponsorData {
   socialNetworks?: Array<{
     id?: number
     url: string
-    type: string
+    socialNetworkType: string
   }>
 }
 

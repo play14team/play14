@@ -41,7 +41,7 @@ export interface UploadFile {
 export interface SocialNetwork {
   id: string
   url: string
-  type: string
+  socialNetworkType: string
 }
 
 export interface Tag {
@@ -174,7 +174,7 @@ export interface ComponentEventsSponsorship {
 export interface MediaItem {
   id: string
   url: string
-  type: string
+  mediaType: string
 }
 
 export interface Event {

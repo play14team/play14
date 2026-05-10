@@ -10,7 +10,7 @@
     "url": {
       "type": "string"
     },
-    "type": {
+    "socialNetworkType": {
       "type": "enumeration",
       "enum": [
         "Twitter",

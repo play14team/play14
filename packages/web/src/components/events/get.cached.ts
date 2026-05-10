@@ -51,7 +51,7 @@ interface Player {
   name: string
   position?: string
   avatar?: UploadFile
-  socialNetworks?: Array<{ id: string; url: string; type: string }>
+  socialNetworks?: Array<{ id: string; url: string; socialNetworkType: string }>
 }
 
 interface Event {
@@ -84,13 +84,13 @@ interface Event {
       name: string
       url?: string
       logo?: UploadFile
-      socialNetworks?: Array<{ id: string; type: string; url: string }>
+      socialNetworks?: Array<{ id: string; socialNetworkType: string; url: string }>
     }>
   }>
   hosts?: Player[]
   mentors?: Player[]
   players?: Player[]
-  media?: Array<{ id: string; url: string; type: string }>
+  media?: Array<{ id: string; url: string; mediaType: string }>
 }
 
 /**
