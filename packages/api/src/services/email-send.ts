@@ -71,6 +71,24 @@ function formatRecipients(to: string | string[] | undefined): string | undefined
   return Array.isArray(to) ? to.join(", ") : to
 }
 
+// Cap audit-log bodies so a pathological email (or a runaway template loop)
+// can't bloat the table. 256 KB preserves every real transactional email
+// we send today while bounding worst-case storage to ~22 GB over 90 days at
+// 1k emails/day.
+const MAX_BODY_BYTES = 256 * 1024
+
+function truncateBody(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined
+  if (Buffer.byteLength(value, "utf8") <= MAX_BODY_BYTES) return value
+  const marker = `\n…[truncated at ${MAX_BODY_BYTES} bytes]`
+  const markerBytes = Buffer.byteLength(marker, "utf8")
+  // Byte-aware slice; toString() drops any trailing partial UTF-8 sequence.
+  const head = Buffer.from(value, "utf8")
+    .subarray(0, MAX_BODY_BYTES - markerBytes)
+    .toString("utf8")
+  return head + marker
+}
+
 // Sender.net's response shape isn't a stable contract; look in a few
 // plausible places and silently fall back to undefined.
 function extractProviderMessageId(result: unknown): string | undefined {
@@ -122,8 +140,8 @@ async function persistEmailLog(
     emailStatus: args.emailStatus,
     errorMessage: args.errorMessage,
     providerMessageId: args.providerMessageId,
-    bodyHtml: args.options.html,
-    bodyText: args.options.text,
+    bodyHtml: truncateBody(args.options.html),
+    bodyText: truncateBody(args.options.text),
     attachmentNames: args.options.attachments?.map((a) => a.filename),
     context: args.context,
     sentAt: args.sentAt.toISOString(),
