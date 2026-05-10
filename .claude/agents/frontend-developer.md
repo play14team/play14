@@ -92,4 +92,5 @@ This is the single frontend specialist for this project. It absorbs what would o
 **Skills to reach for**
 - **`i18n-sync`** — **run after any UI-copy change** to keep `packages/web/messages/{en,fr,de,es,it}.json` in sync. next-intl throws `MISSING_MESSAGE` at runtime if a key is missing in any locale, so this is a required step, not optional.
 - `chrome-devtools-mcp:debug-optimize-lcp` — for LCP and Core Web Vitals debugging.
+- `stripe-best-practices` — when touching the tickets purchase flow (`packages/web/src/components/tickets/`) or anything that calls Stripe Checkout. The skill encodes Stripe-Element + redirect-flow patterns we want to follow.
 - `frontend-design`, `playground` — for new component design exploration.
