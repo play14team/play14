@@ -290,17 +290,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const knex = strapi.db.connection
     const updateResult = await knex(TABLES.ticketOrders)
       .where("document_id", order.documentId)
-      .where("status", "pending")
-      .update({ status: "processing" })
+      .where("order_status", "pending")
+      .update({ order_status: "processing" })
 
     if (updateResult === 0) {
       // Either order was already processed or is being processed by another webhook
       // Re-fetch the order to get the current status for accurate logging
       const currentOrder = await strapi.documents("api::ticket-order.ticket-order").findFirst({
         filters: { documentId: order.documentId },
-        fields: ["status"],
+        fields: ["orderStatus"],
       })
-      const currentStatus = currentOrder?.status || "unknown"
+      const currentStatus = currentOrder?.orderStatus || "unknown"
       strapi.log.info(
         `[Webhook] Order ${orderNumber} skipped - current status: ${currentStatus} (was not pending) | event=${eventName}, correlationId=${correlationId}`
       )
@@ -421,7 +421,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: order.documentId,
         data: {
-          status: "paid",
+          orderStatus: "paid",
           providerOrderId: paymentIntent,
           paidAt: new Date().toISOString(),
         } as any,
@@ -488,8 +488,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       await knex(TABLES.ticketOrders)
         .where("document_id", order.documentId)
-        .where("status", "processing")
-        .update({ status: "pending" })
+        .where("order_status", "processing")
+        .update({ order_status: "pending" })
 
       strapi.log.info(
         `[Webhook] Order ${orderNumber} status reverted to pending for retry | correlationId=${correlationId}`
@@ -567,9 +567,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const orderNumber = order.orderNumber
     const eventName = order.event?.name || "unknown"
 
-    if (order.status !== "pending") {
+    if (order.orderStatus !== "pending") {
       strapi.log.info(
-        `[Webhook] Order ${orderNumber} not pending (status: ${order.status}), skipping expiration | event=${eventName}, correlationId=${correlationId}`
+        `[Webhook] Order ${orderNumber} not pending (status: ${order.orderStatus}), skipping expiration | event=${eventName}, correlationId=${correlationId}`
       )
       return
     }
@@ -589,7 +589,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     await strapi.documents("api::ticket-order.ticket-order").update({
       documentId: order.documentId,
       data: {
-        status: "expired",
+        orderStatus: "expired",
       } as any,
     })
 
@@ -671,7 +671,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     )
 
     // Update order with failure info if still pending
-    if (order.status === "pending") {
+    if (order.orderStatus === "pending") {
       // Release any ticket reservations before marking failed
       await releaseReservations(strapi, order.documentId)
 
@@ -686,7 +686,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: order.documentId,
         data: {
-          status: "failed",
+          orderStatus: "failed",
           notes: `Payment failed: ${errorCode} - ${errorMessage}`,
         } as any,
       })
@@ -774,16 +774,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Early-return guard: treat both fully- and partially-refunded orders as
     // already processed to avoid duplicate ticket/attendee mutations when
     // Stripe replays the webhook.
-    if (order.status === "refunded" || order.status === "partially_refunded") {
+    if (order.orderStatus === "refunded" || order.orderStatus === "partially_refunded") {
       strapi.log.info(
-        `[Webhook] Order ${orderNumber} already ${order.status} | event=${eventName}, correlationId=${correlationId}`
+        `[Webhook] Order ${orderNumber} already ${order.orderStatus} | event=${eventName}, correlationId=${correlationId}`
       )
       return
     }
 
     // Update order status
     const orderUpdateData: Record<string, unknown> = {
-      status: newOrderStatus,
+      orderStatus: newOrderStatus,
       refundedAt: new Date().toISOString(),
       refundAmount: amountRefunded,
     }
@@ -837,7 +837,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           filters: {
             event: { documentId: order.event.documentId },
             player: { documentId: order.player.documentId },
-            status: "paid",
+            orderStatus: "paid",
             documentId: { $ne: order.documentId },
           },
         })

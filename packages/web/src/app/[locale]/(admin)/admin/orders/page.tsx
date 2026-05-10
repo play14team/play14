@@ -57,8 +57,8 @@ export default async function MyOrdersPage() {
             <div key={order.documentId} className={styles.orderCard}>
               <div className={styles.orderHeader}>
                 <span className={styles.orderNumber}>{order.orderNumber}</span>
-                <span className={`${styles.status} ${getStatusBadgeClass(order.status)}`}>
-                  {order.status.toUpperCase()}
+                <span className={`${styles.status} ${getStatusBadgeClass(order.orderStatus)}`}>
+                  {order.orderStatus.toUpperCase()}
                 </span>
               </div>
 

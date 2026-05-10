@@ -26,7 +26,7 @@ export default {
     const strapi = (global as any).strapi as Core.Strapi
 
     // Only send email when status changes to refunded
-    const newStatus = result.status
+    const newStatus = result.orderStatus
     if (newStatus !== "refunded" && newStatus !== "partially_refunded") {
       return
     }

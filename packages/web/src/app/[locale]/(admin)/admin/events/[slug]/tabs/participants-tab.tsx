@@ -406,7 +406,7 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                             </>
                           )}
                         </button>
-                        {participant.order?.status === "paid" && (
+                        {participant.order?.orderStatus === "paid" && (
                           <button
                             type="button"
                             className={`${styles.actionButton} ${styles.refund}`}

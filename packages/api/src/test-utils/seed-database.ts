@@ -42,7 +42,7 @@ export interface TestOrder {
   id: number
   documentId: string
   orderNumber: string
-  status: string
+  orderStatus: string
   providerSessionId: string | null
   providerOrderId: string | null
 }
@@ -282,7 +282,7 @@ export async function seedTestOrder(
   data: Partial<{
     event: number
     player: number
-    status: string
+    orderStatus: string
     purchaserEmail: string
     purchaserName: string
     totalAmount: number
@@ -298,7 +298,7 @@ export async function seedTestOrder(
   const order = await strapi.documents("api::ticket-order.ticket-order").create({
     data: {
       orderNumber: `P14-TEST-${id}`,
-      status: data.status || "pending",
+      orderStatus: data.orderStatus || "pending",
       purchaserEmail: data.purchaserEmail || "test@example.com",
       purchaserName: data.purchaserName || "Test User",
       totalAmount: data.totalAmount ?? 100,
@@ -317,7 +317,7 @@ export async function seedTestOrder(
     id: Number(order.id),
     documentId: order.documentId,
     orderNumber: order.orderNumber,
-    status: order.status,
+    orderStatus: order.orderStatus,
     providerSessionId: order.providerSessionId,
     providerOrderId: order.providerOrderId,
   }
@@ -342,7 +342,7 @@ export async function seedPaidOrderWithTickets(
   const order = await seedTestOrder(strapi, {
     event: data.event.id,
     player: data.player.id,
-    status: "paid",
+    orderStatus: "paid",
     totalAmount: data.totalAmount || 100,
     providerOrderId: `pi_test_${generateId()}`,
     ticketDetails: ticketTypeId

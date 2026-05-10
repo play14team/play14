@@ -1972,7 +1972,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     // Process each order
     for (const order of orders as any[]) {
-      const status = order.status || "pending"
+      const status = order.orderStatus || "pending"
       const amount = order.totalAmount || 0
       currency = order.currency || currency
 
@@ -2124,7 +2124,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             "orderNumber",
             "purchaserName",
             "purchaserEmail",
-            "status",
+            "orderStatus",
             "paidAt",
           ],
         },
@@ -2167,7 +2167,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
                 orderNumber: ticket.order.orderNumber,
                 purchaserName: ticket.order.purchaserName,
                 purchaserEmail: ticket.order.purchaserEmail,
-                status: ticket.order.status,
+                orderStatus: ticket.order.orderStatus,
                 paidAt: ticket.order.paidAt,
               }
             : null,

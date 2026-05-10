@@ -72,7 +72,7 @@ describe("Draft Order Flow", () => {
       const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
         documentId: response.body.data.orderId,
       })
-      expect(order.status).toBe("draft")
+      expect(order.orderStatus).toBe("draft")
       expect(order.hasReservation).toBe(false)
       expect(order.providerSessionId).toBeNull()
     })
@@ -294,7 +294,7 @@ describe("Draft Order Flow", () => {
       const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
         documentId: orderId,
       })
-      expect(order.status).toBe("pending")
+      expect(order.orderStatus).toBe("pending")
       expect(order.hasReservation).toBe(true)
       expect(order.providerSessionId).not.toBeNull()
     })
@@ -355,7 +355,7 @@ describe("Draft Order Flow", () => {
         documentId: orderId,
         populate: { tickets: true },
       })
-      expect(order.status).toBe("paid")
+      expect(order.orderStatus).toBe("paid")
       expect(order.tickets).toHaveLength(1)
     })
 
@@ -462,7 +462,7 @@ describe("Draft Order Flow", () => {
         populate: { tickets: true },
       })
 
-      expect(finalOrder.status).toBe("paid")
+      expect(finalOrder.orderStatus).toBe("paid")
       expect(finalOrder.tickets).toHaveLength(2)
 
       // Verify attendee info preserved on tickets

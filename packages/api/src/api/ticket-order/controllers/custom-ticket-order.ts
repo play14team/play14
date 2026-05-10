@@ -426,7 +426,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const order = await strapi.documents("api::ticket-order.ticket-order").create({
       data: {
         orderNumber,
-        status: "pending",
+        orderStatus: "pending",
         originalAmount,
         discountAmount,
         totalAmount,
@@ -631,7 +631,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         data: {
           documentId: order.documentId,
           orderNumber: order.orderNumber,
-          status: order.status,
+          orderStatus: order.orderStatus,
           totalAmount: order.totalAmount,
           currency: order.currency,
           // Mask purchaser info for unauthenticated requests
@@ -656,7 +656,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       data: {
         documentId: order.documentId,
         orderNumber: order.orderNumber,
-        status: order.status,
+        orderStatus: order.orderStatus,
         totalAmount: order.totalAmount,
         currency: order.currency,
         purchaserName: order.purchaserName,
@@ -720,7 +720,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       data: orders.map((o: any) => ({
         documentId: o.documentId,
         orderNumber: o.orderNumber,
-        status: o.status, // This is order status, not ticket status
+        orderStatus: o.orderStatus,
         totalAmount: o.totalAmount,
         currency: o.currency,
         paidAt: o.paidAt,
@@ -762,7 +762,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.notFound("Order not found")
     }
 
-    if (order.status !== "paid") {
+    if (order.orderStatus !== "paid") {
       return ctx.badRequest("Only paid orders can be refunded")
     }
 
@@ -795,7 +795,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: orderId,
         data: {
-          status: "refunded",
+          orderStatus: "refunded",
           refundedAt: new Date().toISOString(),
           refundAmount: refund.amount,
           refundReason: reason || null,
@@ -895,13 +895,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Only pending or draft orders can be cancelled this way
-    if (order.status !== "pending" && order.status !== "draft") {
+    if (order.orderStatus !== "pending" && order.orderStatus !== "draft") {
       return ctx.badRequest("Only pending or draft orders can be cancelled")
     }
 
     // Release any ticket reservations before cancelling
     // (only pending orders have reservations, draft orders don't)
-    if (order.status === "pending") {
+    if (order.orderStatus === "pending") {
       await releaseReservations(strapi, orderId)
 
       // Release any discount code reservation
@@ -916,7 +916,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Update order status to cancelled
     await strapi.documents("api::ticket-order.ticket-order").update({
       documentId: orderId,
-      data: { status: "cancelled" } as any,
+      data: { orderStatus: "cancelled" } as any,
     })
 
     strapi.log.info(`[Ticketing] Order ${order.orderNumber} cancelled by user ${user.email}`)
@@ -968,7 +968,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const existingDrafts = await strapi.documents("api::ticket-order.ticket-order").findMany({
       filters: {
         player: { id: player.id },
-        status: "draft",
+        orderStatus: "draft",
       },
       limit: ORDER_LIMITS.MAX_PENDING_DRAFTS + 1,
     })
@@ -1147,7 +1147,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     const order = await strapi.documents("api::ticket-order.ticket-order").create({
       data: {
         orderNumber,
-        status: "draft",
+        orderStatus: "draft",
         originalAmount,
         discountAmount,
         totalAmount,
@@ -1226,7 +1226,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.notFound("Order not found")
     }
 
-    if (order.status !== "draft") {
+    if (order.orderStatus !== "draft") {
       return ctx.badRequest("Order is not in draft status")
     }
 
@@ -1385,7 +1385,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.notFound("Order not found")
     }
 
-    if (order.status !== "draft") {
+    if (order.orderStatus !== "draft") {
       return ctx.badRequest("Order is not in draft status")
     }
 
@@ -1472,7 +1472,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: orderId,
         data: {
-          status: "paid",
+          orderStatus: "paid",
           paidAt: new Date().toISOString(),
         } as any,
       })
@@ -1578,7 +1578,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       await strapi.documents("api::ticket-order.ticket-order").update({
         documentId: order.documentId,
         data: {
-          status: "pending",
+          orderStatus: "pending",
           providerSessionId: session.sessionId,
         } as any,
       })
@@ -1645,7 +1645,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           await strapi.documents("api::ticket-order.ticket-order").update({
             documentId: order.documentId,
             data: {
-              status: "draft",
+              orderStatus: "draft",
               providerSessionId: null,
             } as any,
           })
@@ -1930,7 +1930,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     // Only paid orders can have invoices
-    if (order.status !== "paid" && order.status !== "refunded") {
+    if (order.orderStatus !== "paid" && order.orderStatus !== "refunded") {
       return ctx.badRequest("Invoice is only available for paid orders")
     }
 
@@ -1992,7 +1992,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       totalAmount: order.totalAmount,
       currency: order.currency,
       paymentMethod: "Stripe",
-      notes: order.status === "refunded" ? "This order has been refunded." : undefined,
+      notes: order.orderStatus === "refunded" ? "This order has been refunded." : undefined,
     }
 
     // Logo path - anchor to app root so it works in both src and dist builds

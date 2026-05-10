@@ -52,7 +52,7 @@ export interface OrderTicket {
 export interface OrderStatusResponse {
   documentId: string
   orderNumber: string
-  status: string
+  orderStatus: string
   totalAmount: number
   currency: string
   purchaserName: string
@@ -72,7 +72,7 @@ export interface OrderStatusResponse {
 export interface MyOrderSummary {
   documentId: string
   orderNumber: string
-  status: string
+  orderStatus: string
   totalAmount: number
   currency: string
   paidAt?: string
