@@ -152,6 +152,39 @@ describe("sendEmail", () => {
     )
   })
 
+  it("captures sentAt before the provider call, not after it returns", async () => {
+    const captureStart = Date.now()
+    let providerResolvedAt: number | undefined
+
+    const { strapi, documentCreate } = createMockStrapi({
+      sendImpl: async () => {
+        // Simulate a slow provider so any post-send timestamp would drift.
+        await new Promise((resolve) => setTimeout(resolve, 50))
+        providerResolvedAt = Date.now()
+        return { id: "msg_x" }
+      },
+    })
+
+    await sendEmail(strapi, "confirmation", { to: "alice@example.com", subject: "Hi" })
+
+    const loggedSentAt = new Date(documentCreate.mock.calls[0][0].data.sentAt as string).getTime()
+    expect(providerResolvedAt).toBeDefined()
+    expect(providerResolvedAt! - loggedSentAt).toBeGreaterThanOrEqual(40)
+    expect(loggedSentAt - captureStart).toBeLessThan(20)
+  })
+
+  it("skips the audit log when the recipient is empty", async () => {
+    const { strapi, emailSend, documentCreate } = createMockStrapi()
+
+    await sendEmail(strapi, "confirmation", { to: "", subject: "Hi" })
+
+    expect(emailSend).toHaveBeenCalledOnce()
+    expect(documentCreate).not.toHaveBeenCalled()
+    expect(strapi.log.warn).toHaveBeenCalledWith(
+      expect.stringContaining("Skipping audit log: no recipient")
+    )
+  })
+
   it("attaches caller-supplied context to the audit log", async () => {
     const { strapi, documentCreate } = createMockStrapi()
 

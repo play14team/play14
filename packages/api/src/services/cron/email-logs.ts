@@ -1,17 +1,5 @@
-/**
- * Email-log retention.
- *
- * Every transactional email funnelled through `sendEmail()` (see
- * services/email-send.ts) persists an `email-log` row containing the
- * recipient, subject, body, status, and any provider error. We keep those
- * rows for 90 days so operators can audit "did the confirmation actually go
- * out?" or "why did this player never receive their invite?", then purge
- * them to prevent unbounded table growth (HTML bodies can be ~100KB each).
- *
- * Deletion goes through Knex rather than the Document Service so a bulk
- * purge stays cheap — there are no lifecycle hooks worth firing on an
- * audit-log row.
- */
+// Bulk delete via Knex (no lifecycle hooks worth firing on audit rows);
+// indexed on sent_at so this stays O(deleted), not O(table).
 
 import type { Core } from "@strapi/strapi"
 
