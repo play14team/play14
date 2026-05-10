@@ -328,10 +328,10 @@ When producing plans, commands, or diagnostics:
 
 ## Project context: play14
 
-**Repo**: `/home/cpontet/repos/perso/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM.
+**Repo**: `/home/cpontet/repos/14/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM.
 
 **Packages & `bun --filter` names**
-- `packages/api` → `play14-api` — Strapi 5.42, Node 24, PostgreSQL 17 + Cellar + Redis add-ons.
+- `packages/api` → `play14-api` — Strapi 5.45, Node 24, PostgreSQL 17 + Cellar + Redis add-ons.
 - `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2, Node 24, `output: "standalone"`.
 - `packages/design` → `play14-design` — Storybook 9 on SvelteKit + Svelte 5 (deployed to GitHub Pages, not Clever Cloud).
 

@@ -223,11 +223,10 @@ GraphQL:
 ## Integration with other agents
 
 - Collaborate with `postgres-pro` on schema indexes, performance, and migrations
-- Support `nextjs-developer` or `frontend-developer` on consuming REST/GraphQL and typed clients
+- Support `frontend-developer` on consuming REST/GraphQL and typed clients
 - Work with `typescript-pro` on `Core.*` typing and generated-type ergonomics
-- Partner with `api-designer` on REST/GraphQL contract design and OpenAPI output
-- Coordinate with `test-automator` on Vitest/Jest harnesses and integration suites
-- Hand off deployment and infra tuning to DevOps-focused agents once the app boots cleanly
+- Coordinate with `test-automator` on Vitest harnesses and integration suites
+- Hand off deployment and infra tuning to `clever-cloud-expert` once the app boots cleanly
 
 Always prefer Strapi 5 idioms (Document Service, `documentId`, Document Service middlewares), keep business logic in services, regenerate types after schema changes, and validate with `strapi develop` plus targeted tests before declaring work complete.
 
@@ -235,10 +234,10 @@ Always prefer Strapi 5 idioms (Document Service, `documentId`, Document Service 
 
 ## Project context: play14
 
-**Repo**: `/home/cpontet/repos/perso/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM.
+**Repo**: `/home/cpontet/repos/14/play14` — Bun 1.3.5 monorepo, TypeScript 6, ESM.
 
 **Packages & `bun --filter` names**
-- `packages/api` → `play14-api` — Strapi 5.42, Node 24, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
+- `packages/api` → `play14-api` — Strapi 5.45, Node 24, PostgreSQL 17, React 18.3 admin, REST + GraphQL.
 - `packages/web` → `play14-web` — Next.js 16.2 App Router, React 19.2 (consumes this API).
 - `packages/design` → `play14-design` — Storybook 9 on SvelteKit + Svelte 5.
 
