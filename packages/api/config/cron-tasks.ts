@@ -19,6 +19,7 @@ import { cleanupLockoutStore, getLockoutStoreSize } from "../src/services/accoun
 import {
   cleanAbandonedDraftOrders,
   cleanExpiredTicketOrders,
+  cleanOldEmailLogs,
   processEventResultsReminders,
   reconcileNewsletterSends,
   reservationHealthCheck,
@@ -210,6 +211,19 @@ const cronTasks = {
       })
     ),
     options: { rule: "0 0 6 * * *" },
+  },
+
+  // Daily at 02:30 - Purge email-log rows older than 90 days
+  // Audit log of every transactional email — retained 90 days for ops review,
+  // then deleted to keep table size bounded (HTML bodies can be ~100KB each).
+  cleanOldEmailLogs: {
+    task: withLock(
+      "cleanOldEmailLogs",
+      withErrorReporting("cleanOldEmailLogs", async ({ strapi }) => {
+        await cleanOldEmailLogs(strapi!)
+      })
+    ),
+    options: { rule: "0 30 2 * * *" },
   },
 
   // Every 5 minutes - Reconcile newsletters stuck in "sending"
