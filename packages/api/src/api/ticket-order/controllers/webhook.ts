@@ -152,7 +152,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
     if (!idempotencyResult.shouldProcess) {
       strapi.log.info(
-        `[Webhook] Event ${eventId} already processed (status: ${idempotencyResult.status}) - returning success | correlationId=${correlationId}`
+        `[Webhook] Event ${eventId} already processed (status: ${idempotencyResult.webhookStatus}) - returning success | correlationId=${correlationId}`
       )
       webhookProcessingTotal.inc({ event_type: eventType, status: "duplicate" })
       return ctx.send({ received: true, duplicate: true })

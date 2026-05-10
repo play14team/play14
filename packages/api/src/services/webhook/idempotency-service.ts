@@ -10,7 +10,7 @@ import type { Core } from "@strapi/strapi"
 export interface IdempotencyResult {
   shouldProcess: boolean
   alreadyProcessed: boolean
-  status?: "processing" | "completed" | "failed"
+  webhookStatus?: "processing" | "completed" | "failed"
 }
 
 /**
@@ -34,7 +34,7 @@ export async function claimWebhookEvent(
       event_id: eventId,
       event_type: eventType,
       provider,
-      status: "processing",
+      webhook_status: "processing",
       created_at: new Date(),
       updated_at: new Date(),
     })
@@ -54,11 +54,13 @@ export async function claimWebhookEvent(
       const existing = await knex("processed_webhooks").where("event_id", eventId).first()
 
       if (existing) {
-        strapi.log.info(`[Idempotency] Event ${eventId} already ${existing.status} - skipping`)
+        strapi.log.info(
+          `[Idempotency] Event ${eventId} already ${existing.webhook_status} - skipping`
+        )
         return {
           shouldProcess: false,
           alreadyProcessed: true,
-          status: existing.status,
+          webhookStatus: existing.webhook_status,
         }
       }
     }
@@ -81,7 +83,7 @@ export async function markWebhookCompleted(
   await knex("processed_webhooks")
     .where("event_id", eventId)
     .update({
-      status: "completed",
+      webhook_status: "completed",
       processed_at: new Date(),
       metadata: metadata ? JSON.stringify(metadata) : null,
       updated_at: new Date(),
@@ -104,7 +106,7 @@ export async function markWebhookFailed(
   await knex("processed_webhooks")
     .where("event_id", eventId)
     .update({
-      status: "failed",
+      webhook_status: "failed",
       metadata: JSON.stringify({ error: errorMessage }),
       updated_at: new Date(),
     })
@@ -140,7 +142,7 @@ export async function cleanupOldWebhookRecords(
 
   const deletedCount = await knex("processed_webhooks")
     .where("created_at", "<", cutoffDate)
-    .where("status", "completed")
+    .where("webhook_status", "completed")
     .delete()
 
   if (deletedCount > 0) {

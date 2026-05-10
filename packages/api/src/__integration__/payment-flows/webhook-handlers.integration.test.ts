@@ -67,7 +67,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         totalAmount: 100,
@@ -112,7 +112,7 @@ describe("Webhook Handlers", () => {
         populate: { tickets: true },
       })
 
-      expect(updatedOrder.status).toBe("paid")
+      expect(updatedOrder.orderStatus).toBe("paid")
       expect(updatedOrder.paidAt).not.toBeNull()
       expect(updatedOrder.tickets).toHaveLength(2)
       expect(updatedOrder.hasReservation).toBe(false)
@@ -133,7 +133,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
@@ -201,7 +201,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
@@ -235,7 +235,7 @@ describe("Webhook Handlers", () => {
       const updatedOrder = await strapi.documents("api::ticket-order.ticket-order").findOne({
         documentId: order.documentId,
       })
-      expect(updatedOrder.status).toBe("expired")
+      expect(updatedOrder.orderStatus).toBe("expired")
       expect(updatedOrder.hasReservation).toBe(false)
 
       // Verify reservations released (5 - 2 = 3)
@@ -263,7 +263,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
@@ -309,7 +309,7 @@ describe("Webhook Handlers", () => {
       const updatedOrder = await strapi.documents("api::ticket-order.ticket-order").findOne({
         documentId: order.documentId,
       })
-      expect(updatedOrder.status).toBe("failed")
+      expect(updatedOrder.orderStatus).toBe("failed")
       expect(updatedOrder.hasReservation).toBe(false)
     })
   })
@@ -351,7 +351,7 @@ describe("Webhook Handlers", () => {
         populate: { tickets: true },
       })
 
-      expect(updatedOrder.status).toBe("refunded")
+      expect(updatedOrder.orderStatus).toBe("refunded")
       expect(updatedOrder.tickets.every((t: any) => t.ticketStatus === "refunded")).toBe(true)
     })
   })
@@ -373,7 +373,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
@@ -416,7 +416,7 @@ describe("Webhook Handlers", () => {
       expect(processedWebhook.event_id).toBe(eventId)
       expect(processedWebhook.event_type).toBe("checkout.session.completed")
       expect(processedWebhook.provider).toBe("stripe")
-      expect(processedWebhook.status).toBe("completed")
+      expect(processedWebhook.webhook_status).toBe("completed")
     })
 
     it("prevents duplicate processing with same event ID across different sessions", async () => {
@@ -440,7 +440,7 @@ describe("Webhook Handlers", () => {
       const order1 = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId1,
         hasReservation: true,
         ticketDetails: [
@@ -451,7 +451,7 @@ describe("Webhook Handlers", () => {
       const order2 = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId2,
         hasReservation: true,
         ticketDetails: [
@@ -544,8 +544,8 @@ describe("Webhook Handlers", () => {
         documentId: order2.documentId,
       })
 
-      expect(updatedOrder1.status).toBe("paid")
-      expect(updatedOrder2.status).toBe("pending") // Not processed due to duplicate event ID
+      expect(updatedOrder1.orderStatus).toBe("paid")
+      expect(updatedOrder2.orderStatus).toBe("pending") // Not processed due to duplicate event ID
     })
 
     it("handles concurrent webhook deliveries with same event ID", async () => {
@@ -564,7 +564,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
@@ -638,7 +638,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
@@ -682,7 +682,7 @@ describe("Webhook Handlers", () => {
 
       expect(processedWebhook).toBeDefined()
       expect(processedWebhook.event_type).toBe("payment_intent.payment_failed")
-      expect(processedWebhook.status).toBe("completed")
+      expect(processedWebhook.webhook_status).toBe("completed")
     })
 
     it("different event types with different IDs are processed independently", async () => {
@@ -702,7 +702,7 @@ describe("Webhook Handlers", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
         providerSessionId: sessionId,
         hasReservation: true,
         ticketDetails: [
