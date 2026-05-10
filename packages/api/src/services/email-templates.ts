@@ -743,7 +743,7 @@ export async function sendEventCancellationEmails(
     const page = (await strapi.documents("api::ticket-order.ticket-order").findMany({
       filters: {
         event: { documentId: event.documentId },
-        status: "paid",
+        orderStatus: "paid",
       },
       fields: ["documentId", "purchaserEmail", "purchaserName"],
       sort: { createdAt: "asc" },
