@@ -301,9 +301,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         fields: ["orderStatus"],
       })
       const currentStatus = currentOrder?.orderStatus || "unknown"
-      strapi.log.info(
+      // Surface this as `warn` + a Prometheus counter rather than `info` because
+      // a non-pending order receiving a `checkout.session.completed` is almost
+      // always a recoverable incident — usually the cleanup cron expired the
+      // order before a delayed/retried webhook arrived (e.g. after a webhook
+      // URL change or signing-secret rotation). Without alerting on this we
+      // discover the problem only when a customer asks where their tickets are.
+      // See `.claude/skills/stripe-webhook-replay/SKILL.md` for the recovery.
+      strapi.log.warn(
         `[Webhook] Order ${orderNumber} skipped - current status: ${currentStatus} (was not pending) | event=${eventName}, correlationId=${correlationId}`
       )
+      webhookProcessingTotal.inc({
+        event_type: "checkout.session.completed",
+        status: "skipped_terminal",
+      })
       return
     }
 
