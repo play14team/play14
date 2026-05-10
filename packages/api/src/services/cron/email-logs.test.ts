@@ -44,11 +44,8 @@ describe("cleanOldEmailLogs", () => {
 
     const cutoff = mockStrapi._builder.where.mock.calls[0][2] as Date
     const ageInDays = (Date.now() - cutoff.getTime()) / (24 * 60 * 60 * 1000)
-    // setDate() is local-time, so DST transitions can shift this by ~1h
-    // (~0.042d). Bounds are loose enough to absorb that without missing a
-    // true off-by-one in retention days.
-    expect(ageInDays).toBeGreaterThanOrEqual(89.9)
-    expect(ageInDays).toBeLessThanOrEqual(90.1)
+    expect(ageInDays).toBeGreaterThanOrEqual(89.99)
+    expect(ageInDays).toBeLessThanOrEqual(90.01)
   })
 
   it("stays quiet when there is nothing to delete", async () => {
@@ -67,8 +64,8 @@ describe("cleanOldEmailLogs", () => {
 
     const cutoff = mockStrapi._builder.where.mock.calls[0][2] as Date
     const ageInDays = (Date.now() - cutoff.getTime()) / (24 * 60 * 60 * 1000)
-    expect(ageInDays).toBeGreaterThanOrEqual(6.9)
-    expect(ageInDays).toBeLessThanOrEqual(7.1)
+    expect(ageInDays).toBeGreaterThanOrEqual(6.99)
+    expect(ageInDays).toBeLessThanOrEqual(7.01)
     expect(mockStrapi.log.info).toHaveBeenCalledWith(
       "[EmailLogs] Purged 3 email-log rows older than 7 days"
     )

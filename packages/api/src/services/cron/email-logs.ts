@@ -10,8 +10,9 @@ export async function cleanOldEmailLogs(
   retentionDays: number = DEFAULT_RETENTION_DAYS
 ): Promise<number> {
   const knex = strapi.db.connection
-  const cutoff = new Date()
-  cutoff.setDate(cutoff.getDate() - retentionDays)
+  // Epoch arithmetic — setDate() runs in local time and can shift by ±1h
+  // across DST boundaries, which would silently change the retention window.
+  const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000)
 
   const deletedCount = await knex("email_logs").where("sent_at", "<", cutoff).delete()
 
