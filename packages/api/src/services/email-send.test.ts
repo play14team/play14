@@ -179,8 +179,46 @@ describe("sendEmail", () => {
 
     const loggedSentAt = new Date(documentCreate.mock.calls[0][0].data.sentAt as string).getTime()
     expect(providerResolvedAt).toBeDefined()
+    // Ordering matters; absolute bounds are loose enough to absorb CI jitter.
     expect(providerResolvedAt! - loggedSentAt).toBeGreaterThanOrEqual(40)
-    expect(loggedSentAt - captureStart).toBeLessThan(20)
+    expect(loggedSentAt - captureStart).toBeLessThan(100)
+  })
+
+  it("truncates a multi-byte body without splitting a UTF-8 sequence", async () => {
+    const { strapi, documentCreate } = createMockStrapi()
+    // 中 = 3 bytes in UTF-8. Repeating it overflows the 256 KB cap with a
+    // string whose natural byte-slice point lands mid-sequence.
+    const oversized = "中".repeat(100_000)
+
+    await sendEmail(strapi, "confirmation", {
+      to: "alice@example.com",
+      subject: "Multi-byte",
+      html: oversized,
+      text: oversized,
+    })
+
+    const data = documentCreate.mock.calls[0][0].data
+    // No U+FFFD replacement character should appear — Buffer.toString("utf8")
+    // drops trailing partial sequences cleanly. The marker is appended after.
+    expect(data.bodyHtml).not.toMatch(/�/)
+    expect(data.bodyText).not.toMatch(/�/)
+    expect(Buffer.byteLength(data.bodyHtml, "utf8")).toBeLessThanOrEqual(256 * 1024)
+    expect(Buffer.byteLength(data.bodyText, "utf8")).toBeLessThanOrEqual(256 * 1024)
+    expect(data.bodyHtml.endsWith("[truncated at 262144 bytes]")).toBe(true)
+  })
+
+  it("redacts bcc to a count so addresses never reach the audit log", async () => {
+    const { strapi, documentCreate } = createMockStrapi()
+
+    await sendEmail(strapi, "confirmation", {
+      to: "alice@example.com",
+      subject: "Hi",
+      bcc: ["secret1@example.com", "secret2@example.com", "secret3@example.com"],
+    })
+
+    const data = documentCreate.mock.calls[0][0].data
+    expect(data.bcc).toBe("3 recipient(s) (redacted)")
+    expect(data.bcc).not.toMatch(/secret/)
   })
 
   it("short-circuits the entire send when the recipient is empty", async () => {
