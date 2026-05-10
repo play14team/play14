@@ -7,7 +7,7 @@
       "filterable": true,
       "searchable": true,
       "pageSize": 10,
-      "mainField": "type",
+      "mainField": "socialNetworkType",
       "defaultSortBy": "url",
       "defaultSortOrder": "ASC"
     },
@@ -34,7 +34,7 @@
           "sortable": true
         }
       },
-      "type": {
+      "socialNetworkType": {
         "edit": {
           "label": "Social Network",
           "description": "Which social network?",
@@ -43,7 +43,7 @@
           "editable": true
         },
         "list": {
-          "label": "type",
+          "label": "socialNetworkType",
           "searchable": true,
           "sortable": true
         }
@@ -58,7 +58,7 @@
       }
     },
     "layouts": {
-      "list": ["id", "url", "type", "documentId"],
+      "list": ["id", "url", "socialNetworkType", "documentId"],
       "edit": [
         [
           {
@@ -66,7 +66,7 @@
             "size": 6
           },
           {
-            "name": "type",
+            "name": "socialNetworkType",
             "size": 6
           }
         ]

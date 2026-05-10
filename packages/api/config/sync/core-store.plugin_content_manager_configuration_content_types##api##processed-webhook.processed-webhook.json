@@ -61,16 +61,16 @@
           "sortable": true
         }
       },
-      "status": {
+      "webhookStatus": {
         "edit": {
-          "label": "status",
+          "label": "webhookStatus",
           "description": "",
           "placeholder": "",
           "visible": true,
           "editable": true
         },
         "list": {
-          "label": "status",
+          "label": "webhookStatus",
           "searchable": true,
           "sortable": true
         }
@@ -189,7 +189,7 @@
             "size": 6
           },
           {
-            "name": "status",
+            "name": "webhookStatus",
             "size": 6
           }
         ],

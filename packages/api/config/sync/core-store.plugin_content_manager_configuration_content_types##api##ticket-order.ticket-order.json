@@ -33,16 +33,16 @@
           "sortable": true
         }
       },
-      "status": {
+      "orderStatus": {
         "edit": {
-          "label": "status",
+          "label": "orderStatus",
           "description": "",
           "placeholder": "",
           "visible": true,
           "editable": true
         },
         "list": {
-          "label": "status",
+          "label": "orderStatus",
           "searchable": true,
           "sortable": true
         }
@@ -497,7 +497,7 @@
       }
     },
     "layouts": {
-      "list": ["id", "orderNumber", "status", "totalAmount", "currency", "purchaserEmail"],
+      "list": ["id", "orderNumber", "orderStatus", "totalAmount", "currency", "purchaserEmail"],
       "edit": [
         [
           {
@@ -505,7 +505,7 @@
             "size": 6
           },
           {
-            "name": "status",
+            "name": "orderStatus",
             "size": 6
           }
         ],
