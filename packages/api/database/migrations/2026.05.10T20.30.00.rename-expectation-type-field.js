@@ -19,51 +19,57 @@
 export async function up(knex) {
   console.log("Starting migration: Rename expectation type field")
 
-  const hasTable = await knex.schema.hasTable("expectations")
-  if (!hasTable) {
-    console.log(
-      "expectations table does not exist yet, skipping migration (will be created by schema sync)"
-    )
-    return
-  }
+  await knex.transaction(async (trx) => {
+    const hasTable = await trx.schema.hasTable("expectations")
+    if (!hasTable) {
+      console.log(
+        "expectations table does not exist yet, skipping migration (will be created by schema sync)"
+      )
+      return
+    }
 
-  const hasTypeColumn = await knex.schema.hasColumn("expectations", "type")
-  const hasExpectationTypeColumn = await knex.schema.hasColumn("expectations", "expectation_type")
+    const hasTypeColumn = await trx.schema.hasColumn("expectations", "type")
+    const hasExpectationTypeColumn = await trx.schema.hasColumn("expectations", "expectation_type")
 
-  if (hasTypeColumn && !hasExpectationTypeColumn) {
-    console.log("Renaming type column to expectation_type in expectations table")
+    if (hasTypeColumn && !hasExpectationTypeColumn) {
+      console.log("Renaming type column to expectation_type in expectations table")
 
-    await knex.schema.alterTable("expectations", (table) => {
-      table.renameColumn("type", "expectation_type")
-    })
+      await trx.schema.alterTable("expectations", (table) => {
+        table.renameColumn("type", "expectation_type")
+      })
 
-    console.log("Successfully renamed type column to expectation_type")
-  } else if (hasExpectationTypeColumn) {
-    console.log("Column expectation_type already exists, skipping migration")
-  } else {
-    console.log("Type column not found, creating expectation_type column")
+      console.log("Successfully renamed type column to expectation_type")
+    } else if (hasExpectationTypeColumn) {
+      console.log("Column expectation_type already exists, skipping migration")
+    } else {
+      console.log("Type column not found, creating expectation_type column")
 
-    await knex.schema.alterTable("expectations", (table) => {
-      table.enu("expectation_type", ["Main", "Secondary"]).notNullable()
-    })
-  }
+      await trx.schema.alterTable("expectations", (table) => {
+        table.enu("expectation_type", ["Main", "Secondary"]).notNullable()
+      })
+    }
+  })
 }
 
 export async function down(knex) {
   console.log("Rolling back migration: Rename expectation type field")
 
-  const hasExpectationTypeColumn = await knex.schema.hasColumn("expectations", "expectation_type")
-  const hasTypeColumn = await knex.schema.hasColumn("expectations", "type")
+  await knex.transaction(async (trx) => {
+    const hasExpectationTypeColumn = await trx.schema.hasColumn("expectations", "expectation_type")
+    const hasTypeColumn = await trx.schema.hasColumn("expectations", "type")
 
-  if (hasExpectationTypeColumn && !hasTypeColumn) {
-    console.log("Renaming expectation_type column back to type in expectations table")
+    if (hasExpectationTypeColumn && !hasTypeColumn) {
+      console.log("Renaming expectation_type column back to type in expectations table")
 
-    await knex.schema.alterTable("expectations", (table) => {
-      table.renameColumn("expectation_type", "type")
-    })
+      await trx.schema.alterTable("expectations", (table) => {
+        table.renameColumn("expectation_type", "type")
+      })
 
-    console.log("Successfully renamed expectation_type column back to type")
-  } else {
-    console.log("Cannot rollback: type column already exists or expectation_type column not found")
-  }
+      console.log("Successfully renamed expectation_type column back to type")
+    } else {
+      console.log(
+        "Cannot rollback: type column already exists or expectation_type column not found"
+      )
+    }
+  })
 }

@@ -96,11 +96,23 @@ WHERE provider_session_id IN (
 
 (Note: column is `order_status` post-rename of 2026-05. If the DB pre-dates that migration, the column is `status`. Confirm with `\d ticket_orders` first.)
 
-Three buckets:
+Four buckets:
 
 - `order_status = 'paid'`, `paid_at IS NOT NULL` → already recovered, skip.
 - `order_status IN ('expired', 'failed')`, `paid_at IS NULL` → **needs reset before resend**.
 - `order_status = 'pending'`, `paid_at IS NULL`, `reservation_expires_at` in past → cron will eat it within 5 min if you don't reset; reset it now.
+- `order_status = 'processing'`, `paid_at IS NULL` → **orphaned mid-handler crash**. Both the cleanup cron and the webhook handler use `'processing'` as their exclusive row lock. If the Strapi process was killed (SIGTERM during a deploy, OOM) between the atomic claim and the `documents().update()` call, the order is stuck: the cron's `pending`-only filter skips it, and a replayed webhook hits 0 rows in the `WHERE order_status = 'pending'` conditional update and exits via `skipped_terminal`. **Treat these the same as `expired`/`failed` — include them in the reset transaction below.** Run this query as part of step 3 to surface them:
+
+```sql
+SELECT id, order_number, order_status, paid_at, provider_session_id,
+       reservation_expires_at, updated_at, purchaser_email
+FROM ticket_orders
+WHERE order_status = 'processing'
+  AND paid_at IS NULL
+  AND updated_at < NOW() - INTERVAL '15 minutes';
+```
+
+Anything older than ~15 min in `processing` without a `paid_at` is recoverable: a healthy webhook handler completes within seconds, and the cleanup cron only ever holds the lock for one `documents().update()` call. Add the matching `provider_session_id` values to the reset list in step 4.
 
 ### 4. Reset orders before replay
 
