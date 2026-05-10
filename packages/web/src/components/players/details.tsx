@@ -104,9 +104,9 @@ export default function PlayerDetails({ player }: { player: Player }) {
                         target="_blank"
                         rel="noreferrer"
                         className="player-profile-avatar__social-link"
-                        title={network.type as string}
+                        title={network.socialNetworkType as string}
                       >
-                        <i className={mapSocialIcon(network.type as string)} />
+                        <i className={mapSocialIcon(network.socialNetworkType as string)} />
                       </Link>
                     )
                 )}

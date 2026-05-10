@@ -100,7 +100,7 @@ export interface EventForEdit {
   media?: {
     id?: number
     url: string
-    type: "Photos" | "Videos"
+    mediaType: "Photos" | "Videos"
   }[]
   defaultImage?: {
     id: number

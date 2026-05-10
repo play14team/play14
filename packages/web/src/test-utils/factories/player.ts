@@ -13,7 +13,7 @@ export interface PlayerImage {
 
 export interface SocialNetwork {
   id: number
-  type: string
+  socialNetworkType: string
   url: string
 }
 
@@ -54,12 +54,12 @@ export function createPlayer(overrides: Partial<PlayerFixture> = {}): PlayerFixt
     socialNetworks: [
       {
         id: playerCounter * 10 + 1,
-        type: "linkedin",
+        socialNetworkType: "linkedin",
         url: `https://linkedin.com/in/test-player-${playerCounter}`,
       },
       {
         id: playerCounter * 10 + 2,
-        type: "twitter",
+        socialNetworkType: "twitter",
         url: `https://twitter.com/testplayer${playerCounter}`,
       },
     ],

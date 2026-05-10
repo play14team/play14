@@ -68,7 +68,7 @@ interface PlayerUpdateData {
   location?: Record<string, unknown> | string | null
   socialNetworks?: Array<{
     id?: string
-    type: string
+    socialNetworkType: string
     url: string
   }>
 }

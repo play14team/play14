@@ -49,7 +49,7 @@ describe("Player API Client", () => {
             fields: ["name", "url", "width", "height"],
           },
           socialNetworks: {
-            fields: ["id", "url", "type"],
+            fields: ["id", "url", "socialNetworkType"],
           },
         },
       })

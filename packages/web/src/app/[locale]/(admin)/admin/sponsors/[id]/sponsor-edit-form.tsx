@@ -133,10 +133,14 @@ export default function SponsorEditForm({ sponsor }: Props) {
 
   // Social networks handlers
   const addSocialNetwork = () => {
-    setSocialNetworks([...socialNetworks, { url: "", type: "Website" }])
+    setSocialNetworks([...socialNetworks, { url: "", socialNetworkType: "Website" }])
   }
 
-  const updateSocialNetwork = (index: number, field: "url" | "type", value: string) => {
+  const updateSocialNetwork = (
+    index: number,
+    field: "url" | "socialNetworkType",
+    value: string
+  ) => {
     const updated = [...socialNetworks]
     updated[index] = { ...updated[index], [field]: value }
     setSocialNetworks(updated)
@@ -329,8 +333,10 @@ export default function SponsorEditForm({ sponsor }: Props) {
                 {socialNetworks.map((sn, index) => (
                   <div key={index} className="social-network-row">
                     <select
-                      value={sn.type}
-                      onChange={(e) => updateSocialNetwork(index, "type", e.target.value)}
+                      value={sn.socialNetworkType}
+                      onChange={(e) =>
+                        updateSocialNetwork(index, "socialNetworkType", e.target.value)
+                      }
                       className="admin-select"
                     >
                       {SOCIAL_NETWORK_TYPES.map((type) => (

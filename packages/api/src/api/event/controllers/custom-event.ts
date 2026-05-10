@@ -854,7 +854,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (Array.isArray(requestData.mediaLinks)) {
         updateData.media = requestData.mediaLinks.map((item: any) => ({
           url: item.url,
-          type: item.type,
+          mediaType: item.mediaType,
         }))
       }
     }
@@ -1277,7 +1277,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       if (!item.url || typeof item.url !== "string") {
         return ctx.badRequest("Each media link must have a URL")
       }
-      if (!item.type || !validTypes.includes(item.type)) {
+      if (!item.mediaType || !validTypes.includes(item.mediaType)) {
         return ctx.badRequest("Each media link must have a valid type (Photos or Videos)")
       }
       // Basic URL validation
@@ -1291,7 +1291,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Build media component data
     const mediaData = media.map((item: any) => ({
       url: item.url,
-      type: item.type,
+      mediaType: item.mediaType,
     }))
 
     // Update the event with media data

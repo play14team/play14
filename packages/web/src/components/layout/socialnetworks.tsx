@@ -17,7 +17,7 @@ const SocialNetworks = (props: { socialNetworks: Array<Maybe<SocialNetwork>> }) 
             <li key={socialNetwork.id}>
               {socialNetwork?.url && (
                 <Link href={socialNetwork.url} className="d-block" target="_blank" rel="noreferrer">
-                  <i className={mapIcon(socialNetwork.type as string)} />
+                  <i className={mapIcon(socialNetwork.socialNetworkType as string)} />
                 </Link>
               )}
             </li>

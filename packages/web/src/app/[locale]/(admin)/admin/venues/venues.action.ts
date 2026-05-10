@@ -57,7 +57,7 @@ export interface VenueForEdit {
   socialNetworks: Array<{
     id: number
     url: string
-    type: string
+    socialNetworkType: string
   }>
   eventsCount: number
   events: Array<{

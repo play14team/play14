@@ -7,7 +7,7 @@ import { revalidateEventPages } from "./event-edit.action"
 export interface MediaLink {
   id?: number
   url: string
-  type: "Photos" | "Videos"
+  mediaType: "Photos" | "Videos"
 }
 
 export interface ActionResult<T = void> {

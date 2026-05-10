@@ -83,7 +83,7 @@ export const eventDetailsPopulate = {
             fields: imageFields,
           },
           socialNetworks: {
-            fields: ["id", "type", "url"],
+            fields: ["id", "socialNetworkType", "url"],
           },
         },
       },
@@ -96,7 +96,7 @@ export const eventDetailsPopulate = {
         fields: imageFields,
       },
       socialNetworks: {
-        fields: ["id", "type", "url"],
+        fields: ["id", "socialNetworkType", "url"],
       },
     },
     sort: ["name:asc"],
@@ -108,7 +108,7 @@ export const eventDetailsPopulate = {
         fields: imageFields,
       },
       socialNetworks: {
-        fields: ["id", "type", "url"],
+        fields: ["id", "socialNetworkType", "url"],
       },
     },
     sort: ["name:asc"],
@@ -120,13 +120,13 @@ export const eventDetailsPopulate = {
         fields: imageFields,
       },
       socialNetworks: {
-        fields: ["id", "type", "url"],
+        fields: ["id", "socialNetworkType", "url"],
       },
     },
     sort: ["name:asc"],
   },
   media: {
-    fields: ["id", "url", "type"],
+    fields: ["id", "url", "mediaType"],
   },
 }
 
@@ -176,7 +176,7 @@ export const playerItemPopulate = {
     fields: imageFields,
   },
   socialNetworks: {
-    fields: ["id", "url", "type"],
+    fields: ["id", "url", "socialNetworkType"],
   },
 }
 
@@ -189,7 +189,7 @@ export const playerDetailsPopulate = {
     fields: imageFields,
   },
   socialNetworks: {
-    fields: ["id", "url", "type"],
+    fields: ["id", "url", "socialNetworkType"],
   },
   attended: {
     populate: eventItemPopulate,

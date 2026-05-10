@@ -273,7 +273,7 @@ export const playerPositionSchema = z.enum(["Player", "Host", "Mentor", "Founder
  */
 export const socialNetworkSchema = z.object({
   id: z.string().optional(),
-  type: z.string().min(1, "Social network type is required"),
+  socialNetworkType: z.string().min(1, "Social network type is required"),
   url: z.string().url("Invalid social network URL"),
 })
 

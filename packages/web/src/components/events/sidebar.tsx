@@ -23,12 +23,12 @@ const EventSidebar = ({ event }: { event: Event }) => {
 
   // Find photos album URL from media
   const photosAlbum = event.media?.find(
-    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Photos
+    (medium) => medium?.mediaType === Enum_Componenteventsmedia_Type.Photos
   )
 
   // Find videos library URL from media
   const videosLibrary = event.media?.find(
-    (medium) => medium?.type === Enum_Componenteventsmedia_Type.Videos
+    (medium) => medium?.mediaType === Enum_Componenteventsmedia_Type.Videos
   )
 
   return (
@@ -67,11 +67,11 @@ const EventSidebar = ({ event }: { event: Event }) => {
         {event.media?.map(
           (medium) =>
             medium &&
-            medium.type !== Enum_Componenteventsmedia_Type.Photos &&
-            medium.type !== Enum_Componenteventsmedia_Type.Videos && (
+            medium.mediaType !== Enum_Componenteventsmedia_Type.Photos &&
+            medium.mediaType !== Enum_Componenteventsmedia_Type.Videos && (
               <li key={medium.id}>
                 <div className="d-flex justify-content-between align-items-center">
-                  <span>{medium.type}</span>
+                  <span>{medium.mediaType}</span>
                   <Link href={medium.url || "#"} target="_blank" rel="noopener noreferrer">
                     {medium.url || "Link"}
                   </Link>

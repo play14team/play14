@@ -296,7 +296,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
     (event.media || []).map((m) => ({
       id: m.id,
       url: m.url,
-      type: m.type,
+      mediaType: m.mediaType,
     }))
   )
 
@@ -356,7 +356,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
       mediaLinks: (event.media || []).map((m) => ({
         id: m.id,
         url: m.url,
-        type: m.type,
+        mediaType: m.mediaType,
       })),
       financeData: event.finance
         ? {
@@ -505,7 +505,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
       (event.media || []).map((m) => ({
         id: m.id,
         url: m.url,
-        type: m.type,
+        mediaType: m.mediaType,
       }))
     )
     setFinanceData(

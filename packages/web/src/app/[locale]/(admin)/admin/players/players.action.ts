@@ -56,7 +56,7 @@ export interface PlayerForEdit {
   } | null
   socialNetworks: Array<{
     id: string
-    type: string
+    socialNetworkType: string
     url: string
   }>
 }
@@ -129,7 +129,7 @@ export interface PlayerUpdateData {
   location?: GeoLocation | null
   socialNetworks?: Array<{
     id?: string
-    type: string
+    socialNetworkType: string
     url: string
   }>
 }

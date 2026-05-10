@@ -10,7 +10,7 @@
       "type": "string",
       "required": true
     },
-    "type": {
+    "mediaType": {
       "type": "enumeration",
       "enum": ["Photos", "Videos"],
       "required": true

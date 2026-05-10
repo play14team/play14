@@ -37,7 +37,7 @@ interface Player {
   socialNetworks?: Array<{
     id: string
     url: string
-    type: string
+    socialNetworkType: string
   }>
 }
 

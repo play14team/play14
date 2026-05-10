@@ -64,7 +64,7 @@ const POSITION_HIERARCHY = ["Player", "Host", "Mentor", "Founder"] as const
 
 interface SocialNetworkInput {
   id?: string
-  type: string
+  socialNetworkType: string
   url: string
 }
 
@@ -189,7 +189,7 @@ export default function PlayerForm({
   const [socialNetworks, setSocialNetworks] = useState<SocialNetworkInput[]>(
     player.socialNetworks?.map((sn) => ({
       id: sn.id,
-      type: sn.type,
+      socialNetworkType: sn.socialNetworkType,
       url: sn.url,
     })) || []
   )
@@ -275,14 +275,18 @@ export default function PlayerForm({
     mode === "self" ? player.position !== "Player" : currentUserPosition !== "Player"
 
   const handleAddSocialNetwork = () => {
-    setSocialNetworks([...socialNetworks, { type: "LinkedIn", url: "" }])
+    setSocialNetworks([...socialNetworks, { socialNetworkType: "LinkedIn", url: "" }])
   }
 
   const handleRemoveSocialNetwork = (index: number) => {
     setSocialNetworks(socialNetworks.filter((_, i) => i !== index))
   }
 
-  const handleSocialNetworkChange = (index: number, field: "type" | "url", value: string) => {
+  const handleSocialNetworkChange = (
+    index: number,
+    field: "socialNetworkType" | "url",
+    value: string
+  ) => {
     const updated = [...socialNetworks]
     updated[index] = { ...updated[index], [field]: value }
     setSocialNetworks(updated)
@@ -458,7 +462,7 @@ export default function PlayerForm({
     const initialSocialNetworks =
       player.socialNetworks?.map((sn) => ({
         id: sn.id,
-        type: sn.type,
+        socialNetworkType: sn.socialNetworkType,
         url: sn.url,
       })) || []
 
@@ -626,12 +630,14 @@ export default function PlayerForm({
                     {socialNetworks.map((sn, index) => (
                       <div key={index} className="admin-social-network-row">
                         <i
-                          className={`${getSocialNetworkIcon(sn.type)} admin-social-network-icon`}
-                          title={sn.type}
+                          className={`${getSocialNetworkIcon(sn.socialNetworkType)} admin-social-network-icon`}
+                          title={sn.socialNetworkType}
                         />
                         <select
-                          value={sn.type}
-                          onChange={(e) => handleSocialNetworkChange(index, "type", e.target.value)}
+                          value={sn.socialNetworkType}
+                          onChange={(e) =>
+                            handleSocialNetworkChange(index, "socialNetworkType", e.target.value)
+                          }
                           className="admin-select admin-select-sm"
                         >
                           {SOCIAL_NETWORK_TYPES.map((type) => (
