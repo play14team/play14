@@ -1,7 +1,3 @@
-/**
- * Tests for the email-log retention cron.
- */
-
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { cleanOldEmailLogs } from "./email-logs"
 

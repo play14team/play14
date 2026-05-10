@@ -1,11 +1,3 @@
-/**
- * Tests for the sendEmail() wrapper.
- *
- * Focus areas: every send (success or failure) must produce an email-log row,
- * the underlying provider error must still propagate, and a DB failure when
- * writing the audit log must not change the send result either way.
- */
-
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { sendEmail } from "./email-send"
 
@@ -84,6 +76,24 @@ describe("sendEmail", () => {
     const logArgs = documentCreate.mock.calls[0][0]
     expect(logArgs.data.to).toBe("a@example.com, b@example.com")
     expect(logArgs.data.cc).toBe("c@example.com")
+  })
+
+  it("truncates oversized bodies before persisting", async () => {
+    const { strapi, documentCreate } = createMockStrapi()
+    const oversized = "x".repeat(300 * 1024)
+
+    await sendEmail(strapi, "confirmation", {
+      to: "alice@example.com",
+      subject: "Big",
+      html: oversized,
+      text: oversized,
+    })
+
+    const data = documentCreate.mock.calls[0][0].data
+    expect(Buffer.byteLength(data.bodyHtml, "utf8")).toBeLessThanOrEqual(256 * 1024)
+    expect(Buffer.byteLength(data.bodyText, "utf8")).toBeLessThanOrEqual(256 * 1024)
+    expect(data.bodyHtml).toMatch(/…\[truncated at 262144 bytes\]$/)
+    expect(data.bodyText).toMatch(/…\[truncated at 262144 bytes\]$/)
   })
 
   it("captures attachment filenames in the log", async () => {
