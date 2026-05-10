@@ -25,7 +25,7 @@
       "type": "string",
       "required": true
     },
-    "type": {
+    "expectationType": {
       "pluginOptions": {
         "i18n": {
           "localized": true

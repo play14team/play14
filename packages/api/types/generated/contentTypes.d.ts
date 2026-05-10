@@ -950,7 +950,7 @@ export interface ApiExpectationExpectation extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    type: Schema.Attribute.Enumeration<['Main', 'Secondary']> &
+    expectationType: Schema.Attribute.Enumeration<['Main', 'Secondary']> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
