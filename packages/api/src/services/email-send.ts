@@ -74,9 +74,12 @@ interface EmailLogData {
   sentAt: string
 }
 
-function formatRecipients(to: string | string[] | undefined): string | undefined {
-  if (to === undefined) return undefined
+function formatRecipients(to: string | string[]): string {
   return Array.isArray(to) ? to.join(", ") : to
+}
+
+function formatOptionalRecipients(to: string | string[] | undefined): string | undefined {
+  return to === undefined ? undefined : formatRecipients(to)
 }
 
 // Cap audit-log bodies so a pathological email (or a runaway template loop)
@@ -131,16 +134,10 @@ async function persistEmailLog(
     context?: Record<string, unknown>
   }
 ): Promise<void> {
-  const recipient = formatRecipients(args.options.to)
-  if (!recipient) {
-    strapi.log.warn(`[Email] Skipping audit log: no recipient on ${args.type} email`)
-    return
-  }
-
   const data: EmailLogData = {
-    to: recipient,
-    cc: formatRecipients(args.options.cc),
-    bcc: formatRecipients(args.options.bcc),
+    to: formatRecipients(args.options.to),
+    cc: formatOptionalRecipients(args.options.cc),
+    bcc: formatOptionalRecipients(args.options.bcc),
     fromAddress: args.options.from,
     replyTo: args.options.replyTo,
     subject: args.options.subject,
@@ -156,14 +153,24 @@ async function persistEmailLog(
   }
 
   try {
-    // TODO: drop the `as never` casts once `bun --filter play14-api build`
-    // regenerates Strapi's content-type types to include `email-log`. The
-    // `data` shape is fully typed via EmailLogData above.
-    await strapi.documents("api::email-log.email-log" as never).create({ data } as never)
+    await createEmailLogDocument(strapi, data)
   } catch (logError) {
     const message = logError instanceof Error ? logError.message : String(logError)
     strapi.log.warn(`[Email] Failed to persist email-log row (${args.emailStatus}): ${message}`)
   }
+}
+
+// Single-site type cast. Strapi's `documents()` is typed via a UID registry
+// that won't include `email-log` until `bun --filter play14-api build`
+// regenerates types; the `data` shape is fully checked by EmailLogData.
+// TODO: drop the casts once the build runs on staging and types regenerate.
+type EmailLogCreateArgs = { data: EmailLogData }
+type EmailLogRepository = { create: (args: EmailLogCreateArgs) => Promise<unknown> }
+async function createEmailLogDocument(strapi: Core.Strapi, data: EmailLogData): Promise<void> {
+  const repository = (strapi.documents as unknown as (uid: string) => EmailLogRepository)(
+    "api::email-log.email-log"
+  )
+  await repository.create({ data })
 }
 
 export async function sendEmail(
@@ -172,7 +179,16 @@ export async function sendEmail(
   options: EmailSendOptions,
   extras: EmailSendExtras = {}
 ): Promise<unknown> {
-  strapi.log.info(`[Email] Sending ${type} email to ${formatRecipients(options.to)}`)
+  const recipient = formatRecipients(options.to)
+  if (!recipient) {
+    // Empty `to` is a caller-side bug; fail fast and loud rather than
+    // emit a misleading "[Email] Sending …" line followed by a provider
+    // rejection. Returning here also keeps the audit log free of garbage
+    // rows that never corresponded to a real attempt.
+    strapi.log.warn(`[Email] Skipping ${type} send: empty recipient`)
+    return undefined
+  }
+  strapi.log.info(`[Email] Sending ${type} email to ${recipient}`)
   // Captured before the provider call so a slow send doesn't skew the
   // audit timestamp from when the email actually left our system.
   const sentAt = new Date()

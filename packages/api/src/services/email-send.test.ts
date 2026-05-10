@@ -183,26 +183,29 @@ describe("sendEmail", () => {
     expect(loggedSentAt - captureStart).toBeLessThan(20)
   })
 
-  it("skips the audit log when the recipient is empty", async () => {
+  it("short-circuits the entire send when the recipient is empty", async () => {
     const { strapi, emailSend, documentCreate } = createMockStrapi()
 
-    await sendEmail(strapi, "confirmation", { to: "", subject: "Hi" })
+    const result = await sendEmail(strapi, "confirmation", { to: "", subject: "Hi" })
 
-    expect(emailSend).toHaveBeenCalledOnce()
+    expect(result).toBeUndefined()
+    expect(emailSend).not.toHaveBeenCalled()
     expect(documentCreate).not.toHaveBeenCalled()
+    expect(strapi.log.info).not.toHaveBeenCalled()
     expect(strapi.log.warn).toHaveBeenCalledWith(
-      expect.stringContaining("Skipping audit log: no recipient")
+      expect.stringContaining("Skipping confirmation send: empty recipient")
     )
   })
 
-  it("skips the audit log when the recipient array joins to an empty string", async () => {
-    const { strapi, documentCreate } = createMockStrapi()
+  it("short-circuits when the recipient array joins to an empty string", async () => {
+    const { strapi, emailSend, documentCreate } = createMockStrapi()
 
     await sendEmail(strapi, "confirmation", { to: [""], subject: "Hi" })
 
+    expect(emailSend).not.toHaveBeenCalled()
     expect(documentCreate).not.toHaveBeenCalled()
     expect(strapi.log.warn).toHaveBeenCalledWith(
-      expect.stringContaining("Skipping audit log: no recipient")
+      expect.stringContaining("Skipping confirmation send: empty recipient")
     )
   })
 
