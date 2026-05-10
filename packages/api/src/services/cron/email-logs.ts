@@ -1,5 +1,8 @@
 // Bulk delete via Knex (no lifecycle hooks worth firing on audit rows);
-// indexed on sent_at so this stays O(deleted), not O(table).
+// indexed on sent_at so this stays O(deleted), not O(table). At current
+// volume the unbounded delete is fine; if email throughput ever spikes
+// past a few thousand expired rows per run, batch with `.limit()` in a
+// loop to avoid holding a long row-level lock.
 
 import type { Core } from "@strapi/strapi"
 

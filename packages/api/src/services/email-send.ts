@@ -12,10 +12,10 @@
  * Trade-offs to revisit if volume grows:
  *  - One synchronous DB write per send (~1-2ms on a healthy PG). At current
  *    volume this is in the noise; profile here before batching/async-queuing.
- *  - bcc + raw bodies are stored verbatim. Anyone with admin-UI read access
- *    to the `email-log` collection can see them. Acceptable for ops review
- *    but worth weighing against GDPR data minimisation if retention grows
- *    past 90 days — consider redacting bcc / hashing recipient addresses.
+ *  - bcc addresses are redacted to a count to preserve the confidentiality
+ *    contract (see redactBcc). Raw bodies are stored verbatim for ops
+ *    debugging; restrict the admin-UI read permission on `email-log` to
+ *    operator roles, and revisit if retention extends past 90 days.
  */
 
 import type { Core } from "@strapi/strapi"
@@ -82,21 +82,36 @@ function formatOptionalRecipients(to: string | string[] | undefined): string | u
   return to === undefined ? undefined : formatRecipients(to)
 }
 
+// Bcc addresses are confidential by definition — replacing them with a count
+// preserves their existence for ops debugging without exposing identities to
+// anyone with admin-UI read access to email-log rows.
+function redactBcc(to: string | string[] | undefined): string | undefined {
+  if (to === undefined) return undefined
+  const list = Array.isArray(to)
+    ? to.filter((a) => a.trim().length > 0)
+    : [to].filter((a) => a.trim().length > 0)
+  if (list.length === 0) return undefined
+  return `${list.length} recipient(s) (redacted)`
+}
+
 // Cap audit-log bodies so a pathological email (or a runaway template loop)
 // can't bloat the table. 256 KB preserves every real transactional email
-// we send today while bounding worst-case storage to ~22 GB over 90 days at
-// 1k emails/day.
+// we send today while bounding worst-case storage to ~46 GB over 90 days at
+// 1k emails/day (counting bodyHtml + bodyText at 256 KB each).
 const MAX_BODY_BYTES = 256 * 1024
 
 function truncateBody(value: string | undefined): string | undefined {
   if (value === undefined) return undefined
   if (Buffer.byteLength(value, "utf8") <= MAX_BODY_BYTES) return value
-  const marker = `\n…[truncated at ${MAX_BODY_BYTES} bytes]`
+  const marker = `…[truncated at ${MAX_BODY_BYTES} bytes]`
   const markerBytes = Buffer.byteLength(marker, "utf8")
-  // Byte-aware slice; toString() drops any trailing partial UTF-8 sequence.
+  // Byte-aware slice. Node's UTF-8 decoder substitutes U+FFFD for any
+  // partial trailing sequence rather than dropping it; strip those before
+  // appending the marker so the truncation looks clean in the audit log.
   const head = Buffer.from(value, "utf8")
     .subarray(0, MAX_BODY_BYTES - markerBytes)
     .toString("utf8")
+    .replace(/�+$/, "")
   return head + marker
 }
 
@@ -116,7 +131,7 @@ function extractProviderMessageId(result: unknown): string | undefined {
       return candidate.slice(0, 500)
     }
     if (typeof candidate === "number") {
-      return String(candidate)
+      return String(candidate).slice(0, 500)
     }
   }
   return undefined
@@ -137,7 +152,7 @@ async function persistEmailLog(
   const data: EmailLogData = {
     to: formatRecipients(args.options.to),
     cc: formatOptionalRecipients(args.options.cc),
-    bcc: formatOptionalRecipients(args.options.bcc),
+    bcc: redactBcc(args.options.bcc),
     fromAddress: args.options.from,
     replyTo: args.options.replyTo,
     subject: args.options.subject,
