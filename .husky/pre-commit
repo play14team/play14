@@ -4,10 +4,7 @@
 bunx lint-staged
 
 # Block commits that introduce Strapi reserved attribute names (status, type, state, id)
-bun run scripts/check-strapi-reserved-names.ts
-if [ $? -ne 0 ]; then
-  exit 1
-fi
+bun run scripts/check-strapi-reserved-names.ts || exit 1
 
 # Track which packages have staged TypeScript files
 API_HAS_TS=false
