@@ -10,6 +10,7 @@ export {
   releaseLock,
   withDistributedLock,
 } from "./distributed-lock"
+export { cleanOldEmailLogs } from "./email-logs"
 export { processEventResultsReminders } from "./event-results-reminders"
 export { updateEventStatus } from "./events"
 export { decideReconciliation, reconcileNewsletterSends } from "./newsletter-reconciliation"

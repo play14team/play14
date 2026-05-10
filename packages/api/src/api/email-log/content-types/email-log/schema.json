@@ -1,0 +1,76 @@
+{
+  "kind": "collectionType",
+  "collectionName": "email_logs",
+  "info": {
+    "singularName": "email-log",
+    "pluralName": "email-logs",
+    "displayName": "Email Log",
+    "description": "Audit log of every transactional email funnelled through sendEmail(). Retained 90 days, then purged by the cleanupOldEmailLogs cron."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "to": {
+      "type": "string",
+      "required": true,
+      "maxLength": 1000
+    },
+    "cc": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "bcc": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "fromAddress": {
+      "type": "string",
+      "required": true,
+      "maxLength": 500
+    },
+    "replyTo": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "subject": {
+      "type": "string",
+      "required": true,
+      "maxLength": 998
+    },
+    "emailType": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "emailStatus": {
+      "type": "enumeration",
+      "enum": ["sent", "failed"],
+      "required": true,
+      "default": "sent"
+    },
+    "errorMessage": {
+      "type": "text"
+    },
+    "providerMessageId": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "bodyHtml": {
+      "type": "text"
+    },
+    "bodyText": {
+      "type": "text"
+    },
+    "attachmentNames": {
+      "type": "json"
+    },
+    "context": {
+      "type": "json"
+    },
+    "sentAt": {
+      "type": "datetime",
+      "required": true
+    }
+  }
+}
