@@ -8,6 +8,14 @@
  * propagating to the caller (their emailSendTotal counter / alerts depend
  * on it). The log line is emitted BEFORE the send so a hang still leaves a
  * trace of intent.
+ *
+ * Trade-offs to revisit if volume grows:
+ *  - One synchronous DB write per send (~1-2ms on a healthy PG). At current
+ *    volume this is in the noise; profile here before batching/async-queuing.
+ *  - bcc + raw bodies are stored verbatim. Anyone with admin-UI read access
+ *    to the `email-log` collection can see them. Acceptable for ops review
+ *    but worth weighing against GDPR data minimisation if retention grows
+ *    past 90 days — consider redacting bcc / hashing recipient addresses.
  */
 
 import type { Core } from "@strapi/strapi"
@@ -148,8 +156,9 @@ async function persistEmailLog(
   }
 
   try {
-    // UID cast: generated Strapi types don't include the new content type
-    // until the admin panel is rebuilt; the data shape is fully typed above.
+    // TODO: drop the `as never` casts once `bun --filter play14-api build`
+    // regenerates Strapi's content-type types to include `email-log`. The
+    // `data` shape is fully typed via EmailLogData above.
     await strapi.documents("api::email-log.email-log" as never).create({ data } as never)
   } catch (logError) {
     const message = logError instanceof Error ? logError.message : String(logError)

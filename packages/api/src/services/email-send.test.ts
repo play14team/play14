@@ -195,6 +195,17 @@ describe("sendEmail", () => {
     )
   })
 
+  it("skips the audit log when the recipient array joins to an empty string", async () => {
+    const { strapi, documentCreate } = createMockStrapi()
+
+    await sendEmail(strapi, "confirmation", { to: [""], subject: "Hi" })
+
+    expect(documentCreate).not.toHaveBeenCalled()
+    expect(strapi.log.warn).toHaveBeenCalledWith(
+      expect.stringContaining("Skipping audit log: no recipient")
+    )
+  })
+
   it("attaches caller-supplied context to the audit log", async () => {
     const { strapi, documentCreate } = createMockStrapi()
 

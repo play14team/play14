@@ -1,5 +1,8 @@
 // The cleanOldEmailLogs cron deletes `WHERE sent_at < cutoff` daily; without
 // this index it would seq-scan the full 90-day audit log every run.
+//
+// Migrations run before Strapi bootstraps, so `strapi.log` isn't available
+// here — `console.log` is the right tool, not a style drift.
 
 const INDEX_NAME = "email_logs_sent_at_idx"
 
