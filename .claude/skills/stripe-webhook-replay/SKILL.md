@@ -1,6 +1,6 @@
 ---
 name: stripe-webhook-replay
-description: Recover stuck Stripe webhook deliveries in the play14 platform — find affected orders, reset them to `pending` while pushing past the 30-minute auto-expiry cron, clear the dedupe rows in `processed_webhooks` so the resend isn't short-circuited, and replay the events through the Stripe CLI. Trigger proactively whenever the user mentions stuck/missing tickets, paid orders showing as expired, "paidAt is null", "the webhook didn't fire", failed Stripe deliveries (especially after a hosting migration or webhook URL change), or anything that smells like webhook drift. The order-state machine plus the cleanup cron interact in a way that the obvious "just resend it" path silently no-ops — this skill encodes the guards that make replay actually work.
+description: Recover stuck Stripe webhook deliveries in the play14 platform — find affected orders, reset them to `pending` while pushing past the 30-minute auto-expiry cron, clear the dedupe rows in `processed_webhooks` so the resend isn't short-circuited, and replay the events through the Stripe CLI. Trigger proactively whenever the user mentions stuck/missing tickets, paid orders showing as expired, "paidAt is null", "the webhook didn't fire", failed Stripe deliveries (especially after a hosting migration or webhook URL change), a spike in the `webhook_processing_total{status="skipped_terminal"}` Prometheus counter, or anything that smells like webhook drift. The order-state machine plus the cleanup cron interact in a way that the obvious "just resend it" path silently no-ops — this skill encodes the guards that make replay actually work.
 ---
 
 # stripe-webhook-replay
@@ -21,6 +21,7 @@ This skill walks through the recovery without falling into that trap.
 - DB has orders with `order_status` in `('expired', 'failed')` that customers say they paid for.
 - DB has orders where `total_amount > 0` but `paid_at IS NULL` and `provider_session_id IS NOT NULL`.
 - Recently changed the webhook URL, rotated a signing secret, or migrated hosting.
+- **`webhook_processing_total{event_type="checkout.session.completed",status="skipped_terminal"}` spikes** — especially within ~30 seconds of a `cleanExpiredTicketOrders` cron run (the cron fires every 5 minutes, on `*/5`). The webhook's `WHERE order_status = 'pending'` claim and the cron's `pending → processing → expired` transition share the `processing` lock state; a `checkout.session.completed` arriving while cron holds the row hits `skipped_terminal` and the cron then marks the order `expired`. The customer paid; no ticket issued. Recovery is via this skill.
 
 ## Prerequisites
 
@@ -231,7 +232,11 @@ If the failures came from a hosting migration or URL change, fix the cause befor
 
 ## Why this skill exists
 
-The "Validation error: Invalid status" admin issue and the cron's race against late webhooks are both inherent to the play14 ticket-order state machine. Both have happened; both will happen again. The handler's silent-skip path (at `webhook.ts` around the `WHERE order_status = 'pending'` conditional update) is correct — it prevents double-processing on duplicate deliveries — but it also means a late delivery looks identical to a duplicate and we lose the signal. Until that handler grows a `warn`-level log + Prometheus counter for "arrived for a non-pending terminal-state order", this manual recovery is the canonical path.
+The "Validation error: Invalid status" admin issue and the cron's race against late webhooks are both inherent to the play14 ticket-order state machine. Both have happened; both will happen again. The handler's silent-skip path (at `webhook.ts` around the `WHERE order_status = 'pending'` conditional update) is correct — it prevents double-processing on duplicate deliveries — but it also means a late delivery looks identical to a duplicate and we lose the signal in the happy-path logs.
+
+The handler now emits a `warn`-level log line and increments `webhook_processing_total{status="skipped_terminal"}` whenever this branch is taken, so the signal is no longer lost — but the recovery itself still has to be manual because the order is by then in a terminal-ish state (`expired`/`failed`) and a naive resend hits the same guard. This skill is the canonical recovery path.
+
+There is also an unavoidable race window between the `cleanExpiredTicketOrders` cron (every 5 min) and a delayed `checkout.session.completed`: both transition `pending → processing` as their per-row lock, so a webhook arriving while the cron holds the row hits `skipped_terminal` and the cron then marks it `expired`. Eliminating that race would require either advisory locks shared between the two paths or having the cron defer when a recent unprocessed Stripe event exists for the same `provider_session_id` — neither is in scope. Until then, the `skipped_terminal` counter is the on-call signal and this skill is the recovery.
 
 ## Coordination
 
