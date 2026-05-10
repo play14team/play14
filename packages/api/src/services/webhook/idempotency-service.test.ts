@@ -63,7 +63,7 @@ describe("idempotency-service", () => {
           event_id: "evt_test_123",
           event_type: "checkout.session.completed",
           provider: "stripe",
-          status: "processing",
+          webhook_status: "processing",
         })
       )
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
@@ -79,7 +79,7 @@ describe("idempotency-service", () => {
       mockStrapi._mockKnexBuilder.insert.mockRejectedValue(uniqueError)
       mockStrapi._mockKnexBuilder.first.mockResolvedValue({
         event_id: "evt_test_123",
-        status: "completed",
+        webhook_status: "completed",
       })
 
       const result = await claimWebhookEvent(
@@ -90,7 +90,7 @@ describe("idempotency-service", () => {
 
       expect(result.shouldProcess).toBe(false)
       expect(result.alreadyProcessed).toBe(true)
-      expect(result.status).toBe("completed")
+      expect(result.webhookStatus).toBe("completed")
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
         "[Idempotency] Event evt_test_123 already completed - skipping"
       )
@@ -102,7 +102,7 @@ describe("idempotency-service", () => {
       mockStrapi._mockKnexBuilder.insert.mockRejectedValue(uniqueError)
       mockStrapi._mockKnexBuilder.first.mockResolvedValue({
         event_id: "evt_test_123",
-        status: "processing",
+        webhook_status: "processing",
       })
 
       const result = await claimWebhookEvent(
@@ -113,7 +113,7 @@ describe("idempotency-service", () => {
 
       expect(result.shouldProcess).toBe(false)
       expect(result.alreadyProcessed).toBe(true)
-      expect(result.status).toBe("processing")
+      expect(result.webhookStatus).toBe("processing")
     })
 
     it("throws non-unique-constraint errors", async () => {
@@ -135,7 +135,7 @@ describe("idempotency-service", () => {
       expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("event_id", "evt_test_123")
       expect(mockStrapi._mockKnexBuilder.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          status: "completed",
+          webhook_status: "completed",
           metadata: JSON.stringify({ orderId: "123" }),
         })
       )
@@ -149,7 +149,7 @@ describe("idempotency-service", () => {
 
       expect(mockStrapi._mockKnexBuilder.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          status: "completed",
+          webhook_status: "completed",
           metadata: null,
         })
       )
@@ -163,7 +163,7 @@ describe("idempotency-service", () => {
       expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("event_id", "evt_test_123")
       expect(mockStrapi._mockKnexBuilder.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          status: "failed",
+          webhook_status: "failed",
           metadata: JSON.stringify({ error: "Processing timeout" }),
         })
       )
@@ -192,7 +192,7 @@ describe("idempotency-service", () => {
       const deletedCount = await cleanupOldWebhookRecords(mockStrapi, 7)
 
       expect(deletedCount).toBe(5)
-      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("status", "completed")
+      expect(mockStrapi._mockKnexBuilder.where).toHaveBeenCalledWith("webhook_status", "completed")
       expect(mockStrapi.log.info).toHaveBeenCalledWith(
         "[Idempotency] Cleaned up 5 old webhook records"
       )

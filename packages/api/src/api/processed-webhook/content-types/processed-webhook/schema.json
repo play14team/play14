@@ -28,7 +28,7 @@
       "default": "stripe",
       "required": true
     },
-    "status": {
+    "webhookStatus": {
       "type": "enumeration",
       "enum": ["processing", "completed", "failed"],
       "default": "processing",
