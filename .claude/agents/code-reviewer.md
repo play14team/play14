@@ -83,3 +83,4 @@ This agent covers **both review and targeted refactoring** (no separate refactor
 - `simplify`, `security-review` — general code-quality passes.
 - `i18n-sync` — run whenever the change set touches UI copy.
 - `strapi-permissions-audit` — run whenever the change set touches `packages/api/src/api/*/routes/` or `packages/api/src/api/*/controllers/`.
+- `stripe-best-practices` — run whenever the change set touches Stripe code (ticket-order controllers, the webhook handler, refund flows, or `packages/web/src/components/tickets/`). Catches signature-verification gaps, missing idempotency, secret-handling lapses, and Connect-platform pitfalls.
