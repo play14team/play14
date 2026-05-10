@@ -14,6 +14,12 @@ function stagedFiles(): string[] {
   return new TextDecoder().decode(proc.stdout).split("\n").filter(Boolean)
 }
 
+function readStaged(file: string): string | null {
+  const proc = Bun.spawnSync({ cmd: ["git", "show", `:${file}`] })
+  if (proc.exitCode !== 0) return null
+  return new TextDecoder().decode(proc.stdout)
+}
+
 function lineOf(source: string, key: string): number | null {
   const re = new RegExp(`"${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\s*:\\s*\\{`)
   const lines = source.split("\n")
@@ -28,12 +34,8 @@ const offenders: Array<{ file: string; key: string; line: number | null }> = []
 for (const file of stagedFiles()) {
   if (!SCHEMA_PATTERNS.some((p) => p.test(file))) continue
 
-  let raw: string
-  try {
-    raw = await Bun.file(file).text()
-  } catch {
-    continue
-  }
+  const raw = readStaged(file)
+  if (raw === null) continue
 
   let parsed: unknown
   try {
