@@ -7,7 +7,7 @@
       "filterable": true,
       "searchable": true,
       "pageSize": 10,
-      "mainField": "type",
+      "mainField": "mediaType",
       "defaultSortBy": "url",
       "defaultSortOrder": "ASC"
     },
@@ -34,7 +34,7 @@
           "sortable": true
         }
       },
-      "type": {
+      "mediaType": {
         "edit": {
           "label": "Type of media",
           "description": "What type of media library?",
@@ -43,7 +43,7 @@
           "editable": true
         },
         "list": {
-          "label": "type",
+          "label": "mediaType",
           "searchable": true,
           "sortable": true
         }
@@ -58,7 +58,7 @@
       }
     },
     "layouts": {
-      "list": ["id", "url", "type", "documentId"],
+      "list": ["id", "url", "mediaType", "documentId"],
       "edit": [
         [
           {
@@ -66,7 +66,7 @@
             "size": 6
           },
           {
-            "name": "type",
+            "name": "mediaType",
             "size": 6
           }
         ]
