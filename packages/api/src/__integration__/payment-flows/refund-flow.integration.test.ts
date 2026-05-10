@@ -86,7 +86,7 @@ describe("Refund Flow", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "pending",
+        orderStatus: "pending",
       })
 
       // Act
@@ -111,7 +111,7 @@ describe("Refund Flow", () => {
       const order = await seedTestOrder(strapi, {
         event: event.id,
         player: player.id,
-        status: "refunded",
+        orderStatus: "refunded",
         providerOrderId: `pi_test_${Date.now()}`,
       })
 
