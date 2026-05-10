@@ -48,8 +48,8 @@ export default async function OrderPage({ params }: OrderPageProps) {
     notFound()
   }
 
-  const canRefund = order.status === "paid" && !order.refundedAt
-  const canDownloadInvoice = order.status === "paid" || order.status === "refunded"
+  const canRefund = order.orderStatus === "paid" && !order.refundedAt
+  const canDownloadInvoice = order.orderStatus === "paid" || order.orderStatus === "refunded"
 
   return (
     <div className={styles.container}>
@@ -61,8 +61,8 @@ export default async function OrderPage({ params }: OrderPageProps) {
               {t("orderHash", { orderNumber: order.orderNumber })}
             </p>
           </div>
-          <span className={`${styles.status} ${getStatusBadgeClass(order.status)}`}>
-            {order.status.toUpperCase()}
+          <span className={`${styles.status} ${getStatusBadgeClass(order.orderStatus)}`}>
+            {order.orderStatus.toUpperCase()}
           </span>
         </div>
 

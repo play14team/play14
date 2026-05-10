@@ -488,7 +488,7 @@ describe("webhook controller", () => {
       id: 1,
       documentId: "order-doc-123",
       orderNumber: "ORD-001",
-      status: "pending",
+      orderStatus: "pending",
       purchaserName: "John Doe",
       purchaserEmail: "john@example.com",
       event: mockEvent,
@@ -567,7 +567,7 @@ describe("webhook controller", () => {
       mockStrapi.documents.mockReturnValue({
         findFirst: vi.fn().mockResolvedValue({
           ...mockOrder,
-          status: "paid",
+          orderStatus: "paid",
         }),
       })
 
@@ -627,7 +627,7 @@ describe("webhook controller", () => {
         expect.objectContaining({
           documentId: mockOrder.documentId,
           data: expect.objectContaining({
-            status: "paid",
+            orderStatus: "paid",
             providerOrderId: "pi_test_123",
           }),
         })
@@ -715,7 +715,7 @@ describe("webhook controller", () => {
       mockStrapi.documents.mockReturnValue({
         findFirst: vi.fn().mockResolvedValue({
           orderNumber: "ORD-001",
-          status: "paid",
+          orderStatus: "paid",
         }),
       })
 
@@ -728,7 +728,7 @@ describe("webhook controller", () => {
       const mockOrder = {
         documentId: "order-doc-123",
         orderNumber: "ORD-001",
-        status: "pending",
+        orderStatus: "pending",
         event: { id: 1 },
       }
 
@@ -746,7 +746,7 @@ describe("webhook controller", () => {
       expect(orderDocs.update).toHaveBeenCalledWith(
         expect.objectContaining({
           documentId: mockOrder.documentId,
-          data: { status: "expired" },
+          data: { orderStatus: "expired" },
         })
       )
 
@@ -781,7 +781,7 @@ describe("webhook controller", () => {
       const mockOrder = {
         documentId: "order-doc-123",
         orderNumber: "ORD-001",
-        status: "pending",
+        orderStatus: "pending",
         purchaserEmail: "john@example.com",
         event: { name: "Test Event", slug: "test-event" },
       }
@@ -809,7 +809,7 @@ describe("webhook controller", () => {
         expect.objectContaining({
           documentId: mockOrder.documentId,
           data: expect.objectContaining({
-            status: "failed",
+            orderStatus: "failed",
             notes: expect.stringContaining("card_declined"),
           }),
         })
@@ -822,7 +822,7 @@ describe("webhook controller", () => {
       const mockOrder = {
         documentId: "order-doc-123",
         orderNumber: "ORD-001",
-        status: "paid", // Already paid
+        orderStatus: "paid", // Already paid
         event: { name: "Test Event" },
       }
 
@@ -865,7 +865,7 @@ describe("webhook controller", () => {
       mockStrapi.documents.mockReturnValue({
         findFirst: vi.fn().mockResolvedValue({
           orderNumber: "ORD-001",
-          status: "refunded",
+          orderStatus: "refunded",
         }),
       })
 
@@ -878,7 +878,7 @@ describe("webhook controller", () => {
       const mockOrder = {
         documentId: "order-doc-123",
         orderNumber: "ORD-001",
-        status: "paid",
+        orderStatus: "paid",
         tickets: [{ documentId: "ticket-1" }, { documentId: "ticket-2" }],
         player: { documentId: "player-doc-123" },
         event: { documentId: "event-doc-123" },
@@ -919,7 +919,7 @@ describe("webhook controller", () => {
         expect.objectContaining({
           documentId: mockOrder.documentId,
           data: expect.objectContaining({
-            status: "refunded",
+            orderStatus: "refunded",
             refundAmount: 50,
           }),
         })
@@ -947,7 +947,7 @@ describe("webhook controller", () => {
       const mockOrder = {
         documentId: "order-doc-123",
         orderNumber: "ORD-001",
-        status: "paid",
+        orderStatus: "paid",
         tickets: [{ documentId: "ticket-1" }],
         player: { documentId: "player-doc-123" },
         event: { documentId: "event-doc-123" },
@@ -979,7 +979,7 @@ describe("webhook controller", () => {
       expect(orderDocs.count).toHaveBeenCalledWith(
         expect.objectContaining({
           filters: expect.objectContaining({
-            status: "paid",
+            orderStatus: "paid",
             documentId: { $ne: "order-doc-123" },
           }),
         })

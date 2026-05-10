@@ -176,7 +176,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           },
         },
         order: {
-          fields: ["orderNumber", "status"],
+          fields: ["orderNumber", "orderStatus"],
         },
       },
       sort: { createdAt: "desc" },
@@ -201,7 +201,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         order: t.order
           ? {
               orderNumber: t.order.orderNumber,
-              status: t.order.status,
+              orderStatus: t.order.orderStatus,
             }
           : null,
       })),

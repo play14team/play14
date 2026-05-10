@@ -26,7 +26,7 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
   // 2. createdAt is older than 30 minutes (fallback for orders without explicit expiry)
   const expiredOrders = await strapi.documents(apiName).findMany({
     filters: {
-      status: "pending",
+      orderStatus: "pending",
       $or: [
         { reservationExpiresAt: { $lt: now.toISOString() } },
         {
@@ -45,9 +45,9 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
     // This prevents duplicate processing in multi-container deployments
     const claimResult = await knex("ticket_orders")
       .where("document_id", order.documentId)
-      .where("status", "pending")
+      .where("order_status", "pending")
       .update({
-        status: "expiring",
+        order_status: "expiring",
         updated_at: new Date(),
       })
 
@@ -87,7 +87,7 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
       await strapi.documents(apiName).update({
         documentId: order.documentId,
         data: {
-          status: "expired",
+          orderStatus: "expired",
           hasReservation: false,
           reservationCreatedAt: null,
           reservationExpiresAt: null,
@@ -100,9 +100,9 @@ export async function cleanExpiredTicketOrders(strapi: Core.Strapi): Promise<voi
       console.error(`Failed to process expired order ${order.orderNumber}:`, error)
       await knex("ticket_orders")
         .where("document_id", order.documentId)
-        .where("status", "expiring")
+        .where("order_status", "expiring")
         .update({
-          status: "pending",
+          order_status: "pending",
           updated_at: new Date(),
         })
     }
@@ -122,7 +122,7 @@ export async function cleanAbandonedDraftOrders(strapi: Core.Strapi): Promise<vo
 
   const abandonedDrafts = await strapi.documents(apiName).findMany({
     filters: {
-      status: "draft",
+      orderStatus: "draft",
       createdAt: { $lt: twentyFourHoursAgo.toISOString() },
     },
     populate: {
@@ -142,7 +142,7 @@ export async function cleanAbandonedDraftOrders(strapi: Core.Strapi): Promise<vo
     await strapi.documents(apiName).update({
       documentId: order.documentId,
       data: {
-        status: "cancelled",
+        orderStatus: "cancelled",
       } as any,
     })
 
@@ -176,7 +176,7 @@ export async function reservationHealthCheck(strapi: Core.Strapi): Promise<void>
     // Find all pending orders with reservations for this ticket type
     const ordersWithReservation = await strapi.documents(orderApiName).findMany({
       filters: {
-        status: "pending",
+        orderStatus: "pending",
         hasReservation: true,
       },
     })

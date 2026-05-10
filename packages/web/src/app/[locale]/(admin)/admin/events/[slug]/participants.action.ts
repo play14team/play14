@@ -29,7 +29,7 @@ export interface Participant {
     orderNumber: string
     purchaserName: string
     purchaserEmail: string
-    status: string // order status
+    orderStatus: string
     paidAt?: string
   }
   createdAt: string

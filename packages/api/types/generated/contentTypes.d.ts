@@ -735,6 +735,12 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: false;
         };
       }>;
+    cancellationReason: Schema.Attribute.Text &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }>;
     contactEmail: Schema.Attribute.Email &
       Schema.Attribute.DefaultTo<'team@play14.org'>;
     createdAt: Schema.Attribute.DateTime;
@@ -1726,7 +1732,7 @@ export interface ApiTicketOrderTicketOrder extends Struct.CollectionTypeSchema {
     refundReason: Schema.Attribute.Text;
     reservationCreatedAt: Schema.Attribute.DateTime;
     reservationExpiresAt: Schema.Attribute.DateTime;
-    status: Schema.Attribute.Enumeration<
+    orderStatus: Schema.Attribute.Enumeration<
       [
         'draft',
         'pending',

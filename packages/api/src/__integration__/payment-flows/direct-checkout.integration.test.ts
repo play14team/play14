@@ -74,7 +74,7 @@ describe("Direct Checkout Flow", () => {
         documentId: response.body.data.orderId,
       })
       expect(order).not.toBeNull()
-      expect(order.status).toBe("pending")
+      expect(order.orderStatus).toBe("pending")
       expect(order.hasReservation).toBe(true)
     })
 
@@ -330,7 +330,7 @@ describe("Direct Checkout Flow", () => {
         populate: { tickets: true },
       })
 
-      expect(updatedOrder.status).toBe("paid")
+      expect(updatedOrder.orderStatus).toBe("paid")
       expect(updatedOrder.paidAt).not.toBeNull()
       expect(updatedOrder.tickets).toHaveLength(2)
       expect(updatedOrder.hasReservation).toBe(false)
@@ -374,7 +374,7 @@ describe("Direct Checkout Flow", () => {
       expect(response.status).toBe(200)
       expect(response.body.data).toMatchObject({
         orderNumber: expect.stringMatching(/^P14-/),
-        status: "pending",
+        orderStatus: "pending",
       })
     })
   })
@@ -421,7 +421,7 @@ describe("Direct Checkout Flow", () => {
       const order = await strapi.documents("api::ticket-order.ticket-order").findOne({
         documentId: orderId,
       })
-      expect(order.status).toBe("cancelled")
+      expect(order.orderStatus).toBe("cancelled")
 
       // Verify reservations released
       const ticketTypeAfter = await strapi.db

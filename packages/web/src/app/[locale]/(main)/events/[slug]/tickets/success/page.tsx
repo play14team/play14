@@ -45,7 +45,7 @@ export default async function TicketSuccessPage({ params, searchParams }: Succes
     )
   }
 
-  const isPaid = order.status === "paid"
+  const isPaid = order.orderStatus === "paid"
 
   // If payment is confirmed, show success message and auto-redirect
   if (isPaid) {

@@ -13,7 +13,7 @@ export interface TicketDetail {
 export interface OrderFixture {
   documentId: string
   orderNumber: string
-  status: "pending" | "paid" | "cancelled" | "refunded"
+  orderStatus: "pending" | "paid" | "cancelled" | "refunded"
   customerEmail: string
   customerName: string
   totalAmount: number
@@ -48,7 +48,7 @@ export function createOrder(overrides: Partial<OrderFixture> = {}): OrderFixture
   return {
     documentId: `order-${orderCounter}`,
     orderNumber: `P14-20250101-${String(orderCounter).padStart(6, "0")}`,
-    status: "pending",
+    orderStatus: "pending",
     customerEmail: `customer${orderCounter}@example.com`,
     customerName: `Customer ${orderCounter}`,
     totalAmount: 100,
@@ -88,7 +88,7 @@ export function createPaidOrder(overrides: Partial<OrderFixture> = {}): OrderFix
   const now = new Date().toISOString()
 
   return createOrder({
-    status: "paid",
+    orderStatus: "paid",
     paymentIntentId: generateRandomId("pi_"),
     checkoutSessionId: generateRandomId("cs_"),
     paidAt: now,
@@ -104,7 +104,7 @@ export function createPaidOrder(overrides: Partial<OrderFixture> = {}): OrderFix
  */
 export function createCancelledOrder(overrides: Partial<OrderFixture> = {}): OrderFixture {
   return createOrder({
-    status: "cancelled",
+    orderStatus: "cancelled",
     hasReservation: false,
     ...overrides,
   })

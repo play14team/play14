@@ -37,7 +37,7 @@ export default async function AdminDashboardPage() {
   // Calculate stats
   const upcomingEvents = myEvents.filter((e) => new Date(e.start) > new Date())
   const pastAttendedEvents = attendedEvents.filter((e) => new Date(e.end) < new Date())
-  const paidOrders = orders.filter((o) => o.status === "paid")
+  const paidOrders = orders.filter((o) => o.orderStatus === "paid")
 
   function formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString(locale, {
