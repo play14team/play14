@@ -580,7 +580,7 @@ describe("webhook controller", () => {
 
       await controller.handleCheckoutCompleted({ id: "cs_test_123" })
 
-      expect(mockStrapi.log.info).toHaveBeenCalledWith(
+      expect(mockStrapi.log.warn).toHaveBeenCalledWith(
         expect.stringContaining("skipped - current status: paid")
       )
     })
