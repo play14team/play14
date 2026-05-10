@@ -316,7 +316,7 @@ export const Enum_Expectation_Type = {
 
 export interface Expectation {
   documentId?: string
-  type: Enum_Expectation_Type | string
+  expectationType: Enum_Expectation_Type | string
   title: string
   content: string
   icon?: string

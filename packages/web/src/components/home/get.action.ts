@@ -40,7 +40,7 @@ interface Event {
 interface Expectation {
   documentId: string
   title: string
-  type: string
+  expectationType: string
   icon: string
   content?: string
 }
@@ -79,7 +79,7 @@ export async function getUpcomingEvents(today: string) {
 export async function getExpectations(type: string) {
   const response = await restQuery<Expectation[]>("expectations", {
     filters: {
-      type: { $eq: type },
+      expectationType: { $eq: type },
     },
   })
   return response.data || []
