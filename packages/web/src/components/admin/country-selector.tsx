@@ -27,7 +27,12 @@ interface CountrySelectorProps {
   required?: boolean
 }
 
-export default function CountrySelector({ value, onChange, placeholder }: CountrySelectorProps) {
+export default function CountrySelector({
+  value,
+  onChange,
+  placeholder,
+  required,
+}: CountrySelectorProps) {
   const t = useTranslations("adminCrud")
   const resolvedPlaceholder = placeholder || t("countrySelector.placeholder")
   const [isOpen, setIsOpen] = useState(false)
@@ -77,6 +82,26 @@ export default function CountrySelector({ value, onChange, placeholder }: Countr
 
   return (
     <div className="country-selector" ref={containerRef}>
+      {/* Hidden input drives native required-form validation: the visible
+          trigger is a <button>, which doesn't participate in constraint
+          validation. Positioned over the trigger so the browser's invalid
+          tooltip anchors next to it. */}
+      <input
+        type="text"
+        tabIndex={-1}
+        aria-hidden="true"
+        required={required}
+        value={value}
+        readOnly
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
       <button
         type="button"
         className={`country-selector-trigger ${isOpen ? "is-open" : ""}`}
