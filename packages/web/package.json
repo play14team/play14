@@ -87,7 +87,7 @@
     "react-photo-album": "^3.6.0",
     "react-spinners": "^0.17.0",
     "recharts": "^3.8.1",
-    "sanitize-html": "^2.17.3",
+    "sanitize-html": "^2.17.4",
     "server-only": "^0.0.1",
     "sharp": "^0.34.5",
     "tiptap-markdown": "^0.9.0",

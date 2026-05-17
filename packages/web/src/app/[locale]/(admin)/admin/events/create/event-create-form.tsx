@@ -5,6 +5,7 @@ import { addDays, format, isAfter, isValid } from "date-fns"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { useEffect, useMemo, useState } from "react"
+import CountrySelector from "@/components/admin/country-selector"
 import { useToast } from "@/components/admin/toast"
 import SimpleEditor from "@/components/ui/simple-editor"
 import {
@@ -13,22 +14,6 @@ import {
   type LocationOption,
   type VenueOption,
 } from "./event-create.action"
-
-// Common European countries for the dropdown
-const COUNTRIES = [
-  { code: "BE", name: "Belgium" },
-  { code: "CH", name: "Switzerland" },
-  { code: "DE", name: "Germany" },
-  { code: "ES", name: "Spain" },
-  { code: "FR", name: "France" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "IT", name: "Italy" },
-  { code: "LU", name: "Luxembourg" },
-  { code: "NL", name: "Netherlands" },
-  { code: "PL", name: "Poland" },
-  { code: "PT", name: "Portugal" },
-  { code: "US", name: "United States" },
-]
 
 // Get all IANA timezones from the browser's Intl API, grouped by region
 function getTimezones(): { value: string; region: string }[] {
@@ -395,20 +380,12 @@ export default function EventCreateForm({ locations, venues }: Props) {
             </div>
             <div className="admin-form-group">
               <label htmlFor="newLocationCountry">{t("create.country")}</label>
-              <select
-                id="newLocationCountry"
+              <CountrySelector
                 value={newLocationCountry}
-                onChange={(e) => setNewLocationCountry(e.target.value)}
-                className="admin-select"
+                onChange={setNewLocationCountry}
+                placeholder={t("create.selectCountry")}
                 required={locationMode === "new"}
-              >
-                <option value="">{t("create.selectCountry")}</option>
-                {COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
           </div>
         )}
