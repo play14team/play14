@@ -117,41 +117,14 @@ jobs:
         run: bun --filter play14-web test
 
   # --- Deploy staging apps on PR open/update ----------------------------------
-  detect-changes:
-    name: Detect changes
-    if: github.event.action != 'closed'
-    runs-on: ubuntu-latest
-    outputs:
-      api: ${{ steps.changes.outputs.api || steps.force.outputs.api }}
-      web: ${{ steps.changes.outputs.web || steps.force.outputs.web }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 2
-
-      - name: Detect changed paths
-        id: changes
-        if: github.event_name != 'workflow_dispatch'
-        uses: dorny/paths-filter@v4
-        with:
-          filters: |
-            api:
-              - 'packages/api/**'
-            web:
-              - 'packages/web/**'
-
-      - name: Force both on manual run
-        id: force
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "api=true" >> "$GITHUB_OUTPUT"
-          echo "web=true" >> "$GITHUB_OUTPUT"
-
+  # Both apps redeploy on every PR push. The previous per-package change
+  # detection skipped the API when only web changed, which is wrong on staging
+  # because `stop-staging` (above) stops both apps when a PR is merged — a
+  # later web-only PR would then build against an offline staging API.
   deploy-api-staging:
     name: Deploy play14-api-staging
-    needs: [lint, test, detect-changes]
-    if: needs.detect-changes.outputs.api == 'true'
+    needs: [lint, test]
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -230,10 +203,10 @@ jobs:
 
   deploy-web-staging:
     name: Deploy play14-web-staging
-    needs: [lint, test, detect-changes, deploy-api-staging]
-    # Run when web changed. The API job dependency is soft — if the API job
-    # was skipped (no API changes), GitHub Actions still lets this run.
-    if: ${{ always() && needs.lint.result == 'success' && needs.test.result == 'success' && needs.detect-changes.outputs.web == 'true' && needs.deploy-api-staging.result != 'failure' }}
+    needs: [lint, test, deploy-api-staging]
+    # Web depends on API: `next build` fetches data from the staging API, so
+    # we wait until the API redeploy succeeds before building the web app.
+    if: ${{ github.event.action != 'closed' && needs.deploy-api-staging.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
