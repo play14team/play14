@@ -88,7 +88,7 @@ export default function GlobalError({
                 href={issueUrl}
                 target="_blank"
                 rel="noreferrer"
-                style={{ color: "#666", textDecoration: "underline", fontSize: "0.9rem" }}
+                style={{ color: "#888", textDecoration: "underline", fontSize: "0.875rem" }}
               >
                 Report this issue
               </a>

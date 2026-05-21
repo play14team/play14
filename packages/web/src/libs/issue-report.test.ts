@@ -55,4 +55,18 @@ describe("buildIssueReportUrl", () => {
     expect(context).toContain("Stack trace:")
     expect(context.length).toBeLessThan(2500)
   })
+
+  it("joins user agent and stack trace into a single additional-context block", () => {
+    const url = new URL(
+      buildIssueReportUrl({
+        userAgent: "Mozilla/5.0",
+        errorStack: "at fn (file.ts:1:1)",
+      })
+    )
+    const context = url.searchParams.get("additional-context") ?? ""
+    expect(context).toContain("**User agent:** Mozilla/5.0")
+    expect(context).toContain("**Stack trace:**")
+    expect(context).toContain("at fn (file.ts:1:1)")
+    expect(context.indexOf("Mozilla/5.0")).toBeLessThan(context.indexOf("Stack trace:"))
+  })
 })

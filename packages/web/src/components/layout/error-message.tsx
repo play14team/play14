@@ -12,7 +12,6 @@ interface ErrorMessageProps {
   retryLabel?: string
   onRetry?: () => void
   error?: { message?: string; digest?: string; stack?: string }
-  reportable?: boolean
 }
 
 export default function ErrorMessage({
@@ -23,10 +22,9 @@ export default function ErrorMessage({
   retryLabel = "Retry",
   onRetry,
   error,
-  reportable,
 }: ErrorMessageProps) {
   const t = useTranslations("common")
-  const showReportLink = reportable ?? Boolean(error)
+  const showReportLink = Boolean(error)
   const [issueUrl, setIssueUrl] = useState<string | null>(null)
 
   useEffect(() => {
