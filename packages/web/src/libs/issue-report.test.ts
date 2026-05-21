@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { buildIssueReportUrl } from "./issue-report"
+import { buildIssueReportUrl, issueReportContextFromError } from "./issue-report"
 
 const BASE = "https://github.com/play14team/play14/issues/new"
 
@@ -125,5 +125,64 @@ describe("buildIssueReportUrl", () => {
     })
     expect(url).toBe("https://github.com/play14team/play14/issues/new?template=bug_report.yml")
     expect(new URL(url).searchParams.get("template")).toBe("bug_report.yml")
+  })
+
+  it("scrubs absolute filesystem paths from the error message", () => {
+    const url = new URL(
+      buildIssueReportUrl({
+        errorMessage:
+          "ENOENT: no such file or directory, open '/home/runner/work/play14/secret.env'",
+      })
+    )
+    const title = url.searchParams.get("title") ?? ""
+    const what = url.searchParams.get("what-happened") ?? ""
+    expect(title).not.toContain("/home/runner/work")
+    expect(what).not.toContain("/home/runner/work")
+    expect(what).toContain("<path>")
+  })
+
+  it("preserves newlines in the body but flattens them in the title", () => {
+    const url = new URL(
+      buildIssueReportUrl({
+        errorMessage: "Boom\n  caused by deeper issue\n  on line 3",
+      })
+    )
+    expect(url.searchParams.get("title")).toBe("[Bug]: Boom caused by deeper issue on line 3")
+    const what = url.searchParams.get("what-happened") ?? ""
+    // Horizontal whitespace collapses to a single space, newlines survive.
+    expect(what).toContain("Boom\n caused by deeper issue\n on line 3")
+  })
+})
+
+describe("issueReportContextFromError", () => {
+  const location = { origin: "https://play14.org", pathname: "/events/abc" }
+  const ua = { userAgent: "Mozilla/5.0" }
+
+  it("strips query parameters and the fragment from the page URL", () => {
+    const error = new Error("boom")
+    // Simulate a URL that carries query + hash; the helper should only keep origin+pathname.
+    const dirtyLocation = {
+      origin: "https://play14.org",
+      pathname: "/events/abc",
+    }
+    const ctx = issueReportContextFromError(error, dirtyLocation, ua)
+    expect(ctx.pageUrl).toBe("https://play14.org/events/abc")
+    expect(ctx.pageUrl).not.toContain("?")
+    expect(ctx.pageUrl).not.toContain("#")
+  })
+
+  it("captures message, digest, stack, and user agent", () => {
+    const error = Object.assign(new Error("explode"), { digest: "abc123" })
+    error.stack = "Error: explode\n    at fn (foo.ts:1:1)"
+    const ctx = issueReportContextFromError(error, location, ua)
+    expect(ctx.errorMessage).toBe("explode")
+    expect(ctx.errorDigest).toBe("abc123")
+    expect(ctx.errorStack).toContain("at fn (foo.ts:1:1)")
+    expect(ctx.userAgent).toBe("Mozilla/5.0")
+  })
+
+  it("leaves digest undefined when the error has no digest", () => {
+    const ctx = issueReportContextFromError(new Error("plain"), location, ua)
+    expect(ctx.errorDigest).toBeUndefined()
   })
 })

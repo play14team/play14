@@ -142,7 +142,7 @@ const Footer = async () => {
                   <I18nLink href="/terms">{t("termsOfService")}</I18nLink>
                 </li>
                 <li>
-                  {/* Server-rendered: keep this URL context-free, no window/navigator. */}
+                  {/* buildIssueReportUrl with no args — hook unavailable in Server Components. */}
                   <a
                     href={buildIssueReportUrl()}
                     target="_blank"

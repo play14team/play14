@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { buildIssueReportUrl } from "@/libs/issue-report"
+import { buildIssueReportUrl, issueReportContextFromError } from "@/libs/issue-report"
 
 /**
  * Builds a GitHub issue-report URL pre-filled with the captured error and the
  * current page context. The work happens in a `useEffect` because
- * `window.location.href` and `navigator.userAgent` aren't available during
- * SSR — so the link briefly appears after hydration, which is intentional.
+ * `window.location` and `navigator.userAgent` aren't available during SSR —
+ * so the link briefly appears after hydration, which is intentional.
  * `useMemo` won't work here for the same reason.
  */
 export function useIssueReportUrl(error: (Error & { digest?: string }) | undefined): string | null {
@@ -20,17 +20,7 @@ export function useIssueReportUrl(error: (Error & { digest?: string }) | undefin
       setIssueUrl(null)
       return
     }
-    setIssueUrl(
-      buildIssueReportUrl({
-        errorMessage: error.message,
-        errorDigest: error.digest,
-        errorStack: error.stack,
-        // Strip query + hash so auth tokens / search terms / IDs in the
-        // current URL don't get pre-filled into the public issue body.
-        pageUrl: `${window.location.origin}${window.location.pathname}`,
-        userAgent: navigator.userAgent,
-      })
-    )
+    setIssueUrl(buildIssueReportUrl(issueReportContextFromError(error, window.location, navigator)))
   }, [error])
 
   return issueUrl
