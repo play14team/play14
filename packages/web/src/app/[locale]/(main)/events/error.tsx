@@ -37,6 +37,8 @@ export default function EventsError({
             : undefined
         }
         onRetry={reset}
+        // Suppress the report link on connection errors — those aren't bugs to file.
+        error={isConnectionError ? undefined : error}
       />
     </Page>
   )

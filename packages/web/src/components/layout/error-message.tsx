@@ -1,5 +1,8 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+import { useIssueReportUrl } from "@/hooks/use-issue-report-url"
+
 interface ErrorMessageProps {
   title?: string
   message: string
@@ -7,6 +10,7 @@ interface ErrorMessageProps {
   showReload?: boolean
   retryLabel?: string
   onRetry?: () => void
+  error?: Error & { digest?: string }
 }
 
 export default function ErrorMessage({
@@ -16,7 +20,11 @@ export default function ErrorMessage({
   showReload = true,
   retryLabel = "Retry",
   onRetry,
+  error,
 }: ErrorMessageProps) {
+  const t = useTranslations("common")
+  const issueUrl = useIssueReportUrl(error)
+
   const handleRetry = () => {
     if (onRetry) {
       onRetry()
@@ -53,11 +61,32 @@ export default function ErrorMessage({
             </pre>
           </div>
         )}
-        {showReload && (
-          <div style={{ marginTop: "1.5rem" }}>
-            <button type="button" className="btn btn-primary" onClick={handleRetry}>
-              {retryLabel}
-            </button>
+        {(showReload || issueUrl) && (
+          <div
+            style={{
+              marginTop: "1.5rem",
+              display: "flex",
+              gap: "0.75rem",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            {showReload && (
+              <button type="button" className="btn btn-primary" onClick={handleRetry}>
+                {retryLabel}
+              </button>
+            )}
+            {issueUrl && (
+              <a
+                href={issueUrl}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${t("reportThisIssue")} (${t("opensInNewTab")})`}
+                style={{ color: "var(--color-text-secondary)", textDecoration: "underline" }}
+              >
+                {t("reportThisIssue")}
+              </a>
+            )}
           </div>
         )}
       </div>

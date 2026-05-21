@@ -738,7 +738,9 @@
     "noResults": "Keine Ergebnisse gefunden",
     "serverUnavailable": "Verbindung zum Server nicht möglich",
     "serverUnavailableDescription": "Der Inhaltsserver ist derzeit nicht verfügbar. Dies bedeutet in der Regel, dass das Backend nicht läuft oder nicht erreichbar ist.",
-    "tryAgain": "Erneut versuchen"
+    "tryAgain": "Erneut versuchen",
+    "reportThisIssue": "Dieses Problem melden",
+    "opensInNewTab": "wird in neuem Tab geöffnet"
   },
   "nav": {
     "home": "Startseite",
@@ -782,7 +784,8 @@
     "ourArticles": "Unsere Artikel",
     "copyright": "© 2014 - {year} <strong>#play14</strong> entwickelt von <author>Cédric Pontet</author>",
     "privacyPolicy": "Datenschutzerklärung",
-    "termsOfService": "Nutzungsbedingungen"
+    "termsOfService": "Nutzungsbedingungen",
+    "reportAnIssue": "Problem melden"
   },
   "metadata": {
     "title": "#play14 - play is the way",

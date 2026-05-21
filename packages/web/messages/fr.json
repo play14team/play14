@@ -14,7 +14,9 @@
     "noResults": "Aucun résultat trouvé",
     "serverUnavailable": "Impossible de se connecter au serveur",
     "serverUnavailableDescription": "Le serveur de contenu est actuellement indisponible. Cela signifie généralement que le backend n'est pas en cours d'exécution ou n'est pas accessible.",
-    "tryAgain": "Réessayer"
+    "tryAgain": "Réessayer",
+    "reportThisIssue": "Signaler ce problème",
+    "opensInNewTab": "s'ouvre dans un nouvel onglet"
   },
   "nav": {
     "home": "Accueil",
@@ -58,7 +60,8 @@
     "ourArticles": "Nos articles",
     "copyright": "© 2014 - {year} <strong>#play14</strong> développé par <author>Cédric Pontet</author>",
     "privacyPolicy": "Politique de confidentialité",
-    "termsOfService": "Conditions d'utilisation"
+    "termsOfService": "Conditions d'utilisation",
+    "reportAnIssue": "Signaler un problème"
   },
   "home": {
     "powerOfPlay": {
