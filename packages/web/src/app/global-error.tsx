@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { buildIssueReportUrl } from "@/libs/issue-report"
 
 /**
  * Global error boundary that catches errors in the root layout.
@@ -13,8 +14,19 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const [issueUrl, setIssueUrl] = useState<string | null>(null)
+
   useEffect(() => {
     console.error("Global error:", error)
+    setIssueUrl(
+      buildIssueReportUrl({
+        errorMessage: error.message,
+        errorDigest: error.digest,
+        errorStack: error.stack,
+        pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      })
+    )
   }, [error])
 
   return (
@@ -44,23 +56,44 @@ export default function GlobalError({
           >
             An unexpected error occurred. Our team has been notified and is working to fix it.
           </p>
-          <button
-            onClick={reset}
+          <div
             style={{
-              padding: "0.75rem 1.5rem",
-              fontSize: "1rem",
-              backgroundColor: "#0070f3",
-              color: "white",
-              border: "none",
-              borderRadius: "0.5rem",
-              cursor: "pointer",
-              transition: "background-color 0.2s",
+              display: "flex",
+              gap: "1rem",
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "center",
             }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#0060df")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0070f3")}
           >
-            Try again
-          </button>
+            <button
+              type="button"
+              onClick={reset}
+              style={{
+                padding: "0.75rem 1.5rem",
+                fontSize: "1rem",
+                backgroundColor: "#0070f3",
+                color: "white",
+                border: "none",
+                borderRadius: "0.5rem",
+                cursor: "pointer",
+                transition: "background-color 0.2s",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#0060df")}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0070f3")}
+            >
+              Try again
+            </button>
+            {issueUrl && (
+              <a
+                href={issueUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#666", textDecoration: "underline", fontSize: "0.9rem" }}
+              >
+                Report this issue
+              </a>
+            )}
+          </div>
           {error.digest && (
             <p
               style={{

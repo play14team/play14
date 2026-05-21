@@ -738,7 +738,8 @@
     "noResults": "Keine Ergebnisse gefunden",
     "serverUnavailable": "Verbindung zum Server nicht möglich",
     "serverUnavailableDescription": "Der Inhaltsserver ist derzeit nicht verfügbar. Dies bedeutet in der Regel, dass das Backend nicht läuft oder nicht erreichbar ist.",
-    "tryAgain": "Erneut versuchen"
+    "tryAgain": "Erneut versuchen",
+    "reportThisIssue": "Problem melden"
   },
   "nav": {
     "home": "Startseite",

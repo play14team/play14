@@ -14,7 +14,8 @@
     "noResults": "No results found",
     "serverUnavailable": "Unable to connect to server",
     "serverUnavailableDescription": "The content server is currently unavailable. This usually means the backend is not running or not reachable.",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "reportThisIssue": "Report this issue"
   },
   "nav": {
     "home": "Home",

@@ -38,6 +38,7 @@ export default function Error({
         }
         retryLabel={t("tryAgain")}
         onRetry={reset}
+        error={isConnectionError ? undefined : error}
       />
     </div>
   )

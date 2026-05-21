@@ -37,6 +37,7 @@ export default function EventsError({
             : undefined
         }
         onRetry={reset}
+        error={isConnectionError ? undefined : error}
       />
     </Page>
   )

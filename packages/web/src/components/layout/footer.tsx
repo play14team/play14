@@ -3,6 +3,7 @@ import Link from "next/link"
 import { getTranslations } from "next-intl/server"
 import NewsletterSignup from "@/components/newsletter/newsletter-signup"
 import { Link as I18nLink } from "@/i18n/navigation"
+import { buildIssueReportUrl } from "@/libs/issue-report"
 import footerMap from "@/styles/images/footer-map.png"
 import Logo from "./logo"
 
@@ -140,11 +141,7 @@ const Footer = async () => {
                   <I18nLink href="/terms">{t("termsOfService")}</I18nLink>
                 </li>
                 <li>
-                  <Link
-                    href="https://github.com/play14team/play14/issues/new?template=bug_report.yml"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <Link href={buildIssueReportUrl()} target="_blank" rel="noreferrer">
                     {t("reportAnIssue")}
                   </Link>
                 </li>
