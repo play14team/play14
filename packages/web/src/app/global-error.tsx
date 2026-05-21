@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { buildIssueReportUrl } from "@/libs/issue-report"
+import { useEffect } from "react"
+import { useIssueReportUrl } from "@/hooks/use-issue-report-url"
 
 /**
  * Global error boundary that catches errors in the root layout.
@@ -17,19 +17,10 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const [issueUrl, setIssueUrl] = useState<string | null>(null)
+  const issueUrl = useIssueReportUrl(error)
 
   useEffect(() => {
     console.error("Global error:", error)
-    setIssueUrl(
-      buildIssueReportUrl({
-        errorMessage: error.message,
-        errorDigest: error.digest,
-        errorStack: error.stack,
-        pageUrl: window.location.href,
-        userAgent: navigator.userAgent,
-      })
-    )
   }, [error])
 
   return (

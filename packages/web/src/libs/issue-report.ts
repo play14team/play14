@@ -1,3 +1,7 @@
+// Error messages flow verbatim into the public GitHub issue title and body.
+// Keep server-side errors free of PII (email, IP, user input) in `.message`
+// — anything in there will end up pre-filled in the issue form.
+
 const ISSUE_BASE_URL = "https://github.com/play14team/play14/issues/new"
 const TEMPLATE = "bug_report.yml"
 
@@ -17,9 +21,20 @@ function scrubStack(stack: string): string {
   return stack
     .split("\n")
     .map((line) =>
-      line.replace(/\((\/[^)]+)\)/g, "(<path>)").replace(/(^|\s)(\/[^\s)]+)/g, "$1<path>")
+      line
+        .replace(/\((\/[^)]+)\)/g, "(<path>)")
+        .replace(/\(([A-Za-z]:\\[^)]+)\)/g, "(<path>)")
+        .replace(/(^|\s)(\/[^\s)]+)/g, "$1<path>")
+        .replace(/(^|\s)([A-Za-z]:\\[^\s)]+)/g, "$1<path>")
     )
     .join("\n")
+}
+
+function truncateStack(stack: string): string {
+  if (stack.length <= STACK_MAX) return stack
+  const head = stack.slice(0, STACK_MAX)
+  const lastNewline = head.lastIndexOf("\n")
+  return lastNewline > 0 ? `${head.slice(0, lastNewline)}\n…` : `${head}…`
 }
 
 export function buildIssueReportUrl(ctx: IssueReportContext = {}): string {
@@ -50,7 +65,7 @@ export function buildIssueReportUrl(ctx: IssueReportContext = {}): string {
   const additional: string[] = []
   if (ctx.userAgent) additional.push(`**User agent:** ${ctx.userAgent}`)
   if (ctx.errorStack) {
-    const scrubbed = scrubStack(ctx.errorStack).slice(0, STACK_MAX)
+    const scrubbed = truncateStack(scrubStack(ctx.errorStack))
     additional.push(`**Stack trace:**\n\`\`\`\n${scrubbed}\n\`\`\``)
   }
   if (additional.length > 0) {

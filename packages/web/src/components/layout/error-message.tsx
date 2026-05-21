@@ -1,8 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
-import { buildIssueReportUrl } from "@/libs/issue-report"
+import { useIssueReportUrl } from "@/hooks/use-issue-report-url"
 
 interface ErrorMessageProps {
   title?: string
@@ -24,23 +23,7 @@ export default function ErrorMessage({
   error,
 }: ErrorMessageProps) {
   const t = useTranslations("common")
-  const [issueUrl, setIssueUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!error) {
-      setIssueUrl(null)
-      return
-    }
-    setIssueUrl(
-      buildIssueReportUrl({
-        errorMessage: error.message,
-        errorDigest: error.digest,
-        errorStack: error.stack,
-        pageUrl: window.location.href,
-        userAgent: navigator.userAgent,
-      })
-    )
-  }, [error])
+  const issueUrl = useIssueReportUrl(error)
 
   const handleRetry = () => {
     if (onRetry) {

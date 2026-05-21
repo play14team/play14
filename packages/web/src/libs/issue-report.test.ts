@@ -56,6 +56,28 @@ describe("buildIssueReportUrl", () => {
     expect(context.length).toBeLessThan(2500)
   })
 
+  it("truncates the stack at a newline boundary with an ellipsis", () => {
+    const stack = `${"abc\n".repeat(700)}finalframe-that-should-be-cut`
+    const url = new URL(buildIssueReportUrl({ errorStack: stack }))
+    const context = url.searchParams.get("additional-context") ?? ""
+    const stackBlock = context.match(/```\n([\s\S]+?)\n```/)?.[1] ?? ""
+    expect(stackBlock).not.toContain("finalframe-that-should-be-cut")
+    expect(stackBlock.endsWith("…")).toBe(true)
+    expect(stackBlock).toMatch(/\nabc\n…$/)
+  })
+
+  it("scrubs Windows-style absolute paths from the stack trace", () => {
+    const stack = [
+      "Error: boom",
+      "    at handler (C:\\Users\\alice\\play14\\foo.ts:12:5)",
+      "    at C:\\Users\\alice\\play14\\bar.ts:99:1",
+    ].join("\n")
+    const url = new URL(buildIssueReportUrl({ errorStack: stack }))
+    const context = url.searchParams.get("additional-context") ?? ""
+    expect(context).not.toContain("C:\\Users")
+    expect(context).toContain("<path>")
+  })
+
   it("joins user agent and stack trace into a single additional-context block", () => {
     const url = new URL(
       buildIssueReportUrl({
