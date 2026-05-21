@@ -6,6 +6,9 @@ import { buildIssueReportUrl } from "@/libs/issue-report"
 /**
  * Global error boundary that catches errors in the root layout.
  * This is a fallback for errors that escape all other error boundaries.
+ *
+ * Renders outside the next-intl provider, so user-facing strings are
+ * intentionally hardcoded in English — `useTranslations` is not available.
  */
 export default function GlobalError({
   error,

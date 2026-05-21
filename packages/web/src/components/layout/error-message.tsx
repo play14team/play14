@@ -11,7 +11,7 @@ interface ErrorMessageProps {
   showReload?: boolean
   retryLabel?: string
   onRetry?: () => void
-  error?: { message?: string; digest?: string; stack?: string }
+  error?: Error & { digest?: string }
 }
 
 export default function ErrorMessage({
@@ -24,24 +24,23 @@ export default function ErrorMessage({
   error,
 }: ErrorMessageProps) {
   const t = useTranslations("common")
-  const showReportLink = Boolean(error)
   const [issueUrl, setIssueUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!showReportLink) {
+    if (!error) {
       setIssueUrl(null)
       return
     }
     setIssueUrl(
       buildIssueReportUrl({
-        errorMessage: error?.message,
-        errorDigest: error?.digest,
-        errorStack: error?.stack,
+        errorMessage: error.message,
+        errorDigest: error.digest,
+        errorStack: error.stack,
         pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
         userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
       })
     )
-  }, [showReportLink, error?.message, error?.digest, error?.stack])
+  }, [error])
 
   const handleRetry = () => {
     if (onRetry) {
