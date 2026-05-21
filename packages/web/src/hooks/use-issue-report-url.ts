@@ -7,7 +7,7 @@ import { buildIssueReportUrl, issueReportContextFromError } from "@/libs/issue-r
 export function useIssueReportUrl(error: (Error & { digest?: string }) | undefined): string | null {
   const [issueUrl, setIssueUrl] = useState<string | null>(null)
 
-  // [error] is stable per boundary — Next.js hands the same Error instance until reset() runs.
+  // New Error reference → re-derive the URL; same reference → no-op. Correct in either case.
   useEffect(() => {
     if (!error) {
       setIssueUrl(null)

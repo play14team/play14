@@ -31,10 +31,10 @@ export function issueReportContextFromError(
   }
 }
 
-// Match absolute filesystem paths anchored at recognisable roots so we don't
-// accidentally scrub URL paths (e.g. `https://host/foo`) — only paths starting
-// at typical Unix roots or with a Windows drive letter are redacted.
-const UNIX_PATH_RE = /\/(?:home|Users|usr|var|tmp|opt|etc|root|app|srv|mnt|runner)\/[^\s'")]+/g
+// Match absolute filesystem paths anywhere they appear. The negative lookbehind
+// for `/` and `:` skips URL hosts (`https://host`) so we don't redact the scheme
+// or its `//`, while still catching every Unix root (`/home`, `/workspace`, …).
+const UNIX_PATH_RE = /(?<![/:])\/[a-zA-Z_][a-zA-Z0-9._-]*(?:\/[^\s'")]*)+/g
 const WINDOWS_PATH_RE = /[A-Za-z]:\\[^\s'")]+/g
 
 function scrubPaths(line: string): string {

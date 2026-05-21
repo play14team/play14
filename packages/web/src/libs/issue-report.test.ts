@@ -66,6 +66,30 @@ describe("buildIssueReportUrl", () => {
     expect(stackBlock).toMatch(/\nabc\n…$/)
   })
 
+  it("scrubs absolute paths regardless of their root segment", () => {
+    const stack = [
+      "Error: boom",
+      "    at writer (/workspace/builds/play14/foo.ts:1:1)",
+      "    at proc (/proc/self/fd/3:2:2)",
+    ].join("\n")
+    const url = new URL(buildIssueReportUrl({ errorStack: stack }))
+    const context = url.searchParams.get("additional-context") ?? ""
+    expect(context).not.toContain("/workspace/builds")
+    expect(context).not.toContain("/proc/self")
+    expect(context.match(/<path>/g)?.length ?? 0).toBeGreaterThanOrEqual(2)
+  })
+
+  it("does not rewrite the scheme of URLs that appear in error text", () => {
+    // The lookbehind in UNIX_PATH_RE skips the `://` in scheme-based URLs so
+    // `https://host/...` keeps its scheme. The path suffix may still be
+    // redacted — acceptable since `pageUrl` carries the canonical URL separately.
+    const url = new URL(
+      buildIssueReportUrl({ errorMessage: "fetch failed: GET https://api.play14.org/events" })
+    )
+    const what = url.searchParams.get("what-happened") ?? ""
+    expect(what).toContain("https://api.play14.org")
+  })
+
   it("scrubs Windows-style absolute paths from the stack trace", () => {
     const stack = [
       "Error: boom",

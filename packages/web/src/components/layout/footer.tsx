@@ -31,7 +31,7 @@ const socialLinks = [
 ]
 
 const Footer = async () => {
-  const t = await getTranslations("footer")
+  const tFooter = await getTranslations("footer")
   const tCommon = await getTranslations("common")
   const currentYear = new Date().getFullYear()
 
@@ -44,7 +44,7 @@ const Footer = async () => {
               <I18nLink href="/" className="logo d-inline-block">
                 <Logo width={250} height={83} />
               </I18nLink>
-              <p className="mt-3">{t("tagline")}</p>
+              <p className="mt-3">{tFooter("tagline")}</p>
 
               <ul className="social-link justify-content-center">
                 {socialLinks.map((action, index) => {
@@ -68,24 +68,24 @@ const Footer = async () => {
 
           <div className="col-lg-4 col-sm-6">
             <div className="single-footer-widget">
-              <h3>{t("stayUpdated")}</h3>
+              <h3>{tFooter("stayUpdated")}</h3>
               <NewsletterSignup source="footer" />
             </div>
           </div>
 
           <div className="col-lg-2 col-sm-6 ps-lg-5">
             <div className="single-footer-widget">
-              <h3>{t("explore")}</h3>
+              <h3>{tFooter("explore")}</h3>
 
               <ul className="footer-links-list">
                 <li>
-                  <I18nLink href="/">{t("home")}</I18nLink>
+                  <I18nLink href="/">{tFooter("home")}</I18nLink>
                 </li>
                 <li>
-                  <I18nLink href="/about/story">{t("about")}</I18nLink>
+                  <I18nLink href="/about/story">{tFooter("about")}</I18nLink>
                 </li>
                 <li>
-                  <I18nLink href="/contact">{t("contact")}</I18nLink>
+                  <I18nLink href="/contact">{tFooter("contact")}</I18nLink>
                 </li>
               </ul>
             </div>
@@ -93,20 +93,20 @@ const Footer = async () => {
 
           <div className="col-lg-3 col-sm-6">
             <div className="single-footer-widget">
-              <h3>{t("resources")}</h3>
+              <h3>{tFooter("resources")}</h3>
 
               <ul className="footer-links-list">
                 <li>
-                  <I18nLink href="/events">{t("ourEvents")}</I18nLink>
+                  <I18nLink href="/events">{tFooter("ourEvents")}</I18nLink>
                 </li>
                 <li>
-                  <I18nLink href="/players">{t("ourPlayers")}</I18nLink>
+                  <I18nLink href="/players">{tFooter("ourPlayers")}</I18nLink>
                 </li>
                 <li>
-                  <I18nLink href="/games">{t("ourGames")}</I18nLink>
+                  <I18nLink href="/games">{tFooter("ourGames")}</I18nLink>
                 </li>
                 <li>
-                  <I18nLink href="/articles">{t("ourArticles")}</I18nLink>
+                  <I18nLink href="/articles">{tFooter("ourArticles")}</I18nLink>
                 </li>
               </ul>
             </div>
@@ -117,7 +117,7 @@ const Footer = async () => {
           <div className="row align-items-center">
             <div className="col-lg-6 col-md-6">
               <p>
-                {t.rich("copyright", {
+                {tFooter.rich("copyright", {
                   year: currentYear,
                   strong: (chunks) => <strong>{chunks}</strong>,
                   author: (chunks) => (
@@ -136,10 +136,10 @@ const Footer = async () => {
             <div className="col-lg-6 col-md-6">
               <ul>
                 <li>
-                  <I18nLink href="/privacy">{t("privacyPolicy")}</I18nLink>
+                  <I18nLink href="/privacy">{tFooter("privacyPolicy")}</I18nLink>
                 </li>
                 <li>
-                  <I18nLink href="/terms">{t("termsOfService")}</I18nLink>
+                  <I18nLink href="/terms">{tFooter("termsOfService")}</I18nLink>
                 </li>
                 <li>
                   {/* buildIssueReportUrl with no args — hook unavailable in Server Components. */}
@@ -147,9 +147,9 @@ const Footer = async () => {
                     href={buildIssueReportUrl()}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label={`${t("reportAnIssue")} (${tCommon("opensInNewTab")})`}
+                    aria-label={`${tFooter("reportAnIssue")} (${tCommon("opensInNewTab")})`}
                   >
-                    {t("reportAnIssue")}
+                    {tFooter("reportAnIssue")}
                   </a>
                 </li>
               </ul>
