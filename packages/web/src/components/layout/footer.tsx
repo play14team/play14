@@ -141,12 +141,9 @@ const Footer = async () => {
                   <I18nLink href="/terms">{t("termsOfService")}</I18nLink>
                 </li>
                 <li>
-                  <Link
-                    href={buildIssueReportUrl()}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`${t("reportAnIssue")} (opens in new tab)`}
-                  >
+                  {/* Server-rendered: the footer link is intentionally static. Don't add
+                      window-dependent context here — it would break SSR. */}
+                  <Link href={buildIssueReportUrl()} target="_blank" rel="noreferrer">
                     {t("reportAnIssue")}
                   </Link>
                 </li>

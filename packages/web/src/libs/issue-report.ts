@@ -60,8 +60,10 @@ export function buildIssueReportUrl(ctx: IssueReportContext = {}): string {
   const url = `${ISSUE_BASE_URL}?${params.toString()}`
   if (url.length <= URL_MAX) return url
 
-  // Drop the verbose section first; if still too long, fall back to a hard slice.
+  // Drop the verbose section first; if even that's not enough (e.g. a page URL
+  // longer than ~8 KB), fall back to the bare template so the link stays
+  // navigable rather than slicing inside a percent-encoded sequence.
   params.delete("additional-context")
   const shorter = `${ISSUE_BASE_URL}?${params.toString()}`
-  return shorter.length <= URL_MAX ? shorter : shorter.slice(0, URL_MAX)
+  return shorter.length <= URL_MAX ? shorter : `${ISSUE_BASE_URL}?template=${TEMPLATE}`
 }

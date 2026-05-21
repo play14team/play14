@@ -94,4 +94,14 @@ describe("buildIssueReportUrl", () => {
     expect(url.length).toBeLessThanOrEqual(8000)
     expect(new URL(url).searchParams.has("additional-context")).toBe(false)
   })
+
+  it("falls back to the bare template when even the trimmed URL is too long", () => {
+    // A 10 KB pageUrl alone exceeds the limit; the builder should return a
+    // bare-template URL rather than slice mid percent-encoding.
+    const url = buildIssueReportUrl({
+      pageUrl: `https://play14.org/${"x".repeat(10_000)}`,
+    })
+    expect(url).toBe("https://github.com/play14team/play14/issues/new?template=bug_report.yml")
+    expect(new URL(url).searchParams.get("template")).toBe("bug_report.yml")
+  })
 })

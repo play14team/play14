@@ -98,7 +98,6 @@ export default function ErrorMessage({
                 href={issueUrl}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={`${t("reportThisIssue")} (opens in new tab)`}
                 style={{ color: "var(--color-text-secondary)", textDecoration: "underline" }}
               >
                 {t("reportThisIssue")}
