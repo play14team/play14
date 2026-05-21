@@ -69,4 +69,29 @@ describe("buildIssueReportUrl", () => {
     expect(context).toContain("at fn (file.ts:1:1)")
     expect(context.indexOf("Mozilla/5.0")).toBeLessThan(context.indexOf("Stack trace:"))
   })
+
+  it("scrubs absolute filesystem paths from the stack trace", () => {
+    const stack = [
+      "Error: boom",
+      "    at handler (/home/user/play14/packages/web/src/foo.ts:12:5)",
+      "    at /home/user/play14/node_modules/next/dist/server.js:99:1",
+    ].join("\n")
+    const url = new URL(buildIssueReportUrl({ errorStack: stack }))
+    const context = url.searchParams.get("additional-context") ?? ""
+    expect(context).not.toContain("/home/user/play14")
+    expect(context).toContain("<path>")
+  })
+
+  it("drops additional-context when the final URL would exceed GitHub's limit", () => {
+    // A very long pageUrl bypasses every per-field cap, so the URL builder must
+    // fall back to dropping the verbose additional-context block to stay short.
+    const url = buildIssueReportUrl({
+      errorMessage: "boom",
+      pageUrl: `https://play14.org/${"x".repeat(6000)}`,
+      errorStack: "y".repeat(2000),
+      userAgent: "Mozilla/5.0",
+    })
+    expect(url.length).toBeLessThanOrEqual(8000)
+    expect(new URL(url).searchParams.has("additional-context")).toBe(false)
+  })
 })

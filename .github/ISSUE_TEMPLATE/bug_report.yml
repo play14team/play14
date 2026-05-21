@@ -1,7 +1,7 @@
 name: Bug report
 description: Report a problem with the #play14 website
 title: "[Bug]: "
-labels: ["bug", "from-website"]
+labels: ["bug"]
 body:
   - type: markdown
     attributes:

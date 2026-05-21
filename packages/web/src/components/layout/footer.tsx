@@ -141,7 +141,12 @@ const Footer = async () => {
                   <I18nLink href="/terms">{t("termsOfService")}</I18nLink>
                 </li>
                 <li>
-                  <Link href={buildIssueReportUrl()} target="_blank" rel="noreferrer">
+                  <Link
+                    href={buildIssueReportUrl()}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${t("reportAnIssue")} (opens in new tab)`}
+                  >
                     {t("reportAnIssue")}
                   </Link>
                 </li>

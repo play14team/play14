@@ -26,8 +26,8 @@ export default function GlobalError({
         errorMessage: error.message,
         errorDigest: error.digest,
         errorStack: error.stack,
-        pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+        pageUrl: window.location.href,
+        userAgent: navigator.userAgent,
       })
     )
   }, [error])
@@ -91,6 +91,7 @@ export default function GlobalError({
                 href={issueUrl}
                 target="_blank"
                 rel="noreferrer"
+                aria-label="Report this issue (opens in new tab)"
                 style={{ color: "#888", textDecoration: "underline", fontSize: "0.875rem" }}
               >
                 Report this issue

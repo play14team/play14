@@ -36,8 +36,8 @@ export default function ErrorMessage({
         errorMessage: error.message,
         errorDigest: error.digest,
         errorStack: error.stack,
-        pageUrl: typeof window !== "undefined" ? window.location.href : undefined,
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+        pageUrl: window.location.href,
+        userAgent: navigator.userAgent,
       })
     )
   }, [error])
@@ -98,6 +98,7 @@ export default function ErrorMessage({
                 href={issueUrl}
                 target="_blank"
                 rel="noreferrer"
+                aria-label={`${t("reportThisIssue")} (opens in new tab)`}
                 style={{ color: "var(--color-text-secondary)", textDecoration: "underline" }}
               >
                 {t("reportThisIssue")}
