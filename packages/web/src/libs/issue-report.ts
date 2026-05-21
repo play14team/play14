@@ -34,7 +34,7 @@ export function issueReportContextFromError(
 // Match absolute filesystem paths anchored at recognisable roots so we don't
 // accidentally scrub URL paths (e.g. `https://host/foo`) — only paths starting
 // at typical Unix roots or with a Windows drive letter are redacted.
-const UNIX_PATH_RE = /\/(?:home|Users|usr|var|tmp|opt|etc|root|app|srv|mnt)\/[^\s'")]+/g
+const UNIX_PATH_RE = /\/(?:home|Users|usr|var|tmp|opt|etc|root|app|srv|mnt|runner)\/[^\s'")]+/g
 const WINDOWS_PATH_RE = /[A-Za-z]:\\[^\s'")]+/g
 
 function scrubPaths(line: string): string {

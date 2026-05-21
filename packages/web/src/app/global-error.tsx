@@ -3,13 +3,7 @@
 import { useEffect } from "react"
 import { useIssueReportUrl } from "@/hooks/use-issue-report-url"
 
-/**
- * Global error boundary that catches errors in the root layout.
- * This is a fallback for errors that escape all other error boundaries.
- *
- * Renders outside the next-intl provider, so user-facing strings are
- * intentionally hardcoded in English — `useTranslations` is not available.
- */
+// Renders outside the next-intl provider — strings are intentionally hardcoded in English.
 export default function GlobalError({
   error,
   reset,
