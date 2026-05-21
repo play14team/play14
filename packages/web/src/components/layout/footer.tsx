@@ -139,6 +139,15 @@ const Footer = async () => {
                 <li>
                   <I18nLink href="/terms">{t("termsOfService")}</I18nLink>
                 </li>
+                <li>
+                  <Link
+                    href="https://github.com/play14team/play14/issues/new?template=bug_report.yml"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t("reportAnIssue")}
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

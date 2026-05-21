@@ -782,7 +782,8 @@
     "ourArticles": "Unsere Artikel",
     "copyright": "© 2014 - {year} <strong>#play14</strong> entwickelt von <author>Cédric Pontet</author>",
     "privacyPolicy": "Datenschutzerklärung",
-    "termsOfService": "Nutzungsbedingungen"
+    "termsOfService": "Nutzungsbedingungen",
+    "reportAnIssue": "Problem melden"
   },
   "metadata": {
     "title": "#play14 - play is the way",

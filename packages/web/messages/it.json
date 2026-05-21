@@ -58,7 +58,8 @@
     "ourArticles": "I nostri articoli",
     "copyright": "© 2014 - {year} <strong>#play14</strong> sviluppato da <author>Cédric Pontet</author>",
     "privacyPolicy": "Informativa sulla privacy",
-    "termsOfService": "Termini di servizio"
+    "termsOfService": "Termini di servizio",
+    "reportAnIssue": "Segnala un problema"
   },
   "home": {
     "powerOfPlay": {
