@@ -13,6 +13,8 @@ import { buildIssueReportUrl } from "@/libs/issue-report"
 export function useIssueReportUrl(error: (Error & { digest?: string }) | undefined): string | null {
   const [issueUrl, setIssueUrl] = useState<string | null>(null)
 
+  // [error] is a stable reference per render of an error boundary — Next.js
+  // hands the same Error instance on every re-render until reset() runs.
   useEffect(() => {
     if (!error) {
       setIssueUrl(null)
@@ -23,7 +25,9 @@ export function useIssueReportUrl(error: (Error & { digest?: string }) | undefin
         errorMessage: error.message,
         errorDigest: error.digest,
         errorStack: error.stack,
-        pageUrl: window.location.href,
+        // Strip query + hash so auth tokens / search terms / IDs in the
+        // current URL don't get pre-filled into the public issue body.
+        pageUrl: `${window.location.origin}${window.location.pathname}`,
         userAgent: navigator.userAgent,
       })
     )

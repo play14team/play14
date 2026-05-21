@@ -1,6 +1,4 @@
-// Error messages flow verbatim into the public GitHub issue title and body.
-// Keep server-side errors free of PII (email, IP, user input) in `.message`
-// — anything in there will end up pre-filled in the issue form.
+// NOTE: errorMessage and pageUrl flow verbatim into a public GitHub issue — keep them free of PII.
 
 const ISSUE_BASE_URL = "https://github.com/play14team/play14/issues/new"
 const TEMPLATE = "bug_report.yml"

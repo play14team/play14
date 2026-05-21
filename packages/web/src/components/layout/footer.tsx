@@ -32,6 +32,7 @@ const socialLinks = [
 
 const Footer = async () => {
   const t = await getTranslations("footer")
+  const tCommon = await getTranslations("common")
   const currentYear = new Date().getFullYear()
 
   return (
@@ -142,7 +143,12 @@ const Footer = async () => {
                 </li>
                 <li>
                   {/* Server-rendered: keep this URL context-free, no window/navigator. */}
-                  <a href={buildIssueReportUrl()} target="_blank" rel="noreferrer">
+                  <a
+                    href={buildIssueReportUrl()}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${t("reportAnIssue")} (${tCommon("opensInNewTab")})`}
+                  >
                     {t("reportAnIssue")}
                   </a>
                 </li>

@@ -15,7 +15,8 @@
     "serverUnavailable": "Impossibile connettersi al server",
     "serverUnavailableDescription": "Il server dei contenuti non è attualmente disponibile. Di solito significa che il backend non è in esecuzione o non è raggiungibile.",
     "tryAgain": "Riprova",
-    "reportThisIssue": "Segnala questo problema"
+    "reportThisIssue": "Segnala questo problema",
+    "opensInNewTab": "si apre in una nuova scheda"
   },
   "nav": {
     "home": "Home",

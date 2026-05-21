@@ -15,7 +15,8 @@
     "serverUnavailable": "Unable to connect to server",
     "serverUnavailableDescription": "The content server is currently unavailable. This usually means the backend is not running or not reachable.",
     "tryAgain": "Try again",
-    "reportThisIssue": "Report this issue"
+    "reportThisIssue": "Report this issue",
+    "opensInNewTab": "opens in new tab"
   },
   "nav": {
     "home": "Home",

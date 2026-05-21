@@ -739,7 +739,8 @@
     "serverUnavailable": "Verbindung zum Server nicht möglich",
     "serverUnavailableDescription": "Der Inhaltsserver ist derzeit nicht verfügbar. Dies bedeutet in der Regel, dass das Backend nicht läuft oder nicht erreichbar ist.",
     "tryAgain": "Erneut versuchen",
-    "reportThisIssue": "Dieses Problem melden"
+    "reportThisIssue": "Dieses Problem melden",
+    "opensInNewTab": "wird in neuem Tab geöffnet"
   },
   "nav": {
     "home": "Startseite",
