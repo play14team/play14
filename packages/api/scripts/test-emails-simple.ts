@@ -292,7 +292,7 @@ async function sendTestEmails() {
         },
         body: JSON.stringify({
           from: parseFromEmail(FROM_EMAIL),
-          to: { email: TEST_EMAIL },
+          to: TEST_EMAIL,
           subject: `${subjectPrefix} ${subject}`,
           html,
           text,

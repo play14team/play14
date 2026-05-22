@@ -92,6 +92,33 @@ export function buildApiUrl(pathTemplate: string, params: Record<string, string>
 const STRAPI_REST_ENDPOINT = `${(process.env.STRAPI_API_URL || "http://localhost:1337").replace(/\/$/, "")}/api`
 
 /**
+ * Extract the Strapi error message from a thrown error.
+ *
+ * `@strapi/client` throws an `HTTPError` on non-2xx responses whose `.message`
+ * is the generic `"Request failed with status code N <Statustext>: METHOD <url>"`
+ * format — it does NOT include the body. The underlying Response is attached
+ * as `.response`, so we read the JSON body and surface
+ * `errorData.error.message` instead.
+ */
+export async function extractApiError(
+  error: unknown
+): Promise<{ message: string; status: number }> {
+  const fallbackMessage = error instanceof Error ? error.message : "Unknown error occurred"
+  const response = (error as { response?: Response } | null)?.response
+  if (!(response instanceof Response)) {
+    return { message: fallbackMessage, status: 0 }
+  }
+  const errorData = (await response
+    .clone()
+    .json()
+    .catch(() => ({}))) as { error?: { message?: string } }
+  return {
+    message: errorData?.error?.message || fallbackMessage,
+    status: response.status,
+  }
+}
+
+/**
  * Fetch with timeout to prevent hanging connections
  */
 async function fetchWithTimeout(
@@ -551,20 +578,11 @@ export async function strapiFetch<T>(
       data,
     }
   } catch (error) {
-    // Handle "Not authenticated" error for non-auth endpoints gracefully
-    if (noAuth || optionalAuth) {
-      // If auth fails and it's optional, return error result
-      const errorMsg = error instanceof Error ? error.message : "Unknown error occurred"
-      return {
-        ok: false,
-        status: 0,
-        error: errorMsg,
-      }
-    }
+    const { message, status } = await extractApiError(error)
     return {
       ok: false,
-      status: 0,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      status,
+      error: message,
     }
   }
 }
@@ -687,18 +705,11 @@ export async function strapiFetchWithQuery<T>(
       data,
     }
   } catch (error) {
-    if (noAuth || optionalAuth) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error occurred"
-      return {
-        ok: false,
-        status: 0,
-        error: errorMsg,
-      }
-    }
+    const { message, status } = await extractApiError(error)
     return {
       ok: false,
-      status: 0,
-      error: error instanceof Error ? error.message : "Unknown error occurred",
+      status,
+      error: message,
     }
   }
 }

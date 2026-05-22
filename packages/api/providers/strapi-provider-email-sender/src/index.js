@@ -41,14 +41,42 @@ function parseEmailAddress(address) {
 }
 
 /**
- * Normalize a recipient value (string | string[]) into the shape Sender.net expects.
- * A plain string maps to a single `{ email }` object; an array maps to `[{ email }, ...]`.
+ * Normalize a recipient value (string | string[] | object | object[]) into the
+ * shape Sender.net's `/v2/message/send` endpoint accepts for `to` / `reply_to`.
+ *
+ * Sender.net validates each recipient as either:
+ *   - a plain email string (`"alice@example.com"`), or
+ *   - an `{ email, name }` object — BOTH keys must be present.
+ *
+ * The `{ email }` shape we used previously is silently tolerated for the
+ * single-object form but rejected with HTTP 422
+ *   { "message": "email address must be either email string or
+ *                 {email, name} object", "type": "validation" }
+ * as soon as `to` is an array (e.g. multi-admin claim notifications). To stay
+ * inside the accepted set in every case we coerce each address to a plain
+ * email string here; the brand/sender name still travels via the `from`
+ * field which always carries `{ email, name }`.
  */
+function toRecipient(value) {
+  if (typeof value === "string") return value
+  if (value && typeof value === "object" && typeof value.email === "string") {
+    return value.email
+  }
+  // Don't silently pass through — null/undefined/numbers would still reach
+  // Sender.net and trip a 422 with no breadcrumb. Throw at the boundary so
+  // the caller's stack trace points at the bad input.
+  throw new TypeError(
+    `Invalid Sender.net recipient: expected a string or { email } object, got ${
+      value === null ? "null" : typeof value
+    }`
+  )
+}
+
 function toRecipients(value) {
   if (Array.isArray(value)) {
-    return value.map((addr) => ({ email: addr }))
+    return value.map(toRecipient)
   }
-  return { email: value }
+  return toRecipient(value)
 }
 
 /**

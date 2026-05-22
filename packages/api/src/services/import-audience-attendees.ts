@@ -5,6 +5,7 @@ import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 import { nameToUsername } from "../libs/strings"
 import { sendUserInvitationAndUpdateStatus } from "./user-invitations"
+import { findUserByEmail } from "./users-permissions/find-user-by-email"
 
 type ContactSource = "attendee" | "mailchimp"
 
@@ -40,6 +41,10 @@ interface UserRecord {
   username?: string
   player?: PlayerRecord | null
   planned?: boolean
+  // Set to true when we reuse an existing user whose invitation has already
+  // been accepted, so the invitation loop below skips them instead of
+  // re-sending a "set your password" email to a confirmed account.
+  skipInvitation?: boolean
 }
 
 export interface ImportReportRow {
@@ -936,6 +941,57 @@ export async function runAudienceAttendeeImport(
     if (!user?.planned) continue
 
     try {
+      // Reuse any existing user with this email (case-insensitive) instead of
+      // minting a duplicate. Direct `documents().create()` bypasses the
+      // users-permissions `unique_email` setting, and the LOWER(email) UNIQUE
+      // INDEX would otherwise throw on insert.
+      const existing = (await findUserByEmail(strapi, user.email, { player: true })) as {
+        id: number
+        documentId: string
+        invitationStatus?: string
+        player?: { id?: number } | null
+      } | null
+
+      if (existing) {
+        // Refuse to silently rebind the user to a different player than they
+        // already own — surface the conflict so the operator can fix it in
+        // the spreadsheet or the admin UI. Mirrors the policy in
+        // custom-player.ts:1421-1423.
+        if (user.player?.id && existing.player?.id && existing.player.id !== user.player.id) {
+          const message = `Email already linked to a different player (existing player id=${existing.player.id}, import row player id=${user.player.id})`
+          strapi.log.warn(`[Import] ${user.email}: ${message}`)
+          errors.push({
+            email: user.email,
+            name: action.playerName,
+            operation: "createUser",
+            message,
+          })
+          continue
+        }
+        // Don't re-send an invitation to a user who has already accepted —
+        // that would email them a fresh password-reset link unprompted. They
+        // can still log in normally; the import goal (have a user linked to
+        // this player) is already met.
+        if (existing.invitationStatus === "accepted") {
+          user.skipInvitation = true
+        }
+        strapi.log.info(
+          `[Import] Reusing existing user ${existing.documentId} for ${user.email} ` +
+            `(was about to create a duplicate; invitationStatus=${existing.invitationStatus ?? "unset"}` +
+            `${user.skipInvitation ? "; skipping invitation email" : ""})`
+        )
+        if (user.player?.id && !existing.player?.id) {
+          await strapi.documents("plugin::users-permissions.user").update({
+            documentId: existing.documentId,
+            data: { player: user.player.id } as any,
+          })
+        }
+        user.id = existing.id
+        user.documentId = existing.documentId
+        user.planned = false
+        continue
+      }
+
       const password = `${crypto.randomBytes(16).toString("hex")}!`
 
       // Determine role based on player's position
@@ -1025,6 +1081,9 @@ export async function runAudienceAttendeeImport(
   for (const action of actions.createUsers) {
     const user = usersByEmail.get(action.email)
     if (!user?.documentId) continue
+    // Skip invitation for reused users whose invitation has already been
+    // accepted (see `skipInvitation` set in the createUsers loop above).
+    if (user.skipInvitation) continue
 
     const success = await sendUserInvitationAndUpdateStatus(strapi, {
       documentId: user.documentId,

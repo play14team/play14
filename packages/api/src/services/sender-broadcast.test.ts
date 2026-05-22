@@ -268,7 +268,11 @@ describe("sendTestEmail", () => {
     expect(result).toEqual({ success: true })
     const body = JSON.parse(fetchMock.mock.calls[0][1].body)
     expect(body.from).toEqual({ email: "noreply@play14.org", name: "#play14 community" })
-    expect(body.to).toEqual({ email: "user@example.com" })
+    // Sender.net rejects `{email}` alone — recipients must be plain strings
+    // (or `{email, name}` with both keys). Keep this assertion strict so we
+    // don't regress to the old broken shape that broke multi-admin sends.
+    expect(body.to).toBe("user@example.com")
+    expect(body.reply_to).toBe("community@play14.org")
     expect(body.subject).toBe("[TEST] Hi")
   })
 

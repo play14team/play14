@@ -219,52 +219,129 @@ export default (plugin: StrapiPlugin) => {
     const service = originalProvidersFactory.apply(this, args as [])
     const originalConnect = service.connect.bind(service)
 
+    // Resolve the OAuth profile email so we can look up an existing user
+    // BEFORE calling `originalConnect`. We cache the result in `profileEmail`
+    // and reuse it in the safety-net catch instead of fetching the profile a
+    // second time there.
+    //
+    // Trade-off — there are still TWO profile fetches per first-time login
+    // (one here, one inside `originalConnect`), because `originalConnect` is
+    // a plugin black box that always re-fetches internally. We accept that
+    // because every OAuth provider currently wired up in this project
+    // (Google, GitHub, Microsoft, LinkedIn) issues access tokens that can be
+    // re-presented to the user-info endpoint until they expire — they're not
+    // single-use. If a future provider is added with single-use access tokens
+    // (e.g. some PKCE-only flows), this assumption breaks and the second
+    // fetch inside `originalConnect` will fail with a token error that this
+    // catch does NOT swallow. In that case either drop the proactive fetch
+    // for that provider or patch `originalConnect` directly.
+    const resolveProfileEmail = async (
+      provider: string,
+      query: Record<string, unknown>
+    ): Promise<string | null> => {
+      try {
+        const providersRegistry = strapi.plugin("users-permissions").service("providers-registry")
+        const profile = await providersRegistry.run({
+          provider,
+          accessToken: query.access_token,
+          query,
+          providers: providersRegistry.getAll(),
+        })
+        return typeof profile?.email === "string" ? profile.email.toLowerCase() : null
+      } catch (error) {
+        const errName = error instanceof Error ? error.name : typeof error
+        const errMsg = error instanceof Error ? error.message : String(error)
+        strapi.log.warn(
+          `[OAuth] Profile email resolution failed for provider=${provider}: ${errName}: ${errMsg}`
+        )
+        return null
+      }
+    }
+
+    // Proactive dedupe: look up an existing user by the OAuth profile email
+    // BEFORE delegating to the upstream `connect`. This guards against
+    // duplicate user rows even when the users-permissions `unique_email`
+    // setting is not enforced in the live core store (config drift), or when
+    // a previous user was created by a non-OAuth code path (player auto-link,
+    // CSV import, etc.).
+    //
+    // Side effect of bypassing `originalConnect`: the matching user's
+    // `provider`, `access_token`, `refresh_token`, and `expires_in` fields
+    // stay frozen at whatever was written on the original signup. For our
+    // current use-case (we never call provider APIs on behalf of the user;
+    // OAuth is purely for authentication) this is fine. If we ever need a
+    // live access token (e.g. to read a Google Calendar), revisit this:
+    // either re-run the upstream token-update logic after the merge, or
+    // refactor to patch `originalConnect` rather than short-circuiting it.
+    //
+    // Security: only an `confirmed: true` user is merged. An unconfirmed local
+    // row is never silently bound to an OAuth login — that would let an
+    // attacker take over an account by registering its email at any IdP that
+    // happens to issue it. If `originalConnect` then runs and Strapi's own
+    // checks reject the unconfirmed row, the operator gets a meaningful error;
+    // they don't get a silent merge.
+    //
+    // `findFirst` sorted by `createdAt` ascending picks the oldest matching
+    // user — matches `pickCanonical()` in scripts/cleanup-duplicate-users.ts
+    // so the OAuth wrapper and the cleanup never disagree on which row is
+    // canonical.
+    const lookupExistingByEmail = async (
+      email: string,
+      provider: string
+    ): Promise<UserRecord | null> => {
+      // Case-insensitive equality — the email is already lowercased by
+      // resolveProfileEmail, so `$eqi` is effectively a no-op for matching,
+      // but it documents intent and stays in sync with `findUserByEmail`
+      // (the only other email-lookup helper in the codebase).
+      const existing = (await strapi.documents("plugin::users-permissions.user").findFirst({
+        filters: { email: { $eqi: email } } as any,
+        populate: { role: true, player: true } as any,
+        sort: { createdAt: "asc" },
+      })) as (UserRecord & { confirmed?: boolean }) | null
+      if (!existing) return null
+      if (!existing.confirmed) {
+        strapi.log.warn(
+          `[OAuth] User ${email} via ${provider} matches an unconfirmed account (id=${existing.id}); refusing silent merge to prevent account-takeover-by-OAuth`
+        )
+        return null
+      }
+      strapi.log.info(
+        `[OAuth] User ${email} logged in via ${provider}, reusing existing account ` +
+          `(original provider: ${existing.provider}; access/refresh tokens were NOT ` +
+          `refreshed because originalConnect was bypassed — see strapi-server.ts comment)`
+      )
+      return existing
+    }
+
     // Wrap the connect method
     service.connect = async (
       provider: string,
       query: Record<string, unknown>
     ): Promise<UserRecord> => {
-      let user: UserRecord
+      const profileEmail = await resolveProfileEmail(provider, query)
+      let user: UserRecord | null = profileEmail
+        ? await lookupExistingByEmail(profileEmail, provider)
+        : null
 
-      try {
-        // Try the original connect
-        user = await originalConnect(provider, query)
-      } catch (error: unknown) {
-        const err = error as { message?: string }
-        // Check if error is "Email is already taken"
-        if (err.message?.includes("Email is already taken")) {
-          // Get user profile from the OAuth provider to find the email
-          const providersRegistry = strapi.plugin("users-permissions").service("providers-registry")
-
-          const profile = await providersRegistry.run({
-            provider,
-            accessToken: query.access_token,
-            query,
-            providers: providersRegistry.getAll(),
-          })
-
-          if (profile?.email) {
-            const email = profile.email.toLowerCase()
-            const existingUser = (await strapi
-              .documents("plugin::users-permissions.user")
-              .findFirst({
-                filters: { email },
-                populate: { role: true },
-              })) as UserRecord | null
-
-            if (existingUser) {
-              strapi.log.info(
-                `[OAuth] User ${email} logged in via ${provider}, using existing account (original provider: ${existingUser.provider})`
-              )
-              user = existingUser
+      if (!user) {
+        try {
+          user = await originalConnect(provider, query)
+        } catch (error: unknown) {
+          const err = error as { message?: string }
+          // Reactive safety net for the narrow race window where a duplicate
+          // gets created between our lookup and `originalConnect`. We reuse
+          // `profileEmail` rather than re-running the OAuth profile fetch
+          // because many providers won't honour the same access_token twice.
+          if (err.message?.includes("Email is already taken") && profileEmail) {
+            const existing = await lookupExistingByEmail(profileEmail, provider)
+            if (existing) {
+              user = existing
             } else {
               throw error
             }
           } else {
             throw error
           }
-        } else {
-          throw error
         }
       }
 
