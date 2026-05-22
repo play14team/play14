@@ -60,4 +60,14 @@ describe("findUserByEmail", () => {
 
     expect(result).toEqual({ id: 42, documentId: "abc" })
   })
+
+  it("re-throws transient DB errors instead of swallowing them", async () => {
+    // The helper deliberately does NOT swallow rejections — callers need to
+    // distinguish "no row" (null) from "lookup failed" (throw). Future
+    // contributors must NOT add a try/catch here without a load-bearing reason.
+    const findFirst = vi.fn().mockRejectedValue(new Error("ECONNREFUSED"))
+    const strapi = makeStrapi(findFirst)
+
+    await expect(findUserByEmail(strapi, "user@example.com")).rejects.toThrow("ECONNREFUSED")
+  })
 })

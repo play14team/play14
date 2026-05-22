@@ -948,6 +948,21 @@ export async function runAudienceAttendeeImport(
       } | null
 
       if (existing) {
+        // Refuse to silently rebind the user to a different player than they
+        // already own — surface the conflict so the operator can fix it in
+        // the spreadsheet or the admin UI. Mirrors the policy in
+        // custom-player.ts:1421-1423.
+        if (user.player?.id && existing.player?.id && existing.player.id !== user.player.id) {
+          const message = `Email already linked to a different player (existing player id=${existing.player.id}, import row player id=${user.player.id})`
+          strapi.log.warn(`[Import] ${user.email}: ${message}`)
+          errors.push({
+            email: user.email,
+            name: action.playerName,
+            operation: "createUser",
+            message,
+          })
+          continue
+        }
         strapi.log.info(
           `[Import] Reusing existing user ${existing.documentId} for ${user.email} (was about to create a duplicate)`
         )

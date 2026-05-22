@@ -155,6 +155,17 @@ async function main() {
       }
 
       for (const dup of duplicates) {
+        // If both rows already point at DIFFERENT players, deleting the
+        // duplicate would silently orphan its player. Bail loudly so the
+        // operator can resolve the conflict manually (typically: merge the
+        // two players first via the admin UI, then re-run this script).
+        if (dup.player?.id && canonical.player?.id && dup.player.id !== canonical.player.id) {
+          console.error(
+            `    ✗ SKIPPING duplicate id=${dup.id}: it points at player "${dup.player.name}" but canonical id=${canonical.id} points at "${canonical.player.name}". Resolve the player conflict first, then re-run.`
+          )
+          continue
+        }
+
         const moved = await moveOrphanPlayerLink(strapi, dup, canonical)
         if (moved) {
           totalPlayerLinksMoved++

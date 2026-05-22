@@ -58,6 +58,9 @@ export async function up(knex) {
   await knex.raw(`CREATE UNIQUE INDEX ?? ON up_users (LOWER(email))`, [INDEX_NAME])
 }
 
+// `down` is index-only — it does NOT rehydrate the user rows that
+// scripts/cleanup-duplicate-users.ts may have deleted before `up` ran. If
+// you need the pre-cleanup state back, restore from a database backup.
 export async function down(knex) {
   const hasTable = await knex.schema.hasTable("up_users")
   if (!hasTable) return
