@@ -239,10 +239,15 @@ export async function sendTestEmail(
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      // Sender.net validates `to` / `reply_to` as either a plain email
+      // string or a `{email, name}` object — `{email}` alone is rejected
+      // with HTTP 422. `from` still requires `{email, name}` (both keys),
+      // hence the asymmetric shape below. See the matching coercion in
+      // packages/api/providers/strapi-provider-email-sender/src/index.js.
       body: JSON.stringify({
         from: fromObj,
-        to: { email },
-        reply_to: { email: replyTo },
+        to: email,
+        reply_to: replyTo,
         subject: `[TEST] ${subject}`,
         html: htmlContent,
       }),
