@@ -59,7 +59,12 @@ describe("strapi-provider-email-sender", () => {
   })
 
   describe("recipients", () => {
-    it("maps a string `to` into a single `{ email }` object", async () => {
+    // Sender.net's `/v2/message/send` validates each recipient as either a
+    // plain email string or a `{ email, name }` object — `{ email }` alone is
+    // rejected with HTTP 422 (`type: "validation"`) as soon as `to` is an
+    // array. We coerce every recipient to a plain string for both `to` and
+    // `reply_to`; the brand name still travels via the `from` field.
+    it("maps a string `to` into a plain email string", async () => {
       const fetchFn = mockOkFetch()
       const sender = createSender()
 
@@ -71,10 +76,10 @@ describe("strapi-provider-email-sender", () => {
       })
 
       const body = lastRequestBody(fetchFn)
-      expect(body.to).toEqual({ email: "player@example.com" })
+      expect(body.to).toBe("player@example.com")
     })
 
-    it("maps an array `to` into an array of `{ email }` objects", async () => {
+    it("maps an array `to` into an array of plain email strings", async () => {
       const fetchFn = mockOkFetch()
       const sender = createSender()
 
@@ -85,10 +90,10 @@ describe("strapi-provider-email-sender", () => {
       })
 
       const body = lastRequestBody(fetchFn)
-      expect(body.to).toEqual([{ email: "a@example.com" }, { email: "b@example.com" }])
+      expect(body.to).toEqual(["a@example.com", "b@example.com"])
     })
 
-    it("maps an array `replyTo` into an array of `{ email }` objects", async () => {
+    it("maps an array `replyTo` into an array of plain email strings", async () => {
       const fetchFn = mockOkFetch()
       const sender = createSender()
 
@@ -100,7 +105,7 @@ describe("strapi-provider-email-sender", () => {
       })
 
       const body = lastRequestBody(fetchFn)
-      expect(body.reply_to).toEqual([{ email: "ops@play14.org" }, { email: "help@play14.org" }])
+      expect(body.reply_to).toEqual(["ops@play14.org", "help@play14.org"])
     })
 
     it("falls back to defaultReplyTo from settings when replyTo is not provided", async () => {
@@ -114,7 +119,21 @@ describe("strapi-provider-email-sender", () => {
       })
 
       const body = lastRequestBody(fetchFn)
-      expect(body.reply_to).toEqual({ email: "default-reply@play14.org" })
+      expect(body.reply_to).toBe("default-reply@play14.org")
+    })
+
+    it("coerces a legacy `{email, name}` object recipient to a plain string", async () => {
+      const fetchFn = mockOkFetch()
+      const sender = createSender()
+
+      await sender.send({
+        from: "sender@play14.org",
+        to: [{ email: "c@example.com", name: "C" }],
+        subject: "Hi",
+      })
+
+      const body = lastRequestBody(fetchFn)
+      expect(body.to).toEqual(["c@example.com"])
     })
   })
 
