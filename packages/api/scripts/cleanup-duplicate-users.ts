@@ -18,6 +18,12 @@
  *
  * Default mode is dry-run — pass `--apply` to actually mutate.
  *
+ * Side-effects: the user delete goes through the Document Service, so any
+ * Strapi lifecycle hook registered on `plugin::users-permissions.user`
+ * (none today, but a future extension could add one) WILL fire for every
+ * deleted row. If you wire one up, audit it before running with `--apply`
+ * or temporarily disable noisy notifications.
+ *
  * Usage:
  *   bun --filter play14-api strapi script scripts/cleanup-duplicate-users.ts
  *   bun --filter play14-api strapi script scripts/cleanup-duplicate-users.ts -- --apply
@@ -225,9 +231,10 @@ async function main() {
 
     console.log("\n[cleanup] Summary")
     console.log(`  Duplicate email groups:    ${totalGroups}`)
-    console.log(`  Duplicate users removed:   ${totalDuplicatesRemoved}`)
-    console.log(`  Player-claim rows moved:   ${totalClaimsReassigned}`)
-    console.log(`  Player links re-pointed:   ${totalPlayerLinksMoved}`)
+    const verb = APPLY ? "" : "would be "
+    console.log(`  Duplicate users ${verb}removed:   ${totalDuplicatesRemoved}`)
+    console.log(`  Player-claim rows ${verb}moved:   ${totalClaimsReassigned}`)
+    console.log(`  Player links ${verb}re-pointed:   ${totalPlayerLinksMoved}`)
     if (!APPLY) {
       console.log("\n[cleanup] Re-run with --apply to actually mutate.")
     }

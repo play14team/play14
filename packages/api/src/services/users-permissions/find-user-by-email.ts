@@ -25,6 +25,12 @@ export async function findUserByEmail<TUser = Record<string, unknown>>(
     // $eqi is case-insensitive equality. Bypasses the local Strapi types
     // because the users-permissions content-type doesn't declare it on email.
     filters: { email: { $eqi: trimmed } } as any,
+    // Match the OAuth wrapper's `lookupExistingByEmail` ordering so that
+    // during the pre-cleanup window (when duplicates may still exist), every
+    // caller agrees on which row is canonical: the oldest. Without this sort,
+    // `findFirst` could return a newer player-less row and bind subsequent
+    // player links to the wrong user.
+    sort: { createdAt: "asc" },
     ...(populate ? { populate } : {}),
   })
   return (result as TUser | null) ?? null

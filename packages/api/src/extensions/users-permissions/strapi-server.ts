@@ -219,12 +219,22 @@ export default (plugin: StrapiPlugin) => {
     const service = originalProvidersFactory.apply(this, args as [])
     const originalConnect = service.connect.bind(service)
 
-    // Resolve the OAuth profile email once per login and reuse it on every
-    // subsequent branch (proactive lookup, reactive safety net). Many OAuth
-    // providers (Google, GitHub, Discord) reject re-use of the `access_token`
-    // for a second profile fetch, and even where they don't it costs a round-
-    // trip per login. Returns null on any failure so the upstream connect path
-    // remains the default behaviour.
+    // Resolve the OAuth profile email so we can look up an existing user
+    // BEFORE calling `originalConnect`. We cache the result in `profileEmail`
+    // and reuse it in the safety-net catch instead of fetching the profile a
+    // second time there.
+    //
+    // Trade-off — there are still TWO profile fetches per first-time login
+    // (one here, one inside `originalConnect`), because `originalConnect` is
+    // a plugin black box that always re-fetches internally. We accept that
+    // because every OAuth provider currently wired up in this project
+    // (Google, GitHub, Microsoft, LinkedIn) issues access tokens that can be
+    // re-presented to the user-info endpoint until they expire — they're not
+    // single-use. If a future provider is added with single-use access tokens
+    // (e.g. some PKCE-only flows), this assumption breaks and the second
+    // fetch inside `originalConnect` will fail with a token error that this
+    // catch does NOT swallow. In that case either drop the proactive fetch
+    // for that provider or patch `originalConnect` directly.
     const resolveProfileEmail = async (
       provider: string,
       query: Record<string, unknown>
@@ -239,7 +249,11 @@ export default (plugin: StrapiPlugin) => {
         })
         return typeof profile?.email === "string" ? profile.email.toLowerCase() : null
       } catch (error) {
-        strapi.log.warn(`[OAuth] Profile email resolution failed: ${error}`)
+        const errName = error instanceof Error ? error.name : typeof error
+        const errMsg = error instanceof Error ? error.message : String(error)
+        strapi.log.warn(
+          `[OAuth] Profile email resolution failed for provider=${provider}: ${errName}: ${errMsg}`
+        )
         return null
       }
     }

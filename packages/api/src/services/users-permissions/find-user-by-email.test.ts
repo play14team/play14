@@ -17,6 +17,7 @@ describe("findUserByEmail", () => {
     expect(strapi.documents).toHaveBeenCalledWith("plugin::users-permissions.user")
     expect(findFirst).toHaveBeenCalledWith({
       filters: { email: { $eqi: "GRANT.bosnick@gmail.com" } },
+      sort: { createdAt: "asc" },
     })
   })
 
@@ -28,6 +29,7 @@ describe("findUserByEmail", () => {
 
     expect(findFirst).toHaveBeenCalledWith({
       filters: { email: { $eqi: "user@example.com" } },
+      sort: { createdAt: "asc" },
     })
   })
 
@@ -48,8 +50,21 @@ describe("findUserByEmail", () => {
 
     expect(findFirst).toHaveBeenCalledWith({
       filters: { email: { $eqi: "user@example.com" } },
+      sort: { createdAt: "asc" },
       populate: { player: true },
     })
+  })
+
+  it("sorts by createdAt asc so callers always pick the canonical (oldest) row when duplicates exist", async () => {
+    // Pin the sort. Without it, `findFirst` could return a newer duplicate
+    // during the pre-cleanup window — see comment in find-user-by-email.ts.
+    const findFirst = vi.fn().mockResolvedValue({ id: 1, documentId: "abc" })
+    const strapi = makeStrapi(findFirst)
+
+    await findUserByEmail(strapi, "user@example.com")
+
+    const args = findFirst.mock.calls[0][0]
+    expect(args.sort).toEqual({ createdAt: "asc" })
   })
 
   it("returns the matched user when one exists", async () => {

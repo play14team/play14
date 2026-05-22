@@ -9,6 +9,15 @@
 //
 // Migrations run before Strapi bootstraps, so `strapi.log` isn't available
 // here — `console.log` is the right tool, not a style drift.
+//
+// CREATE / DROP INDEX without `CONCURRENTLY` takes an AccessShareLock on
+// `up_users` for the duration. Migrations run pre-traffic on Clever Cloud
+// (during the build/deploy lifecycle, before the new instance accepts
+// requests), so the lock is harmless in the normal path. If you ever need
+// to roll this index back on a live, traffic-serving instance, switch to
+// `CREATE UNIQUE INDEX CONCURRENTLY` / `DROP INDEX CONCURRENTLY` — but
+// those can't run inside a transaction, so they don't compose with Strapi's
+// default migration runner.
 
 const INDEX_NAME = "up_users_email_lower_unique"
 
