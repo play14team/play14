@@ -219,52 +219,94 @@ export default (plugin: StrapiPlugin) => {
     const service = originalProvidersFactory.apply(this, args as [])
     const originalConnect = service.connect.bind(service)
 
+    // Proactive dedupe: look up an existing user by the OAuth profile email
+    // BEFORE delegating to the upstream `connect`. This guards against duplicate
+    // user rows even when the users-permissions `unique_email` setting is not
+    // enforced in the live core store (config drift), or when a previous user
+    // was created by a non-OAuth code path (player auto-link, CSV import, etc.).
+    //
+    // Returns null on any failure (network blip, missing email, etc.) so the
+    // upstream path remains the default behaviour.
+    const lookupExistingByEmail = async (
+      provider: string,
+      query: Record<string, unknown>
+    ): Promise<UserRecord | null> => {
+      try {
+        const providersRegistry = strapi.plugin("users-permissions").service("providers-registry")
+        const profile = await providersRegistry.run({
+          provider,
+          accessToken: query.access_token,
+          query,
+          providers: providersRegistry.getAll(),
+        })
+        const email = typeof profile?.email === "string" ? profile.email.toLowerCase() : null
+        if (!email) return null
+        const existing = (await strapi.documents("plugin::users-permissions.user").findFirst({
+          filters: { email },
+          populate: { role: true },
+        })) as UserRecord | null
+        if (existing) {
+          strapi.log.info(
+            `[OAuth] User ${email} logged in via ${provider}, reusing existing account (original provider: ${existing.provider})`
+          )
+        }
+        return existing
+      } catch (error) {
+        strapi.log.warn(`[OAuth] Pre-connect email lookup failed: ${error}`)
+        return null
+      }
+    }
+
     // Wrap the connect method
     service.connect = async (
       provider: string,
       query: Record<string, unknown>
     ): Promise<UserRecord> => {
-      let user: UserRecord
+      // Try the proactive path first so we never create a duplicate row.
+      let user: UserRecord | null = await lookupExistingByEmail(provider, query)
 
-      try {
-        // Try the original connect
-        user = await originalConnect(provider, query)
-      } catch (error: unknown) {
-        const err = error as { message?: string }
-        // Check if error is "Email is already taken"
-        if (err.message?.includes("Email is already taken")) {
-          // Get user profile from the OAuth provider to find the email
-          const providersRegistry = strapi.plugin("users-permissions").service("providers-registry")
+      if (!user) {
+        try {
+          user = await originalConnect(provider, query)
+        } catch (error: unknown) {
+          const err = error as { message?: string }
+          // Reactive safety net for the narrow race window where a duplicate
+          // gets created between the lookup and originalConnect.
+          if (err.message?.includes("Email is already taken")) {
+            const providersRegistry = strapi
+              .plugin("users-permissions")
+              .service("providers-registry")
 
-          const profile = await providersRegistry.run({
-            provider,
-            accessToken: query.access_token,
-            query,
-            providers: providersRegistry.getAll(),
-          })
+            const profile = await providersRegistry.run({
+              provider,
+              accessToken: query.access_token,
+              query,
+              providers: providersRegistry.getAll(),
+            })
 
-          if (profile?.email) {
-            const email = profile.email.toLowerCase()
-            const existingUser = (await strapi
-              .documents("plugin::users-permissions.user")
-              .findFirst({
-                filters: { email },
-                populate: { role: true },
-              })) as UserRecord | null
+            if (profile?.email) {
+              const email = profile.email.toLowerCase()
+              const existingUser = (await strapi
+                .documents("plugin::users-permissions.user")
+                .findFirst({
+                  filters: { email },
+                  populate: { role: true },
+                })) as UserRecord | null
 
-            if (existingUser) {
-              strapi.log.info(
-                `[OAuth] User ${email} logged in via ${provider}, using existing account (original provider: ${existingUser.provider})`
-              )
-              user = existingUser
+              if (existingUser) {
+                strapi.log.info(
+                  `[OAuth] User ${email} logged in via ${provider}, using existing account (original provider: ${existingUser.provider})`
+                )
+                user = existingUser
+              } else {
+                throw error
+              }
             } else {
               throw error
             }
           } else {
             throw error
           }
-        } else {
-          throw error
         }
       }
 
