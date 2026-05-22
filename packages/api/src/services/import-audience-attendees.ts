@@ -5,6 +5,7 @@ import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 import { nameToUsername } from "../libs/strings"
 import { sendUserInvitationAndUpdateStatus } from "./user-invitations"
+import { findUserByEmail } from "./users-permissions/find-user-by-email"
 
 type ContactSource = "attendee" | "mailchimp"
 
@@ -936,6 +937,32 @@ export async function runAudienceAttendeeImport(
     if (!user?.planned) continue
 
     try {
+      // Reuse any existing user with this email (case-insensitive) instead of
+      // minting a duplicate. Direct `documents().create()` bypasses the
+      // users-permissions `unique_email` setting, and the LOWER(email) UNIQUE
+      // INDEX would otherwise throw on insert.
+      const existing = (await findUserByEmail(strapi, user.email, { player: true })) as {
+        id: number
+        documentId: string
+        player?: { id?: number } | null
+      } | null
+
+      if (existing) {
+        strapi.log.info(
+          `[Import] Reusing existing user ${existing.documentId} for ${user.email} (was about to create a duplicate)`
+        )
+        if (user.player?.id && !existing.player?.id) {
+          await strapi.documents("plugin::users-permissions.user").update({
+            documentId: existing.documentId,
+            data: { player: user.player.id } as any,
+          })
+        }
+        user.id = existing.id
+        user.documentId = existing.documentId
+        user.planned = false
+        continue
+      }
+
       const password = `${crypto.randomBytes(16).toString("hex")}!`
 
       // Determine role based on player's position

@@ -14,6 +14,7 @@ import { isValidEmail, isValidUrl } from "../../../libs/validation"
 import { sendEmail } from "../../../services/email-send"
 import { addSubscriberToGroup } from "../../../services/sender-subscribers"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
+import { findUserByEmail } from "../../../services/users-permissions/find-user-by-email"
 
 /**
  * Get or create a folder in the media library by name
@@ -1406,49 +1407,79 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
         targetUser = fullUser
       } else {
-        // Create a new user and link to player
-        // Generate username from player name (firstname.lastname format)
-        const username = nameToUsername(targetPlayer.name)
+        // Reuse any existing user with this email (case-insensitive) instead
+        // of minting a duplicate. Direct `documents().create()` bypasses the
+        // users-permissions `unique_email` setting, and the LOWER(email)
+        // UNIQUE INDEX would otherwise throw on insert.
+        const existing = (await findUserByEmail(strapi, email, { player: true })) as {
+          id: number
+          documentId: string
+          blocked?: boolean
+          player?: { id?: number; documentId?: string } | null
+        } | null
 
-        // Map player position to role type
-        const positionToRoleType: Record<string, string> = {
-          Founder: "founder",
-          Mentor: "mentor",
-          Host: "host",
-          Player: "player",
-        }
-        const roleType = positionToRoleType[targetPlayer.position] || "player"
-
-        // Get the role matching the player's position
-        const userRole = await strapi.db.query("plugin::users-permissions.role").findOne({
-          where: { type: roleType },
-        })
-
-        if (!userRole) {
-          strapi.log.error(
-            `[Player] Role '${roleType}' not found for position '${targetPlayer.position}'`
+        if (existing) {
+          if (existing.blocked) {
+            return ctx.badRequest("This user is blocked and cannot receive invitations")
+          }
+          if (existing.player?.id && existing.player.id !== targetPlayer.id) {
+            return ctx.badRequest(`Email ${email} is already linked to a different player profile`)
+          }
+          if (!existing.player?.id) {
+            await strapi.documents("plugin::users-permissions.user").update({
+              documentId: existing.documentId,
+              data: { player: targetPlayer.id } as any,
+            })
+          }
+          targetUser = existing
+          strapi.log.info(
+            `[Player] Reusing existing user ${existing.documentId} for ${email} (was about to create a duplicate)`
           )
-          return ctx.internalServerError("Failed to create user")
+        } else {
+          // Create a new user and link to player
+          // Generate username from player name (firstname.lastname format)
+          const username = nameToUsername(targetPlayer.name)
+
+          // Map player position to role type
+          const positionToRoleType: Record<string, string> = {
+            Founder: "founder",
+            Mentor: "mentor",
+            Host: "host",
+            Player: "player",
+          }
+          const roleType = positionToRoleType[targetPlayer.position] || "player"
+
+          // Get the role matching the player's position
+          const userRole = await strapi.db.query("plugin::users-permissions.role").findOne({
+            where: { type: roleType },
+          })
+
+          if (!userRole) {
+            strapi.log.error(
+              `[Player] Role '${roleType}' not found for position '${targetPlayer.position}'`
+            )
+            return ctx.internalServerError("Failed to create user")
+          }
+
+          // Create user
+          const newUser = await strapi.documents("plugin::users-permissions.user").create({
+            data: {
+              username,
+              email: email.toLowerCase(),
+              password: randomBytes(32).toString("hex"), // Random password, will be reset
+              confirmed: true, // Pre-confirm since we're sending invite
+              blocked: false,
+              role: userRole.id,
+              player: targetPlayer.id,
+              invitationStatus: "pending",
+            } as any,
+          })
+
+          targetUser = newUser
+          strapi.log.info(
+            `[Player] Created new user ${newUser.documentId} with role '${roleType}' for player ${targetPlayer.name}`
+          )
         }
-
-        // Create user
-        const newUser = await strapi.documents("plugin::users-permissions.user").create({
-          data: {
-            username,
-            email: email.toLowerCase(),
-            password: randomBytes(32).toString("hex"), // Random password, will be reset
-            confirmed: true, // Pre-confirm since we're sending invite
-            blocked: false,
-            role: userRole.id,
-            player: targetPlayer.id,
-            invitationStatus: "pending",
-          } as any,
-        })
-
-        targetUser = newUser
-        strapi.log.info(
-          `[Player] Created new user ${newUser.documentId} with role '${roleType}' for player ${targetPlayer.name}`
-        )
       }
 
       // Generate reset token and send invite
