@@ -135,6 +135,28 @@ describe("strapi-provider-email-sender", () => {
       const body = lastRequestBody(fetchFn)
       expect(body.to).toEqual(["c@example.com"])
     })
+
+    it("throws synchronously on unrecognised recipient input instead of letting Sender.net 422", async () => {
+      const sender = createSender()
+
+      await expect(
+        sender.send({
+          from: "sender@play14.org",
+          // @ts-expect-error — deliberately wrong shape
+          to: null,
+          subject: "Hi",
+        })
+      ).rejects.toThrow(/Invalid Sender.net recipient/)
+
+      await expect(
+        sender.send({
+          from: "sender@play14.org",
+          // @ts-expect-error — deliberately wrong shape (no .email)
+          to: [{ name: "missing email key" }],
+          subject: "Hi",
+        })
+      ).rejects.toThrow(/Invalid Sender.net recipient/)
+    })
   })
 
   describe("from parsing", () => {

@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { buildApiUrl, validatePathSegment, validatePathSegments } from "./strapi-client"
+import {
+  buildApiUrl,
+  extractApiError,
+  validatePathSegment,
+  validatePathSegments,
+} from "./strapi-client"
 
 // Mock process.env for buildApiUrl tests
 const originalEnv = process.env
@@ -230,5 +235,83 @@ describe("buildApiUrl", () => {
     expect(() => buildApiUrl("/events/:slug/edit", { slug: "..%2F..%2Fetc%2Fpasswd" })).toThrow(
       "Invalid slug: contains invalid characters"
     )
+  })
+})
+
+describe("extractApiError", () => {
+  // @strapi/client's HTTPError carries the raw Response on `.response`. The
+  // helper has to clone + parse the body to surface the actual Strapi
+  // `error.message` instead of the generic "Request failed with status code N"
+  // string. These tests pin that contract.
+  function makeHttpError(status: number, body: unknown) {
+    const response = new Response(JSON.stringify(body), {
+      status,
+      headers: { "Content-Type": "application/json" },
+    })
+    const error = new Error(
+      `Request failed with status code ${status} Bad Request: PUT /x`
+    ) as Error & {
+      response: Response
+    }
+    error.response = response
+    return error
+  }
+
+  it("surfaces the Strapi error.message from the response body", async () => {
+    const error = makeHttpError(400, {
+      data: null,
+      error: {
+        status: 400,
+        name: "BadRequestError",
+        message: "This player is already linked to another user",
+      },
+    })
+
+    const result = await extractApiError(error)
+
+    expect(result).toEqual({
+      message: "This player is already linked to another user",
+      status: 400,
+    })
+  })
+
+  it("falls back to the raw Error.message when the body has no .error.message", async () => {
+    const error = makeHttpError(500, { unexpected: "shape" })
+
+    const result = await extractApiError(error)
+
+    expect(result.status).toBe(500)
+    expect(result.message).toMatch(/Request failed with status code 500/)
+  })
+
+  it("returns status 0 and the raw message when the error has no .response", async () => {
+    const error = new Error("ECONNREFUSED")
+
+    const result = await extractApiError(error)
+
+    expect(result).toEqual({ message: "ECONNREFUSED", status: 0 })
+  })
+
+  it("returns status 0 and a default message for non-Error throwables", async () => {
+    const result = await extractApiError("oops")
+
+    expect(result).toEqual({ message: "Unknown error occurred", status: 0 })
+  })
+
+  it("never throws when the response body is not valid JSON", async () => {
+    const response = new Response("<html>500</html>", {
+      status: 500,
+      headers: { "Content-Type": "text/html" },
+    })
+    const error = new Error("Request failed with status code 500: GET /x") as Error & {
+      response: Response
+    }
+    error.response = response
+
+    const result = await extractApiError(error)
+
+    expect(result.status).toBe(500)
+    // Falls back to the HTTPError.message — the body is HTML, not JSON
+    expect(result.message).toMatch(/Request failed with status code 500/)
   })
 })

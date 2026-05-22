@@ -266,8 +266,12 @@ export default (plugin: StrapiPlugin) => {
       email: string,
       provider: string
     ): Promise<UserRecord | null> => {
+      // Case-insensitive equality — the email is already lowercased by
+      // resolveProfileEmail, so `$eqi` is effectively a no-op for matching,
+      // but it documents intent and stays in sync with `findUserByEmail`
+      // (the only other email-lookup helper in the codebase).
       const existing = (await strapi.documents("plugin::users-permissions.user").findFirst({
-        filters: { email },
+        filters: { email: { $eqi: email } } as any,
         populate: { role: true, player: true } as any,
         sort: { createdAt: "asc" },
       })) as (UserRecord & { confirmed?: boolean }) | null

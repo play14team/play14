@@ -42,15 +42,31 @@ interface DuplicateGroup {
   users: UserRow[]
 }
 
+const PAGE_SIZE = 500
+
+async function findAllUsers(strapi: any): Promise<UserRow[]> {
+  // Strapi 5's Document Service doesn't document `limit: -1` as "unbounded"
+  // — different content-types interpret it differently and some clamp to
+  // the default page size. Paginate explicitly so we always read every row.
+  const all: UserRow[] = []
+  let start = 0
+  while (true) {
+    const page = (await strapi.documents("plugin::users-permissions.user").findMany({
+      fields: ["id", "documentId", "username", "email", "provider", "createdAt"],
+      populate: { player: { fields: ["id", "documentId", "name"] } },
+      sort: { createdAt: "asc" },
+      start,
+      limit: PAGE_SIZE,
+    })) as UserRow[]
+    all.push(...page)
+    if (page.length < PAGE_SIZE) break
+    start += PAGE_SIZE
+  }
+  return all
+}
+
 async function findDuplicateGroups(strapi: any): Promise<DuplicateGroup[]> {
-  // Group by lower(email). The Document Service has no GROUP BY, so we list
-  // everything and group in memory — fine for a one-off on a small users table.
-  const users = (await strapi.documents("plugin::users-permissions.user").findMany({
-    fields: ["id", "documentId", "username", "email", "provider", "createdAt"],
-    populate: { player: { fields: ["id", "documentId", "name"] } },
-    sort: { createdAt: "asc" },
-    limit: -1,
-  })) as UserRow[]
+  const users = await findAllUsers(strapi)
 
   const byEmail = new Map<string, UserRow[]>()
   for (const u of users) {
@@ -75,11 +91,23 @@ function pickCanonical(group: UserRow[]): UserRow {
 }
 
 async function reassignClaims(strapi: any, fromUserId: number, toUserId: number): Promise<number> {
-  const claims = (await strapi.documents("api::player-claim.player-claim").findMany({
-    filters: { user: fromUserId },
-    fields: ["id", "documentId"],
-    limit: -1,
-  })) as Array<{ id: number; documentId: string }>
+  // Filter by the relation's `id`, not the raw integer. Strapi 5's Document
+  // Service treats `{ user: <int> }` as ambiguous and may silently match
+  // nothing instead of throwing — `{ user: { id: <int> } }` is the
+  // documented shape.
+  const claims: Array<{ id: number; documentId: string }> = []
+  let start = 0
+  while (true) {
+    const page = (await strapi.documents("api::player-claim.player-claim").findMany({
+      filters: { user: { id: fromUserId } } as any,
+      fields: ["id", "documentId"],
+      start,
+      limit: PAGE_SIZE,
+    })) as Array<{ id: number; documentId: string }>
+    claims.push(...page)
+    if (page.length < PAGE_SIZE) break
+    start += PAGE_SIZE
+  }
 
   for (const claim of claims) {
     if (APPLY) {
@@ -99,14 +127,19 @@ async function moveOrphanPlayerLink(
 ): Promise<boolean> {
   if (!duplicate.player?.id || canonical.player?.id) return false
   if (APPLY) {
-    // Unlink first to free the oneToOne, then link to canonical.
-    await strapi.documents("plugin::users-permissions.user").update({
-      documentId: duplicate.documentId,
-      data: { player: null } as any,
-    })
-    await strapi.documents("plugin::users-permissions.user").update({
-      documentId: canonical.documentId,
-      data: { player: duplicate.player.id } as any,
+    // Atomically detach the player from the duplicate and reattach to the
+    // canonical. Without a transaction, a failure between the two updates
+    // would leave the canonical with no player link AND the duplicate
+    // already cleared — losing the player's `user` relation entirely.
+    await strapi.db.transaction(async () => {
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: duplicate.documentId,
+        data: { player: null } as any,
+      })
+      await strapi.documents("plugin::users-permissions.user").update({
+        documentId: canonical.documentId,
+        data: { player: duplicate.player!.id } as any,
+      })
     })
   }
   return true

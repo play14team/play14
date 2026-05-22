@@ -100,7 +100,9 @@ const STRAPI_REST_ENDPOINT = `${(process.env.STRAPI_API_URL || "http://localhost
  * as `.response`, so we read the JSON body and surface
  * `errorData.error.message` instead.
  */
-async function extractApiError(error: unknown): Promise<{ message: string; status: number }> {
+export async function extractApiError(
+  error: unknown
+): Promise<{ message: string; status: number }> {
   const fallbackMessage = error instanceof Error ? error.message : "Unknown error occurred"
   const response = (error as { response?: Response } | null)?.response
   if (!(response instanceof Response)) {

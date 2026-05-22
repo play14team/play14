@@ -62,7 +62,14 @@ function toRecipient(value) {
   if (value && typeof value === "object" && typeof value.email === "string") {
     return value.email
   }
-  return value
+  // Don't silently pass through — null/undefined/numbers would still reach
+  // Sender.net and trip a 422 with no breadcrumb. Throw at the boundary so
+  // the caller's stack trace points at the bad input.
+  throw new TypeError(
+    `Invalid Sender.net recipient: expected a string or { email } object, got ${
+      value === null ? "null" : typeof value
+    }`
+  )
 }
 
 function toRecipients(value) {
