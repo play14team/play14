@@ -265,6 +265,15 @@ export default (plugin: StrapiPlugin) => {
     // a previous user was created by a non-OAuth code path (player auto-link,
     // CSV import, etc.).
     //
+    // Side effect of bypassing `originalConnect`: the matching user's
+    // `provider`, `access_token`, `refresh_token`, and `expires_in` fields
+    // stay frozen at whatever was written on the original signup. For our
+    // current use-case (we never call provider APIs on behalf of the user;
+    // OAuth is purely for authentication) this is fine. If we ever need a
+    // live access token (e.g. to read a Google Calendar), revisit this:
+    // either re-run the upstream token-update logic after the merge, or
+    // refactor to patch `originalConnect` rather than short-circuiting it.
+    //
     // Security: only an `confirmed: true` user is merged. An unconfirmed local
     // row is never silently bound to an OAuth login — that would let an
     // attacker take over an account by registering its email at any IdP that
@@ -297,7 +306,9 @@ export default (plugin: StrapiPlugin) => {
         return null
       }
       strapi.log.info(
-        `[OAuth] User ${email} logged in via ${provider}, reusing existing account (original provider: ${existing.provider})`
+        `[OAuth] User ${email} logged in via ${provider}, reusing existing account ` +
+          `(original provider: ${existing.provider}; access/refresh tokens were NOT ` +
+          `refreshed because originalConnect was bypassed — see strapi-server.ts comment)`
       )
       return existing
     }

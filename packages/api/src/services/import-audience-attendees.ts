@@ -41,6 +41,10 @@ interface UserRecord {
   username?: string
   player?: PlayerRecord | null
   planned?: boolean
+  // Set to true when we reuse an existing user whose invitation has already
+  // been accepted, so the invitation loop below skips them instead of
+  // re-sending a "set your password" email to a confirmed account.
+  skipInvitation?: boolean
 }
 
 export interface ImportReportRow {
@@ -944,6 +948,7 @@ export async function runAudienceAttendeeImport(
       const existing = (await findUserByEmail(strapi, user.email, { player: true })) as {
         id: number
         documentId: string
+        invitationStatus?: string
         player?: { id?: number } | null
       } | null
 
@@ -963,8 +968,17 @@ export async function runAudienceAttendeeImport(
           })
           continue
         }
+        // Don't re-send an invitation to a user who has already accepted —
+        // that would email them a fresh password-reset link unprompted. They
+        // can still log in normally; the import goal (have a user linked to
+        // this player) is already met.
+        if (existing.invitationStatus === "accepted") {
+          user.skipInvitation = true
+        }
         strapi.log.info(
-          `[Import] Reusing existing user ${existing.documentId} for ${user.email} (was about to create a duplicate)`
+          `[Import] Reusing existing user ${existing.documentId} for ${user.email} ` +
+            `(was about to create a duplicate; invitationStatus=${existing.invitationStatus ?? "unset"}` +
+            `${user.skipInvitation ? "; skipping invitation email" : ""})`
         )
         if (user.player?.id && !existing.player?.id) {
           await strapi.documents("plugin::users-permissions.user").update({
@@ -1067,6 +1081,9 @@ export async function runAudienceAttendeeImport(
   for (const action of actions.createUsers) {
     const user = usersByEmail.get(action.email)
     if (!user?.documentId) continue
+    // Skip invitation for reused users whose invitation has already been
+    // accepted (see `skipInvitation` set in the createUsers loop above).
+    if (user.skipInvitation) continue
 
     const success = await sendUserInvitationAndUpdateStatus(strapi, {
       documentId: user.documentId,

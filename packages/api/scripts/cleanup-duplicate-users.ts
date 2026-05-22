@@ -117,6 +117,11 @@ async function reassignClaims(strapi: any, fromUserId: number, toUserId: number)
 
   for (const claim of claims) {
     if (APPLY) {
+      // `data: { user: <int> }` is the documented relation-SET shape for
+      // updates (different from filters, where `{ user: <int> }` is
+      // ambiguous — there we use `{ user: { id: <int> } }`). The pattern
+      // matches every other relation update in this codebase, e.g.
+      // `custom-player.ts:1443` does `data: { player: targetPlayer.id }`.
       await strapi.documents("api::player-claim.player-claim").update({
         documentId: claim.documentId,
         data: { user: toUserId } as any,
@@ -137,14 +142,22 @@ async function moveOrphanPlayerLink(
     // canonical. Without a transaction, a failure between the two updates
     // would leave the canonical with no player link AND the duplicate
     // already cleared — losing the player's `user` relation entirely.
+    //
+    // Use `strapi.db.query()` (Query Engine API) rather than the Document
+    // Service inside the transaction. The Query Engine is the layer that
+    // Strapi's own transaction wrapper participates in directly; Strapi 5
+    // does not contractually guarantee that `strapi.documents()` calls
+    // inherit the ambient transaction context. CLAUDE.md prefers the
+    // Document Service, but a one-off script doing a critical atomic
+    // re-link is the right place to bend that rule.
     await strapi.db.transaction(async () => {
-      await strapi.documents("plugin::users-permissions.user").update({
-        documentId: duplicate.documentId,
-        data: { player: null } as any,
+      await strapi.db.query("plugin::users-permissions.user").update({
+        where: { id: duplicate.id },
+        data: { player: null },
       })
-      await strapi.documents("plugin::users-permissions.user").update({
-        documentId: canonical.documentId,
-        data: { player: duplicate.player!.id } as any,
+      await strapi.db.query("plugin::users-permissions.user").update({
+        where: { id: canonical.id },
+        data: { player: duplicate.player!.id },
       })
     })
   }
