@@ -1,7 +1,10 @@
 import type { Core } from "@strapi/strapi"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { acquireLock } from "../../../services/cron/distributed-lock"
-import { addPlayerToEventAttendees } from "../../../services/ticketing/player-service"
+import {
+  addPlayerToEventAttendees,
+  removePlayerFromEventAttendees,
+} from "../../../services/ticketing/player-service"
 import customEventFactory from "./custom-event"
 
 vi.mock("../../../libs/tickets", () => ({
@@ -10,6 +13,7 @@ vi.mock("../../../libs/tickets", () => ({
 }))
 vi.mock("../../../services/ticketing/player-service", () => ({
   addPlayerToEventAttendees: vi.fn(),
+  removePlayerFromEventAttendees: vi.fn(),
 }))
 vi.mock("../../../services/cron/distributed-lock", () => ({
   acquireLock: vi.fn(async () => "test-lock-token"),
@@ -410,5 +414,128 @@ describe("custom-event.addParticipant", () => {
     )
     expect(model(TICKET_UID).create).not.toHaveBeenCalled()
     expect(model(PLAYER_UID).findOne).not.toHaveBeenCalled()
+  })
+})
+
+describe("custom-event.removeParticipant", () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  /** Organizer (Founder) + found event, with a manual (no-order) ticket by default. */
+  const setupRemoval = (ticketOverrides: Record<string, any> = {}) => {
+    const mocks = createMockStrapi()
+    const { model } = mocks
+    model(USER_UID).findFirst.mockResolvedValue({
+      id: 1,
+      player: { documentId: "host-1", name: "Host One", position: "Founder" },
+    })
+    model(EVENT_UID).findOne.mockResolvedValue({ ...EVENT })
+    model(TICKET_UID).findOne.mockResolvedValue({
+      documentId: "tk-1",
+      ticketCode: "TKT-TEST-1234",
+      event: { documentId: "evt-1" },
+      order: null,
+      player: { documentId: "ply-5" },
+      ...ticketOverrides,
+    })
+    return mocks
+  }
+
+  it("returns forbidden for a non-organizer", async () => {
+    const { strapi, model } = createMockStrapi()
+    model(USER_UID).findFirst.mockResolvedValue({
+      id: 2,
+      player: { documentId: "player-x", position: "Player" },
+    })
+    model(EVENT_UID).findOne.mockResolvedValue({ ...EVENT })
+    const ctx = createMockContext({
+      state: { user: { id: 2 } },
+      params: { eventId: "evt-1", ticketId: "tk-1" },
+    })
+
+    await customEventFactory({ strapi }).removeParticipant(ctx)
+
+    expect(ctx.forbidden).toHaveBeenCalledWith(
+      "You don't have access to remove participants from this event"
+    )
+    expect(model(TICKET_UID).delete).not.toHaveBeenCalled()
+  })
+
+  it("returns notFound when the ticket does not exist", async () => {
+    const { strapi, model } = setupRemoval()
+    model(TICKET_UID).findOne.mockResolvedValue(null)
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1", ticketId: "missing" },
+    })
+
+    await customEventFactory({ strapi }).removeParticipant(ctx)
+
+    expect(ctx.notFound).toHaveBeenCalledWith("Ticket not found")
+  })
+
+  it("returns badRequest when the ticket belongs to a different event", async () => {
+    const { strapi } = setupRemoval({ event: { documentId: "other-event" } })
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1", ticketId: "tk-1" },
+    })
+
+    await customEventFactory({ strapi }).removeParticipant(ctx)
+
+    expect(ctx.badRequest).toHaveBeenCalledWith("Ticket does not belong to this event")
+  })
+
+  it("rejects removing a purchased ticket (has an order)", async () => {
+    const { strapi, model } = setupRemoval({ order: { documentId: "ord-1" } })
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1", ticketId: "tk-1" },
+    })
+
+    await customEventFactory({ strapi }).removeParticipant(ctx)
+
+    expect(ctx.badRequest).toHaveBeenCalledWith(
+      "Only manually-added participants can be removed; purchased tickets must be refunded."
+    )
+    expect(model(TICKET_UID).delete).not.toHaveBeenCalled()
+  })
+
+  it("deletes the comp ticket and detaches the player when no other ticket remains", async () => {
+    const { strapi, model } = setupRemoval()
+    model(TICKET_UID).delete.mockResolvedValue({ documentId: "tk-1" })
+    model(TICKET_UID).findMany.mockResolvedValue([]) // no remaining valid/used tickets
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1", ticketId: "tk-1" },
+    })
+
+    await customEventFactory({ strapi }).removeParticipant(ctx)
+
+    expect(model(TICKET_UID).delete).toHaveBeenCalledWith({ documentId: "tk-1" })
+    expect(removePlayerFromEventAttendees).toHaveBeenCalledWith(
+      strapi,
+      "ply-5",
+      { documentId: "evt-1" },
+      "[Event]"
+    )
+    expect(ctx.send).toHaveBeenCalledWith({ data: { documentId: "tk-1", removed: true } })
+  })
+
+  it("keeps the player on the attendee list when another valid ticket remains", async () => {
+    const { strapi, model } = setupRemoval()
+    model(TICKET_UID).delete.mockResolvedValue({ documentId: "tk-1" })
+    model(TICKET_UID).findMany.mockResolvedValue([{ documentId: "tk-other" }]) // still has a ticket
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1", ticketId: "tk-1" },
+    })
+
+    await customEventFactory({ strapi }).removeParticipant(ctx)
+
+    expect(model(TICKET_UID).delete).toHaveBeenCalledWith({ documentId: "tk-1" })
+    expect(removePlayerFromEventAttendees).not.toHaveBeenCalled()
+    expect(ctx.send).toHaveBeenCalled()
   })
 })

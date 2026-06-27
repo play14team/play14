@@ -12,7 +12,10 @@ import slugify from "slugify"
 import { generateTicketCode } from "../../../libs/tickets"
 import { validateEmail } from "../../../libs/validation"
 import { acquireLock, releaseLock } from "../../../services/cron/distributed-lock"
-import { addPlayerToEventAttendees } from "../../../services/ticketing/player-service"
+import {
+  addPlayerToEventAttendees,
+  removePlayerFromEventAttendees,
+} from "../../../services/ticketing/player-service"
 import { generateTimetable } from "../templates/schedule-templates"
 
 const ORGANIZER_POSITIONS = ["Host", "Mentor", "Founder"]
@@ -2340,8 +2343,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // Serialize concurrent adds to the same event with a distributed lock. This closes the
     // check-then-create race on both the duplicate-ticket guard and the find-or-create of the
     // per-event "external" ticket type. Degrades to no-op locking when Redis is unavailable
-    // (acquireLock returns a non-null fallback token).
-    const lockName = `add-participant:${eventId}`
+    // (acquireLock returns a non-null fallback token). Shared with removeParticipant so
+    // add/remove on the same event are serialized.
+    const lockName = `event-participants:${eventId}`
     const lockToken = await acquireLock(lockName, 30_000)
     if (!lockToken) {
       return ctx.badRequest("Another participant is being added to this event. Please retry.")
@@ -2483,6 +2487,114 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           },
         },
       })
+    } finally {
+      await releaseLock(lockName, lockToken)
+    }
+  },
+
+  /**
+   * Remove a manually-added participant from an event (organizer only).
+   *
+   * Only participants added manually — a comp ticket with no order (no Stripe
+   * purchase) — can be removed. The comp ticket is deleted and the player is
+   * removed from event.players unless they still hold another valid/used ticket
+   * for this event. Purchased/self-registered tickets must go through refund.
+   */
+  async removeParticipant(ctx) {
+    const user = ctx.state.user
+    const { eventId, ticketId } = ctx.params
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to remove participants from this event")
+    }
+
+    const ticket = await strapi.documents("api::ticket.ticket").findOne({
+      documentId: ticketId,
+      populate: {
+        event: { fields: ["documentId"] },
+        order: { fields: ["documentId"] },
+        player: { fields: ["documentId"] },
+      },
+    })
+
+    if (!ticket) {
+      return ctx.notFound("Ticket not found")
+    }
+    if ((ticket as any).event?.documentId !== eventId) {
+      return ctx.badRequest("Ticket does not belong to this event")
+    }
+    // Only manually-added participants (comp ticket, no Stripe order) can be removed.
+    if ((ticket as any).order) {
+      return ctx.badRequest(
+        "Only manually-added participants can be removed; purchased tickets must be refunded."
+      )
+    }
+
+    // Shared per-event lock (see addParticipant) so add/remove are serialized.
+    const lockName = `event-participants:${eventId}`
+    const lockToken = await acquireLock(lockName, 30_000)
+    if (!lockToken) {
+      return ctx.badRequest(
+        "Another participant change is in progress for this event. Please retry."
+      )
+    }
+
+    try {
+      const participantPlayerDocId = (ticket as any).player?.documentId
+
+      await strapi.documents("api::ticket.ticket").delete({ documentId: ticketId })
+
+      // Remove from the event attendee list only if no other valid/used ticket remains
+      // for this player (e.g. they could also hold a separate purchased ticket).
+      if (participantPlayerDocId) {
+        const remaining = await strapi.documents("api::ticket.ticket").findMany({
+          filters: {
+            event: { documentId: eventId },
+            player: { documentId: participantPlayerDocId },
+            ticketStatus: { $in: ["valid", "used"] },
+          },
+          fields: ["documentId"],
+        })
+        if (remaining.length === 0) {
+          await removePlayerFromEventAttendees(
+            strapi,
+            participantPlayerDocId,
+            { documentId: event.documentId },
+            "[Event]"
+          )
+        }
+      }
+
+      strapi.log.info(
+        `[Event] Participant removed from "${event.name}" by ${player.name}: ${ticket.ticketCode}`
+      )
+
+      return ctx.send({ data: { documentId: ticketId, removed: true } })
     } finally {
       await releaseLock(lockName, lockToken)
     }

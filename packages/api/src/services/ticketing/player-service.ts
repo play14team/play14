@@ -308,3 +308,51 @@ export async function addPlayerToEventAttendees(
     )
   }
 }
+
+/**
+ * Remove a player from an event's attendees list.
+ *
+ * Mirror of addPlayerToEventAttendees: drops every version (draft and/or
+ * published) of the event from the player's `attended` relation, so the
+ * change is consistent across the Strapi 5 draft/publish split. No-op if the
+ * player is not currently attending.
+ *
+ * @param strapi - Strapi instance
+ * @param playerDocumentId - Document ID of the player
+ * @param event - Event object with documentId
+ * @param logPrefix - Prefix for log messages
+ */
+export async function removePlayerFromEventAttendees(
+  strapi: Core.Strapi,
+  playerDocumentId: string,
+  event: { documentId: string },
+  logPrefix = "[Ticketing]"
+): Promise<void> {
+  const playerDoc = await strapi.documents("api::player.player").findOne({
+    documentId: playerDocumentId,
+    populate: { attended: { fields: ["id", "documentId"] } },
+  })
+
+  if (!playerDoc) return
+
+  const attended = (playerDoc.attended as any[]) || []
+  const isAttending = attended.some((e: any) => e.documentId === event.documentId)
+  if (!isAttending) return
+
+  // Keep every attended event except the one being removed — this drops both
+  // the draft and published rows of that event in one update.
+  const remainingIds = attended
+    .filter((e: any) => e.documentId !== event.documentId)
+    .map((e: any) => e.id)
+
+  await strapi.documents("api::player.player").update({
+    documentId: playerDocumentId,
+    data: {
+      attended: remainingIds,
+    } as any,
+  })
+
+  strapi.log.info(
+    `${logPrefix} Removed player ${playerDocumentId} from event ${event.documentId} attendees`
+  )
+}
