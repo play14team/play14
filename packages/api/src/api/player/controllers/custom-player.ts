@@ -9,9 +9,15 @@ import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 import UserInvitationEmail from "../../../emails/user-invitation"
 import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
-import { nameToUsername, toSlug } from "../../../libs/strings"
+import { nameToUsername } from "../../../libs/strings"
 import { isValidEmail, isValidUrl } from "../../../libs/validation"
 import { sendEmail } from "../../../services/email-send"
+import {
+  type CreateUnlinkedPlayerResult,
+  createUnlinkedPlayer,
+  PLAYER_NAME_SIMILAR_MESSAGE,
+  PLAYER_NAME_TAKEN_MESSAGE,
+} from "../../../services/player/create-player"
 import { addSubscriberToGroup } from "../../../services/sender-subscribers"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 import { findUserByEmail } from "../../../services/users-permissions/find-user-by-email"
@@ -461,55 +467,35 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
     const trimmedName = name.trim()
 
-    // player.name is unique — reject exact (case-insensitive) matches so the organizer
-    // picks the existing one instead of creating a duplicate.
-    const existing = await strapi.documents("api::player.player").findMany({
-      filters: { name: { $eqi: trimmedName } },
-      fields: ["documentId"],
-    })
-    if (existing.length > 0) {
-      return ctx.badRequest(
-        "A player with this name already exists. Select the existing player instead."
-      )
-    }
-
+    let result: CreateUnlinkedPlayerResult
     try {
-      // slug is `required` and Strapi 5 validates it BEFORE the beforeCreate lifecycle runs, so
-      // we MUST set it here. We use the same toSlug(name) the lifecycle derives, so the two agree.
-      const newPlayer = await strapi.documents("api::player.player").create({
-        data: {
-          name: trimmedName,
-          slug: toSlug(trimmedName),
-          company: typeof company === "string" && company.trim() ? company.trim() : null,
-          position: "Player",
-        } as any,
-      })
-
-      strapi.log.info(
-        `[Player] Organizer ${userWithPlayer.player.name} created player ${newPlayer.documentId} ("${trimmedName}")`
-      )
-
-      return ctx.send({
-        data: {
-          documentId: newPlayer.documentId,
-          slug: newPlayer.slug,
-          name: newPlayer.name,
-          position: newPlayer.position,
-          company: (newPlayer as any).company ?? null,
-        },
-      })
+      result = await createUnlinkedPlayer(strapi, { name: trimmedName, company })
     } catch (err) {
-      // Diacritic-equivalent names ("Rémi" vs "Remi") collide on the slug unique constraint —
-      // surface that as a clear 400 rather than a 500. Retrying is pointless (same slug).
-      if (/unique|duplicate|already exists/i.test(String(err))) {
-        strapi.log.warn(`[Player] Name/slug conflict creating player "${trimmedName}": ${err}`)
-        return ctx.badRequest(
-          "A player with this name (or a very similar one) already exists. Select the existing player instead."
-        )
-      }
       strapi.log.error(`[Player] Failed to create player "${trimmedName}": ${err}`)
       return ctx.internalServerError("Failed to create player profile")
     }
+
+    if (result.status === "name-exists") {
+      return ctx.badRequest(PLAYER_NAME_TAKEN_MESSAGE)
+    }
+    if (result.status === "slug-conflict") {
+      return ctx.badRequest(PLAYER_NAME_SIMILAR_MESSAGE)
+    }
+
+    const newPlayer = result.player
+    strapi.log.info(
+      `[Player] Organizer ${userWithPlayer.player.name} created player ${newPlayer.documentId} ("${trimmedName}")`
+    )
+
+    return ctx.send({
+      data: {
+        documentId: newPlayer.documentId,
+        slug: newPlayer.slug,
+        name: newPlayer.name,
+        position: newPlayer.position,
+        company: newPlayer.company ?? null,
+      },
+    })
   },
 
   /**

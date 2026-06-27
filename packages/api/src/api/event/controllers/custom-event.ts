@@ -7,11 +7,15 @@
 import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
 import { imageSize } from "image-size"
-import { toSlug } from "../../../libs/strings"
 import { generateTicketCode } from "../../../libs/tickets"
 import { validateEmail } from "../../../libs/validation"
 import { acquireLock, releaseLock } from "../../../services/cron/distributed-lock"
 import { triggerContentRevalidation } from "../../../services/frontend-revalidation"
+import {
+  createUnlinkedPlayer,
+  PLAYER_NAME_SIMILAR_MESSAGE,
+  PLAYER_NAME_TAKEN_MESSAGE,
+} from "../../../services/player/create-player"
 import {
   addPlayerToEventAttendees,
   removePlayerFromEventAttendees,
@@ -2311,8 +2315,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     // NOTE: like the sibling participant endpoints (getParticipants), this operates on
     // the organizer's event whether draft or published — addPlayerToEventAttendees below
     // syncs the attendee into BOTH versions, and tickets are linked by event regardless.
+    // `slug` is selected explicitly because the success path revalidates the public event
+    // page by slug; keep it here so the dependency is visible and can't be dropped silently.
     const event = await strapi.documents("api::event.event").findOne({
       documentId: eventId,
+      fields: ["name", "slug"],
       populate: {
         hosts: { fields: ["documentId"] },
         mentors: { fields: ["documentId"] },
@@ -2385,42 +2392,21 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           return ctx.notFound("Player not found")
         }
       } else {
-        // player.name is unique — reject exact matches so the organizer picks the existing one.
-        const existing = await strapi.documents("api::player.player").findMany({
-          filters: { name: { $eqi: newPlayerName } },
-          fields: ["documentId"],
+        // Create a standalone player. createUnlinkedPlayer owns the shared rules (reject an
+        // exact name match, set the required slug since Strapi validates it before the
+        // beforeCreate lifecycle, map a slug-collision to a 400). Genuine errors throw and are
+        // caught by the outer try/catch below (which rolls back and rethrows as a 500).
+        const created = await createUnlinkedPlayer(strapi, {
+          name: newPlayerName,
+          company: newPlayer?.company,
         })
-        if (existing.length > 0) {
-          return ctx.badRequest(
-            "A player with this name already exists. Select the existing player instead."
-          )
+        if (created.status === "name-exists") {
+          return ctx.badRequest(PLAYER_NAME_TAKEN_MESSAGE)
         }
-        // The player schema marks `slug` required, and Strapi 5's Document Service validates
-        // required fields BEFORE the `beforeCreate` lifecycle runs — so the lifecycle's slug
-        // derivation can't satisfy validation and we MUST set the slug on create (every other
-        // player-create path does too). We use the same toSlug(name) the lifecycle would, so the
-        // two agree. Two names that slugify identically ("Rémi" vs "Remi") still collide on the
-        // slug unique constraint; surface that as a clear 400 instead of a 500. Retrying is
-        // pointless — the slug would be regenerated the same.
-        try {
-          participantPlayer = await strapi.documents("api::player.player").create({
-            data: {
-              name: newPlayerName,
-              slug: toSlug(newPlayerName),
-              position: "Player",
-              company: newPlayer?.company?.trim() || null,
-            } as any,
-          })
-        } catch (err) {
-          if (/unique|duplicate|already exists/i.test(String(err))) {
-            strapi.log.warn(`[Event] Name/slug conflict creating player "${newPlayerName}": ${err}`)
-            return ctx.badRequest(
-              "A player with this name (or a very similar one) already exists. Select the existing player instead."
-            )
-          }
-          strapi.log.error(`[Event] Failed to create player "${newPlayerName}": ${err}`)
-          throw err
+        if (created.status === "slug-conflict") {
+          return ctx.badRequest(PLAYER_NAME_SIMILAR_MESSAGE)
         }
+        participantPlayer = created.player
         createdPlayerDocId = participantPlayer.documentId
         strapi.log.info(
           `[Event] Created player ${participantPlayer.documentId} ("${newPlayerName}") while adding participant to "${event.name}" by ${player.name}`
@@ -2504,12 +2490,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // Refresh the public event page: adding the attendee only updates the player record
       // (which revalidates the player page via its lifecycle), so the event's attendee list
       // would otherwise stay stale until the next event edit. Revalidate the event explicitly.
-      triggerContentRevalidation(
-        strapi,
-        "api::event.event",
-        { slug: (event as any).slug },
-        "update"
-      )
+      triggerContentRevalidation(strapi, "api::event.event", { slug: event.slug }, "update")
 
       return ctx.send({
         data: {
@@ -2576,8 +2557,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("You must have a linked player profile")
     }
 
+    // `slug` is selected explicitly because the success path revalidates the public event
+    // page by slug; keep it here so the dependency is visible and can't be dropped silently.
     const event = await strapi.documents("api::event.event").findOne({
       documentId: eventId,
+      fields: ["name", "slug"],
       populate: {
         hosts: { fields: ["documentId"] },
         mentors: { fields: ["documentId"] },
@@ -2671,12 +2655,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       // Refresh the public event page so the removed attendee disappears from its list
       // (see addParticipant — the attendee change lives on the player record, not the event).
-      triggerContentRevalidation(
-        strapi,
-        "api::event.event",
-        { slug: (event as any).slug },
-        "update"
-      )
+      triggerContentRevalidation(strapi, "api::event.event", { slug: event.slug }, "update")
 
       return ctx.send({ data: { documentId: ticketId, removed: true } })
     } finally {
