@@ -591,7 +591,8 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
         </div>
       )}
 
-      {/* Add participant modal */}
+      {/* Add participant modal — intentionally reuses the refund modal's generic
+          overlay/card classes (.refundModal / .modalContent); they are not refund-specific. */}
       {showAddModal && (
         <div className={styles.refundModal} onClick={closeAddModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
