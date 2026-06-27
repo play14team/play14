@@ -1316,7 +1316,19 @@
         "viewPlayer": "Ver jugador",
         "previous": "Anterior",
         "next": "Siguiente",
-        "pageOf": "Página {page} de {pageCount}"
+        "pageOf": "Página {page} de {pageCount}",
+        "createPlayer": "Crear jugador",
+        "createPlayerTitle": "Crear un nuevo jugador",
+        "createPlayerHint": "Crea un perfil no vinculado a una cuenta de usuario. Luego podrás añadir este jugador a un evento.",
+        "createNameLabel": "Nombre",
+        "createNamePlaceholder": "Nombre completo",
+        "createCompanyLabel": "Empresa (opcional)",
+        "createCompanyPlaceholder": "Empresa u organización",
+        "createCancel": "Cancelar",
+        "createSubmit": "Crear jugador",
+        "creating": "Creando…",
+        "createNameTooShort": "El nombre debe tener al menos 2 caracteres",
+        "createFailed": "No se pudo crear el jugador"
       },
       "invite": {
         "title": "Enviar invitación",

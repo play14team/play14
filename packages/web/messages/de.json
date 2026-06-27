@@ -2034,7 +2034,19 @@
         "viewPlayer": "Spieler ansehen",
         "previous": "Zurück",
         "next": "Weiter",
-        "pageOf": "Seite {page} von {pageCount}"
+        "pageOf": "Seite {page} von {pageCount}",
+        "createPlayer": "Spieler anlegen",
+        "createPlayerTitle": "Neuen Spieler anlegen",
+        "createPlayerHint": "Erstellt ein Profil, das nicht mit einem Benutzerkonto verknüpft ist. Du kannst diesen Spieler anschließend zu einem Event hinzufügen.",
+        "createNameLabel": "Name",
+        "createNamePlaceholder": "Vollständiger Name",
+        "createCompanyLabel": "Unternehmen (optional)",
+        "createCompanyPlaceholder": "Unternehmen oder Organisation",
+        "createCancel": "Abbrechen",
+        "createSubmit": "Spieler anlegen",
+        "creating": "Wird angelegt…",
+        "createNameTooShort": "Der Name muss mindestens 2 Zeichen lang sein",
+        "createFailed": "Spieler konnte nicht angelegt werden"
       },
       "invite": {
         "title": "Einladung senden",

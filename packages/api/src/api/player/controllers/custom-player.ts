@@ -12,6 +12,12 @@ import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
 import { nameToUsername } from "../../../libs/strings"
 import { isValidEmail, isValidUrl } from "../../../libs/validation"
 import { sendEmail } from "../../../services/email-send"
+import {
+  type CreateUnlinkedPlayerResult,
+  createUnlinkedPlayer,
+  PLAYER_NAME_SIMILAR_MESSAGE,
+  PLAYER_NAME_TAKEN_MESSAGE,
+} from "../../../services/player/create-player"
 import { addSubscriberToGroup } from "../../../services/sender-subscribers"
 import { syncUserRoleFromPlayer } from "../../../services/user-role-sync"
 import { findUserByEmail } from "../../../services/users-permissions/find-user-by-email"
@@ -424,6 +430,72 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       strapi.log.error(`[Player] Failed to create player: ${error}`)
       return ctx.internalServerError("Failed to create player profile")
     }
+  },
+
+  /**
+   * Create a standalone player profile (organizer only).
+   *
+   * Unlike createForUser (which links the new player to the CURRENT user), this
+   * creates an UNLINKED player — used by organizers to register people who aren't
+   * yet in the directory (e.g. before adding them to an event). No user account,
+   * no invite, no email is created.
+   */
+  async createPlayer(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    // Only organizers (Host and above) can create players directly.
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
+
+    if (!userWithPlayer?.player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+    if (userWithPlayer.player.position === "Player") {
+      return ctx.forbidden("Only organizers can create players")
+    }
+
+    const { name, company } = ctx.request.body?.data || {}
+
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
+      return ctx.badRequest("Name is required and must be at least 2 characters")
+    }
+    const trimmedName = name.trim()
+
+    let result: CreateUnlinkedPlayerResult
+    try {
+      result = await createUnlinkedPlayer(strapi, { name: trimmedName, company })
+    } catch (err) {
+      strapi.log.error(`[Player] Failed to create player "${trimmedName}": ${err}`)
+      return ctx.internalServerError("Failed to create player profile")
+    }
+
+    if (result.status === "name-exists") {
+      return ctx.badRequest(PLAYER_NAME_TAKEN_MESSAGE)
+    }
+    if (result.status === "slug-conflict") {
+      return ctx.badRequest(PLAYER_NAME_SIMILAR_MESSAGE)
+    }
+
+    const newPlayer = result.player
+    strapi.log.info(
+      `[Player] Organizer ${userWithPlayer.player.name} created player ${newPlayer.documentId} ("${trimmedName}")`
+    )
+
+    return ctx.send({
+      data: {
+        documentId: newPlayer.documentId,
+        slug: newPlayer.slug,
+        name: newPlayer.name,
+        position: newPlayer.position,
+        company: newPlayer.company ?? null,
+      },
+    })
   },
 
   /**

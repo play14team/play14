@@ -1,6 +1,7 @@
 import type { Core } from "@strapi/strapi"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { acquireLock } from "../../../services/cron/distributed-lock"
+import { triggerContentRevalidation } from "../../../services/frontend-revalidation"
 import {
   addPlayerToEventAttendees,
   removePlayerFromEventAttendees,
@@ -10,6 +11,9 @@ import customEventFactory from "./custom-event"
 vi.mock("../../../libs/tickets", () => ({
   generateTicketCode: vi.fn(() => "TKT-TEST-1234"),
   generateOrderNumber: vi.fn(() => "P14-TEST-0001"),
+}))
+vi.mock("../../../services/frontend-revalidation", () => ({
+  triggerContentRevalidation: vi.fn(),
 }))
 vi.mock("../../../services/ticketing/player-service", () => ({
   addPlayerToEventAttendees: vi.fn(),
@@ -65,7 +69,14 @@ const PLAYER_UID = "api::player.player"
 const TICKET_UID = "api::ticket.ticket"
 const TICKET_TYPE_UID = "api::ticket-type.ticket-type"
 
-const EVENT = { id: 10, documentId: "evt-1", name: "Test Event", hosts: [], mentors: [] }
+const EVENT = {
+  id: 10,
+  documentId: "evt-1",
+  name: "Test Event",
+  slug: "test-event",
+  hosts: [],
+  mentors: [],
+}
 
 describe("custom-event.addParticipant", () => {
   beforeEach(() => {
@@ -254,8 +265,10 @@ describe("custom-event.addParticipant", () => {
 
     await customEventFactory({ strapi }).addParticipant(ctx)
 
+    // slug MUST be set on create: Strapi 5 validates the required slug field before the
+    // beforeCreate lifecycle runs, so a create without it fails with "slug must be defined".
     expect(model(PLAYER_UID).create).toHaveBeenCalledWith({
-      data: expect.objectContaining({ name: "New Person", position: "Player" }),
+      data: expect.objectContaining({ name: "New Person", slug: "new-person", position: "Player" }),
     })
     // Reused the existing external type — did not create a second one
     expect(model(TICKET_TYPE_UID).create).not.toHaveBeenCalled()
@@ -271,6 +284,13 @@ describe("custom-event.addParticipant", () => {
       "ply-7",
       { documentId: "evt-1", id: 10 },
       "[Event]"
+    )
+    // Public event page is revalidated so the new attendee shows up
+    expect(triggerContentRevalidation).toHaveBeenCalledWith(
+      strapi,
+      "api::event.event",
+      { slug: "test-event" },
+      "update"
     )
   })
 
@@ -588,6 +608,13 @@ describe("custom-event.removeParticipant", () => {
       "[Event]"
     )
     expect(ctx.send).toHaveBeenCalledWith({ data: { documentId: "tk-1", removed: true } })
+    // Public event page is revalidated so the removed attendee disappears
+    expect(triggerContentRevalidation).toHaveBeenCalledWith(
+      strapi,
+      "api::event.event",
+      { slug: "test-event" },
+      "update"
+    )
   })
 
   it("keeps the player on the attendee list when another valid ticket remains", async () => {

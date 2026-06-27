@@ -4,7 +4,12 @@ import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import Avatar from "@/components/ui/avatar"
 import { Link } from "@/i18n/navigation"
-import { getPlayers, type PlayerListItem, type PlayersListResponse } from "./players.action"
+import {
+  createPlayer,
+  getPlayers,
+  type PlayerListItem,
+  type PlayersListResponse,
+} from "./players.action"
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")
 const POSITIONS = ["Founder", "Mentor", "Host", "Player"] as const
@@ -39,6 +44,14 @@ export default function PlayersList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Create-player modal state
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createName, setCreateName] = useState("")
+  const [createCompany, setCreateCompany] = useState("")
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
+  const createModalRef = useRef<HTMLDivElement>(null)
 
   const fetchPlayers = useCallback(
     async (letter: string | null, page = 1, search?: string, position?: Position | null) => {
@@ -120,6 +133,55 @@ export default function PlayersList() {
     fetchPlayers(selectedLetter, newPage, debouncedSearch, selectedPosition)
   }
 
+  const closeCreateModal = useCallback(() => {
+    if (creating) return
+    setShowCreateModal(false)
+    setCreateName("")
+    setCreateCompany("")
+    setCreateError(null)
+  }, [creating])
+
+  // Modal a11y: lock body scroll, move focus into the open dialog, and close on Escape.
+  useEffect(() => {
+    if (!showCreateModal) return
+    createModalRef.current?.focus()
+    document.body.style.overflow = "hidden"
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeCreateModal()
+    }
+    document.addEventListener("keydown", handleEscape)
+    return () => {
+      document.body.style.overflow = ""
+      document.removeEventListener("keydown", handleEscape)
+    }
+  }, [showCreateModal, closeCreateModal])
+
+  const handleCreatePlayer = async () => {
+    const name = createName.trim()
+    if (name.length < 2) {
+      setCreateError(t("createNameTooShort"))
+      return
+    }
+    setCreating(true)
+    setCreateError(null)
+
+    const result = await createPlayer(name, createCompany.trim() || undefined)
+
+    setCreating(false)
+    if (!result.success) {
+      setCreateError(result.error || t("createFailed"))
+      return
+    }
+
+    // Close the modal and surface the new player by searching for its name.
+    setShowCreateModal(false)
+    setCreateName("")
+    setCreateCompany("")
+    setSelectedLetter(null)
+    setSelectedPosition(null)
+    setSearchQuery(name)
+  }
+
   if (isLoading && players.length === 0) {
     return (
       <div className="claims-loading">
@@ -149,6 +211,16 @@ export default function PlayersList() {
   return (
     <div className="players-list">
       <div className="players-toolbar">
+        <div className="players-actions">
+          <button
+            type="button"
+            className="admin-btn admin-btn-primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <i className="bx bx-user-plus" />
+            {t("createPlayer")}
+          </button>
+        </div>
         <div className="players-search">
           <div className="search-input-wrapper">
             <i className="bx bx-search" />
@@ -328,6 +400,99 @@ export default function PlayersList() {
             </div>
           )}
         </>
+      )}
+
+      {showCreateModal && (
+        <div className="admin-modal-overlay" onClick={closeCreateModal}>
+          <div
+            ref={createModalRef}
+            className="admin-modal"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-player-title"
+            tabIndex={-1}
+          >
+            <div className="admin-modal-header">
+              <h3 id="create-player-title">{t("createPlayerTitle")}</h3>
+              <button
+                type="button"
+                className="admin-modal-close"
+                onClick={closeCreateModal}
+                aria-label={t("createCancel")}
+              >
+                <i className="bx bx-x" />
+              </button>
+            </div>
+
+            <div className="admin-modal-body">
+              <p className="admin-form-help">{t("createPlayerHint")}</p>
+
+              {createError && (
+                <div className="admin-alert admin-alert-error admin-alert-sm">
+                  <i className="bx bx-error-circle" />
+                  {createError}
+                </div>
+              )}
+
+              <div className="admin-form-group">
+                <label htmlFor="create-player-name">{t("createNameLabel")}</label>
+                <input
+                  id="create-player-name"
+                  type="text"
+                  className="admin-input"
+                  placeholder={t("createNamePlaceholder")}
+                  value={createName}
+                  onChange={(e) => {
+                    setCreateName(e.target.value)
+                    setCreateError(null)
+                  }}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="create-player-company">{t("createCompanyLabel")}</label>
+                <input
+                  id="create-player-company"
+                  type="text"
+                  className="admin-input"
+                  placeholder={t("createCompanyPlaceholder")}
+                  value={createCompany}
+                  onChange={(e) => setCreateCompany(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="admin-modal-footer">
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary"
+                onClick={closeCreateModal}
+                disabled={creating}
+              >
+                {t("createCancel")}
+              </button>
+              <button
+                type="button"
+                className="admin-btn admin-btn-primary"
+                onClick={handleCreatePlayer}
+                disabled={creating || createName.trim().length < 2}
+              >
+                {creating ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin" />
+                    {t("creating")}
+                  </>
+                ) : (
+                  <>
+                    <i className="bx bx-user-plus" />
+                    {t("createSubmit")}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

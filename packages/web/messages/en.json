@@ -1224,7 +1224,19 @@
         "viewPlayer": "View player",
         "previous": "Previous",
         "next": "Next",
-        "pageOf": "Page {page} of {pageCount}"
+        "pageOf": "Page {page} of {pageCount}",
+        "createPlayer": "Create player",
+        "createPlayerTitle": "Create a new player",
+        "createPlayerHint": "Creates a profile that isn't linked to a user account. You can then add this player to an event.",
+        "createNameLabel": "Name",
+        "createNamePlaceholder": "Full name",
+        "createCompanyLabel": "Company (optional)",
+        "createCompanyPlaceholder": "Company or organisation",
+        "createCancel": "Cancel",
+        "createSubmit": "Create player",
+        "creating": "Creating…",
+        "createNameTooShort": "Name must be at least 2 characters",
+        "createFailed": "Failed to create player"
       },
       "invite": {
         "title": "Send invite",

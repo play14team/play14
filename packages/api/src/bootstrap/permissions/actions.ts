@@ -92,6 +92,7 @@ export const PLAYER_ACTIONS = {
   FIND_ME: "api::player.custom-player.findMe",
   UPDATE_ME: "api::player.custom-player.updateMe",
   CREATE_FOR_USER: "api::player.custom-player.createForUser",
+  CREATE_PLAYER: "api::player.custom-player.createPlayer",
   AUTO_LINK: "api::player.custom-player.autoLink",
   UPLOAD_PICTURE: "api::player.custom-player.uploadPicture",
   DELETE_PICTURE: "api::player.custom-player.deletePicture",
