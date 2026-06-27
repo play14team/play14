@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl"
 import ErrorMessage from "@/components/layout/error-message"
 import { useChunkErrorRecovery } from "@/hooks/use-chunk-error-recovery"
+import { isConnectionError } from "@/libs/connection-error"
 
 // Admin-section error boundary. Without this, errors under /admin bubble all the
 // way up to global-error.tsx (a bare, unstyled fallback). This keeps them inside
@@ -27,20 +28,13 @@ export default function AdminError({
     )
   }
 
-  // Detect connection errors (mirrors the public (main) boundary)
-  const isConnectionError =
-    error.message.includes("fetch failed") ||
-    error.cause?.code === "ECONNRESET" ||
-    error.message.includes("ECONNREFUSED") ||
-    error.message.includes("ECONNABORTED")
+  const connectionError = isConnectionError(error)
 
   return (
     <div className="pt-70">
       <ErrorMessage
-        title={isConnectionError ? t("serverUnavailable") : t("error")}
-        message={
-          isConnectionError ? t("serverUnavailableDescription") : error.message || t("error")
-        }
+        title={connectionError ? t("serverUnavailable") : t("error")}
+        message={connectionError ? t("serverUnavailableDescription") : error.message || t("error")}
         details={
           process.env.NODE_ENV === "development"
             ? `${error.message}\n${error.stack || ""}`
@@ -49,7 +43,7 @@ export default function AdminError({
         retryLabel={t("tryAgain")}
         onRetry={reset}
         // Suppress the report link on connection errors — those aren't bugs to file.
-        error={isConnectionError ? undefined : error}
+        error={connectionError ? undefined : error}
       />
     </div>
   )

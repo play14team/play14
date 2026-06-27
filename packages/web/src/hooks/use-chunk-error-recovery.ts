@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { isChunkLoadError, recoverFromChunkError } from "@/libs/chunk-error"
+import { recoverFromChunkError, willRecoverFromChunkError } from "@/libs/chunk-error"
 
 /**
  * For use inside an error boundary (`error.tsx` / `global-error.tsx`).
@@ -12,8 +12,9 @@ import { isChunkLoadError, recoverFromChunkError } from "@/libs/chunk-error"
  * an error UI. Genuine (non-chunk) errors are logged and surfaced as normal.
  */
 export function useChunkErrorRecovery(error: unknown): boolean {
-  // Start in the reloading state for a chunk error so we never flash the error UI.
-  const [reloading, setReloading] = useState(() => isChunkLoadError(error))
+  // Initialise to whether a reload will actually fire, so we never flash the error UI
+  // before reloading — nor flash the spinner when the reload is guard-suppressed.
+  const [reloading, setReloading] = useState(() => willRecoverFromChunkError(error))
 
   useEffect(() => {
     if (recoverFromChunkError(error)) {

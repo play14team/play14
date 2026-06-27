@@ -20,23 +20,49 @@ export function isChunkLoadError(error: unknown): boolean {
 const RELOAD_GUARD_KEY = "play14:chunk-reload-at"
 /** Don't auto-reload more than once per window — if the chunk is truly gone, show the error. */
 const RELOAD_GUARD_MS = 10_000
+/** Per-page-load flag; a real reload starts a fresh window so it naturally resets. */
+type GuardedWindow = Window & { __play14ChunkReloaded?: boolean }
 
-/**
- * If `error` is a stale-chunk error, force a single full reload to pick up the
- * current build. Returns `true` when a reload was triggered so the caller can
- * render a neutral placeholder instead of an error UI. Guarded by sessionStorage
- * so a genuinely-missing chunk can't cause an infinite reload loop.
- */
-export function recoverFromChunkError(error: unknown): boolean {
-  if (typeof window === "undefined" || !isChunkLoadError(error)) return false
-
+/** True if a reload happened recently (within this page load OR the guard window). */
+function reloadGuardActive(): boolean {
+  if ((window as GuardedWindow).__play14ChunkReloaded) return true
   try {
     const last = Number(window.sessionStorage.getItem(RELOAD_GUARD_KEY) ?? "0")
-    if (Date.now() - last < RELOAD_GUARD_MS) return false
+    return Date.now() - last < RELOAD_GUARD_MS
+  } catch {
+    // sessionStorage inaccessible (SecurityError in sandboxed/strict contexts) — fall back
+    // to the in-memory flag above, which still prevents a same-page-load reload loop.
+    return false
+  }
+}
+
+/**
+ * Whether `recoverFromChunkError` would reload for this error: a stale-chunk
+ * error that isn't already within the reload guard. Pure (no side effects), so
+ * an error boundary can use it to decide its initial render without flashing.
+ */
+export function willRecoverFromChunkError(error: unknown): boolean {
+  if (typeof window === "undefined" || !isChunkLoadError(error)) return false
+  return !reloadGuardActive()
+}
+
+/**
+ * If `error` is a stale-chunk error and we haven't just reloaded, force a single
+ * full reload to pick up the current build. Returns `true` when a reload was
+ * triggered so the caller can render a neutral placeholder instead of an error
+ * UI. Guarded two ways so it can't loop: an in-memory flag (survives even when
+ * storage is blocked) and a sessionStorage timestamp (survives across reloads).
+ */
+export function recoverFromChunkError(error: unknown): boolean {
+  if (!willRecoverFromChunkError(error))
+    return false
+
+    // Set the in-memory flag first so a blocked sessionStorage can't cause a loop.
+  ;(window as GuardedWindow).__play14ChunkReloaded = true
+  try {
     window.sessionStorage.setItem(RELOAD_GUARD_KEY, String(Date.now()))
   } catch {
-    // sessionStorage unavailable (private mode / disabled) — reload anyway; the
-    // worst case is the browser's own back-stop against reload loops.
+    // Best effort — the in-memory flag is the backstop within this page load.
   }
 
   window.location.reload()
