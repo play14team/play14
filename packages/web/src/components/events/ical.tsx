@@ -3,30 +3,41 @@
 import { createEvent, type EventAttributes } from "ics"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { anchorIcsToTimezone, zonedDateParts } from "@/libs/ical"
 import { Enum_Event_Eventstatus, type Event } from "@/models/strapi"
 
 const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boolean }) => {
   const t = useTranslations("events")
   const start = new Date(event.start)
   const end = new Date(event.end)
+  const timezone = event.timezone || "UTC"
 
+  // event.start/end are absolute UTC instants. Express them as the event's local
+  // wall-clock time and emit as "local" (floating); the generated file is then
+  // anchored to event.timezone (TZID + VTIMEZONE) in handleDownload so calendar
+  // apps show the venue's local time, matching the on-site display.
   const evt: EventAttributes = {
-    start: [
-      start.getFullYear(),
-      start.getMonth() + 1,
-      start.getDate(),
-      start.getHours(),
-      start.getMinutes(),
-    ],
-    startInputType: "utc",
-    end: [end.getFullYear(), end.getMonth() + 1, end.getDate(), end.getHours(), end.getMinutes()],
-    endInputType: "utc",
-    title: `#play14 - ${event.name!}`,
-    htmlContent: event.description!,
+    start: zonedDateParts(start, timezone),
+    startInputType: "local",
+    startOutputType: "local",
+    end: zonedDateParts(end, timezone),
+    endInputType: "local",
+    endOutputType: "local",
+    title: `#play14 - ${event.name}`,
     location: getLocation(event),
-    url: getUrl(event),
     categories: ["play", "learning by doing", "unconference"],
     status: getStatus(event),
+  }
+
+  // Only attach optional fields when valid — the ics validator rejects null,
+  // empty strings, and scheme-less URLs, which would otherwise abort the whole
+  // download with a validation error.
+  if (event.description) {
+    evt.htmlContent = event.description
+  }
+  const eventUrl = getUrl(event)
+  if (eventUrl) {
+    evt.url = eventUrl
   }
 
   const geoJSON = event.venue?.location
@@ -57,8 +68,15 @@ const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boole
       : t("noVenue")
   }
 
-  function getUrl(event: Event) {
-    return event.venue ? event.venue.website! : ""
+  function getUrl(event: Event): string | undefined {
+    const website = event.venue?.website?.trim()
+    if (!website) return undefined
+    const withScheme = /^https?:\/\//i.test(website) ? website : `https://${website}`
+    try {
+      return new URL(withScheme).href
+    } catch {
+      return undefined
+    }
   }
 
   function getStatus(event: Event) {
@@ -74,14 +92,17 @@ const ICalendar = ({ event, asButton = false }: { event: Event; asButton?: boole
 
     try {
       const filename = `${event.name}.ics`
-      const file: File = await new Promise((resolve, reject) => {
+      const ics: string = await new Promise((resolve, reject) => {
         createEvent(evt, (error, value) => {
-          if (error) {
-            reject(error)
+          if (error || !value) {
+            reject(error ?? new Error("Failed to generate calendar event"))
+            return
           }
-
-          resolve(new File([value], filename, { type: "text/calendar" }))
+          resolve(value)
         })
+      })
+      const file = new File([anchorIcsToTimezone(ics, timezone, start)], filename, {
+        type: "text/calendar",
       })
       const url = URL.createObjectURL(file)
 
