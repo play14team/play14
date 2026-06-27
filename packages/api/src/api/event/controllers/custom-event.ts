@@ -2351,6 +2351,9 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest("Another participant is being added to this event. Please retry.")
     }
 
+    // Track a player created in THIS request so we can roll it back if a later step throws.
+    let createdPlayerDocId: string | null = null
+
     try {
       // 1. Resolve the participant's player profile (existing or newly created)
       let participantPlayer: any
@@ -2388,6 +2391,14 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
           attempts++
         }
+        if (attempts >= 5) {
+          strapi.log.warn(
+            `[Event] Could not find a free slug for "${newPlayerName}" after 5 attempts`
+          )
+          return ctx.badRequest(
+            "Could not generate a unique player identifier. Please try a slightly different name."
+          )
+        }
         // Create with retry-on-conflict: a concurrent add to a DIFFERENT event (whose lock
         // we don't share) can claim a diacritic-equivalent slug between our pre-check and
         // insert. Regenerate the slug and retry rather than surfacing a spurious 400.
@@ -2411,6 +2422,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
           }
         }
+        createdPlayerDocId = participantPlayer.documentId
         strapi.log.info(
           `[Event] Created player ${participantPlayer.documentId} ("${newPlayerName}") while adding participant to "${event.name}" by ${player.name}`
         )
@@ -2498,6 +2510,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           },
         },
       })
+    } catch (err) {
+      // If we created a player in this request but a later step threw, roll it back so a
+      // transient error doesn't leave an orphan player with no ticket. Returned errors
+      // (ctx.badRequest/notFound) don't reach here — only thrown ones do.
+      if (createdPlayerDocId) {
+        await strapi
+          .documents("api::player.player")
+          .delete({ documentId: createdPlayerDocId })
+          .catch(() => {})
+        strapi.log.warn(
+          `[Event] Rolled back orphan player ${createdPlayerDocId} after add failed: ${err}`
+        )
+      }
+      throw err
     } finally {
       await releaseLock(lockName, lockToken)
     }
@@ -2580,25 +2606,39 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       await strapi.documents("api::ticket.ticket").delete({ documentId: ticketId })
 
-      // Remove from the event attendee list only if no other valid/used ticket remains
-      // for this player (e.g. they could also hold a separate purchased ticket).
-      if (participantPlayerDocId) {
-        const remaining = await strapi.documents("api::ticket.ticket").findMany({
-          filters: {
-            event: { documentId: eventId },
-            player: { documentId: participantPlayerDocId },
-            ticketStatus: { $in: ["valid", "used"] },
-          },
-          fields: ["documentId"],
-        })
-        if (remaining.length === 0) {
-          await removePlayerFromEventAttendees(
-            strapi,
-            participantPlayerDocId,
-            { documentId: event.documentId },
-            "[Event]"
+      // The ticket is now gone (point of no return). The attendee cleanup below is
+      // best-effort: without DB transactions it can't be made atomic, so a transient
+      // failure here is logged for operational visibility rather than failing the
+      // request — the primary action (deleting the comp ticket) already succeeded.
+      try {
+        if (participantPlayerDocId) {
+          // Remove from event.players only if no other valid/used ticket remains for this
+          // player (e.g. they could also hold a separate purchased ticket).
+          const remaining = await strapi.documents("api::ticket.ticket").findMany({
+            filters: {
+              event: { documentId: eventId },
+              player: { documentId: participantPlayerDocId },
+              ticketStatus: { $in: ["valid", "used"] },
+            },
+            fields: ["documentId"],
+          })
+          if (remaining.length === 0) {
+            await removePlayerFromEventAttendees(
+              strapi,
+              participantPlayerDocId,
+              { documentId: event.documentId },
+              "[Event]"
+            )
+          }
+        } else {
+          strapi.log.warn(
+            `[Event] Removed ticket ${ticket.ticketCode} had no linked player; event attendee list left unchanged`
           )
         }
+      } catch (err) {
+        strapi.log.warn(
+          `[Event] Ticket ${ticket.ticketCode} deleted but attendee cleanup failed (player still on event.players): ${err}`
+        )
       }
 
       strapi.log.info(

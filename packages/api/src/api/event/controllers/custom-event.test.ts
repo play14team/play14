@@ -432,6 +432,50 @@ describe("custom-event.addParticipant", () => {
     expect(ctx.badRequest).not.toHaveBeenCalled()
   })
 
+  it("returns badRequest when no free slug is found after 5 attempts", async () => {
+    const { strapi, model } = setupOrganizer()
+    model(PLAYER_UID).findMany.mockResolvedValue([]) // no exact name clash
+    model(PLAYER_UID).findFirst.mockResolvedValue({ documentId: "taken" }) // every slug is taken
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { newPlayer: { name: "Popular Name" } } } },
+    })
+
+    await customEventFactory({ strapi }).addParticipant(ctx)
+
+    expect(ctx.badRequest).toHaveBeenCalledWith(
+      "Could not generate a unique player identifier. Please try a slightly different name."
+    )
+    expect(model(PLAYER_UID).create).not.toHaveBeenCalled()
+  })
+
+  it("rolls back a newly-created player when a later step throws", async () => {
+    const { strapi, model } = setupOrganizer()
+    model(PLAYER_UID).findMany.mockResolvedValue([])
+    model(PLAYER_UID).create.mockResolvedValue({ id: 9, documentId: "ply-new", name: "Newbie" })
+    model(PLAYER_UID).delete.mockResolvedValue({ documentId: "ply-new" })
+    model(TICKET_UID).findMany.mockResolvedValue([])
+    model(TICKET_TYPE_UID).findFirst.mockResolvedValue({
+      id: 99,
+      documentId: "tt-ext",
+      name: "external",
+    })
+    // The final mint step fails with a transient error.
+    model(TICKET_UID).create.mockRejectedValue(new Error("db timeout"))
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { newPlayer: { name: "Newbie" } } } },
+    })
+
+    await expect(customEventFactory({ strapi }).addParticipant(ctx)).rejects.toThrow()
+    // The orphan player is rolled back rather than left without a ticket.
+    expect(model(PLAYER_UID).delete).toHaveBeenCalledWith({ documentId: "ply-new" })
+  })
+
   it("returns badRequest when the per-event lock is already held", async () => {
     const { strapi, model } = setupOrganizer()
     vi.mocked(acquireLock).mockResolvedValueOnce(null) // lock held by a concurrent add
