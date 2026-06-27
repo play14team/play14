@@ -165,6 +165,7 @@ export const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
 
   // Player management (for event organizers)
   { action: PLAYER_ACTIONS.LIST_PLAYERS, minimumRole: ROLE_TYPES.HOST },
+  { action: PLAYER_ACTIONS.CREATE_PLAYER, minimumRole: ROLE_TYPES.HOST },
   { action: PLAYER_ACTIONS.GET_PLAYER_FOR_EDIT, minimumRole: ROLE_TYPES.HOST },
   { action: PLAYER_ACTIONS.UPDATE_PLAYER, minimumRole: ROLE_TYPES.HOST },
   { action: PLAYER_ACTIONS.UPDATE_PLAYER_POSITION, minimumRole: ROLE_TYPES.HOST },

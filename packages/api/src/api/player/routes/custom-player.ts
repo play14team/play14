@@ -62,6 +62,17 @@ export default {
     },
     {
       method: "POST",
+      path: "/admin/players",
+      handler: "custom-player.createPlayer",
+      info: { apiName: "player", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Create a standalone (unlinked) player profile (organizer only)",
+      },
+    },
+    {
+      method: "POST",
       path: "/players/auto-link",
       handler: "custom-player.autoLink",
       info: { apiName: "player", type: "content-api" },

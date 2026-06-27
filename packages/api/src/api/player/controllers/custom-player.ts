@@ -9,7 +9,7 @@ import type { Core } from "@strapi/strapi"
 import slugify from "slugify"
 import UserInvitationEmail from "../../../emails/user-invitation"
 import { sanitizeHtml, sanitizePlainText } from "../../../libs/sanitize"
-import { nameToUsername } from "../../../libs/strings"
+import { nameToUsername, toSlug } from "../../../libs/strings"
 import { isValidEmail, isValidUrl } from "../../../libs/validation"
 import { sendEmail } from "../../../services/email-send"
 import { addSubscriberToGroup } from "../../../services/sender-subscribers"
@@ -422,6 +422,92 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       })
     } catch (error) {
       strapi.log.error(`[Player] Failed to create player: ${error}`)
+      return ctx.internalServerError("Failed to create player profile")
+    }
+  },
+
+  /**
+   * Create a standalone player profile (organizer only).
+   *
+   * Unlike createForUser (which links the new player to the CURRENT user), this
+   * creates an UNLINKED player — used by organizers to register people who aren't
+   * yet in the directory (e.g. before adding them to an event). No user account,
+   * no invite, no email is created.
+   */
+  async createPlayer(ctx) {
+    const user = ctx.state.user
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    // Only organizers (Host and above) can create players directly.
+    const userWithPlayer = await strapi.documents("plugin::users-permissions.user").findFirst({
+      filters: { id: user.id },
+      populate: { player: true },
+    })
+
+    if (!userWithPlayer?.player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+    if (userWithPlayer.player.position === "Player") {
+      return ctx.forbidden("Only organizers can create players")
+    }
+
+    const { name, company } = ctx.request.body?.data || {}
+
+    if (!name || typeof name !== "string" || name.trim().length < 2) {
+      return ctx.badRequest("Name is required and must be at least 2 characters")
+    }
+    const trimmedName = name.trim()
+
+    // player.name is unique — reject exact (case-insensitive) matches so the organizer
+    // picks the existing one instead of creating a duplicate.
+    const existing = await strapi.documents("api::player.player").findMany({
+      filters: { name: { $eqi: trimmedName } },
+      fields: ["documentId"],
+    })
+    if (existing.length > 0) {
+      return ctx.badRequest(
+        "A player with this name already exists. Select the existing player instead."
+      )
+    }
+
+    try {
+      // slug is `required` and Strapi 5 validates it BEFORE the beforeCreate lifecycle runs, so
+      // we MUST set it here. We use the same toSlug(name) the lifecycle derives, so the two agree.
+      const newPlayer = await strapi.documents("api::player.player").create({
+        data: {
+          name: trimmedName,
+          slug: toSlug(trimmedName),
+          company: typeof company === "string" && company.trim() ? company.trim() : null,
+          position: "Player",
+        } as any,
+      })
+
+      strapi.log.info(
+        `[Player] Organizer ${userWithPlayer.player.name} created player ${newPlayer.documentId} ("${trimmedName}")`
+      )
+
+      return ctx.send({
+        data: {
+          documentId: newPlayer.documentId,
+          slug: newPlayer.slug,
+          name: newPlayer.name,
+          position: newPlayer.position,
+          company: (newPlayer as any).company ?? null,
+        },
+      })
+    } catch (err) {
+      // Diacritic-equivalent names ("Rémi" vs "Remi") collide on the slug unique constraint —
+      // surface that as a clear 400 rather than a 500. Retrying is pointless (same slug).
+      if (/unique|duplicate|already exists/i.test(String(err))) {
+        strapi.log.warn(`[Player] Name/slug conflict creating player "${trimmedName}": ${err}`)
+        return ctx.badRequest(
+          "A player with this name (or a very similar one) already exists. Select the existing player instead."
+        )
+      }
+      strapi.log.error(`[Player] Failed to create player "${trimmedName}": ${err}`)
       return ctx.internalServerError("Failed to create player profile")
     }
   },
