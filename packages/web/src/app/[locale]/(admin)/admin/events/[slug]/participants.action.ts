@@ -197,3 +197,27 @@ export async function addParticipant(
     data: result.data?.data?.participant,
   }
 }
+
+/**
+ * Remove a manually-added participant (a comp ticket with no order) from an event.
+ * The API rejects removal of purchased/self-registered tickets.
+ */
+export async function removeParticipant(
+  eventDocumentId: string,
+  ticketDocumentId: string
+): Promise<ActionResult> {
+  const result = await strapiFetch<StrapiDataResponse<{ documentId: string; removed: boolean }>>(
+    "/admin/events/:eventDocumentId/participants/:ticketDocumentId",
+    { eventDocumentId, ticketDocumentId },
+    { method: "DELETE" }
+  )
+
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to remove participant",
+    }
+  }
+
+  return { success: true }
+}

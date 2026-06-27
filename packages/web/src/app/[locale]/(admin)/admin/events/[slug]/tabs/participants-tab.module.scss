@@ -313,6 +313,17 @@
     }
   }
 
+  &.remove {
+    background: transparent;
+    color: #e53935;
+    border: 1px solid #e53935;
+
+    &:hover:not(:disabled) {
+      background: #e53935;
+      color: white;
+    }
+  }
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;

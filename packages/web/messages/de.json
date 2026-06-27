@@ -1524,7 +1524,14 @@
       "addSubmitting": "Wird hinzugefügt...",
       "addSelectPlayerRequired": "Bitte wählen Sie einen Spieler zum Hinzufügen aus.",
       "addNameRequired": "Der Name ist erforderlich und muss mindestens 2 Zeichen lang sein.",
-      "addFailed": "Teilnehmer konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut."
+      "addFailed": "Teilnehmer konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
+      "remove": "Entfernen",
+      "removeTitle": "Teilnehmer entfernen",
+      "removeConfirmText": "{name} aus dieser Veranstaltung entfernen? Dadurch wird der Eintrag gelöscht und die Person von der Teilnehmerliste entfernt.",
+      "removeCancel": "Abbrechen",
+      "removeConfirm": "Teilnehmer entfernen",
+      "removeProcessing": "Wird entfernt...",
+      "removeFailed": "Teilnehmer konnte nicht entfernt werden. Bitte versuchen Sie es erneut."
     },
     "media": {
       "title": "Foto- & Videogalerien",

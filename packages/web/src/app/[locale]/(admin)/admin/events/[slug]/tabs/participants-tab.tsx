@@ -15,6 +15,7 @@ import {
   getEventParticipants,
   getParticipantStats,
   type Participant,
+  removeParticipant,
   undoCheckIn,
 } from "../participants.action"
 import styles from "./participants-tab.module.scss"
@@ -53,6 +54,11 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   const [newEmail, setNewEmail] = useState("")
   const [addError, setAddError] = useState<string | null>(null)
   const [isAdding, setIsAdding] = useState(false)
+
+  // Remove-participant confirmation (manual entries only)
+  const [removingParticipant, setRemovingParticipant] = useState<Participant | null>(null)
+  const [isRemoving, setIsRemoving] = useState(false)
+  const [removeError, setRemoveError] = useState<string | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -193,6 +199,35 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
     setRefundingOrderId(participant.order.documentId)
     setRefundReason("")
     setRefundError(null)
+  }
+
+  const handleRemoveClick = (participant: Participant) => {
+    setRemovingParticipant(participant)
+    setRemoveError(null)
+  }
+
+  const handleRemoveCancel = () => {
+    if (isRemoving) return
+    setRemovingParticipant(null)
+    setRemoveError(null)
+  }
+
+  const handleRemoveConfirm = async () => {
+    if (!removingParticipant) return
+
+    setIsRemoving(true)
+    setRemoveError(null)
+
+    const result = await removeParticipant(eventDocumentId, removingParticipant.documentId)
+
+    setIsRemoving(false)
+
+    if (result.success) {
+      setRemovingParticipant(null)
+      fetchData()
+    } else {
+      setRemoveError(result.error || t("removeFailed"))
+    }
   }
 
   const handleRefundCancel = () => {
@@ -513,6 +548,17 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                             {t("refund")}
                           </button>
                         )}
+                        {/* Manually-added participants (comp ticket, no order) can be removed */}
+                        {!participant.order && (
+                          <button
+                            type="button"
+                            className={`${styles.actionButton} ${styles.remove}`}
+                            onClick={() => handleRemoveClick(participant)}
+                          >
+                            <i className="bx bx-trash" />
+                            {t("remove")}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -728,6 +774,43 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                   </>
                 ) : (
                   t("addConfirm")
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove participant confirmation (manual entries only) — reuses the shared modal classes */}
+      {removingParticipant && (
+        <div className={styles.refundModal} onClick={handleRemoveCancel}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3>{t("removeTitle")}</h3>
+            <p>{t("removeConfirmText", { name: getDisplayName(removingParticipant) })}</p>
+
+            {removeError && <div className={styles.error}>{removeError}</div>}
+
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={handleRemoveCancel}
+                disabled={isRemoving}
+              >
+                {t("removeCancel")}
+              </button>
+              <button
+                type="button"
+                className={styles.confirmButton}
+                onClick={handleRemoveConfirm}
+                disabled={isRemoving}
+              >
+                {isRemoving ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin" /> {t("removeProcessing")}
+                  </>
+                ) : (
+                  t("removeConfirm")
                 )}
               </button>
             </div>

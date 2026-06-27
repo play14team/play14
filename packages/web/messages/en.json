@@ -1954,7 +1954,14 @@
       "addSubmitting": "Adding...",
       "addSelectPlayerRequired": "Please select a player to add.",
       "addNameRequired": "Name is required and must be at least 2 characters.",
-      "addFailed": "Failed to add participant. Please try again."
+      "addFailed": "Failed to add participant. Please try again.",
+      "remove": "Remove",
+      "removeTitle": "Remove participant",
+      "removeConfirmText": "Remove {name} from this event? This deletes their entry and removes them from the attendee list.",
+      "removeCancel": "Cancel",
+      "removeConfirm": "Remove participant",
+      "removeProcessing": "Removing...",
+      "removeFailed": "Failed to remove participant. Please try again."
     },
     "media": {
       "title": "Photo & video galleries",

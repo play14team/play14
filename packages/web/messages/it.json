@@ -1954,7 +1954,14 @@
       "addSubmitting": "Aggiunta in corso...",
       "addSelectPlayerRequired": "Seleziona un giocatore da aggiungere.",
       "addNameRequired": "Il nome è obbligatorio e deve contenere almeno 2 caratteri.",
-      "addFailed": "Impossibile aggiungere il partecipante. Riprova."
+      "addFailed": "Impossibile aggiungere il partecipante. Riprova.",
+      "remove": "Rimuovi",
+      "removeTitle": "Rimuovi partecipante",
+      "removeConfirmText": "Rimuovere {name} da questo evento? Questo elimina la sua iscrizione e lo rimuove dall'elenco dei partecipanti.",
+      "removeCancel": "Annulla",
+      "removeConfirm": "Rimuovi partecipante",
+      "removeProcessing": "Rimozione...",
+      "removeFailed": "Impossibile rimuovere il partecipante. Riprova."
     },
     "media": {
       "title": "Gallerie foto & video",
