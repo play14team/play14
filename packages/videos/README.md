@@ -38,24 +38,63 @@ export const MyScene = () => (
 
 Register new compositions in `src/Root.tsx`. Brand assets live in `public/` (`fonts/`, `logo/`) and are referenced with `staticFile()`.
 
+## Explainer video series
+
+Short, voiced explainers about #play14, built from a shared scene runner. The scene scripts (spoken lines + on-screen visuals) live in `src/episodes.ts`; the runner and its `calculateMetadata` live in `src/Explainer.tsx`.
+
+| Composition ID     | Topic                  | Cut   | ~Length |
+| ------------------ | ---------------------- | ----- | ------- |
+| `FormatLong`       | The #play14 format     | long  | ~80s    |
+| `FormatShort`      | The #play14 format     | short | ~60s    |
+| `MarketplaceLong`  | The marketplace        | long  | ~73s    |
+| `MarketplaceShort` | The marketplace        | short | ~51s    |
+| `BrandIntro`       | Brand sting (reference)| —     | 4s      |
+
+Each scene plays one ElevenLabs voiceover clip from `public/voiceover/<topic>/`, and the composition length is derived from those clips — so **generate the voiceover before rendering or previewing** the explainers.
+
 ## Commands
 
-**Install Dependencies**
+Run these from `packages/videos/`, or from the monorepo root by prefixing with `bun --filter play14-videos` (e.g. `bun --filter play14-videos dev`).
+
+**Install dependencies** (from the monorepo root)
 
 ```console
 bun install
 ```
 
-**Start Preview**
+**Generate the voiceover** — calls ElevenLabs for every scene and writes MP3s to `public/voiceover/`. Requires `ELEVENLABS_API_KEY` in `packages/videos/.env`.
+
+```console
+bun run voiceover           # generate only missing clips
+bun run voiceover --force   # regenerate everything
+```
+
+Override the voice with `ELEVENLABS_VOICE_ID` (default: "Sarah" — `EXAVITQu4vr4xnSDxMaL`) or the model with `ELEVENLABS_MODEL_ID` in `.env`, then re-run with `--force`.
+
+**Preview in Remotion Studio**
 
 ```console
 bun run dev
 ```
 
-**Render video**
+**Render one video** — pass a composition ID from the table above; output goes to `out/` (git-ignored).
 
 ```console
-bunx remotion render
+bunx remotion render FormatLong out/format-long.mp4
+```
+
+**Render all explainer videos**
+
+```console
+for id in FormatLong FormatShort MarketplaceLong MarketplaceShort; do
+  bunx remotion render "$id" "out/$id.mp4"
+done
+```
+
+**Render a still** — a single frame, handy for checking a scene's layout.
+
+```console
+bunx remotion still FormatLong out/frame.png --frame=300
 ```
 
 **Upgrade Remotion**
