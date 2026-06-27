@@ -23,6 +23,10 @@ This is a Bun workspace monorepo with the following structure:
   - Contains graphic design resources (logos, colors, fonts, QR codes)
   - Includes a Storybook application in `storybook/` subdirectory
   - Assets organized in folders: `colors/`, `font/`, `logo/` (with multiple format subfolders: EPS, PNG, SVG, PDF, PSD)
+- **packages/videos** (`play14-videos`): Remotion video studio
+  - **Tech Stack**: Remotion 4, React 19, TypeScript, Tailwind v4, DIN Alternate brand font
+  - **Purpose**: Programmatic #play14 branded videos (intros, promos, social clips)
+  - **Brand style system**: `src/theme.ts` (color + typography tokens mirroring `packages/design`), `src/fonts.ts` (DIN Alternate loader), and `src/components/` (`BrandBackground`, `Play14Wordmark`, `ColorAccentBar`, `BrandTitle`/`BrandSubtitle`, `Play14Logo`). `src/BrandIntro.tsx` is the reference composition.
 
 Root and both app packages run on **Bun 1.3.5** (pinned via `packageManager`) and use TypeScript with ES modules (`"type": "module"`). `.nvmrc` pins Node 24 (the current LTS) for both the API and the web app.
 
@@ -37,7 +41,7 @@ bun install
 
 ### Development
 
-**Package names for bun --filter**: `play14-api`, `play14-web`, `play14-design`
+**Package names for bun --filter**: `play14-api`, `play14-web`, `play14-design`, `play14-videos`
 
 ```bash
 # API-specific commands (run from repo root)
@@ -64,6 +68,12 @@ bun --filter play14-web test:e2e           # Playwright E2E tests
 # Work with Storybook
 bun --filter play14-design storybook          # Start Storybook dev server
 bun --filter play14-design build-storybook    # Build Storybook
+
+# Videos-specific commands
+bun --filter play14-videos dev                # remotionb studio (live preview)
+bun --filter play14-videos build              # remotionb bundle
+bun --filter play14-videos render             # remotionb render
+bun --filter play14-videos typecheck          # tsc --noEmit
 ```
 
 ### Aggregate root scripts
@@ -74,7 +84,7 @@ bun --filter play14-design build-storybook    # Build Storybook
 - `typecheck` — run the web package `tsc --noEmit` (API has its own via `bun --filter play14-api typecheck`)
 - `test`, `test:api`, `test:web`, `test:int`, `test:all` — unit + integration test runners
 - `verify` — lint + check + typecheck + test:all
-- `api`, `web` — start each dev server; `build`, `build:api`, `build:web` — build bundles; `start:api`, `start:web` — production run
+- `api`, `web`, `videos` — start each dev server (videos opens Remotion Studio); `build`, `build:api`, `build:web`, `build:videos` — build bundles; `start:api`, `start:web` — production run
 
 ### Container Development
 
