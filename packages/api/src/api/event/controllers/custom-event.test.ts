@@ -70,6 +70,10 @@ const EVENT = { id: 10, documentId: "evt-1", name: "Test Event", hosts: [], ment
 describe("custom-event.addParticipant", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset the player-service mocks to safe promise-returning defaults each test
+    // (clearAllMocks keeps any per-test mockResolvedValue, so re-establish the baseline).
+    vi.mocked(addPlayerToEventAttendees).mockResolvedValue(false)
+    vi.mocked(removePlayerFromEventAttendees).mockResolvedValue(undefined)
   })
 
   /** Wire an organizer (Founder) user + a found event by default. */
@@ -362,26 +366,14 @@ describe("custom-event.addParticipant", () => {
     expect(model(TICKET_UID).create).not.toHaveBeenCalled()
   })
 
-  it("retries with a suffixed slug when the base slug is already taken", async () => {
+  it("returns a clear clash message (not a 500) when player.create hits the unique constraint", async () => {
     const { strapi, model } = setupOrganizer()
-    model(PLAYER_UID).findMany.mockResolvedValue([]) // no exact name clash ("Rémi" != "Remi")
-    // slug "remi" is taken (a diacritic-equivalent "Remi" already exists), then free
-    model(PLAYER_UID)
-      .findFirst.mockResolvedValueOnce({ documentId: "ply-remi" })
-      .mockResolvedValueOnce(null)
-    model(PLAYER_UID).create.mockResolvedValue({ id: 8, documentId: "ply-8", name: "Rémi" })
-    model(TICKET_UID).findMany.mockResolvedValue([])
-    model(TICKET_TYPE_UID).findFirst.mockResolvedValue({
-      id: 99,
-      documentId: "tt-ext",
-      name: "external",
-    })
-    model(TICKET_UID).create.mockResolvedValue({
-      documentId: "tk-9",
-      ticketCode: "TKT-TEST-1234",
-      ticketStatus: "valid",
-      createdAt: "2026-06-26T00:00:00.000Z",
-    })
+    model(PLAYER_UID).findMany.mockResolvedValue([]) // pre-flight exact-name check passes
+    // The player beforeCreate lifecycle forces slug = toSlug(name); a diacritic-equivalent
+    // name (e.g. "Rémi" vs an existing "Remi") collides on the slug unique constraint.
+    model(PLAYER_UID).create.mockRejectedValue(
+      new Error("duplicate key value violates unique constraint")
+    )
 
     const ctx = createMockContext({
       state: { user: { id: 1 } },
@@ -391,67 +383,29 @@ describe("custom-event.addParticipant", () => {
 
     await customEventFactory({ strapi }).addParticipant(ctx)
 
-    const createArg = model(PLAYER_UID).create.mock.calls[0][0]
-    expect(createArg.data.name).toBe("Rémi")
-    expect(createArg.data.slug).toMatch(/^remi-[0-9a-f]+$/) // base slug "remi" + random suffix
-    expect(ctx.send).toHaveBeenCalled()
+    expect(ctx.badRequest).toHaveBeenCalledWith(
+      "A player with this name (or a very similar one) already exists. Select the existing player instead."
+    )
+    // No futile retries — the lifecycle would regenerate the same slug.
+    expect(model(PLAYER_UID).create).toHaveBeenCalledTimes(1)
   })
 
-  it("retries player.create with a fresh slug when the unique constraint fires", async () => {
+  it("rethrows (500) when player.create fails with a non-uniqueness error", async () => {
     const { strapi, model } = setupOrganizer()
-    model(PLAYER_UID).findMany.mockResolvedValue([]) // no exact name clash
-    // findFirst (slug pre-check) returns null → base slug "newcomer"; first create races and
-    // hits the slug unique constraint, second succeeds with a regenerated slug.
-    model(PLAYER_UID)
-      .create.mockRejectedValueOnce(new Error("unique constraint: players_slug_unique"))
-      .mockResolvedValue({ id: 8, documentId: "ply-8", name: "Newcomer" })
-    model(TICKET_UID).findMany.mockResolvedValue([])
-    model(TICKET_TYPE_UID).findFirst.mockResolvedValue({
-      id: 99,
-      documentId: "tt-ext",
-      name: "external",
-    })
-    model(TICKET_UID).create.mockResolvedValue({
-      documentId: "tk-r",
-      ticketCode: "TKT-TEST-1234",
-      ticketStatus: "valid",
-      createdAt: "2026-06-26T00:00:00.000Z",
-    })
+    model(PLAYER_UID).findMany.mockResolvedValue([])
+    model(PLAYER_UID).create.mockRejectedValue(new Error("connection terminated unexpectedly"))
 
     const ctx = createMockContext({
       state: { user: { id: 1 } },
       params: { eventId: "evt-1" },
-      request: { body: { data: { newPlayer: { name: "Newcomer" } } } },
+      request: { body: { data: { newPlayer: { name: "Newbie" } } } },
     })
 
-    await customEventFactory({ strapi }).addParticipant(ctx)
-
-    expect(model(PLAYER_UID).create).toHaveBeenCalledTimes(2)
-    expect(model(PLAYER_UID).create.mock.calls[1][0].data.slug).toMatch(/^newcomer-[0-9a-f]+$/)
-    expect(ctx.send).toHaveBeenCalled()
+    await expect(customEventFactory({ strapi }).addParticipant(ctx)).rejects.toThrow()
     expect(ctx.badRequest).not.toHaveBeenCalled()
   })
 
-  it("returns badRequest when no free slug is found after 5 attempts", async () => {
-    const { strapi, model } = setupOrganizer()
-    model(PLAYER_UID).findMany.mockResolvedValue([]) // no exact name clash
-    model(PLAYER_UID).findFirst.mockResolvedValue({ documentId: "taken" }) // every slug is taken
-
-    const ctx = createMockContext({
-      state: { user: { id: 1 } },
-      params: { eventId: "evt-1" },
-      request: { body: { data: { newPlayer: { name: "Popular Name" } } } },
-    })
-
-    await customEventFactory({ strapi }).addParticipant(ctx)
-
-    expect(ctx.badRequest).toHaveBeenCalledWith(
-      "Could not generate a unique player identifier. Please try a slightly different name."
-    )
-    expect(model(PLAYER_UID).create).not.toHaveBeenCalled()
-  })
-
-  it("rolls back a newly-created player when a later step throws", async () => {
+  it("rolls back a newly-created player AND its attendee membership when mint throws", async () => {
     const { strapi, model } = setupOrganizer()
     model(PLAYER_UID).findMany.mockResolvedValue([])
     model(PLAYER_UID).create.mockResolvedValue({ id: 9, documentId: "ply-new", name: "Newbie" })
@@ -462,8 +416,8 @@ describe("custom-event.addParticipant", () => {
       documentId: "tt-ext",
       name: "external",
     })
-    // The final mint step fails with a transient error.
-    model(TICKET_UID).create.mockRejectedValue(new Error("db timeout"))
+    vi.mocked(addPlayerToEventAttendees).mockResolvedValue(true) // we added the membership
+    model(TICKET_UID).create.mockRejectedValue(new Error("db timeout")) // mint fails
 
     const ctx = createMockContext({
       state: { user: { id: 1 } },
@@ -472,8 +426,42 @@ describe("custom-event.addParticipant", () => {
     })
 
     await expect(customEventFactory({ strapi }).addParticipant(ctx)).rejects.toThrow()
-    // The orphan player is rolled back rather than left without a ticket.
+    expect(removePlayerFromEventAttendees).toHaveBeenCalledWith(
+      strapi,
+      "ply-new",
+      { documentId: "evt-1" },
+      "[Event]"
+    )
     expect(model(PLAYER_UID).delete).toHaveBeenCalledWith({ documentId: "ply-new" })
+  })
+
+  it("rolls back the attendee membership for an EXISTING player when mint throws", async () => {
+    const { strapi, model } = setupOrganizer()
+    model(PLAYER_UID).findOne.mockResolvedValue({ id: 5, documentId: "ply-5", name: "Jane Doe" })
+    model(TICKET_UID).findMany.mockResolvedValue([])
+    model(TICKET_TYPE_UID).findFirst.mockResolvedValue({
+      id: 99,
+      documentId: "tt-ext",
+      name: "external",
+    })
+    vi.mocked(addPlayerToEventAttendees).mockResolvedValue(true) // freshly enrolled this request
+    model(TICKET_UID).create.mockRejectedValue(new Error("db timeout"))
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { playerDocumentId: "ply-5" } } },
+    })
+
+    await expect(customEventFactory({ strapi }).addParticipant(ctx)).rejects.toThrow()
+    expect(removePlayerFromEventAttendees).toHaveBeenCalledWith(
+      strapi,
+      "ply-5",
+      { documentId: "evt-1" },
+      "[Event]"
+    )
+    // No player was created on this path, so none is deleted.
+    expect(model(PLAYER_UID).delete).not.toHaveBeenCalled()
   })
 
   it("returns badRequest when the per-event lock is already held", async () => {

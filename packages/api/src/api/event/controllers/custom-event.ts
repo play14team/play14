@@ -4,11 +4,9 @@
  * Only accessible by Hosts, Mentors, and Founders
  */
 
-import { randomBytes } from "node:crypto"
 import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
 import { imageSize } from "image-size"
-import slugify from "slugify"
 import { generateTicketCode } from "../../../libs/tickets"
 import { validateEmail } from "../../../libs/validation"
 import { acquireLock, releaseLock } from "../../../services/cron/distributed-lock"
@@ -160,6 +158,17 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
    */
   isOrganizer(position: string | undefined): boolean {
     return ORGANIZER_POSITIONS.includes(position || "")
+  },
+
+  /**
+   * Check whether a player may manage a specific event: a Host/Mentor of that event,
+   * or a Founder (who can manage any event). The event must be populated with its
+   * `hosts` and `mentors` (documentId fields).
+   */
+  isEventOrganizer(event: any, player: any): boolean {
+    const isHost = event?.hosts?.some((h: any) => h.documentId === player?.documentId)
+    const isMentor = event?.mentors?.some((m: any) => m.documentId === player?.documentId)
+    return Boolean(isHost || isMentor || player?.position === "Founder")
   },
 
   /**
@@ -2142,6 +2151,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             "paidAt",
           ],
         },
+        player: { fields: ["documentId", "name"] },
         attendeeInfo: true,
       },
       sort: { createdAt: "desc" },
@@ -2183,6 +2193,12 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
                 purchaserEmail: ticket.order.purchaserEmail,
                 orderStatus: ticket.order.orderStatus,
                 paidAt: ticket.order.paidAt,
+              }
+            : null,
+          player: ticket.player
+            ? {
+                documentId: ticket.player.documentId,
+                name: ticket.player.name,
               }
             : null,
           createdAt: ticket.createdAt,
@@ -2305,11 +2321,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.notFound("Event not found")
     }
 
-    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
-    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
-    const isFounder = player.position === "Founder"
-
-    if (!isHost && !isMentor && !isFounder) {
+    if (!this.isEventOrganizer(event, player)) {
       return ctx.forbidden("You don't have access to add participants to this event")
     }
 
@@ -2340,19 +2352,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       }
     }
 
-    // Serialize concurrent adds to the same event with a distributed lock. This closes the
-    // check-then-create race on both the duplicate-ticket guard and the find-or-create of the
-    // per-event "external" ticket type. Degrades to no-op locking when Redis is unavailable
-    // (acquireLock returns a non-null fallback token). Shared with removeParticipant so
-    // add/remove on the same event are serialized.
+    // Serialize concurrent adds to the same event with a distributed lock (shared with
+    // removeParticipant) to close the check-then-create race on the duplicate-ticket guard
+    // and the find-or-create of the per-event "external" ticket type.
+    // CAVEAT: when Redis is unavailable, acquireLock returns a per-INSTANCE fallback token, so
+    // there is NO cross-container serialization in that degraded mode — two containers could
+    // both pass the guards and double-enroll. There is no DB unique-constraint backstop today
+    // (the ticket-type→event relation lives in a Strapi link table); if double-enrollment in
+    // Redis-down deployments becomes a concern, add one via a migration.
     const lockName = `event-participants:${eventId}`
     const lockToken = await acquireLock(lockName, 30_000)
     if (!lockToken) {
       return ctx.badRequest("Another participant is being added to this event. Please retry.")
     }
 
-    // Track a player created in THIS request so we can roll it back if a later step throws.
+    // Track what THIS request created so we can roll it back if a later step throws:
+    // the player (if newly created) and the attendee-list membership (if newly added).
     let createdPlayerDocId: string | null = null
+    let addedAttendeePlayerDocId: string | null = null
 
     try {
       // 1. Resolve the participant's player profile (existing or newly created)
@@ -2366,7 +2383,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           return ctx.notFound("Player not found")
         }
       } else {
-        // player.name is unique — reject exact matches so the organizer picks the existing one
+        // player.name is unique — reject exact matches so the organizer picks the existing one.
         const existing = await strapi.documents("api::player.player").findMany({
           filters: { name: { $eqi: newPlayerName } },
           fields: ["documentId"],
@@ -2376,51 +2393,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             "A player with this name already exists. Select the existing player instead."
           )
         }
-        // Resolve a unique slug with a retry loop: diacritic-equivalent names ("Rémi" vs
-        // "Remi") slugify to the same value and would otherwise hit the slug unique
-        // constraint and surface as a 500. (Mirrors findOrCreatePlayerForAttendee.)
-        const baseSlug = slugify(newPlayerName, { lower: true, strict: true }) || "player"
-        let slug = baseSlug
-        let attempts = 0
-        while (attempts < 5) {
-          const taken = await strapi.documents("api::player.player").findFirst({
-            filters: { slug },
-            fields: ["documentId"],
+        // NOTE: the player `beforeCreate` lifecycle derives the slug from the name
+        // (slug = toSlug(name)) and overwrites anything we set, so we don't compute a slug
+        // here. Two names that slugify identically ("Rémi" vs "Remi") therefore collide on
+        // the slug unique constraint; surface that as a clear 400 instead of a 500. Retrying
+        // is pointless — the lifecycle would regenerate the same slug.
+        try {
+          participantPlayer = await strapi.documents("api::player.player").create({
+            data: {
+              name: newPlayerName,
+              position: "Player",
+              company: newPlayer?.company?.trim() || null,
+            } as any,
           })
-          if (!taken) break
-          slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
-          attempts++
-        }
-        if (attempts >= 5) {
-          strapi.log.warn(
-            `[Event] Could not find a free slug for "${newPlayerName}" after 5 attempts`
-          )
-          return ctx.badRequest(
-            "Could not generate a unique player identifier. Please try a slightly different name."
-          )
-        }
-        // Create with retry-on-conflict: a concurrent add to a DIFFERENT event (whose lock
-        // we don't share) can claim a diacritic-equivalent slug between our pre-check and
-        // insert. Regenerate the slug and retry rather than surfacing a spurious 400.
-        for (let createAttempt = 0; createAttempt < 3 && !participantPlayer; createAttempt++) {
-          try {
-            participantPlayer = await strapi.documents("api::player.player").create({
-              data: {
-                name: newPlayerName,
-                slug,
-                position: "Player",
-                company: newPlayer?.company?.trim() || null,
-              } as any,
-            })
-          } catch (err) {
-            if (createAttempt === 2) {
-              strapi.log.error(`[Event] Failed to create player "${newPlayerName}": ${err}`)
-              return ctx.badRequest(
-                "Could not create the player; the name or slug may already be in use."
-              )
-            }
-            slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
+        } catch (err) {
+          if (/unique|duplicate|already exists/i.test(String(err))) {
+            strapi.log.warn(`[Event] Name/slug conflict creating player "${newPlayerName}": ${err}`)
+            return ctx.badRequest(
+              "A player with this name (or a very similar one) already exists. Select the existing player instead."
+            )
           }
+          strapi.log.error(`[Event] Failed to create player "${newPlayerName}": ${err}`)
+          throw err
         }
         createdPlayerDocId = participantPlayer.documentId
         strapi.log.info(
@@ -2468,13 +2462,19 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       // 4. Add the player to the event attendee list FIRST (draft + published, dedup-safe).
       // Minting the ticket LAST means a failure in this step leaves no orphan "valid" ticket
       // that the duplicate guard (step 2) would later treat as "already a participant",
-      // blocking retries. addPlayerToEventAttendees is idempotent, so a retry is safe.
-      await addPlayerToEventAttendees(
+      // blocking retries. addPlayerToEventAttendees is idempotent. We record whether WE added
+      // the membership (vs the player already attending) so the catch can reverse only our own
+      // change — otherwise a mint failure would orphan the player on event.players (visible
+      // publicly) with no ticket.
+      const attendeeWasAdded = await addPlayerToEventAttendees(
         strapi,
         participantPlayer.documentId,
         { documentId: event.documentId, id: Number(event.id) },
         "[Event]"
       )
+      if (attendeeWasAdded) {
+        addedAttendeePlayerDocId = participantPlayer.documentId
+      }
 
       // 5. Mint a free ticket (no order) so the attendee appears in the roster
       const attendeeName = participantPlayer.name
@@ -2511,9 +2511,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         },
       })
     } catch (err) {
-      // If we created a player in this request but a later step threw, roll it back so a
-      // transient error doesn't leave an orphan player with no ticket. Returned errors
-      // (ctx.badRequest/notFound) don't reach here — only thrown ones do.
+      // Roll back, in reverse order, only what THIS request created when a later step threw
+      // (e.g. a transient ticket-mint failure). Returned errors (ctx.badRequest/notFound)
+      // don't reach here — only thrown ones do.
+      if (addedAttendeePlayerDocId) {
+        // Reverse the attendee-list membership we added in step 4 so the player isn't left
+        // publicly enrolled with no ticket. Deleting a newly-created player below would also
+        // drop the relation, but existing players must be detached explicitly.
+        await removePlayerFromEventAttendees(
+          strapi,
+          addedAttendeePlayerDocId,
+          { documentId: event.documentId },
+          "[Event]"
+        ).catch(() => {})
+      }
       if (createdPlayerDocId) {
         await strapi
           .documents("api::player.player")
@@ -2562,37 +2573,13 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.notFound("Event not found")
     }
 
-    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
-    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
-    const isFounder = player.position === "Founder"
-
-    if (!isHost && !isMentor && !isFounder) {
+    if (!this.isEventOrganizer(event, player)) {
       return ctx.forbidden("You don't have access to remove participants from this event")
     }
 
-    const ticket = await strapi.documents("api::ticket.ticket").findOne({
-      documentId: ticketId,
-      populate: {
-        event: { fields: ["documentId"] },
-        order: { fields: ["documentId"] },
-        player: { fields: ["documentId"] },
-      },
-    })
-
-    if (!ticket) {
-      return ctx.notFound("Ticket not found")
-    }
-    if ((ticket as any).event?.documentId !== eventId) {
-      return ctx.badRequest("Ticket does not belong to this event")
-    }
-    // Only manually-added participants (comp ticket, no Stripe order) can be removed.
-    if ((ticket as any).order) {
-      return ctx.badRequest(
-        "Only manually-added participants can be removed; purchased tickets must be refunded."
-      )
-    }
-
-    // Shared per-event lock (see addParticipant) so add/remove are serialized.
+    // Acquire the per-event lock BEFORE reading the ticket: two concurrent deletes must not
+    // both pass the guards and then double-delete (the second would no-op and return a
+    // spurious success). Shared with addParticipant so add/remove are serialized.
     const lockName = `event-participants:${eventId}`
     const lockToken = await acquireLock(lockName, 30_000)
     if (!lockToken) {
@@ -2602,6 +2589,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
     }
 
     try {
+      const ticket = await strapi.documents("api::ticket.ticket").findOne({
+        documentId: ticketId,
+        populate: {
+          event: { fields: ["documentId"] },
+          order: { fields: ["documentId"] },
+          player: { fields: ["documentId"] },
+        },
+      })
+
+      if (!ticket) {
+        return ctx.notFound("Ticket not found")
+      }
+      if ((ticket as any).event?.documentId !== eventId) {
+        return ctx.badRequest("Ticket does not belong to this event")
+      }
+      // Only manually-added participants (comp ticket, no Stripe order) can be removed.
+      if ((ticket as any).order) {
+        return ctx.badRequest(
+          "Only manually-added participants can be removed; purchased tickets must be refunded."
+        )
+      }
+
       const participantPlayerDocId = (ticket as any).player?.documentId
 
       await strapi.documents("api::ticket.ticket").delete({ documentId: ticketId })
