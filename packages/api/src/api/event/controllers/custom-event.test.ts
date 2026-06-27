@@ -1,5 +1,6 @@
 import type { Core } from "@strapi/strapi"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { acquireLock } from "../../../services/cron/distributed-lock"
 import { addPlayerToEventAttendees } from "../../../services/ticketing/player-service"
 import customEventFactory from "./custom-event"
 
@@ -9,6 +10,10 @@ vi.mock("../../../libs/tickets", () => ({
 }))
 vi.mock("../../../services/ticketing/player-service", () => ({
   addPlayerToEventAttendees: vi.fn(),
+}))
+vi.mock("../../../services/cron/distributed-lock", () => ({
+  acquireLock: vi.fn(async () => "test-lock-token"),
+  releaseLock: vi.fn(async () => {}),
 }))
 
 /**
@@ -335,5 +340,75 @@ describe("custom-event.addParticipant", () => {
     expect(ctx.forbidden).not.toHaveBeenCalled()
     expect(model(TICKET_UID).create).toHaveBeenCalled()
     expect(ctx.send).toHaveBeenCalled()
+  })
+
+  it("rejects a new player with an invalid email before any writes", async () => {
+    const { strapi, model } = setupOrganizer()
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { newPlayer: { name: "New Person", email: "not-an-email" } } } },
+    })
+
+    await customEventFactory({ strapi }).addParticipant(ctx)
+
+    expect(ctx.badRequest).toHaveBeenCalled()
+    expect(model(PLAYER_UID).create).not.toHaveBeenCalled()
+    expect(model(TICKET_UID).create).not.toHaveBeenCalled()
+  })
+
+  it("retries with a suffixed slug when the base slug is already taken", async () => {
+    const { strapi, model } = setupOrganizer()
+    model(PLAYER_UID).findMany.mockResolvedValue([]) // no exact name clash ("Rémi" != "Remi")
+    // slug "remi" is taken (a diacritic-equivalent "Remi" already exists), then free
+    model(PLAYER_UID)
+      .findFirst.mockResolvedValueOnce({ documentId: "ply-remi" })
+      .mockResolvedValueOnce(null)
+    model(PLAYER_UID).create.mockResolvedValue({ id: 8, documentId: "ply-8", name: "Rémi" })
+    model(TICKET_UID).findMany.mockResolvedValue([])
+    model(TICKET_TYPE_UID).findFirst.mockResolvedValue({
+      id: 99,
+      documentId: "tt-ext",
+      name: "external",
+    })
+    model(TICKET_UID).create.mockResolvedValue({
+      documentId: "tk-9",
+      ticketCode: "TKT-TEST-1234",
+      ticketStatus: "valid",
+      createdAt: "2026-06-26T00:00:00.000Z",
+    })
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { newPlayer: { name: "Rémi" } } } },
+    })
+
+    await customEventFactory({ strapi }).addParticipant(ctx)
+
+    const createArg = model(PLAYER_UID).create.mock.calls[0][0]
+    expect(createArg.data.name).toBe("Rémi")
+    expect(createArg.data.slug).toMatch(/^remi-[0-9a-f]+$/) // base slug "remi" + random suffix
+    expect(ctx.send).toHaveBeenCalled()
+  })
+
+  it("returns badRequest when the per-event lock is already held", async () => {
+    const { strapi, model } = setupOrganizer()
+    vi.mocked(acquireLock).mockResolvedValueOnce(null) // lock held by a concurrent add
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { playerDocumentId: "ply-5" } } },
+    })
+
+    await customEventFactory({ strapi }).addParticipant(ctx)
+
+    expect(ctx.badRequest).toHaveBeenCalledWith(
+      "Another participant is being added to this event. Please retry."
+    )
+    expect(model(TICKET_UID).create).not.toHaveBeenCalled()
+    expect(model(PLAYER_UID).findOne).not.toHaveBeenCalled()
   })
 })

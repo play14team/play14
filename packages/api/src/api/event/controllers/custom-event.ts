@@ -4,11 +4,14 @@
  * Only accessible by Hosts, Mentors, and Founders
  */
 
+import { randomBytes } from "node:crypto"
 import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
 import { imageSize } from "image-size"
 import slugify from "slugify"
 import { generateTicketCode } from "../../../libs/tickets"
+import { validateEmail } from "../../../libs/validation"
+import { acquireLock, releaseLock } from "../../../services/cron/distributed-lock"
 import { addPlayerToEventAttendees } from "../../../services/ticketing/player-service"
 import { generateTimetable } from "../templates/schedule-templates"
 
@@ -2283,7 +2286,10 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("You must have a linked player profile")
     }
 
-    // Find the event and verify organizer access
+    // Find the event and verify organizer access.
+    // NOTE: like the sibling participant endpoints (getParticipants), this operates on
+    // the organizer's event whether draft or published — addPlayerToEventAttendees below
+    // syncs the attendee into BOTH versions, and tickets are linked by event regardless.
     const event = await strapi.documents("api::event.event").findOne({
       documentId: eventId,
       populate: {
@@ -2310,126 +2316,176 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       | { name?: string; email?: string; company?: string }
       | undefined
 
-    // 1. Resolve the participant's player profile (existing or newly created)
-    let participantPlayer: any = null
-
-    if (playerDocumentId) {
-      participantPlayer = await strapi.documents("api::player.player").findOne({
-        documentId: playerDocumentId,
-        populate: { user: { fields: ["email"] } },
-      })
-      if (!participantPlayer) {
-        return ctx.notFound("Player not found")
-      }
-    } else if (newPlayer?.name) {
-      const name = newPlayer.name.trim()
-      if (name.length < 2) {
-        return ctx.badRequest("Name is required and must be at least 2 characters")
-      }
-      // player.name is unique — reject duplicates so the organizer picks the existing one
-      const existing = await strapi.documents("api::player.player").findMany({
-        filters: { name: { $eqi: name } },
-        fields: ["documentId"],
-      })
-      if (existing.length > 0) {
-        return ctx.badRequest(
-          "A player with this name already exists. Select the existing player instead."
-        )
-      }
-      participantPlayer = await strapi.documents("api::player.player").create({
-        data: {
-          name,
-          slug: slugify(name, { lower: true, strict: true }),
-          position: "Player",
-          company: newPlayer.company?.trim() || null,
-        } as any,
-      })
-      strapi.log.info(
-        `[Event] Created player ${participantPlayer.documentId} ("${name}") while adding participant to "${event.name}" by ${player.name}`
-      )
-    } else {
+    if (!playerDocumentId && !newPlayer?.name) {
       return ctx.badRequest("Provide either playerDocumentId or newPlayer.name")
     }
 
-    // 2. Duplicate guard — already enrolled (valid/used ticket) for this event?
-    const existingTickets = await strapi.documents("api::ticket.ticket").findMany({
-      filters: {
-        event: { documentId: eventId },
-        player: { documentId: participantPlayer.documentId },
-        ticketStatus: { $in: ["valid", "used"] },
-      },
-      fields: ["documentId"],
-    })
-    if (existingTickets.length > 0) {
-      return ctx.badRequest("This player is already a participant of this event")
+    // Validate new-player name + optional email up front (fail fast, before any writes).
+    let newPlayerName = ""
+    let newPlayerEmail: string | null = null
+    if (!playerDocumentId) {
+      newPlayerName = (newPlayer?.name || "").trim()
+      if (newPlayerName.length < 2) {
+        return ctx.badRequest("Name is required and must be at least 2 characters")
+      }
+      if (newPlayer?.email?.trim()) {
+        const emailResult = validateEmail(newPlayer.email.trim())
+        if (!emailResult.valid) {
+          return ctx.badRequest(emailResult.error || "Invalid email address")
+        }
+        newPlayerEmail = emailResult.email
+      }
     }
 
-    // 3. Find-or-create the per-event "external" ticket type (inactive → hidden from sale)
-    let externalType = await strapi.documents("api::ticket-type.ticket-type").findFirst({
-      filters: {
-        event: { documentId: eventId },
-        name: { $eqi: EXTERNAL_TICKET_TYPE_NAME },
-      },
-    })
-    if (!externalType) {
-      // Inherit currency from an existing ticket type, else default to EUR
-      const anyType = await strapi.documents("api::ticket-type.ticket-type").findFirst({
-        filters: { event: { documentId: eventId } },
-        fields: ["currency"],
+    // Serialize concurrent adds to the same event with a distributed lock. This closes the
+    // check-then-create race on both the duplicate-ticket guard and the find-or-create of the
+    // per-event "external" ticket type. Degrades to no-op locking when Redis is unavailable
+    // (acquireLock returns a non-null fallback token).
+    const lockName = `add-participant:${eventId}`
+    const lockToken = await acquireLock(lockName, 30_000)
+    if (!lockToken) {
+      return ctx.badRequest("Another participant is being added to this event. Please retry.")
+    }
+
+    try {
+      // 1. Resolve the participant's player profile (existing or newly created)
+      let participantPlayer: any
+      if (playerDocumentId) {
+        participantPlayer = await strapi.documents("api::player.player").findOne({
+          documentId: playerDocumentId,
+          populate: { user: { fields: ["email"] } },
+        })
+        if (!participantPlayer) {
+          return ctx.notFound("Player not found")
+        }
+      } else {
+        // player.name is unique — reject exact matches so the organizer picks the existing one
+        const existing = await strapi.documents("api::player.player").findMany({
+          filters: { name: { $eqi: newPlayerName } },
+          fields: ["documentId"],
+        })
+        if (existing.length > 0) {
+          return ctx.badRequest(
+            "A player with this name already exists. Select the existing player instead."
+          )
+        }
+        // Resolve a unique slug with a retry loop: diacritic-equivalent names ("Rémi" vs
+        // "Remi") slugify to the same value and would otherwise hit the slug unique
+        // constraint and surface as a 500. (Mirrors findOrCreatePlayerForAttendee.)
+        const baseSlug = slugify(newPlayerName, { lower: true, strict: true }) || "player"
+        let slug = baseSlug
+        let attempts = 0
+        while (attempts < 5) {
+          const taken = await strapi.documents("api::player.player").findFirst({
+            filters: { slug },
+            fields: ["documentId"],
+          })
+          if (!taken) break
+          slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
+          attempts++
+        }
+        try {
+          participantPlayer = await strapi.documents("api::player.player").create({
+            data: {
+              name: newPlayerName,
+              slug,
+              position: "Player",
+              company: newPlayer?.company?.trim() || null,
+            } as any,
+          })
+        } catch (err) {
+          strapi.log.error(`[Event] Failed to create player "${newPlayerName}": ${err}`)
+          return ctx.badRequest(
+            "Could not create the player; the name or slug may already be in use."
+          )
+        }
+        strapi.log.info(
+          `[Event] Created player ${participantPlayer.documentId} ("${newPlayerName}") while adding participant to "${event.name}" by ${player.name}`
+        )
+      }
+
+      // 2. Duplicate guard — already enrolled (valid/used ticket) for this event?
+      const existingTickets = await strapi.documents("api::ticket.ticket").findMany({
+        filters: {
+          event: { documentId: eventId },
+          player: { documentId: participantPlayer.documentId },
+          ticketStatus: { $in: ["valid", "used"] },
+        },
+        fields: ["documentId"],
       })
-      externalType = await strapi.documents("api::ticket-type.ticket-type").create({
+      if (existingTickets.length > 0) {
+        return ctx.badRequest("This player is already a participant of this event")
+      }
+
+      // 3. Find-or-create the per-event "external" ticket type (inactive → hidden from sale)
+      let externalType = await strapi.documents("api::ticket-type.ticket-type").findFirst({
+        filters: {
+          event: { documentId: eventId },
+          name: { $eqi: EXTERNAL_TICKET_TYPE_NAME },
+        },
+      })
+      if (!externalType) {
+        // Inherit currency from an existing ticket type, else default to EUR
+        const anyType = await strapi.documents("api::ticket-type.ticket-type").findFirst({
+          filters: { event: { documentId: eventId } },
+          fields: ["currency"],
+        })
+        externalType = await strapi.documents("api::ticket-type.ticket-type").create({
+          data: {
+            name: EXTERNAL_TICKET_TYPE_NAME,
+            price: 0,
+            currency: (anyType as any)?.currency || "EUR",
+            isActive: false,
+            event: event.id,
+          } as any,
+        })
+      }
+
+      // 4. Mint a free ticket (no order) so the attendee appears in the roster
+      const attendeeName = participantPlayer.name
+      const attendeeEmail = newPlayerEmail || (participantPlayer as any).user?.email || null
+
+      const ticket = await strapi.documents("api::ticket.ticket").create({
         data: {
-          name: EXTERNAL_TICKET_TYPE_NAME,
-          price: 0,
-          currency: (anyType as any)?.currency || "EUR",
-          isActive: false,
+          ticketCode: generateTicketCode(),
+          ticketStatus: "valid",
+          attendeeName,
+          attendeeEmail,
+          ticketType: externalType.id,
+          player: participantPlayer.id,
           event: event.id,
         } as any,
       })
-    }
 
-    // 4. Mint a free ticket (no order) so the attendee appears in the roster
-    const attendeeName = participantPlayer.name
-    const attendeeEmail = newPlayer?.email?.trim() || (participantPlayer as any).user?.email || null
+      // 5. Add the player to the event attendee list (draft + published, dedup-safe)
+      await addPlayerToEventAttendees(
+        strapi,
+        participantPlayer.documentId,
+        { documentId: event.documentId, id: Number(event.id) },
+        "[Event]"
+      )
 
-    const ticket = await strapi.documents("api::ticket.ticket").create({
-      data: {
-        ticketCode: generateTicketCode(),
-        ticketStatus: "valid",
-        attendeeName,
-        attendeeEmail,
-        ticketType: externalType.id,
-        player: participantPlayer.id,
-        event: event.id,
-      } as any,
-    })
+      strapi.log.info(
+        `[Event] Participant added to "${event.name}" by ${player.name}: ${attendeeName} (${ticket.ticketCode})`
+      )
 
-    // 5. Add the player to the event attendee list (draft + published, dedup-safe)
-    await addPlayerToEventAttendees(
-      strapi,
-      participantPlayer.documentId,
-      { documentId: event.documentId, id: Number(event.id) },
-      "[Event]"
-    )
-
-    strapi.log.info(
-      `[Event] Participant added to "${event.name}" by ${player.name}: ${attendeeName} (${ticket.ticketCode})`
-    )
-
-    return ctx.send({
-      data: {
-        participant: {
-          documentId: ticket.documentId,
-          ticketCode: ticket.ticketCode,
-          ticketStatus: ticket.ticketStatus,
-          attendeeName,
-          attendeeEmail,
-          ticketType: { documentId: externalType.documentId, name: externalType.name },
-          player: { documentId: participantPlayer.documentId, name: participantPlayer.name },
-          createdAt: (ticket as any).createdAt,
+      return ctx.send({
+        data: {
+          participant: {
+            documentId: ticket.documentId,
+            ticketCode: ticket.ticketCode,
+            ticketStatus: ticket.ticketStatus,
+            attendeeName,
+            attendeeEmail,
+            ticketType: { documentId: externalType.documentId, name: externalType.name },
+            player: { documentId: participantPlayer.documentId, name: participantPlayer.name },
+            createdAt: (ticket as any).createdAt,
+          },
         },
-      },
-    })
+      })
+    } finally {
+      await releaseLock(lockName, lockToken)
+    }
   },
 
   /**
