@@ -157,3 +157,43 @@ export async function getParticipantStats(
     data: result.data?.data,
   }
 }
+
+export interface AddParticipantPayload {
+  /** Enroll an existing player by documentId */
+  playerDocumentId?: string
+  /** Or create a brand-new player profile from these fields */
+  newPlayer?: {
+    name: string
+    email?: string
+    company?: string
+  }
+}
+
+/**
+ * Add a participant to an event (organizer only).
+ *
+ * Enrolls an existing player or creates a new one, issues a free "external"
+ * ticket (no purchase) and adds them to the event attendee list. No email is sent.
+ */
+export async function addParticipant(
+  eventDocumentId: string,
+  payload: AddParticipantPayload
+): Promise<ActionResult<Participant>> {
+  const result = await strapiFetch<StrapiDataResponse<{ participant: Participant }>>(
+    "/admin/events/:eventDocumentId/participants",
+    { eventDocumentId },
+    { method: "POST", body: { data: payload } }
+  )
+
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to add participant",
+    }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data?.participant,
+  }
+}

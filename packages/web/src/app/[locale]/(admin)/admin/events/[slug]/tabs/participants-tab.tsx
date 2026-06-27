@@ -2,8 +2,15 @@
 
 import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useState } from "react"
-import { requestRefund } from "@/components/tickets/purchase.action"
 import {
+  type PlayerForInvite,
+  searchPlayersForInvite,
+} from "@/app/[locale]/(admin)/admin/players/invite.action"
+import { requestRefund } from "@/components/tickets/purchase.action"
+import { useDebounce } from "@/hooks/use-debounce"
+import {
+  type AddParticipantPayload,
+  addParticipant,
   checkInParticipant,
   getEventParticipants,
   getParticipantStats,
@@ -34,6 +41,19 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   const [refundError, setRefundError] = useState<string | null>(null)
   const [isRefunding, setIsRefunding] = useState(false)
 
+  // Add-participant modal
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [addMode, setAddMode] = useState<"existing" | "new">("existing")
+  const [playerQuery, setPlayerQuery] = useState("")
+  const debouncedPlayerQuery = useDebounce(playerQuery, 300)
+  const [searchResults, setSearchResults] = useState<PlayerForInvite[]>([])
+  const [searching, setSearching] = useState(false)
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerForInvite | null>(null)
+  const [newName, setNewName] = useState("")
+  const [newEmail, setNewEmail] = useState("")
+  const [addError, setAddError] = useState<string | null>(null)
+  const [isAdding, setIsAdding] = useState(false)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -61,6 +81,75 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Search players for the "existing player" picker
+  useEffect(() => {
+    if (!showAddModal || addMode !== "existing") return
+    const query = debouncedPlayerQuery.trim()
+    if (query.length < 2) {
+      setSearchResults([])
+      return
+    }
+    let cancelled = false
+    setSearching(true)
+    searchPlayersForInvite(query)
+      .then((players) => {
+        if (!cancelled) setSearchResults(players)
+      })
+      .finally(() => {
+        if (!cancelled) setSearching(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [debouncedPlayerQuery, showAddModal, addMode])
+
+  const openAddModal = () => {
+    setAddMode("existing")
+    setPlayerQuery("")
+    setSearchResults([])
+    setSelectedPlayer(null)
+    setNewName("")
+    setNewEmail("")
+    setAddError(null)
+    setShowAddModal(true)
+  }
+
+  const closeAddModal = () => {
+    if (isAdding) return
+    setShowAddModal(false)
+  }
+
+  const handleAddSubmit = async () => {
+    setAddError(null)
+
+    let payload: AddParticipantPayload
+    if (addMode === "existing") {
+      if (!selectedPlayer) {
+        setAddError(t("addSelectPlayerRequired"))
+        return
+      }
+      payload = { playerDocumentId: selectedPlayer.documentId }
+    } else {
+      const name = newName.trim()
+      if (name.length < 2) {
+        setAddError(t("addNameRequired"))
+        return
+      }
+      payload = { newPlayer: { name, email: newEmail.trim() || undefined } }
+    }
+
+    setIsAdding(true)
+    const result = await addParticipant(eventDocumentId, payload)
+    setIsAdding(false)
+
+    if (result.success) {
+      setShowAddModal(false)
+      fetchData()
+    } else {
+      setAddError(result.error || t("addFailed"))
+    }
+  }
 
   const handleCheckIn = async (participant: Participant) => {
     setCheckingIn(participant.documentId)
@@ -284,8 +373,16 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
 
       {/* Participants List Section */}
       <div className="admin-form-section">
-        <h2>{t("participantsList")}</h2>
-        <p className="admin-form-section-description">{t("participantsListDescription")}</p>
+        <div className={styles.listHeader}>
+          <div>
+            <h2>{t("participantsList")}</h2>
+            <p className="admin-form-section-description">{t("participantsListDescription")}</p>
+          </div>
+          <button type="button" className={styles.addButton} onClick={openAddModal}>
+            <i className="bx bx-plus" />
+            {t("addParticipant")}
+          </button>
+        </div>
 
         {/* Filters */}
         <div className={styles.filters}>
@@ -487,6 +584,149 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                   </>
                 ) : (
                   t("refundConfirm")
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add participant modal */}
+      {showAddModal && (
+        <div className={styles.refundModal} onClick={closeAddModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3>{t("addParticipantTitle")}</h3>
+
+            <div className={styles.modeToggle}>
+              <button
+                type="button"
+                className={`${styles.modeButton} ${addMode === "existing" ? styles.active : ""}`}
+                onClick={() => {
+                  setAddMode("existing")
+                  setAddError(null)
+                }}
+              >
+                {t("addExistingPlayer")}
+              </button>
+              <button
+                type="button"
+                className={`${styles.modeButton} ${addMode === "new" ? styles.active : ""}`}
+                onClick={() => {
+                  setAddMode("new")
+                  setAddError(null)
+                }}
+              >
+                {t("addNewPlayer")}
+              </button>
+            </div>
+
+            {addMode === "existing" ? (
+              <div className={styles.formGroup}>
+                <label>{t("addSearchLabel")}</label>
+                {selectedPlayer ? (
+                  <div className={styles.selectedPlayer}>
+                    <span>{selectedPlayer.name}</span>
+                    <button
+                      type="button"
+                      className={styles.clearSelection}
+                      onClick={() => setSelectedPlayer(null)}
+                      aria-label={t("addClearSelection")}
+                    >
+                      <i className="bx bx-x" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      className="admin-input"
+                      placeholder={t("addSearchPlaceholder")}
+                      value={playerQuery}
+                      onChange={(e) => setPlayerQuery(e.target.value)}
+                    />
+                    {searching && (
+                      <div className={styles.searchHint}>
+                        <i className="bx bx-loader-alt bx-spin" /> {t("addSearching")}
+                      </div>
+                    )}
+                    {!searching &&
+                      debouncedPlayerQuery.trim().length >= 2 &&
+                      searchResults.length === 0 && (
+                        <div className={styles.searchHint}>{t("addNoResults")}</div>
+                      )}
+                    {searchResults.length > 0 && (
+                      <ul className={styles.searchResults}>
+                        {searchResults.map((p) => (
+                          <li key={p.documentId}>
+                            <button
+                              type="button"
+                              className={styles.searchResultItem}
+                              onClick={() => {
+                                setSelectedPlayer(p)
+                                setAddError(null)
+                              }}
+                            >
+                              <span className={styles.resultName}>{p.name}</span>
+                              {p.company && <span className={styles.resultMeta}>{p.company}</span>}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className={styles.formGroup}>
+                  <label>{t("addNameLabel")}</label>
+                  <input
+                    type="text"
+                    className="admin-input"
+                    placeholder={t("addNamePlaceholder")}
+                    value={newName}
+                    onChange={(e) => {
+                      setNewName(e.target.value)
+                      setAddError(null)
+                    }}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>{t("addEmailLabel")}</label>
+                  <input
+                    type="email"
+                    className="admin-input"
+                    placeholder={t("addEmailPlaceholder")}
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
+            {addError && <div className={styles.error}>{addError}</div>}
+
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={closeAddModal}
+                disabled={isAdding}
+              >
+                {t("addCancel")}
+              </button>
+              <button
+                type="button"
+                className={styles.addConfirmButton}
+                onClick={handleAddSubmit}
+                disabled={isAdding}
+              >
+                {isAdding ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin" /> {t("addSubmitting")}
+                  </>
+                ) : (
+                  t("addConfirm")
                 )}
               </button>
             </div>
