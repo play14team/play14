@@ -64,7 +64,7 @@ export const Explainer: FC<ExplainerProps> = ({ topic, cut, sceneDurations }) =>
       {placed.map(({ scene, from, duration }) => (
         <Sequence key={scene.id} from={from} durationInFrames={duration}>
           <SceneShell durationInFrames={duration}>
-            <SceneContent visual={scene.visual} />
+            <SceneContent visual={scene.visual} durationInFrames={duration} />
           </SceneShell>
           <Sequence from={HEAD_PAD}>
             <Audio src={staticFile(sceneAudio(topic, scene, cut))} />

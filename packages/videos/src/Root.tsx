@@ -5,6 +5,7 @@ import { Composition, Folder } from "remotion"
 import { BrandIntro } from "./BrandIntro"
 import { calculateExplainerMetadata, Explainer } from "./Explainer"
 import type { Cut, TopicKey } from "./episodes"
+import { calculateMontageMetadata, Montage } from "./Montage"
 import { tagline, videoFormat } from "./theme"
 
 const { width, height, fps } = videoFormat
@@ -33,6 +34,18 @@ export const RemotionRoot: FC = () => {
             calculateMetadata={calculateExplainerMetadata}
           />
         ))}
+      </Folder>
+      <Folder name="Community">
+        <Composition
+          id="CommunityMontage"
+          component={Montage}
+          durationInFrames={1500}
+          fps={fps}
+          width={width}
+          height={height}
+          defaultProps={{}}
+          calculateMetadata={calculateMontageMetadata}
+        />
       </Folder>
       <Folder name="Brand">
         <Composition

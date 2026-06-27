@@ -10,6 +10,7 @@
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import { communityAudio, communityVO } from "../src/community"
 import { audioFile, audioFileShort, type TopicKey, topics } from "../src/episodes"
 
 const API_KEY = process.env.ELEVENLABS_API_KEY
@@ -68,6 +69,9 @@ for (const topic of Object.keys(topics) as TopicKey[]) {
     }
   }
 }
+
+// The community montage uses a single continuous voiceover.
+clips.push({ path: communityAudio, text: communityVO, label: "community/montage" })
 
 for (const clip of clips) {
   const out = join(publicDir, clip.path)

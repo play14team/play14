@@ -35,15 +35,15 @@ export type SceneVisual =
   | { kind: "intro" }
   | { kind: "outro"; cta: string }
   | { kind: "text"; eyebrow?: string; headline: string; icon?: IconName }
-  | { kind: "crowd"; eyebrow?: string; headline: string }
+  | { kind: "crowd"; eyebrow?: string; headline: string; media?: string }
   | { kind: "agenda"; eyebrow?: string; headline: string }
   | { kind: "contributors"; eyebrow?: string; headline: string }
-  | { kind: "pitch"; eyebrow?: string; headline: string }
+  | { kind: "pitch"; eyebrow?: string; headline: string; media?: string }
   | { kind: "motto"; headline: string }
   | { kind: "twofeet"; eyebrow?: string; headline: string }
   | { kind: "animals" }
-  | { kind: "writeSticky"; eyebrow?: string; headline: string }
-  | { kind: "board"; mode: BoardMode; eyebrow?: string; headline: string }
+  | { kind: "writeSticky"; eyebrow?: string; headline: string; media?: string }
+  | { kind: "board"; mode: BoardMode; eyebrow?: string; headline: string; media?: string }
   | {
       kind: "principle"
       index: number
@@ -252,6 +252,7 @@ const marketplaceTopic: Topic = {
         mode: "overview",
         eyebrow: "the marketplace",
         headline: "One big board",
+        media: "boardClip",
       },
     },
     {
@@ -280,13 +281,23 @@ const marketplaceTopic: Topic = {
       id: "write-sticky",
       tts: "Got a game to share? Grab a big sticky note. Write its name — draw something if you like. Add how many players you need, how long it runs, and your name.",
       inShort: true,
-      visual: { kind: "writeSticky", eyebrow: "propose a game", headline: "Fill in a sticky" },
+      visual: {
+        kind: "writeSticky",
+        eyebrow: "propose a game",
+        headline: "Fill in a sticky",
+        media: "mkt_write",
+      },
     },
     {
       id: "pitch",
       tts: "Then step up and pitch it to everyone. Keep it short, keep it fun.",
       inShort: true,
-      visual: { kind: "pitch", eyebrow: "pitch it", headline: "Pitch it to the room" },
+      visual: {
+        kind: "pitch",
+        eyebrow: "pitch it",
+        headline: "Pitch it to the room",
+        media: "mkt_pitch",
+      },
     },
     {
       id: "place",
@@ -309,7 +320,12 @@ const marketplaceTopic: Topic = {
       id: "tips",
       tts: "Your game doesn't have to be new — the play fourteen classics are always welcome. And no game to propose? That's perfectly fine. Just play.",
       inShort: false,
-      visual: { kind: "crowd", eyebrow: "good to know", headline: "No game? Just play." },
+      visual: {
+        kind: "crowd",
+        eyebrow: "good to know",
+        headline: "No game? Just play.",
+        media: "mkt_tips",
+      },
     },
     {
       id: "debrief",

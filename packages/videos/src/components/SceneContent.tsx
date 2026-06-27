@@ -1,13 +1,65 @@
 import type { CSSProperties, FC, ReactNode } from "react"
-import { Easing, interpolate, useCurrentFrame } from "remotion"
+import { AbsoluteFill, Easing, Img, interpolate, staticFile, useCurrentFrame } from "remotion"
 import type { IconName, SceneVisual } from "../episodes"
-import { brandColors, fontFamily, fontWeight, spacing, tagline } from "../theme"
+import { boardClip, montageByValue, punchins, valueOrder } from "../media.generated"
+import { brandColors, fontFamily, fontWeight, neutrals, spacing, tagline } from "../theme"
+import { BrandMedia, type BrandMediaItem } from "./BrandMedia"
 import { BrandSubtitle, BrandTitle } from "./BrandText"
 import { ColorAccentBar } from "./ColorAccentBar"
 import { Bee, Butterfly, ConceptIcon, SpaceOptions } from "./icons"
 import { EmptyAgenda, MarketplaceBoard, WriteStickyScene } from "./marketplace"
 import { Play14Logo } from "./Play14Logo"
 import { ContributorCrowd, Crowd, PitchScene, WalkBetweenGroups } from "./people"
+
+/** Resolve a scene's `media` key to a staged photo/clip. */
+const resolveMedia = (key: string): { item: BrandMediaItem; kind: "photo" | "clip" } | null => {
+  if (key === "boardClip") return { item: boardClip, kind: "clip" }
+  const p = (punchins as Record<string, BrandMediaItem>)[key]
+  return p ? { item: p, kind: "photo" } : null
+}
+
+/** One representative photo per value — a warm, people-filled outro backdrop. */
+const OUTRO_PHOTOS = valueOrder.map((v) => montageByValue[v][0]).filter(Boolean)
+
+const MontageBackdrop: FC<{ durationInFrames: number }> = ({ durationInFrames }) => {
+  const frame = useCurrentFrame()
+  const per = Math.max(26, Math.floor(durationInFrames / Math.max(1, OUTRO_PHOTOS.length)))
+  return (
+    <AbsoluteFill>
+      {OUTRO_PHOTOS.map((ph, i) => {
+        const start = i * per
+        const op = interpolate(
+          frame,
+          [start - 12, start + 10, start + per - 10, start + per + 12],
+          [0, 1, 1, 0],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+        )
+        const kb = interpolate(frame, [start, start + per + 24], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        })
+        return (
+          <AbsoluteFill key={ph.src} style={{ opacity: op * 0.3 }}>
+            <Img
+              src={staticFile(ph.src)}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                transform: `scale(${1.05 + kb * 0.08})`,
+              }}
+            />
+          </AbsoluteFill>
+        )
+      })}
+      <AbsoluteFill
+        style={{
+          background: `radial-gradient(circle at center, ${neutrals.ink}99, ${neutrals.ink}ee)`,
+        }}
+      />
+    </AbsoluteFill>
+  )
+}
 
 /** Local-frame "appear" (opacity + rise), eased. */
 const useAppear = (start: number, distance = 28) => {
@@ -81,26 +133,29 @@ const IntroVisual: FC = () => (
   </div>
 )
 
-const OutroVisual: FC<{ cta: string }> = ({ cta }) => {
+const OutroVisual: FC<{ cta: string; durationInFrames: number }> = ({ cta, durationInFrames }) => {
   const sub = useAppear(18)
   const link = useAppear(28)
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: spacing.lg }}
-    >
-      <div style={useLogoReveal(2)}>
-        <Play14Logo onDark width={900} />
-      </div>
-      <BrandSubtitle style={sub}>{tagline}</BrandSubtitle>
-      <ColorAccentBar delay={24} width={640} height={16} />
-      <BrandSubtitle
-        fontSize={40}
-        color={brandColors.blue}
-        style={{ ...link, fontWeight: fontWeight.bold }}
+    <>
+      <MontageBackdrop durationInFrames={durationInFrames} />
+      <div
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: spacing.lg }}
       >
-        {cta}
-      </BrandSubtitle>
-    </div>
+        <div style={useLogoReveal(2)}>
+          <Play14Logo onDark width={900} />
+        </div>
+        <BrandSubtitle style={sub}>{tagline}</BrandSubtitle>
+        <ColorAccentBar delay={24} width={640} height={16} />
+        <BrandSubtitle
+          fontSize={40}
+          color={brandColors.blue}
+          style={{ ...link, fontWeight: fontWeight.bold }}
+        >
+          {cta}
+        </BrandSubtitle>
+      </div>
+    </>
   )
 }
 
@@ -166,18 +221,16 @@ const PrincipleHero: FC<{ icon: IconName; color: string }> = ({ icon, color }) =
   )
 }
 
-const PrincipleVisual: FC<Extract<SceneVisual, { kind: "principle" }>> = ({
-  index,
-  total,
-  headline,
-  example,
-  colorKey,
-  icon,
-}) => {
+const PrincipleVisual: FC<
+  Extract<SceneVisual, { kind: "principle" }> & { durationInFrames: number }
+> = ({ index, total, headline, example, colorKey, icon, durationInFrames }) => {
   const color = brandColors[colorKey]
   const eb = useAppear(6, 18)
   const head = useAppear(12)
   const ex = useAppear(22, 18)
+  // Each principle is anchored by a real photo of people living it out.
+  const photo = (punchins as Record<string, BrandMediaItem>)[`p${index}`]
+  const motion = index === 1 ? "pan-left" : index % 2 === 0 ? "zoom-out" : "zoom-in"
   return (
     <div
       style={{
@@ -188,9 +241,22 @@ const PrincipleVisual: FC<Extract<SceneVisual, { kind: "principle" }>> = ({
         maxWidth: 1500,
       }}
     >
-      <div style={{ height: 200, display: "flex", alignItems: "center" }}>
-        <PrincipleHero icon={icon} color={color} />
-      </div>
+      {photo ? (
+        <BrandMedia
+          item={photo}
+          kind="photo"
+          width={1040}
+          height={448}
+          accent={color}
+          motion={motion}
+          durationInFrames={durationInFrames}
+          radius={26}
+        />
+      ) : (
+        <div style={{ height: 200, display: "flex", alignItems: "center" }}>
+          <PrincipleHero icon={icon} color={color} />
+        </div>
+      )}
       <Eyebrow color={color} style={eb}>{`principle ${index} of ${total}`}</Eyebrow>
       <BrandTitle fontSize={86} style={head}>
         {headline}
@@ -273,21 +339,64 @@ const AnimalsVisual: FC = () => {
   )
 }
 
+/** A real photo/clip framed in brand style, captioned like the SVG scenes. */
+const CaptionedMedia: FC<{
+  eyebrow?: string
+  headline: string
+  mediaKey: string
+  accent: string
+  width: number
+  height: number
+  motion: "zoom-in" | "zoom-out" | "pan-left" | "pan-right"
+  durationInFrames: number
+}> = ({ eyebrow, headline, mediaKey, accent, width, height, motion, durationInFrames }) => {
+  const m = resolveMedia(mediaKey)
+  if (!m) return null
+  return (
+    <Captioned eyebrow={eyebrow} headline={headline} gap={spacing.md}>
+      <BrandMedia
+        item={m.item}
+        kind={m.kind}
+        width={width}
+        height={height}
+        accent={accent}
+        motion={motion}
+        durationInFrames={durationInFrames}
+        radius={26}
+      />
+    </Captioned>
+  )
+}
+
 /** Renders the on-screen content for a scene. */
-export const SceneContent: FC<{ visual: SceneVisual }> = ({ visual }) => {
+export const SceneContent: FC<{ visual: SceneVisual; durationInFrames: number }> = ({
+  visual,
+  durationInFrames,
+}) => {
   switch (visual.kind) {
     case "intro":
       return <IntroVisual />
     case "outro":
-      return <OutroVisual cta={visual.cta} />
+      return <OutroVisual cta={visual.cta} durationInFrames={durationInFrames} />
     case "text":
       return <TextVisual eyebrow={visual.eyebrow} headline={visual.headline} icon={visual.icon} />
     case "principle":
-      return <PrincipleVisual {...visual} />
+      return <PrincipleVisual {...visual} durationInFrames={durationInFrames} />
     case "motto":
       return <MottoVisual headline={visual.headline} />
     case "crowd":
-      return (
+      return visual.media ? (
+        <CaptionedMedia
+          eyebrow={visual.eyebrow}
+          headline={visual.headline}
+          mediaKey={visual.media}
+          accent={brandColors.green}
+          width={1080}
+          height={512}
+          motion="zoom-out"
+          durationInFrames={durationInFrames}
+        />
+      ) : (
         <Captioned eyebrow={visual.eyebrow} headline={visual.headline}>
           <Crowd count={6} size={150} />
         </Captioned>
@@ -305,7 +414,18 @@ export const SceneContent: FC<{ visual: SceneVisual }> = ({ visual }) => {
         </Captioned>
       )
     case "pitch":
-      return (
+      return visual.media ? (
+        <CaptionedMedia
+          eyebrow={visual.eyebrow}
+          headline={visual.headline}
+          mediaKey={visual.media}
+          accent={brandColors.blue}
+          width={1040}
+          height={520}
+          motion="zoom-in"
+          durationInFrames={durationInFrames}
+        />
+      ) : (
         <Captioned eyebrow={visual.eyebrow} headline={visual.headline}>
           <PitchScene />
         </Captioned>
@@ -317,13 +437,35 @@ export const SceneContent: FC<{ visual: SceneVisual }> = ({ visual }) => {
         </Captioned>
       )
     case "writeSticky":
-      return (
+      return visual.media ? (
+        <CaptionedMedia
+          eyebrow={visual.eyebrow}
+          headline={visual.headline}
+          mediaKey={visual.media}
+          accent={brandColors.yellow}
+          width={920}
+          height={530}
+          motion="zoom-in"
+          durationInFrames={durationInFrames}
+        />
+      ) : (
         <Captioned eyebrow={visual.eyebrow} headline={visual.headline} gap={spacing.md}>
           <WriteStickyScene />
         </Captioned>
       )
     case "board":
-      return (
+      return visual.media ? (
+        <CaptionedMedia
+          eyebrow={visual.eyebrow}
+          headline={visual.headline}
+          mediaKey={visual.media}
+          accent={brandColors.orange}
+          width={1120}
+          height={512}
+          motion="zoom-in"
+          durationInFrames={durationInFrames}
+        />
+      ) : (
         <Captioned eyebrow={visual.eyebrow} headline={visual.headline} gap={spacing.md}>
           <MarketplaceBoard mode={visual.mode} />
         </Captioned>
