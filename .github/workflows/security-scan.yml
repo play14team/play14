@@ -68,12 +68,34 @@ jobs:
         # `--prod` excludes devDependencies. `--audit-level=high` fails the
         # job only on high/critical advisories — low/moderate still surface
         # in the log but don't block PRs.
-        # Ignored advisories:
+        # Advisories with a clean, non-breaking fix are pinned to patched
+        # versions via root `overrides` (shell-quote, tmp, linkify-it,
+        # form-data) rather than ignored here.
+        #
+        # Ignored advisories (each needs a major bump of a Strapi-internal
+        # transitive dep with no safe override; tracked for an upstream Strapi
+        # bump):
         #   GHSA-r5fr-rjxr-66jc — lodash `_.template` code injection. The only
-        #   fix bun's DB accepts is lodash >=4.17.24, which is an unofficial
-        #   republish; lodash/lodash maintainers have not tagged a release past
-        #   4.17.21 on GitHub. We pin canonical 4.17.21 via root `overrides`
-        #   and accept the warning — our code doesn't call `_.template`, and
-        #   the vulnerable path is only reachable from Strapi/CKEditor
-        #   admin-side internals with no user input.
-        run: bun audit --prod --audit-level=high --ignore=GHSA-r5fr-rjxr-66jc
+        #   fix bun's DB accepts is lodash >=4.17.24, an unofficial republish;
+        #   lodash maintainers have not tagged past 4.17.21. We pin canonical
+        #   4.17.21 via `overrides`; our code never calls `_.template`.
+        #   GHSA-p6gq-j5cr-w38f — nodemailer raw-option file read / SSRF. Only
+        #   reached via @strapi/provider-email-sendmail, which this app does
+        #   not use (a custom strapi-provider-email-sender is configured).
+        #   GHSA-fx2h-pf6j-xcff — vite `server.fs.deny` bypass on Windows. Vite
+        #   5.x is the Strapi admin builder; this is a dev-server-only,
+        #   Windows-only path, irrelevant to our built admin on a Linux runtime.
+        #   GHSA-vmh5-mc38-953g / GHSA-vxpw-j846-p89q / GHSA-hm92-r4w5-c3mj —
+        #   undici SOCKS5/WebSocket issues. The vulnerable 7.25 line is a Strapi
+        #   internal; we don't use undici SOCKS5 proxying or its WS client.
+        #   GHSA-96hv-2xvq-fx4p — ws fragment-flood DoS. Reached only via a
+        #   Strapi-internal ws@7 consumer; bumping to 8.x breaks it.
+        run: >
+          bun audit --prod --audit-level=high
+          --ignore=GHSA-r5fr-rjxr-66jc
+          --ignore=GHSA-p6gq-j5cr-w38f
+          --ignore=GHSA-fx2h-pf6j-xcff
+          --ignore=GHSA-vmh5-mc38-953g
+          --ignore=GHSA-vxpw-j846-p89q
+          --ignore=GHSA-hm92-r4w5-c3mj
+          --ignore=GHSA-96hv-2xvq-fx4p
