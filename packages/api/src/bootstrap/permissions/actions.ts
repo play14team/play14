@@ -71,6 +71,8 @@ export const EVENT_ACTIONS = {
   GET_REVENUE_ANALYTICS: "api::event.custom-event.getRevenueAnalytics",
   GET_PARTICIPANTS: "api::event.custom-event.getParticipants",
   GET_PARTICIPANT_STATS: "api::event.custom-event.getParticipantStats",
+  ADD_PARTICIPANT: "api::event.custom-event.addParticipant",
+  REMOVE_PARTICIPANT: "api::event.custom-event.removeParticipant",
   CHECK_IN_PARTICIPANT: "api::event.custom-event.checkInParticipant",
   UNDO_CHECK_IN: "api::event.custom-event.undoCheckIn",
   GET_TRANSLATION: "api::event.custom-event.getTranslation",

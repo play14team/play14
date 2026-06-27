@@ -682,6 +682,77 @@ export interface ApiDiscountCodeDiscountCode
   };
 }
 
+export interface ApiEmailLogEmailLog extends Struct.CollectionTypeSchema {
+  collectionName: 'email_logs';
+  info: {
+    description: 'Audit log of every transactional email funnelled through sendEmail(). Retained 90 days, then purged by the cleanOldEmailLogs cron.';
+    displayName: 'Email Log';
+    pluralName: 'email-logs';
+    singularName: 'email-log';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attachmentNames: Schema.Attribute.JSON;
+    bcc: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+      }>;
+    bodyHtml: Schema.Attribute.Text;
+    bodyText: Schema.Attribute.Text;
+    cc: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+      }>;
+    context: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    emailStatus: Schema.Attribute.Enumeration<['sent', 'failed']> &
+      Schema.Attribute.Required;
+    emailType: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    errorMessage: Schema.Attribute.Text;
+    fromAddress: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::email-log.email-log'
+    > &
+      Schema.Attribute.Private;
+    providerMessageId: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    replyTo: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    sentAt: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    subject: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 998;
+      }>;
+    to: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1000;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiEventLocationEventLocation
   extends Struct.CollectionTypeSchema {
   collectionName: 'event_locations';
@@ -930,6 +1001,13 @@ export interface ApiExpectationExpectation extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    expectationType: Schema.Attribute.Enumeration<['Main', 'Secondary']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     icon: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -944,13 +1022,6 @@ export interface ApiExpectationExpectation extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    expectationType: Schema.Attribute.Enumeration<['Main', 'Secondary']> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
@@ -2591,6 +2662,7 @@ declare module '@strapi/strapi' {
       'api::attendance-claim.attendance-claim': ApiAttendanceClaimAttendanceClaim;
       'api::budget-line-item.budget-line-item': ApiBudgetLineItemBudgetLineItem;
       'api::discount-code.discount-code': ApiDiscountCodeDiscountCode;
+      'api::email-log.email-log': ApiEmailLogEmailLog;
       'api::event-location.event-location': ApiEventLocationEventLocation;
       'api::event.event': ApiEventEvent;
       'api::expectation.expectation': ApiExpectationExpectation;

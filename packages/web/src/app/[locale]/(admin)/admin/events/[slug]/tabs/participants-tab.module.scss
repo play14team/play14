@@ -43,8 +43,8 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(var(--color-primary-rgb, 59, 130, 246), 0.1);
-  color: var(--color-primary, #3b82f6);
+  background: rgba(var(--color-primary-rgb), 0.1);
+  color: var(--color-primary);
   flex-shrink: 0;
 
   i {
@@ -136,14 +136,14 @@
   }
 
   &:hover {
-    border-color: var(--color-primary, #3b82f6);
-    color: var(--color-primary, #3b82f6);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 
   &.active {
-    border-color: var(--color-primary, #3b82f6);
-    background: rgba(var(--color-primary-rgb, 59, 130, 246), 0.1);
-    color: var(--color-primary, #3b82f6);
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    color: var(--color-primary);
     font-weight: 500;
   }
 }
@@ -218,6 +218,22 @@
   font-size: 0.75rem;
   font-family: monospace;
   color: var(--color-text-muted);
+}
+
+// When the name / ticket code are rendered as links, drop the default underline
+// and surface it on hover only (the non-link span fallback is unaffected).
+a.name,
+a.ticketCode {
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+a.name:hover {
+  color: var(--color-primary);
 }
 
 // Status Badge
@@ -313,6 +329,17 @@
     }
   }
 
+  &.remove {
+    background: transparent;
+    color: #e53935;
+    border: 1px solid #e53935;
+
+    &:hover:not(:disabled) {
+      background: #e53935;
+      color: white;
+    }
+  }
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -400,8 +427,8 @@
 
   &:focus {
     outline: none;
-    border-color: var(--color-primary, #3b82f6);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 59, 130, 246), 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
   }
 }
 
@@ -472,5 +499,165 @@
   p {
     margin: 0;
     color: var(--color-text-secondary);
+  }
+}
+
+// Add participant
+.listHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  i {
+    font-size: 1.1rem;
+  }
+}
+
+.modeToggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.modeButton {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+
+  &.active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    font-weight: 500;
+  }
+}
+
+.searchHint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.searchResults {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.searchResultItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+
+  li:last-child & {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+}
+
+.resultName {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.resultMeta {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.selectedPlayer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  background: rgba(var(--color-primary-rgb), 0.08);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.clearSelection {
+  display: inline-flex;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 1.1rem;
+
+  &:hover {
+    color: var(--color-text);
+  }
+}
+
+.addConfirmButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.95);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }

@@ -1,13 +1,22 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useCallback, useEffect, useState } from "react"
-import { requestRefund } from "@/components/tickets/purchase.action"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
+  type PlayerForInvite,
+  searchPlayersForInvite,
+} from "@/app/[locale]/(admin)/admin/players/invite.action"
+import { requestRefund } from "@/components/tickets/purchase.action"
+import { useDebounce } from "@/hooks/use-debounce"
+import { Link } from "@/i18n/navigation"
+import {
+  type AddParticipantPayload,
+  addParticipant,
   checkInParticipant,
   getEventParticipants,
   getParticipantStats,
   type Participant,
+  removeParticipant,
   undoCheckIn,
 } from "../participants.action"
 import styles from "./participants-tab.module.scss"
@@ -33,6 +42,27 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   const [refundReason, setRefundReason] = useState("")
   const [refundError, setRefundError] = useState<string | null>(null)
   const [isRefunding, setIsRefunding] = useState(false)
+
+  // Add-participant modal
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [addMode, setAddMode] = useState<"existing" | "new">("existing")
+  const [playerQuery, setPlayerQuery] = useState("")
+  const debouncedPlayerQuery = useDebounce(playerQuery, 300)
+  const [searchResults, setSearchResults] = useState<PlayerForInvite[]>([])
+  const [searching, setSearching] = useState(false)
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerForInvite | null>(null)
+  const [newName, setNewName] = useState("")
+  const [newEmail, setNewEmail] = useState("")
+  const [addError, setAddError] = useState<string | null>(null)
+  const [isAdding, setIsAdding] = useState(false)
+
+  // Remove-participant confirmation (manual entries only)
+  const [removingParticipant, setRemovingParticipant] = useState<Participant | null>(null)
+  const [isRemoving, setIsRemoving] = useState(false)
+  const [removeError, setRemoveError] = useState<string | null>(null)
+
+  const addModalRef = useRef<HTMLDivElement>(null)
+  const removeModalRef = useRef<HTMLDivElement>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -61,6 +91,109 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Search players for the "existing player" picker
+  useEffect(() => {
+    // Clear the spinner on every bail-out path (modal closed, switched to "new" mode, or
+    // query too short) — otherwise an in-flight search whose effect is cleaned up leaves
+    // `searching` stuck true (the .finally below is guarded by !cancelled).
+    if (!showAddModal || addMode !== "existing") {
+      setSearching(false)
+      return
+    }
+    const query = debouncedPlayerQuery.trim()
+    if (query.length < 2) {
+      setSearchResults([])
+      setSearching(false)
+      return
+    }
+    let cancelled = false
+    setSearching(true)
+    searchPlayersForInvite(query)
+      .then((players) => {
+        if (!cancelled) setSearchResults(players)
+      })
+      .finally(() => {
+        if (!cancelled) setSearching(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [debouncedPlayerQuery, showAddModal, addMode])
+
+  // Modal a11y: lock body scroll, move focus into the open dialog, and close on Escape.
+  // (Matches the project's ConfirmationDialog pattern.)
+  useEffect(() => {
+    const isAnyOpen = showAddModal || removingParticipant !== null
+    if (!isAnyOpen) return
+
+    if (removingParticipant) removeModalRef.current?.focus()
+    else if (showAddModal) addModalRef.current?.focus()
+
+    document.body.style.overflow = "hidden"
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return
+      if (removingParticipant && !isRemoving) setRemovingParticipant(null)
+      else if (showAddModal && !isAdding) setShowAddModal(false)
+    }
+    document.addEventListener("keydown", handleEscape)
+
+    return () => {
+      document.body.style.overflow = ""
+      document.removeEventListener("keydown", handleEscape)
+    }
+  }, [showAddModal, removingParticipant, isAdding, isRemoving])
+
+  const openAddModal = () => {
+    setAddMode("existing")
+    setPlayerQuery("")
+    setSearchResults([])
+    setSelectedPlayer(null)
+    setNewName("")
+    setNewEmail("")
+    setAddError(null)
+    setShowAddModal(true)
+  }
+
+  const closeAddModal = () => {
+    if (isAdding) return
+    setShowAddModal(false)
+  }
+
+  const handleAddSubmit = async () => {
+    setAddError(null)
+
+    let payload: AddParticipantPayload
+    if (addMode === "existing") {
+      if (!selectedPlayer) {
+        setAddError(t("addSelectPlayerRequired"))
+        return
+      }
+      payload = { playerDocumentId: selectedPlayer.documentId }
+    } else {
+      const name = newName.trim()
+      if (name.length < 2) {
+        setAddError(t("addNameRequired"))
+        return
+      }
+      payload = { newPlayer: { name, email: newEmail.trim() || undefined } }
+    }
+
+    setIsAdding(true)
+    try {
+      const result = await addParticipant(eventDocumentId, payload)
+      if (result.success) {
+        setShowAddModal(false)
+        fetchData()
+      } else {
+        setAddError(result.error || t("addFailed"))
+      }
+    } catch {
+      setAddError(t("addFailed"))
+    } finally {
+      setIsAdding(false)
+    }
+  }
 
   const handleCheckIn = async (participant: Participant) => {
     setCheckingIn(participant.documentId)
@@ -104,6 +237,38 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
     setRefundingOrderId(participant.order.documentId)
     setRefundReason("")
     setRefundError(null)
+  }
+
+  const handleRemoveClick = (participant: Participant) => {
+    setRemovingParticipant(participant)
+    setRemoveError(null)
+  }
+
+  const handleRemoveCancel = () => {
+    if (isRemoving) return
+    setRemovingParticipant(null)
+    setRemoveError(null)
+  }
+
+  const handleRemoveConfirm = async () => {
+    if (!removingParticipant) return
+
+    setIsRemoving(true)
+    setRemoveError(null)
+
+    try {
+      const result = await removeParticipant(eventDocumentId, removingParticipant.documentId)
+      if (result.success) {
+        setRemovingParticipant(null)
+        fetchData()
+      } else {
+        setRemoveError(result.error || t("removeFailed"))
+      }
+    } catch {
+      setRemoveError(t("removeFailed"))
+    } finally {
+      setIsRemoving(false)
+    }
   }
 
   const handleRefundCancel = () => {
@@ -284,8 +449,16 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
 
       {/* Participants List Section */}
       <div className="admin-form-section">
-        <h2>{t("participantsList")}</h2>
-        <p className="admin-form-section-description">{t("participantsListDescription")}</p>
+        <div className={styles.listHeader}>
+          <div>
+            <h2>{t("participantsList")}</h2>
+            <p className="admin-form-section-description">{t("participantsListDescription")}</p>
+          </div>
+          <button type="button" className={styles.addButton} onClick={openAddModal}>
+            <i className="bx bx-plus" />
+            {t("addParticipant")}
+          </button>
+        </div>
 
         {/* Filters */}
         <div className={styles.filters}>
@@ -352,8 +525,22 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                   >
                     <td>
                       <div className={styles.nameCell}>
-                        <span className={styles.name}>{getDisplayName(participant)}</span>
-                        <span className={styles.ticketCode}>{participant.ticketCode}</span>
+                        {participant.player ? (
+                          <Link
+                            href={`/admin/players/${participant.player.documentId}`}
+                            className={styles.name}
+                          >
+                            {getDisplayName(participant)}
+                          </Link>
+                        ) : (
+                          <span className={styles.name}>{getDisplayName(participant)}</span>
+                        )}
+                        <Link
+                          href={`/tickets/${participant.documentId}`}
+                          className={styles.ticketCode}
+                        >
+                          {participant.ticketCode}
+                        </Link>
                       </div>
                     </td>
                     <td>{getDisplayEmail(participant)}</td>
@@ -414,6 +601,17 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                           >
                             <i className="bx bx-credit-card" />
                             {t("refund")}
+                          </button>
+                        )}
+                        {/* Manually-added participants (comp ticket, no order) can be removed */}
+                        {!participant.order && (
+                          <button
+                            type="button"
+                            className={`${styles.actionButton} ${styles.remove}`}
+                            onClick={() => handleRemoveClick(participant)}
+                          >
+                            <i className="bx bx-trash" />
+                            {t("remove")}
                           </button>
                         )}
                       </div>
@@ -487,6 +685,215 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                   </>
                 ) : (
                   t("refundConfirm")
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add participant modal — intentionally reuses the refund modal's generic
+          overlay/card classes (.refundModal / .modalContent); they are not refund-specific. */}
+      {showAddModal && (
+        <div className={styles.refundModal} onClick={closeAddModal}>
+          <div
+            ref={addModalRef}
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-participant-title"
+            tabIndex={-1}
+          >
+            <h3 id="add-participant-title">{t("addParticipantTitle")}</h3>
+
+            <div className={styles.modeToggle}>
+              <button
+                type="button"
+                className={`${styles.modeButton} ${addMode === "existing" ? styles.active : ""}`}
+                onClick={() => {
+                  setAddMode("existing")
+                  setAddError(null)
+                  setPlayerQuery("")
+                  setSearchResults([])
+                  setSelectedPlayer(null)
+                }}
+              >
+                {t("addExistingPlayer")}
+              </button>
+              <button
+                type="button"
+                className={`${styles.modeButton} ${addMode === "new" ? styles.active : ""}`}
+                onClick={() => {
+                  setAddMode("new")
+                  setAddError(null)
+                  setPlayerQuery("")
+                  setSearchResults([])
+                  setSelectedPlayer(null)
+                }}
+              >
+                {t("addNewPlayer")}
+              </button>
+            </div>
+
+            {addMode === "existing" ? (
+              <div className={styles.formGroup}>
+                <label htmlFor="add-participant-search">{t("addSearchLabel")}</label>
+                {selectedPlayer ? (
+                  <div className={styles.selectedPlayer}>
+                    <span>{selectedPlayer.name}</span>
+                    <button
+                      type="button"
+                      className={styles.clearSelection}
+                      onClick={() => setSelectedPlayer(null)}
+                      aria-label={t("addClearSelection")}
+                    >
+                      <i className="bx bx-x" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      id="add-participant-search"
+                      type="text"
+                      className="admin-input"
+                      placeholder={t("addSearchPlaceholder")}
+                      value={playerQuery}
+                      onChange={(e) => setPlayerQuery(e.target.value)}
+                    />
+                    {searching && (
+                      <div className={styles.searchHint}>
+                        <i className="bx bx-loader-alt bx-spin" /> {t("addSearching")}
+                      </div>
+                    )}
+                    {!searching &&
+                      debouncedPlayerQuery.trim().length >= 2 &&
+                      searchResults.length === 0 && (
+                        <div className={styles.searchHint}>{t("addNoResults")}</div>
+                      )}
+                    {searchResults.length > 0 && (
+                      <ul className={styles.searchResults}>
+                        {searchResults.map((p) => (
+                          <li key={p.documentId}>
+                            <button
+                              type="button"
+                              className={styles.searchResultItem}
+                              onClick={() => {
+                                setSelectedPlayer(p)
+                                setAddError(null)
+                              }}
+                            >
+                              <span className={styles.resultName}>{p.name}</span>
+                              {p.company && <span className={styles.resultMeta}>{p.company}</span>}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className={styles.formGroup}>
+                  <label htmlFor="add-participant-name">{t("addNameLabel")}</label>
+                  <input
+                    id="add-participant-name"
+                    type="text"
+                    className="admin-input"
+                    placeholder={t("addNamePlaceholder")}
+                    value={newName}
+                    onChange={(e) => {
+                      setNewName(e.target.value)
+                      setAddError(null)
+                    }}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="add-participant-email">{t("addEmailLabel")}</label>
+                  <input
+                    id="add-participant-email"
+                    type="email"
+                    className="admin-input"
+                    placeholder={t("addEmailPlaceholder")}
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
+            {addError && <div className={styles.error}>{addError}</div>}
+
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={closeAddModal}
+                disabled={isAdding}
+              >
+                {t("addCancel")}
+              </button>
+              <button
+                type="button"
+                className={styles.addConfirmButton}
+                onClick={handleAddSubmit}
+                disabled={isAdding}
+              >
+                {isAdding ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin" /> {t("addSubmitting")}
+                  </>
+                ) : (
+                  t("addConfirm")
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove participant confirmation (manual entries only) — reuses the shared modal classes */}
+      {removingParticipant && (
+        <div className={styles.refundModal} onClick={handleRemoveCancel}>
+          <div
+            ref={removeModalRef}
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="remove-participant-title"
+            aria-describedby="remove-participant-desc"
+            tabIndex={-1}
+          >
+            <h3 id="remove-participant-title">{t("removeTitle")}</h3>
+            <p id="remove-participant-desc">
+              {t("removeConfirmText", { name: getDisplayName(removingParticipant) })}
+            </p>
+
+            {removeError && <div className={styles.error}>{removeError}</div>}
+
+            <div className={styles.modalActions}>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={handleRemoveCancel}
+                disabled={isRemoving}
+              >
+                {t("removeCancel")}
+              </button>
+              <button
+                type="button"
+                className={styles.confirmButton}
+                onClick={handleRemoveConfirm}
+                disabled={isRemoving}
+              >
+                {isRemoving ? (
+                  <>
+                    <i className="bx bx-loader-alt bx-spin" /> {t("removeProcessing")}
+                  </>
+                ) : (
+                  t("removeConfirm")
                 )}
               </button>
             </div>

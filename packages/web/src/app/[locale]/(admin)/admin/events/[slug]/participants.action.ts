@@ -32,6 +32,10 @@ export interface Participant {
     orderStatus: string
     paidAt?: string
   }
+  player?: {
+    documentId: string
+    name: string
+  } | null
   createdAt: string
 }
 
@@ -156,4 +160,68 @@ export async function getParticipantStats(
     success: true,
     data: result.data?.data,
   }
+}
+
+export interface AddParticipantPayload {
+  /** Enroll an existing player by documentId */
+  playerDocumentId?: string
+  /** Or create a brand-new player profile from these fields */
+  newPlayer?: {
+    name: string
+    email?: string
+    company?: string
+  }
+}
+
+/**
+ * Add a participant to an event (organizer only).
+ *
+ * Enrolls an existing player or creates a new one, issues a free "external"
+ * ticket (no purchase) and adds them to the event attendee list. No email is sent.
+ */
+export async function addParticipant(
+  eventDocumentId: string,
+  payload: AddParticipantPayload
+): Promise<ActionResult<Participant>> {
+  const result = await strapiFetch<StrapiDataResponse<{ participant: Participant }>>(
+    "/admin/events/:eventDocumentId/participants",
+    { eventDocumentId },
+    { method: "POST", body: { data: payload } }
+  )
+
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to add participant",
+    }
+  }
+
+  return {
+    success: true,
+    data: result.data?.data?.participant,
+  }
+}
+
+/**
+ * Remove a manually-added participant (a comp ticket with no order) from an event.
+ * The API rejects removal of purchased/self-registered tickets.
+ */
+export async function removeParticipant(
+  eventDocumentId: string,
+  ticketDocumentId: string
+): Promise<ActionResult> {
+  const result = await strapiFetch<StrapiDataResponse<{ documentId: string; removed: boolean }>>(
+    "/admin/events/:eventDocumentId/participants/:ticketDocumentId",
+    { eventDocumentId, ticketDocumentId },
+    { method: "DELETE" }
+  )
+
+  if (!result.ok) {
+    return {
+      success: false,
+      error: result.error || "Failed to remove participant",
+    }
+  }
+
+  return { success: true }
 }

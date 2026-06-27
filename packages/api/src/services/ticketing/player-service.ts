@@ -234,17 +234,26 @@ export async function findOrCreatePlayerForAttendee(
  * 2. If we only add to published, the relation would be lost when draft is published
  * 3. Adding to both ensures the player appears immediately AND survives future publishes
  *
+ * CONCURRENCY: this is a non-atomic read-modify-write of the player's `attended` array.
+ * It is NOT serialized against other writers (e.g. the Stripe webhook flow), so two
+ * concurrent calls for the same player can lose an update. Callers that need exclusivity
+ * (addParticipant/removeParticipant) hold the per-event participants lock; the purchase
+ * path does not, so a simultaneous purchase + organizer add/remove on the same player is a
+ * known (narrow) race.
+ *
  * @param strapi - Strapi instance
  * @param playerDocumentId - Document ID of the player
  * @param event - Event object with documentId and id
  * @param logPrefix - Prefix for log messages
+ * @returns true if the player was newly added; false if they were already attending or
+ *   the event/player could not be found (lets callers roll back only what they added).
  */
 export async function addPlayerToEventAttendees(
   strapi: Core.Strapi,
   playerDocumentId: string,
   event: { documentId: string; id: number },
   logPrefix = "[Ticketing]"
-): Promise<void> {
+): Promise<boolean> {
   // Fetch BOTH draft and published versions of the event
   // We need to add the player to both to ensure:
   // 1. Player appears immediately on the public site (published)
@@ -266,7 +275,7 @@ export async function addPlayerToEventAttendees(
     strapi.log.warn(
       `${logPrefix} Cannot add player to event attendees - event ${event.documentId} not found`
     )
-    return
+    return false
   }
 
   const playerDoc = await strapi.documents("api::player.player").findOne({
@@ -274,7 +283,7 @@ export async function addPlayerToEventAttendees(
     populate: { attended: { fields: ["id", "documentId"] } },
   })
 
-  if (!playerDoc) return
+  if (!playerDoc) return false
 
   const currentAttendedIds = playerDoc.attended?.map((e: any) => e.id) || []
   const alreadyAttending = playerDoc.attended?.some((e: any) => e.documentId === event.documentId)
@@ -306,5 +315,56 @@ export async function addPlayerToEventAttendees(
     strapi.log.info(
       `${logPrefix} Added player ${playerDocumentId} to event ${event.documentId} attendees (${versionInfo})`
     )
+    return true
   }
+
+  return false
+}
+
+/**
+ * Remove a player from an event's attendees list.
+ *
+ * Mirror of addPlayerToEventAttendees: drops every version (draft and/or
+ * published) of the event from the player's `attended` relation, so the
+ * change is consistent across the Strapi 5 draft/publish split. No-op if the
+ * player is not currently attending.
+ *
+ * @param strapi - Strapi instance
+ * @param playerDocumentId - Document ID of the player
+ * @param event - Event object with documentId
+ * @param logPrefix - Prefix for log messages
+ */
+export async function removePlayerFromEventAttendees(
+  strapi: Core.Strapi,
+  playerDocumentId: string,
+  event: { documentId: string },
+  logPrefix = "[Ticketing]"
+): Promise<void> {
+  const playerDoc = await strapi.documents("api::player.player").findOne({
+    documentId: playerDocumentId,
+    populate: { attended: { fields: ["id", "documentId"] } },
+  })
+
+  if (!playerDoc) return
+
+  const attended = (playerDoc.attended as any[]) || []
+  const isAttending = attended.some((e: any) => e.documentId === event.documentId)
+  if (!isAttending) return
+
+  // Keep every attended event except the one being removed — this drops both
+  // the draft and published rows of that event in one update.
+  const remainingIds = attended
+    .filter((e: any) => e.documentId !== event.documentId)
+    .map((e: any) => e.id)
+
+  await strapi.documents("api::player.player").update({
+    documentId: playerDocumentId,
+    data: {
+      attended: remainingIds,
+    } as any,
+  })
+
+  strapi.log.info(
+    `${logPrefix} Removed player ${playerDocumentId} from event ${event.documentId} attendees`
+  )
 }

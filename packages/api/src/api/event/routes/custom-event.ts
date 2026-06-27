@@ -236,6 +236,28 @@ export default {
       },
     },
     {
+      method: "POST",
+      path: "/admin/events/:eventId/participants",
+      handler: "custom-event.addParticipant",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Add a participant to an event (organizer only)",
+      },
+    },
+    {
+      method: "DELETE",
+      path: "/admin/events/:eventId/participants/:ticketId",
+      handler: "custom-event.removeParticipant",
+      info: { apiName: "event", type: "content-api" },
+      config: {
+        policies: [],
+        middlewares: [],
+        description: "Remove a manually-added participant from an event (organizer only)",
+      },
+    },
+    {
       method: "PUT",
       path: "/admin/events/:eventId/participants/:ticketId/check-in",
       handler: "custom-event.checkInParticipant",
