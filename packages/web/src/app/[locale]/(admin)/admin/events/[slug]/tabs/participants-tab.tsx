@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   type PlayerForInvite,
   searchPlayersForInvite,
@@ -60,6 +60,9 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
   const [isRemoving, setIsRemoving] = useState(false)
   const [removeError, setRemoveError] = useState<string | null>(null)
 
+  const addModalRef = useRef<HTMLDivElement>(null)
+  const removeModalRef = useRef<HTMLDivElement>(null)
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -110,6 +113,29 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
     }
   }, [debouncedPlayerQuery, showAddModal, addMode])
 
+  // Modal a11y: lock body scroll, move focus into the open dialog, and close on Escape.
+  // (Matches the project's ConfirmationDialog pattern.)
+  useEffect(() => {
+    const isAnyOpen = showAddModal || removingParticipant !== null
+    if (!isAnyOpen) return
+
+    if (removingParticipant) removeModalRef.current?.focus()
+    else if (showAddModal) addModalRef.current?.focus()
+
+    document.body.style.overflow = "hidden"
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return
+      if (removingParticipant && !isRemoving) setRemovingParticipant(null)
+      else if (showAddModal && !isAdding) setShowAddModal(false)
+    }
+    document.addEventListener("keydown", handleEscape)
+
+    return () => {
+      document.body.style.overflow = ""
+      document.removeEventListener("keydown", handleEscape)
+    }
+  }, [showAddModal, removingParticipant, isAdding, isRemoving])
+
   const openAddModal = () => {
     setAddMode("existing")
     setPlayerQuery("")
@@ -146,14 +172,18 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
     }
 
     setIsAdding(true)
-    const result = await addParticipant(eventDocumentId, payload)
-    setIsAdding(false)
-
-    if (result.success) {
-      setShowAddModal(false)
-      fetchData()
-    } else {
-      setAddError(result.error || t("addFailed"))
+    try {
+      const result = await addParticipant(eventDocumentId, payload)
+      if (result.success) {
+        setShowAddModal(false)
+        fetchData()
+      } else {
+        setAddError(result.error || t("addFailed"))
+      }
+    } catch {
+      setAddError(t("addFailed"))
+    } finally {
+      setIsAdding(false)
     }
   }
 
@@ -218,15 +248,18 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
     setIsRemoving(true)
     setRemoveError(null)
 
-    const result = await removeParticipant(eventDocumentId, removingParticipant.documentId)
-
-    setIsRemoving(false)
-
-    if (result.success) {
-      setRemovingParticipant(null)
-      fetchData()
-    } else {
-      setRemoveError(result.error || t("removeFailed"))
+    try {
+      const result = await removeParticipant(eventDocumentId, removingParticipant.documentId)
+      if (result.success) {
+        setRemovingParticipant(null)
+        fetchData()
+      } else {
+        setRemoveError(result.error || t("removeFailed"))
+      }
+    } catch {
+      setRemoveError(t("removeFailed"))
+    } finally {
+      setIsRemoving(false)
     }
   }
 
@@ -641,8 +674,16 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
           overlay/card classes (.refundModal / .modalContent); they are not refund-specific. */}
       {showAddModal && (
         <div className={styles.refundModal} onClick={closeAddModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h3>{t("addParticipantTitle")}</h3>
+          <div
+            ref={addModalRef}
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-participant-title"
+            tabIndex={-1}
+          >
+            <h3 id="add-participant-title">{t("addParticipantTitle")}</h3>
 
             <div className={styles.modeToggle}>
               <button
@@ -651,6 +692,9 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                 onClick={() => {
                   setAddMode("existing")
                   setAddError(null)
+                  setPlayerQuery("")
+                  setSearchResults([])
+                  setSelectedPlayer(null)
                 }}
               >
                 {t("addExistingPlayer")}
@@ -661,6 +705,9 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                 onClick={() => {
                   setAddMode("new")
                   setAddError(null)
+                  setPlayerQuery("")
+                  setSearchResults([])
+                  setSelectedPlayer(null)
                 }}
               >
                 {t("addNewPlayer")}
@@ -669,7 +716,7 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
 
             {addMode === "existing" ? (
               <div className={styles.formGroup}>
-                <label>{t("addSearchLabel")}</label>
+                <label htmlFor="add-participant-search">{t("addSearchLabel")}</label>
                 {selectedPlayer ? (
                   <div className={styles.selectedPlayer}>
                     <span>{selectedPlayer.name}</span>
@@ -685,6 +732,7 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                 ) : (
                   <>
                     <input
+                      id="add-participant-search"
                       type="text"
                       className="admin-input"
                       placeholder={t("addSearchPlaceholder")}
@@ -726,8 +774,9 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
             ) : (
               <>
                 <div className={styles.formGroup}>
-                  <label>{t("addNameLabel")}</label>
+                  <label htmlFor="add-participant-name">{t("addNameLabel")}</label>
                   <input
+                    id="add-participant-name"
                     type="text"
                     className="admin-input"
                     placeholder={t("addNamePlaceholder")}
@@ -739,8 +788,9 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>{t("addEmailLabel")}</label>
+                  <label htmlFor="add-participant-email">{t("addEmailLabel")}</label>
                   <input
+                    id="add-participant-email"
                     type="email"
                     className="admin-input"
                     placeholder={t("addEmailPlaceholder")}
@@ -784,9 +834,20 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
       {/* Remove participant confirmation (manual entries only) — reuses the shared modal classes */}
       {removingParticipant && (
         <div className={styles.refundModal} onClick={handleRemoveCancel}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h3>{t("removeTitle")}</h3>
-            <p>{t("removeConfirmText", { name: getDisplayName(removingParticipant) })}</p>
+          <div
+            ref={removeModalRef}
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="remove-participant-title"
+            aria-describedby="remove-participant-desc"
+            tabIndex={-1}
+          >
+            <h3 id="remove-participant-title">{t("removeTitle")}</h3>
+            <p id="remove-participant-desc">
+              {t("removeConfirmText", { name: getDisplayName(removingParticipant) })}
+            </p>
 
             {removeError && <div className={styles.error}>{removeError}</div>}
 
