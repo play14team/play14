@@ -2388,20 +2388,28 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
           attempts++
         }
-        try {
-          participantPlayer = await strapi.documents("api::player.player").create({
-            data: {
-              name: newPlayerName,
-              slug,
-              position: "Player",
-              company: newPlayer?.company?.trim() || null,
-            } as any,
-          })
-        } catch (err) {
-          strapi.log.error(`[Event] Failed to create player "${newPlayerName}": ${err}`)
-          return ctx.badRequest(
-            "Could not create the player; the name or slug may already be in use."
-          )
+        // Create with retry-on-conflict: a concurrent add to a DIFFERENT event (whose lock
+        // we don't share) can claim a diacritic-equivalent slug between our pre-check and
+        // insert. Regenerate the slug and retry rather than surfacing a spurious 400.
+        for (let createAttempt = 0; createAttempt < 3 && !participantPlayer; createAttempt++) {
+          try {
+            participantPlayer = await strapi.documents("api::player.player").create({
+              data: {
+                name: newPlayerName,
+                slug,
+                position: "Player",
+                company: newPlayer?.company?.trim() || null,
+              } as any,
+            })
+          } catch (err) {
+            if (createAttempt === 2) {
+              strapi.log.error(`[Event] Failed to create player "${newPlayerName}": ${err}`)
+              return ctx.badRequest(
+                "Could not create the player; the name or slug may already be in use."
+              )
+            }
+            slug = `${baseSlug}-${randomBytes(2).toString("hex")}`
+          }
         }
         strapi.log.info(
           `[Event] Created player ${participantPlayer.documentId} ("${newPlayerName}") while adding participant to "${event.name}" by ${player.name}`
@@ -2445,7 +2453,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         })
       }
 
-      // 4. Mint a free ticket (no order) so the attendee appears in the roster
+      // 4. Add the player to the event attendee list FIRST (draft + published, dedup-safe).
+      // Minting the ticket LAST means a failure in this step leaves no orphan "valid" ticket
+      // that the duplicate guard (step 2) would later treat as "already a participant",
+      // blocking retries. addPlayerToEventAttendees is idempotent, so a retry is safe.
+      await addPlayerToEventAttendees(
+        strapi,
+        participantPlayer.documentId,
+        { documentId: event.documentId, id: Number(event.id) },
+        "[Event]"
+      )
+
+      // 5. Mint a free ticket (no order) so the attendee appears in the roster
       const attendeeName = participantPlayer.name
       const attendeeEmail = newPlayerEmail || (participantPlayer as any).user?.email || null
 
@@ -2460,14 +2479,6 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
           event: event.id,
         } as any,
       })
-
-      // 5. Add the player to the event attendee list (draft + published, dedup-safe)
-      await addPlayerToEventAttendees(
-        strapi,
-        participantPlayer.documentId,
-        { documentId: event.documentId, id: Number(event.id) },
-        "[Event]"
-      )
 
       strapi.log.info(
         `[Event] Participant added to "${event.name}" by ${player.name}: ${attendeeName} (${ticket.ticketCode})`

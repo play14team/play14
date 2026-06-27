@@ -397,6 +397,41 @@ describe("custom-event.addParticipant", () => {
     expect(ctx.send).toHaveBeenCalled()
   })
 
+  it("retries player.create with a fresh slug when the unique constraint fires", async () => {
+    const { strapi, model } = setupOrganizer()
+    model(PLAYER_UID).findMany.mockResolvedValue([]) // no exact name clash
+    // findFirst (slug pre-check) returns null → base slug "newcomer"; first create races and
+    // hits the slug unique constraint, second succeeds with a regenerated slug.
+    model(PLAYER_UID)
+      .create.mockRejectedValueOnce(new Error("unique constraint: players_slug_unique"))
+      .mockResolvedValue({ id: 8, documentId: "ply-8", name: "Newcomer" })
+    model(TICKET_UID).findMany.mockResolvedValue([])
+    model(TICKET_TYPE_UID).findFirst.mockResolvedValue({
+      id: 99,
+      documentId: "tt-ext",
+      name: "external",
+    })
+    model(TICKET_UID).create.mockResolvedValue({
+      documentId: "tk-r",
+      ticketCode: "TKT-TEST-1234",
+      ticketStatus: "valid",
+      createdAt: "2026-06-26T00:00:00.000Z",
+    })
+
+    const ctx = createMockContext({
+      state: { user: { id: 1 } },
+      params: { eventId: "evt-1" },
+      request: { body: { data: { newPlayer: { name: "Newcomer" } } } },
+    })
+
+    await customEventFactory({ strapi }).addParticipant(ctx)
+
+    expect(model(PLAYER_UID).create).toHaveBeenCalledTimes(2)
+    expect(model(PLAYER_UID).create.mock.calls[1][0].data.slug).toMatch(/^newcomer-[0-9a-f]+$/)
+    expect(ctx.send).toHaveBeenCalled()
+    expect(ctx.badRequest).not.toHaveBeenCalled()
+  })
+
   it("returns badRequest when the per-event lock is already held", async () => {
     const { strapi, model } = setupOrganizer()
     vi.mocked(acquireLock).mockResolvedValueOnce(null) // lock held by a concurrent add
