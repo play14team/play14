@@ -7,9 +7,11 @@
 import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
 import { imageSize } from "image-size"
+import { toSlug } from "../../../libs/strings"
 import { generateTicketCode } from "../../../libs/tickets"
 import { validateEmail } from "../../../libs/validation"
 import { acquireLock, releaseLock } from "../../../services/cron/distributed-lock"
+import { triggerContentRevalidation } from "../../../services/frontend-revalidation"
 import {
   addPlayerToEventAttendees,
   removePlayerFromEventAttendees,
@@ -2393,15 +2395,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
             "A player with this name already exists. Select the existing player instead."
           )
         }
-        // NOTE: the player `beforeCreate` lifecycle derives the slug from the name
-        // (slug = toSlug(name)) and overwrites anything we set, so we don't compute a slug
-        // here. Two names that slugify identically ("Rémi" vs "Remi") therefore collide on
-        // the slug unique constraint; surface that as a clear 400 instead of a 500. Retrying
-        // is pointless — the lifecycle would regenerate the same slug.
+        // The player schema marks `slug` required, and Strapi 5's Document Service validates
+        // required fields BEFORE the `beforeCreate` lifecycle runs — so the lifecycle's slug
+        // derivation can't satisfy validation and we MUST set the slug on create (every other
+        // player-create path does too). We use the same toSlug(name) the lifecycle would, so the
+        // two agree. Two names that slugify identically ("Rémi" vs "Remi") still collide on the
+        // slug unique constraint; surface that as a clear 400 instead of a 500. Retrying is
+        // pointless — the slug would be regenerated the same.
         try {
           participantPlayer = await strapi.documents("api::player.player").create({
             data: {
               name: newPlayerName,
+              slug: toSlug(newPlayerName),
               position: "Player",
               company: newPlayer?.company?.trim() || null,
             } as any,
@@ -2494,6 +2499,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       strapi.log.info(
         `[Event] Participant added to "${event.name}" by ${player.name}: ${attendeeName} (${ticket.ticketCode})`
+      )
+
+      // Refresh the public event page: adding the attendee only updates the player record
+      // (which revalidates the player page via its lifecycle), so the event's attendee list
+      // would otherwise stay stale until the next event edit. Revalidate the event explicitly.
+      triggerContentRevalidation(
+        strapi,
+        "api::event.event",
+        { slug: (event as any).slug },
+        "update"
       )
 
       return ctx.send({
@@ -2652,6 +2667,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
       strapi.log.info(
         `[Event] Participant removed from "${event.name}" by ${player.name}: ${ticket.ticketCode}`
+      )
+
+      // Refresh the public event page so the removed attendee disappears from its list
+      // (see addParticipant — the attendee change lives on the player record, not the event).
+      triggerContentRevalidation(
+        strapi,
+        "api::event.event",
+        { slug: (event as any).slug },
+        "update"
       )
 
       return ctx.send({ data: { documentId: ticketId, removed: true } })
