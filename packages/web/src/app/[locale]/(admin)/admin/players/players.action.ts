@@ -105,6 +105,46 @@ export async function getPlayers(
   return result.data || emptyResponse
 }
 
+export interface CreatedPlayer {
+  documentId: string
+  slug: string
+  name: string
+  position: string
+  company: string | null
+}
+
+export interface CreatePlayerResult {
+  success: boolean
+  error?: string
+  data?: CreatedPlayer
+}
+
+/**
+ * Create a standalone (unlinked) player profile (organizers only).
+ *
+ * The new player isn't linked to any user account and no invite/email is sent —
+ * it can then be added to an event as a participant via the event's participants tab.
+ */
+export async function createPlayer(name: string, company?: string): Promise<CreatePlayerResult> {
+  const result = await strapiFetch<{ data: CreatedPlayer }>(
+    "/admin/players",
+    {},
+    {
+      method: "POST",
+      body: { data: { name, company: company || undefined } },
+    }
+  )
+
+  if (!result.ok) {
+    return { success: false, error: result.error || "Failed to create player" }
+  }
+
+  // Refresh the public player directory so the new profile shows up
+  revalidatePlayerPages(result.data?.data?.slug)
+
+  return { success: true, data: result.data?.data }
+}
+
 /**
  * Get a player for editing
  */

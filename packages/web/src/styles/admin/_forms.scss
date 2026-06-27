@@ -2505,6 +2505,11 @@ label.admin-btn {
   gap: 12px;
 }
 
+.players-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .players-search {
   width: 100%;
   max-width: 400px;
