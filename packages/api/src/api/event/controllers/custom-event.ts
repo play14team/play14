@@ -7,9 +7,17 @@
 import * as fs from "node:fs"
 import type { Core } from "@strapi/strapi"
 import { imageSize } from "image-size"
+import slugify from "slugify"
+import { generateTicketCode } from "../../../libs/tickets"
+import { addPlayerToEventAttendees } from "../../../services/ticketing/player-service"
 import { generateTimetable } from "../templates/schedule-templates"
 
 const ORGANIZER_POSITIONS = ["Host", "Mentor", "Founder"]
+
+// Name of the per-event ticket type used for participants enrolled by an
+// organizer (e.g. when ticketing is handled by an external tool). Kept
+// inactive so it never appears in public ticket sales.
+export const EXTERNAL_TICKET_TYPE_NAME = "external"
 
 // Default image aspect ratio requirements (600x500 = 6:5 = 1.2)
 const DEFAULT_IMAGE_ASPECT_RATIO = 6 / 5 // 1.2
@@ -2247,6 +2255,179 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         total,
         checkedIn,
         pending: total - checkedIn,
+      },
+    })
+  },
+
+  /**
+   * Add a participant to an event (organizer only)
+   *
+   * Enrolls a player as an attendee without a Stripe purchase — e.g. when
+   * ticketing is handled by an external tool. The player is:
+   * - added to event.players (public attendee list + attendance/position logic)
+   * - issued a free "external" ticket (no order) so they show up in the
+   *   participants list and can be checked in at the door.
+   *
+   * Body: { playerDocumentId?: string, newPlayer?: { name, email?, company? } }
+   */
+  async addParticipant(ctx) {
+    const user = ctx.state.user
+    const { eventId } = ctx.params
+
+    if (!user) {
+      return ctx.unauthorized("You must be logged in")
+    }
+
+    const player = await this.getLinkedPlayer(user.id)
+    if (!player) {
+      return ctx.forbidden("You must have a linked player profile")
+    }
+
+    // Find the event and verify organizer access
+    const event = await strapi.documents("api::event.event").findOne({
+      documentId: eventId,
+      populate: {
+        hosts: { fields: ["documentId"] },
+        mentors: { fields: ["documentId"] },
+      },
+    })
+
+    if (!event) {
+      return ctx.notFound("Event not found")
+    }
+
+    const isHost = (event as any).hosts?.some((h: any) => h.documentId === player.documentId)
+    const isMentor = (event as any).mentors?.some((m: any) => m.documentId === player.documentId)
+    const isFounder = player.position === "Founder"
+
+    if (!isHost && !isMentor && !isFounder) {
+      return ctx.forbidden("You don't have access to add participants to this event")
+    }
+
+    const body = ctx.request.body?.data || ctx.request.body || {}
+    const playerDocumentId: string | undefined = body.playerDocumentId
+    const newPlayer = body.newPlayer as
+      | { name?: string; email?: string; company?: string }
+      | undefined
+
+    // 1. Resolve the participant's player profile (existing or newly created)
+    let participantPlayer: any = null
+
+    if (playerDocumentId) {
+      participantPlayer = await strapi.documents("api::player.player").findOne({
+        documentId: playerDocumentId,
+        populate: { user: { fields: ["email"] } },
+      })
+      if (!participantPlayer) {
+        return ctx.notFound("Player not found")
+      }
+    } else if (newPlayer?.name) {
+      const name = newPlayer.name.trim()
+      if (name.length < 2) {
+        return ctx.badRequest("Name is required and must be at least 2 characters")
+      }
+      // player.name is unique — reject duplicates so the organizer picks the existing one
+      const existing = await strapi.documents("api::player.player").findMany({
+        filters: { name: { $eqi: name } },
+        fields: ["documentId"],
+      })
+      if (existing.length > 0) {
+        return ctx.badRequest(
+          "A player with this name already exists. Select the existing player instead."
+        )
+      }
+      participantPlayer = await strapi.documents("api::player.player").create({
+        data: {
+          name,
+          slug: slugify(name, { lower: true, strict: true }),
+          position: "Player",
+          company: newPlayer.company?.trim() || null,
+        } as any,
+      })
+      strapi.log.info(
+        `[Event] Created player ${participantPlayer.documentId} ("${name}") while adding participant to "${event.name}" by ${player.name}`
+      )
+    } else {
+      return ctx.badRequest("Provide either playerDocumentId or newPlayer.name")
+    }
+
+    // 2. Duplicate guard — already enrolled (valid/used ticket) for this event?
+    const existingTickets = await strapi.documents("api::ticket.ticket").findMany({
+      filters: {
+        event: { documentId: eventId },
+        player: { documentId: participantPlayer.documentId },
+        ticketStatus: { $in: ["valid", "used"] },
+      },
+      fields: ["documentId"],
+    })
+    if (existingTickets.length > 0) {
+      return ctx.badRequest("This player is already a participant of this event")
+    }
+
+    // 3. Find-or-create the per-event "external" ticket type (inactive → hidden from sale)
+    let externalType = await strapi.documents("api::ticket-type.ticket-type").findFirst({
+      filters: {
+        event: { documentId: eventId },
+        name: { $eqi: EXTERNAL_TICKET_TYPE_NAME },
+      },
+    })
+    if (!externalType) {
+      // Inherit currency from an existing ticket type, else default to EUR
+      const anyType = await strapi.documents("api::ticket-type.ticket-type").findFirst({
+        filters: { event: { documentId: eventId } },
+        fields: ["currency"],
+      })
+      externalType = await strapi.documents("api::ticket-type.ticket-type").create({
+        data: {
+          name: EXTERNAL_TICKET_TYPE_NAME,
+          price: 0,
+          currency: (anyType as any)?.currency || "EUR",
+          isActive: false,
+          event: event.id,
+        } as any,
+      })
+    }
+
+    // 4. Mint a free ticket (no order) so the attendee appears in the roster
+    const attendeeName = participantPlayer.name
+    const attendeeEmail = newPlayer?.email?.trim() || (participantPlayer as any).user?.email || null
+
+    const ticket = await strapi.documents("api::ticket.ticket").create({
+      data: {
+        ticketCode: generateTicketCode(),
+        ticketStatus: "valid",
+        attendeeName,
+        attendeeEmail,
+        ticketType: externalType.id,
+        player: participantPlayer.id,
+        event: event.id,
+      } as any,
+    })
+
+    // 5. Add the player to the event attendee list (draft + published, dedup-safe)
+    await addPlayerToEventAttendees(
+      strapi,
+      participantPlayer.documentId,
+      { documentId: event.documentId, id: Number(event.id) },
+      "[Event]"
+    )
+
+    strapi.log.info(
+      `[Event] Participant added to "${event.name}" by ${player.name}: ${attendeeName} (${ticket.ticketCode})`
+    )
+
+    return ctx.send({
+      data: {
+        participant: {
+          documentId: ticket.documentId,
+          ticketCode: ticket.ticketCode,
+          ticketStatus: ticket.ticketStatus,
+          attendeeName,
+          attendeeEmail,
+          ticketType: { documentId: externalType.documentId, name: externalType.name },
+          player: { documentId: participantPlayer.documentId, name: participantPlayer.name },
+          createdAt: (ticket as any).createdAt,
+        },
       },
     })
   },
