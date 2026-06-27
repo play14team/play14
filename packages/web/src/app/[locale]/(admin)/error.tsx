@@ -4,7 +4,11 @@ import { useTranslations } from "next-intl"
 import ErrorMessage from "@/components/layout/error-message"
 import { useChunkErrorRecovery } from "@/hooks/use-chunk-error-recovery"
 
-export default function Error({
+// Admin-section error boundary. Without this, errors under /admin bubble all the
+// way up to global-error.tsx (a bare, unstyled fallback). This keeps them inside
+// the locale layout so they render the styled #play14 error UI — and auto-reloads
+// on a stale-chunk error after a deploy.
+export default function AdminError({
   error,
   reset,
 }: {
@@ -23,7 +27,7 @@ export default function Error({
     )
   }
 
-  // Detect connection errors
+  // Detect connection errors (mirrors the public (main) boundary)
   const isConnectionError =
     error.message.includes("fetch failed") ||
     error.cause?.code === "ECONNRESET" ||

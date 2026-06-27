@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useChunkErrorRecovery } from "@/hooks/use-chunk-error-recovery"
 import { useIssueReportUrl } from "@/hooks/use-issue-report-url"
 
 // Renders outside the next-intl provider — strings are intentionally hardcoded in English.
@@ -12,10 +12,30 @@ export default function GlobalError({
   reset: () => void
 }) {
   const issueUrl = useIssueReportUrl(error)
+  const reloading = useChunkErrorRecovery(error)
 
-  useEffect(() => {
-    console.error("Global error:", error)
-  }, [error])
+  // Stale chunk after a deploy — a full reload is in flight; show a neutral placeholder.
+  // This renders its own document (no app CSS), so styles are inline.
+  if (reloading) {
+    return (
+      <html lang="en">
+        <body>
+          <div
+            style={{
+              minHeight: "100vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "system-ui, sans-serif",
+              color: "#666",
+            }}
+          >
+            Reloading…
+          </div>
+        </body>
+      </html>
+    )
+  }
 
   return (
     <html lang="en">
