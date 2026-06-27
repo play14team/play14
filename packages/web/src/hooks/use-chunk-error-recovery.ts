@@ -1,7 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { recoverFromChunkError, willRecoverFromChunkError } from "@/libs/chunk-error"
+import {
+  isChunkLoadError,
+  recoverFromChunkError,
+  willRecoverFromChunkError,
+} from "@/libs/chunk-error"
 
 /**
  * For use inside an error boundary (`error.tsx` / `global-error.tsx`).
@@ -21,8 +25,11 @@ export function useChunkErrorRecovery(error: unknown): boolean {
       setReloading(true)
       return
     }
+    // A chunk error that didn't trigger a reload means recovery already fired (the
+    // guard is active — e.g. React StrictMode re-running this effect, or a prior
+    // reload). Don't log it or flash the error UI; the reload is in flight.
+    if (isChunkLoadError(error)) return
     setReloading(false)
-    // Log only errors we're actually surfacing (a reloaded chunk error is expected).
     console.error(error)
   }, [error])
 

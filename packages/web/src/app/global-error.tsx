@@ -2,17 +2,20 @@
 
 import { useChunkErrorRecovery } from "@/hooks/use-chunk-error-recovery"
 import { useIssueReportUrl } from "@/hooks/use-issue-report-url"
+import { isConnectionError } from "@/libs/connection-error"
 
 // Renders outside the next-intl provider — strings are intentionally hardcoded in English.
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
+  error: Error & { digest?: string; cause?: Error & { code?: string } }
   reset: () => void
 }) {
   const issueUrl = useIssueReportUrl(error)
   const reloading = useChunkErrorRecovery(error)
+  // A dropped connection isn't a bug to file — show a connectivity message and hide the report link.
+  const connectionError = isConnectionError(error)
 
   // Stale chunk after a deploy — a full reload is in flight; show a neutral placeholder.
   // This renders its own document (no app CSS), so styles are inline.
@@ -53,7 +56,9 @@ export default function GlobalError({
             color: "#333",
           }}
         >
-          <h1 style={{ marginBottom: "1rem", fontSize: "2rem" }}>Something went wrong</h1>
+          <h1 style={{ marginBottom: "1rem", fontSize: "2rem" }}>
+            {connectionError ? "Can't reach the server" : "Something went wrong"}
+          </h1>
           <p
             style={{
               marginBottom: "2rem",
@@ -62,7 +67,9 @@ export default function GlobalError({
               maxWidth: "400px",
             }}
           >
-            An unexpected error occurred. Our team has been notified and is working to fix it.
+            {connectionError
+              ? "We couldn't reach the server. Please check your connection and try again."
+              : "An unexpected error occurred. Our team has been notified and is working to fix it."}
           </p>
           <div
             style={{
@@ -91,7 +98,7 @@ export default function GlobalError({
             >
               Try again
             </button>
-            {issueUrl && (
+            {!connectionError && issueUrl && (
               <a
                 href={issueUrl}
                 target="_blank"
