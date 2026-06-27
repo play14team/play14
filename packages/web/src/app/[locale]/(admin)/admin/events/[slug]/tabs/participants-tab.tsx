@@ -8,6 +8,7 @@ import {
 } from "@/app/[locale]/(admin)/admin/players/invite.action"
 import { requestRefund } from "@/components/tickets/purchase.action"
 import { useDebounce } from "@/hooks/use-debounce"
+import { Link } from "@/i18n/navigation"
 import {
   type AddParticipantPayload,
   addParticipant,
@@ -93,10 +94,17 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
 
   // Search players for the "existing player" picker
   useEffect(() => {
-    if (!showAddModal || addMode !== "existing") return
+    // Clear the spinner on every bail-out path (modal closed, switched to "new" mode, or
+    // query too short) — otherwise an in-flight search whose effect is cleaned up leaves
+    // `searching` stuck true (the .finally below is guarded by !cancelled).
+    if (!showAddModal || addMode !== "existing") {
+      setSearching(false)
+      return
+    }
     const query = debouncedPlayerQuery.trim()
     if (query.length < 2) {
       setSearchResults([])
+      setSearching(false)
       return
     }
     let cancelled = false
@@ -517,8 +525,22 @@ export default function ParticipantsTab({ eventDocumentId }: ParticipantsTabProp
                   >
                     <td>
                       <div className={styles.nameCell}>
-                        <span className={styles.name}>{getDisplayName(participant)}</span>
-                        <span className={styles.ticketCode}>{participant.ticketCode}</span>
+                        {participant.player ? (
+                          <Link
+                            href={`/admin/players/${participant.player.documentId}`}
+                            className={styles.name}
+                          >
+                            {getDisplayName(participant)}
+                          </Link>
+                        ) : (
+                          <span className={styles.name}>{getDisplayName(participant)}</span>
+                        )}
+                        <Link
+                          href={`/tickets/${participant.documentId}`}
+                          className={styles.ticketCode}
+                        >
+                          {participant.ticketCode}
+                        </Link>
                       </div>
                     </td>
                     <td>{getDisplayEmail(participant)}</td>

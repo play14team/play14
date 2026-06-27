@@ -220,6 +220,22 @@
   color: var(--color-text-muted);
 }
 
+// When the name / ticket code are rendered as links, drop the default underline
+// and surface it on hover only (the non-link span fallback is unaffected).
+a.name,
+a.ticketCode {
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+a.name:hover {
+  color: var(--color-primary);
+}
+
 // Status Badge
 .statusBadge {
   display: inline-flex;

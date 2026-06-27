@@ -32,6 +32,10 @@ export interface Participant {
     orderStatus: string
     paidAt?: string
   }
+  player?: {
+    documentId: string
+    name: string
+  } | null
   createdAt: string
 }
 
