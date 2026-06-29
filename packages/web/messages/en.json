@@ -64,31 +64,35 @@
     "reportAnIssue": "Report an issue"
   },
   "home": {
+    "hero": {
+      "headline": "#play14 is where playing makes you better — at work, at life, at being human.",
+      "subhead": "A worldwide unconference where play becomes how we learn, connect, and leave changed.",
+      "cta": "See upcoming events"
+    },
     "powerOfPlay": {
-      "title": "Discover the power of <span>play</span>",
-      "subtitle": "Play engages both mind and body, making learning an active, immersive experience.",
-      "intro": "Welcome to #play14, a global movement that believes in the <strong>transformative power of play</strong>! We are a worldwide gathering of like-minded people who believe that <strong>playing is the best way to learn, share and foster creativity!</strong>",
-      "body": "Through play, individuals explore, experiment, and discover concepts in a hands-on way, which enhances understanding and retention. Playfulness encourages innovation, problem-solving, and collaboration, helping learners develop critical thinking skills.",
+      "title": "What it actually <span>is</span>",
+      "subtitle": "It's nothing like the conference you're picturing.",
+      "intro": "So what actually happens? For two and a half days, you and a room full of curious people build the program yourselves. No slides, no keynote speakers talking at you — just games and activities you propose, facilitate, and dive into together. You learn by doing, by sharing what you know, and by getting your hands on what everyone else brought. Some of it is pure fun. Some of it quietly changes how you see things.",
+      "body": "That's the <unconference>unconference</unconference> format, and it's the whole point. There's no fixed agenda and nobody pushing sessions at you. Each morning the room decides what happens: you pitch the games and conversations you want to run, and you join the ones that pull you in. Not feeling a session? The Law of Two Feet says get up and find a better one — no offence taken, ever. You're not in the audience here. You're co-writing the program.",
       "quote": "Tell me and I forget, teach me and I may remember, involve me and I learn",
       "quoteAuthor": "Benjamin Franklin",
-      "conclusion": "Play also reduces stress and increases motivation, making the learning process enjoyable and effective. By creating a safe space for trial and error, play fosters a deeper, more meaningful connection to the material being learned."
+      "conclusion": "You don't learn this stuff by being told. You learn it by doing it, with other people, in the room. Which brings us to the people."
     },
     "joinMovement": {
-      "title": "Join the <span>movement</span>",
-      "subtitle": "Join us in cities worldwide to connect with like-minded individuals.",
-      "intro": "Whether you are a facilitator, educator, or curious mind, our events are designed to spark creativity, foster collaboration, and ignite new ideas. Dive into a world of playful experimentation.",
-      "globalCommunity": "<strong>Global community:</strong> Connect with a diverse network of innovators.",
-      "endlessFun": "<strong>Endless fun:</strong> Engage in hands-on, playful activities.",
-      "inspire": "<strong>Inspire & be inspired:</strong> Share and discover new games, tools, and techniques.",
-      "unconference": "#play14 is an <unconference>unconference</unconference>, where <strong>all attendees are also contributors</strong>. Just show up with an open mind, and you'll have the chance to propose your own games or dive into the games suggested by others. It's all about participation, creativity, and shared fun!"
+      "title": "Who you'll <span>meet</span>",
+      "subtitle": "The real point isn't the games. It's who you play them with.",
+      "intro": "Look around the room and you'll find facilitators, coaches, teachers, designers, therapists, improvisers, agile folks, serial gamers — and people who just got curious and showed up. Different jobs, different countries, different reasons for being there. For one weekend they're all building things with you, sleeves rolled up. You don't get that mix anywhere else.",
+      "sandbox": "<strong>A safe place to experiment:</strong> run the session you'd never dare try at work. Fail, laugh, learn, run it again. Nobody's grading you.",
+      "kindred": "<strong>Kindred spirits, worldwide:</strong> you'll find people who think like you — and who you'll keep bumping into, event after event, city after city.",
+      "connection": "<strong>Connection that sticks:</strong> a weekend of playing together tells you more about someone than a year of meetings ever will."
     },
     "worldMap": {
       "srTitle": "Events around the world"
     },
     "experience": {
-      "title": "The <span>experience</span>",
-      "subtitle": "For two and a half days, <players>people with many different profiles</players> share <games>games and activities</games>, knowledge, and laughs. <strong>Everyone is welcome</strong>.",
-      "activitiesIntro": "Here are some examples of activities we engage in:",
+      "title": "What a session can <span>be</span>",
+      "subtitle": "Every session is proposed by someone in the room. Here's the kind of thing <players>people</players> bring to the <games>marketplace</games> — though, honestly, the list never stops surprising us.",
+      "activitiesIntro": "A few things people have actually run:",
       "seriousGame": "A <link>serious game</link> that you use as a metaphor in order to understand a new concept",
       "iceBreaker": "An <link>ice breaker</link> game where people learn more about one another",
       "warmUp": "A <warmup>warm up</warmup> or an <energizer>energizer</energizer> that you can use to raise the level of awareness and energy",
@@ -102,17 +106,62 @@
       "funTime": "A fun and energetic time with <dancing>dancing</dancing>, <singing>singing</singing> or being silly together",
       "improv": "An <link>improv theater</link> session where you can work on your confidence and ability to speak publicly",
       "esoteric": "A more esoteric session on a practice/hobby you want to share like yoga, laughter yoga, Tai Chi, Qigong, meditation, mindfulness, aikido, ...",
-      "callToAction": "Join us in order to develop your <strong>facilitation skills</strong>, increase your <strong>ability to accompany change</strong> in your organization, <strong>foster your creativity</strong> and improve your <strong>capacity to innovate</strong>.",
+      "callToAction": "And that's just what fits in a list. Bring something to share, or turn up empty-handed and curious — both work. <strong>Everyone leaves with more than they came with.</strong>",
       "quote": "You can discover more about a person in an hour of play than a year of conversation",
       "quoteAuthor": "Plato"
     },
+    "takeaways": {
+      "title": "What you'll <span>take home</span>",
+      "subtitle": "The stuff that's still with you on Monday.",
+      "body1": "You won't leave with a tote bag of slides you'll never open. You'll leave with games and facilitation techniques you can run with your team on Monday morning. With a fresh way of looking at problems you've been stuck on. And with a network of people across the world who think like you — and who you'll keep bumping into, event after event, city after city.",
+      "body2": "Worried it's 'just playing around'? That's the point, and it's also not. The play is how the learning sneaks in. People have walked out of a weekend and changed how they lead, how they teach, even what they do for a living. <strong>Come for the fun. Stay for what it does to you.</strong>"
+    },
+    "cta": {
+      "title": "Find your <span>#play14</span>",
+      "body": "Events run in cities all over the world, all year round. Pick one that fits your calendar — or one that's worth the trip — and grab a ticket. No countdown timers, no fake scarcity here: the only urgency is a real date on a real weekend.",
+      "primary": "Find an event near you",
+      "secondary": "Caught the bug, or nothing near you yet? <link>Bring #play14 to your city.</link>"
+    },
+    "coreValues": {
+      "title": "The values we play by",
+      "openness": {
+        "name": "Openness",
+        "short": "Leave your job title at the door and stay open to ideas, people, and games you'd never have tried alone.",
+        "detail": "We show up without armour — no hierarchy, no hidden agenda, no 'that's not how we do it here'. The best moments happen when you say yes to something you'd normally walk straight past. So we keep the door, and our minds, wide open."
+      },
+      "inclusion": {
+        "name": "Inclusion",
+        "short": "Whoever you are and whatever you do, there's a place for you in the room.",
+        "detail": "Different jobs, different countries, different reasons for turning up — everyone belongs, and nobody has to earn their seat. We build events where no one sits on the sidelines and every voice gets to play."
+      },
+      "connection": {
+        "name": "Connection",
+        "short": "The games are the excuse. The people are the point — and they tend to stay in your life.",
+        "detail": "Playing together skips the small talk and gets you to something real, fast. The people you meet here have a habit of turning up again — at the next event, in another city, years down the line. That's not networking; it's the start of friendships."
+      },
+      "curiosity": {
+        "name": "Curiosity",
+        "short": "Follow what makes you wonder. Ask the question, try the thing, see what happens.",
+        "detail": "We're all here because we never quite stopped asking 'what if?'. Curiosity is what gets a session proposed, a game reinvented, a stuck problem looked at sideways. Bring yours — the more you poke at things, the more you'll take home."
+      },
+      "sharing": {
+        "name": "Sharing",
+        "short": "Give away your best stuff. The more you put in, the more everyone walks out with.",
+        "detail": "Nobody hoards here. You hand over the game, the technique, the half-formed idea — and you get back ten you'd never have found on your own. It isn't a transaction; it's how the whole movement grows, person to person, event to event."
+      },
+      "courage": {
+        "name": "Courage",
+        "short": "Try the thing you'd never dare at work. Fail, laugh, learn, go again.",
+        "detail": "It takes a little nerve to facilitate in front of strangers, to play full-out, to be silly on purpose. #play14 is the safe place to find that nerve — and once you've used it here, you'll notice it's still there on Monday morning."
+      }
+    },
     "manifesto": {
       "title": "What we <span>stand for</span>",
-      "subtitle": "A game or activity at #play14 could be pretty much anything as long as it respects our <link>Manifesto and Code of Conduct</link>."
+      "subtitle": "Six values hold the whole thing together — and they're spelled out in our <link>Manifesto and Code of Conduct</link>. Any game, any activity, anything goes, as long as it lives by them."
     },
     "testimonials": {
       "title": "What our community <span>says</span>",
-      "subtitle": "Hear from members of the #play14 community about their experiences. These testimonials capture the spirit, impact, and joy of our events around the world.",
+      "subtitle": "Don't take our word for it. Here's what people say after they've been — in their own words.",
       "viewAll": "View all testimonials",
       "refreshLabel": "Show different testimonials"
     },
@@ -162,7 +211,7 @@
     },
     "statistics": {
       "title": "Our global <span>impact</span>",
-      "subtitle": "Since 2014, #play14 has grown into a worldwide movement connecting people through the power of play.",
+      "subtitle": "We don't grow by packing rooms. We grow by the number of events — city by city, year after year, all over the world. There's a good chance one is happening near you.",
       "yearsOfPlay": "Years of play",
       "countries": "Countries",
       "eventsOrganized": "Events organized",
@@ -331,6 +380,10 @@
       "title": "Our values",
       "intro": "Values are very important to us. They are what make #play14 what it is. Please, make sure you take a look at our manifesto and our code of conduct before you register to one of our events.",
       "thanksNina": "Many thanks to <link>Nina Neef</link> for the wonderful images.",
+      "valuesIntro": "Everything at #play14 grows from these six. They shape how we run events, how we treat each other, and what it feels like to be in the room.",
+      "manifestoIntro": "Those values took shape, years ago, in a short manifesto — our north star for what #play14 is, and what it will always be.",
+      "cocIntro": "And this is what we ask of everyone who shows up. Nothing heavy — just the handful of things that keep the room open, kind, and fun.",
+      "scoutIntro": "One of those lines deserves a closer look: the one about leaving the playground clean.",
       "scoutRule": "Boy/Girl scout rule",
       "scoutSaying": "Always leave the campground cleaner than you found it.",
       "scoutText1": "Be mindful of other people well being by cleaning after yourself when you leave a space. That goes for the space you played on, the space you ate on, the space you rested on, etc.",

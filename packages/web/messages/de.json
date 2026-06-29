@@ -1,30 +1,34 @@
 {
   "home": {
+    "hero": {
+      "headline": "#play14 ist der Ort, an dem Spielen Sie besser macht — bei der Arbeit, im Leben, als Mensch.",
+      "subhead": "Eine weltweite Unconference, bei der Spielen zur Art wird, wie wir lernen, uns verbinden und verändert gehen.",
+      "cta": "Kommende Veranstaltungen ansehen"
+    },
     "powerOfPlay": {
-      "title": "Entdecken Sie die Kraft des <span>Spielens</span>",
-      "subtitle": "Spielen aktiviert Körper und Geist und macht Lernen zu einem aktiven, immersiven Erlebnis.",
-      "intro": "Willkommen bei #play14, einer globalen Bewegung, die an die <strong>transformative Kraft des Spielens</strong> glaubt! Wir sind eine weltweite Gemeinschaft von Gleichgesinnten, die überzeugt sind, dass <strong>Spielen der beste Weg ist, zu lernen, sich auszutauschen und Kreativität zu fördern!</strong>",
-      "body": "Durch das Spielen erkunden, experimentieren und entdecken Menschen Konzepte auf praktische Weise, was das Verständnis und die Merkfähigkeit verbessert. Spielerisches Vorgehen ermuntert Innovation, Problemlösung und Zusammenarbeit und hilft Lernenden, kritisches Denken zu entwickeln.",
+      "title": "Was es eigentlich <span>ist</span>",
+      "subtitle": "Es ähnelt überhaupt nicht der Konferenz, die Sie sich vorstellen.",
+      "intro": "Was passiert eigentlich? Zweieinhalb Tage lang gestalten Sie und ein Raum voller neugieriger Menschen das Programm selbst. Keine Folien, keine Keynote-Redner, die auf Sie einreden — nur Spiele und Aktivitäten, die Sie vorschlagen, facilitieren und gemeinsam erleben. Sie lernen durch Tun, durch das Teilen Ihres Wissens und durch das, was alle anderen mitgebracht haben. Manches ist purer Spaß. Manches verändert leise, wie Sie die Dinge sehen.",
+      "body": "Das ist das <unconference>Unconference</unconference>-Format, und darum geht es. Es gibt keine feste Agenda und niemanden, der Ihnen Sessions aufzwingt. Jeden Morgen entscheidet der Raum, was passiert: Sie pitchen die Spiele und Gespräche, die Sie leiten wollen, und schließen sich den Dingen an, die Sie anziehen. Fühlt sich eine Session nicht richtig an? Das Gesetz der zwei Füße sagt: Aufstehen und eine bessere finden — niemand ist je beleidigt. Sie sind hier nicht im Publikum. Sie schreiben das Programm mit.",
       "quote": "Sage es mir und ich vergesse es, lehre mich und ich erinnere mich vielleicht, beziehe mich ein und ich lerne",
       "quoteAuthor": "Benjamin Franklin",
-      "conclusion": "Spielen reduziert auch Stress und erhöht die Motivation, wodurch der Lernprozess angenehm und effektiv wird. Indem es einen sicheren Raum für Versuch und Irrtum schafft, fördert Spielen eine tiefere, bedeutungsvollere Verbindung zu dem zu lernenden Material."
+      "conclusion": "Das hier lernt man nicht, indem man es erklärt bekommt. Man lernt es, indem man es mit anderen Menschen, im Raum, selbst tut. Was uns zu den Menschen bringt."
     },
     "joinMovement": {
-      "title": "Schließen Sie sich der <span>Bewegung</span> an",
-      "subtitle": "Vernetzen Sie sich weltweit in verschiedenen Städten mit Gleichgesinnten.",
-      "intro": "Ob Sie Facilitator, Pädagoge oder einfach neugierig sind – unsere Veranstaltungen sind darauf ausgelegt, Kreativität zu wecken, Zusammenarbeit zu fördern und neue Ideen zu entfachen. Tauchen Sie ein in eine Welt spielerischer Experimente.",
-      "globalCommunity": "<strong>Globale Gemeinschaft:</strong> Vernetzen Sie sich mit einem vielfältigen Netzwerk von Innovatoren.",
-      "endlessFun": "<strong>Endloser Spaß:</strong> Nehmen Sie an praktischen, spielerischen Aktivitäten teil.",
-      "inspire": "<strong>Inspirieren & inspiriert werden:</strong> Teilen und entdecken Sie neue Spiele, Werkzeuge und Techniken.",
-      "unconference": "#play14 ist eine <unconference>Unconference</unconference>, bei der <strong>alle Teilnehmenden auch Beitragende sind</strong>. Kommen Sie einfach mit offenem Geist, und Sie haben die Möglichkeit, eigene Spiele vorzuschlagen oder an den von anderen vorgeschlagenen Spielen teilzunehmen. Es geht um Teilnahme, Kreativität und gemeinsamen Spaß!"
+      "title": "Wem Sie <span>begegnen</span>",
+      "subtitle": "Es geht eigentlich nicht um die Spiele. Es geht darum, mit wem Sie spielen.",
+      "intro": "Schauen Sie sich im Raum um und Sie finden Facilitators, Coaches, Lehrerinnen und Lehrer, Designerinnen und Designer, Therapeutinnen und Therapeuten, Improvisationskünstler, Agile-Enthusiasten, Vielspieler — und Menschen, die einfach neugierig wurden und hingekommen sind. Verschiedene Berufe, verschiedene Länder, verschiedene Gründe, dort zu sein. Ein Wochenende lang bauen sie alle mit Ihnen zusammen, die Ärmel hochgekrempelt. Diesen Mix bekommen Sie nirgendwo anders.",
+      "sandbox": "<strong>Ein sicherer Raum zum Experimentieren:</strong> Leiten Sie die Session, die Sie bei der Arbeit nie wagen würden. Scheitern, lachen, lernen, nochmal. Niemand bewertet Sie.",
+      "kindred": "<strong>Gleichgesinnte weltweit:</strong> Sie finden Menschen, die so denken wie Sie — und denen Sie immer wieder begegnen werden, Veranstaltung für Veranstaltung, Stadt für Stadt.",
+      "connection": "<strong>Verbindungen, die bleiben:</strong> Ein Wochenende gemeinsamen Spielens verrät Ihnen mehr über einen Menschen als ein Jahr Meetings."
     },
     "worldMap": {
       "srTitle": "Veranstaltungen weltweit"
     },
     "experience": {
-      "title": "Das <span>Erlebnis</span>",
-      "subtitle": "Zweieinhalb Tage lang teilen <players>Menschen mit vielen verschiedenen Profilen</players> <games>Spiele und Aktivitäten</games>, Wissen und Lachen. <strong>Alle sind willkommen</strong>.",
-      "activitiesIntro": "Hier sind einige Beispiele für Aktivitäten, an denen wir teilnehmen:",
+      "title": "Was eine Session <span>sein kann</span>",
+      "subtitle": "Jede Session wird von jemandem im Raum vorgeschlagen. Das ist die Art von Dingen, die <players>Menschen</players> zum <games>Marketplace</games> bringen — obwohl die Liste uns ehrlich gesagt nie aufhört zu überraschen.",
+      "activitiesIntro": "Ein paar Dinge, die Menschen tatsächlich schon gemacht haben:",
       "seriousGame": "Ein <link>Serious Game</link>, das Sie als Metapher verwenden, um ein neues Konzept zu verstehen",
       "iceBreaker": "Ein <link>Kennenlernspiel</link>, bei dem sich die Menschen besser kennenlernen",
       "warmUp": "Ein <warmup>Aufwärmspiel</warmup> oder ein <energizer>Energizer</energizer>, um das Bewusstsein und die Energie zu steigern",
@@ -38,17 +42,62 @@
       "funTime": "Eine spaßige und energiegeladene Zeit mit <dancing>Tanzen</dancing>, <singing>Singen</singing> oder gemeinsam albern sein",
       "improv": "Eine <link>Improtheater</link>-Session, bei der Sie an Ihrem Selbstvertrauen und Ihrer Fähigkeit arbeiten können, öffentlich zu sprechen",
       "esoteric": "Eine esoterischere Session zu einer Praxis oder einem Hobby, das Sie teilen möchten, wie Yoga, Lachyoga, Tai Chi, Qigong, Meditation, Achtsamkeit, Aikido, ...",
-      "callToAction": "Schließen Sie sich uns an, um Ihre <strong>Facilitationsfähigkeiten</strong> zu entwickeln, Ihre <strong>Fähigkeit zu erhöhen, Veränderungen zu begleiten</strong> in Ihrer Organisation, Ihre <strong>Kreativität zu fördern</strong> und Ihre <strong>Innovationsfähigkeit zu verbessern</strong>.",
+      "callToAction": "Und das ist nur, was in eine Liste passt. Bringen Sie etwas zum Teilen mit, oder kommen Sie mit leeren Händen und Neugier — beides funktioniert. <strong>Jede und jeder geht mit mehr nach Hause, als sie oder er mitgebracht hat.</strong>",
       "quote": "Man kann mehr über eine Person in einer Stunde Spiel erfahren als in einem Jahr Konversation",
       "quoteAuthor": "Platon"
     },
+    "takeaways": {
+      "title": "Was Sie <span>mitnehmen</span>",
+      "subtitle": "Was am Montag noch mit Ihnen da ist.",
+      "body1": "Sie gehen nicht mit einer Tasche voller Folien nach Hause, die Sie nie öffnen werden. Sie gehen mit Spielen und Facilitationstechniken nach Hause, die Sie am Montagmorgen mit Ihrem Team ausprobieren können. Mit einer neuen Sichtweise auf Probleme, bei denen Sie feststeckten. Und mit einem Netzwerk von Menschen auf der ganzen Welt, die so denken wie Sie — und denen Sie immer wieder begegnen werden, Veranstaltung für Veranstaltung, Stadt für Stadt.",
+      "body2": "Besorgt, dass es 'bloßes Herumspiele' ist? Das ist der Punkt, und gleichzeitig auch nicht. Das Spielen ist der Weg, auf dem das Lernen sich einschleicht. Menschen haben ein Wochenende verlassen und verändert, wie sie führen, wie sie unterrichten, sogar was sie beruflich machen. <strong>Kommen Sie wegen des Spaßes. Bleiben Sie wegen dem, was er mit Ihnen macht.</strong>"
+    },
+    "cta": {
+      "title": "Finden Sie Ihr <span>#play14</span>",
+      "body": "Veranstaltungen finden das ganze Jahr über in Städten auf der ganzen Welt statt. Suchen Sie eine aus, die in Ihren Kalender passt — oder eine, für die sich die Reise lohnt — und holen Sie sich ein Ticket. Keine Countdown-Timer, keine künstliche Knappheit: Das einzige, was drängt, ist ein echtes Datum an einem echten Wochenende.",
+      "primary": "Eine Veranstaltung in Ihrer Nähe finden",
+      "secondary": "Den Virus erwischt, oder noch nichts in Ihrer Nähe? <link>#play14 in Ihre Stadt bringen.</link>"
+    },
+    "coreValues": {
+      "title": "Die Werte, nach denen wir spielen",
+      "openness": {
+        "name": "Offenheit",
+        "short": "Lassen Sie Ihren Jobtitel an der Tür und bleiben Sie offen für Ideen, Menschen und Spiele, die Sie allein nie ausprobiert hätten.",
+        "detail": "Wir kommen ohne Rüstung — keine Hierarchie, keine versteckte Agenda, kein 'So machen wir das hier nicht'. Die besten Momente entstehen, wenn Sie Ja zu etwas sagen, an dem Sie sonst einfach vorbeigegangen wären. Also halten wir die Tür — und unseren Geist — weit offen."
+      },
+      "inclusion": {
+        "name": "Inklusion",
+        "short": "Wer Sie auch sind und was auch immer Sie tun — es gibt einen Platz für Sie im Raum.",
+        "detail": "Verschiedene Berufe, verschiedene Länder, verschiedene Gründe, dabei zu sein — jeder gehört dazu, und niemand muss seinen Platz erst verdienen. Wir gestalten Veranstaltungen, bei denen niemand auf der Tribüne sitzt und jede Stimme mitspielen darf."
+      },
+      "connection": {
+        "name": "Verbindung",
+        "short": "Die Spiele sind der Vorwand. Die Menschen sind der Punkt — und sie bleiben oft in Ihrem Leben.",
+        "detail": "Gemeinsames Spielen überspringt den Smalltalk und bringt Sie schnell zu etwas Echtem. Die Menschen, denen Sie hier begegnen, haben die Angewohnheit, immer wieder aufzutauchen — bei der nächsten Veranstaltung, in einer anderen Stadt, Jahre später. Das ist kein Networking; das ist der Beginn von Freundschaften."
+      },
+      "curiosity": {
+        "name": "Neugier",
+        "short": "Folgen Sie dem, was Sie zum Staunen bringt. Stellen Sie die Frage, probieren Sie die Sache aus, schauen Sie, was passiert.",
+        "detail": "Wir alle sind hier, weil wir nie ganz aufgehört haben zu fragen: 'Was wäre, wenn?'. Neugier ist das, was eine Session zum Vorschlag macht, ein Spiel neu erfindet, ein festgefahrenes Problem von der Seite betrachtet. Bringen Sie Ihre mit — je mehr Sie an Dingen herumpokern, desto mehr nehmen Sie mit nach Hause."
+      },
+      "sharing": {
+        "name": "Teilen",
+        "short": "Geben Sie Ihr Bestes weiter. Je mehr Sie einbringen, desto mehr gehen alle mit.",
+        "detail": "Niemand hortet hier. Sie geben das Spiel, die Technik, die halbfertige Idee weiter — und bekommen zehn zurück, die Sie allein nie gefunden hätten. Das ist keine Transaktion; so wächst die ganze Bewegung, von Mensch zu Mensch, von Veranstaltung zu Veranstaltung."
+      },
+      "courage": {
+        "name": "Mut",
+        "short": "Probieren Sie die Sache aus, die Sie bei der Arbeit nie wagen würden. Scheitern, lachen, lernen, nochmal.",
+        "detail": "Es braucht ein bisschen Überwindung, vor Fremden zu facilitieren, voll mitzuspielen, absichtlich albern zu sein. #play14 ist der sichere Ort, um diese Überwindung zu finden — und wenn Sie sie einmal hier eingesetzt haben, merken Sie, dass sie am Montagmorgen noch da ist."
+      }
+    },
     "manifesto": {
       "title": "Wofür wir <span>stehen</span>",
-      "subtitle": "Ein Spiel oder eine Aktivität bei #play14 kann so ziemlich alles sein, solange es unser <link>Manifest und unseren Verhaltenskodex</link> respektiert."
+      "subtitle": "Sechs Werte halten das Ganze zusammen — und sie sind in unserem <link>Manifest und Verhaltenskodex</link> festgehalten. Jedes Spiel, jede Aktivität, alles ist erlaubt, solange es nach ihnen lebt."
     },
     "testimonials": {
       "title": "Was unsere Community <span>sagt</span>",
-      "subtitle": "Hören Sie von Mitgliedern der #play14-Community über ihre Erfahrungen. Diese Erfahrungsberichte erfassen den Geist, die Wirkung und die Freude unserer Veranstaltungen weltweit.",
+      "subtitle": "Glauben Sie uns nicht einfach so. Hier ist, was Menschen danach sagen — in ihren eigenen Worten.",
       "viewAll": "Alle Erfahrungsberichte anzeigen",
       "refreshLabel": "Andere Erfahrungsberichte anzeigen"
     },
@@ -98,7 +147,7 @@
     },
     "statistics": {
       "title": "Unsere globale <span>Wirkung</span>",
-      "subtitle": "Seit 2014 ist #play14 zu einer weltweiten Bewegung gewachsen, die Menschen durch die Kraft des Spielens verbindet.",
+      "subtitle": "Wir wachsen nicht, indem wir Räume füllen. Wir wachsen durch die Anzahl der Veranstaltungen — Stadt für Stadt, Jahr für Jahr, überall auf der Welt. Es ist gut möglich, dass eine in Ihrer Nähe stattfindet.",
       "yearsOfPlay": "Jahre des Spielens",
       "countries": "Länder",
       "eventsOrganized": "Organisierte Veranstaltungen",
@@ -137,6 +186,10 @@
       "title": "Unsere Werte",
       "intro": "Werte sind uns sehr wichtig. Sie machen #play14 zu dem, was es ist. Bitte schauen Sie sich unser Manifest und unseren Verhaltenskodex an, bevor Sie sich für eine unserer Veranstaltungen registrieren.",
       "thanksNina": "Vielen Dank an <link>Nina Neef</link> für die wunderbaren Bilder.",
+      "valuesIntro": "Alles bei #play14 wächst aus diesen sechs. Sie prägen, wie wir Veranstaltungen gestalten, wie wir miteinander umgehen und wie es sich anfühlt, im Raum zu sein.",
+      "manifestoIntro": "Diese Werte haben sich vor Jahren in einem kurzen Manifest gefestigt — unser Nordstern dafür, was #play14 ist und immer sein wird.",
+      "cocIntro": "Und das ist, was wir von allen bitten, die kommen. Nichts Schweres — nur die paar Dinge, die den Raum offen, freundlich und lustig halten.",
+      "scoutIntro": "Eine dieser Zeilen verdient einen näheren Blick: die über das Sauberhalten des Spielplatzes.",
       "scoutRule": "Pfadfinderregel",
       "scoutSaying": "Hinterlasse den Lagerplatz immer sauberer, als du ihn vorgefunden hast.",
       "scoutText1": "Achten Sie auf das Wohlbefinden anderer Menschen, indem Sie nach sich selbst aufräumen, wenn Sie einen Raum verlassen. Das gilt für den Raum, in dem Sie gespielt haben, den Raum, in dem Sie gegessen haben, den Raum, in dem Sie sich ausgeruht haben, usw.",
