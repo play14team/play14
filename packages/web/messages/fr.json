@@ -75,7 +75,7 @@
       "title": "Ce que c'est <span>vraiment</span>",
       "subtitle": "Rien à voir avec la conférence que tu imagines.",
       "intro": "Alors, qu'est-ce qui se passe vraiment ? Pendant deux jours et demi, toi et une salle pleine de gens curieux construisez le programme vous-mêmes. Pas de slides, pas de conférenciers qui te parlent — juste des jeux et des activités que tu proposes, facilites et explores ensemble. Tu apprends en faisant, en partageant ce que tu sais, et en mettant les mains dans ce que les autres ont apporté. Certaines choses sont du pur plaisir. D'autres changent doucement ta façon de voir les choses.",
-      "body": "C'est le format de la <unconference>non-conférence</unconference>, et c'est tout l'intérêt. Pas d'agenda figé, personne pour t'imposer des sessions. Chaque matin, la salle décide de ce qui se passe : tu proposes les jeux et discussions que tu veux animer, et tu rejoins ceux qui t'attirent. Tu n'es pas à l'aise dans une session ? La Loi des deux pieds dit que tu te lèves et en trouves une meilleure — sans offense, jamais. Tu n'es pas dans le public ici. Tu co-écris le programme.",
+      "body": "C'est le format de la <unconference>non-conférence</unconference>, et c'est tout l'intérêt. Pas d'agenda figé, personne pour t'imposer des sessions. Chaque matin, la salle décide de ce qui se passe : tu proposes les jeux et discussions que tu veux faciliter, et tu rejoins ceux qui t'attirent. Tu n'es pas à l'aise dans une session ? La Loi des deux pieds dit que tu te lèves et en trouves une meilleure — sans offense, jamais. Tu n'es pas dans le public ici. Tu co-écris le programme.",
       "quote": "Dis-moi et j'oublie, enseigne-moi et je me souviens, implique-moi et j'apprends",
       "quoteAuthor": "Benjamin Franklin",
       "conclusion": "Ces choses-là, on ne les apprend pas en se les faisant expliquer. On les apprend en les faisant, avec d'autres, dans la salle. Ce qui nous amène aux gens."
@@ -84,7 +84,7 @@
       "title": "Qui tu vas <span>rencontrer</span>",
       "subtitle": "L'intérêt véritable, ce ne sont pas les jeux. C'est avec qui tu les joues.",
       "intro": "Regarde autour de toi dans la salle et tu trouveras des facilitateurs, des coachs, des enseignants, des designers, des thérapeutes, des improvisateurs, des agilistes, des joueurs en série — et des gens qui ont juste eu la curiosité de venir. Des métiers différents, des pays différents, des raisons différentes d'être là. Pour un week-end, ils construisent tous des choses avec toi, manches retroussées. Ce mélange-là, tu ne le trouves nulle part ailleurs.",
-      "sandbox": "<strong>Un espace sûr pour expérimenter :</strong> anime la session que tu n'oserais jamais tenter au boulot. Rate, ris, apprends, recommence. Personne ne te note.",
+      "sandbox": "<strong>Un espace sûr pour expérimenter :</strong> facilite la session que tu n'oserais jamais tenter au boulot. Rate, ris, apprends, recommence. Personne ne te note.",
       "kindred": "<strong>Des esprits proches, dans le monde entier :</strong> tu trouveras des gens qui pensent comme toi — et que tu croiseras encore et encore, d'événement en événement, de ville en ville.",
       "connection": "<strong>Des liens qui restent :</strong> un week-end à jouer ensemble t'en dit plus sur quelqu'un qu'une année de réunions."
     },
@@ -98,7 +98,7 @@
     "experience": {
       "title": "Ce qu'une session peut <span>être</span>",
       "subtitle": "Chaque session est proposée par quelqu'un dans la salle. Voici le genre de choses que les <players>gens</players> apportent au <games>marketplace</games> — honnêtement, la liste ne cesse jamais de nous surprendre.",
-      "activitiesIntro": "Quelques choses que des gens ont vraiment animées :",
+      "activitiesIntro": "Quelques choses que des gens ont vraiment facilitées :",
       "seriousGame": "Un <link>jeu sérieux</link> que tu utilises comme métaphore pour comprendre un nouveau concept",
       "iceBreaker": "Un <link>brise-glace</link> où les gens apprennent à mieux se connaître",
       "warmUp": "Un <warmup>échauffement</warmup> ou un <energizer>énergisant</energizer> que tu peux utiliser pour augmenter le niveau de conscience et d'énergie",
@@ -192,11 +192,11 @@
       },
       "proposeGame": {
         "question": "Dois-je proposer un jeu pour participer ?",
-        "answer": "<strong>Non, pas du tout !</strong> Il est tout à fait possible de participer à #play14 sans proposer de jeu ou d'activité. Tu peux simplement participer aux sessions proposées par d'autres. Cependant, si tu découvres un jeu que tu adores, tu pourrais être inspiré pour l'animer lors d'un prochain événement !"
+        "answer": "<strong>Non, pas du tout !</strong> Il est tout à fait possible de participer à #play14 sans proposer de jeu ou d'activité. Tu peux simplement participer aux sessions proposées par d'autres. Cependant, si tu découvres un jeu que tu adores, tu pourrais être inspiré pour le faciliter lors d'un prochain événement !"
       },
       "lawOfTwoFeet": {
         "question": "Qu'est-ce que la Loi des deux pieds ?",
-        "answer": "La Loi des deux pieds est un principe fondamental de l'Open Space Technology. Cela signifie que si tu te trouves dans une session où tu <strong>n'apprends ni ne contribues</strong>, tu as la responsabilité d'utiliser tes deux pieds et d'aller ailleurs. Ni l'animateur ni les autres participants ne devraient se sentir offensés — c'est simplement le fonctionnement du format."
+        "answer": "La Loi des deux pieds est un principe fondamental de l'Open Space Technology. Cela signifie que si tu te trouves dans une session où tu <strong>n'apprends ni ne contribues</strong>, tu as la responsabilité d'utiliser tes deux pieds et d'aller ailleurs. Ni le facilitateur ni les autres participants ne devraient se sentir offensés — c'est simplement le fonctionnement du format."
       },
       "whoCanAttend": {
         "question": "Qui peut participer à #play14 ?",
@@ -212,7 +212,7 @@
       },
       "experience": {
         "question": "Ai-je besoin d'une expérience préalable avec les jeux ou la facilitation ?",
-        "answer": "<strong>Aucune expérience préalable n'est nécessaire.</strong> #play14 accueille les débutants et les experts. De nombreux participants découvrent de nouveaux jeux lors de leur premier événement et reviennent les animer plus tard. La communauté est solidaire et tout le monde apprend les uns des autres, quel que soit le niveau d'expérience."
+        "answer": "<strong>Aucune expérience préalable n'est nécessaire.</strong> #play14 accueille les débutants et les experts. De nombreux participants découvrent de nouveaux jeux lors de leur premier événement et reviennent les faciliter plus tard. La communauté est solidaire et tout le monde apprend les uns des autres, quel que soit le niveau d'expérience."
       }
     },
     "statistics": {
@@ -239,7 +239,7 @@
       "openMinded": "Tu seras <strong>ouvert d'esprit</strong> et prêt à <strong>écouter et apprendre</strong> des autres",
       "propose": "Tu te sentiras libre de <strong>proposer, expérimenter et expliquer</strong> ce que tu as en tête",
       "noHighjack": "Tu ne <strong>détourneras pas, ne saboteras pas et ne ruineras pas</strong> l'expérience d'apprentissage des autres",
-      "timebox": "Tu <strong>géreras ta propre durée</strong> lors de l'animation afin que les autres sessions puissent commencer à l'heure",
+      "timebox": "Tu <strong>géreras ta propre durée</strong> lors de la facilitation afin que les autres sessions puissent commencer à l'heure",
       "behave": "Tu <strong>te comporteras de manière appropriée</strong> et seras un <strong>être humain décent</strong>",
       "clean": "Tu <strong>laisseras toujours le terrain de jeu propre</strong> (règle du scout), <strong>éviteras le gaspillage</strong> et essaieras de réduire ton <strong>empreinte carbone</strong>",
       "fun": "Tu seras prêt à <strong>t'amuser sérieusement et à bien rire</strong> et ne devrais pas avoir honte de cela",
@@ -278,8 +278,8 @@
     },
     "details": {
       "editEvent": "Modifier l'événement",
-      "venue": "Lieu",
-      "venueTbd": "Lieu à confirmer",
+      "venue": "Espace",
+      "venueTbd": "Espace à confirmer",
       "resources": "Ressources",
       "schedule": "Programme",
       "start": "Début",
@@ -321,7 +321,7 @@
       "sec": "sec",
       "inProgress": "En cours"
     },
-    "noVenue": "Pas encore de lieu",
+    "noVenue": "Pas encore d'espace",
     "map": {
       "loading": "Chargement des lieux d'événements...",
       "noEvents": "Aucun événement #play14",
@@ -393,7 +393,7 @@
       "scoutRule": "Règle du scout",
       "scoutSaying": "Laisse toujours le campement plus propre que tu ne l'as trouvé.",
       "scoutText1": "Sois attentif au bien-être des autres en nettoyant après ton passage lorsque tu quittes un espace. Cela vaut pour l'espace où tu as joué, mangé, où tu t'es reposé, etc.",
-      "scoutText2": "N'oublie pas que l'équipe organisatrice n'est pas là pour nettoyer après toi, mais ce sont aussi des participants de l'événement. Ils veulent aussi animer et assister aux sessions, tout autant que toi."
+      "scoutText2": "N'oublie pas que l'équipe organisatrice n'est pas là pour nettoyer après toi, mais ce sont aussi des participants de l'événement. Ils veulent aussi faciliter et assister aux sessions, tout autant que toi."
     },
     "format": {
       "title": "Notre format",
@@ -405,17 +405,17 @@
       "principles": "Principes",
       "principlesIntro": "Il y a quelques règles simples pour les participants.",
       "whoeverComes": "Quiconque vient est la bonne personne",
-      "whoeverComesText": "En tant qu'animateur, tu dois accueillir quiconque a décidé de rejoindre ta session, et ne pas être frustré si tu attendais des personnes différentes. En tant que participant, tu dois être prêt à collaborer avec n'importe qui.",
+      "whoeverComesText": "En tant que facilitateur, tu dois accueillir quiconque a décidé de rejoindre ta session, et ne pas être frustré si tu attendais des personnes différentes. En tant que participant, tu dois être prêt à collaborer avec n'importe qui.",
       "wheneverStarts": "Quand ça commence, c'est le bon moment",
-      "wheneverStartsText": "En tant qu'animateur, si tu as besoin de temps pour préparer, prends-le. Pense simplement que les gens pourraient s'ennuyer et aller rejoindre une autre session. Le mieux est de tout préparer à l'avance. En tant que participant, il n'y a rien de mal à rejoindre une session en cours. Mais respecte les personnes qui ont déjà commencé, et essaie de t'intégrer discrètement.",
+      "wheneverStartsText": "En tant que facilitateur, si tu as besoin de temps pour préparer, prends-le. Pense simplement que les gens pourraient s'ennuyer et aller rejoindre une autre session. Le mieux est de tout préparer à l'avance. En tant que participant, il n'y a rien de mal à rejoindre une session en cours. Mais respecte les personnes qui ont déjà commencé, et essaie de t'intégrer discrètement.",
       "whereverItIs": "Où que ce soit, c'est le bon endroit",
-      "whereverItIsText": "Plusieurs espaces te seront proposés pour ta session. Choisis celui qui correspond à tes besoins en tant qu'animateur ou participant.",
+      "whereverItIsText": "Plusieurs espaces te seront proposés pour ta session. Choisis celui qui correspond à tes besoins en tant que facilitateur ou participant.",
       "whateverHappens": "Quoi qu'il arrive, c'est la seule chose qui pouvait arriver",
       "whateverHappensText": "Sois prêt à être surpris. Ne sois pas contrarié si tu reçois des retours. Ne sois pas déçu si ça ne fonctionne pas. Réessaie si nécessaire.",
       "whenItsOver": "Quand c'est fini, c'est fini",
-      "whenItsOverText": "En tant qu'animateur, c'est à toi de gérer ton temps. Les organisateurs ne le feront pas pour toi. Garde à l'esprit que les participants de ta session pourraient vouloir aller à une autre session après la tienne et que la salle pourrait être réservée ensuite. N'hésite pas à continuer dans un autre endroit avec les personnes intéressées.",
+      "whenItsOverText": "En tant que facilitateur, c'est à toi de gérer ton temps. Les organisateurs ne le feront pas pour toi. Garde à l'esprit que les participants de ta session pourraient vouloir aller à une autre session après la tienne et que la salle pourrait être réservée ensuite. N'hésite pas à continuer dans un autre endroit avec les personnes intéressées.",
       "lawOfTwoFeet": "La Loi des deux pieds",
-      "lawOfTwoFeetText": "Dès qu'une personne sent qu'une session ne contribue pas à son apprentissage, elle a la responsabilité envers elle-même de se lever et de bouger. C'est-à-dire d'utiliser ses deux pieds ou quatre roues pour aller dans un endroit plus intéressant. Ni l'animateur ni les autres participants ne devraient se sentir offensés. C'est comme ça.",
+      "lawOfTwoFeetText": "Dès qu'une personne sent qu'une session ne contribue pas à son apprentissage, elle a la responsabilité envers elle-même de se lever et de bouger. C'est-à-dire d'utiliser ses deux pieds ou quatre roues pour aller dans un endroit plus intéressant. Ni le facilitateur ni les autres participants ne devraient se sentir offensés. C'est comme ça.",
       "bumblebeeButterfly": "Bourdon et Papillon",
       "butterflyText": "Un papillon reste assis, l'air détendu, et des discussions intéressantes peuvent émerger autour de lui lorsque les gens le trouvent et s'arrêtent pour discuter.",
       "bumblebeeText": "Un bourdon vole d'un groupe à l'autre et pollinise les discussions.",
@@ -434,10 +434,10 @@
       "proposeDetails": "Tu n'as pas besoin d'entrer dans les détails. Explique simplement le concept principal de ton jeu et liste quelques enseignements. L'objectif est de donner suffisamment d'informations pour que les gens aient envie de venir à ta session.",
       "proposeKeepShort": "Pour que ce soit amusant, sois bref.",
       "notNewGame": "Et si le jeu que je propose n'est pas nouveau ?",
-      "notNewGameText1": "Il est tout à fait acceptable de proposer un jeu qui a déjà été proposé par quelqu'un d'autre ou joué auparavant. En fait, c'est même encouragé si tu veux t'améliorer en facilitation. Au fil des années, certains jeux sont devenus des classiques de #play14. Animer l'un d'entre eux est un excellent moyen de progresser.",
-      "notNewGameText2": "N'oublie pas que #play14 est une question d'expérimentation. C'est en prenant des risques et en sortant de ta zone de confort que tu t'amélioreras. Nous avons vu des personnes découvrir un jeu un jour en tant que joueur et animer ce même jeu le lendemain.",
+      "notNewGameText1": "Il est tout à fait acceptable de proposer un jeu qui a déjà été proposé par quelqu'un d'autre ou joué auparavant. En fait, c'est même encouragé si tu veux t'améliorer en facilitation. Au fil des années, certains jeux sont devenus des classiques de #play14. Faciliter l'un d'entre eux est un excellent moyen de progresser.",
+      "notNewGameText2": "N'oublie pas que #play14 est une question d'expérimentation. C'est en prenant des risques et en sortant de ta zone de confort que tu t'amélioreras. Nous avons vu des personnes découvrir un jeu un jour en tant que joueur et faciliter ce même jeu le lendemain.",
       "shouldDebrief": "Dois-je prévoir un debriefing de mon jeu ?",
-      "shouldDebriefText1": "OUI, OUI, et encore OUI. Il n'y a rien de plus triste qu'un super jeu, plein d'opportunités d'apprentissage, sans un bon debriefing. Garde toujours du temps pour débriefer ton jeu/activité à la fin de ta session. C'est ta responsabilité en tant qu'animateur de t'assurer que tous les participants peuvent apprendre autant que possible de ton jeu.",
+      "shouldDebriefText1": "OUI, OUI, et encore OUI. Il n'y a rien de plus triste qu'un super jeu, plein d'opportunités d'apprentissage, sans un bon debriefing. Garde toujours du temps pour débriefer ton jeu/activité à la fin de ta session. C'est ta responsabilité en tant que facilitateur de t'assurer que tous les participants peuvent apprendre autant que possible de ton jeu.",
       "shouldDebriefText2": "N'oublie pas que le debriefing consiste à poser des questions, pas à expliquer aux gens ce qu'ils devraient ressentir ou comprendre. Essaie de ne pas projeter ta propre compréhension du jeu, mais pose plutôt des questions puissantes qui mèneront le groupe à des prises de conscience liées à leur propre expérience.",
       "shouldDebriefText3": "Un excellent outil pour t'aider est <link>Le Cube de Debriefing</link>.",
       "noGame": "Et si je n'ai aucun jeu/activité à proposer ?",
@@ -714,7 +714,7 @@
     "toc": {
       "title": "Sommaire",
       "part1": "Partie 1 : Organiser un événement #play14",
-      "section1": "Comment devenir hôte",
+      "section1": "Comment devenir organisateur",
       "section2": "Tes responsabilités",
       "section3": "Choisir le bon lieu",
       "section4": "Planifier le matériel et les fournitures",
@@ -1762,7 +1762,7 @@
       "noEventsCreated": "Tu n'as encore créé aucun événement.",
       "createFirstEvent": "Créer ton premier événement",
       "noEventsFound": "Aucun événement trouvé",
-      "noMineEvents": "Aucun événement où tu es hôte ou mentor.",
+      "noMineEvents": "Aucun événement où tu es organisateur ou mentor.",
       "events": "événements"
     },
     "claims": {
@@ -1812,14 +1812,14 @@
       "locationNamePlaceholder": "ex. Nancy",
       "country": "Pays",
       "selectCountry": "Sélectionner un pays...",
-      "venueTitle": "Hébergeur (optionnel)",
+      "venueTitle": "Espace (optionnel)",
       "venueDescription": "L'entreprise ou l'organisation qui accueille cet événement.",
-      "noVenueYet": "Pas encore d'hébergeur",
-      "selectExistingVenue": "Sélectionner un hébergeur existant",
-      "createNewVenue": "Créer un nouvel hébergeur",
-      "venue": "Hébergeur",
-      "selectVenue": "Sélectionner un hébergeur...",
-      "venueName": "Nom de l'hébergeur",
+      "noVenueYet": "Pas encore d'espace",
+      "selectExistingVenue": "Sélectionner un espace existant",
+      "createNewVenue": "Créer un nouvel espace",
+      "venue": "Espace",
+      "selectVenue": "Sélectionner un espace...",
+      "venueName": "Nom de l'espace",
       "venueNamePlaceholder": "ex. Tech Company Inc.",
       "addressDetails": "Détails de l'adresse",
       "addressPlaceholder": "ex. 123 rue Principale",
@@ -1829,7 +1829,7 @@
       "nextStep1": "L'événement sera créé avec le statut « Annoncé » (brouillon)",
       "nextStep2": "Un programme par défaut sera généré en fonction de tes dates de début/fin",
       "nextStep3": "Deux types de billets créés : Early Bird et Standard (prix à 0)",
-      "nextStep4": "Tu seras ajouté comme hôte de cet événement",
+      "nextStep4": "Tu seras ajouté comme organisateur de cet événement",
       "createButton": "Créer l'événement",
       "creatingButton": "Création de l'événement...",
       "invalidStartDateTime": "Date/heure de début invalide",
@@ -1902,9 +1902,9 @@
       "location": "Lieu",
       "locationRequired": "Lieu *",
       "createNew": "Créer nouveau",
-      "venueLabel": "Hébergeur",
+      "venueLabel": "Espace",
       "venueDescription": "L'entreprise ou l'organisation qui accueille cet événement.",
-      "clearVenue": "Effacer la sélection de l'hébergeur"
+      "clearVenue": "Effacer la sélection de l'espace"
     },
     "content": {
       "description": "Description",
@@ -1936,8 +1936,8 @@
     },
     "teamSponsors": {
       "organizers": "Organisateurs",
-      "organizersDescription": "Ajoute des hôtes et des mentors pour cet événement. Ils auront un accès en modification à l'événement.",
-      "hosts": "Hôtes",
+      "organizersDescription": "Ajoute des organisateurs et des mentors pour cet événement. Ils auront un accès en modification à l'événement.",
+      "hosts": "Organisateurs",
       "mentors": "Mentors",
       "sponsors": "Sponsors",
       "sponsorsDescription": "Ajoute des entreprises ou des organisations qui sponsorisent cet événement.",
@@ -2345,10 +2345,10 @@
       "createNew": "Créer un nouveau lieu"
     },
     "venueSelector": {
-      "placeholder": "Sélectionner un hébergeur...",
-      "searchPlaceholder": "Rechercher des hébergeurs...",
-      "noVenues": "Aucun hébergeur trouvé",
-      "createNew": "Créer un nouvel hébergeur"
+      "placeholder": "Sélectionner un espace...",
+      "searchPlaceholder": "Rechercher des espaces...",
+      "noVenues": "Aucun espace trouvé",
+      "createNew": "Créer un nouvel espace"
     },
     "organizerSelect": {
       "add": "Ajouter...",

@@ -197,7 +197,7 @@
       "scoutRule": "Pfadfinderregel",
       "scoutSaying": "Hinterlasse den Lagerplatz immer sauberer, als du ihn vorgefunden hast.",
       "scoutText1": "Achte auf das Wohlbefinden anderer Menschen, indem du nach dir selbst aufräumst, wenn du einen Raum verlässt. Das gilt für den Raum, in dem du gespielt hast, den Raum, in dem du gegessen hast, den Raum, in dem du dich ausgeruht hast, usw.",
-      "scoutText2": "Denk daran, dass das Hosting-Team nicht da ist, um nach dir aufzuräumen, sondern ebenfalls Teilnehmende der Veranstaltung sind. Sie möchten auch Sessions facilitieren und besuchen, genauso wie du."
+      "scoutText2": "Denk daran, dass das Gastgeber-Team nicht da ist, um nach dir aufzuräumen, sondern ebenfalls Teilnehmende der Veranstaltung sind. Sie möchten auch Sessions facilitieren und besuchen, genauso wie du."
     },
     "format": {
       "title": "Unser Format",
@@ -251,7 +251,7 @@
       "noGameItem4": "Beim nächsten Mal, wenn du teilnimmst, hast du vielleicht ein Spiel/eine Aktivität zum Teilen",
       "whatMaterial": "Welche Art von Material wird verfügbar sein?",
       "materialIntro": "Übliche Workshop-Materialien und Büromaterial werden verfügbar sein.",
-      "materialSpecific": "Wenn dein Spiel spezifisches Material erfordert, stell sicher, dass du es mitbringst oder das Hosting-Team im Voraus fragst. Wenn du nicht findest, wonach du suchst, improvisiere gerne.",
+      "materialSpecific": "Wenn dein Spiel spezifisches Material erfordert, stell sicher, dass du es mitbringst oder das Gastgeber-Team im Voraus fragst. Wenn du nicht findest, wonach du suchst, improvisiere gerne.",
       "whatElse": "Was muss ich sonst noch wissen?",
       "whatElseIntro": "Hier ist, was du wissen musst, wenn du an einer #play14-Veranstaltung teilnimmst."
     }
@@ -1043,7 +1043,7 @@
       "deletedSuccess": "{entity} erfolgreich gelöscht!"
     },
     "locations": {
-      "title": "Veranstaltungsorte",
+      "title": "Orte",
       "subtitle": "Städte und Regionen verwalten, in denen Veranstaltungen stattfinden",
       "entityName": "Ort",
       "create": {

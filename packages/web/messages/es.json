@@ -278,8 +278,8 @@
     },
     "details": {
       "editEvent": "Editar evento",
-      "venue": "Lugar",
-      "venueTbd": "Lugar por confirmar",
+      "venue": "Sede",
+      "venueTbd": "Sede por confirmar",
       "resources": "Recursos",
       "schedule": "Programa",
       "start": "Inicio",
@@ -321,7 +321,7 @@
       "sec": "seg",
       "inProgress": "En curso"
     },
-    "noVenue": "Sin lugar aún",
+    "noVenue": "Sin sede aún",
     "map": {
       "loading": "Cargando ubicaciones de eventos...",
       "noEvents": "Sin eventos #play14",
@@ -714,7 +714,7 @@
     "toc": {
       "title": "Contenidos",
       "part1": "Parte 1: Organizar un evento #play14",
-      "section1": "Cómo ser anfitrión",
+      "section1": "Cómo ser organizador",
       "section2": "Tus responsabilidades",
       "section3": "Elegir el lugar adecuado",
       "section4": "Planificar materiales y suministros",
@@ -980,54 +980,54 @@
       }
     },
     "venues": {
-      "title": "Espacios",
-      "subtitle": "Gestionar instalaciones y organizaciones de acogida para eventos",
-      "entityName": "espacio",
+      "title": "Sedes",
+      "subtitle": "Gestionar instalaciones y organizaciones organizadoras para eventos",
+      "entityName": "sede",
       "create": {
-        "title": "Crear espacio",
-        "subtitle": "Añadir una nueva instalación u organización de acogida",
-        "backTitle": "Volver a espacios",
-        "submitButton": "Crear espacio"
+        "title": "Crear sede",
+        "subtitle": "Añadir una nueva instalación u organización organizadora",
+        "backTitle": "Volver a sedes",
+        "submitButton": "Crear sede"
       },
       "edit": {
-        "title": "Editar espacio",
-        "backTitle": "Volver a espacios",
-        "deleteButton": "Eliminar espacio"
+        "title": "Editar sede",
+        "backTitle": "Volver a sedes",
+        "deleteButton": "Eliminar sede"
       },
       "list": {
-        "loadingVenues": "Cargando espacios...",
-        "noVenuesTitle": "No se encontraron espacios",
+        "loadingVenues": "Cargando sedes...",
+        "noVenuesTitle": "No se encontraron sedes",
         "noVenuesHint": "Intenta ajustar tu búsqueda",
-        "noVenuesEmpty": "Crea tu primer espacio para empezar",
+        "noVenuesEmpty": "Crea tu primera sede para empezar",
         "eventsCount": "{count} evento{count, plural, one {} other {s}}"
       },
       "form": {
-        "detailsTitle": "Detalles del espacio",
+        "detailsTitle": "Detalles de la sede",
         "nameLabel": "Nombre *",
         "namePlaceholder": "ej. Centro de Conferencias Hilton",
-        "nameHelp": "El nombre completo del espacio",
+        "nameHelp": "El nombre completo de la sede",
         "websiteLabel": "Sitio web",
         "websitePlaceholder": "https://ejemplo.com",
         "addressLabel": "Dirección detallada",
         "addressPlaceholder": "ej. Calle Principal 123, Oficina 100",
-        "addressHelp": "La dirección física del espacio",
+        "addressHelp": "La dirección física de la sede",
         "mapTitle": "Ubicación en el mapa",
-        "mapDescription": "Establece las coordenadas de este espacio en el mapa. Se usa para mostrar la ubicación del espacio.",
-        "mapDescriptionShort": "Establece las coordenadas de este espacio en el mapa."
+        "mapDescription": "Establece las coordenadas de esta sede en el mapa. Se usa para mostrar la ubicación de la sede.",
+        "mapDescriptionShort": "Establece las coordenadas de esta sede en el mapa."
       },
       "modal": {
-        "title": "Crear nuevo espacio",
-        "nameLabel": "Nombre del espacio *",
-        "nameHelp": "El nombre de la instalación u organización de acogida",
+        "title": "Crear nueva sede",
+        "nameLabel": "Nombre de la sede *",
+        "nameHelp": "El nombre de la instalación u organización organizadora",
         "addressLabel": "Dirección detallada",
         "websiteLabel": "Sitio web",
         "mapLabel": "Ubicación en el mapa (opcional)",
-        "mapHelp": "Establece las coordenadas para mostrar el espacio en los mapas.",
-        "submitButton": "Crear espacio"
+        "mapHelp": "Establece las coordenadas para mostrar la sede en los mapas.",
+        "submitButton": "Crear sede"
       },
       "logo": {
-        "title": "Logo del espacio",
-        "description": "Un logo cuadrado que representa el espacio (200x200 recomendado).",
+        "title": "Logo de la sede",
+        "description": "Un logo cuadrado que representa la sede (200x200 recomendado).",
         "libraryTitle": "Seleccionar logo",
         "uploadSuccess": "¡Logo subido con éxito!",
         "uploadFailed": "Error al subir el logo",
@@ -1157,7 +1157,7 @@
       "myProfile": "Mi perfil",
       "events": "Eventos",
       "locations": "Ubicaciones",
-      "venues": "Espacios",
+      "venues": "Sedes",
       "sponsors": "Patrocinadores",
       "players": "Participantes",
       "thingsWeLike": "Cosas que nos gustan",
@@ -1186,8 +1186,8 @@
       "createEvent": "Crear evento",
       "locations": "Ubicaciones",
       "createLocation": "Crear ubicación",
-      "venues": "Espacios",
-      "createVenue": "Crear espacio",
+      "venues": "Sedes",
+      "createVenue": "Crear sede",
       "sponsors": "Patrocinadores",
       "players": "Participantes",
       "thingsWeLike": "Cosas que nos gustan",
@@ -1813,7 +1813,7 @@
       "country": "País",
       "selectCountry": "Seleccionar país...",
       "venueTitle": "Sede (opcional)",
-      "venueDescription": "La empresa u organización anfitriona de este evento.",
+      "venueDescription": "La empresa u organización organizadora de este evento.",
       "noVenueYet": "Sin sede aún",
       "selectExistingVenue": "Seleccionar sede existente",
       "createNewVenue": "Crear nueva sede",
@@ -1903,7 +1903,7 @@
       "locationRequired": "Ubicación *",
       "createNew": "Crear nueva",
       "venueLabel": "Sede",
-      "venueDescription": "La empresa u organización anfitriona de este evento.",
+      "venueDescription": "La empresa u organización organizadora de este evento.",
       "clearVenue": "Limpiar selección de sede"
     },
     "content": {
