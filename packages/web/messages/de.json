@@ -31,7 +31,7 @@
     },
     "experience": {
       "title": "Was eine Session <span>sein kann</span>",
-      "subtitle": "Jede Session wird von jemandem im Raum vorgeschlagen. Das ist die Art von Dingen, die <players>Menschen</players> zum <games>Marketplace</games> bringen — obwohl die Liste uns ehrlich gesagt nie aufhört zu überraschen.",
+      "subtitle": "Jede Session wird von jemandem im Raum vorgeschlagen. Das ist die Art von Dingen, die <players>Menschen</players> zum <games>Marketplace</games> bringen — obwohl uns die Liste ehrlich gesagt immer wieder überrascht.",
       "activitiesIntro": "Ein paar Dinge, die Menschen tatsächlich schon gemacht haben:",
       "seriousGame": "Ein <link>Serious Game</link>, das du als Metapher verwendest, um ein neues Konzept zu verstehen",
       "iceBreaker": "Ein <link>Kennenlernspiel</link>, bei dem sich die Menschen besser kennenlernen",
@@ -54,13 +54,13 @@
       "title": "Was du <span>mitnimmst</span>",
       "subtitle": "Was am Montag noch bei dir ist.",
       "body1": "Du gehst nicht mit einer Tasche voller Folien nach Hause, die du nie öffnen wirst. Du gehst mit Spielen und Facilitationstechniken nach Hause, die du am Montagmorgen mit deinem Team ausprobieren kannst. Mit einer neuen Sichtweise auf Probleme, bei denen du festgesteckt hast. Und mit einem Netzwerk von Menschen auf der ganzen Welt, die so denken wie du — und denen du immer wieder begegnen wirst, Veranstaltung für Veranstaltung, Stadt für Stadt.",
-      "body2": "Besorgt, dass es 'bloßes Herumspielen' ist? Das ist der Punkt, und gleichzeitig auch nicht. Das Spielen ist der Weg, auf dem das Lernen sich einschleicht. Menschen haben ein Wochenende verlassen und verändert, wie sie führen, wie sie unterrichten, sogar was sie beruflich machen. <strong>Komm wegen des Spaßes. Bleib wegen dem, was er mit dir macht.</strong>"
+      "body2": "Besorgt, dass es 'bloßes Herumspielen' ist? Das ist der Punkt, und gleichzeitig auch nicht. Das Spielen ist der Weg, auf dem das Lernen sich einschleicht. Menschen haben ein Wochenende verlassen und verändert, wie sie führen, wie sie unterrichten, sogar was sie beruflich machen. <strong>Komm wegen des Spaßes. Bleib für das, was er mit dir macht.</strong>"
     },
     "cta": {
       "title": "Finde dein <span>#play14</span>",
       "body": "Veranstaltungen finden das ganze Jahr über in Städten auf der ganzen Welt statt. Such dir eine aus, die in deinen Kalender passt — oder eine, für die sich die Reise lohnt — und hol dir ein Ticket. Keine Countdown-Timer, keine künstliche Knappheit: Das einzige, was drängt, ist ein echtes Datum an einem echten Wochenende.",
       "primary": "Eine Veranstaltung in deiner Nähe finden",
-      "secondary": "Den Virus erwischt, oder noch nichts in deiner Nähe? <link>#play14 in deine Stadt bringen.</link>"
+      "secondary": "Auf den Geschmack gekommen, oder noch nichts in deiner Nähe? <link>#play14 in deine Stadt bringen.</link>"
     },
     "coreValues": {
       "title": "Die Werte, nach denen wir spielen",
@@ -72,7 +72,7 @@
       "inclusion": {
         "name": "Inklusion",
         "short": "Wer du auch bist und was auch immer du tust — es gibt einen Platz für dich im Raum.",
-        "detail": "Verschiedene Berufe, verschiedene Länder, verschiedene Gründe, dabei zu sein — jeder gehört dazu, und niemand muss seinen Platz erst verdienen. Wir gestalten Veranstaltungen, bei denen niemand auf der Tribüne sitzt und jede Stimme mitspielen darf."
+        "detail": "Verschiedene Berufe, verschiedene Länder, verschiedene Gründe, dabei zu sein — jeder gehört dazu, und niemand muss seinen Platz erst verdienen. Wir gestalten Veranstaltungen, bei denen niemand am Rand steht und jede Stimme mitspielen darf."
       },
       "connection": {
         "name": "Verbindung",
@@ -229,7 +229,7 @@
       "howPropose": "Wie schlage ich ein Spiel vor?",
       "proposeIntro": "Wenn du ein Spiel vorschlagen möchtest, musst du es vor allen pitchen und dann zum Marketplace hinzufügen.",
       "proposeSteps": "Dazu musst du:",
-      "proposeStep1": "Nimm einen großen Haftnotiz",
+      "proposeStep1": "Nimm eine große Haftnotiz",
       "proposeStep2": "Schreib den Namen deines Spiels/deiner Aktivität auf. Du kannst auch etwas zeichnen.",
       "proposeStep3": "Füge die minimale und maximale Anzahl von Personen hinzu, die du brauchst, und die Zeit, die das Spiel ungefähr dauern wird.",
       "proposeStep4": "Füge deinen Namen hinzu, damit wir wissen, wem die Haftnotiz gehört",
@@ -606,7 +606,7 @@
     "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuch es erneut."
   },
   "likes": {
-    "title": "Was wir mögen",
+    "title": "Dinge, die wir mögen",
     "description": "Eine kuratierte Sammlung von Werkzeugen, Ressourcen und Produkten, die die #play14-Community empfiehlt.",
     "comingSoon": "Demnächst verfügbar",
     "comingSoonText": "Wir erstellen eine Sammlung von Dingen, die wir lieben. Schau bald wieder vorbei!",

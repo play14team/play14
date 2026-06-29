@@ -74,8 +74,8 @@
     "powerOfPlay": {
       "title": "Qué es <span>realmente</span>",
       "subtitle": "No se parece en nada a la conferencia que te estás imaginando.",
-      "intro": "¿Qué pasa exactamente? Durante dos días y medio, tú y una sala llena de personas curiosas construís el programa juntos. Sin presentaciones, sin ponentes que te hablan desde un escenario — solo juegos y actividades que proponéis, facilitáis y compartís. Aprendes haciendo, compartiendo lo que sabes y poniendo las manos en lo que cada cual ha traído. Parte es pura diversión. Parte te cambia silenciosamente la mirada.",
-      "body": "Eso es el formato <unconference>desconferencia</unconference>, y ahí está la clave. No hay agenda fija ni nadie empujándote sesiones. Cada mañana la sala decide qué pasa: propones los juegos y conversaciones que quieres dinamizar, y te sumas a los que te enganchan. ¿Una sesión no te convence? La Ley de los dos pies dice: levántate y busca otra mejor — sin ofender a nadie, nunca. Aquí no eres público. Eres coautor del programa.",
+      "intro": "¿Qué pasa exactamente? Durante dos días y medio, tú —junto a una sala llena de personas curiosas— construyes el programa. Sin presentaciones, sin ponentes que te hablan desde un escenario — solo juegos y actividades que propones, facilitas y compartes. Aprendes haciendo, compartiendo lo que sabes y poniendo las manos en lo que cada cual ha traído. Parte es pura diversión. Parte te cambia silenciosamente la mirada.",
+      "body": "Eso es el formato <unconference>desconferencia</unconference>, y ahí está la clave. No hay agenda fija ni nadie empujándote sesiones. Cada mañana la sala decide qué pasa: propones los juegos y conversaciones que quieres facilitar, y te sumas a los que te enganchan. ¿Una sesión no te convence? La Ley de los dos pies dice: levántate y busca otra mejor — sin ofender a nadie, nunca. Aquí no eres público. Eres coautor del programa.",
       "quote": "Dime y lo olvido, enséñame y lo recuerdo, involúcrame y aprendo",
       "quoteAuthor": "Benjamin Franklin",
       "conclusion": "Esto no se aprende que te lo cuenten. Se aprende haciéndolo, con otras personas, en la sala. Y eso nos lleva a las personas."
@@ -142,12 +142,12 @@
       },
       "connection": {
         "name": "Conexión",
-        "short": "Los juegos son la excusa. Las personas son el punto — y suelen quedarse en tu vida.",
+        "short": "Los juegos son la excusa. Lo que importa son las personas — y suelen quedarse en tu vida.",
         "detail": "Jugar juntos se salta la charla intrascendente y te lleva a algo real, rápido. Las personas que conoces aquí tienen la costumbre de volver a aparecer — en el siguiente evento, en otra ciudad, años después. Eso no es networking; es el comienzo de amistades."
       },
       "curiosity": {
         "name": "Curiosidad",
-        "short": "Sigue lo que te genera preguntas. Formula la pregunta, prueba la cosa, mira qué pasa.",
+        "short": "Sigue lo que te genera preguntas. Formula la pregunta, haz la prueba, mira qué pasa.",
         "detail": "Todos estamos aquí porque nunca dejamos del todo de preguntarnos «¿y si...?». La curiosidad es lo que hace que se proponga una sesión, se reinvente un juego, se mire un problema atascado desde otro ángulo. Trae la tuya — cuanto más hurgas, más te llevas."
       },
       "sharing": {
@@ -188,7 +188,7 @@
       },
       "unconference": {
         "question": "¿Qué es una desconferencia?",
-        "answer": "Una desconferencia es un evento impulsado por los participantes donde <strong>los asistentes son también contribuyentes</strong>. #play14 sigue el formato Open Space Technology, lo que significa que no hay una agenda predefinida. En su lugar, los participantes proponen juegos y actividades cada mañana durante la sesión de mercado, y el programa surge orgánicamente."
+        "answer": "Una desconferencia es un evento impulsado por los participantes donde <strong>los asistentes son también contribuyentes</strong>. #play14 sigue el formato Open Space Technology, lo que significa que no hay una agenda predefinida. En su lugar, los participantes proponen juegos y actividades cada mañana durante el marketplace, y el programa surge orgánicamente."
       },
       "proposeGame": {
         "question": "¿Necesito proponer un juego para asistir?",
@@ -472,9 +472,9 @@
       "mentored": "Mentoreados"
     },
     "empty": {
-      "attended": "Aún no ha asistido a ningún evento. ¡La aventura acaba de comenzar!",
-      "hosted": "Aún no ha organizado ningún evento. ¿Quizás algún día?",
-      "mentored": "Aún no ha mentoreado ningún evento. ¡La sabiduría se va construyendo!"
+      "attended": "Aún no hay eventos asistidos. ¡La aventura acaba de comenzar!",
+      "hosted": "Aún no hay eventos organizados. ¿Quizás algún día?",
+      "mentored": "Aún no hay eventos mentoreados. ¡La sabiduría se va construyendo!"
     }
   },
   "articles": {
@@ -1086,7 +1086,7 @@
       }
     },
     "likes": {
-      "title": "Lo que nos gusta",
+      "title": "Cosas que nos gustan",
       "subtitle": "Gestionar elementos destacados - cosas que la comunidad recomienda",
       "entityName": "elemento",
       "create": {

@@ -41,7 +41,7 @@
     "games": "Jeux",
     "articles": "Articles",
     "thingsWeLike": "Ce que nous aimons",
-    "debriefingCube": "Cube de debriefing",
+    "debriefingCube": "Cube de débriefing",
     "about": "À propos",
     "ourStory": "Notre histoire",
     "ourValues": "Nos valeurs",
@@ -126,7 +126,7 @@
       "title": "Trouve ton <span>#play14</span>",
       "body": "Des événements ont lieu dans des villes partout dans le monde, toute l'année. Choisis-en un qui correspond à ton agenda — ou un qui vaut le voyage — et prends ton billet. Pas de compte à rebours, pas de fausse rareté : la seule urgence, c'est une vraie date sur un vrai week-end.",
       "primary": "Trouver un événement près de chez toi",
-      "secondary": "Le virus t'a rattrapé, ou rien près de chez toi ? <link>Amène #play14 dans ta ville.</link>"
+      "secondary": "Mordu, ou rien près de chez toi ? <link>Amène #play14 dans ta ville.</link>"
     },
     "coreValues": {
       "title": "Les valeurs avec lesquelles on joue",
@@ -176,7 +176,7 @@
       "subtitle": "#play14 est avant tout une communauté de personnes, une famille et une incroyable aventure humaine."
     },
     "benefits": {
-      "title": "Ce que ça t'<span>apporte</span>",
+      "title": "Ce que ça t''<span>apporte</span>",
       "subtitle": "Voici quelques-unes des choses auxquelles tu peux t'attendre en participant à un événement #play14. Cependant, sois prêt à « Attendre l'inattendu ! »"
     },
     "faq": {
@@ -472,7 +472,7 @@
       "mentored": "Mentorés"
     },
     "empty": {
-      "attended": "Aucun événement auquel participé pour le moment. L'aventure ne fait que commencer !",
+      "attended": "Aucun événement suivi pour le moment. L'aventure ne fait que commencer !",
       "hosted": "Aucun événement organisé pour le moment. Peut-être un jour ?",
       "mentored": "Aucun événement mentoré pour le moment. La sagesse se construit !"
     }
@@ -1216,7 +1216,7 @@
       "welcome": "Bon retour, {name} !",
       "loggedInAs": "Tu es connecté en tant que <strong>{email}</strong>",
       "eventsOrganized": "Événements organisés",
-      "eventsAttended": "Événements auxquels participé",
+      "eventsAttended": "Événements suivis",
       "ticketsPurchased": "Billets achetés",
       "upcoming": "{count} à venir",
       "pending": "{count} en attente",
@@ -1751,7 +1751,7 @@
       "noEventsAvailable": "Aucun événement disponible pour une réclamation."
     },
     "attended": {
-      "noAttendedEvents": "Aucun événement participé",
+      "noAttendedEvents": "Aucun événement suivi",
       "noAttendedMessage": "Tu n'as encore participé à aucun événement.",
       "noAttendedHint": "Les événements auxquels tu participes via des billets ou des réclamations approuvées apparaîtront ici.",
       "browseEvents": "Parcourir les événements",
