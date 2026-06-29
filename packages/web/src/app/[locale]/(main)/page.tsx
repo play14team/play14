@@ -7,6 +7,7 @@ import Statistics from "@/components/home/statistics"
 import HomeTestimonials from "@/components/home/testimonials"
 import UpcomingEvents from "@/components/home/upcoming"
 import CodeOfConduct from "@/components/layout/codeofconduct"
+import CoreValues from "@/components/layout/corevalues"
 import Manifesto from "@/components/layout/manifesto"
 import Title from "@/components/layout/title"
 import { Link } from "@/i18n/navigation"
@@ -21,6 +22,18 @@ export default async function Home() {
     <>
       <section id="title">
         <Title />
+        <div className="container">
+          <div className="section-title">
+            <h2>{t("hero.headline")}</h2>
+            <p>{t("hero.subhead")}</p>
+          </div>
+          <div className="d-flex justify-content-center">
+            <Link href="/events" className="default-btn">
+              <i className="flaticon-calendar" />
+              {t("hero.cta")}
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section id="power-of-play" className="funfacts-area pt-100">
@@ -38,7 +51,11 @@ export default async function Home() {
               strong: (chunks) => <strong>{chunks}</strong>,
             })}
           </p>
-          <p>{t("powerOfPlay.body")}</p>
+          <p>
+            {t.rich("powerOfPlay.body", {
+              unconference: (chunks) => <Link href="/about/format">{chunks}</Link>,
+            })}
+          </p>
           <div className="d-flex justify-content-center">
             <blockquote>
               {t("powerOfPlay.quote")}
@@ -65,27 +82,21 @@ export default async function Home() {
           <p>{t("joinMovement.intro")}</p>
           <ul>
             <li>
-              {t.rich("joinMovement.globalCommunity", {
+              {t.rich("joinMovement.sandbox", {
                 strong: (chunks) => <strong>{chunks}</strong>,
               })}
             </li>
             <li>
-              {t.rich("joinMovement.endlessFun", {
+              {t.rich("joinMovement.kindred", {
                 strong: (chunks) => <strong>{chunks}</strong>,
               })}
             </li>
             <li>
-              {t.rich("joinMovement.inspire", {
+              {t.rich("joinMovement.connection", {
                 strong: (chunks) => <strong>{chunks}</strong>,
               })}
             </li>
           </ul>
-          <p>
-            {t.rich("joinMovement.unconference", {
-              unconference: (chunks) => <Link href="/about/schedule">{chunks}</Link>,
-              strong: (chunks) => <strong>{chunks}</strong>,
-            })}
-          </p>
         </div>
       </section>
 
@@ -226,6 +237,49 @@ export default async function Home() {
         </div>
       </section>
 
+      <section id="takeaways" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              {t.rich("takeaways.title", {
+                span: (chunks) => <span>{chunks}</span>,
+              })}
+            </h2>
+            <p>{t("takeaways.subtitle")}</p>
+          </div>
+          <p>{t("takeaways.body1")}</p>
+          <p>
+            {t.rich("takeaways.body2", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
+          </p>
+        </div>
+      </section>
+
+      <section id="cta" className="funfacts-area pt-100">
+        <div className="container">
+          <div className="section-title">
+            <h2>
+              {t.rich("cta.title", {
+                span: (chunks) => <span>{chunks}</span>,
+              })}
+            </h2>
+            <p>{t("cta.body")}</p>
+          </div>
+          <div className="d-flex justify-content-center">
+            <Link href="/events" className="default-btn">
+              <i className="flaticon-loupe" />
+              {t("cta.primary")}
+            </Link>
+          </div>
+          <p className="centered pt-4">
+            {t.rich("cta.secondary", {
+              link: (chunks) => <Link href="/events/hosting">{chunks}</Link>,
+            })}
+          </p>
+        </div>
+      </section>
+
       <section id="manifesto-and-code-of-conduct" className="funfacts-area pt-100">
         <div className="container">
           <div className="section-title">
@@ -239,6 +293,9 @@ export default async function Home() {
                 link: (chunks) => <Link href="/about/values">{chunks}</Link>,
               })}
             </p>
+          </div>
+          <div className="pt-4 pb-5">
+            <CoreValues />
           </div>
           <div className="row justify-content-center">
             <div className="col-lg-10 col-md-12 pt-4">

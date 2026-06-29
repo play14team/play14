@@ -20,11 +20,13 @@
   },
   "nav": {
     "home": "Inicio",
-    "powerOfPlay": "El poder del juego",
+    "whatItIs": "Qué es realmente",
+    "whoYoullMeet": "A quién conocerás",
     "upcomingEvents": "Próximos eventos",
     "statistics": "Estadísticas",
     "worldMap": "Mapa mundial",
-    "theExperience": "La experiencia",
+    "whatASessionCanBe": "Lo que una sesión puede ser",
+    "whatYouTakeHome": "Qué te llevarás a casa",
     "manifestoAndCodeOfConduct": "Manifiesto y código de conducta",
     "testimonials": "Testimonios",
     "gallery": "Galería",
@@ -64,31 +66,39 @@
     "reportAnIssue": "Reportar un problema"
   },
   "home": {
+    "hero": {
+      "headline": "#play14 es donde jugar te hace mejor — en el trabajo, en la vida, como persona.",
+      "subhead": "Una desconferencia mundial donde el juego se convierte en la forma de aprender, conectar y salir transformado.",
+      "cta": "Ver próximos eventos"
+    },
     "powerOfPlay": {
-      "title": "Descubre el poder del <span>juego</span>",
-      "subtitle": "El juego involucra tanto la mente como el cuerpo, haciendo del aprendizaje una experiencia activa e inmersiva.",
-      "intro": "Bienvenido a #play14, un movimiento global que cree en el <strong>poder transformador del juego</strong>. Somos un encuentro mundial de personas que creen que <strong>jugar es la mejor manera de aprender, compartir y fomentar la creatividad.</strong>",
-      "body": "A través del juego, las personas exploran, experimentan y descubren conceptos de manera práctica, lo que mejora la comprensión y la retención. El carácter lúdico fomenta la innovación, la resolución de problemas y la colaboración, ayudando a los participantes a desarrollar el pensamiento crítico.",
+      "title": "Qué es <span>realmente</span>",
+      "subtitle": "No se parece en nada a la conferencia que te estás imaginando.",
+      "intro": "¿Qué pasa exactamente? Durante dos días y medio, tú —junto a una sala llena de personas curiosas— construyes el programa. Sin presentaciones, sin ponentes que te hablan desde un escenario — solo juegos y actividades que propones, facilitas y compartes. Aprendes haciendo, compartiendo lo que sabes y poniendo las manos en lo que cada cual ha traído. Parte es pura diversión. Parte te cambia silenciosamente la mirada.",
+      "body": "Eso es el formato <unconference>desconferencia</unconference>, y ahí está la clave. No hay agenda fija ni nadie empujándote sesiones. Cada mañana la sala decide qué pasa: propones los juegos y conversaciones que quieres facilitar, y te sumas a los que te enganchan. ¿Una sesión no te convence? La Ley de los dos pies dice: levántate y busca otra mejor — sin ofender a nadie, nunca. Aquí no eres público. Eres coautor del programa.",
       "quote": "Dime y lo olvido, enséñame y lo recuerdo, involúcrame y aprendo",
       "quoteAuthor": "Benjamin Franklin",
-      "conclusion": "El juego también reduce el estrés y aumenta la motivación, haciendo que el proceso de aprendizaje sea agradable y efectivo. Al crear un espacio seguro para el ensayo y error, el juego fomenta una conexión más profunda y significativa con lo que se aprende."
+      "conclusion": "Esto no se aprende que te lo cuenten. Se aprende haciéndolo, con otras personas, en la sala. Y eso nos lleva a las personas."
     },
     "joinMovement": {
-      "title": "Únete al <span>movimiento</span>",
-      "subtitle": "Únete a nosotros en ciudades de todo el mundo para conectar con personas afines.",
-      "intro": "Ya seas facilitador, educador o una mente curiosa, nuestros eventos están diseñados para estimular la creatividad, fomentar la colaboración y generar nuevas ideas. Sumérgete en un mundo de experimentación lúdica.",
-      "globalCommunity": "<strong>Comunidad global:</strong> Conéctate con una red diversa de innovadores.",
-      "endlessFun": "<strong>Diversión sin fin:</strong> Participa en actividades prácticas y lúdicas.",
-      "inspire": "<strong>Inspira y déjate inspirar:</strong> Comparte y descubre nuevos juegos, herramientas y técnicas.",
-      "unconference": "#play14 es una <unconference>desconferencia</unconference>, donde <strong>todos los asistentes son también contribuyentes</strong>. Solo ven con la mente abierta y tendrás la oportunidad de proponer tus propios juegos o sumergirte en los juegos sugeridos por otros. ¡Todo se trata de participación, creatividad y diversión compartida!"
+      "title": "A quién <span>conocerás</span>",
+      "subtitle": "El punto no son los juegos. Es con quién los juegas.",
+      "intro": "Mira alrededor y encontrarás facilitadores, coaches, docentes, diseñadores, terapeutas, improvisadores, gente ágil, jugadores empedernidos — y personas que simplemente sintieron curiosidad y aparecieron. Empleos distintos, países distintos, razones distintas para estar allí. Un fin de semana construyendo cosas contigo, con las mangas remangadas. Esa mezcla no la encuentras en ningún otro lugar.",
+      "sandbox": "<strong>Un lugar seguro para experimentar:</strong> facilita la sesión que nunca te atreverías a hacer en el trabajo. Falla, ríe, aprende, inténtalo de nuevo. Nadie te pone nota.",
+      "kindred": "<strong>Almas afines, en todo el mundo:</strong> encontrarás personas que piensan como tú — y con las que te seguirás cruzando, evento tras evento, ciudad tras ciudad.",
+      "connection": "<strong>Conexiones que duran:</strong> un fin de semana jugando juntos te dice más de alguien que un año de reuniones."
+    },
+    "upcomingEvents": {
+      "title": "Próximos <span>eventos</span>",
+      "subtitle": "Dónde se celebra el próximo #play14."
     },
     "worldMap": {
       "srTitle": "Eventos en todo el mundo"
     },
     "experience": {
-      "title": "La <span>experiencia</span>",
-      "subtitle": "Durante dos días y medio, <players>personas con perfiles muy diferentes</players> comparten <games>juegos y actividades</games>, conocimientos y risas. <strong>Todos son bienvenidos</strong>.",
-      "activitiesIntro": "Estos son algunos ejemplos de actividades que realizamos:",
+      "title": "Lo que una sesión puede <span>ser</span>",
+      "subtitle": "Cada sesión la propone alguien de la sala. Esto es lo que <players>la gente</players> suele traer al <games>marketplace</games> — aunque, sinceramente, la lista nunca deja de sorprendernos.",
+      "activitiesIntro": "Algunas cosas que la gente ha facilitado de verdad:",
       "seriousGame": "Un <link>juego serio</link> que se usa como metáfora para comprender un nuevo concepto",
       "iceBreaker": "Un <link>juego para romper el hielo</link> donde las personas se conocen mejor",
       "warmUp": "Un <warmup>calentamiento</warmup> o un <energizer>energizante</energizer> que puedes usar para aumentar el nivel de conciencia y energía",
@@ -102,17 +112,62 @@
       "funTime": "Un momento divertido y energético con <dancing>baile</dancing>, <singing>canto</singing> o haciendo el tonto juntos",
       "improv": "Una sesión de <link>teatro de improvisación</link> donde puedes trabajar tu confianza y capacidad de hablar en público",
       "esoteric": "Una sesión más esotérica sobre una práctica/hobby que quieras compartir como yoga, yoga de la risa, Tai Chi, Qigong, meditación, mindfulness, aikido, ...",
-      "callToAction": "Únete a nosotros para desarrollar tus <strong>habilidades de facilitación</strong>, aumentar tu <strong>capacidad de acompañar el cambio</strong> en tu organización, <strong>estimular tu creatividad</strong> y mejorar tu <strong>capacidad de innovar</strong>.",
+      "callToAction": "Y eso es solo lo que cabe en una lista. Trae algo para compartir, o aparece con las manos vacías y la mente abierta — ambas opciones funcionan. <strong>Todo el mundo se va con más de lo que trajo.</strong>",
       "quote": "Se puede descubrir más sobre una persona en una hora de juego que en un año de conversación",
       "quoteAuthor": "Platón"
     },
+    "takeaways": {
+      "title": "Qué te llevarás <span>a casa</span>",
+      "subtitle": "Lo que sigue contigo el lunes.",
+      "body1": "No te irás con una bolsa llena de presentaciones que nunca abrirás. Te irás con juegos y técnicas de facilitación que puedes usar con tu equipo el lunes por la mañana. Con una forma nueva de mirar los problemas en los que llevas tiempo atascado. Y con una red de personas de todo el mundo que piensan como tú — y con las que te seguirás cruzando, evento tras evento, ciudad tras ciudad.",
+      "body2": "¿Te preocupa que sea «solo jugar»? Ese es exactamente el punto, y a la vez no lo es. El juego es la puerta por la que se cuela el aprendizaje. Hay quien ha salido de un fin de semana y ha cambiado cómo lidera, cómo enseña, incluso a qué se dedica. <strong>Ven por la diversión. Quédate por lo que te hace.</strong>"
+    },
+    "cta": {
+      "title": "Encuentra tu <span>#play14</span>",
+      "body": "Los eventos se celebran en ciudades de todo el mundo, durante todo el año. Elige uno que encaje en tu agenda — o uno que valga el viaje — y consigue tu entrada. Sin cuentas atrás, sin escasez artificial: la única urgencia es una fecha real en un fin de semana real.",
+      "primary": "Encuentra un evento cerca de ti",
+      "secondary": "¿Te ha picado el gusanillo, o aún no hay nada cerca? <link>Trae #play14 a tu ciudad.</link>"
+    },
+    "coreValues": {
+      "title": "Los valores con los que jugamos",
+      "openness": {
+        "name": "Apertura",
+        "short": "Deja tu cargo en la puerta y mantente abierto a ideas, personas y juegos que nunca habrías probado solo.",
+        "detail": "Llegamos sin armadura — sin jerarquía, sin agenda oculta, sin «aquí no lo hacemos así». Los mejores momentos ocurren cuando le dices que sí a algo que normalmente pasarías de largo. Así que mantenemos la puerta, y la mente, bien abierta."
+      },
+      "inclusion": {
+        "name": "Inclusión",
+        "short": "Seas quien seas y hagas lo que hagas, hay un lugar para ti en la sala.",
+        "detail": "Empleos distintos, países distintos, razones distintas para aparecer — todo el mundo pertenece, y nadie tiene que ganarse su sitio. Creamos eventos donde nadie se queda al margen y cada voz tiene su espacio."
+      },
+      "connection": {
+        "name": "Conexión",
+        "short": "Los juegos son la excusa. Lo que importa son las personas — y suelen quedarse en tu vida.",
+        "detail": "Jugar juntos se salta la charla intrascendente y te lleva a algo real, rápido. Las personas que conoces aquí tienen la costumbre de volver a aparecer — en el siguiente evento, en otra ciudad, años después. Eso no es networking; es el comienzo de amistades."
+      },
+      "curiosity": {
+        "name": "Curiosidad",
+        "short": "Sigue lo que te genera preguntas. Formula la pregunta, haz la prueba, mira qué pasa.",
+        "detail": "Todos estamos aquí porque nunca dejamos del todo de preguntarnos «¿y si...?». La curiosidad es lo que hace que se proponga una sesión, se reinvente un juego, se mire un problema atascado desde otro ángulo. Trae la tuya — cuanto más hurgas, más te llevas."
+      },
+      "sharing": {
+        "name": "Compartir",
+        "short": "Regala lo mejor que tienes. Cuanto más pones, más se lleva todo el mundo.",
+        "detail": "Aquí nadie acapara. Compartes el juego, la técnica, la idea a medio cocer — y recibes diez que nunca habrías encontrado por tu cuenta. No es una transacción; es cómo crece todo el movimiento, persona a persona, evento a evento."
+      },
+      "courage": {
+        "name": "Valentía",
+        "short": "Prueba lo que nunca te atreverías a hacer en el trabajo. Falla, ríe, aprende, vuelve a intentarlo.",
+        "detail": "Hace falta un poco de nervio para facilitar delante de desconocidos, para jugar a tope, para hacer el ridículo a propósito. #play14 es el lugar seguro donde encontrar ese nervio — y una vez que lo usas aquí, lo notarás intacto el lunes por la mañana."
+      }
+    },
     "manifesto": {
       "title": "Lo que <span>defendemos</span>",
-      "subtitle": "Un juego o actividad en #play14 puede ser prácticamente cualquier cosa siempre que respete nuestro <link>Manifiesto y Código de conducta</link>."
+      "subtitle": "Seis valores sostienen todo esto — y están desarrollados en nuestro <link>Manifiesto y Código de conducta</link>. Cualquier juego, cualquier actividad, todo vale, siempre que los respete."
     },
     "testimonials": {
       "title": "Lo que dice nuestra <span>comunidad</span>",
-      "subtitle": "Escucha a los miembros de la comunidad #play14 hablar sobre sus experiencias. Estos testimonios capturan el espíritu, el impacto y la alegría de nuestros eventos en todo el mundo.",
+      "subtitle": "No te fíes de nuestra palabra. Esto es lo que dice la gente después de haber estado — con sus propias palabras.",
       "viewAll": "Ver todos los testimonios",
       "refreshLabel": "Mostrar otros testimonios"
     },
@@ -133,7 +188,7 @@
       },
       "unconference": {
         "question": "¿Qué es una desconferencia?",
-        "answer": "Una desconferencia es un evento impulsado por los participantes donde <strong>los asistentes son también contribuyentes</strong>. #play14 sigue el formato Open Space Technology, lo que significa que no hay una agenda predefinida. En su lugar, los participantes proponen juegos y actividades cada mañana durante la sesión de mercado, y el programa surge orgánicamente."
+        "answer": "Una desconferencia es un evento impulsado por los participantes donde <strong>los asistentes son también contribuyentes</strong>. #play14 sigue el formato Open Space Technology, lo que significa que no hay una agenda predefinida. En su lugar, los participantes proponen juegos y actividades cada mañana durante el marketplace, y el programa surge orgánicamente."
       },
       "proposeGame": {
         "question": "¿Necesito proponer un juego para asistir?",
@@ -162,7 +217,7 @@
     },
     "statistics": {
       "title": "Nuestro impacto <span>global</span>",
-      "subtitle": "Desde 2014, #play14 se ha convertido en un movimiento mundial que conecta personas a través del poder del juego.",
+      "subtitle": "No crecemos llenando salas. Crecemos por el número de eventos — ciudad a ciudad, año tras año, por todo el mundo. Es muy probable que haya uno cerca de ti.",
       "yearsOfPlay": "Años de juego",
       "countries": "Países",
       "eventsOrganized": "Eventos organizados",
@@ -223,8 +278,8 @@
     },
     "details": {
       "editEvent": "Editar evento",
-      "venue": "Lugar",
-      "venueTbd": "Lugar por confirmar",
+      "venue": "Sede",
+      "venueTbd": "Sede por confirmar",
       "resources": "Recursos",
       "schedule": "Programa",
       "start": "Inicio",
@@ -266,7 +321,7 @@
       "sec": "seg",
       "inProgress": "En curso"
     },
-    "noVenue": "Sin lugar aún",
+    "noVenue": "Sin sede aún",
     "map": {
       "loading": "Cargando ubicaciones de eventos...",
       "noEvents": "Sin eventos #play14",
@@ -330,6 +385,10 @@
     "values": {
       "title": "Nuestros valores",
       "intro": "Los valores son muy importantes para nosotros. Son lo que hace de #play14 lo que es. Por favor, asegúrate de consultar nuestro manifiesto y nuestro código de conducta antes de inscribirte en uno de nuestros eventos.",
+      "valuesIntro": "Todo en #play14 nace de estos seis. Definen cómo organizamos los eventos, cómo nos tratamos y qué se siente al estar en la sala.",
+      "manifestoIntro": "Esos valores tomaron forma, hace años, en un breve manifiesto — nuestra estrella polar sobre qué es #play14 y qué será siempre.",
+      "cocIntro": "Y esto es lo que pedimos a cada persona que aparece. Nada pesado — solo el puñado de cosas que mantienen la sala abierta, amable y divertida.",
+      "scoutIntro": "Una de esas líneas merece un vistazo más de cerca: la de dejar el espacio de juego limpio.",
       "thanksNina": "Muchas gracias a <link>Nina Neef</link> por las maravillosas imágenes.",
       "scoutRule": "Regla del scout",
       "scoutSaying": "Deja siempre el campamento más limpio de lo que lo encontraste.",
@@ -413,9 +472,9 @@
       "mentored": "Mentoreados"
     },
     "empty": {
-      "attended": "Aún no ha asistido a ningún evento. ¡La aventura acaba de comenzar!",
-      "hosted": "Aún no ha organizado ningún evento. ¿Quizás algún día?",
-      "mentored": "Aún no ha mentoreado ningún evento. ¡La sabiduría se va construyendo!"
+      "attended": "Aún no hay eventos asistidos. ¡La aventura acaba de comenzar!",
+      "hosted": "Aún no hay eventos organizados. ¿Quizás algún día?",
+      "mentored": "Aún no hay eventos mentoreados. ¡La sabiduría se va construyendo!"
     }
   },
   "articles": {
@@ -655,7 +714,7 @@
     "toc": {
       "title": "Contenidos",
       "part1": "Parte 1: Organizar un evento #play14",
-      "section1": "Cómo ser anfitrión",
+      "section1": "Cómo ser organizador",
       "section2": "Tus responsabilidades",
       "section3": "Elegir el lugar adecuado",
       "section4": "Planificar materiales y suministros",
@@ -921,54 +980,54 @@
       }
     },
     "venues": {
-      "title": "Espacios",
-      "subtitle": "Gestionar instalaciones y organizaciones de acogida para eventos",
-      "entityName": "espacio",
+      "title": "Sedes",
+      "subtitle": "Gestionar instalaciones y organizaciones organizadoras para eventos",
+      "entityName": "sede",
       "create": {
-        "title": "Crear espacio",
-        "subtitle": "Añadir una nueva instalación u organización de acogida",
-        "backTitle": "Volver a espacios",
-        "submitButton": "Crear espacio"
+        "title": "Crear sede",
+        "subtitle": "Añadir una nueva instalación u organización organizadora",
+        "backTitle": "Volver a sedes",
+        "submitButton": "Crear sede"
       },
       "edit": {
-        "title": "Editar espacio",
-        "backTitle": "Volver a espacios",
-        "deleteButton": "Eliminar espacio"
+        "title": "Editar sede",
+        "backTitle": "Volver a sedes",
+        "deleteButton": "Eliminar sede"
       },
       "list": {
-        "loadingVenues": "Cargando espacios...",
-        "noVenuesTitle": "No se encontraron espacios",
+        "loadingVenues": "Cargando sedes...",
+        "noVenuesTitle": "No se encontraron sedes",
         "noVenuesHint": "Intenta ajustar tu búsqueda",
-        "noVenuesEmpty": "Crea tu primer espacio para empezar",
+        "noVenuesEmpty": "Crea tu primera sede para empezar",
         "eventsCount": "{count} evento{count, plural, one {} other {s}}"
       },
       "form": {
-        "detailsTitle": "Detalles del espacio",
+        "detailsTitle": "Detalles de la sede",
         "nameLabel": "Nombre *",
         "namePlaceholder": "ej. Centro de Conferencias Hilton",
-        "nameHelp": "El nombre completo del espacio",
+        "nameHelp": "El nombre completo de la sede",
         "websiteLabel": "Sitio web",
         "websitePlaceholder": "https://ejemplo.com",
         "addressLabel": "Dirección detallada",
         "addressPlaceholder": "ej. Calle Principal 123, Oficina 100",
-        "addressHelp": "La dirección física del espacio",
+        "addressHelp": "La dirección física de la sede",
         "mapTitle": "Ubicación en el mapa",
-        "mapDescription": "Establece las coordenadas de este espacio en el mapa. Se usa para mostrar la ubicación del espacio.",
-        "mapDescriptionShort": "Establece las coordenadas de este espacio en el mapa."
+        "mapDescription": "Establece las coordenadas de esta sede en el mapa. Se usa para mostrar la ubicación de la sede.",
+        "mapDescriptionShort": "Establece las coordenadas de esta sede en el mapa."
       },
       "modal": {
-        "title": "Crear nuevo espacio",
-        "nameLabel": "Nombre del espacio *",
-        "nameHelp": "El nombre de la instalación u organización de acogida",
+        "title": "Crear nueva sede",
+        "nameLabel": "Nombre de la sede *",
+        "nameHelp": "El nombre de la instalación u organización organizadora",
         "addressLabel": "Dirección detallada",
         "websiteLabel": "Sitio web",
         "mapLabel": "Ubicación en el mapa (opcional)",
-        "mapHelp": "Establece las coordenadas para mostrar el espacio en los mapas.",
-        "submitButton": "Crear espacio"
+        "mapHelp": "Establece las coordenadas para mostrar la sede en los mapas.",
+        "submitButton": "Crear sede"
       },
       "logo": {
-        "title": "Logo del espacio",
-        "description": "Un logo cuadrado que representa el espacio (200x200 recomendado).",
+        "title": "Logo de la sede",
+        "description": "Un logo cuadrado que representa la sede (200x200 recomendado).",
         "libraryTitle": "Seleccionar logo",
         "uploadSuccess": "¡Logo subido con éxito!",
         "uploadFailed": "Error al subir el logo",
@@ -1027,7 +1086,7 @@
       }
     },
     "likes": {
-      "title": "Lo que nos gusta",
+      "title": "Cosas que nos gustan",
       "subtitle": "Gestionar elementos destacados - cosas que la comunidad recomienda",
       "entityName": "elemento",
       "create": {
@@ -1098,7 +1157,7 @@
       "myProfile": "Mi perfil",
       "events": "Eventos",
       "locations": "Ubicaciones",
-      "venues": "Espacios",
+      "venues": "Sedes",
       "sponsors": "Patrocinadores",
       "players": "Participantes",
       "thingsWeLike": "Cosas que nos gustan",
@@ -1127,8 +1186,8 @@
       "createEvent": "Crear evento",
       "locations": "Ubicaciones",
       "createLocation": "Crear ubicación",
-      "venues": "Espacios",
-      "createVenue": "Crear espacio",
+      "venues": "Sedes",
+      "createVenue": "Crear sede",
       "sponsors": "Patrocinadores",
       "players": "Participantes",
       "thingsWeLike": "Cosas que nos gustan",
@@ -1627,7 +1686,7 @@
     "mediaLinks": {
       "addMediaLink": "Añadir enlace multimedia",
       "cancel": "Cancelar",
-      "noLinksAdded": "Todavía no se han añadido enlaces externos a fotos o vídeos. Añada enlaces a Google Photos, Flickr, YouTube",
+      "noLinksAdded": "Todavía no se han añadido enlaces externos a fotos o vídeos. Añade enlaces a Google Photos, Flickr, YouTube",
       "addButton": "Añadir enlace multimedia"
     },
     "schedule": {
@@ -1754,7 +1813,7 @@
       "country": "País",
       "selectCountry": "Seleccionar país...",
       "venueTitle": "Sede (opcional)",
-      "venueDescription": "La empresa u organización anfitriona de este evento.",
+      "venueDescription": "La empresa u organización organizadora de este evento.",
       "noVenueYet": "Sin sede aún",
       "selectExistingVenue": "Seleccionar sede existente",
       "createNewVenue": "Crear nueva sede",
@@ -1844,7 +1903,7 @@
       "locationRequired": "Ubicación *",
       "createNew": "Crear nueva",
       "venueLabel": "Sede",
-      "venueDescription": "La empresa u organización anfitriona de este evento.",
+      "venueDescription": "La empresa u organización organizadora de este evento.",
       "clearVenue": "Limpiar selección de sede"
     },
     "content": {
@@ -1941,12 +2000,12 @@
       "refundWarning": "Esta acción es irreversible. El importe total del pedido será reembolsado al comprador.",
       "refundMultipleTicketsWarning": "Este pedido contiene {count} entradas. Todas las entradas de este pedido serán reembolsadas.",
       "refundReason": "Motivo del reembolso",
-      "refundReasonPlaceholder": "Por favor, explique por qué se reembolsa este pedido...",
-      "refundReasonRequired": "Por favor, indique un motivo para el reembolso.",
+      "refundReasonPlaceholder": "Por favor, explica por qué se reembolsa este pedido...",
+      "refundReasonRequired": "Por favor, indica un motivo para el reembolso.",
       "refundConfirm": "Confirmar reembolso",
       "refundProcessing": "Procesando...",
       "refundCancel": "Cancelar",
-      "refundFailed": "Error al procesar el reembolso. Inténtelo de nuevo.",
+      "refundFailed": "Error al procesar el reembolso. Inténtalo de nuevo.",
       "refundOrderNumber": "Pedido n.º {orderNumber}",
       "addParticipant": "Añadir participante",
       "addParticipantTitle": "Añadir un participante",
@@ -2007,8 +2066,8 @@
       "addCategory": "Añadir {category}",
       "deleteItemTitle": "Eliminar elemento",
       "deleteItemConfirm": "¿Estás seguro de que quieres eliminar \"{name}\"?",
-      "incomeDescription": "Estime sus ingresos de entradas, patrocinadores y otras fuentes.",
-      "expensesDescription": "Planifique sus gastos por categoría."
+      "incomeDescription": "Estima tus ingresos de entradas, patrocinadores y otras fuentes.",
+      "expensesDescription": "Planifica tus gastos por categoría."
     },
     "financeTab": {
       "ticketSalesRevenue": "Ingresos por venta de entradas",
@@ -2346,7 +2405,7 @@
   },
   "privacy": {
     "title": "Política de privacidad",
-    "description": "Cómo #play14 recopila, usa y protege su información personal",
+    "description": "Cómo #play14 recopila, usa y protege tu información personal",
     "lastUpdate": "Última actualización en enero de 2025"
   },
   "terms": {

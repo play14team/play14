@@ -19,12 +19,14 @@
     "opensInNewTab": "si apre in una nuova scheda"
   },
   "nav": {
-    "home": "Home",
-    "powerOfPlay": "Il potere del gioco",
+    "home": "Inizio",
+    "whatItIs": "Cos'è davvero",
+    "whoYoullMeet": "Chi incontrerai",
     "upcomingEvents": "Prossimi eventi",
     "statistics": "Statistiche",
     "worldMap": "Mappa del mondo",
-    "theExperience": "L'esperienza",
+    "whatASessionCanBe": "Cosa può essere una sessione",
+    "whatYouTakeHome": "Cosa porterai a casa",
     "manifestoAndCodeOfConduct": "Manifesto & codice di condotta",
     "testimonials": "Testimonianze",
     "gallery": "Galleria",
@@ -51,7 +53,7 @@
     "stayUpdated": "Resta aggiornato",
     "explore": "Esplora",
     "resources": "Risorse",
-    "home": "Home",
+    "home": "Inizio",
     "about": "Chi siamo",
     "contact": "Contatti",
     "ourEvents": "I nostri eventi",
@@ -64,31 +66,39 @@
     "reportAnIssue": "Segnala un problema"
   },
   "home": {
+    "hero": {
+      "headline": "#play14 è il posto dove giocare ti rende migliore — al lavoro, nella vita, come essere umano.",
+      "subhead": "Un'unconference mondiale dove il gioco diventa il modo in cui impariamo, ci connettiamo e usciamo cambiati.",
+      "cta": "Vedi i prossimi eventi"
+    },
     "powerOfPlay": {
-      "title": "Scopri il potere del <span>gioco</span>",
-      "subtitle": "Il gioco coinvolge mente e corpo, rendendo l'apprendimento un'esperienza attiva e immersiva.",
-      "intro": "Benvenuti su #play14, un movimento globale che crede nel <strong>potere trasformativo del gioco</strong>! Siamo un raduno mondiale di persone che credono che <strong>giocare sia il modo migliore per imparare, condividere e stimolare la creatività!</strong>",
-      "body": "Attraverso il gioco, le persone esplorano, sperimentano e scoprono concetti in modo pratico, migliorando la comprensione e la memorizzazione. La ludicità incoraggia l'innovazione, la risoluzione dei problemi e la collaborazione, aiutando chi impara a sviluppare il pensiero critico.",
+      "title": "Cos'è <span>davvero</span>",
+      "subtitle": "Non assomiglia per niente alla conferenza che stai immaginando.",
+      "intro": "Cosa succede davvero? Per due giorni e mezzo, tu e una stanza piena di persone curiose costruite il programma insieme. Niente slide, nessun relatore che parla solo a voi — solo giochi e attività che proponete, facilitate e affrontate insieme. Si impara facendo, condividendo quello che si sa, e mettendo le mani su ciò che hanno portato gli altri. Una parte è puro divertimento. Un'altra cambia silenziosamente il modo in cui vedi le cose.",
+      "body": "È il formato dell''<unconference>unconference</unconference>, ed è questo il punto. Non c'è un programma fisso e nessuno ti spinge verso le sessioni. Ogni mattina la stanza decide cosa succede: proponi i giochi e le conversazioni che vuoi facilitare, e ti unisci a quelli che ti attraggono. Una sessione non ti convince? La legge dei due piedi dice: alzati e trovane una migliore — nessuno se ne avrà a male, mai. Non sei nel pubblico. Sei co-autore del programma.",
       "quote": "Dimmi e dimentico, insegnami e forse ricordo, coinvolgimi e imparo",
       "quoteAuthor": "Benjamin Franklin",
-      "conclusion": "Il gioco riduce anche lo stress e aumenta la motivazione, rendendo il processo di apprendimento piacevole ed efficace. Creando uno spazio sicuro per tentativi ed errori, il gioco favorisce una connessione più profonda e significativa con il materiale da apprendere."
+      "conclusion": "Queste cose non si imparano ascoltando. Si imparano facendole, con altre persone, nella stanza. E questo ci porta alle persone."
     },
     "joinMovement": {
-      "title": "Unisciti al <span>movimento</span>",
-      "subtitle": "Unisciti a noi nelle città di tutto il mondo per incontrare persone che la pensano come te.",
-      "intro": "Che tu sia un facilitatore, un educatore o una mente curiosa, i nostri eventi sono progettati per stimolare la creatività, favorire la collaborazione e accendere nuove idee. Immergiti in un mondo di sperimentazione ludica.",
-      "globalCommunity": "<strong>Community globale:</strong> Connettiti con una rete diversificata di innovatori.",
-      "endlessFun": "<strong>Divertimento infinito:</strong> Partecipa ad attività pratiche e ludiche.",
-      "inspire": "<strong>Ispira e lasciati ispirare:</strong> Condividi e scopri nuovi giochi, strumenti e tecniche.",
-      "unconference": "#play14 è una <unconference>unconference</unconference>, dove <strong>tutti i partecipanti sono anche contributori</strong>. Basta presentarsi con una mente aperta e avrai la possibilità di proporre i tuoi giochi o tuffarti nei giochi suggeriti da altri. È tutta una questione di partecipazione, creatività e divertimento condiviso!"
+      "title": "Chi <span>incontrerai</span>",
+      "subtitle": "Il vero punto non sono i giochi. È con chi li giochi.",
+      "intro": "Guardati intorno nella stanza e troverai facilitatori, coach, insegnanti, designer, terapeuti, improvvisatori, gente dell'agile, giocatori accaniti — e persone che si sono incuriosite e sono semplicemente venute. Lavori diversi, paesi diversi, ragioni diverse per essere lì. Per un weekend costruiscono cose con te, con le maniche arrotolate. Questo mix non lo trovi da nessun'altra parte.",
+      "sandbox": "<strong>Un posto sicuro per sperimentare:</strong> facilita la sessione che non oseresti mai provare al lavoro. Fallisci, ridi, impara, rifalla. Nessuno ti sta giudicando.",
+      "kindred": "<strong>Anime affini, in tutto il mondo:</strong> troverai persone che pensano come te — e che continuerai a incontrare, evento dopo evento, città dopo città.",
+      "connection": "<strong>Connessioni che restano:</strong> un weekend a giocare insieme ti dice di più su una persona di quanto potrà mai fare un anno di riunioni."
+    },
+    "upcomingEvents": {
+      "title": "Prossimi <span>eventi</span>",
+      "subtitle": "Dove si terrà il prossimo #play14."
     },
     "worldMap": {
       "srTitle": "Eventi nel mondo"
     },
     "experience": {
-      "title": "L''<span>esperienza</span>",
-      "subtitle": "Per due giorni e mezzo, <players>persone con profili molto diversi</players> condividono <games>giochi e attività</games>, conoscenze e risate. <strong>Tutti sono benvenuti</strong>.",
-      "activitiesIntro": "Ecco alcuni esempi di attività che proponiamo:",
+      "title": "Cosa può <span>essere</span> una sessione",
+      "subtitle": "Ogni sessione è proposta da qualcuno nella stanza. Ecco il tipo di cose che <players>le persone</players> portano al <games>marketplace</games> — anche se, onestamente, la lista non smette mai di sorprenderci.",
+      "activitiesIntro": "Alcune cose che le persone hanno davvero facilitato:",
       "seriousGame": "Un <link>serious game</link> che usi come metafora per comprendere un nuovo concetto",
       "iceBreaker": "Un gioco <link>rompighiaccio</link> dove le persone imparano a conoscersi meglio",
       "warmUp": "Un <warmup>riscaldamento</warmup> o un <energizer>energizer</energizer> che puoi usare per alzare il livello di consapevolezza e di energia",
@@ -102,17 +112,62 @@
       "funTime": "Un momento divertente ed energico con <dancing>balli</dancing>, <singing>canti</singing> o facendo gli sciocchi insieme",
       "improv": "Una sessione di <link>teatro d'improvvisazione</link> dove puoi lavorare sulla tua sicurezza e sulla capacità di parlare in pubblico",
       "esoteric": "Una sessione più esoterica su una pratica o un hobby che vuoi condividere come yoga, yoga della risata, Tai Chi, Qigong, meditazione, mindfulness, aikido, ...",
-      "callToAction": "Unisciti a noi per sviluppare le tue <strong>competenze di facilitazione</strong>, aumentare la tua <strong>capacità di accompagnare il cambiamento</strong> nella tua organizzazione, <strong>stimolare la tua creatività</strong> e migliorare la tua <strong>capacità di innovare</strong>.",
+      "callToAction": "E questo è solo ciò che entra in un elenco. Porta qualcosa da condividere, o arriva a mani vuote e curioso — funziona in entrambi i casi. <strong>Tutti escono con più di quello che avevano quando sono entrati.</strong>",
       "quote": "Si può scoprire di più su una persona in un'ora di gioco che in un anno di conversazione",
       "quoteAuthor": "Platone"
     },
+    "takeaways": {
+      "title": "Cosa <span>porterai a casa</span>",
+      "subtitle": "Le cose che ti restano ancora il lunedì.",
+      "body1": "Non uscirai con una borsa piena di slide che non aprirai mai. Uscirai con giochi e tecniche di facilitazione che puoi usare con il tuo team il lunedì mattina. Con un modo nuovo di guardare i problemi su cui sei bloccato. E con una rete di persone in tutto il mondo che pensano come te — e che continuerai a incontrare, evento dopo evento, città dopo città.",
+      "body2": "Preoccupato che sia 'solo giocare'? È proprio questo il punto, e allo stesso tempo non lo è. Il gioco è il modo in cui l'apprendimento si insinua dentro di te. Ci sono persone che sono uscite da un weekend e hanno cambiato il modo in cui guidano, il modo in cui insegnano, persino quello che fanno nella vita. <strong>Vieni per il divertimento. Resta per come ti cambia.</strong>"
+    },
+    "cta": {
+      "title": "Trova il tuo <span>#play14</span>",
+      "body": "Gli eventi si svolgono in città di tutto il mondo, tutto l'anno. Scegline uno che si adatta al tuo calendario — o uno che vale il viaggio — e prendi un biglietto. Niente conto alla rovescia, niente scarsità artificiale: l'unica urgenza è una data vera su un weekend reale.",
+      "primary": "Trova un evento vicino a te",
+      "secondary": "Ti è preso il pallino, o ancora niente vicino a te? <link>Porta #play14 nella tua città.</link>"
+    },
+    "coreValues": {
+      "title": "I valori con cui giochiamo",
+      "openness": {
+        "name": "Apertura",
+        "short": "Lascia il tuo titolo lavorativo fuori dalla porta e rimani aperto alle idee, alle persone e ai giochi che non avresti mai provato da solo.",
+        "detail": "Arriviamo senza armatura — nessuna gerarchia, nessun'agenda nascosta, nessun 'non è così che si fa qui'. I momenti migliori accadono quando dici sì a qualcosa che di solito passeresti dritto oltre. Quindi teniamo la porta, e le nostre menti, spalancate."
+      },
+      "inclusion": {
+        "name": "Inclusione",
+        "short": "Chiunque tu sia e qualunque cosa tu faccia, c'è un posto per te nella stanza.",
+        "detail": "Lavori diversi, paesi diversi, ragioni diverse per esserci — tutti appartengono, e nessuno deve guadagnarsi il proprio posto. Costruiamo eventi dove nessuno resta in panchina e ogni voce ha il diritto di giocare."
+      },
+      "connection": {
+        "name": "Connessione",
+        "short": "I giochi sono il pretesto. Le persone sono il punto — e tendono a restare nella tua vita.",
+        "detail": "Giocare insieme salta le chiacchiere superficiali e ti porta a qualcosa di vero, in fretta. Le persone che incontri qui hanno l'abitudine di riapparire — all'evento successivo, in un'altra città, anni dopo. Non è networking; è l'inizio di amicizie."
+      },
+      "curiosity": {
+        "name": "Curiosità",
+        "short": "Segui ciò che ti meraviglia. Fai la domanda, prova la cosa, vedi cosa succede.",
+        "detail": "Siamo tutti qui perché non abbiamo mai smesso davvero di chiederci 'e se?'. La curiosità è ciò che porta una sessione ad essere proposta, un gioco a essere reinventato, un problema bloccato a essere visto da un'angolazione diversa. Porta la tua — più ficchi il naso nelle cose, più ne porterai a casa."
+      },
+      "sharing": {
+        "name": "Condivisione",
+        "short": "Dai via le tue cose migliori. Più condividi, più tutti se ne vanno con qualcosa in più.",
+        "detail": "Qui nessuno accumula. Passi il gioco, la tecnica, l'idea a metà — e ne ricevi dieci che non avresti mai trovato da solo. Non è una transazione; è così che cresce l'intero movimento, da persona a persona, da evento a evento."
+      },
+      "courage": {
+        "name": "Coraggio",
+        "short": "Prova la cosa che non oseresti mai al lavoro. Fallisci, ridi, impara, riprova.",
+        "detail": "Ci vuole un po' di coraggio per facilitare davanti a degli sconosciuti, per giocare a tutto campo, per essere sciocchi di proposito. #play14 è il posto sicuro per trovare quel coraggio — e una volta che lo hai usato qui, noterai che è ancora lì il lunedì mattina."
+      }
+    },
     "manifesto": {
       "title": "Cosa <span>rappresentiamo</span>",
-      "subtitle": "Un gioco o un'attività a #play14 può essere praticamente qualsiasi cosa, purché rispetti il nostro <link>Manifesto e codice di condotta</link>."
+      "subtitle": "Sei valori tengono insieme tutto — e sono scritti nel nostro <link>Manifesto e codice di condotta</link>. Qualunque gioco, qualunque attività, tutto va bene, purché li rispetti."
     },
     "testimonials": {
       "title": "Cosa dice la nostra <span>community</span>",
-      "subtitle": "Ascolta i membri della community #play14 parlare delle loro esperienze. Queste testimonianze catturano lo spirito, l'impatto e la gioia dei nostri eventi in tutto il mondo.",
+      "subtitle": "Non fidarti della nostra parola. Ecco cosa dicono le persone dopo esserci state — con le loro parole.",
       "viewAll": "Vedi tutte le testimonianze",
       "refreshLabel": "Mostra altre testimonianze"
     },
@@ -121,7 +176,7 @@
       "subtitle": "#play14 è prima di tutto una community di persone, una famiglia e un'incredibile avventura umana."
     },
     "benefits": {
-      "title": "Cosa c'è in gioco <span>per te</span>",
+      "title": "Cosa ci guadagni <span>tu</span>",
       "subtitle": "Ecco alcune delle cose che puoi aspettarti quando partecipi a un evento #play14. Tuttavia, preparati ad \"Aspettarti l'inaspettato!\""
     },
     "faq": {
@@ -132,7 +187,7 @@
         "answer": "Un tipico evento #play14 dura in media <strong>2,5 giorni</strong>. Gli eventi iniziano di solito il venerdì pomeriggio o sera e terminano la domenica pomeriggio. Questo formato permette ai partecipanti di immergersi completamente nell'esperienza avendo comunque tempo per viaggiare."
       },
       "unconference": {
-        "question": "Cos'è una unconference?",
+        "question": "Cos'è un'unconference?",
         "answer": "Una unconference è un evento guidato dai partecipanti dove <strong>i presenti sono anche contributori</strong>. #play14 segue il formato Open Space Technology, il che significa che non c'è un programma predefinito. Invece, i partecipanti propongono giochi e attività ogni mattina durante la sessione del marketplace, e il programma emerge organicamente."
       },
       "proposeGame": {
@@ -153,7 +208,7 @@
       },
       "activities": {
         "question": "Che tipo di attività posso aspettarmi?",
-        "answer": "Puoi aspettarti una grande varietà di attività tra cui <strong>serious game</strong> che insegnano concetti attraverso il gioco, <strong>rompighiaccio</strong> per conoscersi, <strong>energizer</strong> per aumentare l'energia del gruppo, <strong>esercizi di team building</strong>, tecniche di facilitazione, sessioni creative, teatro d'improvvisazione e persino attività più esoteriche come yoga o meditazione. Il bello di una unconference è che può succedere di tutto!"
+        "answer": "Puoi aspettarti una grande varietà di attività tra cui <strong>serious game</strong> che insegnano concetti attraverso il gioco, <strong>rompighiaccio</strong> per conoscersi, <strong>energizer</strong> per aumentare l'energia del gruppo, <strong>esercizi di team building</strong>, tecniche di facilitazione, sessioni creative, teatro d'improvvisazione e persino attività più esoteriche come yoga o meditazione. Il bello di un'unconference è che può succedere di tutto!"
       },
       "experience": {
         "question": "Ho bisogno di esperienza pregressa con giochi o facilitazione?",
@@ -162,7 +217,7 @@
     },
     "statistics": {
       "title": "Il nostro impatto <span>globale</span>",
-      "subtitle": "Dal 2014, #play14 è cresciuto fino a diventare un movimento mondiale che connette le persone attraverso il potere del gioco.",
+      "subtitle": "Non cresciamo riempiendo sale. Cresciamo nel numero di eventi — città per città, anno dopo anno, in tutto il mondo. Ci sono buone probabilità che ce ne sia uno vicino a te.",
       "yearsOfPlay": "Anni di gioco",
       "countries": "Paesi",
       "eventsOrganized": "Eventi organizzati",
@@ -176,7 +231,7 @@
       "shareKnowledge": "un luogo per <strong>condividere conoscenze e pratiche</strong> più che un luogo per vendere servizi e beni",
       "openToAll": "<strong>aperto a tutte le persone o community</strong> con un interesse per l'apprendimento divertente",
       "physicalWorld": "focalizzato su <strong>giochi e attività nel mondo fisico</strong> più che nel mondo virtuale",
-      "unconference": "<strong>una unconference</strong> basata sull'Open Space Technology",
+      "unconference": "<strong>un'unconference</strong> basata sull'Open Space Technology",
       "nonProfit": "<strong>senza scopo di lucro</strong>, il che significa che quando realizziamo un profitto da un evento, reinvestiamo tutto nel successivo"
     },
     "codeOfConduct": {
@@ -331,6 +386,10 @@
       "title": "I nostri valori",
       "intro": "I valori sono molto importanti per noi. Sono ciò che rende #play14 quello che è. Per favore, assicurati di dare un'occhiata al nostro manifesto e al nostro codice di condotta prima di registrarti a uno dei nostri eventi.",
       "thanksNina": "Un grande grazie a <link>Nina Neef</link> per le meravigliose immagini.",
+      "valuesIntro": "Tutto ciò che accade a #play14 cresce da questi sei. Plasmano il modo in cui organizziamo gli eventi, il modo in cui ci trattiamo, e cosa si prova a essere nella stanza.",
+      "manifestoIntro": "Quei valori hanno preso forma, anni fa, in un breve manifesto — la nostra stella polare per ciò che #play14 è, e sarà sempre.",
+      "cocIntro": "E questo è ciò che chiediamo a chiunque si presenti. Niente di pesante — solo le poche cose che tengono la stanza aperta, gentile e divertente.",
+      "scoutIntro": "Una di quelle righe merita uno sguardo più attento: quella su lasciare il campo da gioco pulito.",
       "scoutRule": "Regola dello scout",
       "scoutSaying": "Lascia sempre il campeggio più pulito di come lo hai trovato.",
       "scoutText1": "Abbi cura del benessere degli altri pulendo dopo di te quando lasci uno spazio. Questo vale per lo spazio in cui hai giocato, lo spazio in cui hai mangiato, lo spazio in cui ti sei riposato, ecc.",
@@ -338,8 +397,8 @@
     },
     "format": {
       "title": "Il nostro formato",
-      "whatIsUnconference": "Cos'è una unconference?",
-      "unconferenceIntro": "#play14 è organizzato come una unconference, un formato di conferenza che segue l''<link>Open Space Technology</link>",
+      "whatIsUnconference": "Cos'è un'unconference?",
+      "unconferenceIntro": "#play14 è organizzato come un'unconference, un formato di conferenza che segue l''<link>Open Space Technology</link>",
       "unconferenceContributors": "In questo formato, <strong>i partecipanti sono anche contributori delle sessioni</strong>. Chiunque voglia avviare un argomento può rivendicare uno slot temporale nell'agenda, e il programma viene creato ogni mattina, sul momento, come spiegheremo più avanti.",
       "unconferenceParticipant": "Una volta che sei lì, il lavoro degli organizzatori è finito. Hanno fornito un luogo, cibo e bevande per il resto dell'evento, poi <strong>spetta a te come partecipante renderlo un grande evento</strong>.",
       "funnyDrawings": "Dai un'occhiata ai <drawings>disegni divertenti</drawings> di <author>Claudio Perrone</author>",
@@ -361,7 +420,7 @@
       "butterflyText": "Una farfalla se ne sta seduta rilassata e discussioni interessanti possono emergere intorno a lei quando le persone la trovano e si fermano a chiacchierare.",
       "bumblebeeText": "Un'ape vola da un gruppo all'altro impollinando le discussioni.",
       "howSchedule": "Come nasce il programma?",
-      "scheduleIntro": "Essendo #play14 una unconference, spetta ai partecipanti creare il programma. Questo viene fatto ogni mattina dopo alcuni giochi di riscaldamento, quando riempiamo il marketplace.",
+      "scheduleIntro": "Essendo #play14 un'unconference, spetta ai partecipanti creare il programma. Questo viene fatto ogni mattina dopo alcuni giochi di riscaldamento, quando riempiamo il marketplace.",
       "marketplaceExplain": "Il marketplace è un grande tabellone dove trovi verticalmente l'elenco di tutti gli spazi/sale disponibili, e orizzontalmente tutti gli slot temporali durante la giornata. I partecipanti creano il programma aggiungendo il loro gioco/attività al tabellone.",
       "howPropose": "Come propongo un gioco?",
       "proposeIntro": "Se ti senti di proporre un gioco, dovrai presentarlo davanti a tutti e poi aggiungerlo al marketplace.",
