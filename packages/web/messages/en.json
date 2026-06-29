@@ -20,11 +20,13 @@
   },
   "nav": {
     "home": "Home",
-    "powerOfPlay": "Power of play",
+    "whatItIs": "What it actually is",
+    "whoYoullMeet": "Who you'll meet",
     "upcomingEvents": "Upcoming events",
     "statistics": "Statistics",
     "worldMap": "World map",
-    "theExperience": "The experience",
+    "whatASessionCanBe": "What a session can be",
+    "whatYouTakeHome": "What you'll take home",
     "manifestoAndCodeOfConduct": "Manifesto & code of conduct",
     "testimonials": "Testimonials",
     "gallery": "Gallery",
@@ -85,6 +87,10 @@
       "sandbox": "<strong>A safe place to experiment:</strong> run the session you'd never dare try at work. Fail, laugh, learn, run it again. Nobody's grading you.",
       "kindred": "<strong>Kindred spirits, worldwide:</strong> you'll find people who think like you — and who you'll keep bumping into, event after event, city after city.",
       "connection": "<strong>Connection that sticks:</strong> a weekend of playing together tells you more about someone than a year of meetings ever will."
+    },
+    "upcomingEvents": {
+      "title": "Upcoming <span>events</span>",
+      "subtitle": "Where #play14 is happening next."
     },
     "worldMap": {
       "srTitle": "Events around the world"

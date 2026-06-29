@@ -19,12 +19,14 @@
     "opensInNewTab": "si apre in una nuova scheda"
   },
   "nav": {
-    "home": "Home",
-    "powerOfPlay": "Il potere del gioco",
+    "home": "Inizio",
+    "whatItIs": "Cos'è davvero",
+    "whoYoullMeet": "Chi incontrerai",
     "upcomingEvents": "Prossimi eventi",
     "statistics": "Statistiche",
     "worldMap": "Mappa del mondo",
-    "theExperience": "L'esperienza",
+    "whatASessionCanBe": "Cosa può essere una sessione",
+    "whatYouTakeHome": "Cosa porterai a casa",
     "manifestoAndCodeOfConduct": "Manifesto & codice di condotta",
     "testimonials": "Testimonianze",
     "gallery": "Galleria",
@@ -51,7 +53,7 @@
     "stayUpdated": "Resta aggiornato",
     "explore": "Esplora",
     "resources": "Risorse",
-    "home": "Home",
+    "home": "Inizio",
     "about": "Chi siamo",
     "contact": "Contatti",
     "ourEvents": "I nostri eventi",
@@ -85,6 +87,10 @@
       "sandbox": "<strong>Un posto sicuro per sperimentare:</strong> facilita la sessione che non oseresti mai provare al lavoro. Fallisci, ridi, impara, rifalla. Nessuno ti sta giudicando.",
       "kindred": "<strong>Anime affini, in tutto il mondo:</strong> troverai persone che pensano come te — e che continuerai a incontrare, evento dopo evento, città dopo città.",
       "connection": "<strong>Connessioni che restano:</strong> un weekend a giocare insieme ti dice più di qualcuno di quanto un anno di riunioni potrebbe mai farti capire."
+    },
+    "upcomingEvents": {
+      "title": "Prossimi <span>eventi</span>",
+      "subtitle": "Dove si terrà il prossimo #play14."
     },
     "worldMap": {
       "srTitle": "Eventi nel mondo"

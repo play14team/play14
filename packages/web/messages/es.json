@@ -20,11 +20,13 @@
   },
   "nav": {
     "home": "Inicio",
-    "powerOfPlay": "El poder del juego",
+    "whatItIs": "Qué es realmente",
+    "whoYoullMeet": "A quién conocerás",
     "upcomingEvents": "Próximos eventos",
     "statistics": "Estadísticas",
     "worldMap": "Mapa mundial",
-    "theExperience": "La experiencia",
+    "whatASessionCanBe": "Lo que una sesión puede ser",
+    "whatYouTakeHome": "Qué te llevarás a casa",
     "manifestoAndCodeOfConduct": "Manifiesto y código de conducta",
     "testimonials": "Testimonios",
     "gallery": "Galería",
@@ -85,6 +87,10 @@
       "sandbox": "<strong>Un lugar seguro para experimentar:</strong> facilita la sesión que nunca te atreverías a hacer en el trabajo. Falla, ríe, aprende, inténtalo de nuevo. Nadie te pone nota.",
       "kindred": "<strong>Almas afines, en todo el mundo:</strong> encontrarás personas que piensan como tú — y con las que te seguirás cruzando, evento tras evento, ciudad tras ciudad.",
       "connection": "<strong>Conexiones que duran:</strong> un fin de semana jugando juntos te dice más de alguien que un año de reuniones."
+    },
+    "upcomingEvents": {
+      "title": "Próximos <span>eventos</span>",
+      "subtitle": "Dónde se celebra el próximo #play14."
     },
     "worldMap": {
       "srTitle": "Eventos en todo el mundo"
@@ -1680,7 +1686,7 @@
     "mediaLinks": {
       "addMediaLink": "Añadir enlace multimedia",
       "cancel": "Cancelar",
-      "noLinksAdded": "Todavía no se han añadido enlaces externos a fotos o vídeos. Añada enlaces a Google Photos, Flickr, YouTube",
+      "noLinksAdded": "Todavía no se han añadido enlaces externos a fotos o vídeos. Añade enlaces a Google Photos, Flickr, YouTube",
       "addButton": "Añadir enlace multimedia"
     },
     "schedule": {
@@ -1994,12 +2000,12 @@
       "refundWarning": "Esta acción es irreversible. El importe total del pedido será reembolsado al comprador.",
       "refundMultipleTicketsWarning": "Este pedido contiene {count} entradas. Todas las entradas de este pedido serán reembolsadas.",
       "refundReason": "Motivo del reembolso",
-      "refundReasonPlaceholder": "Por favor, explique por qué se reembolsa este pedido...",
-      "refundReasonRequired": "Por favor, indique un motivo para el reembolso.",
+      "refundReasonPlaceholder": "Por favor, explica por qué se reembolsa este pedido...",
+      "refundReasonRequired": "Por favor, indica un motivo para el reembolso.",
       "refundConfirm": "Confirmar reembolso",
       "refundProcessing": "Procesando...",
       "refundCancel": "Cancelar",
-      "refundFailed": "Error al procesar el reembolso. Inténtelo de nuevo.",
+      "refundFailed": "Error al procesar el reembolso. Inténtalo de nuevo.",
       "refundOrderNumber": "Pedido n.º {orderNumber}",
       "addParticipant": "Añadir participante",
       "addParticipantTitle": "Añadir un participante",
@@ -2060,8 +2066,8 @@
       "addCategory": "Añadir {category}",
       "deleteItemTitle": "Eliminar elemento",
       "deleteItemConfirm": "¿Estás seguro de que quieres eliminar \"{name}\"?",
-      "incomeDescription": "Estime sus ingresos de entradas, patrocinadores y otras fuentes.",
-      "expensesDescription": "Planifique sus gastos por categoría."
+      "incomeDescription": "Estima tus ingresos de entradas, patrocinadores y otras fuentes.",
+      "expensesDescription": "Planifica tus gastos por categoría."
     },
     "financeTab": {
       "ticketSalesRevenue": "Ingresos por venta de entradas",
@@ -2399,7 +2405,7 @@
   },
   "privacy": {
     "title": "Política de privacidad",
-    "description": "Cómo #play14 recopila, usa y protege su información personal",
+    "description": "Cómo #play14 recopila, usa y protege tu información personal",
     "lastUpdate": "Última actualización en enero de 2025"
   },
   "terms": {
