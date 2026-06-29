@@ -29,6 +29,7 @@ export default async function Home() {
           </div>
           <div className="d-flex justify-content-center">
             <Link href="/events" className="default-btn">
+              <i className="flaticon-calendar" />
               {t("hero.cta")}
             </Link>
           </div>
@@ -267,6 +268,7 @@ export default async function Home() {
           </div>
           <div className="d-flex justify-content-center">
             <Link href="/events" className="default-btn">
+              <i className="flaticon-loupe" />
               {t("cta.primary")}
             </Link>
           </div>

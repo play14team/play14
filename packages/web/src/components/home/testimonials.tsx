@@ -17,6 +17,7 @@ const HomeTestimonials = async () => {
 
       <div className="d-flex justify-content-center pb-70 pt-70">
         <Link href="/events/testimonials" className="default-btn">
+          <i className="flaticon-view" />
           {t("testimonials.viewAll")}
         </Link>
       </div>
