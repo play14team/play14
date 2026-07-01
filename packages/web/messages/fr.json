@@ -67,18 +67,18 @@
   },
   "home": {
     "hero": {
-      "headline": "#play14, c'est là où jouer te rend meilleur — au travail, dans la vie, en tant qu'être humain.",
+      "headline": "#play14, là où jouer te rend meilleur — au travail, dans la vie, en tant qu'être humain.",
       "subhead": "Une non-conférence mondiale où le jeu devient la façon d'apprendre, de se connecter et de repartir transformé.",
       "cta": "Voir les prochains événements"
     },
     "powerOfPlay": {
       "title": "Ce que c'est <span>vraiment</span>",
       "subtitle": "Rien à voir avec la conférence que tu imagines.",
-      "intro": "Alors, qu'est-ce qui se passe vraiment ? Pendant deux jours et demi, toi et une salle pleine de gens curieux construisez le programme vous-mêmes. Pas de slides, pas de conférenciers qui te parlent — juste des jeux et des activités que tu proposes, facilites et explores ensemble. Tu apprends en faisant, en partageant ce que tu sais, et en mettant les mains dans ce que les autres ont apporté. Certaines choses sont du pur plaisir. D'autres changent doucement ta façon de voir les choses.",
-      "body": "C'est le format de la <unconference>non-conférence</unconference>, et c'est tout l'intérêt. Pas d'agenda figé, personne pour t'imposer des sessions. Chaque matin, la salle décide de ce qui se passe : tu proposes les jeux et discussions que tu veux faciliter, et tu rejoins ceux qui t'attirent. Tu n'es pas à l'aise dans une session ? La Loi des deux pieds dit que tu te lèves et en trouves une meilleure — sans offense, jamais. Tu n'es pas dans le public ici. Tu co-écris le programme.",
+      "intro": "Alors, qu'est-ce qu'il s'y passe vraiment ? Pendant deux jours et demi, toi et une salle pleine de gens curieux construisez le programme vous-même. Pas de slides, pas de conférenciers qui te parlent — juste des jeux et des activités que tu proposes, facilites et explores collectivement. Tu apprends en faisant, en partageant ce que tu sais, et en mettant les mains dans ce que les autres ont apporté. Certaines choses sont du pur plaisir. D'autres changent doucement ta façon de voir les choses.",
+      "body": "C'est le format de la <unconference>non-conférence</unconference>, et c'est tout l'intérêt. Pas d'agenda figé, personne pour t'imposer des sessions. Chaque matin, les participants décident de ce qui se passe : tu proposes les jeux et discussions que tu veux faciliter, et tu rejoins ceux qui t'attirent. Tu n'es pas à l'aise dans une session ? La Loi des deux pieds dit que tu te lèves et en trouves une meilleure — sans offense, jamais. Tu n'es pas dans le public ici. Tu co-écris le programme.",
       "quote": "Dis-moi et j'oublie, enseigne-moi et je me souviens, implique-moi et j'apprends",
       "quoteAuthor": "Benjamin Franklin",
-      "conclusion": "Ces choses-là, on ne les apprend pas en se les faisant expliquer. On les apprend en les faisant, avec d'autres, dans la salle. Ce qui nous amène aux gens."
+      "conclusion": "Ces choses-là, on ne les apprend pas en se les faisant expliquer. On les apprend en les faisant, avec d'autres, dans une même salle. Ce qui nous amène aux gens."
     },
     "joinMovement": {
       "title": "Qui tu vas <span>rencontrer</span>",
@@ -97,29 +97,29 @@
     },
     "experience": {
       "title": "Ce qu'une session peut <span>être</span>",
-      "subtitle": "Chaque session est proposée par quelqu'un dans la salle. Voici le genre de choses que les <players>gens</players> apportent au <games>marketplace</games> — honnêtement, la liste ne cesse jamais de nous surprendre.",
-      "activitiesIntro": "Quelques choses que des gens ont vraiment facilitées :",
+      "subtitle": "Toutes les sessions sont proposées par les participants. Voici le genre de choses que les <players>gens</players> apportent en <games>marketplace</games> — honnêtement, la liste ne cesse jamais de nous surprendre.",
+      "activitiesIntro": "Quelques sessions que des gens ont vraiment facilitées :",
       "seriousGame": "Un <link>jeu sérieux</link> que tu utilises comme métaphore pour comprendre un nouveau concept",
       "iceBreaker": "Un <link>brise-glace</link> où les gens apprennent à mieux se connaître",
       "warmUp": "Un <warmup>échauffement</warmup> ou un <energizer>énergisant</energizer> que tu peux utiliser pour augmenter le niveau de conscience et d'énergie",
       "facilitation": "Une technique de facilitation que tu peux utiliser dans ton travail quotidien",
       "teamBuilding": "Un exercice de <link>team building</link> qui favorise la collaboration et l'auto-organisation",
-      "gameDesign": "Une session de <link>conception de jeu</link> où tu inventes un nouveau jeu pour enseigner quelque chose de nouveau",
-      "soulSearching": "Une session d'introspection profonde où tu apprends à te connaître",
-      "coaching": "Une session de coaching individuel où tu trouveras des réponses avec l'aide d'un ami",
+      "gameDesign": "Une session de <link>conception de jeu</link> où tu inventes un nouveau jeu pour enseigner quelque chose",
+      "soulSearching": "Une session d'introspection où tu apprends à te connaître",
+      "coaching": "Une session de coaching individuel où tu trouveras des réponses",
       "brainstorming": "Une session de brainstorming sur une question ou un problème qui t'empêche de dormir",
-      "creative": "Une <link>session créative</link> où tu dessines, griffonnes ou construis quelque chose ensemble",
+      "creative": "Une <link>session créative</link> où tu dessines, griffonnes ou construis quelque chose collectivement",
       "funTime": "Un moment amusant et énergique avec de la <dancing>danse</dancing>, du <singing>chant</singing> ou en faisant les fous ensemble",
       "improv": "Une session de <link>théâtre d'improvisation</link> où tu peux travailler ta confiance et ta capacité à parler en public",
       "esoteric": "Une session plus ésotérique sur une pratique/hobby que tu souhaites partager comme le yoga, le yoga du rire, le Tai Chi, le Qigong, la méditation, la pleine conscience, l'aïkido, ...",
-      "callToAction": "Et ça, c'est juste ce qui tient dans une liste. Apporte quelque chose à partager, ou arrive les mains vides et curieux — les deux fonctionnent. <strong>Tout le monde repart avec plus qu'en arrivant.</strong>",
+      "callToAction": "Et ça, ce sont juste quelques exemples. Apporte quelque chose à partager, ou arrive les mains vides et curieux — les deux fonctionnent. <strong>Tout le monde repart avec plus qu'en arrivant.</strong>",
       "quote": "On peut en découvrir plus sur une personne en une heure de jeu qu'en une année de conversation",
       "quoteAuthor": "Platon"
     },
     "takeaways": {
       "title": "Ce que tu <span>remporteras</span>",
       "subtitle": "Ce qui sera encore là le lundi.",
-      "body1": "Tu ne repartiras pas avec un sac plein de slides que tu n'ouvriras jamais. Tu repartiras avec des jeux et des techniques de facilitation que tu pourras utiliser avec ton équipe dès lundi matin. Avec une façon nouvelle de regarder les problèmes sur lesquels tu bloquais. Et avec un réseau de gens à travers le monde qui pensent comme toi — et que tu croiseras encore et encore, d'événement en événement, de ville en ville.",
+      "body1": "Tu repartiras avec des jeux et des techniques de facilitation que tu pourras utiliser avec ton équipe dès lundi matin. Avec une façon nouvelle de regarder les problèmes sur lesquels tu bloquais. Et avec un réseau de gens à travers le monde qui pensent comme toi — et que tu croiseras encore et encore, d'événement en événement, de ville en ville.",
       "body2": "Tu te dis que c'est « juste du jeu » ? C'est exactement le propos, et en même temps non. Le jeu, c'est comme ça que l'apprentissage se glisse en toi. Des gens sont sortis d'un week-end et ont changé leur façon de diriger, d'enseigner, voire ce qu'ils font dans la vie. <strong>Viens pour le plaisir. Reste pour ce que ça te fait.</strong>"
     },
     "cta": {
@@ -152,7 +152,7 @@
       },
       "sharing": {
         "name": "Partage",
-        "short": "Donne ce que tu as de mieux. Plus tu mets, plus tout le monde repart avec.",
+        "short": "Donne ce que tu as de mieux. Plus tu en mets, plus tout le monde repart avec.",
         "detail": "Personne ne planque ses trésors ici. Tu passes le jeu, la technique, l'idée à moitié formée — et tu récupères dix choses que tu n'aurais jamais trouvées seul. Ce n'est pas une transaction ; c'est comme ça que tout le mouvement grandit, de personne en personne, d'événement en événement."
       },
       "courage": {
@@ -217,7 +217,7 @@
     },
     "statistics": {
       "title": "Notre impact <span>mondial</span>",
-      "subtitle": "On ne grandit pas en remplissant des salles. On grandit par le nombre d'événements — ville après ville, année après année, partout dans le monde. Il y a de bonnes chances qu'un se passe près de chez toi.",
+      "subtitle": "Nous n'avons pas grandi année après année dans un même lieu. Nous avons grandi en multipliant les événements — ville après ville, année après année, partout dans le monde. Il y a de bonnes chances qu'un #play14 se passe près de chez toi.",
       "yearsOfPlay": "Années de jeu",
       "countries": "Pays",
       "eventsOrganized": "Événements organisés",
