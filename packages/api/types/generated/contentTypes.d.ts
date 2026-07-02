@@ -822,8 +822,7 @@ export interface ApiEventEvent extends Struct.CollectionTypeSchema {
           localized: false;
         };
       }>;
-    contactEmail: Schema.Attribute.Email &
-      Schema.Attribute.DefaultTo<'team@play14.org'>;
+    contactEmail: Schema.Attribute.Email & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

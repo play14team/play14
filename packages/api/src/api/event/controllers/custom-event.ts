@@ -435,12 +435,33 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.forbidden("Only Hosts, Mentors, or Founders can create events")
     }
 
-    const { name, start, end, locationId, newLocation, venueId, newVenue, description, timezone } =
-      ctx.request.body?.data || {}
+    const {
+      name,
+      start,
+      end,
+      locationId,
+      newLocation,
+      venueId,
+      newVenue,
+      description,
+      timezone,
+      contactEmail,
+    } = ctx.request.body?.data || {}
 
     // Validation
     if (!name || name.trim().length === 0) {
       return ctx.badRequest("Event name is required")
+    }
+
+    // Contact email is mandatory: local organizers must use their own address
+    // (there is no longer a "team@play14.org" default). Strapi only enforces
+    // `required` on publish, but events are created as drafts, so validate here.
+    const contactEmailTrimmed = typeof contactEmail === "string" ? contactEmail.trim() : ""
+    if (!contactEmailTrimmed) {
+      return ctx.badRequest("Contact email is required")
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmailTrimmed)) {
+      return ctx.badRequest("Contact email is invalid")
     }
 
     if (!start) {
@@ -529,6 +550,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
         eventStatus: "Announced",
         timezone: timezone || "Europe/Paris",
         description: description || null,
+        contactEmail: contactEmailTrimmed,
         location: location.id,
         venue: venueNumericId,
         hosts: [player.id],
