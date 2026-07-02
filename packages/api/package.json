@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "bun run build:plugins && strapi build",
-    "build:plugins": "tsc -p src/plugins/strapi-extended-mcp/tsconfig.build.json",
+    "build:plugins": "tsc -p src/plugins/strapi-extended-mcp/tsconfig.build.json && tsc -p src/plugins/rebuild-trigger/tsconfig.build.json",
     "dev": "bun run build:plugins && TZ=UTC strapi develop",
     "export": "strapi export --file ../backup/database/play14",
     "import": "strapi import --file ../backup/database/play14.tar.gz.enc",
