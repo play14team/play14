@@ -20,6 +20,14 @@ export default ({ env }: { env: any }) => ({
     enabled: true,
     resolve: "./src/plugins/rebuild-trigger",
   },
+  // Local plugin: custom MCP tools gated by admin RBAC. Built to its own dist/
+  // by `bun run build:plugins` (wired into build + dev) — Strapi's loader needs
+  // the compiled ./dist/server/index.js referenced by the plugin's package.json
+  // `exports`, not the .ts source.
+  "strapi-extended-mcp": {
+    enabled: env.bool("MCP_ENABLED", true),
+    resolve: "./src/plugins/strapi-extended-mcp",
+  },
   "strapi-cache": {
     enabled: env.bool("CACHE_ENABLED", true),
     config: {

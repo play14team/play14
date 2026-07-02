@@ -1,4 +1,5 @@
 import type { Core } from "@strapi/strapi"
+import { z } from "@strapi/utils" // NOT the top-level "zod" package
 import { bootstrapEmailTemplates } from "./bootstrap/email-templates"
 import { bootstrapLikedItemImages } from "./bootstrap/liked-items"
 import { bootstrapPermissions } from "./bootstrap/permissions"
@@ -210,6 +211,40 @@ export default {
    */
   register({ strapi }: { strapi: Core.Strapi }) {
     try {
+      // Inline MCP tool (see also the strapi-extended-mcp plugin for the
+      // RBAC-gated pattern). devModeOnly: true means no admin permission is
+      // needed and the tool is exposed only while Strapi runs in development
+      // (autoReload); it is absent in production. Registered here in register()
+      // because the MCP server starts during the bootstrap phase, before the
+      // app's own bootstrap() runs — registering a tool any later throws.
+      if (strapi.ai.mcp.isEnabled()) {
+        strapi.ai.mcp.registerTool({
+          name: "get_app_info",
+          title: "Get Strapi app info",
+          description:
+            "Return the Strapi version and the number of api:: content types in this project.",
+          devModeOnly: true,
+          resolveOutputSchema: () =>
+            z.object({
+              strapiVersion: z.string(),
+              contentTypeCount: z.number().int().nonnegative(),
+            }),
+          createHandler: (strapi) => async () => {
+            const contentTypeCount = Object.keys(strapi.contentTypes).filter((u) =>
+              u.startsWith("api::")
+            ).length
+            const payload = {
+              strapiVersion: (strapi.config.get("info.strapi", "unknown") as string) ?? "unknown",
+              contentTypeCount,
+            }
+            return {
+              content: [{ type: "text", text: JSON.stringify(payload) }],
+              structuredContent: payload,
+            }
+          },
+        })
+      }
+
       // Override LinkedIn provider to use OpenID Connect (OIDC) instead of deprecated scopes
       // LinkedIn deprecated r_liteprofile and r_emailaddress scopes in favor of OpenID Connect
       // See: https://github.com/strapi/strapi/issues/19641

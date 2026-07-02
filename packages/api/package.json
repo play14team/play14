@@ -8,8 +8,9 @@
     "name": "Cédric Pontet"
   },
   "scripts": {
-    "build": "strapi build",
-    "dev": "TZ=UTC strapi develop",
+    "build": "bun run build:plugins && strapi build",
+    "build:plugins": "tsc -p src/plugins/strapi-extended-mcp/tsconfig.build.json",
+    "dev": "bun run build:plugins && TZ=UTC strapi develop",
     "export": "strapi export --file ../backup/database/play14",
     "import": "strapi import --file ../backup/database/play14.tar.gz.enc",
     "start": "strapi start",
@@ -33,7 +34,7 @@
     "test:emails": "bun run scripts/test-emails-simple.ts",
     "ts:generate-types": "strapi ts:generate-types",
     "ts:generate-types:watch": "strapi ts:generate-types --watch",
-    "dev:db": "podman-compose up -d play14-db && TZ=UTC strapi develop",
+    "dev:db": "podman-compose up -d play14-db && bun run build:plugins && TZ=UTC strapi develop",
     "dev:pods": "podman-compose up --build",
     "db": "podman-compose up -d play14-db",
     "up": "podman-compose up && podman logs -f play14-api",
@@ -50,6 +51,7 @@
     "@strapi/plugin-documentation": "^5.49.0",
     "@strapi/plugin-users-permissions": "5.49.0",
     "@strapi/strapi": "5.49.0",
+    "@strapi/utils": "5.49.0",
     "@types/pdfkit": "^0.17.6",
     "ics": "^3.12.0",
     "image-size": "^2.0.2",
