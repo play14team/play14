@@ -391,6 +391,11 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
       return { data: null, error: "End date/time must be after start date/time" }
     }
 
+    // Contact email is mandatory (no more team@play14.org default)
+    if (!contactEmail.trim()) {
+      return { data: null, error: "Contact email is required" }
+    }
+
     // Build request data
     // Note: Use null for optional string fields when empty to allow clearing them
     const data: EventUpdateData = {
@@ -401,7 +406,7 @@ export function useEventForm(event: EventForEdit): UseEventFormReturn {
       eventStatus,
       tagline: tagline.trim() || null,
       description: description || null,
-      contactEmail: contactEmail.trim() || null,
+      contactEmail: contactEmail.trim(),
     }
 
     // Handle location
