@@ -11,14 +11,23 @@ export const MCP_ACTIONS = {
   CONTENT_TYPES_READ: `plugin::${PLUGIN_NAME}.content-types.read`,
 } as const
 
+// Shape expected by admin::permission's actionProvider.registerMany for a
+// `plugins`-section action — the UID becomes plugin::<pluginName>.<uid>.
+type McpAdminAction = {
+  section: "plugins"
+  pluginName: string
+  uid: string
+  displayName: string
+}
+
 export const registerMcpPermissions = async (strapi: Core.Strapi) => {
-  await strapi.service("admin::permission").actionProvider.registerMany(
-    ACTION_DEFS.map((a) => ({
-      section: "plugins",
-      pluginName: PLUGIN_NAME,
-      ...a,
-    })) as unknown as any[]
-  )
+  const actions: McpAdminAction[] = ACTION_DEFS.map((a) => ({
+    section: "plugins",
+    pluginName: PLUGIN_NAME,
+    uid: a.uid,
+    displayName: a.displayName,
+  }))
+  await strapi.service("admin::permission").actionProvider.registerMany(actions)
   strapi.log.info(
     `[strapi-extended-mcp plugin] Registered ${ACTION_DEFS.length} custom admin permission(s).`
   )

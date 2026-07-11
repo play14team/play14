@@ -25,7 +25,8 @@ export default ({ env }: { env: any }) => ({
   // the compiled ./dist/server/index.js referenced by the plugin's package.json
   // `exports`, not the .ts source.
   "strapi-extended-mcp": {
-    enabled: env.bool("MCP_ENABLED", true),
+    // Opt-in in production; on by default elsewhere (mirrors config/server.ts).
+    enabled: env.bool("MCP_ENABLED", env("NODE_ENV") !== "production"),
     resolve: "./src/plugins/strapi-extended-mcp",
   },
   "strapi-cache": {

@@ -11,21 +11,16 @@
   "exports": {
     "./package.json": "./package.json",
     "./strapi-server": {
-      "types": "./dist/server/index.d.ts",
       "source": "./server/index.ts",
       "require": "./dist/server/index.js",
       "default": "./dist/server/index.js"
     }
   },
   "main": "./dist/server/index.js",
-  "types": "./dist/server/index.d.ts",
   "files": [
     "dist",
     "server"
   ],
-  "scripts": {
-    "build": "tsc -p tsconfig.build.json"
-  },
   "peerDependencies": {
     "@strapi/strapi": "^5.0.0"
   }
