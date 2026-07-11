@@ -177,6 +177,7 @@ This repo ships specialised subagents and skills under `.claude/` to keep contri
 | `i18n-sync` | Keep the 5 next-intl message files under `packages/web/messages/` synchronised. Run after any UI-copy change — next-intl throws `MISSING_MESSAGE` at runtime for missing keys. |
 | `strapi-permissions-audit` | Detect silent 403s from missing entries in `packages/api/src/bootstrap/permissions/{actions,definitions}.ts`. Run after any change under `packages/api/src/api/*/routes/` or `controllers/`. |
 | `strapi-content-type-scaffolder` | Scaffold a new Strapi 5 content type end-to-end (schema, controller, service, router, permissions actions + definitions) so nothing is forgotten. |
+| `setup-strapi-mcp` | Set up Strapi's built-in MCP server and scaffold custom tools. Enables the server in `config/server.ts`, adds an inline dev-only tool in `src/index.ts`, and/or an RBAC-gated tool via the built `strapi-extended-mcp` plugin. Use to add more MCP tools. |
 
 ### Handoff map
 
