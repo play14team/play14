@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "bun run build:plugins && strapi build",
-    "build:plugins": "tsc -p src/plugins/strapi-extended-mcp/tsconfig.build.json && tsc -p src/plugins/rebuild-trigger/tsconfig.build.json",
+    "build:plugins": "bun build ./src/plugins/strapi-extended-mcp/server/index.ts --target node --format cjs --packages external --outfile ./src/plugins/strapi-extended-mcp/dist/server/index.js && bun build ./src/plugins/rebuild-trigger/server/index.ts --target node --format cjs --packages external --outfile ./src/plugins/rebuild-trigger/dist/server/index.js",
     "dev": "bun run build:plugins && TZ=UTC strapi develop",
     "export": "strapi export --file ../backup/database/play14",
     "import": "strapi import --file ../backup/database/play14.tar.gz.enc",
