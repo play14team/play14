@@ -12,4 +12,8 @@ export default ({ env }: { env: any }) => ({
     enabled: env.bool("CRON_ENABLED", true),
     tasks: cronTasks,
   },
+  // Strapi 5 built-in MCP server, served at <strapi-url>/mcp.
+  // Opt-in in production (it exposes a new HTTP/JSON-RPC surface); on by default
+  // everywhere else. Set MCP_ENABLED=true on the prod app to turn it on there.
+  mcp: { enabled: env.bool("MCP_ENABLED", env("NODE_ENV") !== "production") },
 })

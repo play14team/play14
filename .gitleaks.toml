@@ -1,0 +1,18 @@
+# Gitleaks configuration for play14.
+#
+# Extends the default gitleaks ruleset and allowlists documentation placeholder
+# tokens that are NOT real secrets — e.g. the example curl commands in the
+# setup-strapi-mcp skill (`Authorization: Bearer YOUR_ADMIN_TOKEN`) and the
+# `.env.example` placeholder. Real secrets live in gitignored `.env` files and
+# are still scanned everywhere else.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Documentation placeholder tokens (not real secrets)"
+regexTarget = "match"
+regexes = [
+  '''YOUR_ADMIN_TOKEN''',
+  '''your-mcp-token-here''',
+]

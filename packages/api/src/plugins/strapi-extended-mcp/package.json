@@ -1,0 +1,27 @@
+{
+  "name": "strapi-extended-mcp",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "description": "Custom Strapi MCP tools (example: list_content_types), each gated by its own admin RBAC permission.",
+  "strapi": {
+    "kind": "plugin",
+    "name": "strapi-extended-mcp",
+    "displayName": "Strapi extended MCP"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./strapi-server": {
+      "source": "./server/index.ts",
+      "require": "./dist/server/index.js",
+      "default": "./dist/server/index.js"
+    }
+  },
+  "main": "./dist/server/index.js",
+  "files": [
+    "dist",
+    "server"
+  ],
+  "peerDependencies": {
+    "@strapi/strapi": "^5.0.0"
+  }
+}
