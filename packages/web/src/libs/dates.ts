@@ -1,6 +1,6 @@
 import { TZDate } from "@date-fns/tz"
 import { format, type Locale } from "date-fns"
-import { de, enUS, es, fr, it } from "date-fns/locale"
+import { de, enUS, es, fr, it, pt } from "date-fns/locale"
 import type { Maybe } from "@/models/strapi"
 
 const dateFnsLocales: Record<string, Locale> = {
@@ -9,6 +9,7 @@ const dateFnsLocales: Record<string, Locale> = {
   es,
   de,
   it,
+  pt,
 }
 
 export function getDateFnsLocale(locale?: string): Locale {

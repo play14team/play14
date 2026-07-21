@@ -26,7 +26,7 @@ You are the accessibility specialist for the play14 community-platform web app. 
 
 - Monorepo at `/home/cpontet/repos/14/play14`, Bun 1.3.5, TS 6, ESM. Filter names: `play14-api`, `play14-web`, `play14-design`.
 - `packages/design` Storybook 9 runs on **SvelteKit + Svelte 5** — stories are `.svelte`, not React.
-- Locale files: `packages/web/messages/{en,fr,de,es,it}.json`. Missing keys throw `MISSING_MESSAGE` at runtime — flag if a change touches copy without syncing all five.
+- Locale files: `packages/web/messages/{en,fr,de,es,it,pt}.json`. Missing keys throw `MISSING_MESSAGE` at runtime — flag if a change touches copy without syncing all six.
 - Read `CLAUDE.md` and `packages/web/CLAUDE.md` before non-trivial work.
 
 ## Handoff

@@ -1,5 +1,6 @@
 "use server"
 
+import { getLocale } from "next-intl/server"
 import { getTestimonials } from "@/components/events/get.action"
 import { shuffleArray } from "@/libs/arrays"
 import { normalizeEntity, restQuery } from "@/libs/strapi-client"
@@ -77,12 +78,24 @@ export async function getUpcomingEvents(today: string) {
  * REST equivalent of: home/expectations.graphql
  */
 export async function getExpectations(type: string) {
-  const response = await restQuery<Expectation[]>("expectations", {
-    filters: {
-      expectationType: { $eq: type },
-    },
-  })
-  return response.data || []
+  const locale = await getLocale()
+  const filters = { expectationType: { $eq: type } }
+
+  const response = await restQuery<Expectation[]>("expectations", { filters, locale })
+  const data = response.data || []
+
+  // Strapi has no automatic i18n fallback: a locale with no localization for a
+  // given entry returns nothing. Fall back to the default locale (en) so the
+  // section never renders empty while translations are still partial.
+  if (data.length === 0 && locale !== "en") {
+    const fallback = await restQuery<Expectation[]>("expectations", {
+      filters,
+      locale: "en",
+    })
+    return fallback.data || []
+  }
+
+  return data
 }
 
 /**

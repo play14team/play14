@@ -126,8 +126,8 @@ Provisioning scripts for apps, add-ons, buckets, env vars, and custom domains li
 
 ## Internationalisation
 
-- Web app uses `next-intl` with **five locales**: `en`, `fr`, `de`, `es`, `it` (files in `packages/web/messages/`).
-- `next-intl` throws `MISSING_MESSAGE` at runtime if a key is absent in the active locale, so any UI-copy change must add the key to **all five files**. The `i18n-sync` skill handles this — invoke it after any string change.
+- Web app uses `next-intl` with **six locales**: `en`, `fr`, `de`, `es`, `it`, `pt` (files in `packages/web/messages/`).
+- `next-intl` throws `MISSING_MESSAGE` at runtime if a key is absent in the active locale, so any UI-copy change must add the key to **all six files**. The `i18n-sync` skill handles this — invoke it after any string change.
 
 ## UI Development
 

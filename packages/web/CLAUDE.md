@@ -79,7 +79,7 @@ src/
 ├── libs/                      # Utilities (strapi-client, dates, auth, safe-actions, metrics, …)
 ├── models/                    # TypeScript types (strapi.ts, debriefing-cube.ts)
 ├── hooks/                     # Custom React hooks (useIntersection, use-debounce, …)
-├── messages/                  # next-intl locale JSON files: en, fr, de, es, it
+├── messages/                  # next-intl locale JSON files: en, fr, de, es, it, pt
 └── styles/                    # SCSS, CSS, fonts, images
 ```
 
@@ -229,8 +229,8 @@ All list pages use the `load-more.tsx` pattern:
 
 ## Internationalisation (next-intl)
 
-- **Locales**: `en` (default), `fr`, `de`, `es`, `it` — message files in `src/messages/`.
-- **Hard rule**: every key used in code must exist in **all five files**, or `next-intl` throws `MISSING_MESSAGE` at runtime in that locale. Keep the files structurally identical.
+- **Locales**: `en` (default), `fr`, `de`, `es`, `it`, `pt` — message files in `src/messages/`.
+- **Hard rule**: every key used in code must exist in **all six files**, or `next-intl` throws `MISSING_MESSAGE` at runtime in that locale. Keep the files structurally identical.
 - After any UI-copy change, run the `i18n-sync` skill to mirror the new keys across all locales.
 
 ## Common Pitfalls

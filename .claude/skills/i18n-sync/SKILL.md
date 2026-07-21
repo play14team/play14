@@ -1,11 +1,11 @@
 ---
 name: i18n-sync
-description: Synchronize the five next-intl locale files (en, fr, de, es, it) in the play14 web app so missing keys never throw at runtime. Trigger proactively whenever the user mentions i18n, translations, locale files, "missing keys", next-intl, or adds/edits any UI copy, server action, or message file under `packages/web/messages/`. next-intl throws `MISSING_MESSAGE` at runtime when a key is absent in the active locale, so this sync is a required step after any UI-copy change — not optional, and not only when the user asks for it.
+description: Synchronize the six next-intl locale files (en, fr, de, es, it, pt) in the play14 web app so missing keys never throw at runtime. Trigger proactively whenever the user mentions i18n, translations, locale files, "missing keys", next-intl, or adds/edits any UI copy, server action, or message file under `packages/web/messages/`. next-intl throws `MISSING_MESSAGE` at runtime when a key is absent in the active locale, so this sync is a required step after any UI-copy change — not optional, and not only when the user asks for it.
 ---
 
 # i18n-sync
 
-Keep `packages/web/messages/{en,fr,de,es,it}.json` in sync. English is the authoritative source; the other four locales must mirror its key structure. Any divergence can crash a page in production.
+Keep `packages/web/messages/{en,fr,de,es,it,pt}.json` in sync. English is the authoritative source; the other five locales must mirror its key structure. Any divergence can crash a page in production.
 
 ## When to invoke
 
@@ -67,7 +67,7 @@ Summarise to the user:
 
 ## Not in scope
 
-- **Do not add new keys to English.** English additions come from code changes (UI work), not from this skill. If a key appears in fr/de/es/it but is missing from en, that signals a refactor artefact — surface it to the user rather than auto-aligning.
+- **Do not add new keys to English.** English additions come from code changes (UI work), not from this skill. If a key appears in fr/de/es/it/pt but is missing from en, that signals a refactor artefact — surface it to the user rather than auto-aligning.
 - **Do not remove unused keys.** Detecting whether a key is unused requires verifying zero callers across `packages/web/src/`, which is out of scope here.
 - **Do not touch string contents** in existing keys. This skill only adds missing keys; it never edits translations in place.
 
