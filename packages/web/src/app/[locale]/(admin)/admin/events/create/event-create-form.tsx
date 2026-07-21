@@ -55,6 +55,7 @@ export default function EventCreateForm({ locations, venues }: Props) {
 
   // Form state
   const [name, setName] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
   const [startDate, setStartDate] = useState("")
   const [startTime, setStartTime] = useState("18:00")
   const [locationMode, setLocationMode] = useState<"existing" | "new">("existing")
@@ -147,12 +148,20 @@ export default function EventCreateForm({ locations, venues }: Props) {
       return
     }
 
+    // Contact email is mandatory so participants reach the local organizer
+    if (!contactEmail.trim()) {
+      toast.error(t("create.contactEmailRequired"))
+      setIsSubmitting(false)
+      return
+    }
+
     // Build request data
     const data: EventCreateData = {
       name: name.trim(),
       start: startDateTime.toISOString(),
       end: endDateTime.toISOString(),
       timezone,
+      contactEmail: contactEmail.trim(),
       description: description || undefined,
     }
 
@@ -216,6 +225,20 @@ export default function EventCreateForm({ locations, venues }: Props) {
             placeholder={t("create.eventNamePlaceholder")}
           />
           <p className="admin-form-help">{t("create.eventNameHelp")}</p>
+        </div>
+
+        <div className="admin-form-group">
+          <label htmlFor="contactEmail">{t("create.contactEmail")}</label>
+          <input
+            type="email"
+            id="contactEmail"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            required
+            className="admin-input"
+            placeholder={t("create.contactEmailPlaceholder")}
+          />
+          <p className="admin-form-help">{t("create.contactEmailHelp")}</p>
         </div>
 
         <div className="admin-form-row">

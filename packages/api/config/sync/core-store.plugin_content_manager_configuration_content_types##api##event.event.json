@@ -122,7 +122,7 @@
         "edit": {
           "label": "Contact e-mail",
           "description": "",
-          "placeholder": "team@play14.org",
+          "placeholder": "you@example.com",
           "visible": true,
           "editable": true
         },

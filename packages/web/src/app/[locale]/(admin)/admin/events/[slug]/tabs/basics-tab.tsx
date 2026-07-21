@@ -234,8 +234,9 @@ export default function BasicsTab({
               id="contactEmail"
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
+              required
               className="admin-input"
-              placeholder="email@example.com"
+              placeholder="you@example.com"
             />
           </div>
         </div>

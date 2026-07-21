@@ -19,6 +19,7 @@ export interface EventCreateData {
   name: string
   start: string
   end: string
+  contactEmail: string
   locationId?: string
   newLocation?: { name: string; country: string }
   venueId?: string
