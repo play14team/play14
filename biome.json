@@ -26,7 +26,8 @@
       "!**/packages/api/database/migrations/",
       "!**/packages/api/src/extensions/documentation/",
       "!**/bun.lock",
-      "!**/*.min.js"
+      "!**/*.min.js",
+      "!**/*.svg"
     ]
   },
   "formatter": {
