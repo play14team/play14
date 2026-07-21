@@ -84,7 +84,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": ["en", "fr"]
+        "locales": ["en", "fr", "es", "de", "it", "pt"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -95,7 +95,7 @@
       "action": "plugin::content-manager.explorer.delete",
       "subject": "api::event.event",
       "properties": {
-        "locales": ["en", "fr"]
+        "locales": ["en", "fr", "es", "de", "it", "pt"]
       },
       "conditions": ["admin::is-creator"],
       "actionParameters": {},
@@ -106,7 +106,7 @@
       "action": "plugin::content-manager.explorer.publish",
       "subject": "api::event.event",
       "properties": {
-        "locales": ["en", "fr"]
+        "locales": ["en", "fr", "es", "de", "it", "pt"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -150,7 +150,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": ["en", "fr"]
+        "locales": ["en", "fr", "es", "de", "it", "pt"]
       },
       "conditions": [],
       "actionParameters": {},
@@ -194,7 +194,7 @@
           "finance.result",
           "finance.resultAmount"
         ],
-        "locales": ["en", "fr"]
+        "locales": ["en", "fr", "es", "de", "it", "pt"]
       },
       "conditions": [],
       "actionParameters": {},
