@@ -90,6 +90,24 @@ jobs:
         #   internal; we don't use undici SOCKS5 proxying or its WS client.
         #   GHSA-96hv-2xvq-fx4p — ws fragment-flood DoS. Reached only via a
         #   Strapi-internal ws@7 consumer; bumping to 8.x breaks it.
+        #   GHSA-23hp-3jrh-7fpw — node-tar decompression/parse DoS. The whole
+        #   published line (<=7.5.18) is flagged, so there is no patched version
+        #   to override to; reached only via @strapi/strapi, its documentation
+        #   plugin and strapi-plugin-config-sync (server-side archive handling).
+        #   GHSA-gcfj-64vw-6mp9 — axios inherited-proxy-after-config-clone. Fix
+        #   is axios >=1.18.0, but bumping the existing `^1.15.2` override forces
+        #   a full re-resolve that floats unrelated transitives (parse5 → 8) under
+        #   the pinned-bun mismatch, against this repo's controlled-bump policy.
+        #   Reached only via Strapi-internal plugins; we set no untrusted proxy.
+        #   GHSA-xcpc-8h2w-3j85 — adm-zip crafted-ZIP 4GB allocation. Vulnerable
+        #   range is <0.6.0 and 0.6.0 is unreleased, so no override target; pulled
+        #   only by strapi-plugin-config-sync's server-side config import.
+        #   GHSA-3jxr-9vmj-r5cp — brace-expansion {} expansion DoS. Two major
+        #   lines coexist in the tree (minimatch@3 needs v1, others v2), so no
+        #   single-version override is safe; all consumers are Strapi-internal.
+        #   GHSA-52cp-r559-cp3m — js-yaml merge-key quadratic CPU. The 3.x line
+        #   tops out at 3.14.1 with no fix; only js-yaml 4.x patches it, a
+        #   breaking bump of a @strapi/utils-internal dep.
         run: >
           bun audit --prod --audit-level=high
           --ignore=GHSA-r5fr-rjxr-66jc
@@ -99,3 +117,8 @@ jobs:
           --ignore=GHSA-vxpw-j846-p89q
           --ignore=GHSA-hm92-r4w5-c3mj
           --ignore=GHSA-96hv-2xvq-fx4p
+          --ignore=GHSA-23hp-3jrh-7fpw
+          --ignore=GHSA-gcfj-64vw-6mp9
+          --ignore=GHSA-xcpc-8h2w-3j85
+          --ignore=GHSA-3jxr-9vmj-r5cp
+          --ignore=GHSA-52cp-r559-cp3m
