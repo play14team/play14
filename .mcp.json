@@ -1,15 +1,25 @@
 {
   "mcpServers": {
-    "playwright": {
-      "command": "bunx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--browser",
-        "chromium",
-        "--executable-path",
-        "/snap/bin/chromium",
-        "--headless"
-      ]
+    "strapi-dev": {
+      "type": "http",
+      "url": "${DEV_STRAPI_MCP_URL}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${DEV_STRAPI_MCP_TOKEN}"
+      }
+    },
+    "strapi-staging": {
+      "type": "http",
+      "url": "${STAGING_STRAPI_MCP_URL}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${STAGING_STRAPI_MCP_TOKEN}"
+      }
+    },
+    "strapi-prod": {
+      "type": "http",
+      "url": "${PROD_STRAPI_MCP_URL}/mcp",
+      "headers": {
+        "Authorization": "Bearer ${PROD_STRAPI_MCP_TOKEN}"
+      }
     }
   }
 }
