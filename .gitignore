@@ -123,3 +123,5 @@ BACKLOG.md
 
 # Database dump files from migration
 *.dump
+
+packages/videos/out
