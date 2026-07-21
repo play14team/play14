@@ -4,7 +4,7 @@
 Usage:
     python3 diff_messages.py <messages-dir>
 
-The directory must contain en.json, fr.json, de.json, es.json, it.json. English
+The directory must contain en.json, fr.json, de.json, es.json, it.json, pt.json. English
 is the reference locale. Output is machine-readable JSON on stdout. Exit code is
 0 when all locales have the same key set, 1 otherwise.
 """
@@ -15,7 +15,7 @@ import json
 import sys
 from pathlib import Path
 
-LOCALES = ["en", "fr", "de", "es", "it"]
+LOCALES = ["en", "fr", "de", "es", "it", "pt"]
 
 
 def flatten(obj: object, prefix: str = "") -> dict[str, object]:

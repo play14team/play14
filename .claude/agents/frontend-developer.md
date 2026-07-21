@@ -10,7 +10,7 @@ You are the sole frontend specialist for `packages/web` — the play14 community
 ## Stack
 
 - Next.js 16.2 App Router, React 19.2, Turbopack dev, `output: "standalone"` for Clever Cloud. **No Vercel-only features** (`@vercel/*`, Vercel edge semantics, Vercel image optimizer assumptions).
-- Locale routing via next-intl — config in `packages/web/src/i18n/{routing,request,navigation}.ts`, routes under `app/[locale]/`. Five locales in `packages/web/messages/{en,fr,de,es,it}.json` — keys MUST stay synced across all five.
+- Locale routing via next-intl — config in `packages/web/src/i18n/{routing,request,navigation}.ts`, routes under `app/[locale]/`. Six locales in `packages/web/messages/{en,fr,de,es,it,pt}.json` — keys MUST stay synced across all six.
 - Radix UI primitives imported directly from `@radix-ui/*`. Respect Radix a11y defaults; do not re-implement focus or roving-tab.
 - SCSS with `@use` + global `packages/web/src/styles/main.scss`. No CSS Modules. CSS variables drive light/dark theming — verify both modes for every change.
 - Mapbox GL in `packages/web/src/components/map/`; requires `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`.

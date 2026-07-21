@@ -262,7 +262,7 @@ Use this as the final pass before declaring done:
 - [ ] Unit test mocks — only mocks for this content type, not unrelated tables
 - [ ] All web-app components and `*.action.ts` response interfaces
 - [ ] `contentTypes.d.ts`
-- [ ] All five next-intl locale files if any UI label changed (e.g. status badges) — invoke the `i18n-sync` skill
+- [ ] All six next-intl locale files if any UI label changed (e.g. status badges) — invoke the `i18n-sync` skill
 - [ ] `bun --filter play14-api typecheck && bun --filter play14-web typecheck && bun run check` all clean
 - [ ] `bun --filter play14-api test && bun --filter play14-web test` both pass
 - [ ] Migration applied locally and dev server starts (`bun --filter play14-api dev`)
