@@ -9,6 +9,7 @@ on:
       - "packages/web/**"
       - "package.json"
       - "bun.lock"
+      - "biome.json"
       - ".github/workflows/clever-deploy-staging.yml"
       - "!packages/**/.github/**"
   workflow_dispatch:
