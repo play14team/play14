@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
-    "develop": "next dev --turbopack",
+    "develop": "METRICS_PORT=9001 next dev --turbopack",
     "build": "next build && cp -R public .next/standalone/packages/web/ && cp -R .next/static .next/standalone/packages/web/.next/",
     "start": "HOSTNAME=0.0.0.0 bun .next/standalone/packages/web/server.js",
     "lint": "biome lint .",
