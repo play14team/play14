@@ -24,13 +24,13 @@ export default function LocationCreateForm() {
     setIsSubmitting(true)
 
     if (!name.trim()) {
-      toast.error(t("adminCrud.common.nameRequired"))
+      toast.error(t("common.nameRequired"))
       setIsSubmitting(false)
       return
     }
 
     if (!country) {
-      toast.error(t("adminCrud.locations.form.selectCountry"))
+      toast.error(t("locations.form.selectCountry"))
       setIsSubmitting(false)
       return
     }
@@ -42,28 +42,23 @@ export default function LocationCreateForm() {
     })
 
     if (!result.success) {
-      toast.error(
-        result.error ||
-          t("adminCrud.common.failedToCreate", { entity: t("adminCrud.locations.entityName") })
-      )
+      toast.error(result.error || t("common.failedToCreate", { entity: t("locations.entityName") }))
       setIsSubmitting(false)
       return
     }
 
-    toast.success(
-      t("adminCrud.common.createdSuccess", { entity: t("adminCrud.locations.entityName") })
-    )
+    toast.success(t("common.createdSuccess", { entity: t("locations.entityName") }))
     router.push(`/admin/locations/${result.documentId}`)
   }
 
   return (
     <form onSubmit={handleSubmit} className="admin-form location-edit-form">
       <div className="admin-form-section">
-        <h2>{t("adminCrud.locations.form.detailsTitle")}</h2>
+        <h2>{t("locations.form.detailsTitle")}</h2>
 
         <div className="admin-form-row">
           <div className="admin-form-group">
-            <label htmlFor="name">{t("adminCrud.locations.form.nameLabel")}</label>
+            <label htmlFor="name">{t("locations.form.nameLabel")}</label>
             <input
               type="text"
               id="name"
@@ -72,19 +67,19 @@ export default function LocationCreateForm() {
               required
               minLength={2}
               className="admin-input"
-              placeholder={t("adminCrud.locations.form.namePlaceholder")}
+              placeholder={t("locations.form.namePlaceholder")}
             />
-            <p className="admin-form-help">{t("adminCrud.locations.form.nameHelp")}</p>
+            <p className="admin-form-help">{t("locations.form.nameHelp")}</p>
           </div>
         </div>
 
         <div className="admin-form-row">
           <div className="admin-form-group">
-            <label>{t("adminCrud.locations.form.countryLabel")}</label>
+            <label>{t("locations.form.countryLabel")}</label>
             <CountrySelector
               value={country}
               onChange={setCountry}
-              placeholder={t("adminCrud.locations.form.countryPlaceholder")}
+              placeholder={t("locations.form.countryPlaceholder")}
               required
             />
           </div>
@@ -92,10 +87,8 @@ export default function LocationCreateForm() {
       </div>
 
       <div className="admin-form-section">
-        <h2>{t("adminCrud.locations.form.mapTitle")}</h2>
-        <p className="admin-form-section-description">
-          {t("adminCrud.locations.form.mapDescription")}
-        </p>
+        <h2>{t("locations.form.mapTitle")}</h2>
+        <p className="admin-form-section-description">{t("locations.form.mapDescription")}</p>
 
         <div className="admin-form-row">
           <div className="admin-form-group full-width">
@@ -121,12 +114,12 @@ export default function LocationCreateForm() {
           {isSubmitting ? (
             <>
               <i className="bx bx-loader-alt bx-spin" />
-              {t("adminCrud.common.creating")}...
+              {t("common.creating")}
             </>
           ) : (
             <>
               <i className="bx bx-plus" />
-              {t("adminCrud.locations.create.submitButton")}
+              {t("locations.create.submitButton")}
             </>
           )}
         </button>

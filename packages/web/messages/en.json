@@ -2246,7 +2246,11 @@
       "creating": "Creating...",
       "createSponsor": "Create sponsor",
       "failedToCreate": "Failed to create sponsor",
-      "removeSponsor": "Remove sponsor"
+      "removeSponsor": "Remove sponsor",
+      "removeCategory": "Remove {category} category",
+      "nameRequiredError": "Name is required",
+      "duplicateHint": "A sponsor named “{name}” already exists.",
+      "useExisting": "Use the existing one"
     },
     "finance": {
       "revenue": "Revenue",

@@ -19,6 +19,7 @@ interface Props {
 }
 
 export default function SponsorEditor({ sponsorships, onChange }: Props) {
+  const t = useTranslations("adminEvents.sponsorEditor")
   const [availableSponsors, setAvailableSponsors] = useState<Sponsor[]>([])
   const [_isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -98,7 +99,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
       setCreateForCategory(null)
       return result.data
     }
-    setError(result.error || "Failed to create sponsor")
+    setError(result.error || t("failedToCreate"))
     return null
   }
 
@@ -127,7 +128,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 type="button"
                 className="admin-btn-icon"
                 onClick={() => removeCategory(sponsorship.category)}
-                title={`Remove ${sponsorship.category} category`}
+                title={t("removeCategory", { category: sponsorship.category })}
               >
                 <i className="bx bx-trash" />
               </button>
@@ -152,7 +153,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                     onClick={() =>
                       removeSponsorFromCategory(sponsorship.category, sponsor.documentId)
                     }
-                    title="Remove sponsor"
+                    title={t("removeSponsor")}
                   >
                     <i className="bx bx-x" />
                   </button>
@@ -173,7 +174,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                   }
                 }}
               >
-                <option value="">Add sponsor...</option>
+                <option value="">{t("addSponsor")}</option>
                 {getUnusedSponsors().map((sponsor) => (
                   <option key={sponsor.documentId} value={sponsor.documentId}>
                     {sponsor.name}
@@ -189,7 +190,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 }}
               >
                 <i className="bx bx-plus" />
-                New
+                {t("new")}
               </button>
             </div>
           </div>
@@ -202,7 +203,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
               <input
                 type="text"
                 className="admin-input admin-input-sm"
-                placeholder="Enter category name..."
+                placeholder={t("enterCategoryName")}
                 value={customCategoryName}
                 onChange={(e) => setCustomCategoryName(e.target.value)}
                 onKeyDown={(e) => {
@@ -228,7 +229,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 }}
                 disabled={!customCategoryName.trim()}
               >
-                Add
+                {t("add")}
               </button>
               <button
                 type="button"
@@ -238,7 +239,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                   setShowCustomCategoryInput(false)
                 }}
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
           ) : (
@@ -253,7 +254,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                 }
               }}
             >
-              <option value="">Add category...</option>
+              <option value="">{t("addCategory")}</option>
               {DEFAULT_CATEGORIES.filter(
                 (cat) => !sponsorships.some((s) => s.category === cat)
               ).map((cat) => (
@@ -261,7 +262,7 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
                   {cat}
                 </option>
               ))}
-              <option value="__custom">Custom category...</option>
+              <option value="__custom">{t("customCategory")}</option>
             </select>
           )}
         </div>
@@ -270,11 +271,19 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
       {/* Create Sponsor Modal */}
       {showCreateModal && (
         <CreateSponsorModal
+          existingSponsors={availableSponsors}
           onClose={() => {
             setShowCreateModal(false)
             setCreateForCategory(null)
           }}
           onCreate={handleCreateSponsor}
+          onUseExisting={(sponsor) => {
+            if (createForCategory) {
+              addSponsorToCategory(createForCategory, sponsor)
+            }
+            setShowCreateModal(false)
+            setCreateForCategory(null)
+          }}
         />
       )}
     </div>
@@ -283,12 +292,19 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
 
 // Create Sponsor Modal Component
 interface CreateSponsorModalProps {
+  existingSponsors: Sponsor[]
   onClose: () => void
   onCreate: (name: string, url: string) => Promise<Sponsor | null>
+  onUseExisting: (sponsor: Sponsor) => void
 }
 
-function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
-  const t = useTranslations("adminCrud")
+function CreateSponsorModal({
+  existingSponsors,
+  onClose,
+  onCreate,
+  onUseExisting,
+}: CreateSponsorModalProps) {
+  const t = useTranslations("adminEvents.sponsorEditor")
   const [name, setName] = useState("")
   const [url, setUrl] = useState("")
   const [isCreating, setIsCreating] = useState(false)
@@ -300,12 +316,18 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
     return () => setMounted(false)
   }, [])
 
+  // A sponsor list is global: creating a duplicate name is rejected by the API,
+  // so surface the existing one instead of letting the user hit that dead end.
+  const duplicate = existingSponsors.find(
+    (s) => s.name.trim().toLowerCase() === name.trim().toLowerCase()
+  )
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
     if (!name.trim()) {
-      setError("Name is required")
+      setError(t("nameRequiredError"))
       return
     }
 
@@ -314,7 +336,7 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
 
     const result = await onCreate(name.trim(), url.trim())
     if (!result) {
-      setError("Failed to create sponsor")
+      setError(t("failedToCreate"))
     }
 
     setIsCreating(false)
@@ -324,7 +346,7 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
     <div className="admin-modal-overlay" onClick={onClose}>
       <div className="admin-modal sponsor-modal" onClick={(e) => e.stopPropagation()}>
         <div className="admin-modal-header">
-          <h3>{t("adminCrud.sponsors.create.title")}</h3>
+          <h3>{t("createNewSponsor")}</h3>
           <button type="button" className="admin-modal-close" onClick={onClose}>
             <i className="bx bx-x" />
           </button>
@@ -338,20 +360,34 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
             </div>
           )}
 
+          {duplicate && (
+            <div className="admin-alert admin-alert-warning admin-alert-sm">
+              <i className="bx bx-info-circle" />
+              <span>{t("duplicateHint", { name: duplicate.name })}</span>
+              <button
+                type="button"
+                className="admin-btn admin-btn-secondary admin-btn-sm"
+                onClick={() => onUseExisting(duplicate)}
+              >
+                {t("useExisting")}
+              </button>
+            </div>
+          )}
+
           <div className="admin-form-group">
-            <label htmlFor="sponsorName">{t("adminCrud.sponsors.form.nameLabel")}</label>
+            <label htmlFor="sponsorName">{t("nameRequired")}</label>
             <input
               type="text"
               id="sponsorName"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="admin-input"
-              placeholder={t("adminCrud.sponsors.form.namePlaceholder")}
+              placeholder={t("sponsorNamePlaceholder")}
             />
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="sponsorUrl">Website URL</label>
+            <label htmlFor="sponsorUrl">{t("websiteUrl")}</label>
             <input
               type="url"
               id="sponsorUrl"
@@ -370,23 +406,23 @@ function CreateSponsorModal({ onClose, onCreate }: CreateSponsorModalProps) {
             onClick={onClose}
             disabled={isCreating}
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"
             className="admin-btn admin-btn-primary"
             onClick={handleSubmit}
-            disabled={isCreating || !name.trim()}
+            disabled={isCreating || !name.trim() || Boolean(duplicate)}
           >
             {isCreating ? (
               <>
                 <i className="bx bx-loader-alt bx-spin" />
-                {t("adminCrud.common.creating")}...
+                {t("creating")}
               </>
             ) : (
               <>
                 <i className="bx bx-plus" />
-                {t("adminCrud.sponsors.create.submitButton")}
+                {t("createSponsor")}
               </>
             )}
           </button>

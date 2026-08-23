@@ -2246,7 +2246,11 @@
       "creating": "Creando...",
       "createSponsor": "Crear patrocinador",
       "failedToCreate": "Error al crear el patrocinador",
-      "removeSponsor": "Eliminar patrocinador"
+      "removeSponsor": "Eliminar patrocinador",
+      "removeCategory": "Eliminar la categoría {category}",
+      "nameRequiredError": "El nombre es obligatorio",
+      "duplicateHint": "Ya existe un patrocinador llamado «{name}».",
+      "useExisting": "Usar el existente"
     },
     "finance": {
       "revenue": "Ingresos",

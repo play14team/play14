@@ -724,6 +724,30 @@ label.admin-btn {
   color: #16a34a;
 }
 
+.admin-alert-warning {
+  background-color: rgba(217, 119, 6, 0.1);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  color: #b45309;
+
+  span {
+    flex: 1;
+  }
+
+  .admin-btn {
+    flex-shrink: 0;
+  }
+}
+
+.admin-alert-sm {
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
+
+  i {
+    font-size: 16px;
+  }
+}
+
 // ===========================================
 // Page Header
 // ===========================================

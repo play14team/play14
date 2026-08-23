@@ -1804,7 +1804,11 @@
       "creating": "Erstellen...",
       "createSponsor": "Sponsor erstellen",
       "failedToCreate": "Fehler beim Erstellen des Sponsors",
-      "removeSponsor": "Sponsor entfernen"
+      "removeSponsor": "Sponsor entfernen",
+      "removeCategory": "Kategorie {category} entfernen",
+      "nameRequiredError": "Name ist erforderlich",
+      "duplicateHint": "Ein Sponsor namens „{name}“ existiert bereits.",
+      "useExisting": "Vorhandenen verwenden"
     },
     "finance": {
       "revenue": "Einnahmen",

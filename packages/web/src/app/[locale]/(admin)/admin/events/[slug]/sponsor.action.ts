@@ -38,27 +38,46 @@ export interface SponsorActionResult<T = void> {
  * Get all available sponsors for selection
  */
 export async function getAvailableSponsors(): Promise<SponsorActionResult<Sponsor[]>> {
-  // Fetch all sponsors with pagination disabled (limit -1 not supported, use large number)
-  const result = await strapiFetchWithQuery<{ data: Sponsor[] }>(
-    "/sponsors",
-    {},
-    {
-      sort: "name:asc",
-      populate: "logo",
-      "pagination[pageSize]": "1000",
-    }
-  )
+  // The API clamps pageSize to `api.rest.maxLimit` (100), so a single oversized
+  // page silently truncates the list and hides sponsors from the picker.
+  const PAGE_SIZE = 100
+  const MAX_PAGES = 50
+  const sponsors: Sponsor[] = []
 
-  if (!result.ok) {
-    return {
-      success: false,
-      error: result.error || "Failed to fetch sponsors",
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const result = await strapiFetchWithQuery<{
+      data: Sponsor[]
+      meta?: { pagination?: { pageCount?: number } }
+    }>(
+      "/sponsors",
+      {},
+      {
+        sort: "name:asc",
+        populate: "logo",
+        "pagination[page]": String(page),
+        "pagination[pageSize]": String(PAGE_SIZE),
+      }
+    )
+
+    if (!result.ok) {
+      return {
+        success: false,
+        error: result.error || "Failed to fetch sponsors",
+      }
+    }
+
+    const batch = result.data?.data || []
+    sponsors.push(...batch)
+
+    const pageCount = result.data?.meta?.pagination?.pageCount
+    if (batch.length < PAGE_SIZE || (pageCount !== undefined && page >= pageCount)) {
+      break
     }
   }
 
   return {
     success: true,
-    data: result.data?.data || [],
+    data: sponsors,
   }
 }
 
