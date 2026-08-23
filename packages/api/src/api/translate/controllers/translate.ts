@@ -4,11 +4,19 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai"
 
-const LOCALE_NAMES: Record<string, string> = {
+/**
+ * Must list every locale in `packages/web/src/messages/`. A missing entry does
+ * not fail loudly — the code below falls back to the bare code, so the prompt
+ * became "translate from English to it", where "it" reads as the pronoun rather
+ * than Italian. Keep this in step when a locale is added.
+ */
+export const LOCALE_NAMES: Record<string, string> = {
   en: "English",
   fr: "French",
   es: "Spanish",
   de: "German",
+  it: "Italian",
+  pt: "Portuguese",
 }
 
 const DEFAULT_MODEL = "gemini-2.5-flash"
