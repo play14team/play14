@@ -10,6 +10,8 @@
   "permissions": {
     "allow": [
       "Bash(biome check:*)",
+      "Bash(graphify:*)",
+      "Bash(bash scripts/setup-graphify.sh:*)",
       "WebSearch",
       "WebFetch(domain:bun.com)",
       "WebFetch(domain:github.com)",
@@ -98,6 +100,24 @@
   "enabledMcpjsonServers": ["playwright"],
   "hooks": {
     "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'command -v graphify >/dev/null 2>&1 || exit 0; cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && graphify hook-guard search'"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'command -v graphify >/dev/null 2>&1 || exit 0; cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && graphify hook-guard read'"
+          }
+        ]
+      },
       {
         "matcher": "AskUserQuestion",
         "hooks": [
