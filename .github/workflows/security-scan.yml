@@ -70,30 +70,30 @@ jobs:
         # in the log but don't block PRs.
         # Advisories with a clean, non-breaking fix are pinned to patched
         # versions via root `overrides` (shell-quote, tmp, linkify-it,
-        # form-data) rather than ignored here.
+        # form-data, fast-uri, ip-address, nanoid, postcss, sharp,
+        # brace-expansion) rather than ignored here.
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
-        # transitive dep with no safe override; tracked for an upstream Strapi
-        # bump):
+        # transitive dep with no safe override, or has no published fix;
+        # tracked for an upstream Strapi bump):
         #   GHSA-r5fr-rjxr-66jc — lodash `_.template` code injection. The only
         #   fix bun's DB accepts is lodash >=4.17.24, an unofficial republish;
         #   lodash maintainers have not tagged past 4.17.21. We pin canonical
         #   4.17.21 via `overrides`; our code never calls `_.template`.
-        #   GHSA-p6gq-j5cr-w38f — nodemailer raw-option file read / SSRF. Only
-        #   reached via @strapi/provider-email-sendmail, which this app does
-        #   not use (a custom strapi-provider-email-sender is configured).
         #   GHSA-fx2h-pf6j-xcff — vite `server.fs.deny` bypass on Windows. Vite
         #   5.x is the Strapi admin builder; this is a dev-server-only,
         #   Windows-only path, irrelevant to our built admin on a Linux runtime.
-        #   GHSA-vmh5-mc38-953g / GHSA-vxpw-j846-p89q / GHSA-hm92-r4w5-c3mj —
-        #   undici SOCKS5/WebSocket issues. The vulnerable 7.25 line is a Strapi
-        #   internal; we don't use undici SOCKS5 proxying or its WS client.
-        #   GHSA-96hv-2xvq-fx4p — ws fragment-flood DoS. Reached only via a
-        #   Strapi-internal ws@7 consumer; bumping to 8.x breaks it.
-        #   GHSA-23hp-3jrh-7fpw — node-tar decompression/parse DoS. The whole
-        #   published line (<=7.5.18) is flagged, so there is no patched version
-        #   to override to; reached only via @strapi/strapi, its documentation
-        #   plugin and strapi-plugin-config-sync (server-side archive handling).
+        #   GHSA-vmh5-mc38-953g / GHSA-vxpw-j846-p89q — undici SOCKS5/WebSocket
+        #   issues. The vulnerable line is a Strapi internal; we don't use
+        #   undici SOCKS5 proxying or its WS client.
+        #   GHSA-hm92-r4w5-c3mj — undici. Same reasoning as above.
+        #   GHSA-4cwx-7wf7-3272 — undici cross-user disclosure via degenerate
+        #   private cache directives. Fix is undici >=7.29.0, but @strapi/core
+        #   pins undici to an exact 6.28.0 (outside the advisory range), so a
+        #   flat override would force Strapi's HTTP client across a major.
+        #   The flagged 7.x copy is reached only through isomorphic-dompurify →
+        #   jsdom, which we call to sanitize HTML strings server-side; it never
+        #   issues HTTP requests, so undici's response-cache path is unreachable.
         #   GHSA-gcfj-64vw-6mp9 — axios inherited-proxy-after-config-clone. Fix
         #   is axios >=1.18.0, but bumping the existing `^1.15.2` override forces
         #   a full re-resolve that floats unrelated transitives (parse5 → 8) under
@@ -102,23 +102,24 @@ jobs:
         #   GHSA-xcpc-8h2w-3j85 — adm-zip crafted-ZIP 4GB allocation. Vulnerable
         #   range is <0.6.0 and 0.6.0 is unreleased, so no override target; pulled
         #   only by strapi-plugin-config-sync's server-side config import.
-        #   GHSA-3jxr-9vmj-r5cp — brace-expansion {} expansion DoS. Two major
-        #   lines coexist in the tree (minimatch@3 needs v1, others v2), so no
-        #   single-version override is safe; all consumers are Strapi-internal.
-        #   GHSA-52cp-r559-cp3m — js-yaml merge-key quadratic CPU. The 3.x line
-        #   tops out at 3.14.1 with no fix; only js-yaml 4.x patches it, a
-        #   breaking bump of a @strapi/utils-internal dep.
+        #   GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq — image-size infinite loops
+        #   in the ICNS, JXL and HEIF parsers. No fix exists: the whole published
+        #   line (<=2.0.2) is flagged and 2.0.2 is latest. We call `imageSize` on
+        #   uploaded logo bytes in the custom venue/sponsor/event controllers, so
+        #   the parsers are reachable — but only over authenticated `/admin/*`
+        #   routes, limiting the blast radius to a DoS triggered by an already
+        #   trusted host user. TODO: gate `imageSize` behind a magic-byte
+        #   allowlist (PNG/JPEG/WebP/GIF) so the vulnerable parsers are never
+        #   entered, then drop these two ignores.
         run: >
           bun audit --prod --audit-level=high
           --ignore=GHSA-r5fr-rjxr-66jc
-          --ignore=GHSA-p6gq-j5cr-w38f
           --ignore=GHSA-fx2h-pf6j-xcff
           --ignore=GHSA-vmh5-mc38-953g
           --ignore=GHSA-vxpw-j846-p89q
           --ignore=GHSA-hm92-r4w5-c3mj
-          --ignore=GHSA-96hv-2xvq-fx4p
-          --ignore=GHSA-23hp-3jrh-7fpw
+          --ignore=GHSA-4cwx-7wf7-3272
           --ignore=GHSA-gcfj-64vw-6mp9
           --ignore=GHSA-xcpc-8h2w-3j85
-          --ignore=GHSA-3jxr-9vmj-r5cp
-          --ignore=GHSA-52cp-r559-cp3m
+          --ignore=GHSA-w3rx-r6r6-pgpr
+          --ignore=GHSA-5p2g-fcmc-qvqq
