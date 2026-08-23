@@ -34,3 +34,8 @@
 
 ## Agent Notes
 - Follow `CLAUDE.md` at the repo root and any package-level `CLAUDE.md` for deeper, package-specific guidance.
+
+## graphify
+- The repo ships a knowledge graph tool. Set it up once with `bun run graphify:setup` (needs [uv](https://docs.astral.sh/uv/); no API key).
+- When `graphify-out/graph.json` exists, answer codebase questions with `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` before falling back to grep. Run `graphify update .` after changing code.
+- `graphify-out/` is gitignored; the skill, rules, hooks, and `.graphifyignore` are committed. Non-Claude assistants can install their own copy of the skill with `graphify install --platform <name> --project`.

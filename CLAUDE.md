@@ -178,6 +178,31 @@ This repo ships specialised subagents and skills under `.claude/` to keep contri
 | `strapi-permissions-audit` | Detect silent 403s from missing entries in `packages/api/src/bootstrap/permissions/{actions,definitions}.ts`. Run after any change under `packages/api/src/api/*/routes/` or `controllers/`. |
 | `strapi-content-type-scaffolder` | Scaffold a new Strapi 5 content type end-to-end (schema, controller, service, router, permissions actions + definitions) so nothing is forgotten. |
 | `setup-strapi-mcp` | Set up Strapi's built-in MCP server and scaffold custom tools. Enables the server in `config/server.ts`, adds an inline dev-only tool in `src/index.ts`, and/or an RBAC-gated tool via the built `strapi-extended-mcp` plugin. Use to add more MCP tools. |
+| `graphify` | Build and query a knowledge graph of the repo. `/graphify .` builds, `graphify query/path/explain` answers architecture questions from the graph instead of guessing at grep patterns. |
+
+### Knowledge graph (graphify)
+
+[graphify](https://github.com/Graphify-Labs/graphify) parses the repo with tree-sitter into a queryable graph (~7.3k nodes / 11.5k edges here) so architecture questions get answered from real call/import/inherit edges rather than keyword matches.
+
+Setup — one command, on any clone:
+
+```bash
+bun run graphify:setup            # uv tool install + first build
+bun run graphify:setup --hooks    # + rebuild the graph on commit/checkout
+bun run graphify:setup --postgres # + index the local PG 17 schema alongside the code
+```
+
+What is committed vs local:
+
+- **Committed**: the skill (`.claude/skills/graphify/`, pinned to the version in `.graphify-version`), the always-on rules (the `## graphify` section below), the PreToolUse hooks in `.claude/settings.json`, `.graphifyignore`, and `scripts/setup-graphify.sh`.
+- **Local, gitignored**: `graphify-out/` — a 5 MB `graph.json` that would churn on every commit. Each clone builds its own; see `.gitignore` for how to flip to a shared team graph.
+
+Notes:
+
+- The hooks are PATH-guarded (`command -v graphify || exit 0`), so a clone that has not run the setup script is unaffected — no failing hooks, no noise.
+- `scripts/setup-graphify.sh` deliberately does *not* run `graphify install --project`. That installer hardcodes an absolute exe path into `.claude/settings.json` and rewrites CLAUDE.md; this repo keeps portable, reviewed versions of both. The script instead syncs the skill body straight out of the installed wheel, so a `--upgrade` still refreshes it.
+- `bun run graphify:setup` builds code only (AST, no API key, no cost). Run `/graphify .` in Claude Code for the full pass — it adds docs, specs and PDFs, and names communities with the session model.
+- `.graphifyignore` keeps design binaries, images, generated Strapi types and the Grafana dashboards out of the corpus. Add to it rather than widening `.gitignore`.
 
 ### Handoff map
 
@@ -242,4 +267,15 @@ The container uses the official Stripe CLI image and forwards webhook events to 
 - `packages/api/src/api/ticket-order/controllers/webhook.ts` - Webhook handler
 - `packages/api/src/api/stripe-account/` - Connected accounts management
 - `docs/specs/stripe-connect-ticketing.md` - Full technical specification
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- If graphify-out/ is missing, the clone has not been set up yet: run `bun run graphify:setup` (one command, no API key).
 

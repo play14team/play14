@@ -55,6 +55,17 @@ Start the web frontend (in a separate terminal):
 bun run web
 ```
 
+### Knowledge graph (optional, for AI coding assistants)
+
+[graphify](https://github.com/Graphify-Labs/graphify) turns the repo into a queryable knowledge graph so Claude Code (and other assistants) answer architecture questions from real call/import edges instead of grep guesses. The skill and config are committed; the graph itself is built locally:
+
+```bash
+bun run graphify:setup            # uv tool install + first build (no API key needed)
+graphify query "how does a ticket order reach Stripe?"
+```
+
+Needs [uv](https://docs.astral.sh/uv/). See the "Knowledge graph (graphify)" section in [CLAUDE.md](CLAUDE.md) for the full setup, flags, and what is committed vs local.
+
 ### Container Development
 
 Start all services with Podman:

@@ -125,3 +125,17 @@ BACKLOG.md
 *.dump
 
 packages/videos/out
+
+############################
+# graphify knowledge graph
+############################
+
+# Built graph artifacts. Everyone rebuilds locally via `bun run graphify:setup`
+# (first build) or `graphify update .` (incremental, AST-only, no API cost).
+# To switch to a shared team graph instead: stop ignoring graphify-out/graph.json
+# and graphify-out/GRAPH_REPORT.md, then run `graphify hook install` so the
+# union merge driver keeps graph.json conflict-free.
+graphify-out/
+
+# Rolling backup graphify writes before it edits a Claude settings file.
+*.graphify-bak
