@@ -4,7 +4,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import NextTopLoader from "nextjs-toploader"
 import ScrollToTop from "@/components/utils/scroll-to-top"
-import { routing } from "@/i18n/routing"
+import { ogLocales, routing } from "@/i18n/routing"
 
 type Props = {
   children: React.ReactNode
@@ -45,13 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           alt: "play14 logo transparent background",
         },
       ],
-      locale:
-        (
-          { en: "en_US", fr: "fr_FR", es: "es_ES", de: "de_DE", it: "it_IT" } as Record<
-            string,
-            string
-          >
-        )[locale] || "en_US",
+      locale: ogLocales[locale] || "en_US",
       type: "website",
     },
     alternates: {

@@ -1474,7 +1474,10 @@
       "eventImages": "Veranstaltungsbilder",
       "eventImagesDescription": "Lade Bilder hoch, um deine Veranstaltung zu präsentieren. Füge ein Standardbild für Auflistungen und Galeriebilder für die Veranstaltungsseite hinzu.",
       "eventSchedule": "Veranstaltungszeitplan",
-      "eventScheduleDescription": "Definiere den tageweisen Zeitplan für deine Veranstaltung. Füge Zeitfenster mit Beschreibungen für jeden Tag hinzu."
+      "eventScheduleDescription": "Definiere den tageweisen Zeitplan für deine Veranstaltung. Füge Zeitfenster mit Beschreibungen für jeden Tag hinzu.",
+      "translationQuotaReached": "Tageslimit für Übersetzungen erreicht. Versuch es morgen wieder.",
+      "translationFailed": "Übersetzung fehlgeschlagen. Versuch es noch einmal.",
+      "translationNotAuthenticated": "Deine Sitzung ist abgelaufen. Melde dich erneut an, um zu übersetzen."
     },
     "translation": {
       "unsavedChangesWarning": "Du hast ungespeicherte Änderungen in dieser Sprache. Möchtest du sie speichern, bevor du wechselst?",

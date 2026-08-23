@@ -25,3 +25,17 @@ export const localeShortLabels: Record<string, string> = {
   it: "IT",
   pt: "PT",
 }
+
+/**
+ * OpenGraph `og:locale` values. Lives here with the other locale maps so it is
+ * updated alongside them — it previously sat inline in the root layout and had
+ * already drifted, leaving Portuguese pages advertising themselves as en_US.
+ */
+export const ogLocales: Record<string, string> = {
+  en: "en_US",
+  fr: "fr_FR",
+  es: "es_ES",
+  de: "de_DE",
+  it: "it_IT",
+  pt: "pt_PT",
+}
