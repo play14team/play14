@@ -223,6 +223,13 @@ const nextConfig = {
   },
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
+    // Dart Sass prepends a UTF-8 BOM to its output when the compiled CSS
+    // contains non-ASCII characters. That pushes the Google Fonts `@import` in
+    // styles/scss/style.scss off byte 0, and Turbopack's CSS parser rejects it
+    // ("Unexpected token AtKeyword(import)") because @import must come first.
+    // The declaration is redundant anyway — Next serves CSS as
+    // `text/css; charset=utf-8`.
+    charset: false,
   },
 }
 
