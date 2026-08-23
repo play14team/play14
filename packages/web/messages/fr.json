@@ -2249,7 +2249,11 @@
       "creating": "Création...",
       "createSponsor": "Créer le sponsor",
       "failedToCreate": "Impossible de créer le sponsor",
-      "removeSponsor": "Retirer le sponsor"
+      "removeSponsor": "Retirer le sponsor",
+      "removeCategory": "Retirer la catégorie {category}",
+      "nameRequiredError": "Le nom est obligatoire",
+      "duplicateHint": "Un sponsor nommé « {name} » existe déjà.",
+      "useExisting": "Utiliser l’existant"
     },
     "finance": {
       "revenue": "Revenus",
