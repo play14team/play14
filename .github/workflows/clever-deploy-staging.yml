@@ -30,14 +30,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Set up Node.js for clever-tools
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
       - name: Install clever-tools
-        run: npm install -g clever-tools@3
+        run: npm install -g clever-tools@4
 
       - name: Authenticate with Clever Cloud
         env:
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
         run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+
+      - name: Verify Clever Cloud authentication
+        # `clever login` only writes a local config file; it never contacts the
+        # API, so a bad token still "succeeds" here and surfaces as an opaque
+        # `HTTP error 401` from `clever deploy` several steps later. `clever
+        # profile` is the cheapest call that actually authenticates, so failing
+        # on it points straight at the credentials.
+        run: clever profile
 
       - name: Stop staging API
         env:
@@ -137,14 +150,27 @@ jobs:
           ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
 
+      - name: Set up Node.js for clever-tools
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
       - name: Install clever-tools
-        run: npm install -g clever-tools@3
+        run: npm install -g clever-tools@4
 
       - name: Authenticate with Clever Cloud
         env:
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
         run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+
+      - name: Verify Clever Cloud authentication
+        # `clever login` only writes a local config file; it never contacts the
+        # API, so a bad token still "succeeds" here and surfaces as an opaque
+        # `HTTP error 401` from `clever deploy` several steps later. `clever
+        # profile` is the cheapest call that actually authenticates, so failing
+        # on it points straight at the credentials.
+        run: clever profile
 
       - name: Link Clever Cloud staging app
         env:
@@ -219,14 +245,27 @@ jobs:
           ref: ${{ github.head_ref || github.ref }}
           fetch-depth: 0
 
+      - name: Set up Node.js for clever-tools
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
       - name: Install clever-tools
-        run: npm install -g clever-tools@3
+        run: npm install -g clever-tools@4
 
       - name: Authenticate with Clever Cloud
         env:
           CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
           CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
         run: clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
+
+      - name: Verify Clever Cloud authentication
+        # `clever login` only writes a local config file; it never contacts the
+        # API, so a bad token still "succeeds" here and surfaces as an opaque
+        # `HTTP error 401` from `clever deploy` several steps later. `clever
+        # profile` is the cheapest call that actually authenticates, so failing
+        # on it points straight at the credentials.
+        run: clever profile
 
       - name: Link Clever Cloud staging app
         env:
