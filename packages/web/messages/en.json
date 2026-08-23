@@ -1916,7 +1916,10 @@
       "eventImages": "Event images",
       "eventImagesDescription": "Upload images to showcase your event. Add a default image for listings and gallery images for the event page.",
       "eventSchedule": "Event schedule",
-      "eventScheduleDescription": "Define the day-by-day schedule for your event. Add timeslots with descriptions for each day."
+      "eventScheduleDescription": "Define the day-by-day schedule for your event. Add timeslots with descriptions for each day.",
+      "translationQuotaReached": "Daily translation limit reached. Try again tomorrow.",
+      "translationFailed": "Translation failed. Please try again.",
+      "translationNotAuthenticated": "Your session expired. Sign in again to translate."
     },
     "translation": {
       "unsavedChangesWarning": "You have unsaved changes in this language. Do you want to save them before switching?",

@@ -1916,7 +1916,10 @@
       "eventImages": "Immagini evento",
       "eventImagesDescription": "Carica immagini per presentare il tuo evento. Aggiungi un'immagine predefinita per gli elenchi e immagini della galleria per la pagina evento.",
       "eventSchedule": "Programma evento",
-      "eventScheduleDescription": "Definisci il programma giorno per giorno del tuo evento. Aggiungi fasce orarie con descrizioni per ogni giorno."
+      "eventScheduleDescription": "Definisci il programma giorno per giorno del tuo evento. Aggiungi fasce orarie con descrizioni per ogni giorno.",
+      "translationQuotaReached": "Hai raggiunto il limite giornaliero di traduzione. Riprova domani.",
+      "translationFailed": "Traduzione non riuscita. Riprova.",
+      "translationNotAuthenticated": "La tua sessione è scaduta. Accedi di nuovo per tradurre."
     },
     "translation": {
       "unsavedChangesWarning": "Hai modifiche non salvate in questa lingua. Vuoi salvarle prima di cambiare?",

@@ -2,7 +2,7 @@ import { readdirSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
-import { LOCALE_NAMES } from "./translate"
+import { isQuotaExhausted, LOCALE_NAMES } from "./translate"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const MESSAGES_DIR = resolve(here, "../../../../../web/messages")
@@ -36,5 +36,26 @@ describe("LOCALE_NAMES", () => {
 
   it("names Portuguese explicitly", () => {
     expect(LOCALE_NAMES.pt).toBe("Portuguese")
+  })
+})
+
+describe("isQuotaExhausted", () => {
+  // Real shapes the @google/generative-ai SDK surfaces for a spent free tier.
+  it.each([
+    "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com: [429 Too Many Requests]",
+    "429 RESOURCE_EXHAUSTED: Quota exceeded for quota metric 'Generate requests'",
+    "You exceeded your current quota, please check your plan and billing details",
+    "Resource has been exhausted (e.g. check quota)",
+  ])("recognises %s", (message) => {
+    expect(isQuotaExhausted(message)).toBe(true)
+  })
+
+  it.each([
+    "Translation timed out",
+    "[GoogleGenerativeAI Error]: [400 Bad Request] Invalid JSON payload",
+    "fetch failed",
+    "[503 Service Unavailable] The model is overloaded",
+  ])("does not claim quota for %s", (message) => {
+    expect(isQuotaExhausted(message)).toBe(false)
   })
 })

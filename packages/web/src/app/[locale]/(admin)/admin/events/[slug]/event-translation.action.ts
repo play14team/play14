@@ -81,8 +81,14 @@ export async function updateEventLocalization(
   }
 }
 
+/** Why a translation attempt did not produce text, for the UI to phrase. */
+export type TranslationFailure = "quota" | "unauthenticated" | "failed"
+
 /**
- * Translate description using Gemini
+ * Translate description using Gemini.
+ *
+ * Returns a `reason` rather than a message: the copy lives in the locale files,
+ * so a server action must not decide the wording.
  */
 export async function translateWithGemini(
   text: string,
@@ -92,7 +98,7 @@ export async function translateWithGemini(
   const token = await getAuthCookie()
 
   if (!token) {
-    return { success: false, error: "Not authenticated" as const }
+    return { success: false, reason: "unauthenticated" as const }
   }
 
   try {
@@ -111,15 +117,22 @@ export async function translateWithGemini(
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
+      const errorData = await response.json().catch(() => null)
       console.error("Translation error:", errorData)
-      return { success: false, error: "Translation failed" as const }
+
+      // The daily Gemini quota is the one failure an editor can act on, so it
+      // gets its own reason rather than being flattened into "failed".
+      if (response.status === 429 || errorData?.error?.name === "QuotaExhaustedError") {
+        return { success: false, reason: "quota" as const }
+      }
+
+      return { success: false, reason: "failed" as const }
     }
 
     const data = await response.json()
     return { success: true, translation: data.translation as string }
   } catch (error) {
     console.error("Error translating:", error)
-    return { success: false, error: "Translation failed" as const }
+    return { success: false, reason: "failed" as const }
   }
 }

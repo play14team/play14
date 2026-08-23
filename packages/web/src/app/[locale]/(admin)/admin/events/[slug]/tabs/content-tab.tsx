@@ -90,7 +90,14 @@ export default function ContentTab({
           }
         }
       } else {
-        toast.error(result.error || "Translation failed")
+        // The daily quota is the one outcome the editor can act on, so it gets
+        // its own message instead of a generic failure.
+        const messages = {
+          quota: t("translationQuotaReached"),
+          unauthenticated: t("translationNotAuthenticated"),
+          failed: t("translationFailed"),
+        } as const
+        toast.error(messages[result.reason ?? "failed"])
       }
     } finally {
       setIsTranslating(false)

@@ -1916,7 +1916,10 @@
       "eventImages": "Imagens do evento",
       "eventImagesDescription": "Carrega imagens para dar destaque ao teu evento. Adiciona uma imagem por defeito para as listagens e imagens de galeria para a página do evento.",
       "eventSchedule": "Programa do evento",
-      "eventScheduleDescription": "Define o programa dia a dia do teu evento. Adiciona blocos horários com descrições para cada dia."
+      "eventScheduleDescription": "Define o programa dia a dia do teu evento. Adiciona blocos horários com descrições para cada dia.",
+      "translationQuotaReached": "Atingiste o limite diário de tradução. Tenta outra vez amanhã.",
+      "translationFailed": "A tradução falhou. Tenta outra vez.",
+      "translationNotAuthenticated": "A tua sessão expirou. Inicia sessão outra vez para traduzir."
     },
     "translation": {
       "unsavedChangesWarning": "Tens alterações por guardar neste idioma. Queres guardá-las antes de mudar?",

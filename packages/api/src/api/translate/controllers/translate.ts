@@ -22,6 +22,19 @@ export const LOCALE_NAMES: Record<string, string> = {
 const DEFAULT_MODEL = "gemini-2.5-flash"
 const GEMINI_TIMEOUT_MS = 60000
 
+/**
+ * Recognises Gemini's daily-quota rejection.
+ *
+ * The SDK surfaces it as a plain Error whose message carries the HTTP status
+ * and the API's status name, so string matching is the only option. Matched
+ * broadly on purpose: mistaking another 429 for a quota problem still tells the
+ * editor something true (too many requests, wait), whereas missing a real quota
+ * error puts them back to guessing at "Translation failed".
+ */
+export function isQuotaExhausted(message: string): boolean {
+  return /429|RESOURCE_EXHAUSTED|quota|rate.?limit/i.test(message)
+}
+
 async function withTimeout<T>(promise: Promise<T>): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout>
   const timeoutPromise = new Promise<never>((_, reject) => {
@@ -94,6 +107,22 @@ ${text}`,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
+
+      if (isQuotaExhausted(message)) {
+        // Gemini's free tier resets daily, so this is worth telling the editor
+        // apart from a genuine failure — they only need to come back tomorrow.
+        strapi.log.warn(`[Translate] Gemini quota exhausted: ${message}`)
+        ctx.status = 429
+        ctx.body = {
+          error: {
+            status: 429,
+            name: "QuotaExhaustedError",
+            message: "Daily translation quota reached",
+          },
+        }
+        return
+      }
+
       strapi.log.error("Translation error:", message)
       return ctx.internalServerError("Translation failed")
     }

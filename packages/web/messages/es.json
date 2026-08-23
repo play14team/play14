@@ -1916,7 +1916,10 @@
       "eventImages": "Imágenes del evento",
       "eventImagesDescription": "Sube imágenes para mostrar tu evento. Añade una imagen predeterminada para los listados e imágenes de galería para la página del evento.",
       "eventSchedule": "Horario del evento",
-      "eventScheduleDescription": "Define el horario día a día de tu evento. Añade franjas horarias con descripciones para cada día."
+      "eventScheduleDescription": "Define el horario día a día de tu evento. Añade franjas horarias con descripciones para cada día.",
+      "translationQuotaReached": "Has alcanzado el límite diario de traducción. Inténtalo mañana.",
+      "translationFailed": "La traducción ha fallado. Inténtalo de nuevo.",
+      "translationNotAuthenticated": "Tu sesión ha caducado. Vuelve a iniciar sesión para traducir."
     },
     "translation": {
       "unsavedChangesWarning": "Tienes cambios sin guardar en este idioma. ¿Quieres guardarlos antes de cambiar?",
