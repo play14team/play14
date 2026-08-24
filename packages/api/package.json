@@ -56,7 +56,7 @@
     "@types/pdfkit": "^0.17.6",
     "ics": "^3.12.0",
     "image-size": "^2.0.2",
-    "ioredis": "^5.11.1",
+    "ioredis": "^6.0.0",
     "isomorphic-dompurify": "^3.19.0",
     "pdfkit": "^0.19.1",
     "pg": "^8.22.0",
