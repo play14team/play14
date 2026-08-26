@@ -30,10 +30,20 @@ load_env() {
     # Already set in the environment: leave it alone.
     [ -n "${!key+x}" ] && continue
     value="${line#*=}"
-    # Strip one layer of matching surrounding quotes.
     case "$value" in
+      # Quoted: take the contents verbatim, comment characters included.
       \"*\") value="${value#\"}"; value="${value%\"}" ;;
       \'*\') value="${value#\'}"; value="${value%\'}" ;;
+      *)
+        # Unquoted: drop a trailing inline comment, which sourcing used to
+        # handle for free. Only ` #` counts, so a value like pass#word
+        # survives — same rule the shell applies.
+        case "$value" in
+          *' #'*) value="${value%% #*}" ;;
+        esac
+        # Trailing whitespace would otherwise end up inside the value.
+        value="${value%"${value##*[![:space:]]}"}"
+        ;;
     esac
     export "$key=$value"
   done < "$file"
