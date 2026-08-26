@@ -85,15 +85,14 @@ jobs:
         # Advisories with a clean, non-breaking fix are pinned to patched
         # versions via root `overrides` (shell-quote, tmp, linkify-it,
         # form-data, fast-uri, ip-address, nanoid, postcss, sharp,
-        # brace-expansion) rather than ignored here.
+        # brace-expansion, axios, lodash/lodash-es) rather than ignored here.
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
         # transitive dep with no safe override, or has no published fix;
-        # tracked for an upstream Strapi bump):
-        #   GHSA-r5fr-rjxr-66jc — lodash `_.template` code injection. The only
-        #   fix bun's DB accepts is lodash >=4.17.24, an unofficial republish;
-        #   lodash maintainers have not tagged past 4.17.21. We pin canonical
-        #   4.17.21 via `overrides`; our code never calls `_.template`.
+        # tracked for an upstream Strapi bump). Re-check this list after any
+        # dependency bump and drop the entries an override has since fixed —
+        # `bun audit` says nothing about an ignore that no longer matches, so
+        # dead entries accumulate silently and hide the live ones:
         #   GHSA-fx2h-pf6j-xcff — vite `server.fs.deny` bypass on Windows. Vite
         #   5.x is the Strapi admin builder; this is a dev-server-only,
         #   Windows-only path, irrelevant to our built admin on a Linux runtime.
@@ -105,14 +104,10 @@ jobs:
         #   private cache directives. Fix is undici >=7.29.0, but @strapi/core
         #   pins undici to an exact 6.28.0 (outside the advisory range), so a
         #   flat override would force Strapi's HTTP client across a major.
-        #   The flagged 7.x copy is reached only through isomorphic-dompurify →
-        #   jsdom, which we call to sanitize HTML strings server-side; it never
-        #   issues HTTP requests, so undici's response-cache path is unreachable.
-        #   GHSA-gcfj-64vw-6mp9 — axios inherited-proxy-after-config-clone. Fix
-        #   is axios >=1.18.0, but bumping the existing `^1.15.2` override forces
-        #   a full re-resolve that floats unrelated transitives (parse5 → 8) under
-        #   the pinned-bun mismatch, against this repo's controlled-bump policy.
-        #   Reached only via Strapi-internal plugins; we set no untrusted proxy.
+        #   The flagged 7.x copy is pulled by cheerio, which we use for HTML
+        #   parsing only; it never issues HTTP requests, so undici's
+        #   response-cache path is unreachable. (isomorphic-dompurify → jsdom 30
+        #   now resolves undici 8.x, outside the advisory range entirely.)
         #   GHSA-xcpc-8h2w-3j85 — adm-zip crafted-ZIP 4GB allocation. Vulnerable
         #   range is <0.6.0 and 0.6.0 is unreleased, so no override target; pulled
         #   only by strapi-plugin-config-sync's server-side config import.
@@ -127,13 +122,11 @@ jobs:
         #   entered, then drop these two ignores.
         run: >
           bun audit --prod --audit-level=high
-          --ignore=GHSA-r5fr-rjxr-66jc
           --ignore=GHSA-fx2h-pf6j-xcff
           --ignore=GHSA-vmh5-mc38-953g
           --ignore=GHSA-vxpw-j846-p89q
           --ignore=GHSA-hm92-r4w5-c3mj
           --ignore=GHSA-4cwx-7wf7-3272
-          --ignore=GHSA-gcfj-64vw-6mp9
           --ignore=GHSA-xcpc-8h2w-3j85
           --ignore=GHSA-w3rx-r6r6-pgpr
           --ignore=GHSA-5p2g-fcmc-qvqq

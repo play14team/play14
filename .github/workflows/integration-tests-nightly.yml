@@ -41,15 +41,17 @@ jobs:
     env:
       NODE_ENV: test
 
-      # Database — the API's test setup (src/test-utils/strapi-test-instance.ts)
-      # respects DATABASE_* when already set, so these win over the 5433 defaults.
-      DATABASE_CLIENT: postgres
-      DATABASE_HOST: localhost
-      DATABASE_PORT: "5432"
-      DATABASE_NAME: play14_test
-      DATABASE_USERNAME: test_user
-      DATABASE_PASSWORD: test_password
-      DATABASE_SSL: "false"
+      # Database — TEST_DATABASE_* is the prefix config/env/test/database.ts
+      # reads (DATABASE_* is the development app's, and is deliberately not
+      # consulted for tests). The API's test setup
+      # (src/test-utils/strapi-test-instance.ts) leaves whatever is already set
+      # alone, so these win over its 5433 defaults. The Postgres service
+      # container above publishes 5432 on the runner.
+      TEST_DATABASE_HOST: localhost
+      TEST_DATABASE_PORT: "5432"
+      TEST_DATABASE_NAME: play14_test
+      TEST_DATABASE_USERNAME: test_user
+      TEST_DATABASE_PASSWORD: test_password
 
       # Strapi runtime secrets — dummy values are sufficient for ephemeral
       # single-run CI; nothing persists between jobs.
