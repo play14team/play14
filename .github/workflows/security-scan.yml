@@ -23,7 +23,14 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: security-scan-${{ github.ref }}
+  # The event action is part of the group so the runs `edited` produces —
+  # which the jobs below skip unless the base branch changed — cannot cancel a
+  # real `synchronize` run. Without it, editing a PR's title or description
+  # while its scan is still running kills that scan and leaves only a skipped
+  # run behind, so the head commit ends up never actually scanned. Concurrency
+  # is evaluated before any job-level `if`, so it has to be handled here.
+  # Successive pushes still cancel each other: they share the action.
+  group: security-scan-${{ github.ref }}-${{ github.event.action }}
   cancel-in-progress: true
 
 jobs:
