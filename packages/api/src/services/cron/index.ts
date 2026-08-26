@@ -13,6 +13,13 @@ export {
 export { cleanOldEmailLogs } from "./email-logs"
 export { processEventResultsReminders } from "./event-results-reminders"
 export { updateEventStatus } from "./events"
+export {
+  decideFinding,
+  linkedinUrlOf,
+  markedAssetId,
+  parsePhotoUrl,
+  reportLinkedinAvatarCandidates,
+} from "./linkedin-avatars"
 export { decideReconciliation, reconcileNewsletterSends } from "./newsletter-reconciliation"
 
 export { updatePlayerPositions } from "./players"

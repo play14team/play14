@@ -22,6 +22,7 @@ import {
   cleanOldEmailLogs,
   processEventResultsReminders,
   reconcileNewsletterSends,
+  reportLinkedinAvatarCandidates,
   reservationHealthCheck,
   updateEventStatus,
   updatePlayerPositions,
@@ -211,6 +212,21 @@ const cronTasks = {
       })
     ),
     options: { rule: "0 0 6 * * *" },
+  },
+
+  // Monthly, 1st at 03:00 - Report (never apply) player avatars that LinkedIn
+  // could improve. Off unless LINKEDIN_AVATAR_REPORT_ENABLED=true. Applying is
+  // a human step: bun run avatars:sync. See services/cron/linkedin-avatars.ts
+  // for why this deliberately does not write.
+  linkedinAvatarReport: {
+    task: withLock(
+      "linkedinAvatarReport",
+      withErrorReporting("linkedinAvatarReport", async ({ strapi }) => {
+        await reportLinkedinAvatarCandidates(strapi!)
+      }),
+      15 * 60 * 1000 // one Linked API workflow per player, each polled for up to 90s
+    ),
+    options: { rule: "0 0 3 1 * *" },
   },
 
   // Daily at 02:30 - Purge email-log rows older than 90 days

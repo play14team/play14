@@ -141,6 +141,17 @@ when scaled out (see `src/services/cron/distributed-lock.ts`).
 - Founders are immutable
 - Uses populated relations to check event counts
 
+**LinkedIn Avatar Report** (monthly, 1st at 03:00 UTC, off by default):
+
+- Reports players whose avatar LinkedIn could improve — missing, stale (member
+  changed their photo), or lower-resolution than what is now offered
+- **Never writes.** Applying is a manual step: `bun run avatars:sync` from the
+  repo root. `src/services/cron/linkedin-avatars.ts` documents why
+- Avatars uploaded by this tooling carry a `linkedin:<assetId>` caption; anything
+  without that marker is a human upload and is left alone
+- Requires `LINKEDIN_AVATAR_REPORT_ENABLED=true` plus `LINKEDAPI_TOKEN` and
+  `LINKEDAPI_IDENTIFICATION_TOKEN`; capped by `LINKEDIN_AVATAR_REPORT_LIMIT`
+
 **Note**: Cron is disabled in production by default (`CRON_ENABLED=false` in `config/env/production/server.ts`). Enable with environment variable.
 
 ### GitHub Actions Integration
