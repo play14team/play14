@@ -1,0 +1,11 @@
+// Full type-check surface, including the co-located `*.test.ts(x)` files that
+// tsconfig.json has to exclude so `next build` can run on Clever Cloud without
+// devDependencies installed. Used by `bun run typecheck` and the pre-commit
+// hook, where devDependencies (vitest included) are present.
+//
+// Mirrors the packages/api split between tsconfig.json and
+// tsconfig.typecheck.json.
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", "playwright.config.ts", "vitest.config.mts", "e2e/**", "tests/**"]
+}

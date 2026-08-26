@@ -8,7 +8,7 @@
     "start": "HOSTNAME=0.0.0.0 bun .next/standalone/packages/web/server.js",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "format": "biome format --write src",
     "check": "biome check .",
     "dev": "bun develop",

@@ -30,5 +30,19 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "playwright.config.ts", "vitest.config.mts", "e2e/**", "tests/**"]
+  // Co-located `*.test.ts(x)` files are excluded here because this is the
+  // tsconfig `next build` uses, and Clever Cloud builds after
+  // `bun install --omit dev` — so vitest is not installed and every
+  // `import { … } from "vitest"` fails to resolve. Tests are still fully
+  // type-checked: `bun run typecheck` uses tsconfig.typecheck.json, which adds
+  // them back.
+  "exclude": [
+    "node_modules",
+    "playwright.config.ts",
+    "vitest.config.mts",
+    "e2e/**",
+    "tests/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }
