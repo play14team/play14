@@ -32,21 +32,22 @@ export async function setupStrapiTestInstance(): Promise<Core.Strapi> {
   // Set test environment - must be set before Strapi loads
   process.env.NODE_ENV = "test"
 
-  // PostgreSQL test database configuration
-  // Respects environment variables if already set (e.g., by CI), otherwise uses defaults
-  // CI sets DATABASE_* directly, local dev can use TEST_DATABASE_* for overrides
-  process.env.DATABASE_CLIENT = "postgres"
-  process.env.DATABASE_HOST =
-    process.env.DATABASE_HOST || process.env.TEST_DATABASE_HOST || "localhost"
-  process.env.DATABASE_PORT = process.env.DATABASE_PORT || process.env.TEST_DATABASE_PORT || "5433"
-  process.env.DATABASE_NAME =
-    process.env.DATABASE_NAME || process.env.TEST_DATABASE_NAME || "play14_test"
-  process.env.DATABASE_USERNAME =
-    process.env.DATABASE_USERNAME || process.env.TEST_DATABASE_USERNAME || "test_user"
-  process.env.DATABASE_PASSWORD =
-    process.env.DATABASE_PASSWORD || process.env.TEST_DATABASE_PASSWORD || "test_password"
-  process.env.DATABASE_SCHEMA = process.env.DATABASE_SCHEMA || "public"
-  process.env.DATABASE_SSL = process.env.DATABASE_SSL || "false"
+  // PostgreSQL test database configuration.
+  //
+  // These are TEST_DATABASE_* on purpose: config/env/test/database.ts reads
+  // only that prefix, so the DATABASE_* values in packages/api/.env can never
+  // point an integration run at the development database. Setting DATABASE_*
+  // here would be read by nothing.
+  //
+  // Whatever is already set wins (a CI job's env, or a local override for a
+  // remapped PLAY14_DB_TEST_PORT); the defaults match the play14-db-test
+  // container in compose.yaml.
+  process.env.TEST_DATABASE_HOST = process.env.TEST_DATABASE_HOST || "localhost"
+  process.env.TEST_DATABASE_PORT = process.env.TEST_DATABASE_PORT || "5433"
+  process.env.TEST_DATABASE_NAME = process.env.TEST_DATABASE_NAME || "play14_test"
+  process.env.TEST_DATABASE_USERNAME = process.env.TEST_DATABASE_USERNAME || "test_user"
+  process.env.TEST_DATABASE_PASSWORD = process.env.TEST_DATABASE_PASSWORD || "test_password"
+  process.env.TEST_DATABASE_SCHEMA = process.env.TEST_DATABASE_SCHEMA || "public"
 
   // Stripe environment variables (used by mock provider detection)
   // The actual Stripe SDK won't be used since NODE_ENV=test triggers mock provider
