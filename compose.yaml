@@ -8,7 +8,7 @@ services:
     env_file:
       - ./packages/web/.env.local
     ports:
-      - "3000:3000"
+      - "${PLAY14_WEB_PORT:-3000}:3000"
     volumes:
       - ./packages/web/src:/app/packages/web/src:z
       - ./packages/web/public:/app/packages/web/public:z
@@ -54,7 +54,9 @@ services:
       DATABASE_HOST: play14-db
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PORT: ${DATABASE_PORT}
+      # Container-network port, not the host mapping: remapping
+      # PLAY14_DB_PORT must not change how this container reaches play14-db.
+      DATABASE_PORT: 5432
       JWT_SECRET: ${JWT_SECRET}
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
@@ -68,8 +70,8 @@ services:
       - ./packages/api/.env:/app/packages/api/.env
       - ./packages/api/public/uploads:/app/packages/api/public/uploads
     ports:
-      - "1337:1337"
-      - "9000:9000"
+      - "${PLAY14_API_PORT:-1337}:1337"
+      - "${PLAY14_API_METRICS_PORT:-9000}:9000"
     networks:
       - play14-api
     depends_on:
@@ -88,7 +90,7 @@ services:
     volumes:
       - play14-data:/var/lib/postgresql/data/
     ports:
-      - "5432:5432"
+      - "${PLAY14_DB_PORT:-5432}:5432"
     networks:
       - play14-api
 
@@ -102,7 +104,7 @@ services:
       POSTGRES_PASSWORD: test_password
       POSTGRES_DB: play14_test
     ports:
-      - "5433:5432"
+      - "${PLAY14_DB_TEST_PORT:-5433}:5432"
     networks:
       - play14-api
     # No volume - data is ephemeral for tests
@@ -117,7 +119,7 @@ services:
     image: docker.io/library/redis:7-alpine
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${PLAY14_REDIS_PORT:-6379}:6379"
     networks:
       - play14-api
     healthcheck:
@@ -127,8 +129,8 @@ services:
       retries: 3
 
   # S3-compatible local object storage — mirrors the Cellar add-on we use in
-  # Clever Cloud staging/prod. Host port 9100 (not 9000 — that collides with
-  # the Strapi Prometheus metrics server on play14-api).
+  # Clever Cloud staging/prod. Host port defaults to 9100 (not 9000 — that
+  # collides with the Strapi Prometheus metrics server on play14-api).
   play14-minio:
     container_name: play14-minio
     image: docker.io/minio/minio:latest
@@ -138,8 +140,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     ports:
-      - "9100:9000"
-      - "9101:9001"
+      - "${PLAY14_MINIO_PORT:-9100}:9000"
+      - "${PLAY14_MINIO_CONSOLE_PORT:-9101}:9001"
     volumes:
       - minio-data:/data
     networks:
@@ -186,7 +188,7 @@ services:
     command:
       [
         "-c",
-        "stripe listen --forward-to http://localhost:1337/api/webhooks/stripe --api-key $$STRIPE_SECRET_KEY",
+        "stripe listen --forward-to http://localhost:${PLAY14_API_PORT:-1337}/api/webhooks/stripe --api-key $$STRIPE_SECRET_KEY",
       ]
     env_file:
       - packages/api/.env
@@ -199,7 +201,7 @@ services:
       context: ./packages/design
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "${PLAY14_DESIGN_PORT:-8080}:80"
     restart: unless-stopped
 
   pgadmin:
@@ -207,7 +209,7 @@ services:
     image: docker.io/dpage/pgadmin4:latest
     restart: unless-stopped
     ports:
-      - "5050:80"
+      - "${PLAY14_PGADMIN_PORT:-5050}:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@play14.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
