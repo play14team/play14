@@ -2,6 +2,16 @@ name: Security scan
 
 on:
   pull_request:
+    # `edited` is here so retargeting a PR onto main runs the scan. Without it
+    # a PR opened against another branch and later rebased onto main never
+    # emits an event this workflow listens for: the `opened` event was filtered
+    # out by `branches: [main]`, and a base change emits only `edited`.
+    #
+    # `edited` also fires on every title and body change, so each job is gated
+    # on `github.event.changes.base` to keep description edits from re-running
+    # the scan. The other three types are GitHub's default set, respelled here
+    # because naming any type replaces the default rather than adding to it.
+    types: [opened, synchronize, reopened, edited]
     branches: [main]
   push:
     branches: [main]
@@ -20,6 +30,8 @@ jobs:
   # --- Gitleaks: scan history / PR diff for committed secrets ----------------
   gitleaks:
     name: Gitleaks secret scan
+    # Skip PR description edits; run when the base branch changed.
+    if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -47,6 +59,8 @@ jobs:
   # --- bun audit: known vulnerability check on runtime deps ------------------
   bun-audit:
     name: Bun audit (prod deps)
+    # Skip PR description edits; run when the base branch changed.
+    if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
