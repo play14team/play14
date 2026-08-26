@@ -224,7 +224,11 @@ const cronTasks = {
       withErrorReporting("linkedinAvatarReport", async ({ strapi }) => {
         await reportLinkedinAvatarCandidates(strapi!)
       }),
-      15 * 60 * 1000 // one Linked API workflow per player, each polled for up to 90s
+      // Worst case is LINKEDIN_AVATAR_REPORT_LIMIT (25) candidates each polled
+      // to the full 90s timeout ≈ 38 min. The TTL is only a crash-recovery
+      // expiry, not a deadline, so it has to outlast the slowest real run or a
+      // second container could pick up the lock mid-run.
+      45 * 60 * 1000
     ),
     options: { rule: "0 0 3 1 * *" },
   },

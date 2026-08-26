@@ -1,10 +1,45 @@
 import { describe, expect, it } from "vitest"
-import { decideFinding, linkedinUrlOf, markedAssetId, parsePhotoUrl } from "./linkedin-avatars"
+import {
+  decideFinding,
+  isLinkedinProfileUrl,
+  linkedinUrlOf,
+  markedAssetId,
+  parsePhotoUrl,
+} from "./linkedin-avatars"
 
 const SIGNED_100 =
   "https://media.licdn.com/dms/image/v2/C5103AQEnoLfJAw9kIQ/profile-displayphoto-shrink_100_100/profile-displayphoto-shrink_100_100/0/1541593388921?e=1788998400&v=beta&t=abc"
 const SIGNED_400 =
   "https://media.licdn.com/dms/image/v2/D5603AQFrABzlImlYsQ/profile-displayphoto-scale_400_400/B56Z8sUM2EHUAY-/0/1783154922488?e=2147483647&v=beta&t=def"
+
+describe("isLinkedinProfileUrl", () => {
+  it("accepts linkedin.com and its subdomains over https", () => {
+    expect(isLinkedinProfileUrl("https://www.linkedin.com/in/dannytongkm/")).toBe(true)
+    expect(isLinkedinProfileUrl("https://linkedin.com/in/x")).toBe(true)
+    expect(isLinkedinProfileUrl("https://sg.linkedin.com/in/x")).toBe(true)
+  })
+
+  it("rejects the SSRF targets a player could put in their profile", () => {
+    // socialNetworks[].url is self-service editable and unvalidated, so these
+    // are reachable inputs, not hypotheticals.
+    expect(isLinkedinProfileUrl("http://169.254.169.254/latest/meta-data/")).toBe(false)
+    expect(isLinkedinProfileUrl("https://169.254.169.254/latest/meta-data/")).toBe(false)
+    expect(isLinkedinProfileUrl("http://localhost:1337/admin")).toBe(false)
+    expect(isLinkedinProfileUrl("file:///etc/passwd")).toBe(false)
+  })
+
+  it("rejects hosts that merely contain the brand name", () => {
+    expect(isLinkedinProfileUrl("https://linkedin.com.evil.example/in/x")).toBe(false)
+    expect(isLinkedinProfileUrl("https://notlinkedin.com/in/x")).toBe(false)
+    expect(isLinkedinProfileUrl("https://evil.example/?u=linkedin.com")).toBe(false)
+  })
+
+  it("rejects plain http and unparseable input", () => {
+    expect(isLinkedinProfileUrl("http://www.linkedin.com/in/x")).toBe(false)
+    expect(isLinkedinProfileUrl("linkedin.com/in/x")).toBe(false)
+    expect(isLinkedinProfileUrl("")).toBe(false)
+  })
+})
 
 describe("parsePhotoUrl", () => {
   it("reads the asset id and the rendition size out of the path", () => {
@@ -18,6 +53,16 @@ describe("parsePhotoUrl", () => {
   it("returns null for anything that is not a sized LinkedIn rendition", () => {
     expect(parsePhotoUrl("https://cdn.play14.org/danny_tong.jpeg")).toBeNull()
     expect(parsePhotoUrl("https://media.licdn.com/dms/image/v2/C51/company-logo/0/1")).toBeNull()
+  })
+
+  it("is pinned to media.licdn.com so a hostile page cannot forge a rendition", () => {
+    // An attacker-controlled og:image only has to match the path shape;
+    // without the host pin it would be uploaded as a player's avatar.
+    const forged =
+      "https://evil.example/dms/image/v2/FAKEASSET/profile-displayphoto-shrink_400_400/0/1"
+    expect(parsePhotoUrl(forged)).toBeNull()
+    expect(parsePhotoUrl(forged.replace("evil.example", "media.licdn.com.evil.example"))).toBeNull()
+    expect(parsePhotoUrl(SIGNED_400.replace("https://", "http://"))).toBeNull()
   })
 })
 
@@ -52,6 +97,17 @@ describe("linkedinUrlOf", () => {
   it("returns null when there is no LinkedIn entry", () => {
     expect(linkedinUrlOf({ documentId: "a", name: "x", socialNetworks: [] })).toBeNull()
     expect(linkedinUrlOf({ documentId: "a", name: "x" })).toBeNull()
+  })
+
+  it("drops a LinkedIn entry pointing somewhere other than linkedin.com", () => {
+    const url = linkedinUrlOf({
+      documentId: "a",
+      name: "x",
+      socialNetworks: [
+        { socialNetworkType: "LinkedIn", url: "http://169.254.169.254/latest/meta-data/" },
+      ],
+    })
+    expect(url).toBeNull()
   })
 })
 

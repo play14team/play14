@@ -60,9 +60,27 @@ interface Photo {
 // Mirrors the pure helpers in packages/api/src/services/cron/linkedin-avatars.ts.
 // Duplicated rather than imported: that module is inside the api package and
 // pulls Strapi types. Keep the two in step if the marker format changes.
+function isLinkedinProfileUrl(url: string): boolean {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return false
+  }
+  if (parsed.protocol !== "https:") return false
+  return parsed.hostname === "linkedin.com" || parsed.hostname.endsWith(".linkedin.com")
+}
+
 function parsePhotoUrl(url: string): Photo | null {
-  const asset = url.match(/\/image\/v2\/([^/?]+)\//)
-  const size = url.match(/(?:shrink|scale)_(\d+)_\d+/)
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return null
+  }
+  if (parsed.protocol !== "https:" || parsed.hostname !== "media.licdn.com") return null
+  const asset = parsed.pathname.match(/\/image\/v2\/([^/?]+)\//)
+  const size = parsed.pathname.match(/(?:shrink|scale)_(\d+)_\d+/)
   if (!asset || !size) return null
   return { url, assetId: asset[1], size: Number(size[1]) }
 }
@@ -82,7 +100,14 @@ const flag = (name: string): string | undefined =>
     .join("=")
 const dryRun = args.includes("--dry-run")
 const only = flag("only")
-const limit = Number(flag("limit") ?? Number.POSITIVE_INFINITY)
+// Number("abc") is NaN and slice(0, NaN) is empty — a typo would silently
+// process nothing rather than telling you the flag was wrong.
+const rawLimit = flag("limit")
+const limit = rawLimit === undefined ? Number.POSITIVE_INFINITY : Number(rawLimit)
+if (!Number.isFinite(limit) || limit <= 0) {
+  console.error(`--limit must be a positive number (got "${rawLimit}")`)
+  process.exit(1)
+}
 
 const tokenFile = flag("token-file")
 const strapiUrl = (flag("url") ?? process.env.STRAPI_URL ?? "").replace(/\/$/, "")
@@ -199,16 +224,32 @@ type Outcome = "uploaded" | "would-upload" | "up-to-date" | "manual" | "unreacha
 
 const results: Array<{ player: string; outcome: Outcome; detail: string }> = []
 
-const candidates = (await listPlayers())
+const allPlayers = await listPlayers()
+const withUrl = allPlayers
   .map((player) => ({
     player,
+    // Untrusted: players edit socialNetworks themselves and the schema does not
+    // validate the URL, so anything not on linkedin.com is dropped before we
+    // fetch it. Without this the "LinkedIn" URL could point at localhost or a
+    // cloud metadata endpoint and this script would happily request it.
     profileUrl: (player.socialNetworks ?? []).find(
-      (s) => s.socialNetworkType === "LinkedIn" && s.url
+      (s) => s.socialNetworkType === "LinkedIn" && s.url && isLinkedinProfileUrl(s.url)
     )?.url,
   }))
   .filter((entry): entry is { player: Player; profileUrl: string } => Boolean(entry.profileUrl))
-  .filter((entry) => !only || entry.player.slug === only)
-  .slice(0, limit)
+
+const rejected = allPlayers.filter(
+  (player) =>
+    (player.socialNetworks ?? []).some((s) => s.socialNetworkType === "LinkedIn" && s.url) &&
+    !withUrl.some((entry) => entry.player.documentId === player.documentId)
+)
+for (const player of rejected) {
+  console.log(
+    `${player.slug ?? player.documentId}: skipped — LinkedIn URL is not a linkedin.com URL`
+  )
+}
+
+const candidates = withUrl.filter((entry) => !only || entry.player.slug === only).slice(0, limit)
 
 console.log(
   `${candidates.length} player(s) with a LinkedIn URL${dryRun ? " (dry run — no writes)" : ""}\n`
@@ -251,24 +292,32 @@ for (const [index, { player, profileUrl }] of candidates.entries()) {
     continue
   }
 
+  let uploadedFileId: number | null = null
   try {
     const file = await uploadPhoto(best, player)
+    uploadedFileId = file.id
     await strapi(`/api/players/${player.documentId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ data: { avatar: file.id } }),
     })
+    uploadedFileId = null // attached; no longer an orphan risk
     // Only ever delete a file this script uploaded.
     if (current && markedAssetId(current)) {
-      await strapi(`/api/upload/files/${current.id}`, { method: "DELETE" }).catch(() => {})
+      await strapi(`/api/upload/files/${current.id}`, { method: "DELETE" }).catch((error) => {
+        console.warn(
+          `  ${label}: could not delete superseded file ${current.id} — ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        )
+      })
     }
     results.push({ player: label, outcome: "uploaded", detail })
   } catch (error) {
-    results.push({
-      player: label,
-      outcome: "failed",
-      detail: error instanceof Error ? error.message : String(error),
-    })
+    const message = error instanceof Error ? error.message : String(error)
+    // Naming the id makes the orphan cleanable instead of invisible.
+    const orphan = uploadedFileId === null ? "" : ` (orphaned upload: file ${uploadedFileId})`
+    results.push({ player: label, outcome: "failed", detail: `${message}${orphan}` })
   }
 }
 

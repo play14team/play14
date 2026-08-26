@@ -60,10 +60,42 @@ export interface AvatarFinding {
 /** Signals a dead cloud-browser session — worth an error-level log, not a silent skip. */
 export class LinkedinSessionError extends Error {}
 
-/** LinkedIn renditions are signed per size, so the size lives in the path. */
+/**
+ * True for `https://linkedin.com/...` and its subdomains, nothing else.
+ *
+ * `socialNetworks[].url` is a plain string a player edits themselves (see
+ * `updateMe` in api/player/controllers/custom-player.ts, which validates
+ * `website` but not this), so every consumer must treat it as untrusted input.
+ * Without this gate a player could point us at `169.254.169.254` or an internal
+ * host and have our tooling fetch it — the asset-id identity check happens too
+ * late to help, because the request has already gone out.
+ */
+export function isLinkedinProfileUrl(url: string): boolean {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return false
+  }
+  if (parsed.protocol !== "https:") return false
+  return parsed.hostname === "linkedin.com" || parsed.hostname.endsWith(".linkedin.com")
+}
+
+/**
+ * LinkedIn renditions are signed per size, so the size lives in the path.
+ * Host-pinned: an attacker-controlled page could otherwise serve an `og:image`
+ * that merely matches this path shape and have it uploaded as someone's avatar.
+ */
 export function parsePhotoUrl(url: string): { assetId: string; size: number } | null {
-  const asset = url.match(/\/image\/v2\/([^/?]+)\//)
-  const size = url.match(/(?:shrink|scale)_(\d+)_\d+/)
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return null
+  }
+  if (parsed.protocol !== "https:" || parsed.hostname !== "media.licdn.com") return null
+  const asset = parsed.pathname.match(/\/image\/v2\/([^/?]+)\//)
+  const size = parsed.pathname.match(/(?:shrink|scale)_(\d+)_\d+/)
   if (!asset || !size) return null
   return { assetId: asset[1], size: Number(size[1]) }
 }
@@ -75,9 +107,10 @@ export function markedAssetId(avatar: AvatarFile | null | undefined): string | n
   return caption.slice(MARKER_PREFIX.length) || null
 }
 
+/** The player's LinkedIn profile URL, or null if absent or not actually LinkedIn. */
 export function linkedinUrlOf(player: PlayerRow): string | null {
   const entry = (player.socialNetworks ?? []).find(
-    (s) => s.socialNetworkType === "LinkedIn" && s.url
+    (s) => s.socialNetworkType === "LinkedIn" && s.url && isLinkedinProfileUrl(s.url)
   )
   return entry?.url ?? null
 }
@@ -181,7 +214,18 @@ export async function reportLinkedinAvatarCandidates(
     return []
   }
 
-  const limit = Number(process.env.LINKEDIN_AVATAR_REPORT_LIMIT ?? DEFAULT_LIMIT)
+  // A non-numeric value would become NaN, and slice(0, NaN) yields an empty
+  // array — a misconfigured env var would silently report "0 candidates".
+  const configuredLimit = Number(process.env.LINKEDIN_AVATAR_REPORT_LIMIT ?? DEFAULT_LIMIT)
+  const limit = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : null
+  if (limit === null) {
+    strapi.log.error(
+      `[LinkedinAvatars] Skipped: LINKEDIN_AVATAR_REPORT_LIMIT is not a positive number ` +
+        `(got "${process.env.LINKEDIN_AVATAR_REPORT_LIMIT}")`
+    )
+    return []
+  }
+
   const players = (await strapi.documents("api::player.player").findMany({
     fields: ["name", "slug"],
     populate: ["avatar", "socialNetworks"],
