@@ -2,7 +2,15 @@ name: Clever Cloud — Deploy staging (api + web)
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed]
+    # `edited` is here so retargeting a PR onto main deploys staging. Without
+    # it a PR opened against another branch and later rebased onto main never
+    # emits an event this workflow listens for: the `opened` event was filtered
+    # out by `branches: [main]`, and a base change emits only `edited`.
+    #
+    # `edited` also fires on every title and body change, so the jobs below are
+    # gated on `github.event.changes.base` to keep description edits from
+    # redeploying staging.
+    types: [opened, synchronize, reopened, edited, closed]
     branches: [main]
     paths:
       - "packages/api/**"
@@ -88,7 +96,9 @@ jobs:
   # --- Lint and typecheck on PR open/update ------------------------------------
   lint:
     name: Lint and typecheck
-    if: github.event.action != 'closed'
+    if: >-
+      github.event.action != 'closed'
+      && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -112,7 +122,9 @@ jobs:
   # --- Unit tests on PR open/update -------------------------------------------
   test:
     name: Unit tests
-    if: github.event.action != 'closed'
+    if: >-
+      github.event.action != 'closed'
+      && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -138,7 +150,9 @@ jobs:
   deploy-api-staging:
     name: Deploy play14-api-staging
     needs: [lint, test]
-    if: github.event.action != 'closed'
+    if: >-
+      github.event.action != 'closed'
+      && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
