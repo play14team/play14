@@ -97,6 +97,20 @@ podman-compose down
 - `play14-db-test`: Ephemeral PostgreSQL for integration tests (port 5433)
 - `play14-redis`: Redis 7 (port 6379) — used for cache + distributed cron locks
 - `play14-minio` + `play14-minio-init`: Local S3-compatible object storage (ports 9100/9101) standing in for the Clever Cloud Cellar add-on
+
+**Host ports are configurable.** Every published port in `compose.yaml` is a
+`${PLAY14_*_PORT:-default}`, so the defaults above hold with no configuration,
+and a machine already running another project's Postgres/Redis can remap them
+in a root `.env` (gitignored, read by podman-compose). Container-internal ports
+never change. `packages/api/.env` (`DATABASE_PORT`, `REDIS_URL`,
+`TEST_DATABASE_PORT`) and `packages/web/.env.local` (`STRAPI_API_URL`,
+`NEXT_PUBLIC_STRAPI_URL`) are read on the host and must be mirrored by hand;
+`bun run deps` warns on drift. See the "Running alongside other projects"
+section in [README.md](./README.md).
+
+Integration tests read `TEST_DATABASE_*`, never `DATABASE_*` — Strapi loads
+`.env` in every environment, so sharing the keys would let development
+credentials point a test run at the development database.
 - `pgadmin`: Database admin UI (port 5050)
 - `play14-web`: Next.js frontend (port 3000)
 - `design`: Storybook (port 8080)

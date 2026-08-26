@@ -76,14 +76,46 @@ podman-compose up
 
 Available services:
 
-| Service          | Port | Description                  |
-| ---------------- | ---- | ---------------------------- |
-| `play14-api`     | 1337 | Strapi API                   |
-| `play14-db`      | 5432 | PostgreSQL database          |
-| `pgadmin`        | 5050 | Database admin UI            |
-| `play14-web`     | 3000 | Next.js frontend             |
-| `design`         | 8080 | Storybook                    |
-| `stripe-webhook` | -    | Stripe CLI webhook forwarder |
+| Service          | Default port | Override             | Description                     |
+| ---------------- | ------------ | -------------------- | ------------------------------- |
+| `play14-api`     | 1337         | `PLAY14_API_PORT`    | Strapi API                      |
+| `play14-api`     | 9000         | `PLAY14_API_METRICS_PORT` | Prometheus metrics         |
+| `play14-db`      | 5432         | `PLAY14_DB_PORT`     | PostgreSQL database             |
+| `play14-db-test` | 5433         | `PLAY14_DB_TEST_PORT` | Ephemeral integration test DB  |
+| `play14-redis`   | 6379         | `PLAY14_REDIS_PORT`  | Cache + distributed cron locks  |
+| `play14-minio`   | 9100 / 9101  | `PLAY14_MINIO_PORT`, `PLAY14_MINIO_CONSOLE_PORT` | S3-compatible storage |
+| `pgadmin`        | 5050         | `PLAY14_PGADMIN_PORT` | Database admin UI              |
+| `play14-web`     | 3000         | `PLAY14_WEB_PORT`    | Next.js frontend                |
+| `design`         | 8080         | `PLAY14_DESIGN_PORT` | Storybook                       |
+| `stripe-webhook` | -            | -                    | Stripe CLI webhook forwarder    |
+
+#### Running alongside other projects
+
+Every host port is a `${VAR:-default}` in `compose.yaml`, so the defaults above
+hold with no configuration. When another project already holds 5432 or 6379,
+put the overrides in a root `.env` (gitignored, read by podman-compose):
+
+```bash
+cat > .env <<'EOF'
+PLAY14_DB_PORT=15432
+PLAY14_REDIS_PORT=16379
+PLAY14_DB_TEST_PORT=15433
+EOF
+```
+
+Only the host side moves — container-internal ports are fixed, so nothing
+inside the compose network is affected.
+
+Two files are read on the **host** rather than in a container and must mirror
+any change by hand:
+
+- `packages/api/.env` — `DATABASE_PORT`, `REDIS_URL`, `TEST_DATABASE_PORT`
+  (used by `bun run api` and `bun run test:int`)
+- `packages/web/.env.local` — `STRAPI_API_URL`, `NEXT_PUBLIC_STRAPI_URL`
+  (used by `bun run web`, only if you moved `PLAY14_API_PORT`)
+
+`bun run deps` prints the host port of each service it starts and warns when
+`packages/api/.env` has drifted out of sync.
 
 ## Package Commands
 
