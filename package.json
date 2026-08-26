@@ -9,6 +9,7 @@
     "db": "podman-compose up -d play14-db",
     "deps": "bash scripts/start-deps.sh",
     "graphify:setup": "bash scripts/setup-graphify.sh",
+    "avatars:sync": "bun scripts/sync-linkedin-avatars.ts",
     "stripe": "podman-compose up -d stripe-webhook",
     "stripe:cli": "stripe listen --forward-to localhost:1337/api/ticket-orders/webhook",
     "api": "bun --cwd packages/api dev",
