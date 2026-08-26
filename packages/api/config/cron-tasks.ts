@@ -22,6 +22,7 @@ import {
   cleanOldEmailLogs,
   processEventResultsReminders,
   reconcileNewsletterSends,
+  reportLinkedinAvatarCandidates,
   reservationHealthCheck,
   updateEventStatus,
   updatePlayerPositions,
@@ -211,6 +212,25 @@ const cronTasks = {
       })
     ),
     options: { rule: "0 0 6 * * *" },
+  },
+
+  // Monthly, 1st at 03:00 - Report (never apply) player avatars that LinkedIn
+  // could improve. Off unless LINKEDIN_AVATAR_REPORT_ENABLED=true. Applying is
+  // a human step: bun run avatars:sync. See services/cron/linkedin-avatars.ts
+  // for why this deliberately does not write.
+  linkedinAvatarReport: {
+    task: withLock(
+      "linkedinAvatarReport",
+      withErrorReporting("linkedinAvatarReport", async ({ strapi }) => {
+        await reportLinkedinAvatarCandidates(strapi!)
+      }),
+      // Worst case is LINKEDIN_AVATAR_REPORT_LIMIT (25) candidates each polled
+      // to the full 90s timeout ≈ 38 min. The TTL is only a crash-recovery
+      // expiry, not a deadline, so it has to outlast the slowest real run or a
+      // second container could pick up the lock mid-run.
+      45 * 60 * 1000
+    ),
+    options: { rule: "0 0 3 1 * *" },
   },
 
   // Daily at 02:30 - Purge email-log rows older than 90 days
