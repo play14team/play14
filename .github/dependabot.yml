@@ -4,13 +4,24 @@ version: 2
 # workspace (packages/api, packages/web, packages/design), matching the
 # behaviour documented for yarn/npm workspaces.
 updates:
-  # Root package dependencies (covers all Bun workspaces)
+  # Root package dependencies (covers all Bun workspaces).
+  #
+  # Version updates are DISABLED here via `open-pull-requests-limit: 0`. The
+  # weekly "Weekly dependency update" cloud routine now owns npm bumps end to
+  # end: it bumps patch, minor and major across every package.json, runs the
+  # full lint/typecheck/test/build suite, waits for the staging deploy, then
+  # merges. Two independent sources of dependency PRs would only race each
+  # other on bun.lock.
+  #
+  # The entry is kept rather than deleted because Dependabot *security*
+  # updates still open PRs regardless of this limit - and they honour the
+  # `ignore` rules below, which is the part worth preserving.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     labels:
       - "dependencies"
       - "bun"
@@ -22,17 +33,6 @@ updates:
       - "cpontet"
     assignees:
       - "cpontet"
-    groups:
-      development-dependencies:
-        dependency-type: "development"
-        update-types:
-          - "minor"
-          - "patch"
-      production-dependencies:
-        dependency-type: "production"
-        update-types:
-          - "minor"
-          - "patch"
     ignore:
       # Strapi 5 admin panel pins React 18 and react-router-dom 6 as peers.
       # React 19 support is still RFC (strapi/strapi#25739), so block major
@@ -54,7 +54,8 @@ updates:
           - "version-update:semver-major"
           - "version-update:semver-minor"
 
-  # GitHub Actions used across workflows
+  # GitHub Actions used across workflows. Left enabled: the weekly cloud
+  # routine only touches package.json / bun.lock, so nothing else bumps these.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
