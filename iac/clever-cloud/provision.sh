@@ -48,10 +48,10 @@ ADDONS=(
 
 # Scalability: alias|min-flavor|max-flavor|min-instances|max-instances|build-flavor
 #
-# Clever Cloud's default Node runtime flavor is XS (512 MB RAM, shared CPU),
-# which is too small for the Next.js web tier under real traffic — a single
-# XS instance of play14-web was hitting 95%+ RAM and triggering Node GC
-# stalls long enough to abort outbound fetches (undici kState crash, 10s
+# Clever Cloud's default Node runtime flavor is XS (1 GB RAM, 1 cpu), which
+# is too small for the Next.js web tier under real traffic — a single XS
+# instance of play14-web was hitting 95%+ RAM and triggering Node GC stalls
+# long enough to abort outbound fetches (undici kState crash, 10s
 # strapi-client timeouts).
 #
 # Production web runs two fixed S instances (min=max on both axes):
@@ -63,9 +63,16 @@ ADDONS=(
 #     range bought nothing and two fixed S instances carry the load. Keep the
 #     Grafana RAM% alert as the real signal.
 #
-# Staging and API stay pinned at min=max — no load, no need. Setting
-# min-flavor=max-flavor is equivalent to a fixed flavor but uses the same
-# CLI shape uniformly across apps.
+# Production API runs the same shape as web — two fixed S instances — for the
+# same reasons: HA and zero-downtime deploys on a tier the whole site reads
+# through, and a Strapi process that does not fit XS comfortably once the
+# admin panel, upload pipeline and cron locks are all resident.
+#
+# Both staging apps stay at a single XS instance — no load, no HA
+# requirement, and a restart during deploy costs nothing there.
+#
+# Every app sets min=max on both axes, which is equivalent to a fixed size
+# but keeps one uniform CLI shape across all four.
 #
 # Build flavor is M for most apps because `next build` and `strapi build`
 # both routinely exceed XS memory during compile. play14-web needs L: at M
@@ -77,7 +84,7 @@ ADDONS=(
 APP_FLAVORS=(
   "play14-api-staging|XS|XS|1|1|M"
   "play14-web-staging|XS|XS|1|1|M"
-  "play14-api|XS|XS|1|1|M"
+  "play14-api|S|S|2|2|M"
   "play14-web|S|S|2|2|L"
 )
 
