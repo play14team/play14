@@ -48,31 +48,44 @@ ADDONS=(
 
 # Scalability: alias|min-flavor|max-flavor|min-instances|max-instances|build-flavor
 #
-# Clever Cloud's default Node runtime flavor is XS (512 MB RAM, shared CPU),
-# which is too small for the Next.js web tier under real traffic — a single
-# XS instance of play14-web was hitting 95%+ RAM and triggering Node GC
-# stalls long enough to abort outbound fetches (undici kState crash, 10s
+# Clever Cloud's default Node runtime flavor is XS (1 GB RAM, 1 cpu), which
+# is too small for the Next.js web tier under real traffic — a single XS
+# instance of play14-web was hitting 95%+ RAM and triggering Node GC stalls
+# long enough to abort outbound fetches (undici kState crash, 10s
 # strapi-client timeouts).
 #
-# Production web runs with both scalers enabled:
-#   - Vertical S → M: headroom if S ever feels tight, no cost when not hit
-#     (Clever bills the flavor actually running).
-#   - Horizontal 1 → 2: HA + zero-downtime deploys + spike absorption. Web
+# Production web runs two fixed S instances (min=max on both axes):
+#   - Horizontal 2 → 2: HA + zero-downtime deploys + spike absorption. Web
 #     is stateless (JWT cookie) so no session affinity needed.
-# Clever's auto-scaler triggers on CPU, so keep the Grafana RAM% alert
-# separately — GC-driven stalls won't trip a CPU threshold.
+#   - Vertical S → S: the vertical scaler is deliberately off. Clever's
+#     auto-scaler triggers on CPU, but the failure mode here was RAM
+#     (GC-driven stalls), which never trips a CPU threshold — so the S → M
+#     range bought nothing and two fixed S instances carry the load. Keep the
+#     Grafana RAM% alert as the real signal.
 #
-# Staging and API stay pinned at XS (min=max) — no load, no need. Setting
-# min-flavor=max-flavor is equivalent to a fixed flavor but uses the same
-# CLI shape uniformly across apps.
+# Production API runs the same shape as web — two fixed S instances — for the
+# same reasons: HA and zero-downtime deploys on a tier the whole site reads
+# through, and a Strapi process that does not fit XS comfortably once the
+# admin panel, upload pipeline and cron locks are all resident.
 #
-# Build flavor M is kept for all apps because `next build` and `strapi
-# build` both routinely exceed XS memory during compile.
+# Both staging apps stay at a single XS instance — no load, no HA
+# requirement, and a restart during deploy costs nothing there.
+#
+# Every app sets min=max on both axes, which is equivalent to a fixed size
+# but keeps one uniform CLI shape across all four.
+#
+# Build flavor is M for most apps because `next build` and `strapi build`
+# both routinely exceed XS memory during compile. play14-web needs L: at M
+# (4 GB) `next build` was killed by the OOM killer mid-compile — exit 137,
+# on inputs that had compiled in 18.0s three days earlier — because
+# Turbopack's peak is native memory that NODE_OPTIONS
+# --max-old-space-size cannot cap. Build instances bill per build minute
+# only, so the headroom costs well under a cent per deploy.
 APP_FLAVORS=(
   "play14-api-staging|XS|XS|1|1|M"
   "play14-web-staging|XS|XS|1|1|M"
-  "play14-api|XS|XS|1|1|M"
-  "play14-web|S|M|1|2|M"
+  "play14-api|S|S|2|2|M"
+  "play14-web|S|S|2|2|L"
 )
 
 # --- Helpers -----------------------------------------------------------------
