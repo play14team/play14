@@ -92,7 +92,8 @@ jobs:
         # Advisories with a clean, non-breaking fix are pinned to patched
         # versions via root `overrides` (shell-quote, tmp, linkify-it,
         # form-data, fast-uri, ip-address, nanoid, postcss, sharp,
-        # brace-expansion, axios, lodash/lodash-es) rather than ignored here.
+        # brace-expansion, axios, lodash/lodash-es, browserslist) rather than
+        # ignored here.
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
         # transitive dep with no safe override, or has no published fix;
