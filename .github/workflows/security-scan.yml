@@ -92,8 +92,8 @@ jobs:
         # Advisories with a clean, non-breaking fix are pinned to patched
         # versions via root `overrides` (shell-quote, tmp, linkify-it,
         # form-data, fast-uri, ip-address, nanoid, postcss, sharp,
-        # brace-expansion, axios, lodash/lodash-es, browserslist) rather than
-        # ignored here.
+        # brace-expansion, axios, lodash/lodash-es, browserslist, js-yaml,
+        # nodemailer, adm-zip) rather than ignored here.
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
         # transitive dep with no safe override, or has no published fix;
@@ -116,18 +116,14 @@ jobs:
         #   parsing only; it never issues HTTP requests, so undici's
         #   response-cache path is unreachable. (isomorphic-dompurify → jsdom 30
         #   now resolves undici 8.x, outside the advisory range entirely.)
-        #   GHSA-xcpc-8h2w-3j85 — adm-zip crafted-ZIP 4GB allocation. Vulnerable
-        #   range is <0.6.0 and 0.6.0 is unreleased, so no override target; pulled
-        #   only by strapi-plugin-config-sync's server-side config import.
-        #   GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq — image-size infinite loops
-        #   in the ICNS, JXL and HEIF parsers. No fix exists: the whole published
-        #   line (<=2.0.2) is flagged and 2.0.2 is latest. We call `imageSize` on
-        #   uploaded logo bytes in the custom venue/sponsor/event controllers, so
-        #   the parsers are reachable — but only over authenticated `/admin/*`
-        #   routes, limiting the blast radius to a DoS triggered by an already
-        #   trusted host user. TODO: gate `imageSize` behind a magic-byte
-        #   allowlist (PNG/JPEG/WebP/GIF) so the vulnerable parsers are never
-        #   entered, then drop these two ignores.
+        #
+        # Dropped here because an override or bump has since fixed them, and a
+        # stale ignore would mask a future advisory on the same package:
+        #   GHSA-xcpc-8h2w-3j85 — adm-zip. 0.6.1 is now published, so the
+        #   `adm-zip` override has a target and the advisory no longer matches.
+        #   GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq — image-size ICNS/JXL/HEIF
+        #   parser loops. Fixed upstream in 2.0.3; we are on 2.0.4. The
+        #   magic-byte allowlist TODO these carried is now moot.
         run: >
           bun audit --prod --audit-level=high
           --ignore=GHSA-fx2h-pf6j-xcff
@@ -135,6 +131,3 @@ jobs:
           --ignore=GHSA-vxpw-j846-p89q
           --ignore=GHSA-hm92-r4w5-c3mj
           --ignore=GHSA-4cwx-7wf7-3272
-          --ignore=GHSA-xcpc-8h2w-3j85
-          --ignore=GHSA-w3rx-r6r6-pgpr
-          --ignore=GHSA-5p2g-fcmc-qvqq
