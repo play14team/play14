@@ -1807,6 +1807,7 @@
       "creating": "Erstellen...",
       "createSponsor": "Sponsor erstellen",
       "failedToCreate": "Fehler beim Erstellen des Sponsors",
+      "failedToLoad": "Fehler beim Laden der Sponsoren",
       "removeSponsor": "Sponsor entfernen",
       "removeCategory": "Kategorie {category} entfernen",
       "nameRequiredError": "Name ist erforderlich",

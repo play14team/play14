@@ -2249,6 +2249,7 @@
       "creating": "Creando...",
       "createSponsor": "Crear patrocinador",
       "failedToCreate": "Error al crear el patrocinador",
+      "failedToLoad": "Error al cargar los patrocinadores",
       "removeSponsor": "Eliminar patrocinador",
       "removeCategory": "Eliminar la categoría {category}",
       "nameRequiredError": "El nombre es obligatorio",

@@ -36,10 +36,11 @@ export interface SponsorActionResult<T = void> {
 
 /**
  * Get all available sponsors for selection
+ *
+ * Uses the organizer endpoint: the core `/sponsors` find is founder-only, so
+ * hosts and mentors got a 403 there and saw an empty picker.
  */
 export async function getAvailableSponsors(): Promise<SponsorActionResult<Sponsor[]>> {
-  // The API clamps pageSize to `api.rest.maxLimit` (100), so a single oversized
-  // page silently truncates the list and hides sponsors from the picker.
   const PAGE_SIZE = 100
   const MAX_PAGES = 50
   const sponsors: Sponsor[] = []
@@ -49,13 +50,11 @@ export async function getAvailableSponsors(): Promise<SponsorActionResult<Sponso
       data: Sponsor[]
       meta?: { pagination?: { pageCount?: number } }
     }>(
-      "/sponsors",
+      "/admin/sponsors",
       {},
       {
-        sort: "name:asc",
-        populate: "logo",
-        "pagination[page]": String(page),
-        "pagination[pageSize]": String(PAGE_SIZE),
+        page: String(page),
+        pageSize: String(PAGE_SIZE),
       }
     )
 
