@@ -33,9 +33,11 @@ export default function SponsorEditor({ sponsorships, onChange }: Props) {
     const result = await getAvailableSponsors()
     if (result.success && result.data) {
       setAvailableSponsors(result.data)
+    } else {
+      setError(result.error || t("failedToLoad"))
     }
     setIsLoading(false)
-  }, [])
+  }, [t])
 
   // Load available sponsors on mount
   useEffect(() => {
