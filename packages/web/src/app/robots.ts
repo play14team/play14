@@ -17,7 +17,15 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/*/admin", "/api", "/players", "/*/players"],
+        disallow: [
+          "/api",
+          // Private or per-user pages: nothing to rank, and they cost crawl budget.
+          ...["/admin", "/players", "/auth", "/orders", "/tickets", "/search"].flatMap((path) => [
+            path,
+            `/*${path}`,
+          ]),
+          "/events/*/tickets",
+        ],
       },
     ],
     sitemap: `${PRODUCTION_SITE_URL}/sitemap.xml`,
