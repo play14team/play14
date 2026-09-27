@@ -3,13 +3,14 @@ import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import Expectations from "@/components/home/expectations"
 import Page from "@/components/layout/page"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 import { Enum_Expectation_Type } from "@/models/strapi"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("about.format")
-  return {
-    title: `About | ${t("title")}`,
-  }
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "about.format" })
+  return pageMetadata({ locale, pathname: "/about/format", title: `About | ${t("title")}` })
 }
 
 export default async function FormatPage() {

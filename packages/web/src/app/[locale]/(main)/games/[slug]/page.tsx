@@ -3,7 +3,10 @@ import { getTranslations } from "next-intl/server"
 import GameDetails from "@/components/games/details"
 import { getGame, getGameSlugs } from "@/components/games/get.action"
 import Page from "@/components/layout/page"
+import JsonLd from "@/components/seo/json-ld"
+import { pageMetadata, SITE_NAME, toDescription } from "@/libs/seo"
 import type { SlugParamsProps } from "@/libs/slug-params"
+import { breadcrumbJsonLd, gameJsonLd } from "@/libs/structured-data"
 import type { Game } from "@/models/strapi"
 
 // Enable dynamic params for games not pre-generated
@@ -41,24 +44,27 @@ export async function generateMetadata(props: SlugParamsProps) {
     }
   }
 
-  const images = game.images?.filter(Boolean)?.map((i) => (i as { url: string }).url) as string[]
+  const { slug, locale } = await props.params
+  const description = toDescription(game.summary || game.description)
 
-  return {
-    title: `Games | ${game.name}`,
-    description: game.summary,
-    openGraph: {
-      title: game.name,
-      description: game.summary,
-      type: "article",
-      publishedTime: game.publishedAt,
-      authors: game.documentedBy?.length ? game.documentedBy.map((p) => p.name) : undefined,
-      images: [game.defaultImage?.url].concat(images),
-    },
-  }
+  return pageMetadata({
+    locale,
+    pathname: `/games/${slug}`,
+    title: game.name,
+    description,
+    type: "article",
+    publishedTime: game.publishedAt,
+    authors: game.documentedBy?.map((p) => p.name),
+    images: [game.defaultImage?.url, ...(game.images ?? []).map((i) => i?.url)],
+  })
 }
 
 export default async function Game(props: SlugParamsProps) {
-  const game = await getGame(props)
+  const { locale } = await props.params
+  const [game, t] = await Promise.all([
+    getGame(props),
+    getTranslations({ locale, namespace: "games" }),
+  ])
 
   if (!game) {
     notFound()
@@ -66,6 +72,16 @@ export default async function Game(props: SlugParamsProps) {
 
   return (
     <Page name={game.name} hideName={true}>
+      <JsonLd
+        data={[
+          gameJsonLd(game, locale),
+          breadcrumbJsonLd(locale, [
+            { name: SITE_NAME, pathname: "/" },
+            { name: t("title"), pathname: "/games" },
+            { name: game.name },
+          ]),
+        ]}
+      />
       <GameDetails game={game} />
     </Page>
   )

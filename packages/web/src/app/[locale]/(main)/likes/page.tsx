@@ -4,13 +4,18 @@ import { getTranslations } from "next-intl/server"
 import ContributorLink from "./contributor-link"
 import { getPublicLikedItems, type LikedItemPublic } from "./get.action"
 import "./likes.scss"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("likes")
-  return {
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "likes" })
+  return pageMetadata({
+    locale,
+    pathname: "/likes",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
 export const revalidate = 3600 // Revalidate every hour

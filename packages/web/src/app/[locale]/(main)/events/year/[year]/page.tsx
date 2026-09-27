@@ -5,17 +5,16 @@ import { getEventsByYear, getEventYearCounts, getEventYears } from "@/components
 import EventGrid from "@/components/events/grid"
 import LoadMoreYear from "@/components/events/load-more-year"
 import YearNav from "@/components/events/year-nav"
+import { pageMetadata } from "@/libs/seo"
 import type { Event } from "@/models/strapi"
 
 interface YearEventsPageProps {
-  params: Promise<{ year: string }>
+  params: Promise<{ locale: string; year: string }>
 }
 
 export async function generateMetadata({ params }: YearEventsPageProps): Promise<Metadata> {
-  const { year } = await params
-  return {
-    title: `Events ${year}`,
-  }
+  const { locale, year } = await params
+  return pageMetadata({ locale, pathname: `/events/year/${year}`, title: `Events ${year}` })
 }
 
 export const dynamicParams = true

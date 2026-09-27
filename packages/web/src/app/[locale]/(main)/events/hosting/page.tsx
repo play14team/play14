@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server"
 import Page from "@/components/layout/page"
 import type { Locale } from "@/i18n/routing"
 import { loadMDX } from "@/libs/mdx"
+import { pageMetadata } from "@/libs/seo"
 import styles from "./hosting.module.scss"
 import { getMDXComponents } from "./mdx-components"
 
@@ -13,10 +14,12 @@ interface HostingPageProps {
 export async function generateMetadata({ params }: HostingPageProps): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "hosting" })
-  return {
+  return pageMetadata({
+    locale,
+    pathname: "/events/hosting",
     title: t("metadata.title"),
     description: t("metadata.description"),
-  }
+  })
 }
 
 async function TableOfContents({ locale }: { locale: Locale }) {

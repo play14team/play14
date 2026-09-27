@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import { getAllEvents, getEventCountries } from "@/components/events/get.action"
 import EventGrid from "@/components/events/grid"
+import { pageMetadata } from "@/libs/seo"
 import type { Event } from "@/models/strapi"
 
 interface CountryEventsPageProps {
@@ -25,9 +26,11 @@ export async function generateMetadata({ params }: CountryEventsPageProps): Prom
   const { locale, code } = await params
   const upper = code.toUpperCase()
   if (!isValidCountryCode(upper)) return { title: "Events" }
-  return {
+  return pageMetadata({
+    locale,
+    pathname: `/events/countries/${upper}`,
     title: `Events – ${getCountryName(upper, locale)}`,
-  }
+  })
 }
 
 export const dynamicParams = true
