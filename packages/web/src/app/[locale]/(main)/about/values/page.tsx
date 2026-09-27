@@ -6,12 +6,13 @@ import CoreValues from "@/components/layout/corevalues"
 import Manifesto from "@/components/layout/manifesto"
 import Page from "@/components/layout/page"
 import { Link } from "@/i18n/navigation"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("about.values")
-  return {
-    title: `About | ${t("title")}`,
-  }
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "about.values" })
+  return pageMetadata({ locale, pathname: "/about/values", title: `About | ${t("title")}` })
 }
 
 export default async function Values() {
