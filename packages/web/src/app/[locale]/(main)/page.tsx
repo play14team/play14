@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import EventsWorldMap from "@/components/events/EventsWorldMap"
 import Expectations from "@/components/home/expectations"
@@ -10,16 +11,45 @@ import CodeOfConduct from "@/components/layout/codeofconduct"
 import CoreValues from "@/components/layout/corevalues"
 import Manifesto from "@/components/layout/manifesto"
 import Title from "@/components/layout/title"
+import JsonLd from "@/components/seo/json-ld"
 import { Link } from "@/i18n/navigation"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
+import { organizationJsonLd, websiteJsonLd } from "@/libs/structured-data"
 import { Enum_Expectation_Type } from "@/models/strapi"
 
 export const revalidate = 3600
 
-export default async function Home() {
-  const t = await getTranslations("home")
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "metadata" })
+  // Absolute title: the layout template would render "#play14 - #play14 - …".
+  return {
+    ...(await pageMetadata({
+      locale,
+      pathname: "/",
+      title: t("title"),
+      description: t("description"),
+    })),
+    title: { absolute: t("title") },
+  }
+}
+
+export default async function Home({ params }: LocaleParamsProps) {
+  const { locale } = await params
+  const [t, tMeta] = await Promise.all([
+    getTranslations({ locale, namespace: "home" }),
+    getTranslations({ locale, namespace: "metadata" }),
+  ])
 
   return (
     <>
+      <JsonLd
+        data={[
+          organizationJsonLd(tMeta("description")),
+          websiteJsonLd(locale, tMeta("description")),
+        ]}
+      />
       <section id="title">
         <Title />
         <div className="container">

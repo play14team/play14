@@ -278,7 +278,8 @@ export interface Article {
   summary?: string
   publishedAt?: string
   updatedAt?: string
-  canonical?: string
+  /** Original URL when the article was first published elsewhere (Strapi field name has the typo). */
+  cannonical?: string
   content?: string
   tags?: Tag[]
   defaultImage?: UploadFile
