@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server"
 import NextTopLoader from "nextjs-toploader"
 import ScrollToTop from "@/components/utils/scroll-to-top"
 import { ogLocales, routing } from "@/i18n/routing"
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_URL } from "@/libs/seo"
 
 type Props = {
   children: React.ReactNode
@@ -25,34 +26,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       default: t("title"),
     },
     description: t("description"),
+    applicationName: SITE_NAME,
     creator: "Cédric Pontet",
-    keywords: ["play", "learning", "innovation"],
-    metadataBase: new URL("https://play14.org"),
+    keywords: ["play", "learning", "innovation", "agile", "serious games", "unconference"],
+    metadataBase: new URL(SITE_URL),
     openGraph: {
       title: t("title"),
       description: t("description"),
-      url: "https://play14.org",
-      siteName: "#play14",
-      images: [
-        {
-          url: "https://play14.org/_next/static/media/play14_white_bg_transparent.1b2c7257.svg",
-          alt: "play14 svg logo",
-        },
-        {
-          url: "https://play14.org/_next/static/media/play14_1500x500_transparent.c4d92af9.png",
-          width: 1500,
-          height: 500,
-          alt: "play14 logo transparent background",
-        },
-      ],
+      siteName: SITE_NAME,
+      images: [DEFAULT_OG_IMAGE],
       locale: ogLocales[locale] || "en_US",
       type: "website",
     },
-    alternates: {
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [l, l === routing.defaultLocale ? "/" : `/${l}`])
-      ),
+    twitter: {
+      card: "summary_large_image",
+      site: "@play14team",
+      title: t("title"),
+      description: t("description"),
+      images: [DEFAULT_OG_IMAGE.url],
     },
+    // No `alternates` here on purpose: layout-level hreflang is inherited by
+    // every page that does not set its own, which pointed each page's language
+    // versions at the home page. Pages set canonical + hreflang via
+    // `buildMetadata()` from `@/libs/seo`.
   }
 }
 

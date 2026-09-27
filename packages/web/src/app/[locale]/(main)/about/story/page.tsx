@@ -5,13 +5,14 @@ import HistoryItem from "@/components/about/historyitem"
 import HtmlContent from "@/components/layout/html-content"
 import Page from "@/components/layout/page"
 import PlayerGrid from "@/components/players/grid"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 import type { Enum_Componentdefaulthistoryitem_Dateformat, History, Player } from "@/models/strapi"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("about.story")
-  return {
-    title: `About | ${t("title")}`,
-  }
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "about.story" })
+  return pageMetadata({ locale, pathname: "/about/story", title: `About | ${t("title")}` })
 }
 
 export default async function Story() {

@@ -3,13 +3,14 @@ import { getTranslations, setRequestLocale } from "next-intl/server"
 import ArticlesPageContent from "@/components/articles/articles-page-content"
 import { getAllArticles } from "@/components/articles/get.action"
 import { getArticleFilterOptions } from "@/components/articles/get-filter-options.action"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 import type { Article } from "@/models/strapi"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("articles")
-  return {
-    title: t("title"),
-  }
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "articles" })
+  return pageMetadata({ locale, pathname: "/articles", title: t("title") })
 }
 
 // Force static generation - filtering happens client-side
