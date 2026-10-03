@@ -1,0 +1,14 @@
+{
+  "name": "play14-book",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "#play14, the story: an mdBook about how the community started and grew",
+  "scripts": {
+    "dev": "bash scripts/mdbook.sh serve --open",
+    "build": "bash scripts/mdbook.sh build",
+    "test": "bash scripts/mdbook.sh test",
+    "clean": "bash scripts/mdbook.sh clean",
+    "outreach": "python3 scripts/outreach.py"
+  }
+}

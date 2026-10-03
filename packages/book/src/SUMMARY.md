@@ -1,0 +1,90 @@
+# Summary
+
+[#play14, the story](title.md)
+[Foreword](foreword.md)
+
+# How it started
+
+- [A meeting in a hotel bar](beginnings/the-meeting.md)
+- [A name and a logo](beginnings/a-name-and-a-logo.md)
+- [March 14th, 2014](beginnings/the-first-event.md)
+- [Once was not enough](beginnings/once-was-not-enough.md)
+
+# How we grew
+
+- [A chain of encounters](growth/index.md)
+- [The first circle, 2015–2016](growth/first-circle.md)
+  - [London](growth/cities/london.md)
+  - [Beirut](growth/cities/beirut.md)
+  - [Milano](growth/cities/milano.md)
+  - [Hamburg](growth/cities/hamburg.md)
+- [Across Europe, 2017–2018](growth/europe.md)
+  - [Madrid](growth/cities/madrid.md)
+  - [Berlin](growth/cities/berlin.md)
+  - [Timisoara](growth/cities/timisoara.md)
+  - [Barcelona](growth/cities/barcelona.md)
+  - [Amsterdam](growth/cities/amsterdam.md)
+  - [Basel](growth/cities/basel.md)
+  - [Porto](growth/cities/porto.md)
+  - [Bari](growth/cities/bari.md)
+- [Three continents, 2019](growth/three-continents.md)
+  - [Sydney](growth/cities/sydney.md)
+  - [Mexico](growth/cities/mexico.md)
+  - [Bologna](growth/cities/bologna.md)
+  - [Lisbon](growth/cities/lisbon.md)
+  - [Vienna](growth/cities/vienna.md)
+  - [Emmental](growth/cities/emmental.md)
+  - [Kuala Lumpur](growth/cities/kuala-lumpur.md)
+- [The pandemic years](growth/pandemic.md)
+  - [Utrecht](growth/cities/utrecht.md)
+  - [Viseu](growth/cities/viseu.md)
+  - [Iasi](growth/cities/iasi.md)
+  - [Munich](growth/cities/munich.md)
+- [Asia and beyond, 2023–2026](growth/asia-and-beyond.md)
+  - [Zagreb](growth/cities/zagreb.md)
+  - [Manila](growth/cities/manila.md)
+  - [Curia](growth/cities/curia.md)
+  - [Zürich](growth/cities/zurich.md)
+  - [Bangalore](growth/cities/bangalore.md)
+  - [Figino Serenza](growth/cities/figino-serenza.md)
+  - [Florence](growth/cities/florence.md)
+  - [Zoetermeer](growth/cities/zoetermeer.md)
+  - [Singapore](growth/cities/singapore.md)
+  - [Nancy](growth/cities/nancy.md)
+  - [Vinkeveen](growth/cities/vinkeveen.md)
+  - [Pune](growth/cities/pune.md)
+  - [Aveiro](growth/cities/aveiro.md)
+  - [Bangkok](growth/cities/bangkok.md)
+  - [Delhi](growth/cities/delhi.md)
+  - [Mumbai](growth/cities/mumbai.md)
+- [Twelve years on](growth/twelve-years-on.md)
+
+# The mentoring program
+
+- [Why mentoring](mentoring/why-mentoring.md)
+- [Becoming a host](mentoring/becoming-a-host.md)
+- [What a mentor does](mentoring/what-a-mentor-does.md)
+
+# What makes #play14 special
+
+- [In 14 words](special/index.md)
+  - [Playful](special/playful.md)
+  - [Learning](special/learning.md)
+  - [Metaphor](special/metaphor.md)
+  - [Open](special/open.md)
+  - [Format](special/format.md)
+  - [Flat](special/flat.md)
+  - [Food](special/food.md)
+  - [Affordable](special/affordable.md)
+  - [Non-profit](special/non-profit.md)
+  - [Brand](special/brand.md)
+  - [People](special/people.md)
+  - [Diversity](special/diversity.md)
+  - [Organic](special/organic.md)
+  - [Global](special/global.md)
+
+---
+
+[Join us](epilogue.md)
+[Timeline](timeline.md)
+[Tell your story](contribute.md)
