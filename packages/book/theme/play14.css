@@ -1,0 +1,105 @@
+/* #play14 brand accents on top of the stock mdBook themes.
+   Palette from packages/design/colors/Colors.txt. */
+:root {
+  --play14-red: #d80000;
+  --play14-orange: #ff5200;
+  --play14-yellow: #ffc900;
+  --play14-green: #92c900;
+  --play14-blue: #0098dd;
+  --play14-gray: #393939;
+}
+
+.light,
+.rust {
+  --links: #0077ad;
+  --sidebar-active: var(--play14-orange);
+}
+
+.navy,
+.coal,
+.ayu {
+  --links: #4dc3ff;
+  --sidebar-active: var(--play14-yellow);
+}
+
+/* Five-colour rule under chapter titles, echoing the logo letters */
+.content main > h1:first-of-type {
+  padding-bottom: 0.4em;
+  border-bottom: 4px solid;
+  border-image: linear-gradient(
+      90deg,
+      var(--play14-red) 0 20%,
+      var(--play14-orange) 20% 40%,
+      var(--play14-yellow) 40% 60%,
+      var(--play14-green) 60% 80%,
+      var(--play14-blue) 80% 100%
+    )
+    1;
+}
+
+/* Title page */
+.title-page {
+  text-align: center;
+  margin: 3em 0;
+}
+
+.title-page .subtitle {
+  font-size: 1.4em;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.title-page img {
+  max-width: 280px;
+}
+
+/* Show the logo variant that suits the active theme */
+.logo-dark {
+  display: none;
+}
+
+.navy .logo-light,
+.coal .logo-light,
+.ayu .logo-light {
+  display: none;
+}
+
+.navy .logo-dark,
+.coal .logo-dark,
+.ayu .logo-dark {
+  display: inline;
+}
+
+/* One of the 14 words, set as an epigraph */
+.word-tagline {
+  font-size: 1.25em;
+  font-style: italic;
+  border-left: 4px solid var(--play14-orange);
+  padding-left: 0.8em;
+  margin: 1.5em 0;
+}
+
+/* Timeline images in the story chapters */
+.story-image {
+  display: block;
+  max-width: 360px;
+  margin: 1.5em auto;
+  border-radius: 6px;
+}
+
+/* City chapters: facts line under the title */
+.city-meta {
+  font-size: 0.95em;
+  opacity: 0.85;
+  margin-top: -0.5em;
+}
+
+/* Placeholder for a founding team's story that hasn't arrived yet */
+.contribution-pending {
+  border: 2px dashed var(--play14-blue);
+  border-radius: 6px;
+  padding: 0.2em 1.2em;
+  margin: 1.5em 0;
+  font-style: italic;
+  background: color-mix(in srgb, var(--play14-blue) 8%, transparent);
+}

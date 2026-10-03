@@ -1,0 +1,22 @@
+[book]
+title = "#play14, the story"
+description = "Organically growing a global community"
+authors = ["Cédric Pontet"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+additional-css = ["theme/play14.css"]
+git-repository-url = "https://github.com/play14team/play14"
+site-url = "/"
+no-section-label = false
+edit-url-template = "https://github.com/play14team/play14/edit/main/packages/book/src/{path}"
+
+[output.html.search]
+enable = true
