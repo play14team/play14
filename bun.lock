@@ -65,10 +65,6 @@
         "vitest": "^5.0.3",
       },
     },
-    "packages/book": {
-      "name": "play14-book",
-      "version": "1.0.0",
-    },
     "packages/design": {
       "name": "design",
       "version": "1.0.0",
@@ -3337,8 +3333,6 @@
     "pkg-up": ["pkg-up@3.1.0", "", { "dependencies": { "find-up": "^3.0.0" } }, "sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA=="],
 
     "play14-api": ["play14-api@workspace:packages/api"],
-
-    "play14-book": ["play14-book@workspace:packages/book"],
 
     "play14-web": ["play14-web@workspace:packages/web"],
 

@@ -7,7 +7,7 @@ The contributor guide for founding teams lives in the book itself, so it can be 
 1. Open the city chapter in `src/growth/cities/<city>.md`.
 2. Replace the `<div class="contribution-pending">` block under **In their words** with the contribution. Keep the author's voice, and credit them in a line at the top, for example `*By Mari Luz Garcia*`.
 3. Put photos in `src/images/cities/<city>/`, and only use photos the contributor has the right to share.
-4. Build with `bun --filter play14-book build` and check the page.
+4. Build with `bash packages/book/scripts/mdbook.sh build` and check the page.
 
 ## Outreach
 

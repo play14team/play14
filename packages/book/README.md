@@ -1,4 +1,4 @@
-# play14-book
+# #play14, the story
 
 *#play14, the story: organically growing a global community.*
 
@@ -9,16 +9,17 @@ An [mdBook](https://rust-lang.github.io/mdBook/) telling how #play14 started, ho
 Run from the repo root:
 
 ```bash
-bun --filter play14-book dev     # serve with live reload on http://localhost:3000
-bun --filter play14-book build   # render static HTML into packages/book/book/
-bun --filter play14-book test    # compile and test code samples, if any
-bun --filter play14-book clean   # remove the build output
-bun --filter play14-book outreach  # draft invitations to founding teams (see CONTRIBUTING.md)
+bash packages/book/scripts/mdbook.sh serve --open   # live reload on http://localhost:3000
+bash packages/book/scripts/mdbook.sh build          # render static HTML into packages/book/book/
+bash packages/book/scripts/mdbook.sh clean          # remove the build output
+python3 packages/book/scripts/outreach.py           # draft invitations to founding teams (see CONTRIBUTING.md)
 ```
+
+The book is deliberately **not** a Bun workspace package (it has no `package.json`). Registering it would change the root `package.json` and `bun.lock`, and any PR touching those redeploys staging.
 
 You don't need to install mdBook. `scripts/mdbook.sh` downloads a pinned release (`MDBOOK_VERSION`) for your platform into `.bin/` on first use. Linux and macOS on x86_64 and arm64 are supported. Anywhere else, run `cargo install mdbook`.
 
-The `dev` server uses mdBook's default port 3000, the same as the web app. If both are running, pass a different port: `bash scripts/mdbook.sh serve -p 3100`.
+`serve` uses mdBook's default port 3000, the same as the web app. If both are running, pass a different port: `bash scripts/mdbook.sh serve -p 3100`.
 
 ## Layout
 
