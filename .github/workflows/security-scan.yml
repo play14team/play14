@@ -93,7 +93,10 @@ jobs:
         # versions via root `overrides` (shell-quote, tmp, linkify-it,
         # form-data, fast-uri, ip-address, nanoid, postcss, sharp,
         # brace-expansion, axios, lodash/lodash-es, browserslist, js-yaml,
-        # nodemailer, adm-zip) rather than ignored here.
+        # nodemailer, adm-zip, http-cache-semantics) rather than ignored here.
+        # undici can't take a flat override (6.x, 7.x and 8.x are all in the
+        # tree), so its 7.x and 8.x lockfile entries were re-resolved in place
+        # to patched versions within their consumers' ranges (7.30.0, 8.11.2).
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
         # transitive dep with no safe override, or has no published fix;
@@ -104,21 +107,20 @@ jobs:
         #   GHSA-fx2h-pf6j-xcff — vite `server.fs.deny` bypass on Windows. Vite
         #   5.x is the Strapi admin builder; this is a dev-server-only,
         #   Windows-only path, irrelevant to our built admin on a Linux runtime.
-        #   GHSA-vmh5-mc38-953g / GHSA-vxpw-j846-p89q — undici SOCKS5/WebSocket
-        #   issues. The vulnerable line is a Strapi internal; we don't use
-        #   undici SOCKS5 proxying or its WS client.
-        #   GHSA-hm92-r4w5-c3mj — undici. Same reasoning as above.
-        #   GHSA-4cwx-7wf7-3272 — undici cross-user disclosure via degenerate
-        #   private cache directives. Fix is undici >=7.29.0, but @strapi/core
-        #   pins undici to an exact 6.28.0 (outside the advisory range), so a
-        #   flat override would force Strapi's HTTP client across a major.
-        #   The flagged 7.x copy is pulled by cheerio, which we use for HTML
-        #   parsing only; it never issues HTTP requests, so undici's
-        #   response-cache path is unreachable. (isomorphic-dompurify → jsdom 30
-        #   now resolves undici 8.x, outside the advisory range entirely.)
+        #   GHSA-g84c-rxfj-3j2c — webpack-dev-middleware path traversal. Fix is
+        #   >=7.4.5, but @strapi/strapi pins 6.1.3 exactly. It only runs inside
+        #   `strapi develop`'s admin dev server; production serves the admin
+        #   pre-built by `strapi build` and never loads it.
+        #   GHSA-vfj7-8cjw-p6xm — braces stack exhaustion on deeply nested
+        #   patterns. No patched release exists (3.0.3 is the latest). Pulled
+        #   via micromatch/chokidar in Strapi's tooling and sass; it only ever
+        #   expands glob patterns from our own code and config, never input.
         #
         # Dropped here because an override or bump has since fixed them, and a
         # stale ignore would mask a future advisory on the same package:
+        #   GHSA-vmh5-mc38-953g / GHSA-vxpw-j846-p89q / GHSA-hm92-r4w5-c3mj /
+        #   GHSA-4cwx-7wf7-3272 — undici. The 7.x and 8.x copies are now on
+        #   patched versions (7.30.0, 8.11.2) and the advisories no longer match.
         #   GHSA-xcpc-8h2w-3j85 — adm-zip. 0.6.1 is now published, so the
         #   `adm-zip` override has a target and the advisory no longer matches.
         #   GHSA-w3rx-r6r6-pgpr / GHSA-5p2g-fcmc-qvqq — image-size ICNS/JXL/HEIF
@@ -127,7 +129,5 @@ jobs:
         run: >
           bun audit --prod --audit-level=high
           --ignore=GHSA-fx2h-pf6j-xcff
-          --ignore=GHSA-vmh5-mc38-953g
-          --ignore=GHSA-vxpw-j846-p89q
-          --ignore=GHSA-hm92-r4w5-c3mj
-          --ignore=GHSA-4cwx-7wf7-3272
+          --ignore=GHSA-g84c-rxfj-3j2c
+          --ignore=GHSA-vfj7-8cjw-p6xm
