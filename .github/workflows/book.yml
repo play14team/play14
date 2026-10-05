@@ -1,0 +1,33 @@
+name: Book — build and check
+
+# Builds packages/book with the pinned mdBook and checks links and the
+# lineage data. The book is not deployed, and this workflow file is not in
+# either deploy workflow's trigger paths, so it never starts a deploy.
+on:
+  pull_request:
+    paths:
+      - "packages/book/**"
+      - ".github/workflows/book.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/book/**"
+      - ".github/workflows/book.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and check the book
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build
+        # mdbook.sh downloads the pinned mdBook and verifies its SHA-256
+        run: bash packages/book/scripts/mdbook.sh build
+
+      - name: Check links and lineage
+        run: python3 packages/book/scripts/check.py

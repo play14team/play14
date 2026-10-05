@@ -1,0 +1,8 @@
+# mdBook output
+book/
+# Pinned mdBook binary downloaded by scripts/mdbook.sh
+.bin/
+# Contact tracker and invitation drafts (personal correspondence, see CONTRIBUTING.md)
+outreach/
+# Python bytecode from the scripts
+__pycache__/

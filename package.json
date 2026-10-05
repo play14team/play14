@@ -14,6 +14,7 @@
     "stripe:cli": "stripe listen --forward-to localhost:1337/api/ticket-orders/webhook",
     "api": "bun --cwd packages/api dev",
     "web": "bun --cwd packages/web dev",
+    "book": "bash packages/book/scripts/mdbook.sh serve --open",
     "build": "bun --cwd packages/api build && bun --cwd packages/web build",
     "build:api": "bun --cwd packages/api build",
     "build:web": "bun --cwd packages/web build",

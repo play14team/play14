@@ -19,6 +19,9 @@ This is a Bun workspace monorepo with the following structure:
   - **Purpose**: Frontend for the #play14 community platform, consuming the Strapi 5 REST API
   - **Key Features**: SSR, event calendar, player profiles, interactive maps, server actions, i18n via `next-intl`
   - See `packages/web/CLAUDE.md` for detailed web documentation
+- **packages/book**: *#play14, the story*, an [mdBook](https://rust-lang.github.io/mdBook/) about how the community started, grew, mentors new hosts, and what makes it special
+  - `scripts/mdbook.sh` downloads a pinned mdBook release into `.bin/` on first use; no cargo or global install needed
+  - Not a Bun workspace package (no `package.json` of its own), so book changes never touch `bun.lock`. Its only root footprint is the `book` script in the root `package.json`; editing that line (or anything else in the root `package.json`/`bun.lock`) redeploys staging. Not deployed; see `packages/book/README.md`
 - **packages/design** (`play14-design`): Design assets and Storybook
   - Contains graphic design resources (logos, colors, fonts, QR codes)
   - Includes a Storybook application in `storybook/` subdirectory
@@ -61,6 +64,10 @@ bun --filter play14-web typecheck          # tsc --noEmit
 bun --filter play14-web test               # Vitest unit tests
 bun --filter play14-web test:e2e           # Playwright E2E tests
 
+# Book (mdBook, not a workspace package)
+bash packages/book/scripts/mdbook.sh serve --open   # http://localhost:3100 (pass -p to override)
+bash packages/book/scripts/mdbook.sh build          # Render HTML into packages/book/book/
+
 # Work with Storybook
 bun --filter play14-design storybook          # Start Storybook dev server
 bun --filter play14-design build-storybook    # Build Storybook
@@ -74,7 +81,7 @@ bun --filter play14-design build-storybook    # Build Storybook
 - `typecheck` — run the web package `tsc --noEmit` (API has its own via `bun --filter play14-api typecheck`)
 - `test`, `test:api`, `test:web`, `test:int`, `test:all` — unit + integration test runners
 - `verify` — lint + check + typecheck + test:all
-- `api`, `web` — start each dev server; `build`, `build:api`, `build:web` — build bundles; `start:api`, `start:web` — production run
+- `api`, `web` — start each dev server; `book` — serve the book on http://localhost:3100; `build`, `build:api`, `build:web` — build bundles; `start:api`, `start:web` — production run
 - `avatars:sync` — fill in player avatars from their LinkedIn profile photo. Manual by design; the monthly `linkedinAvatarReport` cron only reports candidates. Needs `STRAPI_URL` + `STRAPI_API_TOKEN` (or `--url=` + `--token-file=`) and the authenticated `linkedin` CLI. Flags: `--dry-run`, `--only=<slug>`, `--limit=N`. Never overwrites a human-uploaded avatar — see `packages/api/src/services/cron/linkedin-avatars.ts`.
 
 ### Container Development

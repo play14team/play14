@@ -1,0 +1,1760 @@
+{
+  "_source": "play14.org production event and player records, snapshot 2026-10-03. firstPlayed = earliest event a host attended or hosted before the city's first edition; null when the records show none.",
+  "cities": [
+    {
+      "city": "Luxembourg",
+      "chapter": null,
+      "parent": null,
+      "firstEdition": {
+        "name": "Luxembourg 2014",
+        "slug": "luxembourg-2014-03",
+        "start": "2014-03-14"
+      },
+      "hosts": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet",
+          "firstPlayed": null
+        },
+        {
+          "name": "Diego De Biasio",
+          "slug": "diego-de-biasio",
+          "firstPlayed": null
+        },
+        {
+          "name": "Pierre Neis",
+          "slug": "pierre-neis",
+          "firstPlayed": null
+        },
+        {
+          "name": "Yann Gensollen",
+          "slug": "yann-gensollen",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "London",
+      "chapter": "growth/cities/london.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "London 2015",
+        "slug": "london-2015-09",
+        "start": "2015-09-11"
+      },
+      "hosts": [
+        {
+          "name": "Chris Caswell",
+          "slug": "chris-caswell",
+          "firstPlayed": null
+        },
+        {
+          "name": "Chris Selby",
+          "slug": "chris-selby",
+          "firstPlayed": null
+        },
+        {
+          "name": "Christina Ohanian",
+          "slug": "christina-ohanian",
+          "firstPlayed": {
+            "event": "Luxembourg 2015",
+            "slug": "luxembourg-2015-03"
+          }
+        },
+        {
+          "name": "Mark Webb",
+          "slug": "mark-webb",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Beirut",
+      "chapter": "growth/cities/beirut.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "Beirut 2015",
+        "slug": "beirut-2015-11",
+        "start": "2015-11-20"
+      },
+      "hosts": [
+        {
+          "name": "Pierre Neis",
+          "slug": "pierre-neis",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Pierre Hervouet",
+          "slug": "pierre-hervouet",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Milano",
+      "chapter": "growth/cities/milano.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "Milano 2016",
+        "slug": "milano-2016-05",
+        "start": "2016-05-05"
+      },
+      "hosts": [
+        {
+          "name": "Fabio Ghislandi",
+          "slug": "fabio-ghislandi",
+          "firstPlayed": null
+        },
+        {
+          "name": "Giovanni Puliti",
+          "slug": "giovanni-puliti",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Giulio Roggero",
+          "slug": "giulio-roggero",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Hamburg",
+      "chapter": "growth/cities/hamburg.md",
+      "parent": "London",
+      "firstEdition": {
+        "name": "Hamburg 2016",
+        "slug": "hamburg-2016-06",
+        "start": "2016-06-24"
+      },
+      "hosts": [
+        {
+          "name": "Julian Kea",
+          "slug": "julian-kea",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Karsten Mueller",
+          "slug": "karsten-mueller",
+          "firstPlayed": {
+            "event": "London 2015",
+            "slug": "london-2015-09"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Madrid",
+      "chapter": "growth/cities/madrid.md",
+      "parent": "Hamburg",
+      "firstEdition": {
+        "name": "Madrid 2017",
+        "slug": "madrid-2017-06",
+        "start": "2017-06-09"
+      },
+      "hosts": [
+        {
+          "name": "Beatriz Gortazar",
+          "slug": "beatriz-gortazar",
+          "firstPlayed": null
+        },
+        {
+          "name": "Mari Luz Garcia",
+          "slug": "mari-luz-garcia",
+          "firstPlayed": {
+            "event": "Hamburg 2016",
+            "slug": "hamburg-2016-06"
+          }
+        },
+        {
+          "name": "Meryl His",
+          "slug": "meryl-his",
+          "firstPlayed": null
+        },
+        {
+          "name": "Sophie Vurpillot",
+          "slug": "sophie-vurpillot",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Berlin",
+      "chapter": "growth/cities/berlin.md",
+      "parent": "Hamburg",
+      "firstEdition": {
+        "name": "Berlin 2017",
+        "slug": "berlin-2017-06",
+        "start": "2017-06-22"
+      },
+      "hosts": [
+        {
+          "name": "Cori Moore",
+          "slug": "cori-moore",
+          "firstPlayed": null
+        },
+        {
+          "name": "Julian Kea",
+          "slug": "julian-kea",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Karsten Mueller",
+          "slug": "karsten-mueller",
+          "firstPlayed": {
+            "event": "London 2015",
+            "slug": "london-2015-09"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Timisoara",
+      "chapter": "growth/cities/timisoara.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "Timisoara 2017",
+        "slug": "timisoara-2017-07",
+        "start": "2017-07-21"
+      },
+      "hosts": [
+        {
+          "name": "Adriana Rusu",
+          "slug": "adriana-rusu",
+          "firstPlayed": {
+            "event": "Luxembourg 2016",
+            "slug": "luxembourg-2016-03"
+          }
+        },
+        {
+          "name": "Dragos Marius Jumanca",
+          "slug": "dragos-marius-jumanca",
+          "firstPlayed": {
+            "event": "Luxembourg 2015",
+            "slug": "luxembourg-2015-03"
+          }
+        },
+        {
+          "name": "Karina Herman",
+          "slug": "karina-herman",
+          "firstPlayed": {
+            "event": "Luxembourg 2016",
+            "slug": "luxembourg-2016-03"
+          }
+        },
+        {
+          "name": "Leon-Cosmin Lupu",
+          "slug": "leon-cosmin-lupu",
+          "firstPlayed": {
+            "event": "Luxembourg 2015",
+            "slug": "luxembourg-2015-03"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Barcelona",
+      "chapter": "growth/cities/barcelona.md",
+      "parent": "Milano",
+      "firstEdition": {
+        "name": "Barcelona 2017",
+        "slug": "barcelona-2017-10",
+        "start": "2017-10-19"
+      },
+      "hosts": [
+        {
+          "name": "Esther Balmaña",
+          "slug": "esther-balmana",
+          "firstPlayed": {
+            "event": "Milano 2017",
+            "slug": "milano-2017-05"
+          }
+        },
+        {
+          "name": "Francesc Mas",
+          "slug": "francesc-mas",
+          "firstPlayed": {
+            "event": "Milano 2017",
+            "slug": "milano-2017-05"
+          }
+        },
+        {
+          "name": "Manolo Lopez",
+          "slug": "manolo-lopez",
+          "firstPlayed": {
+            "event": "Madrid 2017",
+            "slug": "madrid-2017-06"
+          }
+        },
+        {
+          "name": "Mònica Valcárcel",
+          "slug": "monica-valcarcel",
+          "firstPlayed": null
+        },
+        {
+          "name": "Yuval Sidney Barak Azagury",
+          "slug": "yuval-sidney-barak-azagury",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Amsterdam",
+      "chapter": "growth/cities/amsterdam.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "Amsterdam 2017",
+        "slug": "amsterdam-2017-11",
+        "start": "2017-11-02"
+      },
+      "hosts": [
+        {
+          "name": "Anko Tijman",
+          "slug": "anko-tijman",
+          "firstPlayed": null
+        },
+        {
+          "name": "Jordann Gross",
+          "slug": "jordann-gross",
+          "firstPlayed": null
+        },
+        {
+          "name": "Koen van der Pasch",
+          "slug": "koen-van-der-pasch",
+          "firstPlayed": {
+            "event": "Luxembourg 2017",
+            "slug": "luxembourg-2017-03"
+          }
+        },
+        {
+          "name": "Ralph van Roosmalen",
+          "slug": "ralph-van-roosmalen",
+          "firstPlayed": null
+        },
+        {
+          "name": "Sonja Uittenboogaard",
+          "slug": "sonja-uittenboogaard",
+          "firstPlayed": {
+            "event": "Luxembourg 2017",
+            "slug": "luxembourg-2017-03"
+          }
+        },
+        {
+          "name": "Stanislava Potupchik",
+          "slug": "stanislava-potupchik",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Basel",
+      "chapter": "growth/cities/basel.md",
+      "parent": "Milano",
+      "firstEdition": {
+        "name": "Basel 2018",
+        "slug": "basel-2018-04",
+        "start": "2018-04-13"
+      },
+      "hosts": [
+        {
+          "name": "Andreas Erbe",
+          "slug": "andreas-erbe",
+          "firstPlayed": null
+        },
+        {
+          "name": "Bernhard Sterchi",
+          "slug": "bernhard-sterchi",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        },
+        {
+          "name": "Peter Stevens",
+          "slug": "peter-stevens",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Porto",
+      "chapter": "growth/cities/porto.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "Porto 2018",
+        "slug": "porto-2018-09",
+        "start": "2018-09-28"
+      },
+      "hosts": [
+        {
+          "name": "Ana Umbelino",
+          "slug": "ana-umbelino",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Nuno Mateiro",
+          "slug": "nuno-mateiro",
+          "firstPlayed": {
+            "event": "Barcelona 2017",
+            "slug": "barcelona-2017-10"
+          }
+        },
+        {
+          "name": "Raquel Pedrouso",
+          "slug": "raquel-pedrouso",
+          "firstPlayed": {
+            "event": "Madrid 2017",
+            "slug": "madrid-2017-06"
+          }
+        },
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Rita Oliveira Pelica",
+          "slug": "rita-oliveira-pelica",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Bari",
+      "chapter": "growth/cities/bari.md",
+      "parent": "Milano",
+      "firstEdition": {
+        "name": "Bari 2018",
+        "slug": "bari-2018-12",
+        "start": "2018-12-14"
+      },
+      "hosts": [
+        {
+          "name": "Fabio Ghislandi",
+          "slug": "fabio-ghislandi",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        },
+        {
+          "name": "Giovanni Puliti",
+          "slug": "giovanni-puliti",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Giulio Roggero",
+          "slug": "giulio-roggero",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Sydney",
+      "chapter": "growth/cities/sydney.md",
+      "parent": "Madrid",
+      "firstEdition": {
+        "name": "Sydney 2019",
+        "slug": "sydney-2019-03",
+        "start": "2019-03-01"
+      },
+      "hosts": [
+        {
+          "name": "Catherine Hyams",
+          "slug": "catherine-hyams",
+          "firstPlayed": null
+        },
+        {
+          "name": "Hanna Karlsson",
+          "slug": "hanna-karlsson",
+          "firstPlayed": {
+            "event": "Madrid 2018",
+            "slug": "madrid-2018-06"
+          }
+        },
+        {
+          "name": "Hayley Bell",
+          "slug": "hayley-bell",
+          "firstPlayed": null
+        },
+        {
+          "name": "Ralph Warta",
+          "slug": "ralph-warta",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Mexico",
+      "chapter": "growth/cities/mexico.md",
+      "parent": "London",
+      "firstEdition": {
+        "name": "Mexico 2019",
+        "slug": "mexico-2019-05",
+        "start": "2019-05-31"
+      },
+      "hosts": [
+        {
+          "name": "Adriana Molina",
+          "slug": "adriana-molina",
+          "firstPlayed": null
+        },
+        {
+          "name": "Alex Canizales Castro",
+          "slug": "alex-canizales-castro",
+          "firstPlayed": null
+        },
+        {
+          "name": "Mario Méndez López",
+          "slug": "mario-mendez-lopez",
+          "firstPlayed": null
+        },
+        {
+          "name": "Ulises Aguila",
+          "slug": "ulises-aguila",
+          "firstPlayed": {
+            "event": "London 2018",
+            "slug": "london-2018-09"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Pierre Neis",
+          "slug": "pierre-neis"
+        }
+      ]
+    },
+    {
+      "city": "Bologna",
+      "chapter": "growth/cities/bologna.md",
+      "parent": "Milano",
+      "firstEdition": {
+        "name": "Bologna 2019",
+        "slug": "bologna-2019-06",
+        "start": "2019-06-13"
+      },
+      "hosts": [
+        {
+          "name": "Fabio Ghislandi",
+          "slug": "fabio-ghislandi",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        },
+        {
+          "name": "Giovanni Puliti",
+          "slug": "giovanni-puliti",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Giulio Roggero",
+          "slug": "giulio-roggero",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Lisbon",
+      "chapter": "growth/cities/lisbon.md",
+      "parent": "Porto",
+      "firstEdition": {
+        "name": "Lisbon 2019",
+        "slug": "lisbon-2019-06",
+        "start": "2019-06-28"
+      },
+      "hosts": [
+        {
+          "name": "Ana Umbelino",
+          "slug": "ana-umbelino",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Nuno Mateiro",
+          "slug": "nuno-mateiro",
+          "firstPlayed": {
+            "event": "Barcelona 2017",
+            "slug": "barcelona-2017-10"
+          }
+        },
+        {
+          "name": "Raquel Pedrouso",
+          "slug": "raquel-pedrouso",
+          "firstPlayed": {
+            "event": "Madrid 2017",
+            "slug": "madrid-2017-06"
+          }
+        },
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Rita Oliveira Pelica",
+          "slug": "rita-oliveira-pelica",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Vienna",
+      "chapter": "growth/cities/vienna.md",
+      "parent": "Hamburg",
+      "firstEdition": {
+        "name": "Vienna 2019",
+        "slug": "vienna-2019-09",
+        "start": "2019-09-05"
+      },
+      "hosts": [
+        {
+          "name": "Barbara Pauer-Faulmann",
+          "slug": "barbara-pauer-faulmann",
+          "firstPlayed": {
+            "event": "Hamburg 2018",
+            "slug": "hamburg-2018-06"
+          }
+        },
+        {
+          "name": "Anton Jessner",
+          "slug": "anton-jessner",
+          "firstPlayed": null
+        },
+        {
+          "name": "Barbara Kühnelt",
+          "slug": "barbara-kuhnelt",
+          "firstPlayed": null
+        },
+        {
+          "name": "Michael Laussegger",
+          "slug": "michael-laussegger",
+          "firstPlayed": null
+        },
+        {
+          "name": "Mike Leber",
+          "slug": "mike-leber",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Pierre Neis",
+          "slug": "pierre-neis"
+        }
+      ]
+    },
+    {
+      "city": "Emmental",
+      "chapter": "growth/cities/emmental.md",
+      "parent": "Basel",
+      "firstEdition": {
+        "name": "Emmental 2019",
+        "slug": "emmental-2019-10",
+        "start": "2019-10-11"
+      },
+      "hosts": [
+        {
+          "name": "Brigitte Woodtli",
+          "slug": "brigitte-woodtli",
+          "firstPlayed": null
+        },
+        {
+          "name": "Elvira Bühlmann",
+          "slug": "elvira-buhlmann",
+          "firstPlayed": null
+        },
+        {
+          "name": "Patrik Kämpf",
+          "slug": "patrik-kampf",
+          "firstPlayed": {
+            "event": "Basel 2018",
+            "slug": "basel-2018-04"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Bernhard Sterchi",
+          "slug": "bernhard-sterchi"
+        },
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Kuala Lumpur",
+      "chapter": "growth/cities/kuala-lumpur.md",
+      "parent": "Sydney",
+      "firstEdition": {
+        "name": "Kuala Lumpur 2019",
+        "slug": "kuala-lumpur-2019-10",
+        "start": "2019-10-25"
+      },
+      "hosts": [
+        {
+          "name": "Andrew Lau",
+          "slug": "andrew-lau",
+          "firstPlayed": null
+        },
+        {
+          "name": "Frederic Ducros",
+          "slug": "frederic-ducros",
+          "firstPlayed": {
+            "event": "Sydney 2019",
+            "slug": "sydney-2019-03"
+          }
+        },
+        {
+          "name": "Narudee (Poom) Kristhanin",
+          "slug": "narudee-poom-kristhanin",
+          "firstPlayed": null
+        },
+        {
+          "name": "Shadaitul Intan",
+          "slug": "shadaitul-intan",
+          "firstPlayed": null
+        },
+        {
+          "name": "Sufiz Mohd Suffian",
+          "slug": "sufiz-mohd-suffian",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        },
+        {
+          "name": "Hanna Karlsson",
+          "slug": "hanna-karlsson"
+        }
+      ]
+    },
+    {
+      "city": "Utrecht",
+      "chapter": "growth/cities/utrecht.md",
+      "parent": "Amsterdam",
+      "firstEdition": {
+        "name": "Utrecht 2021",
+        "slug": "utrecht-2021-11",
+        "start": "2021-11-11"
+      },
+      "hosts": [
+        {
+          "name": "Anko Tijman",
+          "slug": "anko-tijman",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Eddy Bruin",
+          "slug": "eddy-bruin",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Koen van der Pasch",
+          "slug": "koen-van-der-pasch",
+          "firstPlayed": {
+            "event": "Luxembourg 2017",
+            "slug": "luxembourg-2017-03"
+          }
+        },
+        {
+          "name": "Sonja Uittenboogaard",
+          "slug": "sonja-uittenboogaard",
+          "firstPlayed": {
+            "event": "Luxembourg 2017",
+            "slug": "luxembourg-2017-03"
+          }
+        },
+        {
+          "name": "Theo Geelen",
+          "slug": "theo-geelen",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Viseu",
+      "chapter": "growth/cities/viseu.md",
+      "parent": "Porto",
+      "firstEdition": {
+        "name": "Viseu 2022",
+        "slug": "viseu-2022-06",
+        "start": "2022-06-30"
+      },
+      "hosts": [
+        {
+          "name": "Ana Umbelino",
+          "slug": "ana-umbelino",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Nuno Mateiro",
+          "slug": "nuno-mateiro",
+          "firstPlayed": {
+            "event": "Barcelona 2017",
+            "slug": "barcelona-2017-10"
+          }
+        },
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Iasi",
+      "chapter": "growth/cities/iasi.md",
+      "parent": "Madrid",
+      "firstEdition": {
+        "name": "Iasi 2022",
+        "slug": "iasi-2022-09",
+        "start": "2022-09-09"
+      },
+      "hosts": [
+        {
+          "name": "Andrei Onofrei",
+          "slug": "andrei-onofrei",
+          "firstPlayed": null
+        },
+        {
+          "name": "Catalina Vrabie",
+          "slug": "catalina-vrabie",
+          "firstPlayed": {
+            "event": "Madrid 2019",
+            "slug": "madrid-2019-05"
+          }
+        },
+        {
+          "name": "Gabriel Musteata",
+          "slug": "gabriel-musteata",
+          "firstPlayed": null
+        },
+        {
+          "name": "Ionut Grecu",
+          "slug": "ionut-grecu",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Munich",
+      "chapter": "growth/cities/munich.md",
+      "parent": "Hamburg",
+      "firstEdition": {
+        "name": "Munich 2022",
+        "slug": "munich-2022-10",
+        "start": "2022-10-14"
+      },
+      "hosts": [
+        {
+          "name": "Benjamin Sung Ho Wenzel",
+          "slug": "benjamin-sung-ho-wenzel",
+          "firstPlayed": {
+            "event": "Hamburg 2019",
+            "slug": "hamburg-2019-09"
+          }
+        },
+        {
+          "name": "Karsten Mueller",
+          "slug": "karsten-mueller",
+          "firstPlayed": {
+            "event": "London 2015",
+            "slug": "london-2015-09"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Zagreb",
+      "chapter": "growth/cities/zagreb.md",
+      "parent": null,
+      "firstEdition": {
+        "name": "Zagreb 2023",
+        "slug": "zagreb-2023-03",
+        "start": "2023-03-03"
+      },
+      "hosts": [
+        {
+          "name": "Kristijan Zimmer",
+          "slug": "kristijan-zimmer",
+          "firstPlayed": null
+        },
+        {
+          "name": "Lucija Pilić",
+          "slug": "lucija-pilic",
+          "firstPlayed": null
+        },
+        {
+          "name": "Aleksandar Gavrilović",
+          "slug": "aleksandar-gavrilovic",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Nancy Beers",
+          "slug": "nancy-beers"
+        }
+      ]
+    },
+    {
+      "city": "Manila",
+      "chapter": "growth/cities/manila.md",
+      "parent": "Kuala Lumpur",
+      "firstEdition": {
+        "name": "Manila 2023",
+        "slug": "manila-2023-05",
+        "start": "2023-05-24"
+      },
+      "hosts": [
+        {
+          "name": "Darwin Antipolo",
+          "slug": "darwin-antipolo",
+          "firstPlayed": null
+        },
+        {
+          "name": "Brent Byron Que",
+          "slug": "brent-byron-que",
+          "firstPlayed": null
+        },
+        {
+          "name": "Jeng Lamug",
+          "slug": "jeng-lamug",
+          "firstPlayed": null
+        },
+        {
+          "name": "Laxman Murugappan",
+          "slug": "laxman-murugappan",
+          "firstPlayed": {
+            "event": "Lisbon 2019",
+            "slug": "lisbon-2019-06"
+          }
+        },
+        {
+          "name": "Michael Marcel Santos",
+          "slug": "michael-marcel-santos",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Curia",
+      "chapter": "growth/cities/curia.md",
+      "parent": "Viseu",
+      "firstEdition": {
+        "name": "Curia 2023",
+        "slug": "curia-2023-09",
+        "start": "2023-09-14"
+      },
+      "hosts": [
+        {
+          "name": "Ana Umbelino",
+          "slug": "ana-umbelino",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Nuno Mateiro",
+          "slug": "nuno-mateiro",
+          "firstPlayed": {
+            "event": "Barcelona 2017",
+            "slug": "barcelona-2017-10"
+          }
+        },
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Pedro Figueiredo",
+          "slug": "pedro-figueiredo",
+          "firstPlayed": {
+            "event": "Viseu 2022",
+            "slug": "viseu-2022-06"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Zürich",
+      "chapter": "growth/cities/zurich.md",
+      "parent": "Berlin",
+      "firstEdition": {
+        "name": "Zürich 2023",
+        "slug": "zurich-2023-09",
+        "start": "2023-09-21"
+      },
+      "hosts": [
+        {
+          "name": "Bernhard Sterchi",
+          "slug": "bernhard-sterchi",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        },
+        {
+          "name": "Nicole Helmerich",
+          "slug": "nicole-helmerich",
+          "firstPlayed": {
+            "event": "Berlin 2023",
+            "slug": "berlin-2023-06"
+          }
+        },
+        {
+          "name": "Pierre Neis",
+          "slug": "pierre-neis",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Alexandre Cuva",
+          "slug": "alexandre-cuva",
+          "firstPlayed": null
+        },
+        {
+          "name": "Tetiana Petrukha",
+          "slug": "tetiana-petrukha",
+          "firstPlayed": {
+            "event": "Madrid 2018",
+            "slug": "madrid-2018-06"
+          }
+        },
+        {
+          "name": "Isatu S Barrie",
+          "slug": "isatu-s-barrie",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Bangalore",
+      "chapter": "growth/cities/bangalore.md",
+      "parent": "Kuala Lumpur",
+      "firstEdition": {
+        "name": "Bangalore 2024",
+        "slug": "bangalore-2024-04",
+        "start": "2024-04-19"
+      },
+      "hosts": [
+        {
+          "name": "Wan Fadzil Adlan Wan Sidik",
+          "slug": "wan-fadzil-adlan-wan-sidik",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2019",
+            "slug": "kuala-lumpur-2019-10"
+          }
+        },
+        {
+          "name": "Laxman Murugappan",
+          "slug": "laxman-murugappan",
+          "firstPlayed": {
+            "event": "Lisbon 2019",
+            "slug": "lisbon-2019-06"
+          }
+        },
+        {
+          "name": "Senthil Kumar G",
+          "slug": "senthil-kumar-g",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2023",
+            "slug": "kuala-lumpur-2023-11"
+          }
+        },
+        {
+          "name": "Sripada Nema",
+          "slug": "sripada-nema",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2023",
+            "slug": "kuala-lumpur-2023-11"
+          }
+        },
+        {
+          "name": "Sumit Sethi",
+          "slug": "sumit-sethi",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2023",
+            "slug": "kuala-lumpur-2023-11"
+          }
+        },
+        {
+          "name": "Atul Jain",
+          "slug": "atul-jain",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2023",
+            "slug": "kuala-lumpur-2023-11"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes"
+        }
+      ]
+    },
+    {
+      "city": "Figino Serenza",
+      "chapter": "growth/cities/figino-serenza.md",
+      "parent": "Bologna",
+      "firstEdition": {
+        "name": "Figino Serenza 2024",
+        "slug": "figino-serenza-2024-06",
+        "start": "2024-06-05"
+      },
+      "hosts": [
+        {
+          "name": "Fabio Ghislandi",
+          "slug": "fabio-ghislandi",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        },
+        {
+          "name": "Giovanni Puliti",
+          "slug": "giovanni-puliti",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Marta Ghislandi",
+          "slug": "marta-ghislandi",
+          "firstPlayed": {
+            "event": "Bologna 2023",
+            "slug": "bologna-2023-06"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Florence",
+      "chapter": "growth/cities/florence.md",
+      "parent": "Bologna",
+      "firstEdition": {
+        "name": "Florence 2024",
+        "slug": "florence-2024-09",
+        "start": "2024-09-05"
+      },
+      "hosts": [
+        {
+          "name": "Fabio Ghislandi",
+          "slug": "fabio-ghislandi",
+          "firstPlayed": {
+            "event": "Milano 2016",
+            "slug": "milano-2016-05"
+          }
+        },
+        {
+          "name": "Giovanni Puliti",
+          "slug": "giovanni-puliti",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Marta Ghislandi",
+          "slug": "marta-ghislandi",
+          "firstPlayed": {
+            "event": "Bologna 2023",
+            "slug": "bologna-2023-06"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Zoetermeer",
+      "chapter": "growth/cities/zoetermeer.md",
+      "parent": "Amsterdam",
+      "firstEdition": {
+        "name": "Zoetermeer 2024",
+        "slug": "zoetermeer-2024-09",
+        "start": "2024-09-26"
+      },
+      "hosts": [
+        {
+          "name": "Anko Tijman",
+          "slug": "anko-tijman",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Eddy Bruin",
+          "slug": "eddy-bruin",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Jordann Gross",
+          "slug": "jordann-gross",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Koen van der Pasch",
+          "slug": "koen-van-der-pasch",
+          "firstPlayed": {
+            "event": "Luxembourg 2017",
+            "slug": "luxembourg-2017-03"
+          }
+        },
+        {
+          "name": "Theo Geelen",
+          "slug": "theo-geelen",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Singapore",
+      "chapter": "growth/cities/singapore.md",
+      "parent": "Madrid",
+      "firstEdition": {
+        "name": "Singapore 2024",
+        "slug": "singapore-2024-10",
+        "start": "2024-10-25"
+      },
+      "hosts": [
+        {
+          "name": "Avi Liran",
+          "slug": "avi-liran",
+          "firstPlayed": {
+            "event": "Madrid 2019",
+            "slug": "madrid-2019-05"
+          }
+        },
+        {
+          "name": "Darwin Antipolo",
+          "slug": "darwin-antipolo",
+          "firstPlayed": {
+            "event": "Manila 2023",
+            "slug": "manila-2023-05"
+          }
+        },
+        {
+          "name": "Sripada Nema",
+          "slug": "sripada-nema",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2023",
+            "slug": "kuala-lumpur-2023-11"
+          }
+        },
+        {
+          "name": "Carol Lim",
+          "slug": "carol-lim",
+          "firstPlayed": null
+        },
+        {
+          "name": "Rajasekhar Tatavarthi",
+          "slug": "rajasekhar-tatavarthi",
+          "firstPlayed": null
+        },
+        {
+          "name": "Si Yu Lai",
+          "slug": "si-yu-lai",
+          "firstPlayed": null
+        },
+        {
+          "name": "Jodie Loi",
+          "slug": "jodie-loi",
+          "firstPlayed": null
+        },
+        {
+          "name": "Ilamathi Selvarajoo",
+          "slug": "ilamathi-selvarajoo",
+          "firstPlayed": null
+        },
+        {
+          "name": "Yin Mei Ho",
+          "slug": "yin-mei-ho",
+          "firstPlayed": null
+        },
+        {
+          "name": "Anna Ong",
+          "slug": "anna-ong",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        }
+      ]
+    },
+    {
+      "city": "Nancy",
+      "chapter": "growth/cities/nancy.md",
+      "parent": "Luxembourg",
+      "firstEdition": {
+        "name": "Nancy 2025",
+        "slug": "nancy-2025-05",
+        "start": "2025-05-15"
+      },
+      "hosts": [
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        },
+        {
+          "name": "Yann Gensollen",
+          "slug": "yann-gensollen",
+          "firstPlayed": {
+            "event": "Luxembourg 2014",
+            "slug": "luxembourg-2014-03"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Vinkeveen",
+      "chapter": "growth/cities/vinkeveen.md",
+      "parent": "Zoetermeer",
+      "firstEdition": {
+        "name": "Vinkeveen 2025",
+        "slug": "vinkeveen-2025-07",
+        "start": "2025-07-03"
+      },
+      "hosts": [
+        {
+          "name": "Eddy Bruin",
+          "slug": "eddy-bruin",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Jantine de Geest",
+          "slug": "jantine-de-geest",
+          "firstPlayed": null
+        },
+        {
+          "name": "Jordann Gross",
+          "slug": "jordann-gross",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Theo Geelen",
+          "slug": "theo-geelen",
+          "firstPlayed": {
+            "event": "Amsterdam 2017",
+            "slug": "amsterdam-2017-11"
+          }
+        },
+        {
+          "name": "Diana Vredenbregt",
+          "slug": "diana-vredenbregt",
+          "firstPlayed": {
+            "event": "Zoetermeer 2024",
+            "slug": "zoetermeer-2024-09"
+          }
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Pune",
+      "chapter": "growth/cities/pune.md",
+      "parent": "Bangalore",
+      "firstEdition": {
+        "name": "Pune 2025",
+        "slug": "pune-2025-10",
+        "start": "2025-10-10"
+      },
+      "hosts": [
+        {
+          "name": "Kavitha Talreja",
+          "slug": "kavitha-talreja",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2023",
+            "slug": "kuala-lumpur-2023-11"
+          }
+        },
+        {
+          "name": "Imran Shaikh",
+          "slug": "imran-shaikh",
+          "firstPlayed": {
+            "event": "Bangalore 2024",
+            "slug": "bangalore-2024-04"
+          }
+        },
+        {
+          "name": "Chetan Patil",
+          "slug": "chetan-patil",
+          "firstPlayed": {
+            "event": "Kuala Lumpur 2024",
+            "slug": "kuala-lumpur-2024-08"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Wan Fadzil Adlan Wan Sidik",
+          "slug": "wan-fadzil-adlan-wan-sidik"
+        },
+        {
+          "name": "Laxman Murugappan",
+          "slug": "laxman-murugappan"
+        }
+      ]
+    },
+    {
+      "city": "Aveiro",
+      "chapter": "growth/cities/aveiro.md",
+      "parent": "Porto",
+      "firstEdition": {
+        "name": "Aveiro 2025",
+        "slug": "aveiro-2025-10",
+        "start": "2025-10-16"
+      },
+      "hosts": [
+        {
+          "name": "Nuno Mateiro",
+          "slug": "nuno-mateiro",
+          "firstPlayed": {
+            "event": "Barcelona 2017",
+            "slug": "barcelona-2017-10"
+          }
+        },
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes",
+          "firstPlayed": {
+            "event": "Luxembourg 2018",
+            "slug": "luxembourg-2018-03"
+          }
+        },
+        {
+          "name": "Bruno Morais",
+          "slug": "bruno-morais",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": []
+    },
+    {
+      "city": "Bangkok",
+      "chapter": "growth/cities/bangkok.md",
+      "parent": "Singapore",
+      "firstEdition": {
+        "name": "Bangkok 2025",
+        "slug": "bangkok-2025-11",
+        "start": "2025-11-14"
+      },
+      "hosts": [
+        {
+          "name": "Chompoonuch Tojaroen (Chompoo)",
+          "slug": "chompoonuch-tojaroen-chompoo",
+          "firstPlayed": {
+            "event": "Singapore 2024",
+            "slug": "singapore-2024-10"
+          }
+        },
+        {
+          "name": "Pamas Limpiwatana (Pam)",
+          "slug": "pamas-limpiwatana-pam",
+          "firstPlayed": {
+            "event": "Singapore 2024",
+            "slug": "singapore-2024-10"
+          }
+        },
+        {
+          "name": "Panupan Peasura (Jo)",
+          "slug": "panupan-peasura-jo",
+          "firstPlayed": null
+        },
+        {
+          "name": "Tanawat Akharametawee (Top)",
+          "slug": "tanawat-akharametawee-top",
+          "firstPlayed": null
+        },
+        {
+          "name": "Poopha Teerachotpokin",
+          "slug": "poopha-teerachotpokin",
+          "firstPlayed": null
+        },
+        {
+          "name": "Tanatporn Kunarayakul (Mai)",
+          "slug": "tanatporn-kunarayakul-mai",
+          "firstPlayed": null
+        },
+        {
+          "name": "Bencharatana Jongjumruspun (Neat)",
+          "slug": "bencharatana-jongjumruspun-neat",
+          "firstPlayed": null
+        },
+        {
+          "name": "Ranida Nuangjhamnong",
+          "slug": "ranida-nuangjhamnong",
+          "firstPlayed": null
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Avi Liran",
+          "slug": "avi-liran"
+        },
+        {
+          "name": "Cédric Pontet",
+          "slug": "cedric-pontet"
+        },
+        {
+          "name": "Darwin Antipolo",
+          "slug": "darwin-antipolo"
+        }
+      ]
+    },
+    {
+      "city": "Delhi",
+      "chapter": "growth/cities/delhi.md",
+      "parent": "Bangalore",
+      "firstEdition": {
+        "name": "Delhi 2026",
+        "slug": "delhi-2026-02",
+        "start": "2026-02-20"
+      },
+      "hosts": [
+        {
+          "name": "Bharti Maru",
+          "slug": "bharti-maru",
+          "firstPlayed": {
+            "event": "Bangalore Nov 2024",
+            "slug": "bangalore-nov-2024-11"
+          }
+        },
+        {
+          "name": "Vidya GV",
+          "slug": "vidya-gv",
+          "firstPlayed": {
+            "event": "Bangalore Nov 2024",
+            "slug": "bangalore-nov-2024-11"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Ricardo Fernandes",
+          "slug": "ricardo-fernandes"
+        },
+        {
+          "name": "Laxman Murugappan",
+          "slug": "laxman-murugappan"
+        }
+      ]
+    },
+    {
+      "city": "Mumbai",
+      "chapter": "growth/cities/mumbai.md",
+      "parent": "Bangalore",
+      "firstEdition": {
+        "name": "Mumbai 2026",
+        "slug": "mumbai-2026-03",
+        "start": "2026-03-27"
+      },
+      "hosts": [
+        {
+          "name": "Pankkti Shhah",
+          "slug": "pankkti-shhah",
+          "firstPlayed": {
+            "event": "Bangalore 2024",
+            "slug": "bangalore-2024-04"
+          }
+        },
+        {
+          "name": "Imran Shaikh",
+          "slug": "imran-shaikh",
+          "firstPlayed": {
+            "event": "Bangalore 2024",
+            "slug": "bangalore-2024-04"
+          }
+        },
+        {
+          "name": "Bharti Maru",
+          "slug": "bharti-maru",
+          "firstPlayed": {
+            "event": "Bangalore Nov 2024",
+            "slug": "bangalore-nov-2024-11"
+          }
+        },
+        {
+          "name": "Vaishali Naik",
+          "slug": "vaishali-naik",
+          "firstPlayed": {
+            "event": "Bangalore Nov 2024",
+            "slug": "bangalore-nov-2024-11"
+          }
+        }
+      ],
+      "mentors": [
+        {
+          "name": "Wan Fadzil Adlan Wan Sidik",
+          "slug": "wan-fadzil-adlan-wan-sidik"
+        },
+        {
+          "name": "Laxman Murugappan",
+          "slug": "laxman-murugappan"
+        }
+      ]
+    }
+  ]
+}
