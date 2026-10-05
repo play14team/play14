@@ -9,7 +9,8 @@ import type { Testimonial } from "@/models/strapi"
 
 export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
   const { locale } = await params
-  return pageMetadata({ locale, pathname: "/events/testimonials", title: "Events | Testimonials" })
+  const t = await getTranslations({ locale, namespace: "events" })
+  return pageMetadata({ locale, pathname: "/events/testimonials", title: t("testimonialsTitle") })
 }
 
 export default async function Testimonials() {

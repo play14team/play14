@@ -9,7 +9,8 @@ import type { Event } from "@/models/strapi"
 
 export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
   const { locale } = await params
-  return pageMetadata({ locale, pathname: "/events/map", title: "Events | Map" })
+  const t = await getTranslations({ locale, namespace: "events" })
+  return pageMetadata({ locale, pathname: "/events/map", title: t("mapTitle") })
 }
 
 export default async function EventMapPage() {
