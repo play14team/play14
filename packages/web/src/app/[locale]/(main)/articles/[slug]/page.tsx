@@ -4,7 +4,7 @@ import ArticleDetails from "@/components/articles/details"
 import { getArticle, getArticleSlugs } from "@/components/articles/get.action"
 import Page from "@/components/layout/page"
 import JsonLd from "@/components/seo/json-ld"
-import { pageMetadata, SITE_NAME, toDescription } from "@/libs/seo"
+import { externalCanonical, pageMetadata, SITE_NAME, toDescription } from "@/libs/seo"
 import type { SlugParamsProps } from "@/libs/slug-params"
 import { articleJsonLd, breadcrumbJsonLd } from "@/libs/structured-data"
 import type { Article } from "@/models/strapi"
@@ -57,7 +57,7 @@ export async function generateMetadata(props: SlugParamsProps) {
     authors: article.author?.name ? [article.author.name] : undefined,
     images: [article.defaultImage?.url, ...(article.images ?? []).map((i) => i?.url)],
     // Cross-posted articles point search engines at the original.
-    canonical: article.cannonical?.startsWith("http") ? article.cannonical : undefined,
+    canonical: externalCanonical(article.cannonical),
   })
 }
 

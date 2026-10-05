@@ -1,5 +1,12 @@
 import type { Article, Event, Game, GeoLocation } from "@/models/strapi"
-import { absoluteUrl, localizedPath, SITE_NAME, SITE_URL, toDescription } from "./seo"
+import {
+  absoluteUrl,
+  externalCanonical,
+  localizedPath,
+  SITE_NAME,
+  SITE_URL,
+  toDescription,
+} from "./seo"
 
 /**
  * schema.org JSON-LD builders. Pure functions so they can be unit-tested and
@@ -171,7 +178,7 @@ export function articleJsonLd(article: Article, locale: string): JsonLdObject {
       ? { "@type": "Person", name: article.author.name }
       : organizationRef,
     publisher: organizationRef,
-    mainEntityOfPage: article.cannonical || url,
+    mainEntityOfPage: externalCanonical(article.cannonical) ?? url,
     keywords: article.tags?.map((t) => t.value).join(", ") || undefined,
   }
 }

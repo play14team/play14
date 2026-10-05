@@ -24,6 +24,16 @@ export function localizedPath(locale: string, pathname: string): string {
   return `/${locale}${path}`
 }
 
+/**
+ * The article's `cannonical` field when it is a usable absolute URL, i.e. the
+ * article was first published elsewhere. Anything else (empty, relative, junk)
+ * means the play14.org page is its own canonical.
+ */
+export function externalCanonical(value: string | null | undefined): string | undefined {
+  const trimmed = value?.trim()
+  return trimmed && /^https?:\/\/[^/\s]+/.test(trimmed) ? trimmed : undefined
+}
+
 export function absoluteUrl(pathOrUrl: string): string {
   if (/^https?:\/\//.test(pathOrUrl)) return pathOrUrl
   return `${SITE_URL}${pathOrUrl.startsWith("/") ? "" : "/"}${pathOrUrl}`

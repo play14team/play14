@@ -8,7 +8,14 @@ vi.mock("next-intl/server", () => ({
   getTranslations: vi.fn(async () => (key: string) => `metadata.${key}`),
 }))
 
-import { buildMetadata, localeAlternates, localizedPath, pageMetadata, toDescription } from "./seo"
+import {
+  buildMetadata,
+  externalCanonical,
+  localeAlternates,
+  localizedPath,
+  pageMetadata,
+  toDescription,
+} from "./seo"
 
 describe("localizedPath", () => {
   it("leaves the default locale unprefixed", () => {
@@ -41,6 +48,21 @@ describe("localeAlternates", () => {
     expect(localeAlternates("en", "/articles/x", "https://example.com/x")).toEqual({
       canonical: "https://example.com/x",
     })
+  })
+})
+
+describe("externalCanonical", () => {
+  it("keeps absolute http(s) URLs", () => {
+    expect(externalCanonical(" https://blog.example/post ")).toBe("https://blog.example/post")
+    expect(externalCanonical("http://blog.example")).toBe("http://blog.example")
+  })
+
+  it("ignores empty, relative and malformed values", () => {
+    expect(externalCanonical(undefined)).toBeUndefined()
+    expect(externalCanonical("")).toBeUndefined()
+    expect(externalCanonical("/articles/x")).toBeUndefined()
+    expect(externalCanonical("httpfoo")).toBeUndefined()
+    expect(externalCanonical("https://")).toBeUndefined()
   })
 })
 

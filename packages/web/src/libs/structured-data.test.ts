@@ -97,6 +97,12 @@ describe("articleJsonLd", () => {
       articleJsonLd({ ...article, cannonical: "https://blog.example/hello" }, "en").mainEntityOfPage
     ).toBe("https://blog.example/hello")
   })
+
+  it("ignores a cannonical that is not an absolute URL", () => {
+    expect(articleJsonLd({ ...article, cannonical: "hello" }, "en").mainEntityOfPage).toBe(
+      "https://play14.org/articles/hello"
+    )
+  })
 })
 
 describe("breadcrumbJsonLd", () => {
