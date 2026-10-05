@@ -10,6 +10,7 @@ import {
   eventJsonLd,
   gameJsonLd,
   organizationJsonLd,
+  serializeJsonLd,
   websiteJsonLd,
 } from "./structured-data"
 
@@ -168,5 +169,14 @@ describe("organizationJsonLd / websiteJsonLd", () => {
     })
     expect(site).toMatchObject({ "@type": "WebSite", inLanguage: "pt" })
     expect(site.publisher).toMatchObject({ "@id": org["@id"] })
+  })
+})
+
+describe("serializeJsonLd", () => {
+  it("escapes < so CMS content cannot close the script tag", () => {
+    const json = serializeJsonLd({ name: "</script><script>alert(1)</script>" })
+    expect(json).not.toContain("<")
+    expect(json).toBe('{"name":"\\u003c/script>\\u003cscript>alert(1)\\u003c/script>"}')
+    expect(JSON.parse(json)).toEqual({ name: "</script><script>alert(1)</script>" })
   })
 })
