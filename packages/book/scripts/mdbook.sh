@@ -30,4 +30,9 @@ if [[ ! -x "$bin" ]]; then
   chmod +x "$bin"
 fi
 
+# mdBook serves on 3000 by default, which the web app already uses
+if [[ "${1:-}" == "serve" && " $* " != *" -p "* && " $* " != *" --port"* ]]; then
+  set -- "$@" --port 3100
+fi
+
 exec "$bin" "$@"

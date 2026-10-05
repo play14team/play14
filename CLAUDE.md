@@ -65,7 +65,7 @@ bun --filter play14-web test               # Vitest unit tests
 bun --filter play14-web test:e2e           # Playwright E2E tests
 
 # Book (mdBook, not a workspace package)
-bash packages/book/scripts/mdbook.sh serve --open   # port 3000, clashes with web
+bash packages/book/scripts/mdbook.sh serve --open   # http://localhost:3100 (pass -p to override)
 bash packages/book/scripts/mdbook.sh build          # Render HTML into packages/book/book/
 
 # Work with Storybook

@@ -9,7 +9,7 @@ An [mdBook](https://rust-lang.github.io/mdBook/) telling how #play14 started, ho
 Run from the repo root:
 
 ```bash
-bash packages/book/scripts/mdbook.sh serve --open   # live reload on http://localhost:3000
+bash packages/book/scripts/mdbook.sh serve --open   # live reload on http://localhost:3100
 bash packages/book/scripts/mdbook.sh build          # render static HTML into packages/book/book/
 bash packages/book/scripts/mdbook.sh clean          # remove the build output
 python3 packages/book/scripts/outreach.py           # draft invitations to founding teams (see CONTRIBUTING.md)
@@ -19,7 +19,7 @@ The book is deliberately **not** a Bun workspace package (it has no `package.jso
 
 You don't need to install mdBook. `scripts/mdbook.sh` downloads a pinned release (`MDBOOK_VERSION`) for your platform into `.bin/` on first use. Linux and macOS on x86_64 and arm64 are supported. Anywhere else, run `cargo install mdbook`.
 
-`serve` uses mdBook's default port 3000, the same as the web app. If both are running, pass a different port: `bash scripts/mdbook.sh serve -p 3100`.
+`serve` uses port 3100 so it never clashes with the web app on 3000. Pass `-p <port>` to use another one.
 
 ## Layout
 
