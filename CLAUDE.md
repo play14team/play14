@@ -81,7 +81,7 @@ bun --filter play14-design build-storybook    # Build Storybook
 - `typecheck` — run the web package `tsc --noEmit` (API has its own via `bun --filter play14-api typecheck`)
 - `test`, `test:api`, `test:web`, `test:int`, `test:all` — unit + integration test runners
 - `verify` — lint + check + typecheck + test:all
-- `api`, `web` — start each dev server; `build`, `build:api`, `build:web` — build bundles; `start:api`, `start:web` — production run
+- `api`, `web` — start each dev server; `book` — serve the book on http://localhost:3100; `build`, `build:api`, `build:web` — build bundles; `start:api`, `start:web` — production run
 - `avatars:sync` — fill in player avatars from their LinkedIn profile photo. Manual by design; the monthly `linkedinAvatarReport` cron only reports candidates. Needs `STRAPI_URL` + `STRAPI_API_TOKEN` (or `--url=` + `--token-file=`) and the authenticated `linkedin` CLI. Flags: `--dry-run`, `--only=<slug>`, `--limit=N`. Never overwrites a human-uploaded avatar — see `packages/api/src/services/cron/linkedin-avatars.ts`.
 
 ### Container Development

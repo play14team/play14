@@ -9,7 +9,7 @@ An [mdBook](https://rust-lang.github.io/mdBook/) telling how #play14 started, ho
 Run from the repo root:
 
 ```bash
-bash packages/book/scripts/mdbook.sh serve --open   # live reload on http://localhost:3100
+bun run book                                        # same as: bash packages/book/scripts/mdbook.sh serve --open (http://localhost:3100)
 bash packages/book/scripts/mdbook.sh build          # render static HTML into packages/book/book/
 bash packages/book/scripts/mdbook.sh clean          # remove the build output
 python3 packages/book/scripts/outreach.py           # draft invitations to founding teams (see CONTRIBUTING.md)
