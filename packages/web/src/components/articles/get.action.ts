@@ -129,8 +129,10 @@ export async function getArticle({ params }: SlugParamsProps) {
  * REST equivalent of: articles/slugs.graphql
  */
 export async function getArticleSlugs() {
-  const response = await restQuery<Array<{ slug: string; updatedAt?: string }>>("articles", {
-    fields: ["slug", "updatedAt"],
+  const response = await restQuery<
+    Array<{ slug: string; updatedAt?: string; cannonical?: string }>
+  >("articles", {
+    fields: ["slug", "updatedAt", "cannonical"],
     pagination: { page: 1, pageSize: 5000 },
   })
 

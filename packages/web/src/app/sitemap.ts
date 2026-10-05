@@ -3,7 +3,7 @@ import { getArticleSlugs } from "@/components/articles/get.action"
 import { getEventSitemapEntries } from "@/components/events/get.action"
 import { getGameSlugs } from "@/components/games/get.action"
 import { routing } from "@/i18n/routing"
-import { localizedPath, SITE_URL } from "@/libs/seo"
+import { absoluteUrl, externalCanonical, localizedPath } from "@/libs/seo"
 
 export const revalidate = 3600
 
@@ -37,12 +37,11 @@ const STATIC_ROUTES: StaticRoute[] = [
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? SITE_URL
   const buildDate = new Date()
 
-  // Same form as the page's own canonical: "/" resolves to "https://play14.org/".
-  const urlFor = (locale: string, pathname: string) =>
-    `${siteUrl}${localizedPath(locale, pathname)}`
+  // Same origin and form as the page's own canonical (always production, and
+  // "/" resolves to "https://play14.org/"), so the two never disagree.
+  const urlFor = (locale: string, pathname: string) => absoluteUrl(localizedPath(locale, pathname))
 
   const languagesFor = (pathname: string): Record<string, string> => {
     const languages: Record<string, string> = {}
@@ -84,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
     getArticleSlugs().catch((error) => {
       console.error("sitemap: failed to fetch article slugs", error)
-      return { articles: [] as Array<{ slug: string; updatedAt?: string }> }
+      return { articles: [] as Array<{ slug: string; updatedAt?: string; cannonical?: string }> }
     }),
   ])
 
@@ -125,12 +124,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       })
     ),
-    ...articles.articles.flatMap((a) =>
-      toEntries(`/articles/${a.slug}`, {
-        lastModified: a.updatedAt ? new Date(a.updatedAt) : buildDate,
-        changeFrequency: "monthly",
-        priority: 0.6,
-      })
-    ),
+    // Cross-posted articles name the original as canonical: listing them here
+    // would ask Google to index a page that says it is a copy.
+    ...articles.articles
+      .filter((a) => !externalCanonical(a.cannonical))
+      .flatMap((a) =>
+        toEntries(`/articles/${a.slug}`, {
+          lastModified: a.updatedAt ? new Date(a.updatedAt) : buildDate,
+          changeFrequency: "monthly",
+          priority: 0.6,
+        })
+      ),
   ]
 }
