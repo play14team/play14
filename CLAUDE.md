@@ -21,7 +21,7 @@ This is a Bun workspace monorepo with the following structure:
   - See `packages/web/CLAUDE.md` for detailed web documentation
 - **packages/book**: *#play14, the story*, an [mdBook](https://rust-lang.github.io/mdBook/) about how the community started, grew, mentors new hosts, and what makes it special
   - `scripts/mdbook.sh` downloads a pinned mdBook release into `.bin/` on first use; no cargo or global install needed
-  - Not a Bun workspace package (no `package.json`) so it never touches the root `package.json`/`bun.lock`, whose changes redeploy staging. Not deployed; see `packages/book/README.md`
+  - Not a Bun workspace package (no `package.json` of its own), so book changes never touch `bun.lock`. Its only root footprint is the `book` script in the root `package.json`; editing that line (or anything else in the root `package.json`/`bun.lock`) redeploys staging. Not deployed; see `packages/book/README.md`
 - **packages/design** (`play14-design`): Design assets and Storybook
   - Contains graphic design resources (logos, colors, fonts, QR codes)
   - Includes a Storybook application in `storybook/` subdirectory
