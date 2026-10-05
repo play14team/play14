@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next"
-
-const PRODUCTION_SITE_URL = "https://play14.org"
+import { SITE_URL as PRODUCTION_SITE_URL } from "@/libs/seo"
 
 export default function robots(): MetadataRoute.Robots {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? PRODUCTION_SITE_URL
@@ -20,7 +19,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api",
           // Private or per-user pages: nothing to rank, and they cost crawl budget.
-          ...["/admin", "/players", "/auth", "/orders", "/tickets", "/search"].flatMap((path) => [
+          // /search is left crawlable on purpose: it carries a noindex meta tag,
+          // which Google can only honour if it is allowed to fetch the page.
+          ...["/admin", "/players", "/auth", "/orders", "/tickets"].flatMap((path) => [
             path,
             `/*${path}`,
           ]),
