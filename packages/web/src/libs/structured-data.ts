@@ -178,9 +178,10 @@ export function articleJsonLd(article: Article, locale: string): JsonLdObject {
 
 export function gameJsonLd(game: Game, locale: string): JsonLdObject {
   const url = absoluteUrl(localizedPath(locale, `/games/${game.slug}`))
-  const authors = [...(game.proposedBy ?? []), ...(game.documentedBy ?? [])]
-    .filter((p) => p?.name)
-    .map((p) => ({ "@type": "Person", name: p.name }))
+  const authorNames = [...(game.proposedBy ?? []), ...(game.documentedBy ?? [])]
+    .map((p) => p?.name)
+    .filter((name): name is string => Boolean(name))
+  const authors = [...new Set(authorNames)].map((name) => ({ "@type": "Person", name }))
   return {
     "@context": "https://schema.org",
     "@type": "Game",

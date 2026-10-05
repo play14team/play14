@@ -3,8 +3,15 @@
  */
 
 import { describe, expect, it } from "vitest"
-import type { Article, Event } from "@/models/strapi"
-import { articleJsonLd, breadcrumbJsonLd, eventJsonLd } from "./structured-data"
+import type { Article, Event, Game } from "@/models/strapi"
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  eventJsonLd,
+  gameJsonLd,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "./structured-data"
 
 const baseEvent: Event = {
   slug: "luxembourg-2026",
@@ -104,5 +111,56 @@ describe("breadcrumbJsonLd", () => {
       { "@type": "ListItem", position: 2, name: "Events", item: "https://play14.org/de/events" },
       { "@type": "ListItem", position: 3, name: "Current" },
     ])
+  })
+})
+
+describe("gameJsonLd", () => {
+  const game: Game = {
+    slug: "marshmallow-challenge",
+    name: "Marshmallow challenge",
+    category: "Team building",
+    summary: "<p>Build the <em>tallest</em> tower.</p>",
+    tags: [{ value: "teamwork" }, { value: "prototyping" }],
+    defaultImage: { name: "cover", url: "/uploads/cover.jpg" },
+    proposedBy: [{ slug: "jane", name: "Jane Doe" }],
+    documentedBy: [
+      { slug: "jane", name: "Jane Doe" },
+      { slug: "john", name: "John Roe" },
+    ],
+  } as Game
+
+  it("merges proposers and documenters into one author list without duplicates", () => {
+    expect(gameJsonLd(game, "it")).toMatchObject({
+      "@type": "Game",
+      url: "https://play14.org/it/games/marshmallow-challenge",
+      description: "Build the tallest tower.",
+      genre: "Team building",
+      keywords: "teamwork, prototyping",
+      image: ["https://play14.org/uploads/cover.jpg"],
+      author: [
+        { "@type": "Person", name: "Jane Doe" },
+        { "@type": "Person", name: "John Roe" },
+      ],
+    })
+  })
+
+  it("omits the author when nobody is credited", () => {
+    const ld = gameJsonLd({ ...game, proposedBy: [], documentedBy: undefined }, "en")
+    expect(ld).not.toHaveProperty("author")
+    expect(ld.publisher).toMatchObject({ "@id": "https://play14.org/#organization" })
+  })
+})
+
+describe("organizationJsonLd / websiteJsonLd", () => {
+  it("share the organization @id so the website's publisher resolves to it", () => {
+    const org = organizationJsonLd("A community")
+    const site = websiteJsonLd("pt", "A community")
+    expect(org).toMatchObject({
+      "@type": "NGO",
+      url: "https://play14.org",
+      description: "A community",
+    })
+    expect(site).toMatchObject({ "@type": "WebSite", inLanguage: "pt" })
+    expect(site.publisher).toMatchObject({ "@id": org["@id"] })
   })
 })

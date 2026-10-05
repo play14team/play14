@@ -85,6 +85,46 @@ describe("buildMetadata", () => {
     expect(metadata.openGraph).toMatchObject({ url: "/fr/games/x", locale: "fr_FR" })
   })
 
+  it("maps share images onto the Twitter card", () => {
+    const metadata = buildMetadata({
+      locale: "en",
+      pathname: "/games/x",
+      images: ["https://cdn/a.jpg", "https://cdn/b.jpg"],
+    })
+    expect(metadata.twitter).toMatchObject({ images: ["https://cdn/a.jpg", "https://cdn/b.jpg"] })
+    expect(buildMetadata({ locale: "en", pathname: "/" }).twitter).toMatchObject({
+      images: ["/og-default.png"],
+    })
+  })
+
+  it("adds article fields for type article", () => {
+    const metadata = buildMetadata({
+      locale: "en",
+      pathname: "/articles/x",
+      type: "article",
+      publishedTime: "2026-01-01T00:00:00.000Z",
+      modifiedTime: "2026-02-01T00:00:00.000Z",
+      authors: ["Jane Doe"],
+    })
+    expect(metadata.openGraph).toMatchObject({
+      type: "article",
+      publishedTime: "2026-01-01T00:00:00.000Z",
+      modifiedTime: "2026-02-01T00:00:00.000Z",
+      authors: ["Jane Doe"],
+    })
+  })
+
+  it("leaves authors out of an article with none", () => {
+    const metadata = buildMetadata({
+      locale: "en",
+      pathname: "/articles/x",
+      type: "article",
+      authors: [],
+    })
+    expect(metadata.openGraph).toMatchObject({ type: "article" })
+    expect((metadata.openGraph as { authors?: string[] }).authors).toBeUndefined()
+  })
+
   it("sets robots noindex on request", () => {
     expect(buildMetadata({ locale: "en", pathname: "/search", noindex: true }).robots).toEqual({
       index: false,
