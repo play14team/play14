@@ -324,6 +324,22 @@ export async function getEventSlugs() {
 }
 
 /**
+ * Every event's slug, last update, start date and country in one fetch, so the
+ * sitemap can list event, year and country pages without scanning events three times.
+ */
+export async function getEventSitemapEntries() {
+  const response = await restQuery<
+    Array<{ slug: string; updatedAt?: string; start?: string; location?: { country?: string } }>
+  >("events", {
+    fields: ["slug", "updatedAt", "start"],
+    populate: { location: { fields: ["country"] } },
+    pagination: { page: 1, pageSize: 5000 },
+  })
+
+  return response.data || []
+}
+
+/**
  * Get all events for navigation
  * REST equivalent of: events/nav.graphql
  * Note: Strapi limits pageSize to 100, so we need to fetch all pages
@@ -443,7 +459,8 @@ export async function getEventYearCounts(): Promise<Record<number, number>> {
 
   events.forEach((event) => {
     if (event.start) {
-      const year = new Date(event.start).getFullYear()
+      // UTC, like getEventsByYear's range, so a year never comes up empty.
+      const year = new Date(event.start).getUTCFullYear()
       yearCounts[year] = (yearCounts[year] || 0) + 1
     }
   })

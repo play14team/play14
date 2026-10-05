@@ -4,6 +4,7 @@ import Page from "@/components/layout/page"
 import { getLegalMDXComponents } from "@/components/legal/mdx-components"
 import type { Locale } from "@/i18n/routing"
 import { loadMDX } from "@/libs/mdx"
+import { pageMetadata } from "@/libs/seo"
 
 interface PrivacyPageProps {
   params: Promise<{ locale: Locale }>
@@ -12,10 +13,12 @@ interface PrivacyPageProps {
 export async function generateMetadata({ params }: PrivacyPageProps): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "privacy" })
-  return {
+  return pageMetadata({
+    locale,
+    pathname: "/privacy",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
 export default async function PrivacyPolicy({ params }: PrivacyPageProps) {

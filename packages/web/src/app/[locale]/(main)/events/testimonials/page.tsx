@@ -3,10 +3,14 @@ import { getTranslations } from "next-intl/server"
 import { getTestimonials } from "@/components/events/get.action"
 import TestimonialItem from "@/components/events/testimonial"
 import Page from "@/components/layout/page"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 import type { Testimonial } from "@/models/strapi"
 
-export const metadata: Metadata = {
-  title: "Events | Testimonials",
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "events" })
+  return pageMetadata({ locale, pathname: "/events/testimonials", title: t("testimonialsTitle") })
 }
 
 export default async function Testimonials() {

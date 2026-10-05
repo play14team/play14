@@ -3,12 +3,13 @@ import { getTranslations } from "next-intl/server"
 import Page from "@/components/layout/page"
 import NewsletterSignup from "@/components/newsletter/newsletter-signup"
 import { Link } from "@/i18n/navigation"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("contact")
-  return {
-    title: t("title"),
-  }
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "contact" })
+  return pageMetadata({ locale, pathname: "/contact", title: t("title") })
 }
 
 export default async function Contact() {

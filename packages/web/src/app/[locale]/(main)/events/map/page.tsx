@@ -3,10 +3,14 @@ import { getTranslations } from "next-intl/server"
 import { getEventMarkers } from "@/components/events/get.action"
 import EventMap from "@/components/events/map"
 import Page from "@/components/layout/page"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 import type { Event } from "@/models/strapi"
 
-export const metadata: Metadata = {
-  title: "Events | Map",
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "events" })
+  return pageMetadata({ locale, pathname: "/events/map", title: t("mapTitle") })
 }
 
 export default async function EventMapPage() {

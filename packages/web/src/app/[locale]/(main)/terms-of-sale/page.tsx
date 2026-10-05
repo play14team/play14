@@ -4,6 +4,7 @@ import Page from "@/components/layout/page"
 import { getLegalMDXComponents } from "@/components/legal/mdx-components"
 import type { Locale } from "@/i18n/routing"
 import { loadMDX } from "@/libs/mdx"
+import { pageMetadata } from "@/libs/seo"
 
 interface TermsOfSalePageProps {
   params: Promise<{ locale: Locale }>
@@ -12,10 +13,12 @@ interface TermsOfSalePageProps {
 export async function generateMetadata({ params }: TermsOfSalePageProps): Promise<Metadata> {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "termsOfSale" })
-  return {
+  return pageMetadata({
+    locale,
+    pathname: "/terms-of-sale",
     title: t("title"),
     description: t("description"),
-  }
+  })
 }
 
 export default async function TermsOfSale({ params }: TermsOfSalePageProps) {

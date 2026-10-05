@@ -4,8 +4,11 @@ import EventDetails from "@/components/events/details/index"
 import { getEventSlugs } from "@/components/events/get.action"
 import { getEventBySlug } from "@/components/events/get.cached"
 import Page from "@/components/layout/page"
+import JsonLd from "@/components/seo/json-ld"
 import { formatDate } from "@/libs/dates"
+import { pageMetadata, SITE_NAME } from "@/libs/seo"
 import type { SlugParamsProps } from "@/libs/slug-params"
+import { breadcrumbJsonLd, eventJsonLd } from "@/libs/structured-data"
 
 // Enable dynamic params for any new events not pre-generated at build time
 export const dynamicParams = true
@@ -34,29 +37,26 @@ export async function generateMetadata(props: SlugParamsProps) {
     }
   }
 
-  const images = event.images?.filter(Boolean)?.map((i) => (i as { url: string }).url) as string[]
   let description = formatDate(event.start, event.end, event.timezone || "", true, locale)
   if (event.venue?.location) {
     description += ` | ${event.venue?.name} | ${event.venue?.location?.place_name}`
   }
 
-  return {
-    title: `Events | ${event.name}`,
-    description: description,
-    openGraph: {
-      title: event.name,
-      description: description,
-      type: "article",
-      publishedTime: event.publishedAt,
-      authors: event.hosts?.filter(Boolean)?.map((h) => (h as { name: string }).name),
-      images: [event.defaultImage?.url].concat(images),
-    },
-  }
+  return pageMetadata({
+    locale,
+    pathname: `/events/${slug}`,
+    title: event.name,
+    description,
+    images: [event.defaultImage?.url, ...(event.images ?? []).map((i) => i?.url)],
+  })
 }
 
 export default async function Event(props: SlugParamsProps) {
   const { slug, locale } = await props.params
-  const event = await getEventBySlug(slug, locale)
+  const [event, t] = await Promise.all([
+    getEventBySlug(slug, locale),
+    getTranslations({ locale, namespace: "events" }),
+  ])
 
   if (!event) {
     notFound()
@@ -64,6 +64,16 @@ export default async function Event(props: SlugParamsProps) {
 
   return (
     <Page name={event.name} hideName={true}>
+      <JsonLd
+        data={[
+          eventJsonLd(event, locale),
+          breadcrumbJsonLd(locale, [
+            { name: SITE_NAME, pathname: "/" },
+            { name: t("title"), pathname: "/events" },
+            { name: event.name },
+          ]),
+        ]}
+      />
       <EventDetails event={event} />
     </Page>
   )

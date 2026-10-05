@@ -3,10 +3,14 @@ import { getTranslations } from "next-intl/server"
 import EventCalendar, { type CalendarEvent } from "@/components/events/calendar"
 import { getEventCalendar } from "@/components/events/get.action"
 import Page from "@/components/layout/page"
+import { pageMetadata } from "@/libs/seo"
+import type { LocaleParamsProps } from "@/libs/slug-params"
 import type { Event } from "@/models/strapi"
 
-export const metadata: Metadata = {
-  title: "Events | Calendar",
+export async function generateMetadata({ params }: LocaleParamsProps): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "events" })
+  return pageMetadata({ locale, pathname: "/events/calendar", title: t("calendarTitle") })
 }
 
 export default async function Calendar() {

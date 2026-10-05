@@ -3,7 +3,10 @@ import { getTranslations } from "next-intl/server"
 import ArticleDetails from "@/components/articles/details"
 import { getArticle, getArticleSlugs } from "@/components/articles/get.action"
 import Page from "@/components/layout/page"
+import JsonLd from "@/components/seo/json-ld"
+import { externalCanonical, pageMetadata, SITE_NAME, toDescription } from "@/libs/seo"
 import type { SlugParamsProps } from "@/libs/slug-params"
+import { articleJsonLd, breadcrumbJsonLd } from "@/libs/structured-data"
 import type { Article } from "@/models/strapi"
 
 // Enable dynamic params for articles not pre-generated
@@ -40,24 +43,30 @@ export async function generateMetadata(props: SlugParamsProps) {
     }
   }
 
-  const images = article.images?.filter(Boolean)?.map((i) => (i as { url: string }).url) as string[]
+  const { slug, locale } = await props.params
+  const description = toDescription(article.summary || article.content)
 
-  return {
-    title: `${t("title")} | ${article.title}`,
-    description: article.content?.substring(0, 200),
-    openGraph: {
-      title: article.title,
-      description: article.content?.substring(0, 200),
-      type: "article",
-      publishedTime: article.publishedAt,
-      authors: article.author?.name,
-      images: [article.defaultImage?.url].concat(images),
-    },
-  }
+  return pageMetadata({
+    locale,
+    pathname: `/articles/${slug}`,
+    title: article.title,
+    description,
+    type: "article",
+    publishedTime: article.publishedAt,
+    modifiedTime: article.updatedAt,
+    authors: article.author?.name ? [article.author.name] : undefined,
+    images: [article.defaultImage?.url, ...(article.images ?? []).map((i) => i?.url)],
+    // Cross-posted articles point search engines at the original.
+    canonical: externalCanonical(article.cannonical),
+  })
 }
 
 export default async function Article(props: SlugParamsProps) {
-  const article = await getArticle(props)
+  const { locale } = await props.params
+  const [article, t] = await Promise.all([
+    getArticle(props),
+    getTranslations({ locale, namespace: "articles" }),
+  ])
 
   if (!article) {
     notFound()
@@ -65,6 +74,16 @@ export default async function Article(props: SlugParamsProps) {
 
   return (
     <Page name={article.title} hideName={true}>
+      <JsonLd
+        data={[
+          articleJsonLd(article, locale),
+          breadcrumbJsonLd(locale, [
+            { name: SITE_NAME, pathname: "/" },
+            { name: t("title"), pathname: "/articles" },
+            { name: article.title },
+          ]),
+        ]}
+      />
       <ArticleDetails article={article} />
     </Page>
   )
