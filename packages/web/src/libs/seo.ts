@@ -58,11 +58,12 @@ export function toDescription(content: string | undefined | null, maxLength = 16
   const text = content
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
+    // Last, so an escaped entity like "&amp;lt;" decodes to "&lt;", not "<".
+    .replace(/&amp;/g, "&")
     .replace(/[#*_`>[\]]/g, "")
     .replace(/\s+/g, " ")
     .replace(/ ([.,;:!?])/g, "$1")

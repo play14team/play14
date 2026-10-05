@@ -56,6 +56,10 @@ describe("toDescription", () => {
     expect(result).toBe("one two three…")
   })
 
+  it("does not double-unescape entities", () => {
+    expect(toDescription("Tom &amp; Jerry use &amp;lt;b&amp;gt;")).toBe("Tom & Jerry use &lt;b&gt;")
+  })
+
   it("returns undefined for empty content", () => {
     expect(toDescription(undefined)).toBeUndefined()
     expect(toDescription("<p> </p>")).toBeUndefined()
