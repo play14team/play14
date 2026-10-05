@@ -1,13 +1,11 @@
 import type { MetadataRoute } from "next"
 import { getArticleSlugs } from "@/components/articles/get.action"
-import { getEventCountries, getEventSlugs, getEventYears } from "@/components/events/get.action"
+import { getEventSitemapEntries } from "@/components/events/get.action"
 import { getGameSlugs } from "@/components/games/get.action"
 import { routing } from "@/i18n/routing"
-import { localizedPath } from "@/libs/seo"
+import { localizedPath, SITE_URL } from "@/libs/seo"
 
 export const revalidate = 3600
-
-const DEFAULT_SITE_URL = "https://play14.org"
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>
 
@@ -39,11 +37,12 @@ const STATIC_ROUTES: StaticRoute[] = [
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? SITE_URL
   const buildDate = new Date()
 
+  // Same form as the page's own canonical: "/" resolves to "https://play14.org/".
   const urlFor = (locale: string, pathname: string) =>
-    `${siteUrl}${localizedPath(locale, pathname).replace(/^\/$/, "")}` || siteUrl
+    `${siteUrl}${localizedPath(locale, pathname)}`
 
   const languagesFor = (pathname: string): Record<string, string> => {
     const languages: Record<string, string> = {}
@@ -74,10 +73,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   }
 
-  const [events, games, articles, years, countries] = await Promise.all([
-    getEventSlugs().catch((error) => {
-      console.error("sitemap: failed to fetch event slugs", error)
-      return { events: [] as Array<{ slug: string; updatedAt?: string }> }
+  const [events, games, articles] = await Promise.all([
+    getEventSitemapEntries().catch((error) => {
+      console.error("sitemap: failed to fetch events", error)
+      return []
     }),
     getGameSlugs().catch((error) => {
       console.error("sitemap: failed to fetch game slugs", error)
@@ -87,15 +86,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       console.error("sitemap: failed to fetch article slugs", error)
       return { articles: [] as Array<{ slug: string; updatedAt?: string }> }
     }),
-    getEventYears().catch((error) => {
-      console.error("sitemap: failed to fetch event years", error)
-      return [] as string[]
-    }),
-    getEventCountries().catch((error) => {
-      console.error("sitemap: failed to fetch event countries", error)
-      return [] as string[]
-    }),
   ])
+
+  // Derived from the one events fetch rather than a scan per listing.
+  const years = [
+    ...new Set(
+      events.filter((e) => e.start).map((e) => String(new Date(e.start as string).getFullYear()))
+    ),
+  ].sort((a, b) => Number(b) - Number(a))
+  const countries = [
+    ...new Set(events.map((e) => e.location?.country).filter((c): c is string => Boolean(c))),
+  ].sort()
 
   return [
     ...STATIC_ROUTES.flatMap(({ path, changeFrequency, priority }) =>
@@ -110,7 +111,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .flatMap((code) =>
         toEntries(`/events/countries/${code}`, { changeFrequency: "weekly", priority: 0.5 })
       ),
-    ...events.events.flatMap((e) =>
+    ...events.flatMap((e) =>
       toEntries(`/events/${e.slug}`, {
         lastModified: e.updatedAt ? new Date(e.updatedAt) : buildDate,
         changeFrequency: "weekly",
