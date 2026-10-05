@@ -87,10 +87,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   ])
 
-  // Derived from the one events fetch rather than a scan per listing.
+  // Derived from the one events fetch rather than a scan per listing. Years are
+  // UTC, like the /events/year/[year] page's date range.
   const years = [
     ...new Set(
-      events.filter((e) => e.start).map((e) => String(new Date(e.start as string).getFullYear()))
+      events.filter((e) => e.start).map((e) => String(new Date(e.start as string).getUTCFullYear()))
     ),
   ].sort((a, b) => Number(b) - Number(a))
   const countries = [

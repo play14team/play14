@@ -13,6 +13,7 @@ vi.mock("@/components/events/get.action", () => ({
       location: { country: "lu" },
     },
     { slug: "paris-2024", start: "2024-06-01T17:00:00.000Z", location: { country: "FR" } },
+    { slug: "new-year", start: "2023-01-01T00:30:00.000Z" },
     { slug: "online", start: "2024-11-01T17:00:00.000Z", location: { country: "Online" } },
   ]),
 }))
@@ -71,6 +72,13 @@ describe("sitemap", () => {
       ])
     )
     expect(all.some((u) => u.includes("/countries/ONLINE"))).toBe(false)
+  })
+
+  it("groups years in UTC, whatever the server timezone", async () => {
+    vi.stubEnv("TZ", "America/New_York")
+    const all = urls(await sitemap())
+    expect(all).toContain("https://play14.org/events/year/2023")
+    expect(all).not.toContain("https://play14.org/events/year/2022")
   })
 
   it("leaves out articles whose canonical lives elsewhere", async () => {

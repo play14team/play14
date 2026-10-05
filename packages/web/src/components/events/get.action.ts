@@ -459,7 +459,8 @@ export async function getEventYearCounts(): Promise<Record<number, number>> {
 
   events.forEach((event) => {
     if (event.start) {
-      const year = new Date(event.start).getFullYear()
+      // UTC, like getEventsByYear's range, so a year never comes up empty.
+      const year = new Date(event.start).getUTCFullYear()
       yearCounts[year] = (yearCounts[year] || 0) + 1
     }
   })
