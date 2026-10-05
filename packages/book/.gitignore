@@ -4,3 +4,5 @@ book/
 .bin/
 # Contact tracker and invitation drafts (personal correspondence, see CONTRIBUTING.md)
 outreach/
+# Python bytecode from the scripts
+__pycache__/

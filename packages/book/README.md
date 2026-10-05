@@ -12,10 +12,11 @@ Run from the repo root:
 bun run book                                        # same as: bash packages/book/scripts/mdbook.sh serve --open (http://localhost:3100)
 bash packages/book/scripts/mdbook.sh build          # render static HTML into packages/book/book/
 bash packages/book/scripts/mdbook.sh clean          # remove the build output
-python3 packages/book/scripts/outreach.py           # draft invitations to founding teams (see CONTRIBUTING.md)
+python3 packages/book/scripts/check.py              # after build: broken links, lineage vs SUMMARY.md, open TODOs
+python3 packages/book/scripts/outreach.py --reply-by "<date>"  # draft invitations to founding teams (see CONTRIBUTING.md)
 ```
 
-The book is deliberately **not** a Bun workspace package (it has no `package.json`). Registering it would change the root `package.json` and `bun.lock`, and any PR touching those redeploys staging.
+The book is deliberately **not** a Bun workspace package (it has no `package.json`). Registering it would change the root `package.json` and `bun.lock`, and any PR touching those redeploys staging. The `bun run book` script in the root `package.json` is the one exception: editing that line redeploys staging too.
 
 You don't need to install mdBook. `scripts/mdbook.sh` downloads a pinned release (`MDBOOK_VERSION`) for your platform into `.bin/` on first use. Linux and macOS on x86_64 and arm64 are supported. Anywhere else, run `cargo install mdbook`.
 
