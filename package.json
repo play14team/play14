@@ -38,7 +38,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@types/bun": "^1.4.2",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "typescript": "^6.0.2"
@@ -64,7 +64,7 @@
     "nanoid": "^3.3.18",
     "nodemailer": "^10.0.14",
     "postcss": "^8.5.26",
-    "sanitize-html": "^2.17.7",
+    "sanitize-html": "^2.18.0",
     "sharp": "^0.35.5",
     "shell-quote": "^1.10.0",
     "tmp": "^0.2.7"
