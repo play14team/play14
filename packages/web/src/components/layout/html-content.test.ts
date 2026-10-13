@@ -38,4 +38,41 @@ describe("sanitize", () => {
     expect(html).not.toContain("onerror")
     expect(html).not.toContain("style")
   })
+
+  it("accepts an uppercase https scheme", () => {
+    expect(sanitize('<img src="HTTPS://cdn.play14.org/a.webp" />', false)).toContain("<img")
+  })
+
+  it("keeps title and class on images", () => {
+    const html = sanitize(
+      '<img src="https://cdn.play14.org/a.webp" title="Setup" class="diagram" />',
+      false
+    )
+    expect(html).toContain('title="Setup"')
+    expect(html).toContain('class="diagram"')
+  })
+
+  it("overrides author-supplied loading and decoding", () => {
+    const html = sanitize(
+      '<img src="https://cdn.play14.org/a.webp" loading="eager" decoding="sync" />',
+      false
+    )
+    expect(html).toContain('loading="lazy"')
+    expect(html).toContain('decoding="async"')
+    expect(html).not.toContain("eager")
+    expect(html).not.toContain('"sync"')
+  })
+
+  it("defaults a missing alt to empty", () => {
+    expect(sanitize('<img src="https://cdn.play14.org/a.webp" />', false)).toContain('alt=""')
+  })
+
+  it("drops non-numeric width and height", () => {
+    const html = sanitize(
+      '<img src="https://cdn.play14.org/a.webp" width="50%" height="abc" />',
+      false
+    )
+    expect(html).not.toContain("width")
+    expect(html).not.toContain("height")
+  })
 })

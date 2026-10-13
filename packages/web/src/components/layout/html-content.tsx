@@ -28,7 +28,25 @@ const IMG_ATTRS = ["src", "alt", "title", "width", "height", "loading", "decodin
 
 // Only absolute https images render. Relative or templated sources such as
 // the legacy `{{site.url}}/images/...` paths would show as broken images.
+// The host is not checked here: the CSP `img-src` in next.config.mjs is the
+// host gate (Cellar/CDN, Mapbox, YouTube), so other hosts are blocked there.
 const isHttpsImage = (src: string | undefined) => /^https:\/\//i.test(src ?? "")
+
+// Pixel dimensions only; anything else (percentages, junk) is dropped.
+const isPixelSize = (value: string | undefined) => /^\d+$/.test(value ?? "")
+
+function imgAttributes(attribs: sanitizeHtml.Attributes): sanitizeHtml.Attributes {
+  const { width, height, ...rest } = attribs
+  return {
+    ...rest,
+    ...(isPixelSize(width) ? { width } : {}),
+    ...(isPixelSize(height) ? { height } : {}),
+    // A missing alt marks the image decorative instead of announcing its URL.
+    alt: attribs.alt ?? "",
+    loading: "lazy",
+    decoding: "async",
+  }
+}
 
 function buildAllowedAttributes(preserveStyles: boolean): IOptions["allowedAttributes"] {
   const styleAttrs = preserveStyles ? ["style"] : []
@@ -87,7 +105,7 @@ export function sanitize(html: string, preserveStyles: boolean): string {
       }),
       img: (tagName, attribs) => ({
         tagName,
-        attribs: { ...attribs, loading: "lazy", decoding: "async" },
+        attribs: imgAttributes(attribs),
       }),
     },
   })
