@@ -20,17 +20,24 @@ const ALLOWED_TAGS = [
   "blockquote",
   "code",
   "pre",
+  "img",
 ]
 
 const LINK_ATTRS = ["href", "target", "rel", "class"]
+const IMG_ATTRS = ["src", "alt", "title", "width", "height", "loading", "decoding", "class"]
+
+// Only absolute https images render. Relative or templated sources such as
+// the legacy `{{site.url}}/images/...` paths would show as broken images.
+const isHttpsImage = (src: string | undefined) => /^https:\/\//i.test(src ?? "")
 
 function buildAllowedAttributes(preserveStyles: boolean): IOptions["allowedAttributes"] {
   const styleAttrs = preserveStyles ? ["style"] : []
   const attrs: Record<string, string[]> = {
     a: [...LINK_ATTRS, ...styleAttrs],
+    img: IMG_ATTRS,
   }
   for (const tag of ALLOWED_TAGS) {
-    if (tag === "a") continue
+    if (tag === "a" || tag === "img") continue
     attrs[tag] = ["class", ...styleAttrs]
   }
   return attrs
@@ -60,13 +67,15 @@ function normalizeAllCapsText(html: string): string {
   })
 }
 
-function sanitize(html: string, preserveStyles: boolean): string {
+export function sanitize(html: string, preserveStyles: boolean): string {
   return sanitizeHtml(html, {
     allowedTags: ALLOWED_TAGS,
     allowedAttributes: buildAllowedAttributes(preserveStyles),
     allowedSchemes: ["http", "https", "mailto", "tel"],
-    allowedSchemesAppliedToAttributes: ["href"],
+    allowedSchemesByTag: { img: ["https"] },
+    allowedSchemesAppliedToAttributes: ["href", "src"],
     allowProtocolRelative: true,
+    exclusiveFilter: (frame) => frame.tag === "img" && !isHttpsImage(frame.attribs.src),
     transformTags: {
       a: (tagName, attribs) => ({
         tagName,
@@ -75,6 +84,10 @@ function sanitize(html: string, preserveStyles: boolean): string {
           target: "_blank",
           rel: "noopener noreferrer",
         },
+      }),
+      img: (tagName, attribs) => ({
+        tagName,
+        attribs: { ...attribs, loading: "lazy", decoding: "async" },
       }),
     },
   })
@@ -95,7 +108,13 @@ const HtmlContent = ({
   // content is sanitized by sanitize-html above. suppressHydrationWarning
   // guards against minor whitespace/attribute-ordering drift between the
   // server-rendered HTML string and the client's parsed DOM.
-  return <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: content }} />
+  return (
+    <div
+      className="html-content"
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
+  )
 }
 
 export default HtmlContent
