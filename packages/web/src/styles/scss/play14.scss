@@ -102,6 +102,15 @@ $theme-colors: (
   color: var(--color-text-secondary);
 }
 
+// Images embedded in CMS rich text (HtmlContent)
+.html-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+}
+
 // Schedule description styling
 .schedule-description {
   margin-bottom: 1rem;
