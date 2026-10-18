@@ -1,7 +1,7 @@
-import client from "prom-client"
+import * as client from "@prometheus-io/client"
 
-// Business metrics registered on the default prom-client registry so the
-// strapi-prometheus plugin can expose them.
+// Business metrics registered on the default @prometheus-io/client registry so
+// the strapi-prometheus plugin can expose them.
 
 /**
  * Get or create a metric to avoid duplicate registration errors when

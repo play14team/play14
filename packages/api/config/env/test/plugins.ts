@@ -6,7 +6,7 @@
  */
 export default ({ env }: { env: any }) => ({
   // Disable prometheus to avoid metric re-registration errors
-  // prom-client's registry persists between test runs causing conflicts
+  // the metrics client's registry persists between test runs causing conflicts
   prometheus: {
     enabled: false,
   },
