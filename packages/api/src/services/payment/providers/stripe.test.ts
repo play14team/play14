@@ -123,7 +123,7 @@ describe("StripeProvider", () => {
 
       expect(mockStripeInstance.checkout.sessions.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          payment_method_types: ["card"],
+          allowed_payment_method_types: ["card"],
           mode: "payment",
           customer_email: "test@example.com",
           success_url: "https://play14.org/success",
