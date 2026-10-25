@@ -248,6 +248,7 @@ describe("StripeProvider", () => {
 
       expect(mockStripeInstance.checkout.sessions.create).toHaveBeenCalledWith(
         expect.objectContaining({
+          allowed_payment_method_types: ["card"],
           payment_intent_data: expect.objectContaining({
             application_fee_amount: 500,
             transfer_data: {
