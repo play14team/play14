@@ -93,10 +93,14 @@ jobs:
         # versions via root `overrides` (shell-quote, tmp, linkify-it,
         # form-data, fast-uri, ip-address, nanoid, postcss, sharp,
         # brace-expansion, axios, lodash/lodash-es, browserslist, js-yaml,
-        # nodemailer, adm-zip, http-cache-semantics) rather than ignored here.
+        # nodemailer, adm-zip, http-cache-semantics, dompurify, markdown-it,
+        # follow-redirects, git-diff, ckeditor5) rather than ignored here.
+        # ckeditor5 is forced from the ckeditor plugin's `~48.4.0` onto 48.5.x
+        # for GHSA-rh54-vffm-5fvp (engine XSS); drop the override once
+        # @_sh/strapi-plugin-ckeditor ships with >=48.5.1.
         # undici can't take a flat override (6.x, 7.x and 8.x are all in the
-        # tree), so its 7.x and 8.x lockfile entries were re-resolved in place
-        # to patched versions within their consumers' ranges (7.30.0, 8.11.2).
+        # tree), so its 6.x and 7.x lockfile entries were re-resolved in place
+        # to patched versions within their consumers' ranges (6.29.1, 7.30.1).
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
         # transitive dep with no safe override, or has no published fix;
@@ -115,6 +119,17 @@ jobs:
         #   patterns. No patched release exists (3.0.3 is the latest). Pulled
         #   via micromatch/chokidar in Strapi's tooling and sass; it only ever
         #   expands glob patterns from our own code and config, never input.
+        #   GHSA-587h-7wmj-h5pm — launch-editor `fs.existsSync()` bypass on
+        #   Windows, inlined into vite 5.x (Strapi's admin builder and plugin
+        #   tooling). Vite can't take a flat override (5.x, 6.x and 8.x are all
+        #   in the tree). Like GHSA-fx2h above, it is a Windows-only dev-server
+        #   path that the built admin on a Linux runtime never loads.
+        #   GHSA-mrhx-c7xc-m3w5 — zod memory exhaustion on huge arrays without
+        #   a length constraint. @strapi/* 5.60.0 (latest) pins zod 4.4.3
+        #   exactly, and koa-body/koa-session/openai need zod 3.x, which has no
+        #   patched release, so a flat override would break session handling.
+        #   Request bodies are capped by Strapi's 1 MB JSON limit. Drop once
+        #   Strapi moves to zod >=4.6.6.
         #
         # Dropped here because an override or bump has since fixed them, and a
         # stale ignore would mask a future advisory on the same package:
@@ -131,3 +146,5 @@ jobs:
           --ignore=GHSA-fx2h-pf6j-xcff
           --ignore=GHSA-g84c-rxfj-3j2c
           --ignore=GHSA-vfj7-8cjw-p6xm
+          --ignore=GHSA-587h-7wmj-h5pm
+          --ignore=GHSA-mrhx-c7xc-m3w5
