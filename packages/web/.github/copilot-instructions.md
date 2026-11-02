@@ -129,7 +129,7 @@ All list pages (events, games, articles, players) use the `load-more.tsx` patter
 - Mapbox GL JS integration via `react-map-gl`
 - Requires `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN` environment variable
 - See `src/components/map/index.tsx` and `src/components/events/map.tsx`
-- Geocoding via `@mapbox/mapbox-sdk`
+- Geocoding via `@mapbox/mapbox-gl-geocoder`
 
 ### Authentication
 

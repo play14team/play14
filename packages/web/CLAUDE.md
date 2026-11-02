@@ -225,7 +225,7 @@ All list pages use the `load-more.tsx` pattern:
 
 - Mapbox GL JS via `react-map-gl`
 - Components: `src/components/map/index.tsx`, `src/components/events/map.tsx`
-- Geocoding: `@mapbox/mapbox-sdk`
+- Geocoding: `@mapbox/mapbox-gl-geocoder`
 
 ## Internationalisation (next-intl)
 

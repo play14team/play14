@@ -44,7 +44,6 @@
   "dependencies": {
     "@_sh/strapi-plugin-ckeditor": "^8.0.0",
     "@google/generative-ai": "^0.24.1",
-    "@mapbox/mapbox-sdk": "^0.16.2",
     "@prometheus-io/client": "^0.16.1",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.2.0",
@@ -73,7 +72,6 @@
     "strapi-plugin-country-select": "^2.1.0",
     "strapi-plugin-fuzzy-search": "4.1.0",
     "strapi-plugin-map-field": "^2.0.0",
-    "strapi-plugin-multi-select": "2.1.2",
     "strapi-plugin-timezone-select": "^2.0.0",
     "strapi-plugin-webp-converter": "^1.0.4",
     "strapi-prometheus": "^3.0.0",

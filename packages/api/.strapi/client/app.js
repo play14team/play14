@@ -11,7 +11,6 @@ import strapiCache from "strapi-cache/strapi-admin";
 import configSync from "strapi-plugin-config-sync/strapi-admin";
 import countrySelect from "strapi-plugin-country-select/strapi-admin";
 import mapField from "strapi-plugin-map-field/strapi-admin";
-import multiSelect from "strapi-plugin-multi-select/strapi-admin";
 import timezoneSelect from "strapi-plugin-timezone-select/strapi-admin";
 import { renderAdmin } from "@strapi/strapi/admin";
 
@@ -29,7 +28,6 @@ renderAdmin(document.getElementById("strapi"), {
     "config-sync": configSync,
     "country-select": countrySelect,
     "map-field": mapField,
-    "multi-select": multiSelect,
     "timezone-select": timezoneSelect,
   },
 });
