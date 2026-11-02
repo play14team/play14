@@ -148,9 +148,6 @@ export default ({ env }: { env: any }) => ({
   "country-select": {
     enabled: true,
   },
-  "multi-select": {
-    enabled: true,
-  },
   "webp-converter": {
     enabled: true,
     config: {

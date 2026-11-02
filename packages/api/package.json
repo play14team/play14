@@ -72,7 +72,6 @@
     "strapi-plugin-country-select": "^2.1.0",
     "strapi-plugin-fuzzy-search": "4.1.0",
     "strapi-plugin-map-field": "^2.0.0",
-    "strapi-plugin-multi-select": "2.1.2",
     "strapi-plugin-timezone-select": "^2.0.0",
     "strapi-plugin-webp-converter": "^1.0.4",
     "strapi-prometheus": "^3.0.0",
