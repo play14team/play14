@@ -101,6 +101,11 @@ jobs:
         # undici can't take a flat override (6.x, 7.x and 8.x are all in the
         # tree), so its 6.x and 7.x lockfile entries were re-resolved in place
         # to patched versions within their consumers' ranges (6.29.1, 7.30.1).
+        # Bun has no nested overrides, so a later `bun update` that re-resolves
+        # the parent can bring an older patch back; this job then fails. Redo
+        # it by editing the `<parent>/undici` line in bun.lock (version plus
+        # `npm view undici@<v> dist.integrity`) and running
+        # `bun install --frozen-lockfile` with the pinned Bun to confirm.
         #
         # Ignored advisories (each needs a major bump of a Strapi-internal
         # transitive dep with no safe override, or has no published fix;
@@ -128,8 +133,10 @@ jobs:
         #   a length constraint. @strapi/* 5.60.0 (latest) pins zod 4.4.3
         #   exactly, and koa-body/koa-session/openai need zod 3.x, which has no
         #   patched release, so a flat override would break session handling.
-        #   Request bodies are capped by Strapi's 1 MB JSON limit. Drop once
-        #   Strapi moves to zod >=4.6.6.
+        #   Request size bounds the array: koa-body's 1 MB JSON limit, but up
+        #   to formidable's default 20 MB `maxFieldsSize` for the multipart
+        #   `data` field Strapi parses, as `strapi::body` sets no limits of its
+        #   own. Drop once Strapi moves to zod >=4.6.6.
         #
         # Dropped here because an override or bump has since fixed them, and a
         # stale ignore would mask a future advisory on the same package:
