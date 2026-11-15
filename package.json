@@ -40,7 +40,7 @@
     "@types/bun": "^1.4.4",
     "@types/node": "^26.6.6",
     "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
+    "lint-staged": "^17.6.1",
     "typescript": "^6.0.2"
   },
   "packageManager": "bun@1.3.5",
@@ -71,7 +71,7 @@
     "nodemailer": "^10.0.14",
     "postcss": "^8.5.26",
     "prosemirror-view": "^1.42.6",
-    "sanitize-html": "^2.18.1",
+    "sanitize-html": "^2.18.2",
     "sharp": "^0.35.5",
     "shell-quote": "^1.12.0",
     "source-map-js": "^1.2.2",
