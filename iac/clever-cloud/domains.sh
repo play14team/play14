@@ -4,14 +4,18 @@
 # Pre-cutover: only staging hostnames. Production hostnames are added on
 # cutover day (uncomment the production block at the bottom and re-run).
 #
-# Clever Cloud auto-provisions Let's Encrypt certificates after DNS
-# resolves to the app's domain. The CNAME targets shown below are the
-# default per-app domains assigned at app creation — confirm yours via:
-#   clever domain --alias <app-alias>
+# Every custom domain CNAMEs to Clever Cloud's custom-domain load balancer
+# for the app's zone (domain.par.clever-cloud.com for Paris). Clever routes
+# by Host header to whichever app the domain is bound to. Never point DNS at
+# an app's default app-<id>.cleverapps.io domain: that load balancer only
+# serves *.cleverapps.io hosts, and after Clever's 2026-11 load-balancer
+# upgrade it answers 404 "application doesn't exist" for custom domains
+# (this took play14.org down). Clever auto-provisions Let's Encrypt
+# certificates once DNS resolves to the load balancer.
 #
 # Prerequisites:
 #   - clever-tools authenticated
-#   - DNS records pointing to the Clever Cloud apps (CNAME)
+#   - DNS records CNAME'd to domain.par.clever-cloud.com
 #
 # Usage:
 #   ./domains.sh                # adds staging domains (idempotent)
@@ -64,21 +68,21 @@ echo
 case "$STAGE" in
   staging)
     cat <<'EOF'
-  api-staging.play14.org   CNAME  → <play14-api-staging Clever Cloud domain>
-  staging.play14.org       CNAME  → <play14-web-staging Clever Cloud domain>
+  api-staging.play14.org   CNAME  → domain.par.clever-cloud.com   (proxied)
+  staging.play14.org       CNAME  → domain.par.clever-cloud.com   (proxied)
 
-Get the target CNAME via:
-  clever domain --alias play14-api-staging
-  clever domain --alias play14-web-staging
+Do NOT target app-<id>.cleverapps.io: that load balancer 404s custom domains.
 EOF
     ;;
   production)
     cat <<'EOF'
-  api.play14.org           CNAME  → <play14-api Clever Cloud domain>
-  play14.org               A/ALIAS  → <play14-web Clever Cloud domain>
-  www.play14.org           CNAME  → <play14-web Clever Cloud domain>
+  api.play14.org           CNAME  → domain.par.clever-cloud.com   (proxied)
+  play14.org               CNAME  → domain.par.clever-cloud.com   (proxied, apex flattened by Cloudflare)
+  www.play14.org           CNAME  → domain.par.clever-cloud.com   (proxied)
   cdn.play14.org           CNAME  → cdn.play14.org.cellar-c2.services.clever-cloud.com
                            (proxied through Cloudflare)
+
+Do NOT target app-<id>.cleverapps.io: that load balancer 404s custom domains.
 EOF
     ;;
 esac

@@ -97,7 +97,9 @@ values.
 ```
 
 The script prints the DNS records you need to set at your registrar /
-Cloudflare. After DNS resolves, Clever Cloud auto-provisions Let's Encrypt
+Cloudflare. Every custom domain is a CNAME to `domain.par.clever-cloud.com`
+(Clever's custom-domain load balancer), never to the app's
+`app-<id>.cleverapps.io` domain, which returns 404 for custom hosts. After DNS resolves, Clever Cloud auto-provisions Let's Encrypt
 certificates (1–3 minutes per host).
 
 ### 5. First deploy
