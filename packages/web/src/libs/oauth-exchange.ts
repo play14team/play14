@@ -63,3 +63,56 @@ export async function exchangeOAuthSession(
 
   return { ok: true, jwt: body.jwt }
 }
+
+export const OAUTH_SUCCESS_PATH = "/auth/callback"
+
+export function oauthErrorPath(code: string): string {
+  return `/auth/error?error=${encodeURIComponent(code)}`
+}
+
+/** Provider-supplied text is attacker-controllable; cap what reaches the logs. */
+const MAX_LOGGED_DESCRIPTION = 200
+
+export interface OAuthRedirectDeps {
+  exchange: (provider: OAuthProvider) => Promise<OAuthExchangeResult>
+  /** POST the JWT to /api/auth/session; resolves true when the cookie was set. */
+  storeSession: (jwt: string) => Promise<boolean>
+  logError?: (...args: unknown[]) => void
+}
+
+/**
+ * Everything the /connect/:provider/redirect page does, minus navigation.
+ * Returns the path to send the browser to next.
+ */
+export async function completeOAuthRedirect(
+  provider: string,
+  search: string,
+  { exchange, storeSession, logError = () => {} }: OAuthRedirectDeps
+): Promise<string> {
+  const params = new URLSearchParams(search)
+
+  const error = params.get("error")
+  if (error) {
+    const description = params.get("error_description")?.slice(0, MAX_LOGGED_DESCRIPTION)
+    logError(`[OAuth] Error from ${provider}:`, error.slice(0, MAX_LOGGED_DESCRIPTION), description)
+    return oauthErrorPath(error)
+  }
+
+  if (!isOAuthProvider(provider)) {
+    return oauthErrorPath("token_exchange_failed")
+  }
+
+  const result = await exchange(provider)
+  if (!result.ok) {
+    logError(`[OAuth] Exchange with ${provider} failed:`, result.error)
+    return oauthErrorPath(result.error)
+  }
+
+  let stored = false
+  try {
+    stored = await storeSession(result.jwt)
+  } catch {
+    stored = false
+  }
+  return stored ? OAUTH_SUCCESS_PATH : oauthErrorPath("token_exchange_failed")
+}
