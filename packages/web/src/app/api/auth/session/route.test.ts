@@ -44,6 +44,30 @@ describe("POST /api/auth/session", () => {
     expect(res.status).toBe(400)
   })
 
+  it("rejects an invalid JSON body", async () => {
+    const req = new NextRequest("https://play14.org/api/auth/session", {
+      method: "POST",
+      headers: { origin: "https://play14.org", "Content-Type": "application/json" },
+      body: "{not json",
+    })
+    const res = await POST(req)
+    expect(res.status).toBe(400)
+  })
+
+  it("rejects a non-string JWT", async () => {
+    const res = await POST(post({ jwt: 123 }))
+    expect(res.status).toBe(400)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it("returns 502 when Strapi is unreachable", async () => {
+    fetchMock.mockRejectedValue(new TypeError("fetch failed"))
+    vi.spyOn(console, "error").mockImplementation(() => {})
+    const res = await POST(post({ jwt: "abc" }))
+    expect(res.status).toBe(502)
+    expect(setAuthCookie).not.toHaveBeenCalled()
+  })
+
   it("rejects a JWT Strapi does not accept", async () => {
     fetchMock.mockResolvedValue(new Response("{}", { status: 401 }))
     const res = await POST(post({ jwt: "forged" }))
